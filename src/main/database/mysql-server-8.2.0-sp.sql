@@ -21,3 +21,49 @@
 -- QUERY START:
 drop procedure if exists TigPutDBProperty;
 -- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigUserLogin;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUserLogout;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigOnlineUsers;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigOfflineUsers;
+-- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigAllUsers;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUserLoginPlainPw;
+-- QUERY END:
+-- QUERY START:
+drop procedure if exists TigUpdateLoginTime;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+-- List of all users in database
+create procedure TigAllUsers()
+begin
+    select user_id, failed_logins, account_status
+    from tig_users;
+end //
+-- QUERY END:
+
+-- QUERY START:
+-- It sets last_used time to the current timestamp
+create procedure TigUpdateLoginTime(_user_id varchar(2049) charset utf8mb4 )
+begin
+    update tig_users
+    set last_used = CURRENT_TIMESTAMP
+    where sha1_user_id = sha1(lower(_user_id));
+end //
+-- QUERY END:
+
+delimiter ;

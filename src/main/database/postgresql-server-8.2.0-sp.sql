@@ -21,8 +21,43 @@
 -- QUERY START:
 do $$
 begin
-    if exists( select 1 from pg_proc where proname = lower('TigGetDBProperty')) then
+    if exists( select 1 from pg_proc where proname = lower('TigPutDBProperty')) then
         drop function TigPutDBProperty(varchar(255), text);
-end if;
+    end if;
 end$$;
+-- QUERY END:
+
+-- QUERY START:
+do $$
+begin
+    if exists( select 1 from pg_proc where proname = lower('TigUserLogin')) then
+        drop function TigUserLogin(varchar(2049), varchar(255));
+    end if;
+    if exists( select 1 from pg_proc where proname = lower('TigUserLogout')) then
+        drop function TigUserLogout(varchar(2049));
+    end if;
+    if exists( select 1 from pg_proc where proname = lower('TigOnlineUsers')) then
+        drop function TigOnlineUsers();
+    end if;
+    if exists( select 1 from pg_proc where proname = lower('TigOfflineUsers')) then
+        drop function TigOfflineUsers();
+    end if;
+    if exists( select 1 from pg_proc where proname = lower('TigUserLoginPlainPw')) then
+        drop function TigUserLoginPlainPw(varchar(2049), varchar(255));
+    end if;
+end$$;
+-- QUERY END:
+
+-- QUERY START:
+-- It sets last_login time to the current timestamp
+create or replace function TigUpdateLoginTime(varchar(2049)) returns void as $$
+declare
+    _user_id alias for $1;
+begin
+    update tig_users
+        set last_used = now()
+        where lower(user_id) = lower(_user_id);
+    return;
+end;
+$$ LANGUAGE 'plpgsql';
 -- QUERY END:

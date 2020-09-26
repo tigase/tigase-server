@@ -214,9 +214,6 @@ public class TigaseCustomAuth
 	public static final String DEF_ADDUSER_QUERY = "{ call TigAddUserPlainPw(?, ?) }";
 	public static final String DEF_DELUSER_QUERY = "{ call TigRemoveUser(?) }";
 	public static final String DEF_GETPASSWORD_QUERY = "{ call TigGetPassword(?) }";
-	public static final String DEF_UPDATEPASSWORD_QUERY = "{ call TigUpdatePasswordPlainPwRev(?, ?) }";
-	public static final String DEF_USERLOGIN_QUERY = "{ call TigUserLoginPlainPw(?, ?) }";
-	public static final String DEF_USERLOGOUT_QUERY = "{ call TigUserLogout(?) }";
 	public static final String DEF_USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
 	public static final String DEF_USERS_DOMAIN_COUNT_QUERY =
 			"" + "select count(*) from tig_users where user_id like ?";
@@ -589,7 +586,7 @@ public class TigaseCustomAuth
 
 			userlogin_query = getParamWithDef(params, DEF_USERLOGIN_KEY, null);
 
-			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, DEF_USERLOGOUT_QUERY);
+			userlogout_query = getParamWithDef(params, DEF_USERLOGOUT_KEY, null);
 
 			updatelastlogin_query = getParamWithDef(params, DEF_UPDATELOGINTIME_KEY, DEF_UPDATELOGINTIME_QUERY);
 

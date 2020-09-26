@@ -20,3 +20,19 @@
 -- QUERY START:
 DROP procedure TigPutDBProperty;
 -- QUERY END:
+
+-- QUERY START:
+DROP procedure TigUserLogin;
+-- QUERY END:
+-- QUERY START:
+DROP procedure TigUserLogout;
+-- QUERY END:
+-- QUERY START:
+DROP procedure TigOnlineUsers;
+-- QUERY END:
+-- QUERY START:
+DROP procedure TigOfflineUsers;
+-- QUERY END:
+-- QUERY START:
+DROP procedure TigUserLoginPlainPw;
+-- QUERY END:

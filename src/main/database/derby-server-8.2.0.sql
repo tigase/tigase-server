@@ -16,9 +16,13 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
+run 'database/derby-server-8.2.0-schema.sql';
+
 run 'database/derby-server-8.2.0-sp.sql';
 
 run 'database/derby-server-8.2.0-props.sql';
+
+-- LOAD FILE: database/derby-server-8.2.0-schema.sql
 
 -- LOAD FILE: database/derby-server-8.2.0-sp.sql
 

@@ -16,6 +16,8 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
+-- LOAD FILE: database/sqlserver-server-8.2.0-schema.sql
+
 -- LOAD FILE: database/sqlserver-server-8.2.0-sp.sql
 
 -- LOAD FILE: database/sqlserver-server-8.2.0-props.sql

@@ -25,17 +25,21 @@ create table if not exists tig_users (
 	-- UserID SHA1 hash to prevent duplicate user_ids
 	sha1_user_id char(128) NOT NULL,
 	-- User password encrypted or not
+    -- DEPRECATED
 	user_pw varchar(255) default NULL,
 	-- Time the account has been created
 	acc_create_time timestamp DEFAULT CURRENT_TIMESTAMP,
 	-- Time of the last user login
+    -- DEPRECATED
 	last_login timestamp NULL DEFAULT NULL,
 	-- Time of the last user logout
+    -- DEPRECATED
 	last_logout timestamp NULL DEFAULT NULL,
 	-- User online status, if > 0 then user is online, the value
 	-- indicates the number of user connections.
 	-- It is incremented on each user login and decremented on each
 	-- user logout.
+    -- DEPRECATED
 	online_status int default 0,
 	-- Number of failed login attempts
 	failed_logins int default 0,

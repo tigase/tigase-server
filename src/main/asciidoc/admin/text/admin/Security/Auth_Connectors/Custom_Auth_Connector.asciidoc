@@ -44,6 +44,7 @@ authRepository {
     }
 }
 -----
+NOTE: `online_status` column does not exist and would need to be added for that query to work.
 
 Below query performs user authentication on the database level.
 The Tigase server does not need to know authentication algorithm or password encoding type, it simply passes user id (BareJID) and password in form which was received from the client, to the stored procedure.
@@ -56,6 +57,7 @@ authRepository {
     }
 }
 -----
+NOTE: `TigUserLoginPlainPw` is no longer part of a Tigase XMPP Server database schema and would need to be created.
 
 Below query returns number of user accounts in the database, this is mainly used for the server metrics and monitoring components.
 [source,dsl]
@@ -117,6 +119,8 @@ authRepository {
     }
 }
 -----
+NOTE: `online_status` column does not exist and would need to be added for that query to work.
+
 This configuration specifies what non-sasl authentication mechanisms to expose to the client
 [source,dsl]
 -----

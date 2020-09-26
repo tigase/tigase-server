@@ -204,7 +204,7 @@ public class StoredProcedures {
 
 		try {
 			PreparedStatement ps = conn.prepareStatement(
-					"select user_id, last_login, last_logout, online_status, failed_logins, account_status from tig_users");
+					"select user_id, failed_logins, account_status from tig_users");
 
 			data[0] = ps.executeQuery();
 		} catch (SQLException e) {
@@ -570,7 +570,7 @@ public class StoredProcedures {
 
 		try {
 			PreparedStatement ps = conn.prepareStatement(
-					"update tig_users set last_login = current timestamp where lower(user_id) =  ?");
+					"update tig_users set last_used = current timestamp where lower(user_id) =  ?");
 
 			ps.setString(1, userId.toLowerCase());
 			ps.executeUpdate();

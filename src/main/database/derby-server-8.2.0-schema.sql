@@ -16,15 +16,6 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-source database/mysql-server-8.2.0-schema.sql;
-
-source database/mysql-server-8.2.0-sp.sql;
-
-source database/mysql-server-8.2.0-props.sql;
-
--- LOAD FILE: database/mysql-server-8.2.0-schema.sql;
-
--- LOAD FILE: database/mysql-server-8.2.0-sp.sql;
-
--- LOAD FILE: database/mysql-server-8.2.0-props.sql;
-
+-- QUERY START:
+ALTER TABLE tig_users ADD COLUMN last_used timestamp;
+-- QUERY END:

@@ -28,3 +28,64 @@ IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigPutDBProper
     DROP PROCEDURE TigPutDBProperty
 -- QUERY END:
 GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserLogin')
+    DROP PROCEDURE TigUserLogin
+-- QUERY END:
+GO
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserLogout')
+    DROP PROCEDURE TigUserLogout
+-- QUERY END:
+GO
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigOnlineUsers')
+    DROP PROCEDURE TigOnlineUsers
+-- QUERY END:
+GO
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigOfflineUsers')
+    DROP PROCEDURE TigOfflineUsers
+-- QUERY END:
+GO
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUserLoginPlainPw')
+    DROP PROCEDURE TigUserLoginPlainPw
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigAllUsers')
+    DROP PROCEDURE TigAllUsers
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- List of all users in database
+create procedure dbo.TigAllUsers
+AS
+begin
+    select user_id, failed_logins, account_status from dbo.tig_users;
+end
+-- QUERY END:
+GO
+
+-- QUERY START:
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'TigUpdateLoginTime')
+    DROP PROCEDURE TigUpdateLoginTime
+-- QUERY END:
+GO
+
+-- QUERY START:
+-- It sets last_login time to the current timestamp
+create procedure dbo.TigUpdateLoginTime
+    @_user_id nvarchar(2049)
+AS
+begin
+    update dbo.tig_users
+        set last_used = GETUTCDATE()
+        where user_id = @_user_id;
+end
+-- QUERY END:
+GO
