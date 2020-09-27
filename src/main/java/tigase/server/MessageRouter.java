@@ -17,9 +17,7 @@
  */
 package tigase.server;
 
-import tigase.conf.ConfigurationException;
-import tigase.conf.ConfiguratorAbstract;
-import tigase.conf.MonitoringBeanIfc;
+import tigase.conf.*;
 import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -27,6 +25,7 @@ import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.UnregisterAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
+import tigase.server.script.CommandIfc;
 import tigase.stats.StatisticsList;
 import tigase.sys.NMTScope;
 import tigase.sys.NativeMemoryTracking;
@@ -752,6 +751,13 @@ public class MessageRouter
 	@Override
 	protected Integer getMaxQueueSize(int def) {
 		return def * 10;
+	}
+
+	@Override
+	protected void reloadScripts() {
+		super.reloadScripts();
+		CommandIfc cmd = new SetLoggingCommand(kernel);
+		scriptCommands.put(cmd.getCommandId(), cmd);
 	}
 
 	private void processDiscoQuery(final Packet packet, final Queue<Packet> results) {

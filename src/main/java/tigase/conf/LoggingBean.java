@@ -26,9 +26,7 @@ import tigase.util.log.LogFormatter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -69,6 +67,67 @@ public class LoggingBean
 		setHandlers(new HashMap<>());
 
 		rootHandlers = new String[]{ConsoleHandler.class.getCanonicalName(), FileHandler.class.getCanonicalName()};
+	}
+
+	public synchronized Map<String,Level> getPackageLoggingLevels() {
+		// how to merge debug with loggers? shouldn't that be unified??
+		// should we move "tigase" to "debug" and leave rest with loggers??
+		// we should also prepare a good merging mechanism
+		Stream<String> debugStream = Stream.concat(
+				Optional.ofNullable(debug).map(Arrays::stream).orElse(Stream.empty()).map(s -> "tigase." + s),
+				Optional.ofNullable(debugPackages).map(Arrays::stream).orElse(Stream.empty()));
+
+		Map<String, Level> result = new HashMap<>();
+		debugStream.forEach(p -> result.put(p, Level.ALL));
+
+		for (String p : loggers.keySet()) {
+			Optional.ofNullable(loggers.get(p)).map(v -> v.get("level")).filter(String.class::isInstance).map(v -> {
+				try {
+					return Level.parse((String) v);
+				} catch (IllegalArgumentException ex) {
+					return null;
+				}
+			}).filter(Objects::nonNull).ifPresent(level -> result.put(p, level));
+		}
+
+		return result;
+	}
+
+	public synchronized void setPackageLoggingLevel(String packageName, Level level) throws RuntimeException {
+		if (packageName.startsWith("tigase.")) {
+			String part = packageName.substring("tigase.".length());
+			Optional.ofNullable(debug)
+					.map(Arrays::stream)
+					.map(s -> s.filter(name -> !part.equals(name)))
+					.map(s -> s.toArray(String[]::new))
+					.ifPresent(value -> this.debug = value);
+		}
+		Optional.ofNullable(debugPackages)
+				.map(Arrays::stream)
+				.map(s -> s.filter(name -> !packageName.equals(name)))
+				.map(s -> s.toArray(String[]::new))
+				.ifPresent(value -> this.debugPackages = value);
+
+		HashMap<String, Object> value = loggers.get(packageName);
+		if (value == null) {
+			if (level != Level.OFF) {
+				value = new HashMap<>();
+				value.put("level", level.getName());
+				loggers.put(packageName, value);
+			}
+		} else {
+			if (level != Level.OFF) {
+				if (value.size() == 1) {
+					loggers.remove(packageName);
+				} else {
+					value.remove("level");
+				}
+			} else {
+				value.put("level", level.getName());
+			}
+		}
+
+		beanConfigurationChanged(Collections.emptySet());
 	}
 
 	public void setLoggers(HashMap<String, HashMap<String, Object>> loggers) {

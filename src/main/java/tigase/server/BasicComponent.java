@@ -969,7 +969,7 @@ public class BasicComponent
 		return nonAdminCommands;
 	}
 
-	private void reloadScripts() {
+	protected void reloadScripts() {
 		log.log(Level.CONFIG, "Reloading admin scripts for component: {0}.", new Object[]{getName()});
 		scriptCommands.clear();
 		CommandIfc command = new AddScriptCommand();
