@@ -70,7 +70,7 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 	@Inject(nullAllowed = true)
 	private RoomPresenceRepository roomPresenceRepository;
 
-	@Inject(nullAllowed = true)
+	@Inject(nullAllowed = true, bean = "service")
 	private BasicComponent component;
 
 	@Override
@@ -139,16 +139,22 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 				return component.isLocalDomain(jid.getDomain());
 			case ADMIN:
 				return component.isAdmin(JID.jidInstance(jid));
-			case DOMAIN:
-				return channel.getDomain().equals(jid.getDomain());
-			case DOMAIN_ADMIN:
-				return Optional.ofNullable(component.getVHostItem(channel.getDomain()))
+			case DOMAIN: {
+				String domain = channel.getDomain().substring(component.getName().length() + 1);
+				return domain.equals(jid.getDomain());
+			}
+			case DOMAIN_ADMIN: {
+				String domain = channel.getDomain().substring(component.getName().length() + 1);
+				return Optional.ofNullable(component.getVHostItem(domain))
 						.filter(vhost -> vhost.isAdmin(jid.toString()))
 						.isPresent();
-			case DOMAIN_OWNER:
-				return Optional.ofNullable(component.getVHostItem(channel.getDomain()))
+			}
+			case DOMAIN_OWNER: {
+				String domain = channel.getDomain().substring(component.getName().length() + 1);
+				return Optional.ofNullable(component.getVHostItem(domain))
 						.filter(vhost -> vhost.isOwner(jid.toString()))
 						.isPresent();
+			}
 			case JID:
 			case NONE:
 			default:

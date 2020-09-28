@@ -222,7 +222,9 @@ public class RoomPresenceModule
 
 	@Override
 	public void beforeUnregister() {
-		eventBus.registerAll(this);
+		if (eventBus != null) {
+			eventBus.registerAll(this);
+		}
 	}
 
 	private boolean shouldBroadcast(JID recipient) {
