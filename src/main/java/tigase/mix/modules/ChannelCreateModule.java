@@ -82,7 +82,8 @@ public class ChannelCreateModule extends AbstractPubSubModule {
 		BareJID owner = packet.getStanzaFrom().getBareJID();
 
 		try {
-			mixLogic.checkPermission(channelJID, owner, MixAction.manage);
+			mixLogic.checkPermission(isAdHoc ? BareJID.bareJIDInstance(null, channelJID.getDomain()) : channelJID,
+									 owner, MixAction.manage);
 
 			if (getRepository().getNodeConfig(channelJID, Mix.Nodes.CONFIG) != null) {
 				throw new PubSubException(Authorization.CONFLICT);

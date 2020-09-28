@@ -20,6 +20,7 @@ package tigase.mix.model;
 import tigase.component.exceptions.RepositoryException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.mix.IMixComponent;
 import tigase.mix.Mix;
 import tigase.pubsub.*;
@@ -30,6 +31,8 @@ import tigase.pubsub.repository.ISubscriptions;
 import tigase.pubsub.repository.stateless.UsersAffiliation;
 import tigase.pubsub.repository.stateless.UsersSubscription;
 import tigase.pubsub.utils.DefaultPubSubLogic;
+import tigase.server.BasicComponent;
+import tigase.server.CmdAcl;
 import tigase.server.Packet;
 import tigase.util.Algorithms;
 import tigase.util.datetime.TimestampHelper;
@@ -56,11 +59,19 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 
 	private static final tigase.util.datetime.TimestampHelper timestampHelper = new TimestampHelper();
 
+	@ConfigField(desc = "ACL for creation public channels")
+	private CmdAcl.Type publicChannelCreationAcl = CmdAcl.Type.DOMAIN_ADMIN;
+	@ConfigField(desc = "ACL for creation ad-hoc channels")
+	private CmdAcl.Type adhocChannelCreationAcl = CmdAcl.Type.DOMAIN;
+
 	@Inject
 	private IMixRepository mixRepository;
 
 	@Inject(nullAllowed = true)
 	private RoomPresenceRepository roomPresenceRepository;
+
+	@Inject(nullAllowed = true)
+	private BasicComponent component;
 
 	@Override
 	public boolean isServiceAutoCreated() {
@@ -120,18 +131,52 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 		super.checkNodeConfig(nodeConfig);
 	}
 
+	private boolean checkAcl(BareJID channel, CmdAcl.Type type, BareJID jid) {
+		switch (type) {
+			case ALL:
+				return true;
+			case LOCAL:
+				return component.isLocalDomain(jid.getDomain());
+			case ADMIN:
+				return component.isAdmin(JID.jidInstance(jid));
+			case DOMAIN:
+				return channel.getDomain().equals(jid.getDomain());
+			case DOMAIN_ADMIN:
+				return Optional.ofNullable(component.getVHostItem(channel.getDomain()))
+						.filter(vhost -> vhost.isAdmin(jid.toString()))
+						.isPresent();
+			case DOMAIN_OWNER:
+				return Optional.ofNullable(component.getVHostItem(channel.getDomain()))
+						.filter(vhost -> vhost.isOwner(jid.toString()))
+						.isPresent();
+			case JID:
+			case NONE:
+			default:
+				return false;
+		}
+	}
+
 	@Override
 	public void checkPermission(BareJID channel, BareJID senderJid, MixAction action)
 			throws PubSubException, RepositoryException {
 		switch (action) {
 			case manage:
-				ChannelConfiguration configuration = mixRepository.getChannelConfiguration(channel);
+				ChannelConfiguration configuration = channel.getLocalpart() == null ? null : mixRepository.getChannelConfiguration(channel);
 				if (configuration != null) {
 					if (!configuration.isOwner(senderJid)) {
 						throw new PubSubException(Authorization.NOT_ALLOWED);
 					}
 				} else {
 					// do we have any other requirements?? ie. for channel creation?
+					if (channel.getLocalpart() == null) {
+						if (!checkAcl(channel, adhocChannelCreationAcl, senderJid)) {
+							throw new PubSubException(Authorization.FORBIDDEN);
+						}
+					} else {
+						if (!checkAcl(channel, publicChannelCreationAcl, senderJid)) {
+							throw new PubSubException(Authorization.FORBIDDEN);
+						}
+					}
 				}
 				break;
 			case publish:
@@ -199,7 +244,8 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 
 	@Override
 	public boolean isChannelCreationAllowed(BareJID channelJID, BareJID senderJID) {
-		return true;
+		return checkAcl(channelJID, publicChannelCreationAcl, senderJID) ||
+				checkAcl(channelJID, adhocChannelCreationAcl, senderJID);
 	}
 
 	@Override
