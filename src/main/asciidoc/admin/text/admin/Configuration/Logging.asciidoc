@@ -5,7 +5,13 @@
 
 Logging can be an important tool to monitor your server's health and performance. Logging may be controlled and customized on a per-component basis.
 
-A `logging` bean has been implemented to allow more fine configuration of each component.
+A `logging` bean has been implemented to allow more flexible configuration of logging in the Tigase XMPP Server.
+
+== Configuring logging
+
+=== In the config file
+
+Default logging configuration for your installation is kept in the config file and it may be adjusted there.
 
 [source,config]
 -----
@@ -61,6 +67,60 @@ If for some reason you don't want colored output in the logs you can disable it 
 ----
 #DISABLE_LOGGER_COLOR=" -Ddisable_logger_color=true "
 ----
+
+=== Ad-hoc changes to the logging configuration
+
+It is also possible to use ad-hoc command named **Set package logging** with id `logging-set` available at `message-router@domain` (where domain is your server name) to reconfigure logging level of packets at runtime without requirement of restarting the Tigase XMPP Server.
+
+NOTE: Those changes will be applied to this single cluster node.
+
+NOTE: Those changes will not be saved in the Tigase XMPP Server configuration file and will be lost after restart of Tigase XMPP Server.
+
+==== Using Admin UI
+If your Tigase XMPP Server is running with HTTP server and with Admin UI enabled, then the easiest way to change logging configuration is by using Admin UI.
+After logging into web interface, open `Configuration` section and select `Set package logging` command.
+This will bring to you a form which you need to fill in with following fields:
+
+* `Package name` - should contain Java package or class name for which you wish to change logging level
+* `Level` - select a logging level you wish to apply to entered package name _(`OFF` means that logging will be disabled)_
+
+After pressing `Submit` your form will be passed to the server for validation and selected changes will be applied.
+
+==== Using ad-hoc command
+If you have access to the XMPP admin account of Tigase XMPP Server and XMPP client which supports ad-hoc command execution, you may connect with your XMPP client to the Tigase XMPP Server and look for adh-hoc commands available at `message-router@domain` (where domain is your server name).
+Within found ad-hoc commands you should find command named `Set package logging` or `logging-set` (that depends what your XMPP client is showing, id or name of the command) and you should execute it.
+Tigase XMPP Server will return a form which you need to fill in with following fields:
+
+* `Package name` - should contain Java package or class name for which you wish to change logging level
+* `Level` - select a logging level you wish to apply to entered package name _(`OFF` means that logging will be disabled)_
+
+After submitting the form, Tigase XMPP Server will validate your request and update logging configuration.
+
+==== Using REST API
+If you have Tigase XMPP Server with REST API enabled, you can use it for configuring logging of Tigase XMPP Server as well.
+
+NOTE: As with all HTTP REST API requests you will require a valid API key and in this case a valid admin credentials to authenticate a HTTP request using Basic HTTP Authentication.
+
+All you need to to is to send a HTTP POST request to `/rest/adhoc/message-router@domain.com` (where domain is your server name) with `Contect-Type` set to `application/xml` and a following XML as a payload to set logging level of `tigase.server` package to `ALL`.
+
+[source,xml]
+----
+<command>
+  <node>logging-set</node>
+  <fields>
+    <item>
+      <var>package-name</var>
+      <value>tigase.server</value>
+    </item>
+    <item>
+      <var>level</var>
+      <value>ALL</value>
+    </item>
+  </fields>
+</command>
+----
+
+TIP: You can set logging levels also using JSON payload. For more details please refer to https://docs.tigase.net/index.html#collapse-tigase-http-api-master-snapshot-head:[Tigase HTTP API Guide], to section `Executing example ad-hoc commands` in `REST API - usage examples`.
 
 == Alternate loggers in Tigase - Logback
 
