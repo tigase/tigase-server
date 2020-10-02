@@ -116,7 +116,7 @@ public class LoggingBean
 				loggers.put(packageName, value);
 			}
 		} else {
-			if (level != Level.OFF) {
+			if (level == Level.OFF) {
 				if (value.size() == 1) {
 					loggers.remove(packageName);
 				} else {
