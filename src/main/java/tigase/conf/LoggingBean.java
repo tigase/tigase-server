@@ -26,12 +26,11 @@ import tigase.util.log.LogFormatter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
+import java.util.logging.*;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Created by andrzej on 02.04.2017.
@@ -55,6 +54,8 @@ public class LoggingBean
 	private Level rootLevel = Level.CONFIG;
 	@ConfigField(desc = "Log thread dump on shutdown", alias = "shutdown-thread-dump")
 	private boolean shutdownThreadDump = true;
+
+	private final static Logger log = Logger.getLogger(LoggingBean.class.getName());
 
 	public LoggingBean() {
 		HashMap<String, HashMap<String, Object>> loggers = new HashMap<>();
@@ -90,10 +91,13 @@ public class LoggingBean
 			}).filter(Objects::nonNull).ifPresent(level -> result.put(p, level));
 		}
 
+		log.log(Level.FINE, "Currently configured loggers: " + result);
+
 		return result;
 	}
 
 	public synchronized void setPackageLoggingLevel(String packageName, Level level) throws RuntimeException {
+		log.log(Level.CONFIG, "Setting log level for package: {0} to {1}", new Object[]{packageName, level});
 		if (packageName.startsWith("tigase.")) {
 			String part = packageName.substring("tigase.".length());
 			Optional.ofNullable(debug)
@@ -194,6 +198,7 @@ public class LoggingBean
 
 		loggers.forEach((name, props) -> {
 			props.forEach((key, value) -> {
+				log.log(Level.CONFIG, "Setting log level for loggerName: {0} to: {1}", new Object[]{name, props});
 				sb.append(name).append(".").append(key).append("=");
 				if (value instanceof Collection) {
 					Collection col = (Collection) value;
@@ -227,9 +232,10 @@ public class LoggingBean
 			}
 		}
 
-		byte[] data = sb.toString().getBytes(Charset.forName("UTF-8"));
+		byte[] data = sb.toString().getBytes(StandardCharsets.UTF_8);
 		try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {
 			LogManager.getLogManager().readConfiguration(in);
+			log.log(Level.CONFIG, "Initialised LogManager with configuration: {0}", new Object[]{sb});
 		} catch (IOException ex) {
 			throw new RuntimeException("Failed to load logging configuration", ex);
 		}
