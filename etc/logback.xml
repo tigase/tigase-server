@@ -19,7 +19,9 @@
 -->
 
 <!--
-To enable logback for Tigase packages add jul-to-slf4j ('org.slf4j.bridge.SLF4JBridgeHandler') to the list of handlers:
+To enable logback for Tigase packages
+1) uncomment LevelChangePropagator context listener
+2) add jul-to-slf4j ('org.slf4j.bridge.SLF4JBridgeHandler') to the list of handlers:
 ```
 logging () {
     rootHandlers = [ 'java.util.logging.ConsoleHandler', 'java.util.logging.FileHandler', 'org.slf4j.bridge.SLF4JBridgeHandler' ]
@@ -27,7 +29,7 @@ logging () {
 ```
 -->
 <configuration scan="true"  scanPeriod="120 seconds">
-    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+<!--    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>-->
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- daily rollover, files will be compressed -->
