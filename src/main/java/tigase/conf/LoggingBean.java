@@ -25,12 +25,10 @@ import tigase.util.log.LogFormatter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.*;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * Created by andrzej on 02.04.2017.
@@ -185,16 +183,9 @@ public class LoggingBean
 
 		sb.append(".level=").append(rootLevel.getName()).append("\n");
 
-		Optional.ofNullable(debug).ifPresent(names -> {
-			Stream.of(names).forEach(name -> {
-				sb.append("tigase.").append(name).append(".level=").append(Level.ALL).append("\n");
-			});
-		});
-		Optional.ofNullable(debugPackages).ifPresent(names -> {
-			Stream.of(names).forEach(name -> {
-				sb.append(name).append(".level=").append(Level.ALL).append("\n");
-			});
-		});
+		Stream.concat(Optional.ofNullable(debug).stream().flatMap(Arrays::stream).map(s -> "tigase." + s),
+					  Optional.ofNullable(debugPackages).stream().flatMap(Arrays::stream))
+				.forEach(name -> sb.append(name).append(".level=").append(Level.ALL).append("\n"));
 
 		loggers.forEach((name, props) -> {
 			props.forEach((key, value) -> {
@@ -234,7 +225,10 @@ public class LoggingBean
 
 		byte[] data = sb.toString().getBytes(StandardCharsets.UTF_8);
 		try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {
-			LogManager.getLogManager().readConfiguration(in);
+			LogManager.getLogManager().reset();
+			LogManager.getLogManager().updateConfiguration(in, (k) -> k.endsWith(".handlers")
+																	  ? ((o, n) -> (o == null ? n : o))
+																	  : ((o, n) -> n));
 			log.log(Level.CONFIG, "Initialised LogManager with configuration: {0}", new Object[]{sb});
 		} catch (IOException ex) {
 			throw new RuntimeException("Failed to load logging configuration", ex);
