@@ -283,9 +283,8 @@ public class VCardTemp
 					if (session != null) {
 						session.putCommonSessionData("pep-vcard-temp-conv-hash", id);
 					}
-					userRepository.setData(packet.getStanzaFrom().getBareJID(), PUBLIC_DATA_NODE + "/" + ID,
-										   VCardTemp.VCARD_KEY, vCard.toString());
-				} catch (RepositoryException ex) {
+					setVCard(session, vCard);
+				} catch (RepositoryException | NotAuthorizedException ex) {
 					log.log(Level.FINEST, "failed to update VCardTemp avatar on PEP User Avatar change!");
 				}
 			}
