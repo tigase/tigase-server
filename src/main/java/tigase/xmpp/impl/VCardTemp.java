@@ -77,6 +77,7 @@ public class VCardTemp
 	 * Private logger for class instances.
 	 */
 	private static Logger log = Logger.getLogger(VCardTemp.class.getName());
+	private final String PEP_VCARD_TEMP_HASH_KEY = "pep-vcard-temp-conv-hash";
 
 	@Inject
 	private UserRepository userRepository;
@@ -279,11 +280,12 @@ public class VCardTemp
 						photoEl.withElement("BINVAL", null, data.getCData());
 						vCard.addChild(photoEl);
 					}
-					userRepository.setData(packet.getStanzaFrom().getBareJID(), ID, "pep-vcard-temp-conv-hash", id);
+					userRepository.setData(packet.getStanzaFrom().getBareJID(), ID, PEP_VCARD_TEMP_HASH_KEY, id);
 					if (session != null) {
-						session.putCommonSessionData("pep-vcard-temp-conv-hash", id);
+						session.putCommonSessionData(PEP_VCARD_TEMP_HASH_KEY, id);
 					}
 					setVCard(session, vCard);
+					log.log(Level.FINEST, "Updated vCard, avatar hash: {0}, payload: {1}!", new Object[]{id, vCard});
 				} catch (RepositoryException | NotAuthorizedException ex) {
 					log.log(Level.FINEST, "failed to update VCardTemp avatar on PEP User Avatar change!");
 				}
@@ -298,9 +300,9 @@ public class VCardTemp
 		if (photoEl != null) {
 			return null;
 		}
-		String hash = (String) session.computeCommonSessionDataIfAbsent("pep-vcard-temp-conv-hash", (key) -> {
+		String hash = (String) session.computeCommonSessionDataIfAbsent(PEP_VCARD_TEMP_HASH_KEY, (key) -> {
 			try {
-				return Optional.ofNullable(userRepository.getData(session.getBareJID(), ID, "pep-vcard-temp-conv-hash"))
+				return Optional.ofNullable(userRepository.getData(session.getBareJID(), ID, PEP_VCARD_TEMP_HASH_KEY))
 						.orElse("");
 			} catch (NotAuthorizedException ex) {
 				log.log(Level.FINEST, "failed to retrieve VCardTemp avatar hash - session not authorized yet!", ex);
