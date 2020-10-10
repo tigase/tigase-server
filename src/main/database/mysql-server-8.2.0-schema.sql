@@ -25,20 +25,74 @@ delimiter //
 -- QUERY START:
 create procedure TigServerUpgrade()
 begin
-    if exists(SELECT 1 FROM information_schema.statistics s1 WHERE s1.table_schema = database() AND s1.table_name = 'tig_users' AND s1.index_name = 'online_status') then
-        drop index online_status on tig_users;
-    end if;
-    if exists(SELECT 1 FROM information_schema.statistics s1 WHERE s1.table_schema = database() AND s1.table_name = 'tig_users' AND s1.index_name = 'last_login') then
-        drop index last_login on tig_users;
-    end if;
-    if exists(SELECT 1 FROM information_schema.statistics s1 WHERE s1.table_schema = database() AND s1.table_name = 'tig_users' AND s1.index_name = 'last_logout') then
-        drop index last_logout on tig_users;
-    end if;
     if exists (select 1 from information_schema.columns where table_schema = database() and table_name = 'tig_users' and column_name = 'online_status') then
         alter table tig_users
             drop column online_status,
             drop column last_logout,
             change column last_login last_used timestamp null default null;
+    end if;
+end //
+-- QUERY END:
+
+delimiter ;
+
+-- QUERY START:
+call TigServerUpgrade();
+-- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigServerUpgrade;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+create procedure TigServerUpgrade()
+begin
+    if exists(SELECT 1 FROM information_schema.statistics s1 WHERE s1.table_schema = database() AND s1.table_name = 'tig_users' AND s1.index_name = 'online_status') then
+        drop index online_status on tig_users;
+    end if;
+end //
+-- QUERY END:
+
+delimiter ;
+
+-- QUERY START:
+call TigServerUpgrade();
+-- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigServerUpgrade;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+create procedure TigServerUpgrade()
+begin
+    if exists(SELECT 1 FROM information_schema.statistics s1 WHERE s1.table_schema = database() AND s1.table_name = 'tig_users' AND s1.index_name = 'last_login') then
+        drop index last_login on tig_users;
+    end if;
+end //
+-- QUERY END:
+
+delimiter ;
+
+-- QUERY START:
+call TigServerUpgrade();
+-- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigServerUpgrade;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+create procedure TigServerUpgrade()
+begin
+    if exists(SELECT 1 FROM information_schema.statistics s1 WHERE s1.table_schema = database() AND s1.table_name = 'tig_users' AND s1.index_name = 'last_logout') then
+        drop index last_logout on tig_users;
     end if;
 end //
 -- QUERY END:
