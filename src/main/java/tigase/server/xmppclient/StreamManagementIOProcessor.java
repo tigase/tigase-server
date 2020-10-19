@@ -246,6 +246,9 @@ public class StreamManagementIOProcessor
 			OutQueue.Entry e = new OutQueue.Entry(packet);
 			connectionManager.processUndeliveredPacket(e.getPacketWithStamp(), e.stamp, null);
 		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Queuing StreamManagement packet: {1} [{0}]", new Object[]{service, packet});
+			}
 			outQueue.append(packet);
 		}
 

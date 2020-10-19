@@ -118,6 +118,10 @@ public class XMPPIOService<RefObject>
 	 */
 	public void addPacketToSend(Packet packet) {
 
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Added packet to send: {1} [{0}]", new Object[]{toString(), packet});
+		}
+
 		// processing packet using io level processors
 		if (processors != null) {
 			for (XMPPIOProcessor processor : processors) {
