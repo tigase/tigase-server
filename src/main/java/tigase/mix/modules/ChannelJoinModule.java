@@ -102,8 +102,10 @@ public class ChannelJoinModule extends AbstractPubSubModule {
 							it.remove();
 							break;
 						}
-						subscriptions.addSubscriberJid(senderJID, Subscription.subscribed);
-						getRepository().update(channelJID, node, subscriptions);
+						if (subscriptions.getSubscription(senderJID) != Subscription.none) {
+							subscriptions.addSubscriberJid(senderJID, Subscription.subscribed);
+							getRepository().update(channelJID, node, subscriptions);
+						}
 					} catch (Throwable ex) {
 						it.remove();
 					}
