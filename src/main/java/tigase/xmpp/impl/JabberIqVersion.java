@@ -84,7 +84,10 @@ public class JabberIqVersion
 									  NonAuthUserRepository repo, Queue<Packet> results, Map<String, Object> settings)
 			throws PacketErrorTypeException {
 		// Check whether the packet is addressed to the server or some other, XMPP entity
-		if ((packet.getStanzaTo() == null) || session.isLocalDomain(packet.getStanzaTo().toString(), false)) {
+		if ((packet.getStanzaTo() == null) || session.isLocalDomain(packet.getStanzaTo().toString(), false) ||
+				(packet.getStanzaTo().getLocalpart() != null && packet.getStanzaTo().getResource() == null &&
+						session.getSMComponentId().getLocalpart().equals(packet.getStanzaTo().getLocalpart()) &&
+						session.isLocalDomain(packet.getStanzaTo().getDomain(), false))) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Calling method: {0}, for packet={1}, for session={2}",
 						new Object[]{"processFromUserToServerPacket", packet, session});
