@@ -34,12 +34,11 @@ import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.JID;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * XEP-0191: Blocking Command. Based on privacy lists.
@@ -73,8 +72,32 @@ public class BlockingCommand
 
 	private final RosterAbstract roster_util = RosterFactory.getRosterImplementation(true);
 
+	private Element[] DISCO_FEATURES;
+
 	@Inject
 	private EventBus eventBus;
+
+	@Inject(nullAllowed = true)
+	private List<SpamReportsConsumer> spamReportsConsumers = Collections.emptyList();
+
+	@Override
+	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
+		if (DISCO_FEATURES == null) {
+			return super.supDiscoFeatures(session);
+		} else {
+			return DISCO_FEATURES;
+		}
+	}
+
+	public void setSpamReportsConsumers(List<SpamReportsConsumer> spamReportsConsumers) {
+		this.spamReportsConsumers = Optional.ofNullable(spamReportsConsumers).orElse(Collections.emptyList());
+		if (spamReportsConsumers.isEmpty()) {
+			DISCO_FEATURES = null;
+		} else {
+			DISCO_FEATURES = Stream.concat(Arrays.stream(super.supDiscoFeatures(null)),
+										   Arrays.stream(SpamReportsConsumer.FEATURES)).toArray(Element[]::new);
+		}
+	}
 
 	@Override
 	public void process(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
@@ -158,15 +181,16 @@ public class BlockingCommand
 
 	private void processSetBlock(Packet packet, Element e, XMPPResourceConnection session, Queue<Packet> results)
 			throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
-		List<JID> jids = collectJids(e);
-		if (jids != null && !jids.isEmpty()) {
-			Privacy.block(session, jids.stream().map(JID::toString).collect(Collectors.toList()));
+		List<Entry> entries = collectEntries(e);
+		if (entries != null && !entries.isEmpty()) {
+			Privacy.block(session, entries.stream().map(Entry::getJid).map(JID::toString).collect(Collectors.toList()));
 			notifyPrivacyListChanged(session);
-			for (JID jid : jids) {
-				sendBlockPresences(session, jid, results);
+			for (Entry entry : entries) {
+				sendBlockPresences(session, entry.getJid(), results);
 			}
 			results.offer(packet.okResult((Element) null, 0));
 			sendPush(session.getParentSession(), packet, results);
+			notifySpamReportsConsumers(entries);
 		} else {
 			results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Bad request", true));
 		}
@@ -195,6 +219,10 @@ public class BlockingCommand
 		sendPush(session.getParentSession(), packet, results);
 	}
 
+	private List<Entry> collectEntries(Element el) {
+		return el.mapChildren(Entry::new);
+	}
+
 	private List<JID> collectJids(Element el) {
 		return el.mapChildren(item -> {
 			String jid = item.getAttributeStaticStr(_JID);
@@ -202,6 +230,20 @@ public class BlockingCommand
 				return JID.jidInstance(jid);
 			} catch (TigaseStringprepException ex) {
 				throw new TigaseStringprepRuntimeException("Invalid JID: " + jid, ex);
+			}
+		});
+	}
+
+	private void notifySpamReportsConsumers(List<Entry> entries) {
+		for (Entry entry : entries) {
+			notifySpamReportsConsumers(entry);
+		}
+	}
+
+	private void notifySpamReportsConsumers(Entry entry) {
+		entry.getSpamReportType().ifPresent(reportType -> {
+			for (SpamReportsConsumer consumer : spamReportsConsumers) {
+				consumer.spamReportedFrom(entry.getJid().getBareJID(), reportType);
 			}
 		});
 	}
@@ -252,6 +294,25 @@ public class BlockingCommand
 					log.log(Level.FINEST, "failed to send push notification as session is do not have connection id");
 				}
 			}
+		}
+	}
+
+	private class Entry {
+		private final JID jid;
+		private final Optional<SpamReportsConsumer.ReportType> spamReportType;
+
+		public Entry(Element element) {
+			jid = JID.jidInstanceNS(element.getAttributeStaticStr("jid"));
+			spamReportType = Optional.ofNullable(element.getChild("report", SpamReportsConsumer.XMLNS)).map(
+					SpamReportsConsumer.ReportType::fromReport);
+		}
+
+		public JID getJid() {
+			return jid;
+		}
+
+		public Optional<SpamReportsConsumer.ReportType> getSpamReportType() {
+			return spamReportType;
 		}
 	}
 
