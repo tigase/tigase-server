@@ -66,6 +66,7 @@ public class Counter
 
 	public void getStatistics(String compName, StatisticsList list) {
 		if (list.checkLevel(level)) {
+			list.add(compName, name + " total", counter, level);
 			list.add(compName, name + " last hour", per_hour, level);
 			list.add(compName, name + " last minute", per_minute, level);
 			list.add(compName, name + " last second", per_second, level);
