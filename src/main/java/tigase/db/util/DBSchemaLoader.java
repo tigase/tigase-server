@@ -23,6 +23,7 @@ import tigase.db.DataRepository;
 import tigase.db.DataSource;
 import tigase.db.Schema;
 import tigase.db.jdbc.DataRepositoryImpl;
+import tigase.db.util.locker.ConnectionLock;
 import tigase.util.Version;
 import tigase.util.log.LogFormatter;
 import tigase.util.ui.console.CommandlineParameter;
@@ -119,6 +120,7 @@ public class DBSchemaLoader
 	private Map<String, String> replacementMap = new HashMap<String, String>();
 	/** Denotes whether schema has proper version */
 	private boolean schema_ok = false;
+	private Optional<ConnectionLock> connectionLock = null;
 
 	/**
 	 * Main method allowing pass arguments to the class and setting all logging to be printed to console.
@@ -179,17 +181,18 @@ public class DBSchemaLoader
 		// configure logger
 		Level lvl = params.logLevel;
 
-		log.setUseParentHandlers(false);
-		log.setLevel(lvl);
+		Logger logSetup = Logger.getLogger("tigase.db.util");
+		logSetup.setUseParentHandlers(false);
+		logSetup.setLevel(lvl);
 
-		Arrays.stream(log.getHandlers())
+		Arrays.stream(logSetup.getHandlers())
 				.filter((handler) -> handler instanceof ConsoleHandler)
 				.findAny()
 				.orElseGet(() -> {
 					Handler handler = new ConsoleHandler();
 					handler.setLevel(lvl);
 					handler.setFormatter(new LogFormatter());
-					log.addHandler(handler);
+					logSetup.addHandler(handler);
 					return handler;
 				});
 
@@ -296,6 +299,11 @@ public class DBSchemaLoader
 				conn.close();
 				connection_ok = true;
 				log.log(Level.INFO, "Connection OK");
+				connectionLock = ConnectionLock.getConnectionLocker(db_conn);
+				if (connectionLock.isEmpty() || !connectionLock.get().lock()) {
+					log.log(Level.WARNING, "Could not obtain lock, skipping");
+					return Result.error;
+				}
 				return Result.ok;
 			} catch (SQLException e) {
 				log.log(Level.WARNING, e.getMessage());
@@ -306,6 +314,11 @@ public class DBSchemaLoader
 
 	@Override
 	public Result shutdown() {
+		if (connectionLock != null) {
+			connectionLock.ifPresent(ConnectionLock::unlock);
+			connectionLock.ifPresent(ConnectionLock::cleanup);
+			connectionLock = Optional.empty();
+		}
 		return shutdownDerby();
 	}
 
