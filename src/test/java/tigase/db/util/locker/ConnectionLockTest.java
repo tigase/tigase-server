@@ -32,9 +32,9 @@ import static org.junit.Assert.assertTrue;
 
 public class ConnectionLockTest {
 
-//	protected static String uri = System.getProperty("testDbUri");
+	protected static String uri = System.getProperty("testDbUri");
 //	protected static String uri = "jdbc:postgresql://localhost:5432/postgres?user=root&password=root";
-	protected static String uri = "jdbc:mysql://localhost:3306/?user=root&password=root&useSSL=false";
+//	protected static String uri = "jdbc:mysql://localhost:3306/?user=root&password=root&useSSL=false";
 //	protected static String uri = "jdbc:jtds:sqlserver://localhost:1433;user=sa;password=1Secure*Password1;schema=dbo;lastUpdateCount=false";
 
 
