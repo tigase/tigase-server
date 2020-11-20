@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 
 abstract public class ConnectionLock {
 
-	//	protected final Logger log = Logger.getLogger(ConnectionLock.class.getCanonicalName());
 	static final Logger log = Logger.getLogger(ConnectionLock.class.getCanonicalName());
 	protected boolean isLocked = false;
 	protected String jdbcConnection;
@@ -57,6 +56,7 @@ abstract public class ConnectionLock {
 				break;
 			case derby:
 			default:
+				log.log(Level.WARNING, "Database locking is not supported for: " + dbType);
 				break;
 		}
 		return Optional.ofNullable(connectionLock);
@@ -121,7 +121,7 @@ abstract public class ConnectionLock {
 
 			int attempt = 0;
 			while (!gotUnlocked && attempt < lockAttemptsLimit) {
-				log.log(Level.FINEST, "Trying to get unlock the database, attempt {0} of {1}",
+				log.log(Level.FINEST, "Trying to unlock the database, attempt {0} of {1}",
 						new Object[]{attempt, lockAttemptsLimit});
 				gotUnlocked = unlockDatabase(connection);
 				if (isLocked && gotUnlocked) {

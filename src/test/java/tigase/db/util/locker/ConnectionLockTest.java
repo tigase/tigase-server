@@ -18,7 +18,10 @@
 
 package tigase.db.util.locker;
 
-import org.junit.*;
+import org.junit.Assume;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runners.model.Statement;
 import tigase.TestLogger;
@@ -33,10 +36,10 @@ import static org.junit.Assert.assertTrue;
 public class ConnectionLockTest {
 
 	protected static String uri = System.getProperty("testDbUri");
+//	protected static String uri = "jdbc:derby://derbydb;create=true";
 //	protected static String uri = "jdbc:postgresql://localhost:5432/postgres?user=root&password=root";
 //	protected static String uri = "jdbc:mysql://localhost:3306/?user=root&password=root&useSSL=false";
 //	protected static String uri = "jdbc:jtds:sqlserver://localhost:1433;user=sa;password=1Secure*Password1;schema=dbo;lastUpdateCount=false";
-
 
 
 	@ClassRule
@@ -58,35 +61,45 @@ public class ConnectionLockTest {
 	}
 
 	@Test
+	public void permitSkipIfAbsent() {
+		final Optional<ConnectionLock> connectionLock = ConnectionLock.getConnectionLocker(uri);
+		assertTrue(connectionLock.isEmpty() || connectionLock.get().lock());
+		if (connectionLock.isPresent()) {
+			final ConnectionLock lock = connectionLock.get();
+			assertTrue(lock.isLocked());
+			assertTrue(lock.unlock());
+		}
+	}
+	@Test
 	public void singleLockAndUnlock() {
-
 		final Optional<ConnectionLock> connectionLocker = ConnectionLock.getConnectionLocker(uri);
-		assertTrue(connectionLocker.isPresent());
-		final ConnectionLock lock = connectionLocker.get();
-		assertFalse(lock.isLocked());
-		assertTrue(lock.lock());
-		assertTrue(lock.isLocked());
-		assertTrue(lock.unlock());
-		assertFalse(lock.isLocked());
+		if (connectionLocker.isPresent()) {
+			final ConnectionLock lock = connectionLocker.get();
+			assertFalse(lock.isLocked());
+			assertTrue(lock.lock());
+			assertTrue(lock.isLocked());
+			assertTrue(lock.unlock());
+			assertFalse(lock.isLocked());
+		}
 	}
 
 	@Test
 	public void multipleLockAndUnlock() {
 		final Optional<ConnectionLock> connectionLocker = ConnectionLock.getConnectionLocker(uri);
 		final Optional<ConnectionLock> connectionLocker2 = ConnectionLock.getConnectionLocker(uri);
-		assertTrue(connectionLocker.isPresent());
-		final ConnectionLock lock = connectionLocker.get();
-		assertTrue(connectionLocker2.isPresent());
-		final ConnectionLock lock2 = connectionLocker2.get();
-		connectionLocker.get().lockAttemptsLimit = 3;
-		connectionLocker2.get().lockAttemptsLimit = 3;
-		assertFalse(lock.isLocked());
-		assertFalse(lock2.isLocked());
-		assertTrue(lock.lock());
-		assertTrue(lock.isLocked());
-		assertFalse(lock2.lock());
-		assertFalse(lock2.isLocked());
-		assertTrue(lock.unlock());
-		assertFalse(lock.isLocked());
+		if (connectionLocker.isPresent() && connectionLocker2.isPresent()) {
+			final ConnectionLock lock = connectionLocker.get();
+			final ConnectionLock lock2 = connectionLocker2.get();
+			connectionLocker.get().lockAttemptsLimit = 3;
+			connectionLocker2.get().lockAttemptsLimit = 3;
+			assertFalse(lock.isLocked());
+			assertFalse(lock2.isLocked());
+			assertTrue(lock.lock());
+			assertTrue(lock.isLocked());
+			assertFalse(lock2.lock());
+			assertFalse(lock2.isLocked());
+			assertTrue(lock.unlock());
+			assertFalse(lock.isLocked());
+		}
 	}
 }

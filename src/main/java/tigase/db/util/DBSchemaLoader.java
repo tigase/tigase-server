@@ -300,11 +300,12 @@ public class DBSchemaLoader
 				connection_ok = true;
 				log.log(Level.INFO, "Connection OK");
 				connectionLock = ConnectionLock.getConnectionLocker(db_conn);
-				if (connectionLock.isEmpty() || !connectionLock.get().lock()) {
+				if (connectionLock.isEmpty() || connectionLock.get().lock()) {
+					return Result.ok;
+				} else {
 					log.log(Level.WARNING, "Could not obtain lock, skipping");
 					return Result.error;
 				}
-				return Result.ok;
 			} catch (SQLException e) {
 				log.log(Level.WARNING, e.getMessage());
 				return Result.error;
