@@ -31,6 +31,8 @@ logging () {
 <configuration scan="true"  scanPeriod="120 seconds">
 <!--    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>-->
 
+    <shutdownHook/>
+
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- daily rollover, files will be compressed -->
         <file>logs/${HOSTNAME}/tigase.logback.log</file>
