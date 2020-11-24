@@ -74,7 +74,11 @@ public class ChannelSetNickModule extends AbstractPubSubModule {
 
 			IParticipant participant = mixRepository.updateParticipant(channelJID, senderJID, nick);
 
-			packetWriter.write(packet.okResult((Element) null, 1));
+			Element setnickEl = new Element("setnick");
+			setnickEl.setXMLNS(Mix.CORE1_XMLNS);
+			Element nickEl = new Element("nick", nick);
+			setnickEl.addChild(nickEl);
+			packetWriter.write(packet.okResult(setnickEl, 0));
 		} catch (RepositoryException ex) {
 			throw new PubSubException(Authorization.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
 		}
