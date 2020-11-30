@@ -47,7 +47,7 @@ import java.util.function.Consumer;
 import static tigase.xmpp.impl.MIXProcessor.ID;
 
 @Id(ID)
-@Bean(name = ID, parent = SessionManager.class, active = false)
+@Bean(name = ID, parent = SessionManager.class, active = true)
 @Handles({
 		@Handle(path = {Iq.ELEM_NAME, "client-join"}, xmlns = "urn:xmpp:mix:pam:2"),
 		@Handle(path = {Iq.ELEM_NAME, "client-leave"}, xmlns = "urn:xmpp:mix:pam:2"),
