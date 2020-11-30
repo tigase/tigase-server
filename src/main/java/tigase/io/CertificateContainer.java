@@ -299,10 +299,13 @@ public class CertificateContainer
 	KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
+		log.log(Level.FINEST, "Adding certificate entry for alias: {0}. Saving to disk: {2}, entry: {3}",
+				new Object[]{alias, store, entry});
 		PrivateKey privateKey = entry.getPrivateKey();
 		Certificate[] certChain = CertificateUtil.sort(entry.getCertChain());
 
 		if (removeRootCACertificate) {
+			log.log(Level.FINEST, "Removing RootCA from certificate chain.");
 			certChain = CertificateUtil.removeRootCACertificate(certChain);
 		}
 
@@ -310,10 +313,11 @@ public class CertificateContainer
 		kmfs.put(alias, kmf);
 		cens.put(alias, entry);
 
-
 		Optional<Certificate> certificate = entry.getCertificate();
 		if (certificate.isPresent()) {
 			Set<String> domains = getAllCNames(certificate.get());
+			log.log(Level.FINEST, "Certificate present with domains: {0}. Replacing in collections. Certificate: {2}",
+					new Object[]{domains, certificate.get()});
 			SSLContextContainerAbstract.removeMatchedDomains(kmfs,domains);
 			SSLContextContainerAbstract.removeMatchedDomains(cens,domains);
 			for (String domain : domains) {
@@ -365,6 +369,8 @@ public class CertificateContainer
 
 	private void addCertificate(String alias, String pemCert, boolean saveToDisk, boolean notifyCluster) throws CertificateParsingException {
 		try {
+			log.log(Level.FINEST, "Adding new certificate with alias: {0}. Saving to disk: {2}, notify cluster: {3}",
+					new Object[]{alias, saveToDisk, notifyCluster});
 			CertificateEntry entry = CertificateUtil.parseCertificate(new CharArrayReader(pemCert.toCharArray()));
 
 			addCertificateEntry(entry, alias, saveToDisk);
