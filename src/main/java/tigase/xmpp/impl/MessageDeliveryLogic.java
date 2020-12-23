@@ -115,7 +115,9 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 				} else {
 
 					// Otherwise only to the given resource or sent back as error.
-					XMPPResourceConnection con = session.getParentSession().getResourceForResource(resource);
+					XMPPResourceConnection con = session.getParentSession() == null
+												 ? null
+												 : session.getParentSession().getResourceForResource(resource);
 
 					if (con != null) {
 						conns.add(con);

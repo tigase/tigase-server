@@ -75,7 +75,7 @@ public abstract class WorkerThread
 				if (!stopped) {
 					log.log(Level.SEVERE,
 							this.getClass().getName() + ",(" + getName() + ") Exception during packet processing: " +
-									item.getPacket(), e);
+									item, e);
 				}
 			}
 

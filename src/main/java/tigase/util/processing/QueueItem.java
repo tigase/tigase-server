@@ -57,5 +57,10 @@ public class QueueItem {
 	public XMPPProcessorIfc getProcessor() {
 		return processor;
 	}
+
+	@Override
+	public String toString() {
+		return "Packet=" + packet + ", connection=" + conn;
+	}
 }
 
