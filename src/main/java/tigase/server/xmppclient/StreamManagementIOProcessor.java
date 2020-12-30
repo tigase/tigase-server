@@ -513,7 +513,6 @@ public class StreamManagementIOProcessor
 				if (timerTask != null) {
 					timerTask.cancel();
 				}
-				oldService.getSessionData().put(RESUMPTION_TASK_KEY, true);
 				oldService.clearWaitingPackets();
 			}
 
@@ -740,6 +739,13 @@ public class StreamManagementIOProcessor
 
 		public ResumptionTimeoutTask(XMPPIOService service) {
 			this.service = service;
+		}
+
+		@Override
+		public void cancel(boolean mayInterruptIfRunning) {
+			if (!isCancelled()) {
+				super.cancel(mayInterruptIfRunning);
+			}
 		}
 
 		@Override
