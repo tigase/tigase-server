@@ -60,6 +60,7 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 		def VHOST = "VHost"
 		def CERTIFICATE = "Certificate in PEM format"
 		def SAVE_TO_DISK = "Save to disk"
+		def USE_AS_DEFAULT = "Use as default"
 
 		def stanzaFromBare = packet.getStanzaFrom().getBareJID()
 		def isServiceAdmin = admins.contains(stanzaFromBare)
@@ -68,7 +69,8 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 		def marker = Command.getFieldValue(packet, MARKER)
 		def pemCertVals = Command.getFieldValues(packet, CERTIFICATE)
 		def saveToDisk = Command.getCheckBoxFieldValue(packet, SAVE_TO_DISK)
-		
+		def useAsDefault = Command.getCheckBoxFieldValue(packet, USE_AS_DEFAULT)
+
 // The first step - provide a list of all vhosts for the user
 		if (itemKey == null) {
 			Collection<VHostItem> items = repo.allItems()
@@ -99,6 +101,7 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 					Command.addFieldValue(result, VHOST, itemKey, "text-single")
 					Command.addFieldMultiValue(result, CERTIFICATE, [ "" ])
 					Command.addCheckBoxField(result, SAVE_TO_DISK, true)
+					Command.addCheckBoxField(result, USE_AS_DEFAULT, false)
 					Command.addHiddenField(result, MARKER, MARKER)
 					return result
 				} else {
@@ -134,6 +137,7 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 						params.put(SSLContextContainerIfc.PEM_CERTIFICATE_KEY, pemCert)
 						params.put(SSLContextContainerIfc.CERT_ALIAS_KEY, itemKey)
 						params.put(SSLContextContainerIfc.CERT_SAVE_TO_DISK_KEY, saveToDisk.toString())
+						params.put(SSLContextContainerIfc.DEFAULT_DOMAIN_CERT_KEY, useAsDefault.toString())
 						CertificateContainerIfc certContainer = kernel.getInstance(CertificateContainerIfc.class);
 						certContainer.addCertificates(params);
 						Command.addTextField(result, "Note",

@@ -90,6 +90,10 @@ public class CertificateContainer
 		String pemCert = params.get(PEM_CERTIFICATE_KEY);
 		String saveToDiskVal = params.get(CERT_SAVE_TO_DISK_KEY);
 		boolean saveToDisk = (saveToDiskVal != null) && saveToDiskVal.equalsIgnoreCase("true");
+
+		String useAsDefaultVal = params.get(DEFAULT_DOMAIN_CERT_KEY);
+		boolean useAsDefault = (useAsDefaultVal != null) && useAsDefaultVal.equalsIgnoreCase("true");
+
 		final String alias = params.get(CERT_ALIAS_KEY);
 
 		if (alias == null) {
@@ -98,6 +102,9 @@ public class CertificateContainer
 
 		if (pemCert != null) {
 			addCertificate(alias, pemCert, saveToDisk, true);
+			if (useAsDefault) {
+				addCertificate(def_cert_alias, pemCert, saveToDisk, true);
+			}
 		}
 	}
 
