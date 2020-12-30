@@ -1628,15 +1628,25 @@ public class SessionManager
 						// to new connection
 						XMPPResourceConnection oldConn = connectionsByFrom.remove(oldConnJid);
 
-						oldConn.setConnectionId(connection.getConnectionId());
-						connectionsByFrom.remove(connection.getConnectionId());
-						connectionsByFrom.put(oldConn.getConnectionId(), oldConn);
+						if (oldConn != null) {
+							oldConn.setConnectionId(connection.getConnectionId());
+							connectionsByFrom.remove(connection.getConnectionId());
+							connectionsByFrom.put(oldConn.getConnectionId(), oldConn);
 
-						// remove current connection from list of active connections as
-						// this connection will be used with other already authenticated connection
-						sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(connection);
+							// remove current connection from list of active connections as
+							// this connection will be used with other already authenticated connection
+							sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(connection);
 
-						xmppStreamMoved(oldConn, oldConnJid, oldConn.getConnectionId());
+							xmppStreamMoved(oldConn, oldConnJid, oldConn.getConnectionId());
+						} else {
+							try {
+								addOutPacket(
+										Authorization.ITEM_NOT_FOUND.getResponseMessage(pc, "Previous session missing",
+																						false));
+							} catch (PacketErrorTypeException e) {
+								log.log(Level.FINEST, "could not send error, packet already of type error", e);
+							}
+						}
 					} catch (XMPPException ex) {
 						log.log(Level.SEVERE, "exception while replacing old connection id = " + oldConnJid +
 								" with new connection id = " + pc.getPacketFrom().toString(), ex);
