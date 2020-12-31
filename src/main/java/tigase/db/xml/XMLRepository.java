@@ -17,6 +17,7 @@
  */
 package tigase.db.xml;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.xml.db.NodeExistsException;
 import tigase.xml.db.NodeNotFoundException;
@@ -177,6 +178,8 @@ public class XMLRepository
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Support for multi-level nodes will be removed")
 	public synchronized String[] getSubnodes(BareJID user, final String subnode)
 			throws UserNotFoundException, TigaseDBException {
 		log.log(Level.FINE, "Getting subnodes, user: {0}, subnode: {1}", new Object[]{user, subnode});

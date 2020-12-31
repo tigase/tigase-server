@@ -257,6 +257,8 @@ public interface UserRepository
 	 * @throws UserNotFoundException if user id hasn't been found in repository.
 	 * @throws TigaseDBException if database backend error occurs.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Support for multi-level nodes will be removed")
 	String[] getSubnodes(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException;
 
 	/**

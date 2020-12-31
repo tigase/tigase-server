@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.beans.MDPoolBeanWithStatistics;
 import tigase.db.beans.UserRepositoryMDPoolBean;
 import tigase.eventbus.EventBus;
@@ -195,6 +196,8 @@ public abstract class UserRepositoryMDImpl
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Support for multi-level nodes will be removed")
 	public String[] getSubnodes(BareJID user, String subnode) throws UserNotFoundException, TigaseDBException {
 		UserRepository repo = getRepo(user.getDomain());
 
