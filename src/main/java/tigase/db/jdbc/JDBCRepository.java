@@ -17,6 +17,7 @@
  */
 package tigase.db.jdbc;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.util.cache.SimpleCache;
@@ -333,6 +334,8 @@ public class JDBCRepository
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Support for multi-level nodes will be removed")
 	public String[] getSubnodes(BareJID user_id, final String subnode) throws UserNotFoundException, TigaseDBException {
 		try {
 			long nid = getNodeNID(null, user_id, subnode);

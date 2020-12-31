@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.component.exceptions.RepositoryException;
 import tigase.util.Version;
 import tigase.xmpp.jid.BareJID;
@@ -109,6 +110,8 @@ public class DummyRepository
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Support for multi-level nodes will be removed")
 	public String[] getSubnodes(BareJID user, String subnode) {
 		return null;
 	}
