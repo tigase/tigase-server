@@ -26,6 +26,7 @@ import tigase.mix.Mix;
 import tigase.mix.MixComponent;
 import tigase.pubsub.Affiliation;
 import tigase.pubsub.CollectionItemsOrdering;
+import tigase.pubsub.Subscription;
 import tigase.pubsub.exceptions.PubSubException;
 import tigase.pubsub.modules.PublishItemModule;
 import tigase.pubsub.modules.RetractItemModule;
@@ -36,6 +37,7 @@ import tigase.pubsub.repository.ISubscriptions;
 import tigase.pubsub.repository.cached.CachedPubSubRepository;
 import tigase.pubsub.repository.cached.IAffiliationsCached;
 import tigase.pubsub.repository.stateless.UsersAffiliation;
+import tigase.pubsub.repository.stateless.UsersSubscription;
 import tigase.pubsub.utils.Cache;
 import tigase.pubsub.utils.LRUCacheWithFuture;
 import tigase.server.DataForm;
@@ -236,30 +238,58 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 
 	@Override
 	public void itemDeleted(BareJID serviceJID, String node, String id) {
+		switch (node) {
+			case Mix.Nodes.ALLOWED:
+				try {
+					if (id != null) {
+						bannedParticipantFromChannel(serviceJID, BareJID.bareJIDInstanceNS(id));
+					}
+				} catch (RepositoryException ex) {
+					// if exception happended just ignore it..
+				}
+				break;
+			default:
+				// nothing to do..
+				break;
+		}
 	}
 
 	@Override
 	public void itemWritten(BareJID serviceJID, String node, String id, String publisher, Element item, String uuid) {
-		if (Mix.Nodes.CONFIG.equals(node)) {
-			// node config has changed, we need to update it
-			ChannelConfiguration oldConfig = null;
-			ChannelConfiguration newConfig = null;
+		switch (node) {
+			case Mix.Nodes.CONFIG:
+				// node config has changed, we need to update it
+				ChannelConfiguration oldConfig = null;
+				ChannelConfiguration newConfig = null;
 
-			try {
-				oldConfig = getChannelConfiguration(serviceJID);
-			} catch (RepositoryException ex) {
-				// if exception happended just ignore it..
-			}
-			updateChannelConfiguration(serviceJID, item);
-
-			try {
-				newConfig = getChannelConfiguration(serviceJID);
-				if (newConfig != null && oldConfig != null) {
-					mixLogic.generateAffiliationChangesNotifications(serviceJID, oldConfig, newConfig, packetWriter::write);
+				try {
+					oldConfig = getChannelConfiguration(serviceJID);
+				} catch (RepositoryException ex) {
+					// if exception happended just ignore it..
 				}
-			} catch (RepositoryException ex) {
-				// if exception happended just ignore it..
-			}
+				updateChannelConfiguration(serviceJID, item);
+
+				try {
+					newConfig = getChannelConfiguration(serviceJID);
+					if (newConfig != null && oldConfig != null) {
+						mixLogic.generateAffiliationChangesNotifications(serviceJID, oldConfig, newConfig, packetWriter::write);
+					}
+				} catch (RepositoryException ex) {
+					// if exception happended just ignore it..
+				}
+				break;
+			case Mix.Nodes.BANNED:
+				try {
+					if (id != null) {
+						bannedParticipantFromChannel(serviceJID, BareJID.bareJIDInstanceNS(id));
+					}
+				} catch (RepositoryException ex) {
+					// if exception happended just ignore it..
+				}
+				break;
+			default:
+				// nothing to do..
+				break;
 		}
 	}
 
@@ -308,6 +338,19 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 			return new Affiliations(serviceJid, nodeName, this);
 		} else {
 			return null;
+		}
+	}
+
+	protected void bannedParticipantFromChannel(BareJID channelJID, BareJID participantJID) throws RepositoryException {
+		if (getParticipant(channelJID, participantJID) != null) {
+			removeParticiapnt(channelJID, participantJID);
+			Map<String, UsersSubscription> userSubscriptions = pubSubRepository.getUserSubscriptions(channelJID,
+																									 participantJID);
+			for (String node : userSubscriptions.keySet()) {
+				ISubscriptions subscriptions = pubSubRepository.getNodeSubscriptions(channelJID, node);
+				subscriptions.changeSubscription(participantJID, Subscription.none);
+				pubSubRepository.update(channelJID, node, subscriptions);
+			}
 		}
 	}
 
