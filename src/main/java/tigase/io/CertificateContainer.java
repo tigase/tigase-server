@@ -56,25 +56,33 @@ import static tigase.io.SSLContextContainerIfc.*;
  */
 @Bean(name = "certificate-container", parent = Kernel.class, active = true, exportable = true)
 public class CertificateContainer
-		implements CertificateContainerIfc, Initializable, UnregisterAware,
+		implements CertificateContainerIfc,
+				   Initializable,
+				   UnregisterAware,
 				   RepositoryChangeListenerIfc<CertificateItem> {
 
 	public final static String PER_DOMAIN_CERTIFICATE_KEY = "virt-hosts-cert-";
 	public final static String SNI_DISABLE_KEY = "sni-disable";
 	private static final Logger log = Logger.getLogger(CertificateContainer.class.getCanonicalName());
 	private static final EventBus eventBus = EventBusFactory.getInstance();
+	@Inject
+	CertificateRepository repository;
 	private Map<String, CertificateEntry> cens = new ConcurrentSkipListMap<>();
-	private File defaultCertDirectory = null;
 	@ConfigField(desc = "Custom certificates", alias = "custom-certificates")
 	private Map<String, String> customCerts = new HashMap<>();
 	@ConfigField(desc = "Alias for default certificate", alias = DEFAULT_DOMAIN_CERT_KEY)
 	private String def_cert_alias = DEFAULT_DOMAIN_CERT_VAL;
+	private File defaultCertDirectory = null;
 	private String email = "admin@tigase.org";
 	private char[] emptyPass = new char[0];
+	@ConfigField(desc = "Whether generated certificate should be wildcard")
+	private boolean generateWildcardCertificate = true;
 	private Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String, KeyManagerFactory>();
 	private KeyManager[] kms = new KeyManager[]{new SniKeyManager()};
 	private String o = "Tigase.org";
 	private String ou = "XMPP Service";
+	@ConfigField(desc = "Remove root CA (efectively self-signed) certificate from chain")
+	private boolean removeRootCACertificate = true;
 	@ConfigField(desc = "Disable SNI support", alias = SNI_DISABLE_KEY)
 	private boolean sniDisable = false;
 	@ConfigField(desc = "Location of server SSL certificates", alias = SERVER_CERTS_LOCATION_KEY)
@@ -83,14 +91,20 @@ public class CertificateContainer
 	private KeyStore trustKeyStore = null;
 	@ConfigField(desc = "Location of trusted certificates", alias = TRUSTED_CERTS_DIR_KEY)
 	private String[] trustedCertsDir = {TRUSTED_CERTS_DIR_VAL};
-	@ConfigField(desc = "Whether generated certificate should be wildcard")
-	private boolean generateWildcardCertificate = true;
 
-	@ConfigField(desc = "Remove root CA (efectively self-signed) certificate from chain")
-	private boolean removeRootCACertificate = true;
-
-	@Inject
-	CertificateRepository repository;
+	private static Set<String> getAllCNames(Certificate certificate) {
+		Set<String> altDomains = new TreeSet<>();
+		if (certificate instanceof X509Certificate) {
+			X509Certificate certX509 = (X509Certificate) certificate;
+			String certCName = CertificateUtil.getCertCName(certX509);
+			if (certCName != null) {
+				altDomains.add(certCName);
+			}
+			List<String> certAltCName = CertificateUtil.getCertAltCName(certX509);
+			altDomains.addAll(certAltCName);
+		}
+		return altDomains;
+	}
 
 	@Override
 	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
@@ -241,6 +255,87 @@ public class CertificateContainer
 		cens.remove(item.getAlias());
 	}
 
+	@Override
+	public void initialize() {
+		eventBus.registerAll(this);
+		try {
+			String[] pemDirs = sslCertsLocation;
+			defaultCertDirectory = getDefaultCertDirectory(pemDirs);
+			// we should first load available files and then override it with user configured mapping
+			loadCertificatesFromDirectories(pemDirs);
+			loadPredefinedCertificates(customCerts);
+			loadCertificatesFromRepository();
+		} catch (Exception ex) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "There was a problem initializing SSL certificates.", ex);
+			}
+			log.log(Level.WARNING, "There was a problem initializing SSL certificates.");
+		}
+
+		// It may take a while, let's do it in background
+		new Thread() {
+			@Override
+			public void run() {
+				loadTrustedCerts(trustedCertsDir);
+			}
+		}.start();
+
+	}
+
+	@Override
+	public void beforeUnregister() {
+		eventBus.unregisterAll(this);
+	}
+
+	@HandleEvent
+	public void certificateChange(CertificateChange event) {
+		if (event.isLocal()) {
+			return;
+		}
+
+		addCertificate(event.getAlias(), event.getPemCertificate(), event.isSaveToDisk());
+		repository.reload();
+	}
+
+	KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
+			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
+				   UnrecoverableKeyException {
+		log.log(Level.FINEST, "Adding certificate entry for alias: {0}. Saving to disk: {2}, entry: {3}",
+				new Object[]{alias, store, entry});
+		PrivateKey privateKey = entry.getPrivateKey();
+		Certificate[] certChain = CertificateUtil.sort(entry.getCertChain());
+
+		if (removeRootCACertificate) {
+			log.log(Level.FINEST, "Removing RootCA from certificate chain.");
+			certChain = CertificateUtil.removeRootCACertificate(certChain);
+		}
+
+		KeyManagerFactory kmf = getKeyManagerFactory(alias, privateKey, certChain);
+		kmfs.put(alias, kmf);
+		cens.put(alias, entry);
+
+		Optional<Certificate> certificate = entry.getCertificate();
+		if (certificate.isPresent()) {
+			Set<String> domains = getAllCNames(certificate.get());
+			log.log(Level.FINEST, "Certificate present with domains: {0}. Replacing in collections. Certificate: {2}",
+					new Object[]{domains, certificate.get()});
+			SSLContextContainerAbstract.removeMatchedDomains(kmfs, domains);
+			SSLContextContainerAbstract.removeMatchedDomains(cens, domains);
+			for (String domain : domains) {
+				kmf = getKeyManagerFactory(domain, privateKey, certChain);
+				kmfs.put(domain, kmf);
+				cens.put(domain, entry);
+			}
+		}
+
+		if (store) {
+			String filename = storeCertificateToFile(entry, alias);
+			repository.addItem(new CertificateItem(filename, entry));
+		}
+
+		return kmf;
+	}
+
 	private void loadCertificatesFromRepository() {
 		for (CertificateItem item : repository.allItems()) {
 			CertificateEntry certificate = item.getCertificateEntry();
@@ -287,7 +382,9 @@ public class CertificateContainer
 			CertificateEntry certEntry = CertificateUtil.loadCertificate(cert);
 			repository.addItem(new CertificateItem(alias, certEntry));
 			addCertificateEntry(certEntry, alias, false);
-			Set<String> domains = certEntry.getCertificate().map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());
+			Set<String> domains = certEntry.getCertificate()
+					.map(CertificateContainer::getAllCNames)
+					.orElse(Collections.emptySet());
 			log.log(Level.CONFIG, "Loaded server certificate for domain: {0} (altCNames: {1}) from file: {2}",
 					new Object[]{alias, String.join(", ", domains), file});
 		} catch (Exception ex) {
@@ -306,8 +403,11 @@ public class CertificateContainer
 				CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
 				String alias = entry.getKey();
 				addCertificateEntry(certEntry, alias, false);
-				Set<String> domains = certEntry.getCertificate().map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());
-				log.log(Level.CONFIG, "Loaded predefined server certificate for domain: {0} (altCNames: {1}) from file: {2}",
+				Set<String> domains = certEntry.getCertificate()
+						.map(CertificateContainer::getAllCNames)
+						.orElse(Collections.emptySet());
+				log.log(Level.CONFIG,
+						"Loaded predefined server certificate for domain: {0} (altCNames: {1}) from file: {2}",
 						new Object[]{alias, String.join(", ", domains), entry.getValue()});
 			} catch (Exception ex) {
 				if (log.isLoggable(Level.FINEST)) {
@@ -316,33 +416,6 @@ public class CertificateContainer
 				log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue());
 			}
 		}
-	}
-
-	@Override
-	public void initialize() {
-		eventBus.registerAll(this);
-		try {
-			String[] pemDirs = sslCertsLocation;
-			defaultCertDirectory = getDefaultCertDirectory(pemDirs);
-			// we should first load available files and then override it with user configured mapping
-			loadCertificatesFromDirectories(pemDirs);
-			loadPredefinedCertificates(customCerts);
-			loadCertificatesFromRepository();
-		} catch (Exception ex) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "There was a problem initializing SSL certificates.", ex);
-			}
-			log.log(Level.WARNING, "There was a problem initializing SSL certificates.");
-		}
-
-		// It may take a while, let's do it in background
-		new Thread() {
-			@Override
-			public void run() {
-				loadTrustedCerts(trustedCertsDir);
-			}
-		}.start();
-
 	}
 
 	private File getDefaultCertDirectory(String[] pemDirs) {
@@ -356,46 +429,8 @@ public class CertificateContainer
 		return file;
 	}
 
-	KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
-			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
-				   UnrecoverableKeyException {
-		log.log(Level.FINEST, "Adding certificate entry for alias: {0}. Saving to disk: {2}, entry: {3}",
-				new Object[]{alias, store, entry});
-		PrivateKey privateKey = entry.getPrivateKey();
-		Certificate[] certChain = CertificateUtil.sort(entry.getCertChain());
-
-		if (removeRootCACertificate) {
-			log.log(Level.FINEST, "Removing RootCA from certificate chain.");
-			certChain = CertificateUtil.removeRootCACertificate(certChain);
-		}
-
-		KeyManagerFactory kmf = getKeyManagerFactory(alias, privateKey, certChain);
-		kmfs.put(alias, kmf);
-		cens.put(alias, entry);
-
-		Optional<Certificate> certificate = entry.getCertificate();
-		if (certificate.isPresent()) {
-			Set<String> domains = getAllCNames(certificate.get());
-			log.log(Level.FINEST, "Certificate present with domains: {0}. Replacing in collections. Certificate: {2}",
-					new Object[]{domains, certificate.get()});
-			SSLContextContainerAbstract.removeMatchedDomains(kmfs,domains);
-			SSLContextContainerAbstract.removeMatchedDomains(cens,domains);
-			for (String domain : domains) {
-				kmf = getKeyManagerFactory(domain, privateKey, certChain);
-				kmfs.put(domain, kmf);
-				cens.put(domain, entry);
-			}
-		}
-
-		if (store) {
-			String filename = storeCertificateToFile(entry, alias);
-			repository.addItem(new CertificateItem(filename, entry));
-		}
-
-		return kmf;
-	}
-
-	private String storeCertificateToFile(CertificateEntry entry, String alias) throws CertificateEncodingException, IOException {
+	private String storeCertificateToFile(CertificateEntry entry, String alias)
+			throws CertificateEncodingException, IOException {
 		String filename = alias.startsWith("*.") ? alias.substring(2) : alias;
 		final String path = new File(defaultCertDirectory, filename + ".pem").toString();
 		CertificateUtil.storeCertificate(path, entry);
@@ -414,21 +449,6 @@ public class CertificateContainer
 		return kmf;
 	}
 
-	@Override
-	public void beforeUnregister() {
-		eventBus.unregisterAll(this);
-	}
-
-	@HandleEvent
-	public void certificateChange(CertificateChange event) {
-		if (event.isLocal()) {
-			return;
-		}
-
-		addCertificate(event.getAlias(), event.getPemCertificate(), event.isSaveToDisk());
-		repository.reload();
-	}
-
 	private void addCertificate(String alias, String pemCertificate, boolean saveToDisk) {
 		try {
 			addCertificate(alias, pemCertificate, saveToDisk, false);
@@ -440,7 +460,8 @@ public class CertificateContainer
 		}
 	}
 
-	private void addCertificate(String alias, String pemCert, boolean saveToDisk, boolean notifyCluster) throws CertificateParsingException {
+	private void addCertificate(String alias, String pemCert, boolean saveToDisk, boolean notifyCluster)
+			throws CertificateParsingException {
 		try {
 			log.log(Level.FINEST, "Adding new certificate with alias: {0}. Saving to disk: {2}, notify cluster: {3}",
 					new Object[]{alias, saveToDisk, notifyCluster});
@@ -590,49 +611,6 @@ public class CertificateContainer
 		log.log(Level.CONFIG, "Loaded {0} trust certificates, it took {1} seconds.", new Object[]{counter, seconds});
 	}
 
-	private static Set<String> getAllCNames(Certificate certificate) {
-		Set<String> altDomains = new TreeSet<>();
-		if (certificate instanceof X509Certificate) {
-			X509Certificate certX509 = (X509Certificate) certificate;
-			String certCName = CertificateUtil.getCertCName(certX509);
-			if (certCName != null) {
-				altDomains.add(certCName);
-			}
-			List<String> certAltCName = CertificateUtil.getCertAltCName(certX509);
-			altDomains.addAll(certAltCName);
-		}
-		return altDomains;
-	}
-
-	private static class FakeTrustManager
-			implements X509TrustManager {
-
-		private X509Certificate[] issuers = null;
-
-		FakeTrustManager() {
-			this(new X509Certificate[0]);
-		}
-
-		FakeTrustManager(X509Certificate[] ai) {
-			issuers = ai;
-		}
-
-		@Override
-		public void checkClientTrusted(final X509Certificate[] x509CertificateArray, final String string)
-				throws CertificateException {
-		}
-
-		@Override
-		public void checkServerTrusted(final X509Certificate[] x509CertificateArray, final String string)
-				throws CertificateException {
-		}
-
-		@Override
-		public X509Certificate[] getAcceptedIssuers() {
-			return issuers;
-		}
-	}
-
 	/**
 	 * Event indicating certificate change that will be distributed in the cluster.
 	 */
@@ -640,9 +618,9 @@ public class CertificateContainer
 			implements Serializable {
 
 		private String alias;
+		private transient boolean local = false;
 		private String pemCert;
 		private boolean saveToDisk;
-		private transient boolean local = false;
 
 		/**
 		 * Empty constructor to be able to serialize/deserialize event
@@ -674,10 +652,39 @@ public class CertificateContainer
 		}
 	}
 
+	private static class FakeTrustManager
+			implements X509TrustManager {
+
+		private X509Certificate[] issuers = null;
+
+		FakeTrustManager() {
+			this(new X509Certificate[0]);
+		}
+
+		FakeTrustManager(X509Certificate[] ai) {
+			issuers = ai;
+		}
+
+		@Override
+		public void checkClientTrusted(final X509Certificate[] x509CertificateArray, final String string)
+				throws CertificateException {
+		}
+
+		@Override
+		public void checkServerTrusted(final X509Certificate[] x509CertificateArray, final String string)
+				throws CertificateException {
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			return issuers;
+		}
+	}
+
 	public class CertificateChanged {
 
-		private String alias;
 		Set<String> domains = new ConcurrentSkipListSet<>();
+		private String alias;
 
 		public CertificateChanged(String alias, Set<String> domains) {
 			this.alias = alias;
