@@ -36,7 +36,7 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	private static final Logger log = Logger.getLogger(ConfigRepository.class.getName());
 
-	@ConfigField(desc = "Automatic items load interval", alias = "repo-autoreload-interval")
+	@ConfigField(desc = "Automatic items load interval (in seconds)", alias = "repo-autoreload-interval")
 	protected long autoReloadInterval = 0;
 	protected Map<String, Item> items = new ConcurrentSkipListMap<String, Item>(String.CASE_INSENSITIVE_ORDER);
 	protected int itemsHash = 0;
