@@ -105,9 +105,11 @@ public class CertificateContainer
 	}
 
 	public void setRepository(CertificateRepository repository) {
+		if (repository != null) {
+			log.log(Level.WARNING,
+					"CertificateRepository configured! No certificate will be loaded from the local filesystem!");
+		}
 		this.repository = repository;
-		log.log(Level.WARNING,
-				"CertificateRepository configured! No certificate will be loaded from the local filesystem!");
 	}
 
 	@Override
@@ -321,7 +323,7 @@ public class CertificateContainer
 	KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
-		log.log(Level.FINEST, "Adding certificate entry for alias: {0}. Saving to disk: {2}, entry: {3}",
+		log.log(Level.FINEST, "Adding certificate entry for alias: {0}. Saving to disk: {1}, entry: {2}",
 				new Object[]{alias, store, entry});
 		PrivateKey privateKey = entry.getPrivateKey();
 		Certificate[] certChain = CertificateUtil.sort(entry.getCertChain());
@@ -406,8 +408,7 @@ public class CertificateContainer
 		}
 
 		try {
-			final byte[] cert = Files.readAllBytes(file.toPath());
-			CertificateEntry certEntry = CertificateUtil.loadCertificate(cert);
+			CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
 			addCertificateEntry(certEntry, alias, false);
 			Set<String> domains = certEntry.getCertificate()
 					.map(CertificateContainer::getAllCNames)
@@ -418,7 +419,7 @@ public class CertificateContainer
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
 			}
-			log.log(Level.WARNING, "Cannot load certficate from file: " + file);
+			log.log(Level.WARNING, "Cannot load certficate from file: " + file + ", " + ex.getMessage());
 		}
 	}
 
@@ -440,7 +441,7 @@ public class CertificateContainer
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Cannot load certficate from file: " + entry.getValue(), ex);
 				}
-				log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue());
+				log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue() + ", " + ex.getMessage());
 			}
 		}
 	}
