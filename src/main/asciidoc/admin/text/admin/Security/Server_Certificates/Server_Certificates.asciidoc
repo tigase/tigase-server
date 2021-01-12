@@ -9,3 +9,5 @@ include::PEM_Files.asciidoc[leveloffset=+1]
 
 include::LetsEncrypt.asciidoc[leveloffset=+1]
 
+include::CertificateStorage.asciidoc[leveloffset=+1]
+

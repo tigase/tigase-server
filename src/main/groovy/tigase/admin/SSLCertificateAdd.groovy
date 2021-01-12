@@ -59,7 +59,7 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 
 		def VHOST = "VHost"
 		def CERTIFICATE = "Certificate in PEM format"
-		def SAVE_TO_DISK = "Save to disk"
+		def SAVE_TO_DISK = "Save permanently (to disk or repository)"
 		def USE_AS_DEFAULT = "Use as default"
 
 		def stanzaFromBare = packet.getStanzaFrom().getBareJID()

@@ -34,7 +34,9 @@ These are the root certificate, and the intermediate certificate signed by root 
 
 NOTE: IdenTrust cross-signed certificate will not function properly.
 
-Take the contents of your `privkey.pem`, certificate, and combine them with the contents of `isrgrootx1.pem` and `letsencryptauthorityx3.pem` into a single pem certificate. You need to name the file after your domain such as `mydomain.com.pem` and place it under `certs/` subdirectory of Tigase XMPP Server installation
+Take the contents of your `privkey.pem`, certificate, and combine them with the contents of `isrgrootx1.pem` and `letsencryptauthorityx3.pem` into a single pem certificate.
+
+Depending on your configuration you either need to name the file after your domain such as `mydomain.com.pem` and place it under `certs/` subdirectory of Tigase XMPP Server installation or update it using admin ad-hoc (see <<certificateStorage>>)
 
 If you moved all certs to a single directory, you may combine them using the following command under *nix operating systems:.
 

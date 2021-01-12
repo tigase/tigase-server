@@ -25,7 +25,7 @@ import tigase.xmpp.jid.BareJID;
 
 import java.util.concurrent.TimeUnit;
 
-@Bean(name = "repository", parent = CertificateContainer.class, active = true)
+@Bean(name = "repository", parent = CertificateContainer.class, active = false)
 public class CertificateRepository
 		extends UserRepoRepository<CertificateItem> {
 

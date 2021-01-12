@@ -25,10 +25,7 @@ import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.io.repo.CertificateItem;
 import tigase.io.repo.CertificateRepository;
-import tigase.kernel.beans.Bean;
-import tigase.kernel.beans.Initializable;
-import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.UnregisterAware;
+import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 
@@ -59,13 +56,14 @@ public class CertificateContainer
 		implements CertificateContainerIfc,
 				   Initializable,
 				   UnregisterAware,
+				   RegistrarBean,
 				   RepositoryChangeListenerIfc<CertificateItem> {
 
 	public final static String PER_DOMAIN_CERTIFICATE_KEY = "virt-hosts-cert-";
 	public final static String SNI_DISABLE_KEY = "sni-disable";
 	private static final Logger log = Logger.getLogger(CertificateContainer.class.getCanonicalName());
 	private static final EventBus eventBus = EventBusFactory.getInstance();
-	@Inject
+	@Inject(nullAllowed = true)
 	CertificateRepository repository;
 	private Map<String, CertificateEntry> cens = new ConcurrentSkipListMap<>();
 	@ConfigField(desc = "Custom certificates", alias = "custom-certificates")
@@ -104,6 +102,12 @@ public class CertificateContainer
 			altDomains.addAll(certAltCName);
 		}
 		return altDomains;
+	}
+
+	public void setRepository(CertificateRepository repository) {
+		this.repository = repository;
+		log.log(Level.WARNING,
+				"CertificateRepository configured! No certificate will be loaded from the local filesystem!");
 	}
 
 	@Override
@@ -189,22 +193,26 @@ public class CertificateContainer
 				sniDisable = false;
 			}
 
-			String pemD = (String) params.get(SERVER_CERTS_LOCATION_KEY);
+			if (repository != null) {
+				loadCertificatesFromRepository();
+			} else {
 
-			if (pemD == null) {
-				pemD = SERVER_CERTS_LOCATION_VAL;
+				String pemD = (String) params.get(SERVER_CERTS_LOCATION_KEY);
+
+				if (pemD == null) {
+					pemD = SERVER_CERTS_LOCATION_VAL;
+				}
+
+				String[] pemDirs = pemD.split(",");
+
+				defaultCertDirectory = getDefaultCertDirectory(pemDirs);
+
+				// we should first load available files and then override it with user configured mapping
+				loadCertificatesFromDirectories(pemDirs);
+
+				Map<String, String> predefined = findPredefinedCertificates(params);
+				loadPredefinedCertificates(predefined);
 			}
-
-			String[] pemDirs = pemD.split(",");
-
-			defaultCertDirectory = getDefaultCertDirectory(pemDirs);
-
-			// we should first load available files and then override it with user configured mapping
-			loadCertificatesFromDirectories(pemDirs);
-
-			Map<String, String> predefined = findPredefinedCertificates(params);
-			loadPredefinedCertificates(predefined);
-			loadCertificatesFromRepository();
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "There was a problem initializing SSL certificates.", ex);
@@ -233,7 +241,6 @@ public class CertificateContainer
 	public void itemAdded(CertificateItem item) {
 		try {
 			addCertificateEntry(item.getCertificateEntry(), item.getAlias(), false);
-			storeCertificateToFile(item.getCertificateEntry(), item.getAlias());
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem adding certificate while reloading from repository", e);
 		}
@@ -243,7 +250,6 @@ public class CertificateContainer
 	public void itemUpdated(CertificateItem item) {
 		try {
 			addCertificateEntry(item.getCertificateEntry(), item.getAlias(), false);
-			storeCertificateToFile(item.getCertificateEntry(), item.getAlias());
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem adding certificate while reloading from repository", e);
 		}
@@ -259,12 +265,15 @@ public class CertificateContainer
 	public void initialize() {
 		eventBus.registerAll(this);
 		try {
-			String[] pemDirs = sslCertsLocation;
-			defaultCertDirectory = getDefaultCertDirectory(pemDirs);
-			// we should first load available files and then override it with user configured mapping
-			loadCertificatesFromDirectories(pemDirs);
-			loadPredefinedCertificates(customCerts);
-			loadCertificatesFromRepository();
+			if (repository != null) {
+				loadCertificatesFromRepository();
+			} else {
+				String[] pemDirs = sslCertsLocation;
+				defaultCertDirectory = getDefaultCertDirectory(pemDirs);
+				// we should first load available files and then override it with user configured mapping
+				loadCertificatesFromDirectories(pemDirs);
+				loadPredefinedCertificates(customCerts);
+			}
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "There was a problem initializing SSL certificates.", ex);
@@ -294,7 +303,19 @@ public class CertificateContainer
 		}
 
 		addCertificate(event.getAlias(), event.getPemCertificate(), event.isSaveToDisk());
-		repository.reload();
+		if (repository != null) {
+			repository.reload();
+		}
+	}
+
+	@Override
+	public void register(Kernel kernel) {
+
+	}
+
+	@Override
+	public void unregister(Kernel kernel) {
+
 	}
 
 	KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
@@ -314,40 +335,47 @@ public class CertificateContainer
 		kmfs.put(alias, kmf);
 		cens.put(alias, entry);
 
-		Optional<Certificate> certificate = entry.getCertificate();
-		if (certificate.isPresent()) {
-			Set<String> domains = getAllCNames(certificate.get());
-			log.log(Level.FINEST, "Certificate present with domains: {0}. Replacing in collections. Certificate: {2}",
-					new Object[]{domains, certificate.get()});
-			SSLContextContainerAbstract.removeMatchedDomains(kmfs, domains);
-			SSLContextContainerAbstract.removeMatchedDomains(cens, domains);
-			for (String domain : domains) {
-				kmf = getKeyManagerFactory(domain, privateKey, certChain);
-				kmfs.put(domain, kmf);
-				cens.put(domain, entry);
+		if (!def_cert_alias.equals(alias)) {
+			Optional<Certificate> certificate = entry.getCertificate();
+			if (certificate.isPresent()) {
+				Set<String> domains = getAllCNames(certificate.get());
+				log.log(Level.FINEST,
+						"Certificate present with domains: {0}. Replacing in collections. Certificate: {2}", new Object[]{domains, certificate.get()});
+				SSLContextContainerAbstract.removeMatchedDomains(kmfs, domains);
+				SSLContextContainerAbstract.removeMatchedDomains(cens, domains);
+				for (String domain : domains) {
+					kmf = getKeyManagerFactory(domain, privateKey, certChain);
+					kmfs.put(domain, kmf);
+					cens.put(domain, entry);
+				}
 			}
 		}
 
 		if (store) {
-			String filename = storeCertificateToFile(entry, alias);
-			repository.addItem(new CertificateItem(filename, entry));
+			String filename = alias.startsWith("*.") ? alias.substring(2) : alias;
+			if (repository != null) {
+				repository.addItem(new CertificateItem(filename, entry));
+			} else {
+				storeCertificateToFile(entry, filename);
+			}
 		}
 
 		return kmf;
 	}
 
 	private void loadCertificatesFromRepository() {
-		for (CertificateItem item : repository.allItems()) {
-			CertificateEntry certificate = item.getCertificateEntry();
-			String alias = item.getAlias();
-			try {
-				addCertificateEntry(certificate, alias, false);
-				storeCertificateToFile(certificate, alias);
-			} catch (Exception ex) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Cannot load certficate from repository: " + item.getKey(), ex);
+		if (repository != null) {
+			for (CertificateItem item : repository.allItems()) {
+				CertificateEntry certificate = item.getCertificateEntry();
+				String alias = item.getAlias();
+				try {
+					addCertificateEntry(certificate, alias, false);
+				} catch (Exception ex) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Cannot load certficate from repository: " + item.getKey(), ex);
+					}
+					log.log(Level.WARNING, "Cannot load certficate from repository: " + item.getKey());
 				}
-				log.log(Level.WARNING, "Cannot load certficate from repository: " + item.getKey());
 			}
 		}
 	}
@@ -380,7 +408,6 @@ public class CertificateContainer
 		try {
 			final byte[] cert = Files.readAllBytes(file.toPath());
 			CertificateEntry certEntry = CertificateUtil.loadCertificate(cert);
-			repository.addItem(new CertificateItem(alias, certEntry));
 			addCertificateEntry(certEntry, alias, false);
 			Set<String> domains = certEntry.getCertificate()
 					.map(CertificateContainer::getAllCNames)
@@ -429,12 +456,10 @@ public class CertificateContainer
 		return file;
 	}
 
-	private String storeCertificateToFile(CertificateEntry entry, String alias)
+	private void storeCertificateToFile(CertificateEntry entry, String filename)
 			throws CertificateEncodingException, IOException {
-		String filename = alias.startsWith("*.") ? alias.substring(2) : alias;
 		final String path = new File(defaultCertDirectory, filename + ".pem").toString();
 		CertificateUtil.storeCertificate(path, entry);
-		return filename;
 	}
 
 	private KeyManagerFactory getKeyManagerFactory(String domain, PrivateKey privateKey, Certificate[] certChain)
@@ -486,7 +511,7 @@ public class CertificateContainer
 	private KeyManagerFactory createCertificateKmf(String alias)
 			throws NoSuchAlgorithmException, CertificateException, IOException, InvalidKeyException,
 				   NoSuchProviderException, SignatureException, KeyStoreException, UnrecoverableKeyException {
-		alias = !alias.startsWith("*.") && generateWildcardCertificate ? "*." + alias : alias;
+		alias = !def_cert_alias.equals(alias) && !alias.startsWith("*.") && generateWildcardCertificate ? "*." + alias : alias;
 		CertificateEntry entry = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
 																			 () -> CertificateUtil.createKeyPair(1024,
 																												 "secret"));
@@ -833,5 +858,4 @@ public class CertificateContainer
 		}
 
 	}
-
 }
