@@ -44,8 +44,8 @@ public class LoggerTask
 
 	public static final Logger log = Logger.getLogger(LoggerTask.class.getName());
 	protected final static TimestampHelper dtf = new TimestampHelper();
-	private static final String[] decoded = {"&", "<", ">", "\"", "\'"};
-	private static final String[] encoded = {"&amp;", "[", "]", "&quot;", "&apos;"};
+//	private static final String[] decoded = {"&", "<", ">", "\"", "\'"};
+//	private static final String[] encoded = {"&amp;", "[", "]", "&quot;", "&apos;"};
 	private static final String LOGGER_MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoggerMonitorEvent";
 	@Inject
 	protected MonitorComponent component;
@@ -209,7 +209,7 @@ public class LoggerTask
 
 		@Override
 		public synchronized void publish(LogRecord record) {
-			String logEntry = XMLUtils.translateAll(formatter.format(record), decoded, encoded);
+			String logEntry = XMLUtils.escape(formatter.format(record));
 			String unicodeLiteral = StringUtilities.convertNonPrintableCharactersToLiterals(logEntry, true);
 			logs.add(unicodeLiteral);
 		}
