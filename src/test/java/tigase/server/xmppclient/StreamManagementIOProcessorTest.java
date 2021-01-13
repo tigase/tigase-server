@@ -57,7 +57,7 @@ public class StreamManagementIOProcessorTest
 				Packet p = Packet.packetInstance(new Element("message", new String[]{"id", "from", "to"},
 															 new String[]{String.valueOf(i), "from@example.com",
 																		  "to@example.com"}));
-				queue.append(p);
+				queue.append(p, Integer.MAX_VALUE);
 			} catch (TigaseStringprepException ex) {
 				log.log(Level.SEVERE, null, ex);
 			}
@@ -86,7 +86,7 @@ public class StreamManagementIOProcessorTest
 				Packet p = Packet.packetInstance(new Element("message", new String[]{"id", "from", "to"},
 															 new String[]{String.valueOf(i), "from@example.com",
 																		  "to@example.com"}));
-				queue.append(p);
+				queue.append(p, Integer.MAX_VALUE);
 			} catch (TigaseStringprepException ex) {
 				log.log(Level.SEVERE, null, ex);
 			}
@@ -97,7 +97,7 @@ public class StreamManagementIOProcessorTest
 				Packet p = Packet.packetInstance(new Element("message", new String[]{"id", "from", "to"},
 															 new String[]{String.valueOf(i), "from@example.com",
 																		  "to@example.com"}));
-				queue.append(p);
+				queue.append(p, Integer.MAX_VALUE);
 			} catch (TigaseStringprepException ex) {
 				log.log(Level.SEVERE, null, ex);
 			}
@@ -127,7 +127,7 @@ public class StreamManagementIOProcessorTest
 				Packet p = Packet.packetInstance(new Element("iq", new String[]{"id", "from", "to"},
 															 new String[]{String.valueOf(i), "from@example.com",
 																		  "to@example.com"}));
-				queue.append(p);
+				queue.append(p, Integer.MAX_VALUE);
 			} catch (TigaseStringprepException ex) {
 				log.log(Level.SEVERE, null, ex);
 			}
@@ -149,7 +149,7 @@ public class StreamManagementIOProcessorTest
 														 new String[]{"id", "from", "to"},
 														 new String[]{String.valueOf("id-1"), "from@example.com",
 																	  "to@example.com"}));
-			queue.append(p);
+			queue.append(p, Integer.MAX_VALUE);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.SEVERE, null, ex);
 		}
@@ -171,7 +171,7 @@ public class StreamManagementIOProcessorTest
 														 new String[]{"id", "from", "to"},
 														 new String[]{String.valueOf("id-1"), "from@example.com",
 																	  "to@example.com"}));
-			queue.append(p);
+			queue.append(p, Integer.MAX_VALUE);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.SEVERE, null, ex);
 		}
@@ -188,7 +188,7 @@ public class StreamManagementIOProcessorTest
 			Packet p = Packet.packetInstance(new Element("iq", new String[]{"id", "from", "to"},
 														 new String[]{String.valueOf("id-2"), "from@example.com",
 																	  "to@example.com"}));
-			queue.append(p);
+			queue.append(p, Integer.MAX_VALUE);
 		} catch (TigaseStringprepException ex) {
 			log.log(Level.SEVERE, null, ex);
 		}

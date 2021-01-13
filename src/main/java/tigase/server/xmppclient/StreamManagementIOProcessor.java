@@ -249,7 +249,10 @@ public class StreamManagementIOProcessor
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Queuing StreamManagement packet: {1} [{0}]", new Object[]{service, packet});
 			}
-			outQueue.append(packet);
+			if (!outQueue.append(packet, max_resumption_timeout)) {
+				// it is too long without confirmation, we need to cancel this connection.
+				service.stop();
+			}
 		}
 
 		return service.getSessionData().containsKey(RESUMPTION_TASK_KEY);
@@ -509,7 +512,9 @@ public class StreamManagementIOProcessor
 
 		if (services.remove(id, oldService)) {
 			synchronized (oldService) {
-				TimerTask timerTask = (TimerTask) oldService.getSessionData().remove(RESUMPTION_TASK_KEY);
+				// we should cancel the timer but not remove it as in other case Watchdog can "recreate" timer task
+				// and restart resumption process
+				TimerTask timerTask = (TimerTask) oldService.getSessionData().get(RESUMPTION_TASK_KEY);
 				if (timerTask != null) {
 					timerTask.cancel();
 				}
@@ -628,13 +633,21 @@ public class StreamManagementIOProcessor
 		 * Append packet to waiting for ack queue
 		 *
 		 */
-		public void append(Packet packet) {
+		public boolean append(Packet packet, int timeout) {
 			if (!packet.wasProcessedBy(XMLNS)) {
+				// we do this check if queue is bigger than 30 as some client confirm after X stanzas (not after each one)
+				if (queue.size() > 30) {
+					Entry first = queue.peekFirst();
+					if (System.currentTimeMillis() - first.stamp > timeout) {
+						return false;
+					}
+				}
 				packet.processedBy(XMLNS);
-
 				queue.offer(new Entry(packet));
 				inc();
+				return true;
 			}
+			return true;
 		}
 
 		/**
