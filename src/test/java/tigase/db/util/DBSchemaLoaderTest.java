@@ -38,6 +38,27 @@ public class DBSchemaLoaderTest {
 	}
 
 	@Test
+	public void testAdditionalJDBCParametersParsing() {
+		final String verifyServerCertificate = "verifyServerCertificate=false";
+		final String requireSSL = "requireSSL=true";
+		final String uri =
+				"jdbc:mysql://localhost/tigasedb?user=xxxx&password=xxxx&useSSL=true&" + verifyServerCertificate + "&" +
+						requireSSL;
+		SchemaLoader schemaLoader = SchemaLoader.newInstanceForURI(uri);
+		SchemaLoader.Parameters parameters = schemaLoader.createParameters();
+		parameters.parseUri(uri);
+		final Map<String, String> otherParameters = ((DBSchemaLoader.Parameters) parameters).getOtherParameters();
+		Assert.assertEquals("false", otherParameters.get("verifyServerCertificate"));
+		Assert.assertEquals("true", otherParameters.get("requireSSL"));
+		SchemaManager.RootCredentialsCache rootCredentialsCache = new SchemaManager.RootCredentialsCache();
+		rootCredentialsCache.set("localhost", new SchemaManager.RootCredentials("root", "root"));
+		schemaLoader.init(parameters, Optional.ofNullable(rootCredentialsCache));
+		schemaLoader.getDBUri();
+		Assert.assertTrue(schemaLoader.getDBUri().contains(verifyServerCertificate));
+		Assert.assertTrue(schemaLoader.getDBUri().contains(requireSSL));
+	}
+
+	@Test
 	public void getSchemaFilesCurrentEmptyRequiredSnapshot() {
 
 		Map<Version, Path> fileVersions = new ConcurrentHashMap<>();
