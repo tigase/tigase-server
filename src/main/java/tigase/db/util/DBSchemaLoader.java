@@ -1176,85 +1176,105 @@ public class DBSchemaLoader
 	}
 
 	private String getDBUri(boolean includeDbName, boolean useRootCredentials, boolean debug) {
-		String db_uri = "jdbc:";
+		StringBuilder db_uri = new StringBuilder("jdbc:");
 		String database = params.getDbType();
 		String USERNAME = useRootCredentials ? params.getDbRootUser() : params.getDbUser();
 		String PASSWORD = useRootCredentials ? params.getDbRootPass() : params.getDbPass();
 
 		switch (database) {
 			case "sqlserver":
-				db_uri += "jtds:sqlserver:";
+				db_uri.append("jtds:sqlserver:");
 				break;
 			default:
-				db_uri += database + ":";
+				db_uri.append(database).append(":");
 				break;
 		}
 		switch (database) {
 			case "derby":
-				db_uri += params.getDbName() + ";create=true";
+				if (params.getOtherParameters() != null && !params.getOtherParameters().isEmpty()) {
+					for (Map.Entry<String, String> entry : params.getOtherParameters().entrySet()) {
+						db_uri.append(";").append(entry.getKey()).append("=").append(entry.getValue());
+					}
+				}
+				db_uri.append(params.getDbName()).append(";create=true");
 				break;
 			case "sqlserver":
-				db_uri += "//" + params.getDbHostname();
+				db_uri.append("//").append(params.getDbHostname());
 				if (includeDbName) {
-					db_uri += ";databaseName=" + params.getDbName();
+					db_uri.append(";databaseName=").append(params.getDbName());
 				}
-				db_uri += ";user=" + USERNAME;
+				db_uri.append(";user=").append(USERNAME);
 				if (PASSWORD != null && !PASSWORD.isEmpty()) {
-					db_uri += ";password=" + (maskString(PASSWORD, debug));
+					db_uri.append(";password=").append(maskString(PASSWORD, debug));
 				}
-				db_uri += ";schema=dbo";
-				db_uri += ";lastUpdateCount=false";
-				db_uri += ";cacheMetaData=false";
+				db_uri.append(";schema=dbo");
+				db_uri.append(";lastUpdateCount=false");
+				db_uri.append(";cacheMetaData=false");
 				if (Boolean.TRUE.equals(params.isUseSSL())) {
-					db_uri += ";encrypt=true";
+					db_uri.append(";encrypt=true");
+				}
+				if (params.getOtherParameters() != null && !params.getOtherParameters().isEmpty()) {
+					for (Map.Entry<String, String> entry : params.getOtherParameters().entrySet()) {
+						db_uri.append(";").append(entry.getKey()).append("=").append(entry.getValue());
+					}
 				}
 				break;
 			case "postgresql":
-				db_uri += "//" + params.getDbHostname() + "/";
+				db_uri.append("//").append(params.getDbHostname()).append("/");
 				if (includeDbName) {
-					db_uri += params.getDbName();
+					db_uri.append(params.getDbName());
 				} else if (useRootCredentials) {
-					db_uri += "postgres";
+					db_uri.append("postgres");
 				}
-				db_uri += "?user=" + USERNAME;
+				db_uri.append("?user=").append(USERNAME);
 				if (PASSWORD != null && !PASSWORD.isEmpty()) {
-					db_uri += "&password=" + (maskString(PASSWORD, debug));
+					db_uri.append("&password=").append(maskString(PASSWORD, debug));
 				}
 				if (Boolean.TRUE.equals(params.isUseSSL())) {
-					db_uri += "&useSSL=true";
+					db_uri.append("&useSSL=true");
 				} else if (Boolean.FALSE.equals(params.isUseSSL())) {
 					// explicitly disable SSL to avoid a warning by the driver
-					db_uri += "&useSSL=false";
+					db_uri.append("&useSSL=false");
+				}
+				if (params.getOtherParameters() != null && !params.getOtherParameters().isEmpty()) {
+					for (Map.Entry<String, String> entry : params.getOtherParameters().entrySet()) {
+						db_uri.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+					}
 				}
 				break;
 
 			case "mysql":
-				db_uri += "//" + params.getDbHostname() + "/";
+				db_uri.append("//").append(params.getDbHostname()).append("/");
 				if (includeDbName) {
-					db_uri += params.getDbName();
+					db_uri.append(params.getDbName());
 				}
-				db_uri += "?user=" + USERNAME;
+				db_uri.append("?user=").append(USERNAME);
 				if (PASSWORD != null && !PASSWORD.isEmpty()) {
-					db_uri += "&password=" + maskString(PASSWORD, debug);
+					db_uri.append("&password=").append(maskString(PASSWORD, debug));
 				}
 				if (Boolean.TRUE.equals(params.isUseSSL())) {
-					db_uri += "&useSSL=true";
+					db_uri.append("&useSSL=true");
 				} else if (Boolean.FALSE.equals(params.isUseSSL())) {
 					// explicitly disable SSL to avoid a warning by the driver
-					db_uri += "&useSSL=false";
+					db_uri.append("&useSSL=false");
 				}
 				if (!params.isUseLegacyDatetimeCode()) {
-					db_uri += "&useLegacyDatetimeCode=" + params.isUseLegacyDatetimeCode();
+					db_uri.append("&useLegacyDatetimeCode=").append(params.isUseLegacyDatetimeCode());
 				}
 				if (params.getServerTimezone() != null) {
-					db_uri += "&serverTimezone=" + params.getServerTimezone();
+					db_uri.append("&serverTimezone=").append(params.getServerTimezone());
 				}
-				db_uri += "&allowPublicKeyRetrieval=true";
+				if (params.getOtherParameters() != null && !params.getOtherParameters().isEmpty()) {
+					for (Map.Entry<String, String> entry : params.getOtherParameters().entrySet()) {
+						db_uri.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+					}
+				}
+				db_uri.append("&allowPublicKeyRetrieval=true");
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown database type: " + database);
 		}
-		return db_uri;
+		return db_uri.toString();
 	}
 
 	private String maskString(String PASSWORD, boolean debug) {
@@ -1393,6 +1413,7 @@ public class DBSchemaLoader
 		private Boolean useSSL = null;
 		private boolean forceReloadSchema = false;
 		private String schemaDirectory = "database/";
+		private Map<String,String> otherParameters = new HashMap<>();
 
 		private static String getProperty(Properties props, PARAMETERS_ENUM param) {
 			return props.getProperty(param.getName(), null); //param.getDefaultValue());
@@ -1456,6 +1477,10 @@ public class DBSchemaLoader
 			return dbPass;
 		}
 
+		public Map<String, String> getOtherParameters() {
+			return otherParameters;
+		}
+
 		public boolean isForceReloadSchema() {
 			return forceReloadSchema;
 		}
@@ -1511,21 +1536,16 @@ public class DBSchemaLoader
 							dbHostname = x;
 						} else {
 							String p[] = x.split("=");
-							switch (p[0]) {
-								case "databaseName":
-									dbName = p[1];
-									break;
-								case "user":
-									dbUser = p[1];
-									break;
-								case "password":
-									dbPass = p[1];
-									break;
-								case "encrypt":
-									useSSL = Boolean.valueOf(p[1]);
-								default:
-									// unknown setting
-									break;
+							if ("databaseName".equals(p[0])) {
+								dbName = p[1];
+							} else if ("user".equals(p[0])) {
+								dbUser = p[1];
+							} else if ("password".equals(p[0])) {
+								dbPass = p[1];
+							} else if ("encrypt".equals(p[0])) {
+								useSSL = Boolean.valueOf(p[1]);
+							} else {
+								otherParameters.put(p[0],p[1]);
 							}
 						}
 					}
@@ -1545,24 +1565,18 @@ public class DBSchemaLoader
 						if (p.length < 2) {
 							continue;
 						}
-						switch (p[0]) {
-							case "user":
-								dbUser = p[1];
-								break;
-							case "password":
-								dbPass = p[1];
-								break;
-							case "useSSL":
-								useSSL = Boolean.valueOf(p[1]);
-								break;
-							case "useLegacyDatetimeCode":
-								useLegacyDatetimeCode = Boolean.valueOf(p[1]);
-								break;
-							case "serverTimezone":
-								serverTimezone = p[1];
-								break;
-							default:
-								break;
+						if ("user".equals(p[0])) {
+							dbUser = p[1];
+						} else if ("password".equals(p[0])) {
+							dbPass = p[1];
+						} else if ("useSSL".equals(p[0])) {
+							useSSL = Boolean.valueOf(p[1]);
+						} else if ("useLegacyDatetimeCode".equals(p[0])) {
+							useLegacyDatetimeCode = Boolean.valueOf(p[1]);
+						} else if ("serverTimezone".equals(p[0])) {
+							serverTimezone = p[1];
+						} else {
+							otherParameters.put(p[0],p[1]);
 						}
 					}
 					break;
