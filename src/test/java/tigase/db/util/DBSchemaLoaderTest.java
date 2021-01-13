@@ -39,18 +39,23 @@ public class DBSchemaLoaderTest {
 
 	@Test
 	public void testAdditionalJDBCParametersParsing() {
-		final String uri = "jdbc:mysql://localhost/tigasedb?user=xxxx&password=xxxx&useSSL=true&verifyServerCertificate=false&requireSSL=true";
+		final String verifyServerCertificate = "verifyServerCertificate=false";
+		final String requireSSL = "requireSSL=true";
+		final String uri =
+				"jdbc:mysql://localhost/tigasedb?user=xxxx&password=xxxx&useSSL=true&" + verifyServerCertificate + "&" +
+						requireSSL;
 		SchemaLoader schemaLoader = SchemaLoader.newInstanceForURI(uri);
 		SchemaLoader.Parameters parameters = schemaLoader.createParameters();
 		parameters.parseUri(uri);
 		final Map<String, String> otherParameters = ((DBSchemaLoader.Parameters) parameters).getOtherParameters();
 		Assert.assertEquals("false", otherParameters.get("verifyServerCertificate"));
 		Assert.assertEquals("true", otherParameters.get("requireSSL"));
-//		SchemaManager.RootCredentialsCache rootCredentialsCache = new SchemaManager.RootCredentialsCache();
-//		rootCredentialsCache.set("localhost", new SchemaManager.RootCredentials("root", "root"));
-//		schemaLoader.init(parameters, Optional.ofNullable(rootCredentialsCache));
-//		schemaLoader.getDBUri();
-//		Assert.assertEquals(uri, schemaLoader.getDBUri());
+		SchemaManager.RootCredentialsCache rootCredentialsCache = new SchemaManager.RootCredentialsCache();
+		rootCredentialsCache.set("localhost", new SchemaManager.RootCredentials("root", "root"));
+		schemaLoader.init(parameters, Optional.ofNullable(rootCredentialsCache));
+		schemaLoader.getDBUri();
+		Assert.assertTrue(schemaLoader.getDBUri().contains(verifyServerCertificate));
+		Assert.assertTrue(schemaLoader.getDBUri().contains(requireSSL));
 	}
 
 	@Test
@@ -67,8 +72,7 @@ public class DBSchemaLoaderTest {
 
 		final Map<Version, Path> result = getSchemaFileNamesInRange(fileVersions, currentVersion, requiredVersion);
 
-		Assert.assertEquals("Should contain all available files",
-		                    result.keySet(), fileVersions.keySet());
+		Assert.assertEquals("Should contain all available files", result.keySet(), fileVersions.keySet());
 	}
 
 	@Test
@@ -85,10 +89,9 @@ public class DBSchemaLoaderTest {
 
 		final Map<Version, Path> result = getSchemaFileNamesInRange(fileVersions, currentVersion, requiredVersion);
 
-		Assert.assertEquals("Should contain only latest version (same as required)",
-		                    result.keySet(), new TreeSet<>(Arrays.asList(Version.of("4.0.0"))));
+		Assert.assertEquals("Should contain only latest version (same as required)", result.keySet(),
+							new TreeSet<>(Arrays.asList(Version.of("4.0.0"))));
 	}
-
 
 	@Test
 	public void getSchemaFilesSameVersionCurrentFinalRequiredFinal() {
@@ -104,8 +107,7 @@ public class DBSchemaLoaderTest {
 
 		final Map<Version, Path> result = getSchemaFileNamesInRange(fileVersions, currentVersion, requiredVersion);
 
-		Assert.assertTrue("Should be empty",
-		                  result.isEmpty());
+		Assert.assertTrue("Should be empty", result.isEmpty());
 	}
 
 	@Test
@@ -122,8 +124,8 @@ public class DBSchemaLoaderTest {
 
 		final Map<Version, Path> result = getSchemaFileNamesInRange(fileVersions, currentVersion, requiredVersion);
 
-		Assert.assertEquals("Should contain only latest version (same as required)",
-		                    result.keySet(), new TreeSet<>(Arrays.asList()));
+		Assert.assertEquals("Should contain only latest version (same as required)", result.keySet(),
+							new TreeSet<>(Arrays.asList()));
 	}
 
 	@Test
@@ -140,10 +142,9 @@ public class DBSchemaLoaderTest {
 
 		final Map<Version, Path> result = getSchemaFileNamesInRange(fileVersions, currentVersion, requiredVersion);
 
-		Assert.assertEquals("Should contain only latest version (same as required)",
-		                    result.keySet(), new TreeSet<>(Arrays.asList(Version.of("4.0.0"))));
+		Assert.assertEquals("Should contain only latest version (same as required)", result.keySet(),
+							new TreeSet<>(Arrays.asList(Version.of("4.0.0"))));
 	}
-
 
 	@Test
 	public void getSchemaFileNamesInRangeOrderTest() {
@@ -159,8 +160,8 @@ public class DBSchemaLoaderTest {
 
 		final Map<Version, Path> result = getSchemaFileNamesInRange(fileVersions, currentVersion, requiredVersion);
 		Assert.assertEquals(result.keySet().toArray(),
-		                    new Object[]{Version.of("3.0.0"), Version.of("3.1.0"), Version.of("3.2.0"),
-		                                 Version.of("4.0.0")});
+							new Object[]{Version.of("3.0.0"), Version.of("3.1.0"), Version.of("3.2.0"),
+										 Version.of("4.0.0")});
 	}
 
 }
