@@ -633,12 +633,12 @@ public class StreamManagementIOProcessor
 		 * Append packet to waiting for ack queue
 		 *
 		 */
-		public boolean append(Packet packet, int timeout) {
+		public boolean append(Packet packet, int timeoutInSec) {
 			if (!packet.wasProcessedBy(XMLNS)) {
 				// we do this check if queue is bigger than 30 as some client confirm after X stanzas (not after each one)
 				if (queue.size() > 30) {
 					Entry first = queue.peekFirst();
-					if (System.currentTimeMillis() - first.stamp > timeout) {
+					if (System.currentTimeMillis() - first.stamp > (timeoutInSec * 1000)) {
 						return false;
 					}
 				}
