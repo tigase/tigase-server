@@ -251,6 +251,15 @@ public class StreamManagementIOProcessor
 			}
 			if (!outQueue.append(packet, max_resumption_timeout)) {
 				// it is too long without confirmation, we need to cancel this connection.
+				try {
+					service.getSessionData().put(RESUMPTION_TIMEOUT_START_KEY, 0L);
+					service.writeRawData("<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" +
+												 "<policy-violation xmlns=\"urn:ietf:params:xml:ns:xmpp-streams\"/>" +
+												 "<text xmlns=\"urn:ietf:params:xml:ns:xmpp-streams\">Too many unacked stanzas</text>" +
+												 "</stream:error>");
+				} catch (IOException ex) {
+					// we do not care if exception happened as we already are closing this connection
+				}
 				service.stop();
 			}
 		}
