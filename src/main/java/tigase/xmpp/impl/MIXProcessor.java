@@ -154,7 +154,7 @@ public class MIXProcessor
 									rosterUtil.updateBuddyChange(session, results, it);
 									break;
 							}
-							Optional.ofNullable(session.getParentSession())
+							Optional.ofNullable(session).map(XMPPResourceConnection::getParentSession)
 									.map(parent -> parent.getResourceForResource(resource))
 									.map(conn -> {
 										try {
@@ -177,7 +177,7 @@ public class MIXProcessor
 							results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, true));
 						}
 					} else if(packet.getType() == StanzaType.error) {
-						Optional.ofNullable(session.getParentSession())
+						Optional.ofNullable(session).map(XMPPResourceConnection::getParentSession)
 								.map(parent -> parent.getResourceForResource(resource))
 								.map(conn -> {
 									try {
