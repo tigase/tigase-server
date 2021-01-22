@@ -53,9 +53,13 @@ public class DBSchemaLoaderTest {
 		SchemaManager.RootCredentialsCache rootCredentialsCache = new SchemaManager.RootCredentialsCache();
 		rootCredentialsCache.set("localhost", new SchemaManager.RootCredentials("root", "root"));
 		schemaLoader.init(parameters, Optional.ofNullable(rootCredentialsCache));
-		schemaLoader.getDBUri();
 		Assert.assertTrue(schemaLoader.getDBUri().contains(verifyServerCertificate));
 		Assert.assertTrue(schemaLoader.getDBUri().contains(requireSSL));
+
+		String recreatedUri = schemaLoader.getDBUri();
+		// we are using MySQL query for testing so separator should be &
+		Assert.assertTrue("Invalid separator after '" + verifyServerCertificate + "' in '" + recreatedUri + "'", recreatedUri.contains(verifyServerCertificate + "&") || recreatedUri.endsWith(verifyServerCertificate));
+		Assert.assertTrue("Invalid separator after '" + requireSSL + "' in '" + recreatedUri + "'", recreatedUri.contains(requireSSL + "&") || recreatedUri.endsWith(requireSSL));
 	}
 
 	@Test
