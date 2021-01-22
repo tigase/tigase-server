@@ -1222,7 +1222,7 @@ public class DBSchemaLoader
 				}
 				if (params.getOtherParameters() != null && !params.getOtherParameters().isEmpty()) {
 					for (Map.Entry<String, String> entry : params.getOtherParameters().entrySet()) {
-						db_uri += ";" + entry.getKey() + "=" + entry.getValue();
+						db_uri += "&" + entry.getKey() + "=" + entry.getValue();
 					}
 				}
 				db_uri += "&allowPublicKeyRetrieval=true";
