@@ -147,7 +147,7 @@ public class DefaultMixLogic extends DefaultPubSubLogic
 				String domain = channel.getDomain().substring(component.getName().length() + 1);
 				return Optional.ofNullable(component.getVHostItem(domain))
 						.filter(vhost -> vhost.isAdmin(jid.toString()))
-						.isPresent();
+						.isPresent() || component.isAdmin(JID.jidInstance(jid));
 			}
 			case DOMAIN_OWNER: {
 				String domain = channel.getDomain().substring(component.getName().length() + 1);
