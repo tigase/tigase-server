@@ -50,6 +50,7 @@ public class JcaTLSWrapper
 	private int netBuffSize = 0;
 	private SSLEngine tlsEngine = null;
 	private SSLEngineResult tlsEngineResult = null;
+	private boolean notifyHandshakeCompleted = false;
 
 	public JcaTLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String hostname, int port,
 						 final boolean clientMode, final boolean wantClientAuth) {
@@ -108,6 +109,14 @@ public class JcaTLSWrapper
 					new Object[]{mode, enabledProtocolsDebug, enabledCiphersDebug, sessionCipher});
 		}
 
+	}
+
+	@Override
+	public void notifyIfHandshakeFinished() {
+		if (notifyHandshakeCompleted) {
+			notifyHandshakeCompleted = false;
+			eventHandler.handshakeCompleted(this);
+		}
 	}
 
 	@Override
@@ -283,9 +292,12 @@ public class JcaTLSWrapper
 		}
 
 		if (tlsEngineResult.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.FINISHED) {
-			if (eventHandler != null) {
-				eventHandler.handshakeCompleted(this);
-			}
+			// this needs to be delayed until after net buffer is added to output queue or we can cause reordering of bytes on the TCP stream
+//			if (eventHandler != null) {
+//				eventHandler.handshakeCompleted(this);
+//			}
+			// so set a flag and check it later on..
+			notifyHandshakeCompleted = true;
 		}
 
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
