@@ -21,6 +21,7 @@ package tigase.io.repo;
 import tigase.db.comp.UserRepoRepository;
 import tigase.io.CertificateContainer;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.concurrent.TimeUnit;
@@ -32,6 +33,9 @@ public class CertificateRepository
 	private final static String CONFIG_KEY = "vhost-certificates";
 
 	private final static BareJID REPO_USER_JID = BareJID.bareJIDInstanceNS("certificate-manager");
+
+	@ConfigField(desc = "Automatically migrate certificates from filesystem to repository (and make backup)", alias = "move-from-filesystem-to-repository")
+	protected boolean moveFromFilesystemToRepository = true;
 
 	public CertificateRepository() {
 		this.autoReloadInterval = TimeUnit.MINUTES.toSeconds(60);
@@ -64,5 +68,9 @@ public class CertificateRepository
 	@Override
 	public void reload() {
 		super.reload();
+	}
+
+	public boolean isMoveFromFilesystemToRepository() {
+		return moveFromFilesystemToRepository;
 	}
 }

@@ -210,10 +210,10 @@ public class CertificateContainer
 				defaultCertDirectory = getDefaultCertDirectory(pemDirs);
 
 				// we should first load available files and then override it with user configured mapping
-				loadCertificatesFromDirectories(pemDirs);
+				loadCertificatesFromDirectories(pemDirs, false);
 
 				Map<String, String> predefined = findPredefinedCertificates(params);
-				loadPredefinedCertificates(predefined);
+				loadPredefinedCertificates(predefined, false);
 			}
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINEST)) {
@@ -269,12 +269,19 @@ public class CertificateContainer
 		try {
 			if (repository != null) {
 				loadCertificatesFromRepository();
+				if (repository.isMoveFromFilesystemToRepository()) {
+					loadCertificatesFromDirectories(sslCertsLocation, true);
+					loadPredefinedCertificates(customCerts, true);
+					for (Map.Entry<String, CertificateEntry> certificates : cens.entrySet()) {
+						repository.addItem(new CertificateItem(certificates.getKey(), certificates.getValue()));
+					}
+				}
 			} else {
 				String[] pemDirs = sslCertsLocation;
 				defaultCertDirectory = getDefaultCertDirectory(pemDirs);
 				// we should first load available files and then override it with user configured mapping
-				loadCertificatesFromDirectories(pemDirs);
-				loadPredefinedCertificates(customCerts);
+				loadCertificatesFromDirectories(pemDirs, false);
+				loadPredefinedCertificates(customCerts, false);
 			}
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINEST)) {
@@ -382,7 +389,7 @@ public class CertificateContainer
 		}
 	}
 
-	private void loadCertificatesFromDirectories(String[] pemDirs) {
+	private void loadCertificatesFromDirectories(String[] pemDirs, boolean moveFileToBackup) {
 		for (String pemDir : pemDirs) {
 			log.log(Level.CONFIG, "Loading server certificates from PEM directory: {0}", pemDir);
 			final File directory = new File(pemDir);
@@ -396,17 +403,21 @@ public class CertificateContainer
 			// subdomain.
 			Arrays.sort(files, Comparator.comparingInt(fn -> fn.getName().split("\\.").length));
 			for (File file : files) {
-				loadCertificateFromFile(file);
+				loadCertificateFromFile(file, moveFileToBackup);
 			}
 		}
 	}
 
-	private void loadCertificateFromFile(File file) {
+	private void loadCertificateFromFile(File file, boolean moveFileToBackup) {
 		String alias = file.getName();
 		if (alias.endsWith(".pem")) {
 			alias = alias.substring(0, alias.length() - 4);
 		}
 
+		loadCertificateFromFile(file, alias, moveFileToBackup);
+	}
+
+	private void loadCertificateFromFile(File file, String alias, boolean moveFileToBackup) {
 		try {
 			CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
 			addCertificateEntry(certEntry, alias, false);
@@ -415,6 +426,12 @@ public class CertificateContainer
 					.orElse(Collections.emptySet());
 			log.log(Level.CONFIG, "Loaded server certificate for domain: {0} (altCNames: {1}) from file: {2}",
 					new Object[]{alias, String.join(", ", domains), file});
+			if (moveFileToBackup) {
+				final Path target = file.toPath().resolveSibling(file.toPath().getFileName() + ".bak");
+				Files.move(file.toPath(), target);
+				log.log(Level.CONFIG, "Made backup of file: {0} to: {1}",
+						new Object[]{file, target});
+			}
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Cannot load certficate from file: " + file, ex);
@@ -423,26 +440,12 @@ public class CertificateContainer
 		}
 	}
 
-	private void loadPredefinedCertificates(Map<String, String> predefined) {
+	private void loadPredefinedCertificates(Map<String, String> predefined, boolean moveFileToBackup) {
 		log.log(Level.CONFIG, "Loading predefined server certificates");
 		for (final Map.Entry<String, String> entry : predefined.entrySet()) {
-			try {
-				File file = new File(entry.getValue());
-				CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
-				String alias = entry.getKey();
-				addCertificateEntry(certEntry, alias, false);
-				Set<String> domains = certEntry.getCertificate()
-						.map(CertificateContainer::getAllCNames)
-						.orElse(Collections.emptySet());
-				log.log(Level.CONFIG,
-						"Loaded predefined server certificate for domain: {0} (altCNames: {1}) from file: {2}",
-						new Object[]{alias, String.join(", ", domains), entry.getValue()});
-			} catch (Exception ex) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Cannot load certficate from file: " + entry.getValue(), ex);
-				}
-				log.log(Level.WARNING, "Cannot load certficate from file: " + entry.getValue() + ", " + ex.getMessage());
-			}
+			File file = new File(entry.getValue());
+			String alias = entry.getKey();
+			loadCertificateFromFile(file, alias, moveFileToBackup);
 		}
 	}
 
