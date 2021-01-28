@@ -481,7 +481,6 @@ public class TLSIO
 						new Object[]{buff.remaining(), loop_cnt, max_loop_runs, toString(), String.valueOf(tlsWrapper)});
 			}
 
-			 tlsWrapper.notifyIfHandshakeFinished();
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
 
 		if (loop_cnt > (max_loop_runs / 2)) {

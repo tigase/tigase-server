@@ -17,7 +17,6 @@
  */
 package tigase.io;
 
-import tigase.annotations.TigaseDeprecated;
 import tigase.cert.CertCheckResult;
 
 import javax.net.ssl.SSLEngineResult;
@@ -61,8 +60,4 @@ public interface TLSWrapper {
 	boolean wantClientAuth();
 
 	void wrap(ByteBuffer app, ByteBuffer net) throws SSLException;
-
-	@Deprecated
-	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "This method might be replaced by checking if handshake was finished on TLSIO level but that requires API changes.")
-	default void notifyIfHandshakeFinished() {}
 }
