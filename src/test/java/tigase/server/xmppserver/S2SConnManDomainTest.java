@@ -63,11 +63,11 @@ public class S2SConnManDomainTest
 		testS2STigaseConnectionManager(null);
 	}
 
-	@Test
-	public void testS2S_frsra_ml() {
-		setupCID("tigase.im", "frsra.ml");
-		testS2STigaseConnectionManager(null);
-	}
+//	@Test
+//	public void testS2S_frsra_ml() {
+//		setupCID("tigase.im", "frsra.ml");
+//		testS2STigaseConnectionManager(null);
+//	}
 
 	@Test
 	public void testS2S_jabber_ru() {
@@ -93,11 +93,11 @@ public class S2SConnManDomainTest
 		testS2STigaseConnectionManager(null);
 	}
 
-	@Test
-	public void testS2S_axeos_nl() {
-		setupCID("tigase.im", "axeos.nl");
-		testS2STigaseConnectionManager(null);
-	}
+//	@Test
+//	public void testS2S_axeos_nl() {
+//		setupCID("tigase.im", "axeos.nl");
+//		testS2STigaseConnectionManager(null);
+//	}
 
 	@Test
 	public void testS2S_tigase_org() {
@@ -115,11 +115,11 @@ public class S2SConnManDomainTest
 		testS2STigaseConnectionManager(null);
 	}
 
-	@Test
-	public void testS2S_jit_si() {
-		setupCID("tigase.im", "jit.si");
-		testS2STigaseConnectionManager(null);
-	}
+//	@Test
+//	public void testS2S_jit_si() {
+//		setupCID("tigase.im", "jit.si");
+//		testS2STigaseConnectionManager(null);
+//	}
 
 	@Test
 	public void testS2S_jabber_org() {
@@ -166,12 +166,12 @@ public class S2SConnManDomainTest
 		testS2STigaseConnectionManager(null);
 	}
 
-	@Test
-	public void testS2S_legaliza_live() {
-		// invalid namespace?! / Openfire 4.4.2
-		setupCID("tigase.im", "legaliza.live");
-		testS2STigaseConnectionManager(null);
-	}
+//	@Test
+//	public void testS2S_legaliza_live() {
+//		// invalid namespace?! / Openfire 4.4.2
+//		setupCID("tigase.im", "legaliza.live");
+//		testS2STigaseConnectionManager(null);
+//	}
 
 	@Test
 	public void testS2S_jabber_cz() {
