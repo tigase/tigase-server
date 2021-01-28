@@ -32,9 +32,7 @@ import tigase.kernel.core.Kernel;
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.*;
@@ -427,10 +425,14 @@ public class CertificateContainer
 			log.log(Level.CONFIG, "Loaded server certificate for domain: {0} (altCNames: {1}) from file: {2}",
 					new Object[]{alias, String.join(", ", domains), file});
 			if (moveFileToBackup) {
-				final Path target = file.toPath().resolveSibling(file.toPath().getFileName() + ".bak");
-				Files.move(file.toPath(), target);
-				log.log(Level.CONFIG, "Made backup of file: {0} to: {1}",
-						new Object[]{file, target});
+				Path target = null;
+				try {
+					target = file.toPath().resolveSibling(file.toPath().getFileName() + ".bak");
+					Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+					log.log(Level.CONFIG, "Made backup of file: {0} to: {1}", new Object[]{file, target});
+				} catch (Exception e) {
+					log.log(Level.INFO, "Making file from: {0} to: {1} failed!", new Object[]{file, target, e});
+				}
 			}
 		} catch (Exception ex) {
 			if (log.isLoggable(Level.FINEST)) {
