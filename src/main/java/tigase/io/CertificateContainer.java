@@ -32,7 +32,10 @@ import tigase.kernel.core.Kernel;
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.*;
@@ -347,9 +350,13 @@ public class CertificateContainer
 			if (certificate.isPresent()) {
 				Set<String> domains = getAllCNames(certificate.get());
 				log.log(Level.FINEST,
-						"Certificate present with domains: {0}. Replacing in collections. Certificate: {2}", new Object[]{domains, certificate.get()});
+						"Certificate present with domains: {0}. Replacing in collections, kmfs domains: {1}, cens domains: {2}. Certificate: {3}",
+						new Object[]{domains, kmfs.keySet(), cens.keySet(), certificate.get()});
 				SSLContextContainerAbstract.removeMatchedDomains(kmfs, domains);
 				SSLContextContainerAbstract.removeMatchedDomains(cens, domains);
+				log.log(Level.FINEST,
+						"Certificate present with domains: {0}. Collections after domain removal, kmfs domains: {1}, cens domains: {2}",
+						new Object[]{domains, kmfs.keySet(), cens.keySet()});
 				for (String domain : domains) {
 					kmf = getKeyManagerFactory(domain, privateKey, certChain);
 					kmfs.put(domain, kmf);
@@ -494,7 +501,7 @@ public class CertificateContainer
 	private void addCertificate(String alias, String pemCert, boolean saveToDisk, boolean notifyCluster)
 			throws CertificateParsingException {
 		try {
-			log.log(Level.FINEST, "Adding new certificate with alias: {0}. Saving to disk: {2}, notify cluster: {3}",
+			log.log(Level.FINEST, "Adding new certificate with alias: {0}. Saving to disk: {1}, notify cluster: {2}",
 					new Object[]{alias, saveToDisk, notifyCluster});
 			CertificateEntry entry = CertificateUtil.parseCertificate(new CharArrayReader(pemCert.toCharArray()));
 
