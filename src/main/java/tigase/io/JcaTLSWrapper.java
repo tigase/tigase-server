@@ -40,6 +40,12 @@ import java.util.logging.Logger;
 public class JcaTLSWrapper
 		implements TLSWrapper {
 
+	enum InternalHandshakeStatus {
+		handshaking,
+		finished,
+		not_handshaking
+	}
+
 	private static final Logger log = Logger.getLogger(JcaTLSWrapper.class.getName());
 
 	private int appBuffSize = 0;
@@ -50,7 +56,7 @@ public class JcaTLSWrapper
 	private int netBuffSize = 0;
 	private SSLEngine tlsEngine = null;
 	private SSLEngineResult tlsEngineResult = null;
-	private boolean notifyHandshakeCompleted = false;
+	private InternalHandshakeStatus handshakeStatus = InternalHandshakeStatus.handshaking;
 
 	public JcaTLSWrapper(SSLContext sslc, TLSEventHandler eventHandler, String hostname, int port,
 						 final boolean clientMode, final boolean wantClientAuth) {
@@ -111,10 +117,33 @@ public class JcaTLSWrapper
 
 	}
 
+	protected void tlsEngineHandshakeCompleted() {
+		if (handshakeStatus == InternalHandshakeStatus.handshaking) {
+			handshakeStatus = InternalHandshakeStatus.finished;
+		} else {
+			log.log(Level.FINEST, "Handshake completed, already reported [{0}]", new Object[]{debugId});
+		}
+	}
+
 	@Override
 	public void notifyIfHandshakeFinished() {
-		if (notifyHandshakeCompleted) {
-			notifyHandshakeCompleted = false;
+		if (handshakeStatus == InternalHandshakeStatus.finished) {
+			handshakeStatus = InternalHandshakeStatus.not_handshaking;
+			if (log.isLoggable(Level.FINE)) {
+				SSLSession session = null;
+				try {
+					session = tlsEngine.getHandshakeSession();
+				} catch (UnsupportedOperationException ex) {
+				}
+				if (session != null && session.isValid()) {
+					log.log(Level.FINE, "Handshake completed with: {1}, cipher: {2}, application protocol: {3} [{0}]",
+							new Object[]{debugId, session.getProtocol(), session.getCipherSuite(),
+										 tlsEngine.getApplicationProtocol()});
+				} else {
+					log.log(Level.FINEST, "Handshake completed, but details are unavailable [{0}]",
+							new Object[]{debugId});
+				}
+			}
 			eventHandler.handshakeCompleted(this);
 		}
 	}
@@ -256,9 +285,8 @@ public class JcaTLSWrapper
 		}
 
 		if (tlsEngineResult.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.FINISHED) {
-			if (eventHandler != null) {
-				eventHandler.handshakeCompleted(this);
-			}
+			this.tlsEngineHandshakeCompleted();
+			this.notifyIfHandshakeFinished();
 		}
 
 		if (tlsEngineResult.getStatus() == Status.BUFFER_OVERFLOW) {
@@ -297,7 +325,7 @@ public class JcaTLSWrapper
 //				eventHandler.handshakeCompleted(this);
 //			}
 			// so set a flag and check it later on..
-			notifyHandshakeCompleted = true;
+			this.tlsEngineHandshakeCompleted();
 		}
 
 		if (tlsEngineResult.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
