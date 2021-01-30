@@ -40,7 +40,7 @@ public class S2SConnManTest
 	}
 
 	private static void setupCID() {
-		String localHostname = System.getProperty("test-local-hostname", "tigase.im");
+		String localHostname = localHostname();
 		String remoteHostname = System.getProperty("test-remote-hostname", "wojtek-local.tigase.eu");
 // //		 https://projects.tigase.net/issue/systems-54
 //			remoteHostname = "convorb.im";
@@ -49,35 +49,39 @@ public class S2SConnManTest
 		setupCID(localHostname, remoteHostname);
 	}
 
+	private static String localHostname() {
+		return System.getProperty("test-local-hostname", "tigase.im");
+	}
+
 	@Test
 	public void testS2STigase_defaults() {
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager(localHostname(), null);
 	}
 
 	@Test
 	public void testS2STigase_default_w_TLS13_only() {
-		testS2STigaseConnectionManager(new String[]{"TLSv1.3"});
+		testS2STigaseConnectionManager(localHostname(), new String[]{"TLSv1.3"});
 	}
 
 	@Test
 	public void testS2STigase_default_w_TLS13_w_SSLv2Hello() {
-		testS2STigaseConnectionManager(new String[]{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1", "SSLv2Hello"});
+		testS2STigaseConnectionManager(localHostname(), new String[]{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1", "SSLv2Hello"});
 	}
 
 	@Test
 	public void testS2STigase_default_w_TLS13_wo_SSLv2Hello() {
-		testS2STigaseConnectionManager(new String[]{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"});
+		testS2STigaseConnectionManager(localHostname(), new String[]{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"});
 	}
 
 	@Test
 	public void testS2STigase_default_wo_TLS13_wo_SSLv2Hello() {
-		testS2STigaseConnectionManager(new String[]{"TLSv1.2", "TLSv1.1", "TLSv1"});
+		testS2STigaseConnectionManager(localHostname(), new String[]{"TLSv1.2", "TLSv1.1", "TLSv1"});
 	}
 
 	@Test
 	public void testS2STigase_default_wo_TLS13_w_SSLv2Hello() {
 		// "SSLv2Hello" failing?! for constricted openssl cipher list [2]
-		testS2STigaseConnectionManager(new String[]{"TLSv1.2", "TLSv1.1", "TLSv1", "SSLv2Hello"});
+		testS2STigaseConnectionManager(localHostname(), new String[]{"TLSv1.2", "TLSv1.1", "TLSv1", "SSLv2Hello"});
 	}
 
 }
