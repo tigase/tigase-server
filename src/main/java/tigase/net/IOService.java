@@ -309,20 +309,23 @@ public abstract class IOService<RefObject>
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "TLS handshake completed: {1} [{0}]", new Object[]{this, certCheckResult});
 		}
+
 		if (!wrapper.isClientMode()) {
 			this.tlsUniqueId = wrapper.getTlsUniqueBindingData();
-			try {
-				Certificate[] certs = wrapper.getLocalCertificates();
-				this.localCertificate = certs == null || certs.length == 0 ? null : certs[0];
-				if (certs != null) {
-					KeyStore trustStore = sslContextContainer.getTrustStore();
-					CertCheckResult checkResult = validateCertificate(certs, trustStore, false);
-					sessionData.put(LOCAL_CERT_CHECK_RESULT, checkResult);
-				}
-			} catch (Exception e) {
-				this.localCertificate = null;
-				log.log(Level.WARNING, "Cannot get local certificate", e);
+		}
+
+		// we want to have local SSL certificate validated all the time, ie. for outgoing S2S connection
+		try {
+			Certificate[] certs = wrapper.getLocalCertificates();
+			this.localCertificate = certs == null || certs.length == 0 ? null : certs[0];
+			if (certs != null) {
+				KeyStore trustStore = sslContextContainer.getTrustStore();
+				CertCheckResult checkResult = validateCertificate(certs, trustStore, false);
+				sessionData.put(LOCAL_CERT_CHECK_RESULT, checkResult);
 			}
+		} catch (Exception e) {
+			this.localCertificate = null;
+			log.log(Level.WARNING, "Cannot get local certificate", e);
 		}
 		if (!wrapper.isClientMode() && (wrapper.wantClientAuth() || wrapper.isNeedClientAuth())) {
 			try {
