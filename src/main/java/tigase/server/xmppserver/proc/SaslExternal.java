@@ -150,6 +150,15 @@ public class SaslExternal
 				return false;
 			}
 
+			if (!canAddSaslToFeatures(serv)) {
+				// if we have not trusted SSL certificate (local), then there is no point in trying SASL EXTERNAL
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Skipping SASL-EXTERNAL: local certificate for {1} is not trusted (self-signed or expired)  [{0}]",
+							new Object[]{serv, cid.getLocalHost()});
+				}
+				return false;
+			}
+
 			return true;
 
 		}
