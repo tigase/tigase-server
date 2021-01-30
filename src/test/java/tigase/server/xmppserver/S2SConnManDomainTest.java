@@ -54,13 +54,13 @@ public class S2SConnManDomainTest
 	@Test
 	public void testS2S_convorb_im() {
 		setupCID("tigase.im", "convorb.im");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_404_city() {
 		setupCID("tigase.im", "404.city");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 //	@Test
@@ -72,25 +72,25 @@ public class S2SConnManDomainTest
 	@Test
 	public void testS2S_jabber_ru() {
 		setupCID("tigase.im", "jabber.ru");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_jabberix_com() {
 		setupCID("tigase.im", "jabberix.com");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_jwchat_org() {
 		setupCID("tigase.im", "jwchat.org");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_vrcshop_com() {
 		setupCID("tigase.im", "vrcshop.com");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 //	@Test
@@ -102,7 +102,7 @@ public class S2SConnManDomainTest
 	@Test
 	public void testS2S_tigase_org() {
 		setupCID("tigase.im", "tigase.org");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class S2SConnManDomainTest
 	@Ignore
 	public void testS2S_puddlejumper_atlantiscity() {
 		setupCID("puddlejumper", "atlantiscity");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("puddlejumper", null);
 	}
 
 //	@Test
@@ -124,46 +124,46 @@ public class S2SConnManDomainTest
 	@Test
 	public void testS2S_jabber_org() {
 		setupCID("tigase.im", "jabber.org");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_cluxia_eu() {
 		setupCID("tigase.im", "cluxia.eu");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_pouet_ovh() {
 		setupCID("tigase.im", "pouet.ovh");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_upload_pouet_ovh() {
 		setupCID("tigase.im", "upload.pouet.ovh");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_rsocks_net() {
 		// can't connect from 404.im, certificate not trusted ; jabster.pl: ejabberd 18.12.1
 		setupCID("tigase.im", "rsocks.net");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_dismail_de() {
 		// ejabberd 19.09.57
 		setupCID("tigase.im", "dismail.de");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_legalize_li() {
 		// can't connect from 404.im, certificate not trusted ; jabster.pl: ejabberd 18.12.1
 		setupCID("tigase.im", "legalize.li");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 //	@Test
@@ -177,52 +177,52 @@ public class S2SConnManDomainTest
 	public void testS2S_jabber_cz() {
 		// invalid namespace?! / Openfire 4.4.2
 		setupCID("tigase.im", "jabber.cz");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_xmpp_jp() {
 		// invalid namespace?! / Openfire 4.4.2
 		setupCID("tigase.im", "xmpp.jp");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_xmpp_uwpx_org() {
 		// can't connect from 404.im, certificate not trusted ; jabster.pl: ejabberd, 19.09.1
 		setupCID("tigase.im", "xmpp.uwpx.org");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_messaging_one() {
 		setupCID("tigase.im", "messaging.one");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_conference_process_one_net() {
 		setupCID("tigase.im", "conference.process-one.net");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_shreddox_eu() {
 		setupCID("tigase.im", "shreddox.eu");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	public void testS2S_xabber_org() {
 		setupCID("tigase.im", "xabber.org");
-		testS2STigaseConnectionManager(null);
+		testS2STigaseConnectionManager("tigase.im", null);
 	}
 
 	@Test
 	@Ignore
 	public void testS2S_expired_badxmpp_eu() {
 		setupCID("tigase.im", "expired.badxmpp.eu");
-		testS2STigaseConnectionManager(null,
+		testS2STigaseConnectionManager("tigase.im", null,
 									   certCheckResult -> Assert.assertEquals(CertCheckResult.expired, certCheckResult),
 									   Assert::assertFalse);
 	}
