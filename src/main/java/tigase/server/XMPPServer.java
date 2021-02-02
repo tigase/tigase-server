@@ -34,6 +34,7 @@ import tigase.util.log.LogFormatter;
 import tigase.xml.XMLUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -64,6 +65,8 @@ public final class XMPPServer {
 	private static Bootstrap bootstrap;
 	private static boolean inOSGi = false;
 	private static String serverName = "message-router";
+	private final static Logger log = Logger.getLogger(XMPPServer.class.getName());
+	private static final String defaultVersion = "0.0.0-0";
 
 	/**
 	 * Allows obtaining {@link tigase.conf.ConfiguratorAbstract} implementation used by Tigase to handle all
@@ -106,7 +109,12 @@ public final class XMPPServer {
 
 	public static String getImplementationVersion() {
 		Optional<Version> version = ComponentInfo.getImplementationVersion(serverVersionCandidates);
-		return (version.isPresent() ? version.get().toString() : "0.0.0-0");
+		if (version.isEmpty() & log.isLoggable(Level.INFO)) {
+			log.log(Level.INFO,
+					"Problem obtaining version for classes: " + Arrays.toString(serverVersionCandidates) + ", setting it to default: " +
+							defaultVersion);
+		}
+		return (version.isPresent() ? version.get().toString() : defaultVersion);
 	}
 
 	public static Version getVersion() {
