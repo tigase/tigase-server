@@ -312,6 +312,11 @@ public class DataForm {
 		return null;
 	}
 
+	public static boolean getFieldBoolValue(final Element el, final String f_name) {
+		String value = getFieldValue(el, f_name);
+		return "true".equals(value) || "1".equals(value);
+	}
+
 	public static String[] getFieldValues(final Element el, final String f_name) {
 		Element x = getXElement(el);
 
@@ -397,6 +402,12 @@ public class DataForm {
 			return dataEl;
 		}
 
+		public Builder(DataType type) {
+			x = new Element("x");
+			x.setXMLNS("jabber:x:data");
+			x.setAttribute("type", type.name());
+		}
+
 		public Builder(Element parent, DataType type) {
 			x = Optional.ofNullable(parent.getChild("x", "jabber:x:data")).orElseGet(() -> createDataEl(parent));
 			x.setAttribute("type", type.name());
@@ -434,6 +445,13 @@ public class DataForm {
 
 		public Builder withFields(Consumer<Builder> consumer) {
 			consumer.accept(this);
+			return this;
+		}
+
+		public Builder withField(FieldType type, String var, Consumer<Field.Builder> consumer) {
+			Field.Builder builder = addField(type, var);
+			consumer.accept(builder);
+			builder.build();
 			return this;
 		}
 
