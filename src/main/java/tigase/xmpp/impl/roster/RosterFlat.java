@@ -18,6 +18,7 @@
 package tigase.xmpp.impl.roster;
 
 import tigase.db.TigaseDBException;
+import tigase.db.UserRepository;
 import tigase.server.PolicyViolationException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
@@ -32,6 +33,7 @@ import tigase.xmpp.jid.JID;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -559,6 +561,22 @@ public class RosterFlat
 		}
 
 		return roster;
+	}
+
+	@Override
+	public void modifyStoredRoster(UserRepository repository, BareJID owner,
+								   Consumer<Map<BareJID, RosterElement>> modifyRoster) throws TigaseDBException {
+		String rosterStr = repository.getData(owner, null, RosterAbstract.ROSTER, null);
+		Map<BareJID, RosterElement> roster = new LinkedHashMap<>();
+		if (rosterStr != null) {
+			RosterFlat.parseRosterUtil(rosterStr, roster, null);
+		}
+		modifyRoster.accept(roster);
+		StringBuilder sb = new StringBuilder();
+		for (RosterElement relem : roster.values()) {
+			sb.append(relem.getRosterElement().toString());
+		}
+		repository.setData(owner, null, RosterAbstract.ROSTER, sb.toString());
 	}
 
 	protected void saveUserRoster(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {

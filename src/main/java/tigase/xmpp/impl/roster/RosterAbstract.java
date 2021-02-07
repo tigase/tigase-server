@@ -482,6 +482,59 @@ public abstract class RosterAbstract {
 		}
 	}
 
+	public Queue<Packet> addJidToRoster(UserRepository repository, XMPPSession session, BareJID owner, RosterElement rosterElement)
+			throws NotAuthorizedException, PolicyViolationException, TigaseDBException, NoConnectionIdException {
+		ArrayDeque<Packet> results = new ArrayDeque<>();
+		Optional<XMPPResourceConnection> conn = getActiveConnections(session).stream().findFirst();
+		if (conn.isEmpty()) {
+			// there is no session..
+			modifyStoredRoster(repository, owner, roster -> {
+				RosterElement item = roster.get(rosterElement.getJid().getBareJID());
+				if (item != null) {
+					item.setGroups(rosterElement.getGroups());
+					item.setSubscription(rosterElement.getSubscription());
+					item.setMixParticipantId(rosterElement.getMixParticipantId());
+				} else {
+					roster.put(rosterElement.getJid().getBareJID(), rosterElement);
+				}
+			});
+		} else {
+			addBuddy(conn.get(), rosterElement.getJid(), rosterElement.getName(), rosterElement.getGroups(), rosterElement.getSubscription(), rosterElement.getMixParticipantId(), rosterElement.getOtherData());
+			Element new_buddy = getBuddyItem(conn.get(), rosterElement.getJid());
+			updateBuddyChange(conn.get(), results, new_buddy);
+		}
+		return results;
+	}
+
+	public Queue<Packet> removeJidFromRoster(UserRepository repository, XMPPSession session, BareJID owner, JID jid)
+			throws TigaseDBException, NotAuthorizedException, NoConnectionIdException {
+		ArrayDeque<Packet> results = new ArrayDeque<>();
+		Optional<XMPPResourceConnection> conn = getActiveConnections(session).stream().findFirst();
+		if (conn.isEmpty()) {
+			// there is no session..
+			modifyStoredRoster(repository, owner, roster -> {
+				roster.remove(jid.getBareJID());
+			});
+		} else {
+			Element it = new Element("item");
+
+			it.setAttribute("jid", jid.toString());
+			it.setAttribute("subscription", "remove");
+			removeBuddy(conn.get(), jid);
+			updateBuddyChange(conn.get(), results, it);
+		}
+		return results;
+	}
+
+	protected List<XMPPResourceConnection> getActiveConnections(XMPPSession session) {
+		return session == null ? Collections.emptyList() : session.getActiveResources();
+	}
+
+	public void modifyStoredRoster(UserRepository repository, BareJID owner, Consumer<Map<BareJID,RosterElement>> modifyRoster)
+			throws TigaseDBException {
+		throw new UnsupportedOperationException("Feature not implemented in " + this.getClass().getCanonicalName());
+	}
+
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
 								  SubscriptionType subscription, String mixParticipantId, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException;

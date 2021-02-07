@@ -31,6 +31,7 @@ import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.*;
 import tigase.xmpp.impl.roster.RosterAbstract;
+import tigase.xmpp.impl.roster.RosterElement;
 import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -135,47 +136,37 @@ public class MIXProcessor
 
 					if (packet.getType() == StanzaType.result) {
 						// we need to modify roster..
-						// FIXME: also for leaving the channel
-						if (session != null && session.isAuthorized()) {
-							JID channelJID = JID.jidInstance(channel);
-							switch (actionEl.getName()) {
-								case "join":
-									rosterUtil.addBuddy(session, channelJID, null, null, RosterAbstract.SubscriptionType.both, actionEl.getAttributeStaticStr("id"),
-														null);
-									Element new_buddy = rosterUtil.getBuddyItem(session, channelJID);
-									rosterUtil.updateBuddyChange(session, results, new_buddy);
-									break;
-								case "leave":
-									Element it = new Element("item");
-
-									it.setAttribute("jid", channelJID.toString());
-									it.setAttribute("subscription", "remove");
-									rosterUtil.removeBuddy(session, channelJID);
-									rosterUtil.updateBuddyChange(session, results, it);
-									break;
-							}
-							Optional.ofNullable(session).map(XMPPResourceConnection::getParentSession)
-									.map(parent -> parent.getResourceForResource(resource))
-									.map(conn -> {
-										try {
-											return conn.getConnectionId();
-										} catch (NoConnectionIdException ex) {
-											return null;
-										}
-									})
-									.ifPresent(connJID -> {
-										Element actionElCopy = actionEl.clone();
-										String id = actionEl.getAttributeStaticStr("id");
-										if (id != null) {
-											actionElCopy.setAttribute("jid", actionEl.getAttributeStaticStr("id") + "#" +
-													channel.toString());
-										}
-										sendToUser(userJID, resource, connJID, packet.getType(),
-												   packet.getStanzaId(), actionElCopy, null, results::offer);
-									});
-						} else {
-							results.offer(Authorization.SERVICE_UNAVAILABLE.getResponseMessage(packet, null, true));
+						JID channelJID = JID.jidInstance(channel);
+						RosterElement item = new RosterElement(channelJID, null, null);
+						item.setSubscription(RosterAbstract.SubscriptionType.both);
+						item.setMixParticipantId(actionEl.getAttributeStaticStr("id"));
+						switch (actionEl.getName()) {
+							case "join":
+								results.addAll(rosterUtil.addJidToRoster(userRepository, session == null ? null : session.getParentSession(),
+																		 userJID, item));
+							case "leave":
+								results.addAll(rosterUtil.removeJidFromRoster(userRepository, session == null ? null : session.getParentSession(), userJID, channelJID));
 						}
+						Optional.ofNullable(session)
+								.map(XMPPResourceConnection::getParentSession)
+								.map(parent -> parent.getResourceForResource(resource))
+								.map(conn -> {
+									try {
+										return conn.getConnectionId();
+									} catch (NoConnectionIdException ex) {
+										return null;
+									}
+								})
+								.ifPresent(connJID -> {
+									Element actionElCopy = actionEl.clone();
+									String id = actionEl.getAttributeStaticStr("id");
+									if (id != null) {
+										actionElCopy.setAttribute("jid", actionEl.getAttributeStaticStr("id") + "#" +
+												channel.toString());
+									}
+									sendToUser(userJID, resource, connJID, packet.getType(), packet.getStanzaId(),
+											   actionElCopy, null, results::offer);
+								});
 					} else if(packet.getType() == StanzaType.error) {
 						Optional.ofNullable(session).map(XMPPResourceConnection::getParentSession)
 								.map(parent -> parent.getResourceForResource(resource))
