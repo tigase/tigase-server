@@ -139,7 +139,7 @@ public class CertificateItem
 
 	@Override
 	public void initFromElement(Element elem) {
-		log.log(Level.FINEST, "Initiating item from element");
+		log.log(Level.FINEST, "Initiating item from element: " + elem);
 		if (elem.getName() != REPO_ITEM_ELEM_NAME) {
 			throw new IllegalArgumentException("Incorrect element name, expected: " + REPO_ITEM_ELEM_NAME);
 		}
@@ -147,11 +147,19 @@ public class CertificateItem
 		setAlias(elem.getAttributeStaticStr(ALIAS_KEY));
 		setFingerprint(elem.getAttributeStaticStr(FINGERPRINT_KEY));
 		setDefault(Boolean.parseBoolean(elem.getAttributeStaticStr(IS_DEFAULT_KEY)));
-		String pemCertificate = elem.getAttributeStaticStr(PEM_CERTIFICATE_KEY);
+		String pemCertificate = elem.getCData();
+		if (pemCertificate == null) {
+			// handling of the short-lived case where certificate was stored as an attribute…
+			pemCertificate = elem.getAttributeStaticStr(PEM_CERTIFICATE_KEY);
+		}
+		if (pemCertificate == null) {
+			throw new IllegalArgumentException(
+					"Certificate is missing - neither as element attribute or CData: " + elem);
+		}
 		try {
 			entry = CertificateUtil.parseCertificate(new CharArrayReader(pemCertificate.toCharArray()));
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Error while loading certificate from PEM format", e);
+			log.log(Level.WARNING, "Error while loading certificate from PEM format: " + elem, e);
 		}
 	}
 
@@ -179,7 +187,7 @@ public class CertificateItem
 		elem.addAttribute(IS_DEFAULT_KEY, String.valueOf(isDefault()));
 		try {
 			final String pemCertificate = CertificateUtil.exportToPemFormat(entry);
-			elem.addAttribute(PEM_CERTIFICATE_KEY, pemCertificate);
+			elem.setCData(pemCertificate);
 		} catch (CertificateEncodingException e) {
 			log.log(Level.WARNING, "Error converting certificate entry to PEM format", e);
 		}
