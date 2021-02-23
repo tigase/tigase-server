@@ -118,7 +118,7 @@ public class SSLContextContainer
 	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0", note = "(temporarily) disable TLS 1.3 due to compatibility issues")
 	@Deprecated
 	@ConfigField(desc = "Disable TLS 1.3", alias = "tls-disable-tls13")
-	private boolean disableTLS13 = true;
+	private boolean disableTLS13 = false;
 	@ConfigField(desc = "Enabled TLS/SSL ciphers", alias = "tls-disabled-ciphers")
 	private String[] disabledCiphers;
 	@ConfigField(desc = "Enabled TLS/SSL protocols", alias = "tls-disabled-protocols")
