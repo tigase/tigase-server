@@ -480,7 +480,7 @@ public class TLSIO
 				log.log(Level.FINER, "TLS - Writing data, remaining: {0}, run {1} of {2}, TLSIO: {3}, tlsWrapper: {4}",
 						new Object[]{buff.remaining(), loop_cnt, max_loop_runs, toString(), String.valueOf(tlsWrapper)});
 			}
-
+			tlsWrapper.notifyIfHandshakeFinished();
 		} while (buff.hasRemaining() && (++loop_cnt < max_loop_runs));
 
 		if (loop_cnt > (max_loop_runs / 2)) {
