@@ -141,7 +141,7 @@ public abstract class AbstractKernelBasedComponent
 		@Override
 		public void write(Packet packet) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Sent: " + packet.getElement());
+				log.finer("Sent: " + packet);
 			}
 			component.addOutPacket(packet);
 		}
@@ -149,7 +149,7 @@ public abstract class AbstractKernelBasedComponent
 		@Override
 		public void write(Packet packet, AsyncCallback callback) {
 			if (log.isLoggable(Level.FINER)) {
-				log.finer("Sent: " + packet.getElement());
+				log.finer("Sent: " + packet);
 			}
 			responseManager.registerResponseHandler(packet, ResponseManager.DEFAULT_TIMEOUT, callback);
 			component.addOutPacket(packet);
