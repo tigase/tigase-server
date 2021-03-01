@@ -1,0 +1,13 @@
+= Tigase MIX Component
+:version: v2.0 August 2017. Reformatted for v8.0.0.
+
+:author: Tigase Team <team@tigase.net>
+:toc:
+:numbered:
+:website: http://tigase.net
+
+:leveloffset: 1
+
+Welcome to Tigase Mediated Information eXchange (MIX) component guide. The MIX component allows you to have multi user group chats (channels), which are better suited for multi device usage.
+
+include::adminlink.asciidoc[]

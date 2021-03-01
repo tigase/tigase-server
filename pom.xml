@@ -10,6 +10,9 @@
 
     <properties>
         <license.inlineHeader>${inlineHeader_agpl3}</license.inlineHeader>
+
+        <guide_name>Tigase_MIX</guide_name>
+        <documentation_phases.all_converters>generate-resources</documentation_phases.all_converters>
     </properties>
 
     <artifactId>tigase-mix</artifactId>
