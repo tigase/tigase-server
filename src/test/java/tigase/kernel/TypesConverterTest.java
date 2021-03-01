@@ -157,6 +157,51 @@ public class TypesConverterTest {
 		compositeVariable.add('*', 60.0);
 		compositeVariable.add('*', 1000);
 		assertEquals(new Double(300000.0), converter.convert(compositeVariable, Double.class));
+
+		try {
+			HashMap<String, String> test = new HashMap<>();
+			test.put("test-domain.com", "true");
+			assertFalse("Invalid conversion of Map<> to String, should throw!", converter.convert(test, String.class) != null);
+		} catch (RuntimeException ex) {
+			assertTrue(true);
+		}
+		try {
+			HashMap<String, String> test = new HashMap<>();
+			test.put("test-domain.com", "true");
+			assertFalse("Invalid conversion of Map<> to BareJID, should throw!", converter.convert(test, BareJID.class) != null);
+		} catch (RuntimeException ex) {
+			assertTrue(true);
+		}
+		try {
+			HashMap<String, String> test = new HashMap<>();
+			test.put("test-domain.com", "true");
+			assertFalse("Invalid conversion of Map<> to JID, should throw!", converter.convert(test, JID.class) != null);
+		} catch (RuntimeException ex) {
+			assertTrue(true);
+		}
+
+		try {
+			List<String> test = new ArrayList<>();
+			test.add("test-domain.com");
+			assertFalse("Invalid conversion of List<> to String, should throw!", converter.convert(test, String.class) != null);
+		} catch (RuntimeException ex) {
+			assertTrue(true);
+		}
+		try {
+			List<String> test = new ArrayList<>();
+			test.add("test-domain.com");
+			assertFalse("Invalid conversion of List<> to BareJID, should throw!", converter.convert(test, BareJID.class) != null);
+		} catch (RuntimeException ex) {
+			assertTrue(true);
+		}
+		try {
+			List<String> test = new ArrayList<>();
+			test.add("test-domain.com");
+			assertFalse("Invalid conversion of List<> to JID, should throw!", converter.convert(test, JID.class) != null);
+		} catch (RuntimeException ex) {
+			assertTrue(true);
+		}
+
 	}
 
 	@Test

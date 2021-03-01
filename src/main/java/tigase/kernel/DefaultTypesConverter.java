@@ -120,6 +120,9 @@ public class DefaultTypesConverter
 					throw new RuntimeException("Cannot convert to " + expectedType, e);
 				}
 			} else if (expectedType.equals(File.class)) {
+				if (value instanceof Collection || value instanceof Map) {
+					throw new RuntimeException("Cannot convert " + value + " to " + expectedType);
+				}
 				return expectedType.cast(new File(value.toString().trim()));
 			} else if (expectedType.equals(Level.class)) {
 				return expectedType.cast(Level.parse(value.toString().trim()));
@@ -141,12 +144,21 @@ public class DefaultTypesConverter
 					throw new RuntimeException("Cannot convert to " + expectedType, ex);
 				}
 			} else if (expectedType.equals(JID.class)) {
+				if (value instanceof Collection || value instanceof Map) {
+					throw new RuntimeException("Cannot convert " + value + " to " + expectedType);
+				}
 				return expectedType.cast(JID.jidInstance(value.toString().trim()));
 			} else if (expectedType.equals(BareJID.class)) {
+				if (value instanceof Collection || value instanceof Map) {
+					throw new RuntimeException("Cannot convert " + value + " to " + expectedType);
+				}
 				return expectedType.cast(BareJID.bareJIDInstance(value.toString().trim()));
 			} else if (expectedType.equals(CmdAcl.class)) {
 				return expectedType.cast(new CmdAcl(value.toString().trim()));
 			} else if (expectedType.equals(String.class)) {
+				if (value instanceof Collection || value instanceof Map) {
+					throw new RuntimeException("Cannot convert " + value + " to " + expectedType);
+				}
 				return expectedType.cast(String.valueOf(value.toString().trim()));
 			} else if (expectedType.equals(Long.class)) {
 				return expectedType.cast(Long.valueOf(value.toString().trim()));
@@ -154,8 +166,7 @@ public class DefaultTypesConverter
 				return expectedType.cast(Integer.valueOf(value.toString().trim()));
 			} else if (expectedType.equals(Boolean.class)) {
 				String val = value.toString().trim();
-				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") ||
-						val.equalsIgnoreCase("on") || val.equals("1"));
+				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on") || val.equals("1"));
 				return expectedType.cast(Boolean.valueOf(b));
 			} else if (expectedType.equals(Float.class)) {
 				return expectedType.cast(Float.valueOf(value.toString().trim()));
@@ -182,8 +193,7 @@ public class DefaultTypesConverter
 				return (T) Float.valueOf(value.toString().trim());
 			} else if (expectedType.equals(boolean.class)) {
 				String val = value.toString().trim();
-				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") ||
-						val.equalsIgnoreCase("on") || val.equals("1"));
+				boolean b = (val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true") || val.equalsIgnoreCase("on") || val.equals("1"));
 				return (T) Boolean.valueOf(b);
 			} else if (expectedType.equals(Duration.class)) {
 				return (T) Duration.parse(value.toString().trim());
@@ -245,8 +255,7 @@ public class DefaultTypesConverter
 				return (T) Pattern.compile(value.toString());
 			} else if (Collection.class.isAssignableFrom(expectedType) && genericType != null) {
 				int mod = expectedType.getModifiers();
-				if ((Modifier.isInterface(mod) || !Modifier.isAbstract(mod)) &&
-						genericType instanceof ParameterizedType) {
+				if ((Modifier.isInterface(mod) || !Modifier.isAbstract(mod)) && genericType instanceof ParameterizedType) {
 					ParameterizedType pt = (ParameterizedType) genericType;
 					Type[] actualTypes = pt.getActualTypeArguments();
 					if (actualTypes[0] instanceof Class) {
@@ -274,8 +283,7 @@ public class DefaultTypesConverter
 						}
 					}
 				}
-			} else if (Map.class.isAssignableFrom(expectedType) && genericType instanceof ParameterizedType &&
-					value instanceof Map) {
+			} else if (Map.class.isAssignableFrom(expectedType) && genericType instanceof ParameterizedType && value instanceof Map) {
 				// this is additional support for convertion to type of Map, however value needs to be instance of Map
 				// Added mainly for BeanConfigurators to be able to configure Map fields
 				int mod = expectedType.getModifiers();
