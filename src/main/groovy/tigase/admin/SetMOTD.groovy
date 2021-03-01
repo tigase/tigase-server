@@ -25,6 +25,7 @@ AS:Group: Configuration
 package tigase.admin
 
 import groovy.transform.CompileStatic
+import tigase.kernel.KernelException
 import tigase.kernel.core.Kernel
 import tigase.server.Command
 import tigase.server.Iq
@@ -32,35 +33,46 @@ import tigase.server.Packet
 import tigase.server.xmppsession.SessionManager
 import tigase.xmpp.impl.MotdProcessor
 
+import java.util.logging.Level
+import java.util.logging.Logger
+
 Kernel kernel = (Kernel) kernel;
 SessionManager component = (SessionManager) component
 packet = (Iq) packet
 
 @CompileStatic
 Packet process(Kernel kernel, SessionManager component, Iq p) {
-	String MOTD = "motd"
-
 	if (!component.isAdmin(p.getStanzaFrom())) {
 		def result = p.commandResult(Command.DataType.result)
 		Command.addTextField(result, "Error", "You are not service administrator")
 		return result
 	}
 
-	def motd = Command.getFieldValues(p, MOTD)
-	if (!motd) {
-		def result = p.commandResult(Command.DataType.form)
-
-		Command.addTitle(result, "Setting the Message of the Day")
-		Command.addInstructions(result, "Fill out this form to set the message of the day.")
-		Command.addHiddenField(result, "FORM_TYPE", "http://jabber.org/protocol/admin")
-		Command.addFieldMultiValue(result, MOTD, [ ], "Message of the Day")
-
-		return result
-	} else {
-		def result = p.commandResult(Command.DataType.result)
+	try {
 		MotdProcessor motdProcessor = kernel.getInstance(MotdProcessor.class)
-		motdProcessor.setMotd(motd.join("\n"))
-		return result
+		String MOTD = "motd"
+		
+		def motd = Command.getFieldValues(p, MOTD)
+		if (!motd) {
+			def result = p.commandResult(Command.DataType.form)
+
+			Command.addTitle(result, "Setting the Message of the Day")
+			Command.addInstructions(result, "Fill out this form to set the message of the day.")
+			Command.addHiddenField(result, "FORM_TYPE", "http://jabber.org/protocol/admin")
+			Command.addFieldMultiValue(result, MOTD, [ ], "Message of the Day")
+
+			return result
+		} else {
+			def result = p.commandResult(Command.DataType.result)
+			motdProcessor.setMotd(motd.join("\n"))
+			return result
+		}
+	} catch (KernelException ex) {
+		def result = p.commandResult(Command.DataType.result)
+		Logger.getLogger("tigase.admin.SetMOTD").log(Level.WARNING, "MotDProcessor is not enabled or misconfigured", ex);
+		Command.addTextField(result, "Error",
+								 "MotDProcessor is not enabled or misconfigured - please check server logs.");
+		return result;
 	}
 }
 
