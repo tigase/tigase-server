@@ -27,6 +27,8 @@ include::Auth_Connectors/SASL_EXTERNAL.asciidoc[leveloffset=+2]
 
 include::SASL_Mechanisms.asciidoc[leveloffset=+1]
 
+include::Application_Passwords.asciidoc[leveloffset=+1]
+
 include::Packet_Filtering/Packet_Filtering.asciidoc[leveloffset=+1]
 
 include::Access_Control_List.asciidoc[leveloffset=+1]
