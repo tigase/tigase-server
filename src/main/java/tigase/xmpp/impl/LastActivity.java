@@ -55,7 +55,7 @@ import static tigase.xmpp.impl.LastActivityAbstract.XMLNS;
 @DiscoFeatures({XMLNS})
 @HandleStanzaTypes(StanzaType.get)
 @Handles(@Handle(path = {Iq.ELEM_NAME, Iq.QUERY_NAME}, xmlns = XMLNS))
-@Bean(name = LastActivity.ID, parent = LastActivityMarker.class, active = false)
+@Bean(name = LastActivity.ID, parent = LastActivityMarker.class, active = true)
 public class LastActivity
 		extends XMPPProcessorAbstract
 		implements LastActivityRetriever {
