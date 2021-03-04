@@ -6,34 +6,31 @@ Configuration of MIX component is extended version of PubSub component configura
 
 == Setting ACL
 
-With ACL you can control who can create publicly visible channels and also ad-hoc channels.
+With ACL you can control who can create publicly visible channels and also ad-hoc channels. ACL properties accept following values:
 
-=== Possible values
-ACL properties accept following values:
-
-==== ALL
+ALL::
 Anyone can create channel
 
-==== LOCAL
+LOCAL::
 Only local users can create channels (from all local domains on all local domains)
 
-==== ADMIN
+ADMIN::
 Only installation administrator can create channels
 
-==== DOMAIN_OWNER
+DOMAIN_OWNER::
 Only domain owner of the domain as the domain under which MIX component is running can create channels
 
-==== DOMAIN_ADMIN
+DOMAIN_ADMIN::
 Only domain administrator of the domain as the domain under which MIX component is running can create channels
 
-==== DOMAIN
+DOMAIN::
 Only users from the same domain as the domain under which MIX component is running can create channels
 
 === Setting ACL for creation of public channels
 
-*Property name: publicChannelCreationAcl*
+*Property name: `publicChannelCreationAcl`*
 
-*Default value: DOMAIN_ADMIN*
+*Default value: `DOMAIN_ADMIN`*
 
 By default we allow only local domain owners or admins to create publicly browsable channels.
 
@@ -42,43 +39,36 @@ By default we allow only local domain owners or admins to create publicly browsa
 -----
 mix () {
     logic () {
-    ...
-    publicChannelCreationAcl = 'DOMAIN'
-    ...
+        publicChannelCreationAcl = 'DOMAIN'
     }
 }
 -----
 
 === Setting ACL for creation of ad-hoc (private) channels
 
-*Property nmae: adhocChannelCreationAcl*
+*Property nmae: `adhocChannelCreationAcl`*
 
-*Default value: DOMAIN*
+*Default value: `DOMAIN`*
 
 .Allowing all local users to create public channels
 [source,dsl]
 -----
 mix () {
     logic () {
-    ...
-    adhocChannelCreationAcl = 'LOCAL'
-    ...
+        adhocChannelCreationAcl = 'LOCAL'
     }
 }
 -----
 
 == Disabling support for MUC
 
-MIX component by default enables support for MUC to improve interoperability between new clients wanting to use MIX and old - not supporting MIX at all.
+MIX component by default exposes MUC compatibility layer for clients that doesn't support MIX yet, so they would still be able to participate in the MIX channel conversation. It's possible to disable it with the following option.
 
 .Disabling support for MUC
 [source,dsl]
 -----
 mix () {
-    ...
-    roomPresenceModule (active: false) {
-    }
-    ...
+    roomPresenceModule (active: false) {}
 }
 -----
 
@@ -86,7 +76,7 @@ mix () {
 
 *Property name: `maxCacheSize`*
 
-*Default value: 2000*
+*Default value: `2000`*
 
 MIX component is caching channels configuration and affiliation in memory while it is processing request for the particular channel.
 To make that more efficient it is using cache to keep the most often used channels configuration in memory instead of loading it every time.
@@ -97,10 +87,8 @@ You can increase this value by setting `maxCacheSize` property in the `config` s
 [source,dsl]
 -----
 mix () {
-    ...
     config () {
         maxCacheSize = 3000
     }
-    ...
 }
 -----
