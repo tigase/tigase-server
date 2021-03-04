@@ -1,3 +1,0 @@
-
-include::text/Overview.asciidoc[]
-include::text/Configuration.asciidoc[]
