@@ -1,5 +1,4 @@
 [[config]]
-
 = Configuration
 
 Configuration of MIX component is extended version of PubSub component configuration. We will not describe here configuration of PubSub component as it already available in PubSub component documentation.
