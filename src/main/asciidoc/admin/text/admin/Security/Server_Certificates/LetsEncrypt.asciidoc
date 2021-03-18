@@ -5,7 +5,7 @@
 
 LetsEncrypt is a trusted CA that provides free security certificates. Unlike previously self-signed certificates, we can use LetsEncrypt Certificates to certify your domains from a trusted source.
 
-Please refer to official [certbot User Guide](https://certbot.eff.org/docs/using.html) for details how to install and operate the tool, choosing desired method of domain authentication (DNS or webserver). After successful execution the certificate with all related files will be stored under `/etc/letsencrypt/live/$domain`
+Please refer to official https://certbot.eff.org/docs/using.html[certbot User Guide] for details how to install and operate the tool, choosing desired method of domain authentication (DNS or webserver). After successful execution the certificate with all related files will be stored under `/etc/letsencrypt/live/$domain`
 
 [source,bash]
 -----
@@ -14,12 +14,13 @@ cert.pem  chain.pem  fullchain.pem  privkey.pem  README
 -----
 
 In that directory, you will find four files:
+
 - `privkey.pem` - private key for the certificate
 - `cert.pem` - contains the server certificate by itself
 - `chain.pem` - contains the additional intermediate certificate or certificates
 - `fullchain.pem` - all certificates, including server certificate (aka leaf certificate or end-entity certificate). The server certificate is the first one in this file, followed by any intermediates.
 
-For Tigase XMPP Server, we are only concerned with `privkey.pem` and `fullchain.pem`.
+For Tigase XMPP Server, we are only concerned with `privkey.pem` and `fullchain.pem` (or `chain.pem` - please consider actual issuers!).
 
 At this point we will need to obtain the root and intermediate certificates, this can be done by downloading these certificates from the link:https://letsencrypt.org/certificates/[LetsEncrypt website].
 
