@@ -66,46 +66,24 @@ image:images/admin/web-install-01.png[]
 
 Read it and then click "Next"
 
-image:images/admin/web-install-02.png[]
-
-Here is some information about our commercial products and licensing. Please read though the agreement, type in your name or company and click "Next".
-
-image:images/admin/web-install-03.png[]
+You will see some information about our commercial products and licensing. Please read though the agreement, type in your name or company and click "Next" to go to the next page.
 
 This page will look over your basic configuration settings, these include the server type, domains you wish to use, and gives you a chance to specify an administrator for the domain. Also, you will be selecting what type of database Tigase server will be using (configuration comes later).
-If you do not specify an administrator and password, one is made for you, which will be admin@yourdomain and password is tigase. If you wish to configure your server beyond the basics, check Advanced configuration options.
+If you do not specify an administrator and password, one is made for you, which will be admin@yourdomain and password is tigase.
 
-image:images/admin/web-install-04.png[]
+At the next page you will be presented with a list of possible connectivity options supported by Tigase XMPP Server and a way to enable/disable each of them. After making this decisions, click "Next".
 
-The Advanced configuration page. Select what components and configurations you need. Some may be highlighted red to indicate conflicts or unmet requirements.
-
-image:images/admin/web-install-05.png[]
-
-Plugins which will be loaded by the server, most plugins are enabled by default. Some may be highlighted red to indicate conflicts or unmet requirements.
-
-image:images/admin/web-install-06.png[]
+Now you will be able to select which features of Tigase XMPP Server (such as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or disabled. When you will be ready, click "Next".
 
 This is where the database is setup. The type of database selected in step 3 will influence available options. *BE SURE TO SPECIFY DATABASE ROOT USER ACCOUNT AND PASSWORD*
 
-image:images/admin/web-install-07.png[]
-
-You should see a page like this after a successful database setup. This page will reveal any issues with your database setup such as invalid URIs, passwords, and schemas. You may hit Back on your browser to check credentials and settings and try again.
-
-image:images/admin/web-install-08.png[]
-
-Next a page asking if you'd like to provide an API Access Key to access HTTP REST commands. It is highly recommended that you either specify an API key or block access. Open API keys allow any REST command to be interpreted by the server.
-
-image:images/admin/web-install-09.png[]
+After database setup, you should see a page with executed actions and their results. All presented items should be "green", meaning that everything went well. If anything is presented in "red" or "yellow", please read description presented below this header to learn more about this issue. If setup is completed, click "Next".
 
 The Setup Access Page will be locked from the admin/tigase user as specified above. This is your chance to have the setup pages add a specific user in addition to admin accounts to re-access this setup process later. If left blank, only JIDs listed in admin will be allowed to access.
 
-image:images/admin/web-install-10.png[]
-
-The installation is complete and this is what the `config.tdsl` file will look like.
+The installation is almost complete and you will be presented with a page showing what the `config.tdsl` file will look like.
 If you have a custom setup, or would like to put your own settings in, you may copy and past the contents here to edit the current `config.tdsl` file.
 Click "Save" to write the file to disk.
-
-image:images/admin/web-install-11.png[]
 
 You have now finished the installation, proceed to the next step to restart the server.
 
