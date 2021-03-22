@@ -66,25 +66,54 @@ image:images/admin/web-install-01.png[]
 
 Read it and then click "Next"
 
-You will see some information about our commercial products and licensing. Please read though the agreement, type in your name or company and click "Next" to go to the next page.
+The setup consists of several steps that help you configure your installation: selecting features and providing database configuration.
 
-This page will look over your basic configuration settings, these include the server type, domains you wish to use, and gives you a chance to specify an administrator for the domain. Also, you will be selecting what type of database Tigase server will be using (configuration comes later).
+NOTE: Order and design of the steps may slightly differ thus we only provide a broad overview of how to proceed:
+
+. *Advanced Clustering Strategy information*
++
+You will see some information about our commercial products and licensing. Please read though the agreement, and as a confirmation of agreement type in your name or company and click "Next" to go to the next page.
++
+. *Basic Tigase server configuration*
++
+This page will look over your basic configuration settings, those include the server type, domain you wish to use, and gives you a chance to specify an administrator for the domain. Also, you will be selecting what type of database Tigase server will be using (configuration comes later).
++
 If you do not specify an administrator and password, one is made for you, which will be admin@yourdomain and password is tigase.
-
-At the next page you will be presented with a list of possible connectivity options supported by Tigase XMPP Server and a way to enable/disable each of them. After making this decisions, click "Next".
-
-Now you will be able to select which features of Tigase XMPP Server (such as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or disabled. When you will be ready, click "Next".
-
-This is where the database is setup. The type of database selected in step 3 will influence available options. *BE SURE TO SPECIFY DATABASE ROOT USER ACCOUNT AND PASSWORD*
-
++
+. *Connectivity*
++
+At this page you will be presented with a list of possible connectivity options supported by Tigase XMPP Server and a way to enable/disable each of them (desktop, mobile, http, websocket, federation, etc.). After making this decisions, click "Next".
++
+. *Features*
++
+Now you will be able to select which features of Tigase XMPP Server (such as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or disabled.
++
+At this step will also be able to enable clustering on your installation
++
+When you will be ready, click "Next".
++
+. *Database configuration*
++
+This is where the database is configured. The type of database selected in step 3 will influence available options. *BE SURE TO SPECIFY DATABASE ROOT USER ACCOUNT AND PASSWORD*
++
+. *Database connectivity check*
++
 After database setup, you should see a page with executed actions and their results. All presented items should be "green", meaning that everything went well. If anything is presented in "red" or "yellow", please read description presented below this header to learn more about this issue. If setup is completed, click "Next".
-
++
+. *Setup security*
++
 The Setup Access Page will be locked from the admin/tigase user as specified above. This is your chance to have the setup pages add a specific user in addition to admin accounts to re-access this setup process later. If left blank, only JIDs listed in admin will be allowed to access.
-
-The installation is almost complete and you will be presented with a page showing what the `config.tdsl` file will look like.
++
+. *Saving configuration*
++
+The installation is almost complete and you will be presented with a page showing what the resulting configuration (stored in `config.tdsl` file) will look like.
++
 If you have a custom setup, or would like to put your own settings in, you may copy and past the contents here to edit the current `config.tdsl` file.
++
 Click "Save" to write the file to disk.
-
++
+. *Finished*
++
 You have now finished the installation, proceed to the next step to restart the server.
 
 == Restart the Server
