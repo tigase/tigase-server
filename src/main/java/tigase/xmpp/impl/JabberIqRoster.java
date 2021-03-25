@@ -337,7 +337,7 @@ public class JabberIqRoster
 					new Object[]{e, packet});
 			results.offer(packet.okResult((String) null, 0));
 		} catch (NotAuthorizedException e) {
-			log.log(Level.WARNING, "Received roster request but user session is not authorized yet: {0}", packet);
+			log.log(Level.FINE, "Received roster request but user session is not authorized yet: {0}", packet);
 			results.offer(
 					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		} catch (PolicyViolationException e) {
