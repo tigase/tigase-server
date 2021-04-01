@@ -40,7 +40,9 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
-@Bean(name = JabberIqStats.ID, parent = SessionManager.class, active = true)
+
+// FIXME: Plugin doesn't work correctly currently so it's disabled, see #server-1242 for details
+@Bean(name = JabberIqStats.ID, parent = SessionManager.class, active = false)
 public class JabberIqStats
 		extends XMPPProcessor
 		implements XMPPProcessorIfc {
