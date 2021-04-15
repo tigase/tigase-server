@@ -26,6 +26,7 @@ import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.JID;
 
 import java.util.Collections;
 import java.util.List;
@@ -75,6 +76,14 @@ public class StanzaProcessor {
 			log.finer("Received: " + packet.getElement());
 		}
 		try {
+			final JID senderJID = packet.getStanzaFrom();
+			if (senderJID == null) {
+				if (log.isLoggable(Level.FINER)) {
+					log.finer(packet.getElemName() + " stanza without 'from' attribute ignored.");
+				}
+				return;
+			}
+
 			Runnable responseHandler = responseManager.getResponseHandler(packet);
 
 			boolean handled;
