@@ -11,6 +11,18 @@ You component still shows in the service discovery list as an element with "_Und
 
 In this article I will show how to, in a simple way, change the basic component information presented on the service discovery list and how to add some service disco features. As a bit more advanced feature the guide will teach you about adding/removing service discovery nodes at run-time and about updating existing elements.
 
+In order for the component to properly respond to `disco#info` and `disco#items` request you should register `DiscoveryModule` in your component:
+
+[source,java]
+----
+@Override
+protected void registerModules(Kernel kernel) {
+	kernel.registerBean("disco").asClass(DiscoveryModule.class).exec();
+}
+----
+
+NOTE It's essential to **explicitly** register `DiscoveryModule` in your component.
+
 Component description and category type can be changed by overriding two following methods:
 
 [source,java]
@@ -34,7 +46,6 @@ image:images/spam-filtering-disco-small.png[]
 
 Now let's add method which will allow our module `TestModule` to return supported features. This way our component will automatically report features supported by all it's modules.
 To do so we need to implement a method *String[] getFeatures()* which returns array of `String` items. This items are used to generate a list of features supported by component.
-List of features supported by all modules are retrieved during service discovery of a component by `DiscoveryModule`.
 
 Although this was easy, this particular change doesn't affect anything apart from just a visual appearance. Let's get then to more advanced and more useful changes.
 
