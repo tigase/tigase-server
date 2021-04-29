@@ -94,6 +94,7 @@ public class MsgRepositoryStoredProcedures {
 		try {
 			PreparedStatement stmt = conn.prepareStatement("delete from tig_offline_messages where msg_id = ?");
 			stmt.setLong(1, msgId);
+			stmt.executeUpdate();
 		} finally {
 			conn.close();
 		}
