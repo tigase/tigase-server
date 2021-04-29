@@ -89,3 +89,21 @@ begin
 end
 -- QUERY END:
 GO
+
+-- QUERY START:
+if exists (select 1 from sys.objects where type = 'P' and name = 'Tig_OfflineMessages_DeleteMessage')
+    drop procedure [dbo].[Tig_OfflineMessages_DeleteMessage];
+-- QUERY END:
+GO
+
+-- QUERY START:
+create procedure [dbo].[Tig_OfflineMessages_DeleteMessage]
+@_msg_id bigint
+as
+begin
+    set nocount on;
+    delete from tig_offline_messages where msg_id = @_msg_id;
+    set nocount off;
+end
+-- QUERY END:
+GO

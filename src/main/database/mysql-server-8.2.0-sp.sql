@@ -45,6 +45,11 @@ drop procedure if exists TigUserLoginPlainPw;
 drop procedure if exists TigUpdateLoginTime;
 -- QUERY END:
 
+-- QUERY START:
+drop procedure if exists Tig_OfflineMessages_DeleteMessage;
+-- QUERY END:
+
+
 delimiter //
 
 -- QUERY START:
@@ -64,6 +69,13 @@ begin
     set last_used = CURRENT_TIMESTAMP
     where sha1_user_id = sha1(lower(_user_id));
 end //
+-- QUERY END:
+
+-- QUERY START:
+    create procedure Tig_OfflineMessages_DeleteMessage(_msg_id bigint)
+    begin
+        delete from tig_offline_messages where msg_id = _msg_id;
+    end //
 -- QUERY END:
 
 delimiter ;

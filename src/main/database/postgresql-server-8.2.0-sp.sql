@@ -61,3 +61,20 @@ begin
 end;
 $$ LANGUAGE 'plpgsql';
 -- QUERY END:
+
+-- QUERY START:
+do $$
+begin
+    if exists( select 1 from pg_proc where proname = lower('Tig_OfflineMessages_DeleteMessage')) then
+        drop function Tig_OfflineMessages_DeleteMessage(_msg_id bigint);
+    end if;
+end$$;
+-- QUERY END:
+
+-- QUERY START:
+create function Tig_OfflineMessages_DeleteMessage(_msg_id bigint) returns void as $$
+begin
+    delete from tig_offline_messages where msg_id = _msg_id;
+end;
+$$ LANGUAGE 'plpgsql';
+-- QUERY END:
