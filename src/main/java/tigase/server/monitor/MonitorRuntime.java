@@ -285,6 +285,10 @@ public class MonitorRuntime
 			while (threads.activeCount() > 0 && (System.currentTimeMillis() - shutdownStart) < 20000) {
 				try {
 					sleep(100);
+
+					if (thlist.stream().noneMatch(th -> th.isAlive())) {
+						break;
+					}
 				} catch (Exception e) {
 				}
 			}
