@@ -1140,16 +1140,18 @@ public abstract class AbstractMessageReceiver
 	private void stopThreads() {
 		// stopped = true;
 		try {
-			stopThread(threadsQueueIn);
-			stopThread(threadsQueueOut);
-
-			if (out_thread != null) {
-				out_thread.threadStopped = true;
-				out_thread.interrupt();
-				while (out_thread.isAlive()) {
-					Thread.sleep(100);
-				}
+			ArrayDeque<QueueListener> threads = new ArrayDeque<>();
+			if (threadsQueueIn != null) {
+				threads.addAll(threadsQueueIn);
 			}
+			if (threadsQueueOut != null) {
+				threads.addAll(threadsQueueOut);
+			}
+			if (out_thread != null) {
+				threads.add(out_thread);
+			}
+			stopThread(threads);
+
 		} catch (InterruptedException e) {
 		}
 		threadsQueueIn = null;
@@ -1167,14 +1169,19 @@ public abstract class AbstractMessageReceiver
 
 	private void stopThread(ArrayDeque<QueueListener> threadsQueue) throws InterruptedException {
 		if (threadsQueue != null) {
+			Set<QueueListener> awaiting = new HashSet<>();
 			for (QueueListener in_thread : threadsQueue) {
 				in_thread.threadStopped = true;
 				in_thread.interrupt();
+				awaiting.add(in_thread);
 			}
-			for (QueueListener in_thread : threadsQueue) {
-				while (in_thread.isAlive()) {
-					Thread.sleep(100);
+			while (!awaiting.isEmpty()) {
+				for (QueueListener in_thread : threadsQueue) {
+					if (!in_thread.isAlive()) {
+						awaiting.remove(in_thread);
+					}
 				}
+				Thread.sleep(10);
 			}
 		}
 	}
