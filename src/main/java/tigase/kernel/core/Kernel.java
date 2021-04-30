@@ -1234,7 +1234,12 @@ public class Kernel {
 
 	private boolean injectDependencies(Object bean, Dependency dep, Set<BeanConfig> createdBeansConfig, int deep,
 									   boolean forceNullInjection)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {    
+		if (shutdown) {
+			// we are shutting down, no more dependency injection..
+			return false;
+		}
+
 		BeanConfig[] dependentBeansConfigs = dependencyManager.getBeanConfig(dep);
 		ArrayList<Object> dataToInject = new ArrayList<Object>();
 
