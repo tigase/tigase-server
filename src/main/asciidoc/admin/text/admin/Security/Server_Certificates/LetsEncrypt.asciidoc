@@ -54,7 +54,7 @@ If you moved all certs to a single directory, you may combine them using the fol
 
 [source,bash]
 -----
-cat ./cert.pem ./privkey.pem ./letsencryptauthorityx3.pem ./isrgrootx1.pem > mydomain.com.pem
+cat ./cert.pem ./privkey.pem ./lets-encrypt-r3.pem ./isrgrootx1.pem > mydomain.com.pem
 -----
 
 NOTE: If you are using `isrgrootx1` root make sure you use `cert.pem` file instead of `fullchain.pem`, which uses different intermediate certificate ( https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt[Let’s Encrypt Authority X3 (IdenTrust cross-signed)] ) and you will have to use https://letsencrypt.org/certs/trustid-x3-root.pem.txt[DST Root CA X3] certificate!
