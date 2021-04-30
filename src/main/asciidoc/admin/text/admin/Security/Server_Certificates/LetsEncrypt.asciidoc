@@ -20,22 +20,33 @@ In that directory, you will find four files:
 - `chain.pem` - contains the additional intermediate certificate or certificates
 - `fullchain.pem` - all certificates, including server certificate (aka leaf certificate or end-entity certificate). The server certificate is the first one in this file, followed by any intermediates.
 
-For Tigase XMPP Server, we are only concerned with `privkey.pem` and `fullchain.pem` (or `chain.pem` - please consider actual issuers!).
+For Tigase XMPP Server, we are only concerned with `privkey.pem` and `fullchain.pem` (or `chain.pem` - please consider actual issuers and certification chain!).
 
-At this point we will need to obtain the root and intermediate certificates, this can be done by downloading these certificates from the link:https://letsencrypt.org/certificates/[LetsEncrypt website].
+At this point we will need to obtain the root and intermediate certificates, this can be done by downloading these certificates from the link:https://letsencrypt.org/certificates/[LetsEncrypt *Chain of Trust* website].
 
-Alternatively, you may obtain them using wget:
+NOTE: Please pay utmost attention to the actual certificate issuers and make sure that the certification chain is maintained!
+
+On the time of the writing, LetsEncrypt was providing domain certificates issued by `R3` CertificateAuthorigy (CA). In order to provide complete chain to the root CA you should get
+Let’s Encrypt R3 (`RSA 2048, O = Let's Encrypt, CN = R3`) certificate. Depending on desired certification chain you have two options:
+1) (default and recommended) using own LetsEncrypt CA:
+    a) `R3` certificate signed by ISRG Root X1: https://letsencrypt.org/certs/lets-encrypt-r3.pem
+    b) `ISRG Root X1` root certificate: https://letsencrypt.org/certs/isrgrootx1.pem
+2) (legacy, option more compatible with old systems): cross-signed certificate by IdenTrust:
+    a) `R3` certificate cross-signed by IdenTrust: https://letsencrypt.org/certs/lets-encrypt-r3-cross-signed.pem
+    b) `TrustID X3 Root` from IdenTrust: https://letsencrypt.org/certs/trustid-x3-root.pem.txt
+
+Considering first (recommended) option, you may obtain them using wget:
 [source,bash]
 -----
 wget https://letsencrypt.org/certs/isrgrootx1.pem
-wget https://letsencrypt.org/certs/letsencryptauthorityx3.pem
+wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
 -----
 
 These are the root certificate, and the intermediate certificate signed by root certificate.
 
-NOTE: IdenTrust cross-signed certificate will not function properly.
+NOTE: IdenTrust cross-signed certificate will not function properly in the future!
 
-Take the contents of your `privkey.pem`, certificate, and combine them with the contents of `isrgrootx1.pem` and `letsencryptauthorityx3.pem` into a single pem certificate.
+Take the contents of your `privkey.pem`, certificate, and combine them with the contents of `isrgrootx1.pem` and `lets-encrypt-r3.pem` into a single pem certificate.
 
 Depending on your configuration you either need to name the file after your domain such as `mydomain.com.pem` and place it under `certs/` subdirectory of Tigase XMPP Server installation or update it using admin ad-hoc (see <<certificateStorage>>)
 
