@@ -368,7 +368,10 @@ public class CertificateContainer
 		if (store) {
 			String filename = alias.startsWith("*.") ? alias.substring(2) : alias;
 			if (repository != null) {
-				repository.addItem(new CertificateItem(filename, entry));
+				final CertificateItem item = new CertificateItem(filename, entry);
+				log.log(Level.FINEST, "Storing to repository, certificate entry for alias: {0} with SerialNumber: {1}",
+						new Object[]{alias, item.getSerialNumber()});
+				repository.addItem(item);
 			} else {
 				storeCertificateToFile(entry, filename);
 			}

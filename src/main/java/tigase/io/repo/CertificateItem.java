@@ -27,6 +27,7 @@ import tigase.xml.Element;
 
 import java.io.CharArrayReader;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Objects;
@@ -39,6 +40,7 @@ public class CertificateItem
 
 	public static final String PEM_CERTIFICATE_KEY = "pem-certificate";
 	public static final String FINGERPRINT_KEY = "fingerprint";
+	public static final String SERIALNUMBER_KEY = "serial-number";
 	public static final String IS_DEFAULT_KEY = "is-default";
 	public static final String ALIAS_KEY = "alias";
 	public static final String REPO_ITEM_ELEM_NAME = "certificate";
@@ -48,6 +50,7 @@ public class CertificateItem
 	private CertificateEntry entry;
 	private String fingerprint;
 	private boolean isDefault;
+	private String serialNumber;
 
 	public CertificateItem() {
 	}
@@ -64,11 +67,22 @@ public class CertificateItem
 		this.entry = entry;
 		try {
 			if (entry.getCertificate().isPresent()) {
-				fingerprint = CertificateUtil.getCertificateFingerprint(entry.getCertificate().get());
+				final Certificate certificate = entry.getCertificate().get();
+				fingerprint = CertificateUtil.getCertificateFingerprint(certificate);
+				CertificateUtil.getCertificateSerialNumber(certificate)
+						.ifPresent(serialNumber -> this.serialNumber = serialNumber.toString(16));
 			}
 		} catch (CertificateEncodingException | NoSuchAlgorithmException e) {
 			log.log(Level.WARNING, "Failing creating Certificate item", e);
 		}
+	}
+
+	public Optional<String> getSerialNumber() {
+		return Optional.ofNullable(serialNumber);
+	}
+
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
 	}
 
 	public Optional<String> getFingerprint() {
@@ -112,6 +126,7 @@ public class CertificateItem
 		super.initFromCommand(packet);
 		alias = Command.getFieldValue(packet, ALIAS_KEY);
 		fingerprint = Command.getFieldValue(packet, FINGERPRINT_KEY);
+		serialNumber = Command.getFieldValue(packet, SERIALNUMBER_KEY);
 		isDefault = Boolean.parseBoolean(Command.getFieldValue(packet, IS_DEFAULT_KEY));
 		final String pemCertificate = Command.getFieldValue(packet, PEM_CERTIFICATE_KEY);
 		try {
@@ -127,6 +142,9 @@ public class CertificateItem
 		Command.addFieldValue(packet, ALIAS_KEY, alias);
 		if (getFingerprint().isPresent()) {
 			Command.addFieldValue(packet, FINGERPRINT_KEY, getFingerprint().get());
+		}
+		if (getSerialNumber().isPresent()) {
+			Command.addFieldValue(packet, SERIALNUMBER_KEY, getSerialNumber().get());
 		}
 		Command.addFieldValue(packet, IS_DEFAULT_KEY, String.valueOf(isDefault));
 		try {
@@ -161,6 +179,13 @@ public class CertificateItem
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Error while loading certificate from PEM format: " + elem, e);
 		}
+		String serialNumberVal = elem.getAttributeStaticStr(SERIALNUMBER_KEY);
+		if (serialNumberVal != null) {
+			setSerialNumber(serialNumberVal);
+		} else if (entry.getCertificate().isPresent()) {
+			CertificateUtil.getCertificateSerialNumber(entry.getCertificate().get())
+					.ifPresent(serialNumber -> setSerialNumber(serialNumber.toString(16)));
+		}
 	}
 
 	@Override
@@ -184,6 +209,9 @@ public class CertificateItem
 		if (getFingerprint().isPresent()) {
 			elem.addAttribute(FINGERPRINT_KEY, getFingerprint().get());
 		}
+		if (getSerialNumber().isPresent()) {
+			elem.addAttribute(SERIALNUMBER_KEY, getSerialNumber().get());
+		}
 		elem.addAttribute(IS_DEFAULT_KEY, String.valueOf(isDefault()));
 		try {
 			final String pemCertificate = CertificateUtil.exportToPemFormat(entry);
@@ -192,6 +220,12 @@ public class CertificateItem
 			log.log(Level.WARNING, "Error converting certificate entry to PEM format", e);
 		}
 		return elem;
+	}
+
+	@Override
+	public String toString() {
+		return "CertificateItem{" + "alias='" + alias + '\'' + ", fingerprint='" + fingerprint + '\'' +
+				", isDefault=" + isDefault + ", serialNumber='" + serialNumber + '\'' + '}';
 	}
 
 	@Override

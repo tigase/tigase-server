@@ -136,6 +136,9 @@ public abstract class ConfigRepository<Item extends RepositoryItem>
 
 	@Override
 	public void addItem(Item item) {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Adding item: {0}", item);
+		}
 		addItemNoStore(item);
 
 		store();
