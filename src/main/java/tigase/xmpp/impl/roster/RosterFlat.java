@@ -18,6 +18,7 @@
 package tigase.xmpp.impl.roster;
 
 import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
 import tigase.server.PolicyViolationException;
 import tigase.xml.DomBuilderHandler;
@@ -525,7 +526,11 @@ public class RosterFlat
 				// notify that roster element was changed!
 			}
 		} catch (NotAuthorizedException | TigaseDBException ex) {
-			log.log(Level.WARNING, "Error logging out user", ex);
+			if (ex.getCause() instanceof UserNotFoundException) {
+				log.log(Level.FINEST, "Error logging out user, user already removed? " + session, ex);
+			} else {
+				log.log(Level.WARNING, "Error logging out user", ex);
+			}
 		}
 	}
 
