@@ -17,6 +17,7 @@
  */
 package tigase.server.amp.db;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.beans.MDRepositoryBeanWithStatistics;
 import tigase.kernel.beans.Bean;
@@ -92,25 +93,14 @@ public abstract class MsgRepository<T, S extends DataSource>
 	}
 	protected long earliestOffline = Long.MAX_VALUE;
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
-	private Condition expiredMessagesCondition;
-
-	;
-	private ReentrantLock expiredMessagesLock;
 	protected DelayQueue<MsgDBItem<T>> expiredQueue = new DelayQueue<MsgDBItem<T>>() {
 		@Override
-		public boolean offer(MsgDBItem msgDBItem) {
-			expiredMessagesLock.lock();
-			boolean result = false;
-			;
-			try {
-				result = super.offer(msgDBItem);
-				if (result && expiredMessagesCondition != null) {
-					expiredMessagesCondition.signal();
-				}
-			} finally {
-				expiredMessagesLock.unlock();
+		public boolean offer(MsgDBItem<T> tMsgDBItem) {
+			if (msgRepositoryIfc != null) {
+				return msgRepositoryIfc.offerExpired(MsgRepository.this, tMsgDBItem.db_id, tMsgDBItem.msg, tMsgDBItem.expired);
+			} else {
+				return super.offer(tMsgDBItem);
 			}
-			return result;
 		}
 	};
 	@ConfigField(desc = "Limit of offline messages", alias = "store-limit")
@@ -119,6 +109,8 @@ public abstract class MsgRepository<T, S extends DataSource>
 	private boolean msgs_user_store_limit = false;
 	@Inject
 	private UserRepository userRepository;
+	@Inject(nullAllowed = true)
+	private MsgRepositoryPoolBean msgRepositoryIfc;
 
 	public static MsgRepositoryIfc getInstance(String cls, String id_string) throws TigaseDBException {
 		try {
@@ -165,6 +157,7 @@ public abstract class MsgRepository<T, S extends DataSource>
 	}
 
 	@Override
+	@Deprecated
 	public Element getMessageExpired(long time, boolean delete) {
 		if (expiredQueue.size() == 0) {
 
@@ -201,14 +194,18 @@ public abstract class MsgRepository<T, S extends DataSource>
 		return item.msg;
 	}
 
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
+	@Deprecated
 	@Override
 	public void setCondition(ReentrantLock lock, Condition condition) {
-		this.expiredMessagesLock = lock;
-		this.expiredMessagesCondition = condition;
 	}
 
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Will be replaced by method in MsgRepositoryIfc returning loaded items")
+	@Deprecated
 	protected abstract void loadExpiredQueue(int max);
 
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Will be replaced by method in MsgRepositoryIfc returning loaded items")
+	@Deprecated
 	protected abstract void loadExpiredQueue(Date expired);
 
 	protected abstract void deleteMessage(T db_id);
@@ -270,11 +267,18 @@ public abstract class MsgRepository<T, S extends DataSource>
 				 ConfigTypeEnum.ComponentMode})
 	public static class MsgRepositoryMDBean
 			extends MDRepositoryBeanWithStatistics<MsgRepositoryIfc>
-			implements MsgRepositoryIfc {
+			implements MsgRepositoryIfc, MsgRepositoryPoolBean {
 
 		private static final Logger log = Logger.getLogger(MsgRepositoryMDBean.class.getCanonicalName());
 
+		private DelayQueue<RepoAwareMsgDBItem> expiredQueue = new DelayQueue<RepoAwareMsgDBItem>();
+		private long earliestOffline = Long.MAX_VALUE;
+
+		@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
+		@Deprecated
 		private final transient ReentrantLock lock = new ReentrantLock();
+		@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
+		@Deprecated
 		private final Condition expiredMessagesCondition = lock.newCondition();
 
 		public MsgRepositoryMDBean() {
@@ -288,22 +292,71 @@ public abstract class MsgRepository<T, S extends DataSource>
 
 		@Override
 		public Element getMessageExpired(long time, boolean delete) {
-			lock.lock();
-			try {
-				for (MsgRepositoryIfc repo : getRepositories().values()) {
-					Element el = repo.getMessageExpired(time, delete);
-					if (el != null) {
-						return el;
-					}
+			if (expiredQueue.size() == 0) {
+
+				// If the queue is empty load it with some elements
+				loadExpiredQueue(MAX_QUEUE_SIZE);
+			} else {
+
+				// If the queue is not empty, check whether recently saved off-line
+				// message
+				// is due to expire sooner then the head of the queue.
+				RepoAwareMsgDBItem item = expiredQueue.peek();
+
+				if ((item != null) && (earliestOffline < item.expired.getTime())) {
+
+					// There is in fact off-line message due to expire sooner then the head
+					// of the
+					// queue. Load all off-line message due to expire sooner then the first
+					// element
+					// in the queue.
+					loadExpiredQueue(item.expired);
 				}
-				expiredMessagesCondition.await();
-			} catch (InterruptedException e) {
-				log.log(Level.FINER, "awaiting for expired messages interrupted");
-			} finally {
-				lock.unlock();
 			}
 
-			return null;
+			RepoAwareMsgDBItem item = null;
+			while (item == null) {
+				try {
+					item = expiredQueue.take();
+				} catch (InterruptedException ex) {
+				}
+			}
+			
+			if (delete) {
+				if (item.getRepo() instanceof MsgRepository) {
+					((MsgRepository) item.getRepo()).deleteMessage(item.db_id);
+				}
+			}
+
+			return item.msg;
+		}
+
+		@Override
+		public boolean offerExpired(MsgRepositoryIfc repo, Object id, Element element, Date expired) {
+			return expiredQueue.offer(new RepoAwareMsgDBItem(repo, id, element, expired));
+		}
+
+		protected void loadExpiredQueue(int min_elements) {
+			int max = Math.max(min_elements / getRepositories().size(), 1);
+			for (MsgRepositoryIfc repo : getRepositories().values()) {
+				if (repo instanceof MsgRepository) {
+					((MsgRepository) repo).loadExpiredQueue(max);
+				}
+			}
+			earliestOffline = Long.MAX_VALUE;
+		}
+
+		protected void loadExpiredQueue(Date expired) {
+			if (expiredQueue.size() > 100 * MAX_QUEUE_SIZE) {
+				expiredQueue.clear();
+			}
+			
+			for (MsgRepositoryIfc repo : getRepositories().values()) {
+				if (repo instanceof MsgRepository) {
+					((MsgRepository) repo).loadExpiredQueue(expired);
+				}
+			}
+			earliestOffline = Long.MAX_VALUE;
 		}
 
 		@Override
@@ -323,7 +376,13 @@ public abstract class MsgRepository<T, S extends DataSource>
 		public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo)
 				throws UserNotFoundException {
 			MsgRepositoryIfc repo = getRepository(to.getDomain());
-			return repo.storeMessage(from, to, expired, msg, userRepo);
+			boolean result = repo.storeMessage(from, to, expired, msg, userRepo);
+			if (result && expired != null) {
+				if (expired.getTime() < earliestOffline) {
+					earliestOffline = expired.getTime();
+				}
+			}
+			return result;
 		}
 
 		@Override
@@ -392,6 +451,26 @@ public abstract class MsgRepository<T, S extends DataSource>
 				extends MDRepositoryConfigBean<MsgRepositoryIfc> {
 
 		}
+
+		public static class RepoAwareMsgDBItem extends MsgDBItem {
+
+			private final MsgRepositoryIfc repo;
+
+			public RepoAwareMsgDBItem(MsgRepositoryIfc repo, Object db_id, Element msg, Date expired) {
+				super(db_id, msg, expired);
+				this.repo = repo;
+			}
+
+			public MsgRepositoryIfc getRepo() {
+				return repo;
+			}
+		}
+	}
+
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "It is expected to be moved to MsgRepositoryIfc")
+	@Deprecated
+	public interface MsgRepositoryPoolBean<T> {
+		boolean offerExpired(MsgRepositoryIfc repo, T id, Element element, Date expired);
 	}
 
 }

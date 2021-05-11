@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.JID;
@@ -46,6 +47,8 @@ public interface OfflineMsgRepositoryIfc
 	 * @return head of the payloads queue which holds items that would be expired after stated time with an option to
 	 * delete them from repository after being retrieved.
 	 */
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Will be removed. MsgRepository pool beans ")
+	@Deprecated
 	Element getMessageExpired(long time, boolean delete);
 
 	/**
