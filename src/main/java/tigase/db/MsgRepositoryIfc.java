@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.amp.db.MsgRepository;
 import tigase.xml.Element;
 import tigase.xmpp.XMPPResourceConnection;
@@ -38,6 +39,8 @@ public interface MsgRepositoryIfc<T extends DataSource>
 
 	List<Element> getMessagesList(JID to) throws UserNotFoundException;
 
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
+	@Deprecated
 	void setCondition(ReentrantLock lock, Condition condition);
 
 	Queue<Element> loadMessagesToJID(List<String> db_ids, XMPPResourceConnection session,
