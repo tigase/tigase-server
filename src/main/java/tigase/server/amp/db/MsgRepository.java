@@ -45,6 +45,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -91,16 +92,22 @@ public abstract class MsgRepository<T, S extends DataSource>
 		}
 
 	}
+	protected AtomicInteger awaitingInExpiredQueue = new AtomicInteger(0);
 	protected long earliestOffline = Long.MAX_VALUE;
 	protected SimpleParser parser = SingletonFactory.getParserInstance();
 	protected DelayQueue<MsgDBItem<T>> expiredQueue = new DelayQueue<MsgDBItem<T>>() {
 		@Override
 		public boolean offer(MsgDBItem<T> tMsgDBItem) {
+			boolean result = false;
 			if (msgRepositoryIfc != null) {
-				return msgRepositoryIfc.offerExpired(MsgRepository.this, tMsgDBItem.db_id, tMsgDBItem.msg, tMsgDBItem.expired);
+				result = msgRepositoryIfc.offerExpired(MsgRepository.this, tMsgDBItem.db_id, tMsgDBItem.msg, tMsgDBItem.expired);
 			} else {
-				return super.offer(tMsgDBItem);
+				result = super.offer(tMsgDBItem);
 			}
+			if (result) {
+				awaitingInExpiredQueue.incrementAndGet();
+			}
+			return result;
 		}
 	};
 	@ConfigField(desc = "Limit of offline messages", alias = "store-limit")
@@ -187,6 +194,7 @@ public abstract class MsgRepository<T, S extends DataSource>
 			return null;
 		}
 
+		awaitingInExpiredQueue.decrementAndGet();
 		if (delete) {
 			deleteMessage(item.db_id);
 		}
@@ -292,11 +300,20 @@ public abstract class MsgRepository<T, S extends DataSource>
 
 		@Override
 		public Element getMessageExpired(long time, boolean delete) {
+			// what if some queue has entries one repo (far in the future)
+			// but the other repo loaded only part of his queue and some remained in the database?
+
 			if (expiredQueue.size() == 0) {
 
 				// If the queue is empty load it with some elements
 				loadExpiredQueue(MAX_QUEUE_SIZE);
 			} else {
+				// Check if any repository in the poll has empty expiredQueue and if so, try to load for them..
+				for (MsgRepositoryIfc repo : getRepositories().values()) {
+					if (repo instanceof MsgRepository && ((MsgRepository) repo).awaitingInExpiredQueue.get() == 0) {
+						((MsgRepository) repo).loadExpiredQueue(MAX_QUEUE_SIZE);
+					}
+				}
 
 				// If the queue is not empty, check whether recently saved off-line
 				// message
@@ -321,7 +338,10 @@ public abstract class MsgRepository<T, S extends DataSource>
 				} catch (InterruptedException ex) {
 				}
 			}
-			
+
+			if (item != null && item.getRepo() instanceof MsgRepository) {
+				((MsgRepository) item.getRepo()).awaitingInExpiredQueue.decrementAndGet();
+			}
 			if (delete) {
 				if (item.getRepo() instanceof MsgRepository) {
 					((MsgRepository) item.getRepo()).deleteMessage(item.db_id);
@@ -349,6 +369,11 @@ public abstract class MsgRepository<T, S extends DataSource>
 		protected void loadExpiredQueue(Date expired) {
 			if (expiredQueue.size() > 100 * MAX_QUEUE_SIZE) {
 				expiredQueue.clear();
+				for (MsgRepositoryIfc repo : getRepositories().values()) {
+					if (repo instanceof MsgRepository) {
+						((MsgRepository) repo).awaitingInExpiredQueue.set(0);
+					}
+				}
 			}
 			
 			for (MsgRepositoryIfc repo : getRepositories().values()) {

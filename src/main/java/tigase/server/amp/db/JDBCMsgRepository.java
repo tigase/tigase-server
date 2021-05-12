@@ -423,7 +423,7 @@ public class JDBCMsgRepository
 					earliestOffline = expired.getTime();
 				}
 
-				if (expiredQueue.size() == 0) {
+				if (awaitingInExpiredQueue.get() == 0) {
 					loadExpiredQueue(1);
 				}
 			}
@@ -529,6 +529,7 @@ public class JDBCMsgRepository
 		try {
 			if (expiredQueue.size() > 100 * MAX_QUEUE_SIZE) {
 				expiredQueue.clear();
+				awaitingInExpiredQueue.set(0);
 			}
 
 			ResultSet rs = null;
