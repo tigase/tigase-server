@@ -144,8 +144,10 @@ public class MIXProcessor
 							case "join":
 								results.addAll(rosterUtil.addJidToRoster(userRepository, session == null ? null : session.getParentSession(),
 																		 userJID, item));
+								break;
 							case "leave":
 								results.addAll(rosterUtil.removeJidFromRoster(userRepository, session == null ? null : session.getParentSession(), userJID, channelJID));
+								break;
 						}
 						Optional.ofNullable(session)
 								.map(XMPPResourceConnection::getParentSession)
