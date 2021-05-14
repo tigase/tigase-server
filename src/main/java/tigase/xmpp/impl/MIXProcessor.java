@@ -66,6 +66,8 @@ public class MIXProcessor
 
 	private static final RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true);
 
+	private static final EnumSet<StanzaType> RESPONSE_TYPES = EnumSet.of(StanzaType.result, StanzaType.error);
+
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
 		Authorization result = super.canHandle(packet, conn);
@@ -75,7 +77,13 @@ public class MIXProcessor
 				return conn != null ? result : null;
 			} else {
 				// join/leave response is only processed if returned to bare JID
-				return packet.getStanzaTo() != null && packet.getStanzaTo().getResource() == null ? result : null;
+				// and is sent with type "result" or "error"
+				if (RESPONSE_TYPES.contains(packet.getType())) {
+					return packet.getStanzaTo() != null && packet.getStanzaTo().getResource() == null ? result : null;
+				} else {
+					// stanza is a request and for direct communication with MIX component so leave it..
+					return null;
+				}
 			}
 		}
 		return result;
