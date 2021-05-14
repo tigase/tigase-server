@@ -339,7 +339,7 @@ public abstract class MsgRepository<T, S extends DataSource>
 				}
 			}
 
-			if (item != null && item.getRepo() instanceof MsgRepository) {
+			if (item.getRepo() instanceof MsgRepository) {
 				((MsgRepository) item.getRepo()).awaitingInExpiredQueue.decrementAndGet();
 			}
 			if (delete) {
