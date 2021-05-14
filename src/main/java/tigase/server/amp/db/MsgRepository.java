@@ -341,9 +341,7 @@ public abstract class MsgRepository<T, S extends DataSource>
 
 			if (item.getRepo() instanceof MsgRepository) {
 				((MsgRepository) item.getRepo()).awaitingInExpiredQueue.decrementAndGet();
-			}
-			if (delete) {
-				if (item.getRepo() instanceof MsgRepository) {
+				if (delete) {
 					((MsgRepository) item.getRepo()).deleteMessage(item.db_id);
 				}
 			}
