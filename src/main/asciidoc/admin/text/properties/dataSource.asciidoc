@@ -60,6 +60,20 @@ dataSource () {
 }
 -----
 
+== MySQL
+MySQL support works out of the box, however Tigase uses prepared calls for calling procedures accessing data stored in database. While this works very fast, it takes time during Tigase XMPP Server startup to prepare those prepared calls.
+Since version 8.2.0, it is possible to enable workaround which will force Tigase XMPP Server to use prepared statements instead of prepared calls, that will improve startup time but may have slight impact on performance during execution of queries and disables startup verification checking if stored procedures and function in database exist and have correct parameter types.
+To enable this mode you need to set `useCallableMysqlWorkaround` to `true`.
+[source,dsl]
+-----
+dataSource {
+    default () {
+        uri = 'jdbc:mysql://localhost/tigasedb?user=tigase&password=tigase12'
+        useCallableMysqlWorkaround = 'true'
+    }
+}
+-----
+
 [[dataRepoPoolSize]]
 == pool-size
 `DataSource` is an abstraction layer between any higher level data access repositories such as `userRepository` or `authRepository` and SQL database or JDBC driver to be more specific.
