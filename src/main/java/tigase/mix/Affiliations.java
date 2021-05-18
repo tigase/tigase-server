@@ -82,6 +82,9 @@ public class Affiliations implements IAffiliationsCached {
 	public UsersAffiliation getSubscriberAffiliation(BareJID jid) {
 		try {
 			ChannelConfiguration channelConfiguration = mixRepository.getChannelConfiguration(channelJID);
+			if (channelConfiguration == null) {
+				return new UsersAffiliation(jid, Affiliation.none);
+			}
 			switch (nodeName) {
 				case Mix.Nodes.CONFIG:
 					switch (channelConfiguration.getConfigurationNodeAccess()) {
