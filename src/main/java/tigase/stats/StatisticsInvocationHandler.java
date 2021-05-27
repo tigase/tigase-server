@@ -105,6 +105,7 @@ public class StatisticsInvocationHandler<S>
 	public static class MethodStatistics {
 
 		private final Method method;
+		private final String methodName;
 		private long avgProcessingTime = 0;
 		private long exceptions_counter = 0;
 		private long executions_counter = 0;
@@ -117,6 +118,19 @@ public class StatisticsInvocationHandler<S>
 
 		public MethodStatistics(Method method) {
 			this.method = method;
+			StringBuilder sb = new StringBuilder(method.getName());
+			sb.append("(");
+			boolean first = true;
+			for (Class<?> parameter : method.getParameterTypes()) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(",");
+				}
+				sb.append(parameter.getSimpleName());
+			}
+			sb.append(")");
+			methodName = sb.toString();
 		}
 
 		public synchronized void everyHour() {
@@ -135,15 +149,14 @@ public class StatisticsInvocationHandler<S>
 		}
 
 		public void getStatistics(String compName, String prefix, StatisticsList list) {
-			String name = method.getName();
 			if (list.checkLevel(Level.FINEST)) {
-				list.add(compName, prefix + "/" + name + "/Excutions last hour", per_hour, Level.FINEST);
-				list.add(compName, prefix + "/" + name + "/Excutions last minute", per_minute, Level.FINEST);
-				list.add(compName, prefix + "/" + name + "/Excutions last second", per_second, Level.FINEST);
+				list.add(compName, prefix + "/" + methodName + "/Excutions last hour", per_hour, Level.FINEST);
+				list.add(compName, prefix + "/" + methodName + "/Excutions last minute", per_minute, Level.FINEST);
+				list.add(compName, prefix + "/" + methodName + "/Excutions last second", per_second, Level.FINEST);
 			}
-			list.add(compName, prefix + "/" + name + "/Average processing time", avgProcessingTime, Level.FINE);
-			list.add(compName, prefix + "/" + name + "/Executions", executions_counter, Level.FINE);
-			list.add(compName, prefix + "/" + name + "/Exceptions during execution", exceptions_counter, Level.FINE);
+			list.add(compName, prefix + "/" + methodName + "/Average processing time", avgProcessingTime, Level.FINE);
+			list.add(compName, prefix + "/" + methodName + "/Executions", executions_counter, Level.FINE);
+			list.add(compName, prefix + "/" + methodName + "/Exceptions during execution", exceptions_counter, Level.FINE);
 		}
 
 		public void updateExecutionTime(long executionTime) {
