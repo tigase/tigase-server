@@ -102,10 +102,9 @@ public class StatisticsInvocationHandler<S>
 		}
 	}
 
-	public static class MethodStatistics {
+	public static class Statistics {
 
-		private final Method method;
-		private final String methodName;
+		private final String name;
 		private long avgProcessingTime = 0;
 		private long exceptions_counter = 0;
 		private long executions_counter = 0;
@@ -116,21 +115,12 @@ public class StatisticsInvocationHandler<S>
 		private long per_minute = 0;
 		private long per_second = 0;
 
-		public MethodStatistics(Method method) {
-			this.method = method;
-			StringBuilder sb = new StringBuilder(method.getName());
-			sb.append("(");
-			boolean first = true;
-			for (Class<?> parameter : method.getParameterTypes()) {
-				if (first) {
-					first = false;
-				} else {
-					sb.append(",");
-				}
-				sb.append(parameter.getSimpleName());
-			}
-			sb.append(")");
-			methodName = sb.toString();
+		public Statistics(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
 		}
 
 		public synchronized void everyHour() {
@@ -150,13 +140,13 @@ public class StatisticsInvocationHandler<S>
 
 		public void getStatistics(String compName, String prefix, StatisticsList list) {
 			if (list.checkLevel(Level.FINEST)) {
-				list.add(compName, prefix + "/" + methodName + "/Excutions last hour", per_hour, Level.FINEST);
-				list.add(compName, prefix + "/" + methodName + "/Excutions last minute", per_minute, Level.FINEST);
-				list.add(compName, prefix + "/" + methodName + "/Excutions last second", per_second, Level.FINEST);
+				list.add(compName, prefix + "/" + getName() + "/Excutions last hour", per_hour, Level.FINEST);
+				list.add(compName, prefix + "/" + getName() + "/Excutions last minute", per_minute, Level.FINEST);
+				list.add(compName, prefix + "/" + getName() + "/Excutions last second", per_second, Level.FINEST);
 			}
-			list.add(compName, prefix + "/" + methodName + "/Average processing time", avgProcessingTime, Level.FINE);
-			list.add(compName, prefix + "/" + methodName + "/Executions", executions_counter, Level.FINE);
-			list.add(compName, prefix + "/" + methodName + "/Exceptions during execution", exceptions_counter, Level.FINE);
+			list.add(compName, prefix + "/" + getName() + "/Average processing time", avgProcessingTime, Level.FINE);
+			list.add(compName, prefix + "/" + getName() + "/Executions", executions_counter, Level.FINE);
+			list.add(compName, prefix + "/" + getName() + "/Exceptions during execution", exceptions_counter, Level.FINE);
 		}
 
 		public void updateExecutionTime(long executionTime) {
@@ -167,7 +157,34 @@ public class StatisticsInvocationHandler<S>
 		public void executionFailed() {
 			exceptions_counter++;
 		}
+	}
 
+	public static class MethodStatistics extends Statistics {
+
+		private static String generateMethodName(Method method) {
+			StringBuilder sb = new StringBuilder(method.getName());
+			sb.append("(");
+			boolean first = true;
+			for (Class<?> parameter : method.getParameterTypes()) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(",");
+				}
+				sb.append(parameter.getSimpleName());
+			}
+			sb.append(")");
+			return sb.toString();
+		}
+
+		private final Method method;
+
+		public MethodStatistics(Method method) {
+			super(generateMethodName(method));
+			this.method = method;
+
+		}
+		
 	}
 
 }

@@ -23,6 +23,9 @@ import tigase.component.responses.ResponseManager;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
+import tigase.stats.ComponentStatisticsProvider;
+import tigase.stats.StatisticsInvocationHandler;
+import tigase.stats.StatisticsList;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.StanzaType;
@@ -30,11 +33,13 @@ import tigase.xmpp.jid.JID;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Bean(name = "stanzaProcessor", active = true)
-public class StanzaProcessor {
+public class StanzaProcessor implements ComponentStatisticsProvider {
 
 	private Logger log = Logger.getLogger(this.getClass().getName());
 
@@ -47,12 +52,16 @@ public class StanzaProcessor {
 	@Inject
 	private PacketWriter writer;
 
+	private ConcurrentHashMap<Class<? extends Module>,ModuleStatistics> modulesStatistics = new ConcurrentHashMap<>();
+
 	public List<Module> getModules() {
 		return modules;
 	}
 
 	public void setModules(List<Module> modules) {
 		this.modules = modules == null ? Collections.emptyList() : modules;
+		modulesStatistics = new ConcurrentHashMap<Class<? extends Module>, ModuleStatistics>(
+				modules.stream().collect(Collectors.toMap(Module::getClass, ModuleStatistics::new)));
 	}
 
 	public ResponseManager getResponseManager() {
@@ -158,6 +167,25 @@ public class StanzaProcessor {
 		}
 	}
 
+	public void everyHour() {
+		modulesStatistics.values().forEach(StatisticsInvocationHandler.Statistics::everyHour);
+	}
+
+	public void everyMinute() {
+		modulesStatistics.values().forEach(StatisticsInvocationHandler.Statistics::everyMinute);
+	}
+
+	public void everySecond() {
+		modulesStatistics.values().forEach(StatisticsInvocationHandler.Statistics::everySecond);
+	}
+	
+	@Override
+	public void getStatistics(String compName, StatisticsList list) {
+		for (ModuleStatistics statistics : modulesStatistics.values()) {
+			statistics.getStatistics(compName, "stanzaProcessor", list);
+		}
+	}
+
 	private boolean process(final Packet packet) throws ComponentException, TigaseStringprepException {
 		boolean handled = false;
 		if (log.isLoggable(Level.FINER)) {
@@ -170,7 +198,7 @@ public class StanzaProcessor {
 				if (log.isLoggable(Level.FINER)) {
 					log.finer("Handled by module " + module.getClass());
 				}
-				module.process(packet);
+				execute(module, packet);
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("Finished " + module.getClass());
 				}
@@ -179,4 +207,31 @@ public class StanzaProcessor {
 		return handled;
 	}
 
+	private void execute(Module module, Packet packet) throws ComponentException, TigaseStringprepException {
+		ModuleStatistics statistics = modulesStatistics.get(module.getClass());
+		try {
+			long start = System.currentTimeMillis();
+			module.process(packet);
+			long end = System.currentTimeMillis();
+			if (statistics != null) {
+				statistics.updateExecutionTime(end - start);
+			}
+		} catch (Throwable ex) {
+			if (statistics != null) {
+				statistics.executionFailed();
+			}
+			throw ex;
+		}
+	}
+	
+	public static class ModuleStatistics extends StatisticsInvocationHandler.Statistics {
+
+		private static String generateModuleName(Module module) {
+			return module.getClass().getCanonicalName();
+		}
+
+		public ModuleStatistics(Module module) {
+			super(generateModuleName(module));
+		}
+	}
 }
