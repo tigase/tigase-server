@@ -227,7 +227,7 @@ public class StanzaProcessor implements ComponentStatisticsProvider {
 	public static class ModuleStatistics extends StatisticsInvocationHandler.Statistics {
 
 		private static String generateModuleName(Module module) {
-			return module.getClass().getCanonicalName();
+			return module.getClass().getSimpleName();
 		}
 
 		public ModuleStatistics(Module module) {
