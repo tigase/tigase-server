@@ -26,6 +26,7 @@ import tigase.util.dns.DNSEntry;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.PacketInvalidTypeException;
 
 import java.net.UnknownHostException;
 import java.util.*;
@@ -651,6 +652,8 @@ public class CIDConnections {
 				handler.addOutPacket(
 						Authorization.REMOTE_SERVER_NOT_FOUND.getResponseMessage(p, "S2S - destination host not found",
 																				 true));
+			} catch (PacketInvalidTypeException e) {
+				log.log(Level.FINE, "Packet: {0} processing exception: {1}", new Object[]{p.toString(), e});
 			} catch (PacketErrorTypeException e) {
 				log.log(Level.WARNING, "Packet: {0} processing exception: {1}", new Object[]{p.toString(), e});
 			}
