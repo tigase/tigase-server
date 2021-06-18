@@ -17,7 +17,10 @@
  */
 package tigase.server;
 
-import tigase.conf.*;
+import tigase.conf.ConfigurationException;
+import tigase.conf.ConfiguratorAbstract;
+import tigase.conf.MonitoringBeanIfc;
+import tigase.conf.SetLoggingCommand;
 import tigase.disco.XMPPService;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -35,6 +38,7 @@ import tigase.util.updater.UpdatesChecker;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
+import tigase.xmpp.PacketInvalidTypeException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
 import tigase.xmpp.jid.JID;
@@ -459,7 +463,15 @@ public class MessageRouter
 		} else {
 
 			// Not a command for sure...
-			log.warning("I expect command (Iq) packet here, instead I got: " + packet.toString());
+			log.log(Level.FINE, "I expect command (Iq) packet here, instead I got: " + packet.toString());
+			try {
+				Packet res = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, null, true);
+				results.offer(res);
+			} catch (PacketInvalidTypeException e) {
+				log.log(Level.FINE, "Packet: {0} processing exception: {1}", new Object[]{packet.toString(), e});
+			} catch (PacketErrorTypeException e) {
+				log.log(Level.WARNING, "Packet processing exception: ", e);
+			}
 
 			return;
 		}
