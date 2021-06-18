@@ -9,6 +9,10 @@
 
 During this step, kernel creates instance of the class which was registered for this bean (for more details see **Registration of a bean**). Instance of a bean is created using paremeterless constructor of a class.
 
+NOTE: Bean instance is only created for required beans (i.e. beans that were injected somewhere).
+
+NOTE: It's possible to create bean instance without the need to inject it anywhere - such bean should be annoted with `@Autostart` annotation.
+
 [[beanConfiguration]]
 === Configuring a bean _(optional)_
 
