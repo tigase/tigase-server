@@ -22,7 +22,6 @@ import tigase.cluster.api.ClusterCommandException;
 import tigase.cluster.api.CommandListenerAbstract;
 import tigase.kernel.beans.Bean;
 import tigase.server.*;
-import tigase.server.xmppsession.UserConnectedEvent;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
@@ -372,8 +371,6 @@ public class DefaultClusteringStrategy<E extends ConnectionRecordIfc>
 						log.log(Level.WARNING, "Error executing cluster command", ex);
 					}
 				}
-			} else {
-				fireEvent(new UserConnectedEvent(rec.getUserJid()));
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				log.finest("User connected jid: " + rec.getUserJid() + ", fromNode: " + fromNode);

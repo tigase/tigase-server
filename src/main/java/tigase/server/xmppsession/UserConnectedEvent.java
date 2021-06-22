@@ -19,9 +19,12 @@ package tigase.server.xmppsession;
 
 import tigase.xmpp.jid.JID;
 
-public class UserConnectedEvent {
+import java.io.Serializable;
 
-	private final JID userJid;
+public class UserConnectedEvent
+		implements Serializable {
+
+	final JID userJid;
 
 	public UserConnectedEvent(JID userJid) {
 		this.userJid = userJid;
@@ -30,5 +33,4 @@ public class UserConnectedEvent {
 	public JID getUserJid() {
 		return userJid;
 	}
-
 }
