@@ -35,6 +35,7 @@ public class ShutdownEvent
 	public ShutdownEvent(String node, long delay, String msg) {
 		this.node = node;
 		this.delay = delay;
+		this.msg = msg;
 	}
 
 	public long getDelay() {
