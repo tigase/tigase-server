@@ -126,7 +126,7 @@ public abstract class XMPPProcessorAbstract
 					processToUserPacket(packet, session, repo, results, settings);
 				}
 			} catch (NotAuthorizedException ex) {
-				log.log(Level.WARNING,
+				log.log(Level.FINE,
 						"Packet to a user session which is not yet authenticated: " + session + ", packet: " + packet);
 			}
 		} catch (PacketErrorTypeException ex) {
