@@ -1,165 +1,220 @@
 [[eventBusAPI]]
 = EventBus API in Tigase
-:author: Bartosz Małkowski <bmalkowski@tigase.pl>
-:version: v1.0 August 2015. Reformatted for v8.0.0.
+:author: Bartosz Małkowski <bartosz.malkowski@tigase.net>
+:version: v1.1 June 2021. Reformatted for v8.0.0.
 
 :toc:
 :numbered:
 :website: http://tigase.net/
 
 EventBus is a custom publish-subscribe mechanism which allows for the use of Event Listener within Tigase Server.
-EventBus consists of two separated parts: Distributed EventBus and Local EventBus.
-Local EventBus is only concerned with local event listener, and will operate events locally.  Distributed EventBus is designed to distribute events among cluster nodes.
 For a more detailed overview of EventBus and it's features, please visit link:http://docs.tigase.org/tigase-server/snapshot/Administration_Guide/html/#eventBus[The Administration Guide].
 
 == EventBus API
+
 To create instance of EventBus use the following code:
-[source, xml]
+
+[source,java]
 -------
 EventBus eventBus = EventBusFactory.getInstance();
 -------
 
-*NOTE:* Remember, that EventBus is asynchronous. All handlers are called in a different thread than the thread that initially fired the event.
+NOTE: Remember, that EventBus is asynchronous.
+All handlers are called in a different thread than the thread that initially fired the event.
 
-== Distributed EventBus
-Distributed EventBus is designed to distribute events among cluster nodes.
-Events must extends `tigase.xml.Element`:
+=== Events
 
-[source, xml]
+Events may be defined in two ways: as a XML element or as a class.
+
+.XML Element event
+[source,xml]
 -------
 <EventName xmlns="tigase:demo">
   <sample_value>1</sample_value>
 </EventName>
 -------
-Events are identified by two elements: name of event and namespace.
 
-
-=== Registering events handlers
-To catch and handle an event published in any node of cluster, EventsHandler must be registered first.
-
-[source, java]
--------
-EventHandler handler = new EventHandler() {
-    @Override
-    public void onEvent(String name, String xmlns, Element event) {
-        // TODO
+.Serialized event class
+[source,java]
+----
+public class SampleSerializedEvent implements Serializable {
+    private JID data;
+    public JID getData() {
+        return this.data;
     }
-};
+    public void setData(JID data) {
+        this.data = data;
+    }
+}
+----
 
-eventBus.addHandler("EventName", "tigase:demo", handler);
+.Event class
+[source,java]
+----
+public class SampleEvent {
+    private JID data;
+    public JID getData() {
+        return this.data;
+    }
+    public void setData(JID data) {
+        this.data = data;
+    }
+}
+----
 
--------
+Events defined as XML element and class implementing `Serializable` interface may be distributed among all servers in cluster.
+Event `SampleEvent` will be broadcasted only in the same instance what fired the event.
 
-It is possible to register handler for all events with a specific xmlns such as `tigase:demo` below:
+Class based events are serialized (if it is required and possible) to XML element.
+Name of XML element is taken from full name of class:
 
-[source, java]
--------
-eventBus.addHandler(null, "tigase:demo", handler);
--------
+.Class based event serialized to XML
+[source,xml]
+----
+<net.tigase.sample.SampleSerializedEvent>
+    <data>sample@data.tigase.net</data>
+</net.tigase.sample.SampleSerializedEvent>
+----
 
-Events created on others cluster node, will have attribute `remote` set to `true` and attribute `source` set to event creator node name:
+=== Firing events
 
-[source, xml]
+To fire event, just get instance of EventBus and call method `fire()`.
+
+.Firing event based on XML Element
+[source,java]
+----
+EventBus eventBus = EventBusFactory.getInstance();
+Element event = new Element("tigase.eventbus.impl.Event1");
+eventBus.fire(event)
+----
+
+.Firing serialized event
+[source,java]
+----
+EventBus eventBus = EventBusFactory.getInstance();
+SampleSerializedEvent event = new SampleSerializedEvent();
+eventBus.fire(event)
+----
+
+.Firing simple event
+[source,java]
+----
+EventBus eventBus = EventBusFactory.getInstance();
+SampleEvent event = new SampleEvent();
+eventBus.fire(event)
+----
+
+=== Handling events
+
+To handle fired event, we have to register listener in EventBus.
+When listener is registered, EventBus automatically subscribes for this type of event in all instances in cluster.
+
+Depends on expected event type, we have to decide what type of listener we should register.
+
+==== Handling class based events
+
+This option is reserved for class based events only.
+It doesn't matter if it is serialized class or not.
+
+[source,java]
+----
+eventBus.addListener(SampleEvent.class, new EventListener<SampleEvent>() {
+
+    @Override
+    public void onEvent(SampleEvent event) {
+    }
+});
+
+----
+
+To make registering listeners more easy, you can use method `registerAll()` from EventBus.
+This method registers all methods given class, annotated by `@HandleEvent` as listeners for event declared as the method argument.
+
+[source,java]
+----
+public class SomeConsumer {
+
+    @HandleEvent
+    public void event1(Event12 e) {
+    }
+
+    public void initialize() {
+        eventBus.registerAll(this);
+    }
+}
+----
+
+==== Handling XML events
+
+To handle XML events we have to register listener for specific event package and name.
+In our example, package is empty because event name has no package declared (see also <<Filtering events>>).
+
+[source,java]
+----
+eventBus.addListener("", "EventName", new EventListener<Element>() {
+    @Override
+    public void onEvent(Element event) {
+
+    }
+});
+eventBus.addListener("tigase.eventbus.impl", "Event1", new EventListener<Element>() {
+    @Override
+    public void onEvent(Element event) {
+
+    }
+});
+----
+
+Because serialized class events, ale transformed to XML elements, we are able to listen for XML representation of class based event.
+To do that, we have to register listener for specific package and class name:
+
+[source,java]
+----
+eventBus.addListener("net.tigase.sample", "SampleSerializedEvent", new EventListener<Element>() {
+    @Override
+    public void onEvent(Element event) {
+
+    }
+});
+----
+
+[IMPORTANT]
+====
+XML events created on others cluster node, will have attribute `remote` set to `true` and attribute `source` set to event creator node name:
+
+[source,xml]
 -------
 <EventName xmlns="tigase:demo" remote="true" source="node1.example">
   <sample_value>1</sample_value>
 </EventName>
 -------
+====
 
-=== Publishing events
+==== Filtering events
 
-The only limitation for events are the requirements of name and xmlns. Internal structure may be defined by programmer.
+Sometimes you may want to receive many kinds of events with the same handler.
+EventBus has very simple mechanism to generalization:
 
-[source, java]
--------
-Element event = new Element("EventName", new String[]{"xmlns"}, new String[]{"tigase:demo"});
-event.addChild(new Element("sample_value", "1"));
+[source,java]
+----
+eventBus.addListener("net.tigase.sample", null,  event -> {}); <1>
+eventBus.addListener(null, null,  event -> {}); <2>
+----
+<1> This listener will be called for each event with given package name (XML based, or serialized class based).
+<2> This listener will be called for ALL events (XML based, or serialized class based).
 
-eventBus.fire(event);
--------
+In case of class based events, EventBus is checking class inheritance.
 
-This event will be received by all handlers that are registered for exactly this event, or all events using the *tigase:demo* namespace on all cluster nodes. It is possible to limit event delivery only to the current Tigase instance (current cluster node), by setting the attribute `local`:
+[source,java]
+----
+class MainEvent { }
+class SpecificEvent extends MainEvent {}
 
-[source, java]
--------
-Element event = new Element("EventName", new String[]{"xmlns", "local"}, new String[]{"tigase:demo", "true"});
-event.addChild(new Element("sample_value", "1"));
+eventBus.addListener(SpecificEvent.class, event -> {}); <3>
+eventBus.addListener(MainEvent.class, event -> {}); <4>
 
-eventBus.fire(event);
--------
+eventBus.fire(new SpecificEvent());
+----
 
-== Local EventBus
-
-Local EventBus is the mechanism to distribute events to all listeners on the same instance of Tigase Server.  Local EventBus uses Java Objects as events and allows for the transmission instance of object (for example `Map` or `Set`).
-
-=== Defining events and handlers classes
-Local EventBus uses own structures of events and handlers.
-
-[source, java]
-.SampleEvent.java
--------
-public static class SampleEvent implements Event {
-
-    private final String data;
-
-    public SampleEvent(String data) {
-        this.data = data;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-}
--------
-
-=== Registering events handlers
-
-To catch an event, `EventHandler` must be registered in EventBus:
-
-[source, java]
--------
-EventHandler handler = new EventHandler() {
-    @Override
-    public void onEvent(Event event) {
-
-    }
-};
-
-eventBus.addHandler(SampleEvent.class, handler);
--------
-
-The other way to register a handler is by using annotations. Event consumer class must contain the method with a single parameter, and its type must be equal to expected event type.
-
-[source, java]
-.SampleConsumer.java
--------
-public static class SampleConsumer {
-
-	@HandleEvent
-	public void onCatchSomeNiceEvent(SampleEvent event) {
-	}
-
-	@HandleEvent
-	public void onEvent01(ImportantEvent event) {
-	}
-}
--------
-
-The instance of class must be registered in Eventbus:
-
-[source, java]
--------
-eventBus.registerAll(consumer);
--------
-
-Once this is in place, EventBus will be added as the event handler for two different events.
-
-=== Publishing events
-Publishing events is simple:
-
-[source, java]
--------
-SampleEvent event = new SampleEvent("data");
-eventBus.fire(event);
--------
+3. Will be called, because this is listener stricte for `SpecificEvent`.
+4. Will be called, because `SpecificEvent` extends  `MainEvent`.

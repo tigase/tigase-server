@@ -31,8 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class EventBusImplementationTest {
 
@@ -176,6 +175,34 @@ public class EventBusImplementationTest {
 		Assert.assertNull(resp[2]);
 		Assert.assertTrue(resp[3] instanceof Element);
 		Assert.assertTrue(resp[4] instanceof Element);
+	}
+
+	@Test
+	public void testFireAndHandleXmlEventNoPackageName() {
+		final Element event = new Element("ShortNameEvent");
+		event.withElement("data", null, "9842984");
+
+		final Element[] receivedEvent = new Element[]{null};
+		eventBus.addListener("", "ShortNameEvent", event1 -> receivedEvent[0] = event1);
+		eventBus.fire(event);
+
+		assertNotNull(receivedEvent[0]);
+		assertEquals("ShortNameEvent", receivedEvent[0].getName());
+		assertEquals("9842984", receivedEvent[0].getChild("data").getCData());
+	}
+
+	@Test
+	public void testFireAndHandleXmlEventLongName() {
+		final Element event = new Element("package.name.ShortNameEvent");
+		event.withElement("data", null, "9842981");
+
+		final Element[] receivedEvent = new Element[]{null};
+		eventBus.addListener("package.name", "ShortNameEvent", event1 -> receivedEvent[0] = event1);
+		eventBus.fire(event);
+
+		assertNotNull(receivedEvent[0]);
+		assertEquals("package.name.ShortNameEvent", receivedEvent[0].getName());
+		assertEquals("9842981", receivedEvent[0].getChild("data").getCData());
 	}
 
 	@Test
