@@ -62,7 +62,9 @@ public class SampleEvent {
 }
 ----
 
-Events defined as XML element and class implementing `Serializable` interface may be distributed among all servers in cluster.
+Class based event must have public non-parameter constructor. Setters are optional.
+
+NOTE: Events defined as XML element and class implementing `Serializable` interface may be distributed among all servers in cluster.
 Event `SampleEvent` will be broadcasted only in the same instance what fired the event.
 
 Class based events are serialized (if it is required and possible) to XML element.
