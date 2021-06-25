@@ -24,7 +24,9 @@ import java.io.Serializable;
 public class UserConnectedEvent
 		implements Serializable {
 
-	final JID userJid;
+	private JID userJid;
+
+	public UserConnectedEvent() {}
 
 	public UserConnectedEvent(JID userJid) {
 		this.userJid = userJid;
