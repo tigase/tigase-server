@@ -62,10 +62,16 @@ public class SampleEvent {
 }
 ----
 
-Class based event must have public non-parameter constructor. Setters are optional.
+NOTE: Events defined as XML element and class implementing `Serializable` interface will be distributed to all servers in cluster.
+Event `SampleEvent` will be broadcast only in the same instance what fired the event.
 
-NOTE: Events defined as XML element and class implementing `Serializable` interface may be distributed among all servers in cluster.
-Event `SampleEvent` will be broadcasted only in the same instance what fired the event.
+==== Requirements for class-based events
+
+* Default, explicit, public, paremeter-less constructor is mandatory.
+* If the event should be delivered to all cluster nodes then it *MUST* implement `Serializable` interface.
+* Variables serialisation follows `Serializable` semantics, which means that `final`, `static` nor `transient` fields will be skipped. What's more, fields with `null` value will not be serialised neither.
+
+==== Serialisation of class-based events
 
 Class based events are serialized (if it is required and possible) to XML element.
 Name of XML element is taken from full name of class:
