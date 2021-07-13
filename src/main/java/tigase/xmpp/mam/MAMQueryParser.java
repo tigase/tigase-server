@@ -65,6 +65,9 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 		query.setId(queryEl.getAttributeStaticStr("queryid"));
 
 		if (queryEl.getChild("x", "jabber:x:data") == null) {
+			query.getRsm().fromElement(queryEl);
+			validateRsm(query.getRsm());
+			
 			return query;
 		}
 
@@ -96,7 +99,6 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 		}
 
 		query.getRsm().fromElement(queryEl);
-
 		validateRsm(query.getRsm());
 
 		return query;
