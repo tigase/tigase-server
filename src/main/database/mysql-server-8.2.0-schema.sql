@@ -106,3 +106,45 @@ call TigServerUpgrade();
 -- QUERY START:
 drop procedure if exists TigServerUpgrade;
 -- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+create procedure TigServerUpgrade()
+begin
+    if exists(SELECT 1 FROM information_schema.statistics s1 WHERE s1.table_schema = database() AND s1.table_name = 'tig_offline_messages' AND s1.index_name = 'tig_offline_messages_receiver_sha1_index') then
+        drop index tig_offline_messages_receiver_sha1_index on tig_offline_messages;
+    end if;
+end //
+-- QUERY END:
+
+delimiter ;
+
+-- QUERY START:
+call TigServerUpgrade();
+-- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigServerUpgrade;
+-- QUERY END:
+
+delimiter //
+
+-- QUERY START:
+create procedure TigServerUpgrade()
+begin
+    if exists(select * from information_schema.COLUMNS where TABLE_SCHEMA = database() and TABLE_NAME = 'tig_offline_messages' and COLUMN_NAME = 'sender_sha1' and CHARACTER_MAXIMUM_LENGTH = 128) and exists(select * from information_schema.COLUMNS where TABLE_SCHEMA = database() and TABLE_NAME = 'tig_offline_messages' and COLUMN_NAME = 'receiver_sha1' and CHARACTER_MAXIMUM_LENGTH = 128) then
+        alter table tig_offline_messages modify column receiver_sha1 char(40) not null, modify column sender_sha1 char(40);
+    end if;
+end //
+-- QUERY END:
+
+delimiter ;
+
+-- QUERY START:
+call TigServerUpgrade();
+-- QUERY END:
+
+-- QUERY START:
+drop procedure if exists TigServerUpgrade;
+-- QUERY END:
