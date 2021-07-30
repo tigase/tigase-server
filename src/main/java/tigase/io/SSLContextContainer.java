@@ -315,9 +315,10 @@ public class SSLContextContainer
 
 	public void setHardenedMode(HARDENED_MODE hardenedMode) {
 		this.hardenedMode = hardenedMode;
-		if (HARDENED_MODE.relaxed.equals(hardenedMode)) {
-			System.clearProperty(EPHEMERAL_DH_KEYSIZE_KEY);
-		}
+		// Don't clear DH key size property as it's global property and affects all connections.
+//		if (HARDENED_MODE.relaxed.equals(hardenedMode)) {
+//			System.clearProperty(EPHEMERAL_DH_KEYSIZE_KEY);
+//		}
 	}
 
 
