@@ -587,14 +587,8 @@ public abstract class AbstractMessageReceiver
 	}
 
 	public String newPacketId(String prefix) {
-		StringBuilder sb = new StringBuilder(32);
-
-		if (prefix != null) {
-			sb.append(prefix).append("-");
-		}
-		sb.append(getName()).append(++packetId);
-
-		return sb.toString();
+		final String uuid = UUID.randomUUID().toString();
+		return prefix != null ? prefix + "-" + uuid : uuid;
 	}
 
 	/**
