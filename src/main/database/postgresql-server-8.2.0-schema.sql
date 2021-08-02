@@ -45,3 +45,12 @@ begin
     end if;
 end$$;
 -- QUERY END:
+
+-- QUERY START:
+do $$
+begin
+    if exists (select 1 where (select to_regclass('public.tig_offline_messages_receiver')) is not null) then
+        drop index tig_offline_messages_receiver;
+    end if;
+end$$;
+-- QUERY END:

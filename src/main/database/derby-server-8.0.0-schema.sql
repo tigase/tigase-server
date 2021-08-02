@@ -111,9 +111,9 @@ create table tig_offline_messages (
     ts timestamp DEFAULT CURRENT_TIMESTAMP,
     expired timestamp,
     sender varchar(2049),
-    sender_sha1 char(128),
+    sender_sha1 char(40),
     receiver varchar(2049) not null,
-    receiver_sha1 char(128) not null,
+    receiver_sha1 char(40) not null,
 	msg_type int not null default 0,
 	message varchar(32672) not null
 );

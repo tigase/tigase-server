@@ -70,3 +70,9 @@ BEGIN
 END
 -- QUERY END:
 GO
+
+-- QUERY START:
+IF EXISTS (select 1 from sys.indexes where object_id = object_id('dbo.tig_offline_messages') and name = 'IX_tig_offline_messages_receiver_sha1' )
+    DROP INDEX [IX_tig_offline_messages_receiver_sha1] ON [dbo].[tig_offline_messages]
+-- QUERY END:
+GO
