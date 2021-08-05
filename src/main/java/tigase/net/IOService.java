@@ -26,6 +26,7 @@ import tigase.xmpp.jid.JID;
 
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLProtocolException;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -875,7 +876,7 @@ public abstract class IOService<RefObject>
 			// } catch (MalformedInputException ex) {
 			//// This happens after TLS initialization sometimes, maybe reset helps
 			// decoder.reset();
-		} catch (SSLHandshakeException e) {
+		} catch (SSLProtocolException | SSLHandshakeException e) {
 			if (log.isLoggable(Level.INFO)) {
 				log.log(Level.INFO, "Socket: " + socketIO + ", Exception starting connection" + e);
 			}
