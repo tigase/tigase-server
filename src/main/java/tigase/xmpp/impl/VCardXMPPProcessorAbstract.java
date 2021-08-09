@@ -77,7 +77,6 @@ public abstract class VCardXMPPProcessorAbstract
 						r.addChild(new Element("text", c.getCData()));
 						break;
 					case "N":
-						r = new Element("n");
 						list = c.mapChildren((Element c1) -> {
 							switch (c1.getName()) {
 								case "GIVEN":
@@ -96,7 +95,10 @@ public abstract class VCardXMPPProcessorAbstract
 						});
 						if (list != null) {
 							list.removeIf((Element c1) -> c1 == null);
-							r.addChildren(list);
+							if (!list.isEmpty()) {
+								r = new Element("n");
+								r.addChildren(list);
+							}
 						}
 						break;
 					case "PHOTO":
@@ -119,119 +121,125 @@ public abstract class VCardXMPPProcessorAbstract
 						r.addChild(new Element("date", c.getCData()));
 						break;
 					case "ADR":
-						r = new Element("adr");
-						for (Element c1 : c.getChildren()) {
-							switch (c1.getName()) {
-								case "POBOX":
-								case "STREET":
-								case "LOCALITY":
-								case "REGION":
-									r.addChild(new Element(c1.getName().toLowerCase(), c1.getCData()));
-									break;
-								case "EXTADD":
-									r.addChild(new Element("ext", c1.getCData()));
-									break;
-								case "PCODE":
-									r.addChild(new Element("code", c1.getCData()));
-									break;
-								case "CTRY":
-									r.addChild(new Element("country", c1.getCData()));
-									break;
-								case "HOME":
-								case "WORK":
-									if (parameters == null) {
-										parameters = new Element("parameters");
-										r.addChild(parameters);
-									}
-									if (type == null) {
-										type = new Element("type");
-										parameters.addChild(type);
-									}
-									type.addChild(new Element("text", c1.getName().toLowerCase()));
-									break;
-								case "PREF":
-									if (parameters == null) {
-										parameters = new Element("parameters");
-										r.addChild(parameters);
-									}
-									Element pref = new Element("pref");
-									pref.addChild(new Element("integer", "1"));
-									parameters.addChild(pref);
-									break;
-								default:
-									break;
+						if (c.getChildren() != null) {
+							r = new Element("adr");
+							for (Element c1 : c.getChildren()) {
+								switch (c1.getName()) {
+									case "POBOX":
+									case "STREET":
+									case "LOCALITY":
+									case "REGION":
+										r.addChild(new Element(c1.getName().toLowerCase(), c1.getCData()));
+										break;
+									case "EXTADD":
+										r.addChild(new Element("ext", c1.getCData()));
+										break;
+									case "PCODE":
+										r.addChild(new Element("code", c1.getCData()));
+										break;
+									case "CTRY":
+										r.addChild(new Element("country", c1.getCData()));
+										break;
+									case "HOME":
+									case "WORK":
+										if (parameters == null) {
+											parameters = new Element("parameters");
+											r.addChild(parameters);
+										}
+										if (type == null) {
+											type = new Element("type");
+											parameters.addChild(type);
+										}
+										type.addChild(new Element("text", c1.getName().toLowerCase()));
+										break;
+									case "PREF":
+										if (parameters == null) {
+											parameters = new Element("parameters");
+											r.addChild(parameters);
+										}
+										Element pref = new Element("pref");
+										pref.addChild(new Element("integer", "1"));
+										parameters.addChild(pref);
+										break;
+									default:
+										break;
+								}
 							}
 						}
 						break;
 					case "TEL":
 						r = new Element("tel");
-						for (Element c1 : c.getChildren()) {
-							switch (c1.getName()) {
-								case "HOME":
-								case "WORK":
-								case "TEXT":
-								case "FAX":
-								case "CELL":
-								case "VOICE":
-								case "VIDEO":
-								case "PAGER":
-								case "TEXTPHONE":
-									if (parameters == null) {
-										parameters = new Element("parameters");
-										r.addChild(parameters);
-									}
-									if (type == null) {
-										type = new Element("type");
-										parameters.addChild(type);
-									}
-									type.addChild(new Element("text", c1.getName().toLowerCase()));
-									break;
-								case "PREF":
-									if (parameters == null) {
-										parameters = new Element("parameters");
-										r.addChild(parameters);
-									}
-									Element pref = new Element("pref");
-									pref.addChild(new Element("integer", "1"));
-									parameters.addChild(pref);
-									break;
-								case "NUMBER":
-									Element uri = new Element("uri", "tel:" + c1.getCData());
-									r.addChild(uri);
-								default:
-									break;
+						if (c.getChildren() != null) {
+							for (Element c1 : c.getChildren()) {
+								switch (c1.getName()) {
+									case "HOME":
+									case "WORK":
+									case "TEXT":
+									case "FAX":
+									case "CELL":
+									case "VOICE":
+									case "VIDEO":
+									case "PAGER":
+									case "TEXTPHONE":
+										if (parameters == null) {
+											parameters = new Element("parameters");
+											r.addChild(parameters);
+										}
+										if (type == null) {
+											type = new Element("type");
+											parameters.addChild(type);
+										}
+										type.addChild(new Element("text", c1.getName().toLowerCase()));
+										break;
+									case "PREF":
+										if (parameters == null) {
+											parameters = new Element("parameters");
+											r.addChild(parameters);
+										}
+										Element pref = new Element("pref");
+										pref.addChild(new Element("integer", "1"));
+										parameters.addChild(pref);
+										break;
+									case "NUMBER":
+										Element uri = new Element("uri", "tel:" + c1.getCData());
+										r.addChild(uri);
+									default:
+										break;
+								}
 							}
 						}
 						break;
 					case "EMAIL":
 						r = new Element("email");
-						for (Element c1 : c.getChildren()) {
-							switch (c1.getName()) {
-								case "HOME":
-								case "WORK":
-									if (parameters == null) {
-										parameters = new Element("parameters");
-										r.addChild(parameters);
-									}
-									if (type == null) {
-										type = new Element("type");
-										parameters.addChild(type);
-									}
-									type.addChild(new Element("text", c1.getName().toLowerCase()));
-									break;
-								case "PREF":
-									if (parameters == null) {
-										parameters = new Element("parameters");
-										r.addChild(parameters);
-									}
-									Element pref = new Element("pref");
-									pref.addChild(new Element("integer", "1"));
-									parameters.addChild(pref);
-									break;
-								case "USERID":
-									r.addChild(new Element("text", c1.getCData()));
-								default:
-									break;
+						if (c.getChildren() != null) {
+							for (Element c1 : c.getChildren()) {
+								switch (c1.getName()) {
+									case "HOME":
+									case "WORK":
+										if (parameters == null) {
+											parameters = new Element("parameters");
+											r.addChild(parameters);
+										}
+										if (type == null) {
+											type = new Element("type");
+											parameters.addChild(type);
+										}
+										type.addChild(new Element("text", c1.getName().toLowerCase()));
+										break;
+									case "PREF":
+										if (parameters == null) {
+											parameters = new Element("parameters");
+											r.addChild(parameters);
+										}
+										Element pref = new Element("pref");
+										pref.addChild(new Element("integer", "1"));
+										parameters.addChild(pref);
+										break;
+									case "USERID":
+										r.addChild(new Element("text", c1.getCData()));
+									default:
+										break;
+								}
 							}
 						}
 						break;
@@ -324,7 +332,6 @@ public abstract class VCardXMPPProcessorAbstract
 						}
 						break;
 					case "n":
-						r = new Element("N");
 						list = c.mapChildren((Element c1) -> {
 							switch (c1.getName()) {
 								case "given":
@@ -343,7 +350,10 @@ public abstract class VCardXMPPProcessorAbstract
 						});
 						if (list != null) {
 							list.removeIf((Element c1) -> c1 == null);
-							r.addChildren(list);
+							if (!list.isEmpty()) {
+								r = new Element("N");
+								r.addChildren(list);
+							}
 						}
 						break;
 					case "photo":
@@ -368,93 +378,26 @@ public abstract class VCardXMPPProcessorAbstract
 						}
 						break;
 					case "adr":
-						r = new Element("ADR");
-						for (Element c1 : c.getChildren()) {
-							switch (c1.getName()) {
-								case "pobox":
-								case "street":
-								case "locality":
-								case "region":
-									r.addChild(new Element(c1.getName().toUpperCase(), c1.getCData()));
-									break;
-								case "ext":
-									r.addChild(new Element("EXTADD", c1.getCData()));
-									break;
-								case "code":
-									r.addChild(new Element("PCODE", c1.getCData()));
-									break;
-								case "country":
-									r.addChild(new Element("CTRY", c1.getCData()));
-									break;
-								case "parameters":
-									for (Element c2 : c1.getChildren()) {
-										switch (c2.getName()) {
-											case "type":
-												list = c2.findChildren((Element c3) -> c3.getName() == "text");
-												if (list != null) {
-													for (Element c3 : list) {
-														r.addChild(new Element(c3.getCData().toUpperCase()));
-													}
-												}
-											case "pref":
-												text = c2.findChild((Element c3) -> c3.getName() == "integer");
-												if (text != null) {
-													r.addChild(new Element("PREF"));
-												}
-												break;
-											default:
-												break;
-										}
-									}
-									break;
-								default:
-									break;
-							}
-						}
-						break;
-					case "tel":
-						r = new Element("TEL");
-						for (Element c1 : c.getChildren()) {
-							switch (c1.getName()) {
-								case "parameters":
-									for (Element c2 : c1.getChildren()) {
-										switch (c2.getName()) {
-											case "type":
-												list = c2.findChildren((Element c3) -> c3.getName() == "text");
-												if (list != null) {
-													for (Element c3 : list) {
-														r.addChild(new Element(c3.getCData().toUpperCase()));
-													}
-												}
-											case "pref":
-												text = c2.findChild((Element c3) -> c3.getName() == "integer");
-												if (text != null) {
-													r.addChild(new Element("PREF"));
-												}
-												break;
-											default:
-												break;
-										}
-									}
-									break;
-								case "uri":
-									String uriStr = c1.getCData();
-									Matcher matcher = TEL_URI_PATTERN.matcher(uriStr);
-									if (matcher.matches()) {
-										r.addChild(new Element("NUMBER", matcher.group(1)));
-									}
-								default:
-									break;
-							}
-						}
-						break;
-					case "email":
-						r = new Element("EMAIL");
-						for (Element c1 : c.getChildren()) {
-							switch (c1.getName()) {
-								case "parameters":
-									List<Element> parametersChildren = c1.getChildren();
-									if (parametersChildren != null) {
+						if (c.getChildren() != null) {
+							r = new Element("ADR");
+							for (Element c1 : c.getChildren()) {
+								switch (c1.getName()) {
+									case "pobox":
+									case "street":
+									case "locality":
+									case "region":
+										r.addChild(new Element(c1.getName().toUpperCase(), c1.getCData()));
+										break;
+									case "ext":
+										r.addChild(new Element("EXTADD", c1.getCData()));
+										break;
+									case "code":
+										r.addChild(new Element("PCODE", c1.getCData()));
+										break;
+									case "country":
+										r.addChild(new Element("CTRY", c1.getCData()));
+										break;
+									case "parameters":
 										for (Element c2 : c1.getChildren()) {
 											switch (c2.getName()) {
 												case "type":
@@ -474,12 +417,85 @@ public abstract class VCardXMPPProcessorAbstract
 													break;
 											}
 										}
-									}
-									break;
-								case "text":
-									r.addChild(new Element("USERID", c1.getCData()));
-								default:
-									break;
+										break;
+									default:
+										break;
+								}
+							}
+						}
+						break;
+					case "tel":
+						r = new Element("TEL");
+						if (c.getChildren() != null) {
+							for (Element c1 : c.getChildren()) {
+								switch (c1.getName()) {
+									case "parameters":
+										for (Element c2 : c1.getChildren()) {
+											switch (c2.getName()) {
+												case "type":
+													list = c2.findChildren((Element c3) -> c3.getName() == "text");
+													if (list != null) {
+														for (Element c3 : list) {
+															r.addChild(new Element(c3.getCData().toUpperCase()));
+														}
+													}
+												case "pref":
+													text = c2.findChild((Element c3) -> c3.getName() == "integer");
+													if (text != null) {
+														r.addChild(new Element("PREF"));
+													}
+													break;
+												default:
+													break;
+											}
+										}
+										break;
+									case "uri":
+										String uriStr = c1.getCData();
+										Matcher matcher = TEL_URI_PATTERN.matcher(uriStr);
+										if (matcher.matches()) {
+											r.addChild(new Element("NUMBER", matcher.group(1)));
+										}
+									default:
+										break;
+								}
+							}
+						}
+						break;
+					case "email":
+						r = new Element("EMAIL");
+						if (c.getChildren() != null) {
+							for (Element c1 : c.getChildren()) {
+								switch (c1.getName()) {
+									case "parameters":
+										List<Element> parametersChildren = c1.getChildren();
+										if (parametersChildren != null) {
+											for (Element c2 : c1.getChildren()) {
+												switch (c2.getName()) {
+													case "type":
+														list = c2.findChildren((Element c3) -> c3.getName() == "text");
+														if (list != null) {
+															for (Element c3 : list) {
+																r.addChild(new Element(c3.getCData().toUpperCase()));
+															}
+														}
+													case "pref":
+														text = c2.findChild((Element c3) -> c3.getName() == "integer");
+														if (text != null) {
+															r.addChild(new Element("PREF"));
+														}
+														break;
+													default:
+														break;
+												}
+											}
+										}
+										break;
+									case "text":
+										r.addChild(new Element("USERID", c1.getCData()));
+									default:
+										break;
+								}
 							}
 						}
 						break;
