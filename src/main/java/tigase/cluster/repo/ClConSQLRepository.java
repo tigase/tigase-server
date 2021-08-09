@@ -138,7 +138,7 @@ public class ClConSQLRepository
 			}
 
 		} catch (SQLException e) {
-			log.log(Level.WARNING, "Problem removing elements from DB: ", e);
+			log.log(Level.WARNING, "Problem removing element: " + key + " from DB: ", e);
 		}
 
 	}
@@ -180,7 +180,7 @@ public class ClConSQLRepository
 			}
 
 		} catch (SQLException e) {
-			log.log(Level.WARNING, "Problem getting elements from DB: ", e);
+			log.log(Level.WARNING, "Problem storing element to DB: " + item, e);
 		}
 	}
 
