@@ -362,12 +362,14 @@ public abstract class VCardXMPPProcessorAbstract
 						if (uri != null) {
 							r = new Element(c.getName().toUpperCase());
 							String uriStr = uri.getCData();
-							Matcher matcher = DATA_URI_PATTERN.matcher(uriStr);
-							if (matcher.matches()) {
-								r.addChild(new Element("TYPE", matcher.group(1)));
-								r.addChild(new Element("BINVAL", matcher.group(2)));
-							} else {
-								r.addChild(new Element("EXTVAL", uriStr));
+							if (uriStr != null) {
+								Matcher matcher = DATA_URI_PATTERN.matcher(uriStr);
+								if (matcher.matches()) {
+									r.addChild(new Element("TYPE", matcher.group(1)));
+									r.addChild(new Element("BINVAL", matcher.group(2)));
+								} else {
+									r.addChild(new Element("EXTVAL", uriStr));
+								}
 							}
 						}
 						break;
@@ -452,9 +454,11 @@ public abstract class VCardXMPPProcessorAbstract
 										break;
 									case "uri":
 										String uriStr = c1.getCData();
-										Matcher matcher = TEL_URI_PATTERN.matcher(uriStr);
-										if (matcher.matches()) {
-											r.addChild(new Element("NUMBER", matcher.group(1)));
+										if (uriStr != null) {
+											Matcher matcher = TEL_URI_PATTERN.matcher(uriStr);
+											if (matcher.matches()) {
+												r.addChild(new Element("NUMBER", matcher.group(1)));
+											}
 										}
 									default:
 										break;
