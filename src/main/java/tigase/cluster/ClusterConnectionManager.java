@@ -423,8 +423,8 @@ public class ClusterConnectionManager
 			if (p.getElemName().equals("handshake")) {
 				processHandshake(p, serv);
 			} else {
-				if (p.getAttributeStaticStr(new String[]{Iq.ELEM_NAME, "ping"}, "xmlns") == "urn:xmpp:ping" &&
-						getDefHostName().getDomain().equals(p.getStanzaTo().getDomain()) &&
+				if (p.getAttributeStaticStr(new String[]{Iq.ELEM_NAME, "ping"}, "xmlns") == "urn:xmpp:ping" && p.getStanzaTo() != null &&
+						getDefHostName().getDomain().equals(p.getStanzaTo().getDomain()) && p.getStanzaFrom() != null &&
 						p.getStanzaFrom().getDomain().equals(serv.getSessionData().get(PORT_REMOTE_HOST_PROP_KEY))) {
 					// received PING between cluster nodes to confirm connectivity
 					if (log.isLoggable(Level.FINEST)) {
@@ -458,7 +458,11 @@ public class ClusterConnectionManager
 	public boolean processUndeliveredPacket(Packet packet, Long stamp, String errorMessage) {
 		// readd packet - this may be good as we would retry to send packet
 		// which delivery failed due to IO error
-		addPacket(packet);
+		try {
+			addPacket(packet);
+		} catch (NullPointerException ex) {
+			log.log(Level.WARNING, "could not redeliver cluster packet on broken cluster connection:", packet.toString());
+		}
 		return true;
 	}
 
