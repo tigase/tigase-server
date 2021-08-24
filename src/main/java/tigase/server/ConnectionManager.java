@@ -1442,14 +1442,22 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 											pingPacket = Iq.packetInstance(pingElement.clone(), JID.jidInstanceNS(
 													(String) service.getSessionData().get(XMPPIOService.HOSTNAME_KEY)),
 																		   JID.jidInstanceNS(service.getUserJid()));
-											if (log.isLoggable(Level.FINEST)) {
-												log.log(Level.FINEST, "Sending XMPP ping {1} [{0}]",
-														new Object[]{service, pingPacket});
-											}
-											if (!writePacketToSocket((IO) service, pingPacket)) {
-												// writing failed, stopp service
-												++watchdogStopped;
-												service.forceStop();
+											if (pingPacket.getStanzaFrom() != null && pingPacket.getStanzaTo() != null) {
+												if (log.isLoggable(Level.FINEST)) {
+													log.log(Level.FINEST, "Sending XMPP ping {1} [{0}]",
+															new Object[]{service, pingPacket});
+												}
+												if (!writePacketToSocket((IO) service, pingPacket)) {
+													// writing failed, stopp service
+													++watchdogStopped;
+													service.forceStop();
+												}
+											} else {
+												if (log.isLoggable(Level.WARNING)) {
+													log.log(Level.WARNING,
+															"Could not sent watchdog XMPP ping - missing to or from: {0}",
+															new Object[]{pingPacket});
+												}
 											}
 											break;
 
