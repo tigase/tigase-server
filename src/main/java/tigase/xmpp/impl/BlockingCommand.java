@@ -182,7 +182,7 @@ public class BlockingCommand
 	private void processSetBlock(Packet packet, Element e, XMPPResourceConnection session, Queue<Packet> results)
 			throws NotAuthorizedException, TigaseDBException, PacketErrorTypeException {
 		List<Entry> entries = collectEntries(e);
-		if (entries != null && !entries.isEmpty()) {
+		if (entries != null && !entries.isEmpty() && entries.stream().filter(entry1 -> entry1.getJid() == null).findAny().isEmpty()) {
 			Privacy.block(session, entries.stream().map(Entry::getJid).map(JID::toString).collect(Collectors.toList()));
 			notifyPrivacyListChanged(session);
 			for (Entry entry : entries) {

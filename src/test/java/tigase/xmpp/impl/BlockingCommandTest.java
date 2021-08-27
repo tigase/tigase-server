@@ -26,7 +26,10 @@ import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
+import tigase.xml.SimpleParser;
+import tigase.xml.XMLUtils;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
@@ -37,6 +40,7 @@ import tigase.xmpp.jid.JID;
 
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Queue;
 
 import static org.junit.Assert.*;
 
@@ -70,6 +74,27 @@ public class BlockingCommandTest
 		blockingCommand = null;
 	}
 
+	@Test
+	public void testEmptyJID() throws TigaseStringprepException, XMPPException {
+		JID connJid = JID.jidInstanceNS("c2s@example.com/test-111");
+		JID userJid = JID.jidInstanceNS("user-1@example.com/res-1");
+		Element iq = new Element("iq", new String[]{"type"}, new String[]{"set"});
+		Element block = new Element("block", new String[]{"xmlns"}, new String[]{BlockingCommand.XMLNS});
+		Element item = new Element("item", new String[]{"jid"}, new String[]{""});
+		block.addChild(item);
+		iq.addChild(block);
+
+		Packet p = Packet.packetInstance(iq, userJid, userJid);
+
+		XMPPResourceConnection sess = getSession(connJid, userJid);
+		blockingCommand.process(p, sess, null, results, null);
+		assertEquals(1, results.size());
+		Packet result = results.poll();
+		assertNotNull(result);
+		assertEquals(Iq.ELEM_NAME, result.getElemName());
+		assertEquals(StanzaType.error, result.getType());
+
+	}
 	@Test
 	public void testBlockUnblock() throws Exception {
 		JID connJid = JID.jidInstanceNS("c2s@example.com/test-111");
