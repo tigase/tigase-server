@@ -101,6 +101,10 @@ public interface ClusteringStrategyIfc<E extends ConnectionRecordIfc>
 	 */
 	Set<E> getConnectionRecords(BareJID bareJID);
 
+	default List<E> getConnectionRecordsByCreationTime(BareJID bareJID) {
+		return null;
+	}
+
 	/**
 	 * This method is used for configuration purpose. Following the convention used in the Tigase project this method is
 	 * supposed to provide configuration defaults. All parameters which exist in configuration file overwrite
