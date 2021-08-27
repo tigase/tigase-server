@@ -2662,6 +2662,9 @@ public class SessionManager
 			} catch (InvalidPacketException e) {
 				log.log(Level.INFO, "Invalid packet! Error: {0}, packet: {1}",
 						new String[]{e.getLocalizedMessage(), item.getPacket().toStringSecure()});
+			} catch (NotAuthorizedException e) {
+				log.log(Level.INFO, "Session hasn't been authorised yet! Error: {0}, packet: {1}",
+						new String[]{e.getLocalizedMessage(), item.getPacket().toStringSecure()});
 			} catch (XMPPException e) {
 				log.log(Level.WARNING, "Exception during packet processing: " + item.getPacket().toStringSecure(), e);
 			}
