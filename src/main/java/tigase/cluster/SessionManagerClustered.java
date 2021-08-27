@@ -32,6 +32,7 @@ import tigase.kernel.beans.selector.ClusterModeRequired;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
+import tigase.server.Command;
 import tigase.server.ComponentInfo;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -42,6 +43,7 @@ import tigase.stats.StatisticsList;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.XMPPSession;
@@ -177,6 +179,48 @@ public class SessionManagerClustered
 	public void handleResourceBind(XMPPResourceConnection conn) {
 		super.handleResourceBind(conn);
 		strategy.handleLocalResourceBind(conn);
+	}
+
+	@Override
+	protected void checkSingleUserConnectionsLimit(XMPPResourceConnection conn) {
+		// this call should not be forwarded, in cluster strategy should take care of that in handleLocalResourceBind()
+		Integer limit = getSingleUserConnectionsLimit();
+		if (limit != null) {
+			try {
+				if (strategy.hasCompleteJidsInfo()) {
+					List<ConnectionRecordIfc> conns = strategy.getConnectionRecordsByCreationTime(conn.getBareJID());
+					if (conns != null) {
+						if (conns.size() > limit) {
+							List<ConnectionRecordIfc> toDisconnect = conns.subList(0, conns.size() - limit);
+							for (ConnectionRecordIfc rec : toDisconnect) {
+								try {
+									Packet cmd = Command.CLOSE.getPacket(getComponentId(), rec.getConnectionId(),
+																		 StanzaType.set, conn.nextStanzaId());
+									Element err_el = new Element("resource-constraint");
+
+									err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+									cmd.getElement().getChild("command").addChild(err_el);
+									fastAddOutPacket(cmd);
+								} catch (Exception ex) {
+
+									// TODO Auto-generated catch block
+									log.log(Level.WARNING, "Error executing cluster command", ex);
+								}
+							}
+						}
+					} else {
+						// if strategy is not aware of all user connections, apply restrictions on single node..
+						super.checkSingleUserConnectionsLimit(conn);
+					}
+				} else {
+					// if strategy is not aware of all user connections, apply restrictions on single node..
+					super.checkSingleUserConnectionsLimit(conn);
+				}
+			} catch (NotAuthorizedException ex) {
+				// if connection is not authorized, we can skip it
+				log.log(Level.INFO, "Exception during closing old connection, ignoring.", ex);
+			}
+		}
 	}
 
 	@Override

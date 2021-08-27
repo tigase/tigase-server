@@ -178,6 +178,8 @@ public class SessionManager
 	private boolean includeCapsInStream = true;
 	@ConfigField(desc = "Skip privacy check", alias = SessionManagerConfig.SKIP_PRIVACY_PROP_KEY)
 	private boolean skipPrivacy = false;
+	@ConfigField(desc = "Max no. of connections single user can user", alias = "user-connections-limit")
+	private Integer singleUserConnectionsLimit = null;
 	private SMResourceConnection smResourceConnection = null;
 	@ConfigField(desc = "Default processors threads pool size", alias = SessionManagerConfig.SM_THREADS_POOL_PROP_KEY)
 	private String smThreadsPool = SessionManagerConfig.SM_THREADS_POOL_PROP_VAL;
@@ -384,7 +386,7 @@ public class SessionManager
 
 		this.processPresenceUpdate(parentSession, presence);
 	}
-
+	
 	@Override
 	public void handleResourceBind(XMPPResourceConnection conn) {
 		if (!conn.isServerSession() && (!"USER_STATUS".equals(conn.getSessionId())) && !conn.isTmpSession()) {
@@ -400,6 +402,29 @@ public class SessionManager
 
 				// This actually should not happen... might be a bug:
 				log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
+			}
+
+			checkSingleUserConnectionsLimit(conn);
+		}
+	}
+
+	protected void checkSingleUserConnectionsLimit(XMPPResourceConnection conn) {
+		if (getSingleUserConnectionsLimit() != null) {
+			XMPPSession session = conn.getParentSession();
+			if (session != null) {
+				int overlimit = session.getActiveResourcesSize() - getSingleUserConnectionsLimit();
+				if (overlimit > 0) {
+					session.getActiveResources().stream().sorted(Comparator.comparing(XMPPResourceConnection::getCreationTime)).limit(overlimit).forEach(connToStop -> {
+						connToStop.putSessionData(XMPPResourceConnection.ERROR_KEY, "resource-constraint");
+						try {
+							connToStop.logout();
+						} catch (NotAuthorizedException ex) {
+							// if it is not authorized, there is nothing we can do, but this should not happen
+							log.log(Level.INFO, "Exception during closing old connection, ignoring.", ex);
+						}
+						session.removeResourceConnection(connToStop);
+					});
+				}
 			}
 		}
 	}
@@ -648,6 +673,10 @@ public class SessionManager
 
 	public int getOpenUsersConnectionsAmount() {
 		return connectionsByFrom.size();
+	}
+
+	public Integer getSingleUserConnectionsLimit() {
+		return singleUserConnectionsLimit;
 	}
 
 	@Override
