@@ -49,7 +49,7 @@ net.ipv4.ip_local_port_range = 1024 65000
 
 == TCP_keepalive
 
-According to link:http://www.gnugk.org/keepalive.html[www.gnugk.org/] some keepalive settings should be changed to improve reliability - it will enable keep alive functionality (checking if the connection is established and valid) and, by decreasing times and interval - will make detection of broken connections faster.
+According to link:http://www.gnugk.org/keepalive.html[Using TCP keepalive to Detect Network Errors] and link:https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/usingkeepalive.html[TCP Keepalive HOWTO] some keepalive settings should be changed to improve reliability - it will enable keep alive functionality (checking if the connection is established and valid) and, by decreasing times and interval - will make detection of broken connections faster.
 
 [source,sh]
 -----
@@ -59,6 +59,8 @@ net.ipv4.tcp_keepalive_time = 60
 net.ipv4.tcp_keepalive_probes = 3
 # sysctl -w net.ipv4.tcp_keepalive_intvl="90"
 net.ipv4.tcp_keepalive_intvl = 90
+# sysctl -w net.ipv4.tcp_retries2=4
+net.ipv4.tcp_retries2 = 4
 -----
 
 == /etc/sysctl.conf
@@ -72,6 +74,7 @@ net.ipv4.ip_local_port_range=1024 65000
 net.ipv4.tcp_keepalive_time=60
 net.ipv4.tcp_keepalive_probes=3
 net.ipv4.tcp_keepalive_intvl=90
+net.ipv4.tcp_retries2=4
 -----
 
 It will be automatically loaded next time you start the server.
