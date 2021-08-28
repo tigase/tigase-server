@@ -21,6 +21,7 @@ import org.junit.Test;
 import tigase.io.IOInterface;
 import tigase.net.IOService;
 import tigase.stats.StatisticsList;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.xmpp.XMPPIOService;
 
 import java.io.IOException;
@@ -255,6 +256,7 @@ public class ConnectionManagerTest {
 		getServices(connectionManager).put(serviceId, service);
 		service.setIOServiceListener(connectionManager);
 		service.setUserJid("m" + SecureRandom.getInstanceStrong().nextInt() + ".example.com");
+		service.getSessionData().put(XMPPIOService.HOSTNAME_KEY, DNSResolverFactory.getInstance().getDefaultHost());
 
 		return service;
 	}
