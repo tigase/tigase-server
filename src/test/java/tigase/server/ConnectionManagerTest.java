@@ -28,6 +28,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
@@ -253,6 +254,7 @@ public class ConnectionManagerTest {
 		f.set(service, serviceId);
 		getServices(connectionManager).put(serviceId, service);
 		service.setIOServiceListener(connectionManager);
+		service.setUserJid("m" + SecureRandom.getInstanceStrong().nextInt() + ".example.com");
 
 		return service;
 	}
