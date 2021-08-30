@@ -642,7 +642,9 @@ public class StreamManagementIOProcessor
 		@Deprecated
 		@TigaseDeprecated(removeIn = "9.0.0", since = "8.2.0")
 		private boolean shouldCheckTimeout() {
-			return queue.size() > 30;
+			// previously we were checking if the queue is bigger than 30 items. After discussing it
+			// we decided to decrease it considerably and in the future remove condition altogether and check always.
+			return queue.size() > 5;
 		}
 
 		/**
@@ -651,7 +653,6 @@ public class StreamManagementIOProcessor
 		 */
 		public boolean append(Packet packet, int timeoutInSec) {
 			if (!packet.wasProcessedBy(XMLNS)) {
-				// we do this check if queue is bigger than 30 as some client confirm after X stanzas (not after each one)
 				if (shouldCheckTimeout()) {
 					Entry first = queue.peekFirst();
 					if (first != null && (System.currentTimeMillis() - first.stamp > (timeoutInSec * 1000))) {
