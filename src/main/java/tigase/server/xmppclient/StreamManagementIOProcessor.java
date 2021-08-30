@@ -17,6 +17,7 @@
  */
 package tigase.server.xmppclient;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -638,6 +639,12 @@ public class StreamManagementIOProcessor
 
 		private boolean resumptionEnabled = false;
 
+		@Deprecated
+		@TigaseDeprecated(removeIn = "9.0.0", since = "8.2.0")
+		private boolean shouldCheckTimeout() {
+			return queue.size() > 30;
+		}
+
 		/**
 		 * Append packet to waiting for ack queue
 		 *
@@ -645,7 +652,7 @@ public class StreamManagementIOProcessor
 		public boolean append(Packet packet, int timeoutInSec) {
 			if (!packet.wasProcessedBy(XMLNS)) {
 				// we do this check if queue is bigger than 30 as some client confirm after X stanzas (not after each one)
-				if (queue.size() > 30) {
+				if (shouldCheckTimeout()) {
 					Entry first = queue.peekFirst();
 					if (first != null && (System.currentTimeMillis() - first.stamp > (timeoutInSec * 1000))) {
 						return false;

@@ -187,30 +187,25 @@ public class SessionManagerClustered
 		Integer limit = getSingleUserConnectionsLimit();
 		if (limit != null) {
 			try {
-				if (strategy.hasCompleteJidsInfo()) {
-					List<ConnectionRecordIfc> conns = strategy.getConnectionRecordsByCreationTime(conn.getBareJID());
-					if (conns != null) {
-						if (conns.size() > limit) {
-							List<ConnectionRecordIfc> toDisconnect = conns.subList(0, conns.size() - limit);
-							for (ConnectionRecordIfc rec : toDisconnect) {
-								try {
-									Packet cmd = Command.CLOSE.getPacket(getComponentId(), rec.getConnectionId(),
-																		 StanzaType.set, conn.nextStanzaId());
-									Element err_el = new Element("resource-constraint");
+				List<ConnectionRecordIfc> conns;
+				if (strategy.hasCompleteJidsInfo() && (conns = strategy.getConnectionRecordsByCreationTime(conn.getBareJID())) != null) {
+					if (conns.size() > limit) {
+						List<ConnectionRecordIfc> toDisconnect = conns.subList(0, conns.size() - limit);
+						for (ConnectionRecordIfc rec : toDisconnect) {
+							try {
+								Packet cmd = Command.CLOSE.getPacket(getComponentId(), rec.getConnectionId(),
+																	 StanzaType.set, conn.nextStanzaId());
+								Element err_el = new Element("resource-constraint");
 
-									err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
-									cmd.getElement().getChild("command").addChild(err_el);
-									fastAddOutPacket(cmd);
-								} catch (Exception ex) {
+								err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+								cmd.getElement().getChild("command").addChild(err_el);
+								fastAddOutPacket(cmd);
+							} catch (Exception ex) {
 
-									// TODO Auto-generated catch block
-									log.log(Level.WARNING, "Error executing cluster command", ex);
-								}
+								// TODO Auto-generated catch block
+								log.log(Level.WARNING, "Error executing cluster command", ex);
 							}
 						}
-					} else {
-						// if strategy is not aware of all user connections, apply restrictions on single node..
-						super.checkSingleUserConnectionsLimit(conn);
 					}
 				} else {
 					// if strategy is not aware of all user connections, apply restrictions on single node..
