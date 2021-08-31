@@ -655,7 +655,7 @@ public class StreamManagementIOProcessor
 			if (!packet.wasProcessedBy(XMLNS)) {
 				if (shouldCheckTimeout()) {
 					Entry first = queue.peekFirst();
-					if (first != null && (System.currentTimeMillis() - first.stamp > (timeoutInSec * 1000))) {
+					if (first != null && (System.currentTimeMillis() - first.stamp > ((long)timeoutInSec * 1000))) {
 						return false;
 					}
 				}
