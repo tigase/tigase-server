@@ -215,6 +215,12 @@ public class ClientConnectionManager
 			if (p.getStanzaFrom() != null) {
 				p.initVars(null, p.getStanzaTo());
 			}
+			if (serv.getAuthorisedUserJid().isPresent()) {
+				p.setServerAuthorisedStanzaFrom(serv.getAuthorisedUserJid().get());
+
+				// In the future, in version 9.0.0, after resolving issue with cluster packet duplication,
+				// we should stamp stanza directly
+			}
 
 			// p.setPacketFrom(getFromAddress(id));
 			p.setPacketFrom(id);

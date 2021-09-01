@@ -17,6 +17,7 @@
  */
 package tigase.server;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
@@ -24,6 +25,7 @@ import tigase.xmpp.jid.JID;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -107,6 +109,7 @@ public class Packet {
 	private JID stanzaTo = null;
 	private StanzaType type;
 	private String stableId = null;
+	private JID serverAuthorisedStanzaFrom = null;
 
 	/**
 	 * Method trims {@link Element} stanza to 1024 characters and returns String representation of the element
@@ -599,6 +602,44 @@ public class Packet {
 	}
 
 	/**
+	 * Method returns JID from-address that was authenticated and bound to user session.
+	 *
+	 * This is a helper method that facilitates and improve maintaining correct stanza from when
+	 * communicating between ClientConnectionManager and SessionManager.
+	 *
+	 * This is a temporary solution! In version 9.0, after reviewing the APIs and correcting clustering strategy
+	 * packets incomming in (Client) Connection Managers should already have correct 'from' attribute in stanzas
+	 * set in {@code tigase.server.xmppclient.ClientConnectionManager#processSocketData(tigase.xmpp.XMPPIOService)}.
+	 *
+	 * @return {@code Optional} that may contain user JID if the session was already authorised.
+	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
+	public Optional<JID> getServerAuthorisedStanzaFrom() {
+		return Optional.ofNullable(serverAuthorisedStanzaFrom);
+	}
+
+	/**
+	 * Method used to set JID from-address that was authenticated and bound to user session.
+	 *
+	 * This is a helper method that facilitates and improve maintaining correct stanza from when
+	 * communicating between ClientConnectionManager and SessionManager.
+	 *
+	 * This is a temporary solution! In version 9.0, after reviewing the APIs and correcting clustering strategy
+	 * packets incomming in (Client) Connection Managers should already have correct 'from' attribute in stanzas
+	 * set in {@code tigase.server.xmppclient.ClientConnectionManager#processSocketData(tigase.xmpp.XMPPIOService)}.
+	 *
+	 * @param serverAuthorisedStanzaFrom
+	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
+	public void setServerAuthorisedStanzaFrom(JID serverAuthorisedStanzaFrom) {
+		this.serverAuthorisedStanzaFrom = serverAuthorisedStanzaFrom;
+		this.packetToString = null;
+		this.packetToStringSecure = null;
+	}
+
+	/**
 	 * Method returns a set of all processor IDs which skipped processing packets.
 	 *
 	 * @return a <code>Set</code> of stanza processor IDs which skipped the packet.
@@ -1071,7 +1112,7 @@ public class Packet {
 			packetToString = calcToString(elemData);
 		}
 
-		return "from=" + packetFrom + ", to=" + packetTo + packetToString;
+		return "from=" + packetFrom + ", to=" + packetTo + ", serverAuthorisedStanzaFrom=" + getServerAuthorisedStanzaFrom() + packetToString;
 	}
 
 	/**
@@ -1122,7 +1163,7 @@ public class Packet {
 				packetToStringSecure = calcToString(elemData);
 			}
 
-			return "from=" + packetFrom + ", to=" + packetTo + packetToStringSecure;
+			return "from=" + packetFrom + ", to=" + packetTo + ", serverAuthorisedStanzaFrom=" + getServerAuthorisedStanzaFrom() + packetToStringSecure;
 		}
 	}
 

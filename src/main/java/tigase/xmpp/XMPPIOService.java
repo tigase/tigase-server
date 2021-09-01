@@ -17,6 +17,7 @@
  */
 package tigase.xmpp;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.net.IOService;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
@@ -26,10 +27,12 @@ import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xml.SimpleParser;
 import tigase.xml.SingletonFactory;
+import tigase.xmpp.jid.JID;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -74,7 +77,7 @@ public class XMPPIOService<RefObject>
 	protected XMPPIOProcessor[] processors = null;
 	private XMPPDomBuilderHandler<RefObject> domHandler = null;
 	private boolean firstPacket = true;
-	private String jid = null;
+	private JID authorisedUserJid = null;
 	/**
 	 * This variable keeps the time of last received XMPP packet, it is used to help detect dead connections.
 	 */
@@ -266,7 +269,7 @@ public class XMPPIOService<RefObject>
 
 	@Override
 	public String toString() {
-		return "jid: " + jid + ", " + super.toString();
+		return "jid: " + authorisedUserJid + ", " + super.toString();
 	}
 
 	public void writeRawData(String data) throws IOException {
@@ -328,12 +331,24 @@ public class XMPPIOService<RefObject>
 		return totalPacketsSent;
 	}
 
-	public String getUserJid() {
-		return this.jid;
+	public Optional<JID> getAuthorisedUserJid() {
+		return Optional.ofNullable(authorisedUserJid);
 	}
 
+	public void setAuthorisedUserJid(JID authorisedUserJid) {
+		this.authorisedUserJid = authorisedUserJid;
+	}
+
+	@Deprecated
+	@TigaseDeprecated(removeIn = "9.0.0", since = "8.2.0", note = "#getAuthorisedUserJid should be used instead")
+	public String getUserJid() {
+		return getAuthorisedUserJid().isPresent() ? getAuthorisedUserJid().get().toString() : null;
+	}
+
+	@Deprecated
+	@TigaseDeprecated(removeIn = "9.0.0", since = "8.2.0", note = "#setAuthorisedUserJid should be used instead")
 	public void setUserJid(String jid) {
-		this.jid = jid;
+		this.authorisedUserJid = JID.jidInstanceNS(jid);
 	}
 
 	public Map<String, Packet> getWaitingForAct() {
