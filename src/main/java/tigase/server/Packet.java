@@ -109,7 +109,7 @@ public class Packet {
 	private JID stanzaTo = null;
 	private StanzaType type;
 	private String stableId = null;
-	private JID serverAuthorisedStanzaFrom = null;
+	private Optional<JID> serverAuthorisedStanzaFrom = Optional.empty();
 
 	/**
 	 * Method trims {@link Element} stanza to 1024 characters and returns String representation of the element
@@ -616,7 +616,7 @@ public class Packet {
 	@Deprecated
 	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
 	public Optional<JID> getServerAuthorisedStanzaFrom() {
-		return Optional.ofNullable(serverAuthorisedStanzaFrom);
+		return serverAuthorisedStanzaFrom;
 	}
 
 	/**
@@ -634,7 +634,7 @@ public class Packet {
 	@Deprecated
 	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
 	public void setServerAuthorisedStanzaFrom(JID serverAuthorisedStanzaFrom) {
-		this.serverAuthorisedStanzaFrom = serverAuthorisedStanzaFrom;
+		this.serverAuthorisedStanzaFrom = Optional.ofNullable(serverAuthorisedStanzaFrom);
 		this.packetToString = null;
 		this.packetToStringSecure = null;
 	}

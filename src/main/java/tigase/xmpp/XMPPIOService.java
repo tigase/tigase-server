@@ -342,7 +342,7 @@ public class XMPPIOService<RefObject>
 	@Deprecated
 	@TigaseDeprecated(removeIn = "9.0.0", since = "8.2.0", note = "#getAuthorisedUserJid should be used instead")
 	public String getUserJid() {
-		return getAuthorisedUserJid().isPresent() ? getAuthorisedUserJid().get().toString() : null;
+		return getAuthorisedUserJid().map(JID::toString).orElse(null);
 	}
 
 	@Deprecated

@@ -24,6 +24,7 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.server.BasicComponent;
 import tigase.server.Iq;
 import tigase.server.Packet;
+import tigase.server.StanzaSourceChecker;
 import tigase.server.xmppclient.ClientConnectionManager;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.dns.DNSResolverFactory;
@@ -32,10 +33,7 @@ import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.jid.JID;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -67,9 +65,8 @@ public class BindResource
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 	private static final String RESOURCE_PREFIX_DEF = "tigase-";
 	private static int resGenerator = 0;
-	@Inject(nullAllowed = true)
-	private List<ClientConnectionManager> clientConnectionManagers;
-	private List<String> clientConnectionManagersIds = new ArrayList<>();
+	@Inject
+	private StanzaSourceChecker stanzaSourceChecker;
 	private String resourceDefPrefix = RESOURCE_PREFIX_DEF;
 	@ConfigField(desc = "Automatic resource assignment prefix", alias = DEF_RESOURCE_PREFIX_PROP_KEY)
 	private String resourcePrefix = null;
@@ -91,8 +88,7 @@ public class BindResource
 			packet.initVars(packet.getServerAuthorisedStanzaFrom().get(), packet.getStanzaTo());
 			return false;
 		}
-		if (session == null && packet.getPacketFrom() != null && packet.getPacketFrom().getLocalpart() != null &&
-				clientConnectionManagersIds.contains(packet.getPacketFrom().getLocalpart())) {
+		if (session == null && stanzaSourceChecker.isPacketFromConnectionManager(packet)) {
 			// rationale: packets coming from clients connections and arriving without existing session are most
 			// likely send after the session has been already closed and if we don't have correct JID
 			// to stamp (neither from packet itself nor from the session that doesn't exists)
@@ -244,15 +240,6 @@ public class BindResource
 		this.resourcePrefix = resourcePrefix;
 		this.resourceDefPrefix = Math.abs(DNSResolverFactory.getInstance().getDefaultHost().hashCode()) + "-" +
 				(this.resourcePrefix != null ? this.resourcePrefix : resourceDefPrefix);
-	}
-
-	public void setClientConnectionManagers(List<ClientConnectionManager> clientConnectionManagers) {
-		this.clientConnectionManagers = clientConnectionManagers;
-		if (clientConnectionManagers != null) {
-			this.clientConnectionManagersIds = clientConnectionManagers.stream()
-					.map(BasicComponent::getName)
-					.collect(Collectors.toList());
-		}
 	}
 
 	@Override
