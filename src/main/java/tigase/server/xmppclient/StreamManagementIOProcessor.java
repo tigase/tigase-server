@@ -203,12 +203,16 @@ public class StreamManagementIOProcessor
 		}
 		if (packet.getXMLNS() == XMLNS) {
 			if (packet.getElemName() == ACK_NAME) {
-				String valStr = packet.getAttributeStaticStr(H_ATTR);
+				String hStr = packet.getAttributeStaticStr(H_ATTR);
 
-				int val = Integer.parseInt(valStr);
+				int h = Integer.parseInt(hStr);
 				OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
 				if (outQueue != null) {
-					outQueue.ack(val);
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "Acking {2} packets, in outQueue: {3} while processing: {1} [{0}]",
+								new Object[]{service, packet, h, outQueue.waitingForAck()});
+					}
+					outQueue.ack(h);
 				} else {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "outQueue already null while processing: {1} [{0}]",
@@ -250,7 +254,7 @@ public class StreamManagementIOProcessor
 			connectionManager.processUndeliveredPacket(e.getPacketWithStamp(), e.stamp, null);
 		} else {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Queuing StreamManagement packet: {1} [{0}]", new Object[]{service, packet});
+				log.log(Level.FINEST, "Queuing StreamManagement packet: {1}, queue size: {2} [{0}]", new Object[]{service, packet, outQueue.waitingForAck()});
 			}
 			if (!outQueue.append(packet, max_queue_size, max_resumption_timeout)) {
 				// it is too long without confirmation or queue is too big, we need to cancel this connection.
@@ -486,6 +490,9 @@ public class StreamManagementIOProcessor
 
 	@Override
 	public void getStatistics(StatisticsList list) {
+		if (list.checkLevel(Level.FINEST)) {
+			list.add(connectionManager.getName() + "/" + getId(), "Number of queues", services.size(), Level.FINEST);
+		}
 	}
 
 	@Override
