@@ -103,6 +103,8 @@ public class StreamManagementIOProcessor
 	private int max_resumption_timeout = 15 * 60;
 	@ConfigField(desc = "Default resumption timeout", alias = RESUMPTION_TIMEOUT_PROP_KEY)
 	private int resumption_timeout = 60;
+	@ConfigField(desc = "Max allowed queue size of unacked packets", alias = "max-resumption-queue-size")
+	private int max_queue_size = 10000;
 
 	/**
 	 * Method returns true if XMPPIOService has enabled SM.
@@ -250,8 +252,8 @@ public class StreamManagementIOProcessor
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Queuing StreamManagement packet: {1} [{0}]", new Object[]{service, packet});
 			}
-			if (!outQueue.append(packet, max_resumption_timeout)) {
-				// it is too long without confirmation, we need to cancel this connection.
+			if (!outQueue.append(packet, max_queue_size, max_resumption_timeout)) {
+				// it is too long without confirmation or queue is too big, we need to cancel this connection.
 				try {
 					service.getSessionData().put(RESUMPTION_TIMEOUT_START_KEY, 0L);
 					service.writeRawData("<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" +
@@ -261,7 +263,9 @@ public class StreamManagementIOProcessor
 				} catch (IOException ex) {
 					// we do not care if exception happened as we already are closing this connection
 				}
-				service.stop();
+				// if we will be polite using stop() queues can still grow.. so let's stop being polite..
+				// in worst case if queue was too large error may not be sent
+				service.forceStop();
 			}
 		}
 
@@ -651,8 +655,25 @@ public class StreamManagementIOProcessor
 		 * Append packet to waiting for ack queue
 		 *
 		 */
+		@Deprecated
+		@TigaseDeprecated(removeIn = "9.0.0", since = "8.2.0", note = "Use method with maxQueueSize")
 		public boolean append(Packet packet, int timeoutInSec) {
+			return append(packet, Integer.MAX_VALUE, timeoutInSec);
+		}
+		
+		/**
+		 * Append packet to waiting for ack queue
+		 *
+		 */
+		public boolean append(Packet packet, int maxQueueSize, int timeoutInSec) {
 			if (!packet.wasProcessedBy(XMLNS)) {
+
+				// check if queue size does not exceed limit
+				if (queue.size() > maxQueueSize) {
+					return false;
+				}
+
+				// we do this check if queue is bigger than 30 as some client confirm after X stanzas (not after each one)
 				if (shouldCheckTimeout()) {
 					Entry first = queue.peekFirst();
 					if (first != null && (System.currentTimeMillis() - first.stamp > ((long)timeoutInSec * 1000))) {
