@@ -104,7 +104,7 @@ public class StreamManagementIOProcessor
 	@ConfigField(desc = "Default resumption timeout", alias = RESUMPTION_TIMEOUT_PROP_KEY)
 	private int resumption_timeout = 60;
 	@ConfigField(desc = "Max allowed queue size of unacked packets", alias = "max-resumption-queue-size")
-	private int max_queue_size = 10000;
+	private int max_queue_size = 2000;
 
 	/**
 	 * Method returns true if XMPPIOService has enabled SM.
