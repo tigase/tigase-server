@@ -402,6 +402,12 @@ public class StreamManagementIOProcessor
 			// not started for longer time than twice value of resumption_timeout
 			if (((System.currentTimeMillis() - resumptionTimeoutStart) > (2 * resumption_timeout * 1000)) ||
 					streamClosed) {
+				
+				if (id == null) {
+					// connection already removed by another thread. It will take care of the rest
+					return false;
+				}
+
 				// if so we should assume that resumption failed so we should
 				// send errors, remove reference to service and stop this service
 				services.remove(id, service);
