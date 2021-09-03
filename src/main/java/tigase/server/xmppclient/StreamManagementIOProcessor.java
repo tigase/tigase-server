@@ -320,10 +320,14 @@ public class StreamManagementIOProcessor
 					// resending packets thru new connection
 					OutQueue outQueue = (OutQueue) newService.getSessionData().get(OUT_COUNTER_KEY);
 					List<OutQueue.Entry> packetsToResend = new ArrayList<OutQueue.Entry>(outQueue.getQueue());
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "resuming stream with id = {1} resending unacked packets = {2} [{0}]",
+								new Object[]{service, id, outQueue.waitingForAck()});
+					}
 					for (OutQueue.Entry entry : packetsToResend) {
 						Packet packetToResend = entry.getPacketWithStamp();
-						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, "resuming stream with id = {1} resending unacked packet = {2} [{0}]",
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "resuming stream with id = {1} resending unacked packet = {2} [{0}]",
 									new Object[]{service, id, packetToResend});
 						}
 						newService.addPacketToSend(packetToResend);
@@ -399,14 +403,19 @@ public class StreamManagementIOProcessor
 //		}
 		Long resumptionTimeoutStart = (Long) service.getSessionData().get(RESUMPTION_TIMEOUT_START_KEY);
 		if (resumptionTimeoutStart != null) {
+			final boolean isBeyondResumptionTimeout = (System.currentTimeMillis() - resumptionTimeoutStart) > (1 * resumption_timeout * 1000);
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Service stopped - checking resumption timeout [{0}]", new Object[]{service});
+				log.log(Level.FINEST,
+						"Service stopped - checking resumption timeout, resumptionTimeoutStart: {1}, resumption_timeout: {2}, streamClosed: {3} [{0}]",
+						new Object[]{service, resumptionTimeoutStart, resumption_timeout, streamClosed});
 			}
 			// if resumptionTimeoutStart is set let's check if resumption was
 			// not started for longer time than twice value of resumption_timeout
-			if (((System.currentTimeMillis() - resumptionTimeoutStart) > (2 * resumption_timeout * 1000)) ||
-					streamClosed) {
-				
+			// wojtek@2021-09-03: after discussion with andrzej we decided to use "once" times resumption timeout
+			// as there wasn't sufficient reason to use double the value - if the resumption was not finished within
+			// established timeout then it's considered failed.
+			if (isBeyondResumptionTimeout || streamClosed) {
+
 				if (id == null) {
 					// connection already removed by another thread. It will take care of the rest
 					return false;
@@ -491,7 +500,20 @@ public class StreamManagementIOProcessor
 	@Override
 	public void getStatistics(StatisticsList list) {
 		if (list.checkLevel(Level.FINEST)) {
-			list.add(connectionManager.getName() + "/" + getId(), "Number of queues", services.size(), Level.FINEST);
+			list.add(connectionManager.getName() + "/" + getId(), "Number of resume services", services.size(), Level.FINEST);
+
+//			final Comparator<XMPPIOService> serviceAckQueueSizeComparator = Comparator.comparingInt(
+//					(XMPPIOService service) -> ((OutQueue) service
+//							.getSessionData()
+//							.get(OUT_COUNTER_KEY)).waitingForAck());
+//
+//			final Optional<XMPPIOService> serviceWithBiggestQueue = services.values().stream().max(serviceAckQueueSizeComparator);
+//			if (serviceWithBiggestQueue.isPresent()) {
+//				int size = ((OutQueue)serviceWithBiggestQueue.get().getSessionData().get(OUT_COUNTER_KEY)).waitingForAck();
+//				Optional<JID> jid = serviceWithBiggestQueue.get().getAuthorisedUserJid();
+//				list.add(connectionManager.getName() + "/" + getId(), "Biggest queue", size + " for " + jid, Level.FINEST);
+//			}
+
 		}
 	}
 
@@ -603,6 +625,11 @@ public class StreamManagementIOProcessor
 		service.clearWaitingPackets();
 
 		OutQueue outQueue = (OutQueue) service.getSessionData().remove(OUT_COUNTER_KEY);
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST,
+					"Service stopped - returning errors for {1} packets in queue [{0}]",
+					new Object[]{service, outQueue.waitingForAck()});
+		}
 		if (outQueue != null) {
 			OutQueue.Entry e = null;
 
