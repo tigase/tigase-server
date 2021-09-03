@@ -625,12 +625,12 @@ public class StreamManagementIOProcessor
 		service.clearWaitingPackets();
 
 		OutQueue outQueue = (OutQueue) service.getSessionData().remove(OUT_COUNTER_KEY);
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST,
-					"Service stopped - returning errors for {1} packets in queue [{0}]",
-					new Object[]{service, outQueue.waitingForAck()});
-		}
 		if (outQueue != null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST,
+						"Service stopped - returning errors for {1} packets in queue [{0}]",
+						new Object[]{service, outQueue.waitingForAck()});
+			}
 			OutQueue.Entry e = null;
 
 			while ((e = outQueue.queue.poll()) != null) {
