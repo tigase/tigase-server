@@ -102,6 +102,9 @@ public class SchemaManager {
 																				  DBSchemaLoader.PARAMETERS_ENUM.ROOT_USERNAME
 																						  .getName()).description(
 			"Database root account username used to create/remove tigase user and database").build();
+	private CommandlineParameter ROOT_ASK = new CommandlineParameter.Builder(null,
+																			 DBSchemaLoader.PARAMETERS_ENUM.ROOT_ASK.getName()).description(
+			"Ask for database root account credentials.").build();
 	private CommandlineParameter TDSL_CONFIG_FILE = new CommandlineParameter.Builder(null,
 																					 ConfigHolder.TDSL_CONFIG_FILE_KEY.replace(
 																							 "--", "")).defaultValue(
@@ -122,6 +125,7 @@ public class SchemaManager {
 			.build();
 
 
+	private Boolean dbRootAsk = false;
 	private String adminPass = null;
 	private List<BareJID> admins = null;
 	private Map<String, Object> config;
@@ -321,6 +325,7 @@ public class SchemaManager {
 
 		admins = params.getAdmins();
 		adminPass = params.getAdminPassword();
+		dbRootAsk = params.isDbRootAsk();
 		logLevel = params.getLogLevel();
 
 		String vhost = DNSResolverFactory.getInstance().getDefaultHost();
@@ -356,6 +361,7 @@ public class SchemaManager {
 
 		Map<String, Object> config = holder.getProperties();
 
+		dbRootAsk = getProperty(props, ROOT_ASK, Boolean::parseBoolean).orElse(false);
 		getProperty(props, LOG_LEVEL, Level::parse).ifPresent(result -> logLevel = result);
 		getProperty(props, FORCE_RELOAD_SCHEMA, Boolean::parseBoolean).ifPresent(result -> forceReloadSchema = result);
 
@@ -587,7 +593,7 @@ public class SchemaManager {
 
 	private List<CommandlineParameter> destroySchemaParametersSupplier() {
 		List<CommandlineParameter> options = new ArrayList<>();
-		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE, LOG_LEVEL));
+		options.addAll(Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, ROOT_ASK, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE, LOG_LEVEL));
 		options.addAll(SchemaLoader.getMainCommandlineParameters(true));
 		return options;
 	}
@@ -602,7 +608,7 @@ public class SchemaManager {
 	}
 
 	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
-		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE, LOG_LEVEL, FORCE_RELOAD_SCHEMA);
+		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, ROOT_ASK, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE, LOG_LEVEL, FORCE_RELOAD_SCHEMA);
 	}
 
 	private boolean isErrorPresent(Map<DataSourceInfo, List<ResultEntry>> results) {
@@ -681,6 +687,7 @@ public class SchemaManager {
 		params.setAdmins(admins, adminPass);
 		params.setLogLevel(logLevel);
 		params.setForceReloadSchema(forceReloadSchema);
+		params.setDbRootAsk(dbRootAsk);
 		schemaLoader.init(params, Optional.ofNullable(rootCredentialsCache));
 
 		results.add(new ResultEntry("Checking connection to database", schemaLoader.validateDBConnection(), handler));

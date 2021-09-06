@@ -78,8 +78,9 @@ public class DBSchemaLoader
 		DATABASE_HOSTNAME("dbHostname", "localhost"),
 		TIGASE_USERNAME("dbUser", "tigase_user"),
 		TIGASE_PASSWORD("dbPass", "tigase_pass"),
-		ROOT_USERNAME("rootUser", "root"),
-		ROOT_PASSWORD("rootPass", "root"),
+		ROOT_USERNAME("rootUser", null),
+		ROOT_PASSWORD("rootPass", null),
+		ROOT_ASK("rootAsk", "false"),
 		LOG_LEVEL("logLevel", "CONFIG"),
 		USE_SSL("useSSL", "false"),
 		GET_URI("getURI", "false"),
@@ -288,8 +289,10 @@ public class DBSchemaLoader
 	@Override
 	public Result validateDBConnection() {
 		connection_ok = false;
-		String db_conn = getDBUri(false, true);
-		log.log(Level.INFO, "Validating DBConnection, URI: " + getDBUri(false, true, true));
+		boolean hasRootCredentials = params.getDbRootUser() != null || params.getDbRootPass() != null;
+
+		String db_conn = getDBUri(false, hasRootCredentials);
+		log.log(Level.INFO, "Validating DBConnection, URI: " + getDBUri(false, hasRootCredentials, true));
 		if (db_conn == null) {
 			log.log(Level.WARNING, "Missing DB connection URL");
 			return Result.ok;
@@ -359,33 +362,39 @@ public class DBSchemaLoader
 				db_ok = true;
 				log.log(Level.INFO, "Exists OK");
 				return Result.ok;
-			}, e -> withConnection(getDBUri(false, true), conn -> {
-				Result result = Result.ok;
-				try {
-					ArrayList<String> queries = loadSQLQueries(
-							"database/" + params.getDbType() + "-installer-create-db.sql");
-					for (String query : queries) {
-						log.log(Level.FINE, "Executing query: " + query);
-						if (!query.isEmpty()) {
-							// Some queries may fail and this is still fine
-							// the user or the database may already exist
-							try (Statement stmt = conn.createStatement()) {
-								stmt.execute(query);
-								stmt.close();
-							} catch (SQLException ex) {
-								result = Result.warning;
-								log.log(Level.WARNING, "Query failed: " + ex.getMessage());
+			}, e -> {
+				if (params.getDbRootPass() == null || params.getDbRootUser() == null) {
+					log.log(Level.WARNING, "Database does not exist!");
+					return Result.error;
+				}
+				return withConnection(getDBUri(false, true), conn -> {
+					Result result = Result.ok;
+					try {
+						ArrayList<String> queries = loadSQLQueries(
+								"database/" + params.getDbType() + "-installer-create-db.sql");
+						for (String query : queries) {
+							log.log(Level.FINE, "Executing query: " + query);
+							if (!query.isEmpty()) {
+								// Some queries may fail and this is still fine
+								// the user or the database may already exist
+								try (Statement stmt = conn.createStatement()) {
+									stmt.execute(query);
+									stmt.close();
+								} catch (SQLException ex) {
+									result = Result.warning;
+									log.log(Level.WARNING, "Query failed: " + ex.getMessage());
+								}
 							}
 						}
+						log.log(Level.INFO, " OK");
+						db_ok = true;
+					} catch (IOException ex) {
+						log.log(Level.WARNING, ex.getMessage());
+						result = Result.error;
 					}
-					log.log(Level.INFO, " OK");
-					db_ok = true;
-				} catch (IOException ex) {
-					log.log(Level.WARNING, ex.getMessage());
-					result = Result.error;
-				}
-				return result;
-			}));
+					return result;
+				});
+			});
 			if (dbExtistResult == Result.ok) {
 				if (dbTypes.postgresql.name().equals(params.getDbType()) && params.getDbRootUser() != null) {
 					String dbConn2 = getDBUri(true, true);
@@ -429,6 +438,10 @@ public class DBSchemaLoader
 		}
 
 		// part 2, acquire reqired fields and validate them
+		if (params.getDbRootUser() == null || params.getDbRootPass() == null) {
+			log.log(Level.FINEST, "No database root user credentials, skipping post database creation scripts.");
+			return Result.skipped;
+		}
 		String db_conn = getDBUri(true, true);
 		log.log(Level.INFO, "Post Installation, URI: " + getDBUri(true, true,true));
 		return withStatement(db_conn, stmt -> {
@@ -570,7 +583,7 @@ public class DBSchemaLoader
 			log.log(Level.WARNING, "Missing DB connection URL");
 			throw new IllegalArgumentException("Wrong component name");
 		} else {
-			String db_conn = getDBUri(true, true);
+			String db_conn = getDBUri(true, false);
 			final SQLCommand<Connection, Version> versionCommand = cmd -> {
 
 				try (PreparedStatement ps = cmd.prepareCall(JDBC_SCHEMA_VERSION_QUERY)) {
@@ -873,6 +886,10 @@ public class DBSchemaLoader
 				return Result.error;
 			}
 		} else {
+			if (params.getDbRootUser() == null && params.getDbRootPass() == null) {
+				log.log(Level.WARNING, "Missing root database user credentials!");
+				return Result.error;
+			}
 			String db_conn = getDBUri(false, true);
 			log.log(Level.INFO, "Dropping database, URI: " + getDBUri(false, true, true));
 			return withStatement(db_conn, stmt -> {
@@ -953,16 +970,21 @@ public class DBSchemaLoader
 							.required(true)
 							.secret()
 							.build());
+		options.add(new CommandlineParameter.Builder(null, PARAMETERS_ENUM.ROOT_ASK.getName()).description(
+						"Ask for database root user credentials")
+							.defaultValue(PARAMETERS_ENUM.ROOT_ASK.getDefaultValue())
+							.type(Boolean.class)
+							.build());
 		options.add(new CommandlineParameter.Builder("R", PARAMETERS_ENUM.ROOT_USERNAME.getName()).description(
 				"Database root account username used to create tigase user and database")
 							.defaultValue(PARAMETERS_ENUM.ROOT_USERNAME.getDefaultValue())
-							.required(true)
+							.required(false)
 							.build());
 		options.add(new CommandlineParameter.Builder("A", PARAMETERS_ENUM.ROOT_PASSWORD.getName()).description(
 				"Database root account password used to create tigase user and database")
 							.defaultValue(PARAMETERS_ENUM.ROOT_PASSWORD.getDefaultValue())
 							.secret()
-							.required(true)
+							.required(false)
 							.build());
 		options.add(new CommandlineParameter.Builder("S", PARAMETERS_ENUM.USE_SSL.getName()).description(
 				"Enable SSL support for database connection (if database supports it)")
@@ -1402,6 +1424,7 @@ public class DBSchemaLoader
 		private String dbPass = null;
 		private String dbRootPass;
 		private String dbRootUser;
+		private boolean dbRootAsk = false;
 		private String dbType;
 		private String dbUser = null;
 		private String file;
@@ -1455,6 +1478,15 @@ public class DBSchemaLoader
 
 		public String getDbRootUser() {
 			return dbRootUser;
+		}
+
+		public boolean isDbRootAsk() {
+			return (dbRootUser == null || dbRootPass == null) && dbRootAsk;
+		}
+
+		@Override
+		public void setDbRootAsk(boolean dbRootAsk) {
+			this.dbRootAsk = dbRootAsk;
 		}
 
 		public String getDbType() {
@@ -1604,6 +1636,7 @@ public class DBSchemaLoader
 
 			dbRootUser = getProperty(props, PARAMETERS_ENUM.ROOT_USERNAME);
 			dbRootPass = getProperty(props, PARAMETERS_ENUM.ROOT_PASSWORD);
+			dbRootAsk = getProperty(props, PARAMETERS_ENUM.ROOT_ASK, Boolean::parseBoolean);
 
 			file = getProperty(props, PARAMETERS_ENUM.FILE);
 			query = getProperty(props, PARAMETERS_ENUM.QUERY);
@@ -1671,7 +1704,7 @@ public class DBSchemaLoader
 					dbRootUser = credentials.user;
 					dbRootPass = credentials.password;
 				} else {
-					if (!"derby".equals(dbType)) {
+					if (isDbRootAsk() && !"derby".equals(dbType)) {
 						SystemConsole console = new SystemConsole();
 						console.writeLine("");
 						if (dbRootUser == null) {
