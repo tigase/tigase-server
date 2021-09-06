@@ -377,6 +377,13 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 		void setDbRootCredentials(String username, String password);
 
+		default boolean isDbRootAsk() {
+			return false;
+		}
+
+		default void setDbRootAsk(boolean value) {
+		}
+
 		default void setSchemaDirectory(String schemaDirectory) {
 
 		}
