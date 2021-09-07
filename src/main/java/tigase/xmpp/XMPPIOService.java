@@ -125,6 +125,9 @@ public class XMPPIOService<RefObject>
 			log.log(Level.FINEST, "Added packet to send: {1} [{0}]", new Object[]{toString(), packet});
 		}
 
+		if (getAuthorisedUserJid().isPresent() && packet.getStanzaTo() == null) {
+			packet.initVars(packet.getStanzaFrom(), getAuthorisedUserJid().get());
+		}
 		// processing packet using io level processors
 		if (processors != null) {
 			for (XMPPIOProcessor processor : processors) {

@@ -719,7 +719,6 @@ public class StreamManagementIOProcessor
 					return false;
 				}
 
-				// we do this check if queue is bigger than 30 as some client confirm after X stanzas (not after each one)
 				if (shouldCheckTimeout()) {
 					Entry first = queue.peekFirst();
 					if (first != null && (System.currentTimeMillis() - first.stamp > ((long)timeoutInSec * 1000))) {
