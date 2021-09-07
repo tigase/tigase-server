@@ -18,6 +18,7 @@
 package tigase.xmpp;
 
 import tigase.db.NonAuthUserRepository;
+import tigase.server.Iq;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.xmpp.impl.annotation.AnnotatedXMPPProcessor;
@@ -275,6 +276,14 @@ public abstract class XMPPProcessorAbstract
 									Queue<Packet> results, Map<String, Object> settings)
 			throws PacketErrorTypeException {
 		try {
+			if (packet.getElemName() == Iq.ELEM_NAME && (packet.getType().equals(StanzaType.error) || packet.getType().equals(StanzaType.result))) {
+				// https://xmpp.org/rfcs/rfc6120.html#stanzas-semantics-iq
+				// An entity that receives a stanza of type "result" or "error" MUST NOT respond to the stanza
+				// by sending a further IQ response of type "result" or "error"; however, the requesting entity
+				// MAY send another request (e.g., an IQ of type "set" to provide obligatory information discovered
+				// through a get/result pair).
+				return;
+			}
 
 			List<XMPPResourceConnection> conns = new ArrayList<XMPPResourceConnection>(5);
 			String resource = packet.getStanzaTo().getResource();
