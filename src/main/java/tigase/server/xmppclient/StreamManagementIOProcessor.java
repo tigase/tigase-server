@@ -94,7 +94,7 @@ public class StreamManagementIOProcessor
 
 	private final ConcurrentHashMap<String, XMPPIOService> services = new ConcurrentHashMap<String, XMPPIOService>();
 	@ConfigField(desc = "Number of sent packets after should ask for confirmation of delivery", alias = ACK_REQUEST_COUNT_KEY)
-	private int ack_request_count = DEF_ACK_REQUEST_COUNT_VAL;
+	private static int ack_request_count = DEF_ACK_REQUEST_COUNT_VAL;
 	@Inject(bean = "service")
 	private ConnectionManager connectionManager;
 	@ConfigField(desc = "Ignore undelivered presence packets", alias = IGNORE_UNDELIVERED_PRESENCE_KEY)
@@ -683,12 +683,18 @@ public class StreamManagementIOProcessor
 
 		private boolean resumptionEnabled = false;
 
-		@Deprecated
-		@TigaseDeprecated(removeIn = "9.0.0", since = "8.2.0")
+		/**
+		 * Method determines if we should check packets for falling within timeout. Currently we only check
+		 * the timeout if the queue size is bigger if the maximum count of packets that can be send
+		 * to the server without the server requiring the ack. Otherwise, it could happen that idle or low
+		 * traffic clients could be disconnected if the packets waiting for the ack were very old thus falling
+		 * outside timeout but still few enough that wouldn't trigger ack request.
+		 *
+		 * @return {@code true} if there are fewer packets than maximum allow packet count that doesn't trigger
+		 * server ack request, {@code false} otherwise.
+		 */
 		private boolean shouldCheckTimeout() {
-			// previously we were checking if the queue is bigger than 30 items. After discussing it
-			// we decided to decrease it considerably and in the future remove condition altogether and check always.
-			return queue.size() > 5;
+			return queue.size() > (ack_request_count + 3);
 		}
 
 		/**
@@ -760,13 +766,6 @@ public class StreamManagementIOProcessor
 		 */
 		protected ArrayDeque<Entry> getQueue() {
 			return queue;
-		}
-
-		public static void main(String[] args) throws TigaseStringprepException {
-			final Logger log = Logger.getGlobal();
-			final Packet packet = new Iq(new Element("iq"), JID.jidInstance("from@bla"), JID.jidInstance("to@bla"));
-			log.log(Level.WARNING, "unacked packet without stanzaTo: {0}, and packetTo: {1}; setting from to: {2}; packet: {3} ",
-					new Object[]{packet.getStanzaTo(), packet.getPacketTo(), "from", packet.toString()});
 		}
 
 		public static class Entry {
