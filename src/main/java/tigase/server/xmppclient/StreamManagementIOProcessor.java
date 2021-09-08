@@ -248,6 +248,10 @@ public class StreamManagementIOProcessor
 			return false;
 		}
 
+		if (service.getAuthorisedUserJid().isPresent() && packet.getStanzaTo() == null) {
+			packet.initVars(packet.getStanzaFrom(), (JID)service.getAuthorisedUserJid().get());
+		}
+
 		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
 		if (outQueue == null) {
 			OutQueue.Entry e = new OutQueue.Entry(packet);
