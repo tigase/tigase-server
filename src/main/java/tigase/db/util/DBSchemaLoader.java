@@ -423,7 +423,7 @@ public class DBSchemaLoader
 
 		// part 2, acquire reqired fields and validate them
 		if (!hasRootCredentials(params)) {
-			log.log(Level.FINEST, "No database root user credentials, skipping post database creation scripts.");
+			log.log(Level.WARNING, "No database root user credentials, skipping post database creation scripts.");
 			return Result.skipped;
 		}
 		String db_conn = getDBUri(true, true);
