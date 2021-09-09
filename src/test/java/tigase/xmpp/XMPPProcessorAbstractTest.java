@@ -24,45 +24,78 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.impl.ProcessorTestCase;
 import tigase.xmpp.jid.JID;
 
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Queue;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class XMPPProcessorAbstractTest {
+public class XMPPProcessorAbstractTest
+		extends ProcessorTestCase {
 
+	JID connId = JID.jidInstanceNS("c2s@localhost/recipient1-res1");
+	String domain = "domain";
+	JID recipient = JID.jidInstanceNS("recipient", domain, "resource");
+	JID sender = JID.jidInstanceNS("sender", domain, "resource");
 	private XMPPProcessorAbstract processor;
 
 	@Before
-	public void setUp() {
-		processor = new XMPPProcessorAbstract() {
-			@Override
-			public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
-													  NonAuthUserRepository repo, Queue<Packet> results,
-													  Map<String, Object> settings) throws PacketErrorTypeException {
-			}
-
-			@Override
-			public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
-												   NonAuthUserRepository repo, Queue<Packet> results,
-												   Map<String, Object> settings) throws PacketErrorTypeException {
-			}
-		};
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		processor = new SimpleXMPPProcessor();
 	}
 
 	@Test
-	public void testProcessToUserPacket() throws TigaseStringprepException, PacketErrorTypeException {
-		final Element iqElement = new Element("iq", new String[]{"type", "to", "from"},
-											  new String[]{"result", "toUser@domain.com", "fromUser@domain.com"});
-		iqElement.addChild(new Element("ping", new String[]{"xmlns"}, new String[]{"urn:xmpp:ping"}));
-		final Iq iq = new Iq(iqElement);
+	public void testProcessToUserPacketWithSession()
+			throws TigaseStringprepException, PacketErrorTypeException, NotAuthorizedException {
+		final Iq iq = getIqPacket();
 
 		final ArrayDeque<Packet> results = new ArrayDeque<>();
-		final XMPPResourceConnection emptySession = new XMPPResourceConnection(null, null, null, null);
+		final XMPPResourceConnection session = getSession(connId, recipient, true);
+		processor.processToUserPacket(iq, session, null, results, null);
+		assertFalse(results.isEmpty());
+		assertEquals(results.poll().getType(), StanzaType.result);
+	}
+
+	@Test
+	public void testProcessToUserPacketWithoutSession()
+			throws TigaseStringprepException, PacketErrorTypeException, NotAuthorizedException {
+		final Iq iq = getIqPacket();
+
+		final ArrayDeque<Packet> results = new ArrayDeque<>();
+		final XMPPResourceConnection emptySession = getSession(connId, recipient, false);
+
 		processor.processToUserPacket(iq, emptySession, null, results, null);
 		assertTrue(results.isEmpty());
+	}
+
+	private Iq getIqPacket() throws TigaseStringprepException {
+		final Element iqElement = new Element("iq").withAttribute("type", StanzaType.result.toString())
+				.withAttribute("from", sender.toString())
+				.withAttribute("to", recipient.toString());
+		iqElement.addChild(new Element("ping").withAttribute("xmlns", "urn:xmpp:ping"));
+		return new Iq(iqElement);
+	}
+
+	private static class SimpleXMPPProcessor
+			extends XMPPProcessorAbstract {
+
+		@Override
+		public void processFromUserToServerPacket(JID connectionId, Packet packet, XMPPResourceConnection session,
+												  NonAuthUserRepository repo, Queue<Packet> results,
+												  Map<String, Object> settings) throws PacketErrorTypeException {
+
+		}
+
+		@Override
+		public void processServerSessionPacket(Packet packet, XMPPResourceConnection session,
+											   NonAuthUserRepository repo, Queue<Packet> results,
+											   Map<String, Object> settings) throws PacketErrorTypeException {
+
+		}
 	}
 }
