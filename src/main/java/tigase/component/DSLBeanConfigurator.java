@@ -19,11 +19,11 @@ package tigase.component;
 
 import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigWriter;
+import tigase.kernel.BeanUtils;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.*;
 import tigase.kernel.core.BeanConfig;
-import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 
@@ -155,15 +155,14 @@ public class DSLBeanConfigurator
 		Map<String, String> configAliasses = new HashMap<>();
 		Class<?> cls = beanConfig.getClazz();
 
-		Field[] fields = DependencyManager.getAllFields(cls);
-		for (Field field : fields) {
+		BeanUtils.getAllFields(cls).forEach(field -> {
 			ConfigField cf = field.getAnnotation(ConfigField.class);
 			if (cf != null) {
 				if (!cf.alias().isEmpty()) {
 					configAliasses.put(cf.alias(), field.getName());
 				}
 			}
-		}
+		});
 
 		do {
 			ConfigAliases ca = cls.getAnnotation(ConfigAliases.class);

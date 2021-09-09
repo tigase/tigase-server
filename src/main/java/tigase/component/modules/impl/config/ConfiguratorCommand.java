@@ -33,7 +33,6 @@ import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.BeanConfig;
-import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
@@ -41,8 +40,10 @@ import tigase.xmpp.jid.JID;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.sort;
 
@@ -70,7 +71,7 @@ public class ConfiguratorCommand
 		} else if (data == null) {
 			Form form = new Form("form", "Select Bean to configure", null);
 
-			ArrayList<String> items = getConfigurableBeansNames();
+			List<String> items = getConfigurableBeansNames();
 			ArrayList<String> options = new ArrayList<>();
 			ArrayList<String> values = new ArrayList<>();
 
@@ -172,8 +173,7 @@ public class ConfiguratorCommand
 				continue;
 			}
 			final Class<?> cl = bc.getClazz();
-			java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
-			for (java.lang.reflect.Field field : fields) {
+			BeanUtils.getAllFields(cl).forEach(field -> {
 				final ConfigField cf = field.getAnnotation(ConfigField.class);
 				if (cf != null) {
 					ConfigFieldItem cfi = new ConfigFieldItem();
@@ -183,26 +183,22 @@ public class ConfiguratorCommand
 
 					result.add(cfi);
 				}
-			}
+			});
 
 		}
 		return result;
 	}
 
-	private ArrayList<String> getConfigurableBeansNames() {
-		ArrayList<String> result = new ArrayList<>();
-		for (BeanConfig bc : kernel.getDependencyManager().getBeanConfigs()) {
-			final Class<?> cl = bc.getClazz();
-			java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
-			for (java.lang.reflect.Field field : fields) {
-				final ConfigField cf = field.getAnnotation(ConfigField.class);
-				if (cf != null) {
-					result.add(bc.getBeanName());
-					break;
-				}
-			}
-		}
-		return result;
+	private List<String> getConfigurableBeansNames() {
+		return kernel.getDependencyManager()
+				.getBeanConfigs()
+				.stream()
+				.filter(bc -> BeanUtils.getAllFields(bc.getClazz())
+						.filter(field -> field.getAnnotation(ConfigField.class) != null)
+						.findFirst()
+						.isPresent())
+				.map(bc -> bc.getBeanName())
+				.collect(Collectors.toList());
 	}
 
 	private class ConfigFieldItem

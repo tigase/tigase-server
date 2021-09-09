@@ -26,7 +26,6 @@ import tigase.server.Packet;
 import tigase.xml.Element;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
@@ -161,7 +160,7 @@ public abstract class RepositoryItemAbstract
 	}
 
 	private Stream<Field> streamConfigFields() {
-		return Arrays.stream(BeanUtils.getAllFields(getClass()))
+		return BeanUtils.getAllFields(getClass())
 				.filter(field -> field.isAnnotationPresent(ConfigField.class));
 	}
 }

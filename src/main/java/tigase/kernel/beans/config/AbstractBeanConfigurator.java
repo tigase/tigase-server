@@ -25,7 +25,6 @@ import tigase.kernel.TypesConverter;
 import tigase.kernel.beans.*;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.BeanConfigBuilder;
-import tigase.kernel.core.DependencyManager;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.osgi.util.ClassUtilBean;
@@ -617,33 +616,29 @@ public abstract class AbstractBeanConfigurator
 		BeanConfig beanConfig = kernel.getDependencyManager().getBeanConfig(beanName);
 		Object bean = kernel.getInstance(beanName);
 
-		try {
-			HashMap<Field, Object> defaultConfig = defaultFieldValues.get(beanConfig);
-			if (defaultConfig == null) {
-				return;
-			}
+		HashMap<Field, Object> defaultConfig = defaultFieldValues.get(beanConfig);
+		if (defaultConfig == null) {
+			return;
+		}
 
-			final Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
-			for (Field field : fields) {
-
+		BeanUtils.getAllFields(beanConfig.getClazz()).forEach(field -> {
+			try {
 				ConfigField configField = field.getAnnotation(ConfigField.class);
 
 				if (configField == null) {
-					continue;
+					return;
 				}
 
 				if (!defaultConfig.containsKey(field)) {
-					continue;
+					return;
 				}
 
 				Object valueToSet = defaultConfig.get(field);
 				BeanUtils.setValue(bean, field, valueToSet);
-
+			} catch (Exception e) {
+				throw new KernelException("Cannot inject configuration to bean " + beanConfig.getBeanName(), e);
 			}
-		} catch (Exception e) {
-			throw new KernelException("Cannot inject configuration to bean " + beanConfig.getBeanName(), e);
-		}
-
+		});
 	}
 
 	/**
@@ -652,53 +647,40 @@ public abstract class AbstractBeanConfigurator
 	protected abstract Map<String, Object> getConfiguration(BeanConfig beanConfig);
 
 	protected Map<Field, Object> grabDefaultConfig(final BeanConfig beanConfig, final Object bean) {
-		try {
-			HashMap<Field, Object> defaultConfig = defaultFieldValues.get(beanConfig);
-			if (defaultConfig == null) {
-				defaultConfig = new HashMap<Field, Object>();
-				defaultFieldValues.put(beanConfig, defaultConfig);
-			}
-			final Field[] fields = DependencyManager.getAllFields(beanConfig.getClazz());
-			for (Field field : fields) {
-
+			HashMap<Field, Object> defaultConfig = defaultFieldValues.computeIfAbsent(beanConfig, key -> new HashMap<>());
+			BeanUtils.getAllFields(beanConfig.getClazz()).forEach(field -> {
 				ConfigField configField = field.getAnnotation(ConfigField.class);
 
-				if (configField == null) {
-					continue;
-				} else {
-					Object currentValue = BeanUtils.getValue(bean, field);
-					if (!defaultConfig.containsKey(field)) {
-						defaultConfig.put(field, currentValue);
+				if (configField != null) {
+					try {
+						Object currentValue = BeanUtils.getValue(bean, field);
+						if (!defaultConfig.containsKey(field)) {
+							defaultConfig.put(field, currentValue);
+						}
+					} catch (Exception e) {
+						throw new KernelException("Cannot grab default values of bean " + beanConfig.getBeanName(), e);
 					}
 				}
-			}
+			});
 			return defaultConfig;
-		} catch (Exception e) {
-			throw new KernelException("Cannot grab default values of bean " + beanConfig.getBeanName(), e);
-		}
 	}
 
 	protected Map<Field, Object> grabCurrentConfig(final Object bean, String beanName) {
 		Map<Field, Object> config = new HashMap<>();
-		try {
-			final Field[] fields = DependencyManager.getAllFields(bean.getClass());
-
-			for (Field field : fields) {
-
-				ConfigField configField = field.getAnnotation(ConfigField.class);
-
-				if (configField == null) {
-					continue;
-				} else {
+		BeanUtils.getAllFields(bean.getClass()).forEach(field -> {
+			ConfigField configField = field.getAnnotation(ConfigField.class);
+			if (configField != null) {
+				try {
 					Object currentValue = BeanUtils.getValue(bean, field);
 					if (!config.containsKey(field)) {
 						config.put(field, currentValue);
 					}
+				} catch (Exception ex) {
+					log.log(Level.FINEST, "retrieval of configuration for bean " + beanName + " failed", ex);
 				}
 			}
-		} catch (Exception ex) {
-			log.log(Level.FINEST, "retrieval of configuration for bean " + beanName + " failed", ex);
-		}
+		});
+
 		return config;
 	}
 

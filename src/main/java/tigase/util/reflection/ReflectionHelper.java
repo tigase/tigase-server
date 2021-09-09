@@ -21,10 +21,11 @@ import tigase.kernel.BeanUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Utility class with useful methods to work with reflections
@@ -97,19 +98,13 @@ public class ReflectionHelper {
 	public static <A extends Annotation, T> Collection<T> collectAnnotatedMethods(final Object consumer,
 																				  Class<A> annotationCls,
 																				  Handler<A, T> handler) {
-		ArrayList<T> result = new ArrayList<>();
-
-		Method[] methods = BeanUtils.getAllMethods(consumer.getClass());
-
-		for (Method method : methods) {
+		return BeanUtils.getAllMethods(consumer.getClass()).map(method -> {
 			A annotation = method.getAnnotation(annotationCls);
 			if (annotation == null) {
-				continue;
+				return null;
 			}
-
-			result.add(handler.process(consumer, method, annotation));
-		}
-		return result;
+			return handler.process(consumer, method, annotation);
+		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	private static boolean compareParameterizedTypes(ParameterizedType expected, ParameterizedType actual,

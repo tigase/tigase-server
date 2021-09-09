@@ -22,10 +22,8 @@ import org.junit.Test;
 import tigase.db.TigaseDBException;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.beans.config.ConfigField;
-import tigase.kernel.core.DependencyManager;
 import tigase.xmpp.jid.JID;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -202,14 +200,9 @@ public class JabberIqRegisterWhitelistTest
 
 		@Override
 		public void init(Map<String, Object> settings) throws TigaseDBException {
-			final Field[] fields = DependencyManager.getAllFields(this.getClass());
-			for (Field field : fields) {
-
+			BeanUtils.getAllFields(this.getClass()).forEach(field ->  {
 				ConfigField configField = field.getAnnotation(ConfigField.class);
-
-				if (configField == null) {
-					continue;
-				} else {
+				if (configField != null) {
 					try {
 						Object value = settings.getOrDefault(field.getName(), settings.get(configField.alias()));
 						if (value != null) {
@@ -225,8 +218,7 @@ public class JabberIqRegisterWhitelistTest
 						throw new RuntimeException(ex);
 					}
 				}
-			}
-			;
+			});
 		}
 	}
 

@@ -17,6 +17,8 @@
  */
 package tigase.kernel.core;
 
+import tigase.db.util.SchemaManager;
+import tigase.kernel.BeanUtils;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.core.BeanConfig.State;
 import tigase.util.reflection.ReflectionHelper;
@@ -26,10 +28,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DependencyManager {
 
@@ -43,14 +46,14 @@ public class DependencyManager {
 	 */
 	private boolean throwExceptionIfCannotCreate = false;
 
-	public static Field[] getAllFields(Class<?> klass) {
-		List<Field> fields = new ArrayList<Field>();
-		fields.addAll(Arrays.asList(klass.getDeclaredFields()));
-		if (klass.getSuperclass() != null) {
-			fields.addAll(Arrays.asList(getAllFields(klass.getSuperclass())));
-		}
-		return fields.toArray(new Field[]{});
-	}
+//	public static Field[] getAllFields(Class<?> klass) {
+//		List<Field> fields = new ArrayList<Field>();
+//		fields.addAll(Arrays.asList(klass.getDeclaredFields()));
+//		if (klass.getSuperclass() != null) {
+//			fields.addAll(Arrays.asList(getAllFields(klass.getSuperclass())));
+//		}
+//		return fields.toArray(new Field[]{});
+//	}
 
 	public static boolean match(Dependency dependency, BeanConfig beanConfig) {
 		if (dependency.getBeanName() != null) {
@@ -138,22 +141,20 @@ public class DependencyManager {
 
 	public List<BeanConfig> getBeanConfigs(final Class<?> type, Type genericType, Class<?> ownerClass,
 										   final boolean allowNonExportable) {
-		ArrayList<BeanConfig> result = new ArrayList<BeanConfig>();
-		for (BeanConfig bc : beanConfigs.values()) {
-			if (bc.getState() != State.inactive && type.isAssignableFrom(bc.getClazz()) &&
-					(allowNonExportable || bc.isExportable())) {
-				if (genericType == null) {
-					result.add(bc);
-					continue;
-				}
-
-				Map<TypeVariable<?>, Type> map = ReflectionHelper.createGenericsTypeMap(ownerClass);
-				if (ReflectionHelper.compareTypes(genericType, bc.getClazz(), map, null)) {
-					result.add(bc);
-				}
-			}
-		}
-		return result;
+		return beanConfigs.values()
+				.stream()
+				//.parallel()
+				.filter(bc -> bc.getState() != State.inactive && type.isAssignableFrom(bc.getClazz()) &&
+						(allowNonExportable || bc.isExportable()))
+				.filter(bc -> {
+					if (genericType == null) {
+						return true;
+					} else {
+						Map<TypeVariable<?>, Type> map = ReflectionHelper.createGenericsTypeMap(ownerClass);
+						return ReflectionHelper.compareTypes(genericType, bc.getClazz(), map, null);
+					}
+				})
+				.collect(Collectors.toList());
 	}
 
 	public Collection<Dependency> getDependenciesTo(BeanConfig destination) {
@@ -246,8 +247,7 @@ public class DependencyManager {
 		final String id = beanConfig.getBeanName();
 		final Class<?> cls = beanConfig.getClazz();
 
-		Map<Field, Inject> deps = createFieldsDependencyList(cls);
-		for (Entry<Field, Inject> e : deps.entrySet()) {
+		createFieldsDependencyStream(cls).map(e -> {
 			Field f = e.getKey();
 			Dependency d = new Dependency(beanConfig);
 			d.setField(f);
@@ -263,20 +263,18 @@ public class DependencyManager {
 				d.setType(type);
 				d.setGenericType(f.getGenericType());
 			}
-
-			beanConfig.getFieldDependencies().put(e.getKey(), d);
-		}
+			return d;
+		}).forEach(d -> beanConfig.getFieldDependencies().put(d.getField(), d));
 	}
 
-	private Map<Field, Inject> createFieldsDependencyList(final Class<?> cls) {
-		Map<Field, Inject> deps = new HashMap<Field, Inject>();
-		for (Field field : getAllFields(cls)) {
+	private Stream<SchemaManager.Pair<Field, Inject>> createFieldsDependencyStream(final Class<?> cls) {
+		return BeanUtils.getAllFields(cls).map(field -> {
 			Inject injectAnnotation = field.getAnnotation(Inject.class);
-			if (injectAnnotation != null) {
-				deps.put(field, injectAnnotation);
+			if (injectAnnotation == null) {
+				return (SchemaManager.Pair<Field,Inject>) null;
 			}
-		}
-		return deps;
+			return new SchemaManager.Pair<Field, Inject>(field, injectAnnotation);
+		}).filter(Objects::nonNull);
 	}
 
 }

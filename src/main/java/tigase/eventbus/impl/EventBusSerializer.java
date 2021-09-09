@@ -40,7 +40,7 @@ public class EventBusSerializer
 			final Class<?> cls = Class.forName(element.getName());
 			final Object result = cls.newInstance();
 
-			Field[] fields = BeanUtils.getAllFields(cls);
+			Field[] fields = BeanUtils.getAllFields(cls).toArray(Field[]::new);
 			for (final Field f : fields) {
 				if (Modifier.isTransient(f.getModifiers())) {
 					continue;
@@ -87,7 +87,7 @@ public class EventBusSerializer
 		final Class<?> cls = object.getClass();
 		Element e = new Element(cls.getName());
 
-		Field[] fields = BeanUtils.getAllFields(cls);
+		Field[] fields = BeanUtils.getAllFields(cls).toArray(Field[]::new);
 		for (final Field f : fields) {
 			if (Modifier.isTransient(f.getModifiers())) {
 				continue;

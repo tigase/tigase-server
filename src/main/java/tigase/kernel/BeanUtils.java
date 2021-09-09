@@ -18,42 +18,36 @@
 package tigase.kernel;
 
 import tigase.kernel.core.BeanConfig;
-import tigase.kernel.core.DependencyManager;
 
-import java.lang.reflect.*;
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BeanUtils {
 
-	public static Field[] getAllFields(Class<?> klass) {
-		List<Field> fields = new ArrayList<Field>();
-		fields.addAll(Arrays.asList(klass.getDeclaredFields()));
+	public static Stream<Field> getAllFields(Class<?> klass) {
+		Stream<Field> result = Arrays.stream(klass.getDeclaredFields());
 		if (klass.getSuperclass() != null) {
-			fields.addAll(Arrays.asList(getAllFields(klass.getSuperclass())));
+			result = Stream.concat(result, getAllFields(klass.getSuperclass()));
 		}
-		return fields.toArray(new Field[]{});
+		return result;
 	}
 
-	public static Method[] getAllMethods(Class<?> klass) {
-		List<Method> fields = new ArrayList<Method>();
-		fields.addAll(Arrays.asList(klass.getDeclaredMethods()));
+	public static Stream<Method> getAllMethods(Class<?> klass) {
+		Stream<Method> result = Arrays.stream(klass.getDeclaredMethods());
 		if (klass.getSuperclass() != null) {
-			fields.addAll(Arrays.asList(getAllMethods(klass.getSuperclass())));
+			result = Stream.concat(result, getAllMethods(klass.getSuperclass()));
 		}
-		return fields.toArray(new Method[]{});
+		return result;
 	}
 
 	public static java.lang.reflect.Field getField(BeanConfig bc, String fieldName) {
-		final Class<?> cl = bc.getClazz();
-		java.lang.reflect.Field[] fields = DependencyManager.getAllFields(cl);
-		for (java.lang.reflect.Field field : fields) {
-			if (field.getName().equals(fieldName)) {
-				return field;
-			}
-		}
-		return null;
+		return getAllFields(bc.getClazz()).filter(field -> field.getName().equals(fieldName)).findFirst().orElse(null);
 	}
 
 	public static Type getGetterSetterMethodsParameterType(Field f) {
@@ -147,16 +141,10 @@ public class BeanUtils {
 		}
 	}
 
-	public static ArrayList<Method> prepareSetterMethods(Class<?> destination, String fieldName) {
+	public static List<Method> prepareSetterMethods(Class<?> destination, String fieldName) {
 		String t = prepareAccessorMainPartName(fieldName);
-		ArrayList<Method> result = new ArrayList<Method>();
 		try {
-			for (Method m : getAllMethods(destination)) {
-				if (m.getName().equals("set" + t)) {
-					result.add(m);
-				}
-			}
-			return result;
+			return getAllMethods(destination).filter(m -> m.getName().equals("set" + t)).collect(Collectors.toList());
 		} catch (Exception e) {
 			return null;
 		}
@@ -178,7 +166,7 @@ public class BeanUtils {
 
 	public static void setValue(Object toBean, String fieldName, Object valueToSet)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
-		ArrayList<Method> setters = BeanUtils.prepareSetterMethods(toBean.getClass(), fieldName);
+		List<Method> setters = BeanUtils.prepareSetterMethods(toBean.getClass(), fieldName);
 
 		if (setters == null || setters.isEmpty()) {
 			throw new NoSuchMethodException("No setter for property '" + fieldName + "'.");
