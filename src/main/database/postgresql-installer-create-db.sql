@@ -37,5 +37,9 @@ GRANT ALL ON database ${dbName} TO ${dbUser};
 ALTER DATABASE ${dbName} OWNER TO ${dbUser};
 -- QUERY END: ALTER DATABASE
 
+-- QUERY START: Install uuid extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- QUERY END: Install uuid extension
+
 
 
