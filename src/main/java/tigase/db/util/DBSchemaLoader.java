@@ -289,10 +289,8 @@ public class DBSchemaLoader
 	@Override
 	public Result validateDBConnection() {
 		connection_ok = false;
-		boolean hasRootCredentials = params.getDbRootUser() != null || params.getDbRootPass() != null;
-
-		String db_conn = getDBUri(false, hasRootCredentials);
-		log.log(Level.INFO, "Validating DBConnection, URI: " + getDBUri(false, hasRootCredentials, true));
+		String db_conn = getDBUri(false, hasRootCredentials(params));
+		log.log(Level.INFO, "Validating DBConnection, URI: " + getDBUri(false, hasRootCredentials(params), true));
 		if (db_conn == null) {
 			log.log(Level.WARNING, "Missing DB connection URL");
 			return Result.ok;
@@ -314,6 +312,10 @@ public class DBSchemaLoader
 				return Result.error;
 			}
 		}
+	}
+
+	private static boolean hasRootCredentials(Parameters params) {
+		return params.getDbRootUser() != null && params.getDbRootPass() != null;
 	}
 
 	@Override
@@ -363,7 +365,7 @@ public class DBSchemaLoader
 				log.log(Level.INFO, "Exists OK");
 				return Result.ok;
 			}, e -> {
-				if (params.getDbRootPass() == null || params.getDbRootUser() == null) {
+				if (!hasRootCredentials(params)) {
 					log.log(Level.WARNING, "Database does not exist!");
 					return Result.error;
 				}
@@ -420,7 +422,7 @@ public class DBSchemaLoader
 		}
 
 		// part 2, acquire reqired fields and validate them
-		if (params.getDbRootUser() == null || params.getDbRootPass() == null) {
+		if (!hasRootCredentials(params)) {
 			log.log(Level.FINEST, "No database root user credentials, skipping post database creation scripts.");
 			return Result.skipped;
 		}
@@ -868,7 +870,7 @@ public class DBSchemaLoader
 				return Result.error;
 			}
 		} else {
-			if (params.getDbRootUser() == null && params.getDbRootPass() == null) {
+			if (!hasRootCredentials(params)) {
 				log.log(Level.WARNING, "Missing root database user credentials!");
 				return Result.error;
 			}
