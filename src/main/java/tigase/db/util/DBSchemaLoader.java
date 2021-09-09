@@ -358,7 +358,7 @@ public class DBSchemaLoader
 			log.log(Level.WARNING, "Missing DB connection URL");
 			return Result.error;
 		} else {
-			Result dbExtistResult = withConnection(db_conn1, conn -> {
+			return withConnection(db_conn1, conn -> {
 				db_ok = true;
 				log.log(Level.INFO, "Exists OK");
 				return Result.ok;
@@ -395,24 +395,6 @@ public class DBSchemaLoader
 					return result;
 				});
 			});
-			if (dbExtistResult == Result.ok) {
-				if (dbTypes.postgresql.name().equals(params.getDbType()) && params.getDbRootUser() != null) {
-					String dbConn2 = getDBUri(true, true);
-					dbExtistResult = withConnection(dbConn2, conn -> {
-						try (Statement stmt = conn.createStatement()) {
-							log.log(Level.FINE, "Installing extension: uuid-ossp");
-							String query = "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";";
-							log.log(Level.FINE, "Executing query: " + query);
-							stmt.execute(query);
-						    return Result.ok;
-						} catch (Throwable ex) {
-							log.log(Level.WARNING, ex.getMessage());
-							return Result.error;
-						}
-					});
-				}
-			}
-			return dbExtistResult;
 		}
 	}
 
