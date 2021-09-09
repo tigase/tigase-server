@@ -78,25 +78,31 @@ if (clusterMode && notifyCluster && supportedComponents.contains(componentName))
 	}
 }
 
-item.initFromCommand(p)
 def oldItem = item.getKey() != null ? repo.getItem(item.getKey()) : null;
 def result = p.commandResult(Command.DataType.result)
-if (oldItem == null) {
-	def validateResult = repo.validateItem(item)
-	if (validateResult == null || (isServiceAdmin && !item.getKey().isEmpty())) {
-		repo.addItem(item)
-		Command.addTextField(result, "Note", "Operation successful.")
-		if (validateResult != null) {
+
+try {
+	item.initFromCommand(p)
+
+	if (oldItem == null) {
+		def validateResult = repo.validateItem(item)
+		if (validateResult == null || (isServiceAdmin && !item.getKey().isEmpty())) {
+			repo.addItem(item)
+			Command.addTextField(result, "Note", "Operation successful.")
+			if (validateResult != null) {
+				Command.addTextField(result, "Note", "   ")
+				Command.addTextField(result, "Warning", validateResult)
+			}
+		} else {
+			Command.addTextField(result, "Error", "The item did not pass validation checking.")
 			Command.addTextField(result, "Note", "   ")
 			Command.addTextField(result, "Warning", validateResult)
 		}
 	} else {
-		Command.addTextField(result, "Error", "The item did not pass validation checking.")
-		Command.addTextField(result, "Note", "   ")
-		Command.addTextField(result, "Warning", validateResult)
+		Command.addTextField(result, "Error", "The item is already added, you can't add it twice.")
 	}
-} else {
-	Command.addTextField(result, "Error", "The item is already added, you can't add it twice.")
+} catch (IllegalArgumentException ex) {
+	Command.addTextField(result, "Error", ex.getMessage());
 }
 
 results.add(result);
