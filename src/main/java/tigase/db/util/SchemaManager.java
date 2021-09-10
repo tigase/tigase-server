@@ -580,7 +580,7 @@ public class SchemaManager {
 			}
 
 			schemas.stream()
-					.filter(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId()))
+					.filter(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId()) || (Schema.SERVER_SCHEMA_ID + "-user").equals(schema.getId()))
 					.findAny()
 					.ifPresent(schemaInfo -> results.add(
 							new ResultEntry("Adding XMPP admin accounts", schemaLoader.addXmppAdminAccount(schemaInfo),
