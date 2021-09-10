@@ -343,9 +343,7 @@ public class JabberIqRegister
 						break;
 					}
 					case result:
-
-						// It might be a registration request from transport for
-						// example...
+						// It might be a registration request from transport for example...
 						Packet pack_res = packet.copyElementOnly();
 
 						pack_res.setPacketTo(session.getConnectionId());
@@ -361,9 +359,7 @@ public class JabberIqRegister
 				} // end of switch (type)
 			} else {
 				if (session.isUserId(id)) {
-
-					// It might be a registration request from transport for
-					// example...
+					// It might be a registration request from transport for example...
 					Packet pack_res = packet.copyElementOnly();
 
 					pack_res.setPacketTo(session.getConnectionId());
@@ -528,24 +524,17 @@ public class JabberIqRegister
 		try {
 			userRepository.removeUser(BareJID.bareJIDInstance(user_name, session.getDomain().getVhost().getDomain()));
 		} catch (UserNotFoundException ex) {
-
 			// We ignore this error here. If auth_repo and user_repo are in fact
-			// the same
-			// database, then user has been already removed with the
-			// auth_repo.removeUser(...)
-			// then the second call to user_repo may throw the exception which is
-			// fine.
+			// the same database, then user has been already removed with the auth_repo.removeUser(...)
+			// then the second call to user_repo may throw the exception which is fine.
 		}
 
 		session.logout();
 
 		Packet ok_result = packet.okResult((String) null, 0);
 
-		// We have to set SYSTEM priority for the packet
-		// here,
-		// otherwise the network connection is closed
-		// before the
-		// client received a response
+		// We have to set SYSTEM priority for the packet here, otherwise the network connection is closed
+		// before the client received a response
 		ok_result.setPriority(Priority.SYSTEM);
 		results.offer(ok_result);
 
@@ -677,7 +666,7 @@ public class JabberIqRegister
 
 		if ((email != null) && !email.trim().isEmpty()) {
 			reg_params = new LinkedHashMap<String, String>();
-			reg_params.put("email", email);
+			reg_params.put("email", email.trim());
 		}
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
