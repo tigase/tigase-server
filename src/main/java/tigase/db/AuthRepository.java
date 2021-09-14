@@ -116,6 +116,7 @@ public interface AuthRepository
 		system(-1),
 		vip(2),
 		paid(3),
+		spam(-50),
 		undefined_active(Integer.MAX_VALUE),
 		undefined_inactive(Integer.MIN_VALUE);
 
