@@ -78,7 +78,11 @@ public class StartTLS
 				// This is possible and can even work but this can also be
 				// a DOS attack. Blocking it now, unless someone requests he wants
 				// to have multiple layers of TLS for his connection
-				log.log(Level.WARNING, "Multiple TLS requests, possible DOS attack, closing connection: {0}", packet);
+				//
+				// 2021-09-20, wojtek: switching level from WARNING to FINE as while it could be possible to have
+				// multiple starttls requests, we don't advertise it in features after first time so the client is
+				// definitely doing something wrong…
+				log.log(Level.FINEST, "Multiple TLS requests, possible DOS attack, closing connection: {0}", packet);
 				results.offer(packet.swapFromTo(failure, null, null));
 				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
 													  session.nextStanzaId()));
