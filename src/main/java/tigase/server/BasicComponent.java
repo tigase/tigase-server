@@ -622,7 +622,7 @@ public class BasicComponent
 					form = DataForm.createDataForm(Command.DataType.result);
 					DataForm.addHiddenField(form, "FORM_TYPE", "http://jabber.org/network/serverinfo");
 				}
-				DataForm.addFieldMultiValue(form, field, addresses);
+				DataForm.addFieldListMultiValue(form, field, addresses);
 			}
 		}
 
@@ -637,7 +637,7 @@ public class BasicComponent
 					continue;
 				}
 
-				DataForm.addFieldMultiValue(form, item.getKey(), item.getValue());
+				DataForm.addFieldListMultiValue(form, item.getKey(), item.getValue());
 			}
 			return form;
 		}
@@ -1246,12 +1246,12 @@ public class BasicComponent
 		@Override
 		public void addCommandFields(String prefix, Packet packet, boolean forDefault) {
 			Element command = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
-			DataForm.addFieldMultiValue(command, prefix + "-abuse", abuseAddresses, "Abuse reporting addresses");
-			DataForm.addFieldMultiValue(command, prefix + "-admin", adminAddresses, "Admin addresses");
-			DataForm.addFieldMultiValue(command, prefix + "-feedback", feedbackAddresses, "Feedback addresses");
-			DataForm.addFieldMultiValue(command, prefix + "-sales", salesAddresses, "Sales addresses");
-			DataForm.addFieldMultiValue(command, prefix + "-security", securityAddresses, "Security addresses");
-			DataForm.addFieldMultiValue(command, prefix + "-support", supportAddresses, "Support addresses");
+			DataForm.addFieldListMultiValue(command, prefix + "-abuse", abuseAddresses, "Abuse reporting addresses");
+			DataForm.addFieldListMultiValue(command, prefix + "-admin", adminAddresses, "Admin addresses");
+			DataForm.addFieldListMultiValue(command, prefix + "-feedback", feedbackAddresses, "Feedback addresses");
+			DataForm.addFieldListMultiValue(command, prefix + "-sales", salesAddresses, "Sales addresses");
+			DataForm.addFieldListMultiValue(command, prefix + "-security", securityAddresses, "Security addresses");
+			DataForm.addFieldListMultiValue(command, prefix + "-support", supportAddresses, "Support addresses");
 		}
 
 		@Override

@@ -107,6 +107,20 @@ public class DataForm {
 
 	public static void addFieldMultiValue(final Element el, final String f_name, final List<String> f_value,
 										  final String label) {
+		addFieldMultiValue(el, f_name, f_value, label, "text-multi");
+	}
+
+	public static void addFieldListMultiValue(final Element el, final String f_name, final List<String> f_value) {
+		addFieldMultiValue(el, f_name, f_value, null, "list-multi");
+	}
+
+	public static void addFieldListMultiValue(final Element el, final String f_name, final List<String> f_value,
+											  final String label) {
+		addFieldMultiValue(el, f_name, f_value, label, "list-multi");
+	}
+
+	public static void addFieldMultiValue(final Element el, final String f_name, final List<String> f_value,
+										  final String label, final String type) {
 		Element x = getXElement(el);
 
 		if (x == null) {
@@ -114,7 +128,7 @@ public class DataForm {
 		}
 		if (f_value != null) {
 			Element field = new Element(FIELD_EL, new String[]{"var", "type"},
-										new String[]{XMLUtils.escape(f_name), "text-multi"});
+										new String[]{XMLUtils.escape(f_name), type});
 
 			if (label != null) {
 				field.addAttribute("label", label);
