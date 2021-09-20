@@ -134,7 +134,7 @@ public class VCard4
 				log.warning("This should not happen, unless this is a vcard result packet " +
 									"sent to the server, which should not happen: " + packet);
 			} catch (NotAuthorizedException ex) {
-				log.warning("Received vCard request but user session is not authorized yet: " + packet);
+				log.info("Received vCard request but user session is not authorized yet: " + packet);
 				results.offer(
 						Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.",
 																		true));
