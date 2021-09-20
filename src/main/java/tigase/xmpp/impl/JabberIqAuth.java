@@ -23,13 +23,11 @@ import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
-import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
-import tigase.stats.StatisticsList;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
@@ -160,6 +158,13 @@ public class JabberIqAuth
 					String resource = request.getChildCDataStaticStr(IQ_QUERY_RESOURCE_PATH);
 					String password = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
 					String digest = request.getChildCDataStaticStr(IQ_QUERY_DIGEST_PATH);
+					if (user_name == null || resource == null || (password == null && digest == null)) {
+						results.offer(Authorization.NOT_ACCEPTABLE.getResponseMessage(packet,
+																					  "Authentication failed: Required Information Not Provided",
+																					  false));
+						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+															  session.nextStanzaId()));
+					}
 
 					try {
 						BareJID user_id = BareJID.bareJIDInstance(user_name,
