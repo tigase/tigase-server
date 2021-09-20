@@ -22,14 +22,17 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import tigase.eventbus.EventBusFactory;
 import tigase.form.Field;
 import tigase.form.Form;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.impl.roster.RosterFactory;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
@@ -43,11 +46,17 @@ public class JabberIqRegisterTest
 
 	private JabberIqRegister jabberIqRegister = new JabberIqRegister();
 
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
+		kernel.registerBean(JabberIqRegister.class).setActive(true).exec();
+	}
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		jabberIqRegister = new JabberIqRegister();
-		jabberIqRegister.init(new HashMap<String, Object>());
+		jabberIqRegister = getInstance(JabberIqRegister.class);
 		super.setUp();
 	}
 
@@ -65,7 +74,7 @@ public class JabberIqRegisterTest
 		final Element query = new Element("query", new String[]{"xmlns"}, new String[]{"jabber:iq:register"});
 		final Form form = new Form("submit", "Registration form", "Fill out the form");
 		form.addField(Field.fieldTextSingle("username", "wojtektest", "Username"));
-		form.addField(Field.fieldTextPrivate("password", "wojtektestpass", "Password"));
+		form.addField(Field.fieldTextPrivate("password", "pass", "Password"));
 		form.addField(Field.fieldTextSingle("email", "wojtek@example.com ", "Email (MUST BE VALID!)"));
 
 		query.addChild(form.getElement());
@@ -77,12 +86,40 @@ public class JabberIqRegisterTest
 
 		BareJID userJid = BareJID.bareJIDInstance("wojtektest@example.com");
 		JID userResource = JID.jidInstance(userJid, "resource");
-		XMPPResourceConnection session2 = getSession(connId, userResource);
+		XMPPResourceConnection session2 = getSession(connId, userResource, false);
 		Queue<Packet> results = new ArrayDeque<>();
 		jabberIqRegister.process(packet, session2, null, results, null);
 
 		Assert.assertTrue(!results.isEmpty());
 		final Packet response = results.poll();
 		Assert.assertTrue(StanzaType.result.equals(response.getType()));
+	}
+
+	@Test
+	public void testRegistrationFormInvalidJid() throws TigaseStringprepException, XMPPException {
+		final Element iq = new Element("iq", new String[]{"type", "to", "id"},
+									   new String[]{"set", "sure.im", "some-id"});
+		final Element query = new Element("query", new String[]{"xmlns"}, new String[]{"jabber:iq:register"});
+		final Form form = new Form("submit", "Registration form", "Fill out the form");
+		form.addField(Field.fieldTextSingle("username", "    wojtektest   ", "Username"));
+		form.addField(Field.fieldTextPrivate("password", "pass", "Password"));
+		form.addField(Field.fieldTextSingle("email", "wojtek@example.com ", "Email (MUST BE VALID!)"));
+
+		query.addChild(form.getElement());
+		iq.addChild(query);
+
+		final Packet packet = Packet.packetInstance(iq);
+		final JID connId = JID.jidInstance("c2s@example.com/" + UUID.randomUUID().toString());
+		packet.setPacketFrom(connId);
+
+		BareJID userJid = BareJID.bareJIDInstance("wojtektest@example.com");
+		JID userResource = JID.jidInstance(userJid, "resource");
+		XMPPResourceConnection session2 = getSession(connId, userResource, false);
+		Queue<Packet> results = new ArrayDeque<>();
+		jabberIqRegister.process(packet, session2, null, results, null);
+
+		Assert.assertTrue(!results.isEmpty());
+		final Packet response = results.poll();
+		Assert.assertTrue(StanzaType.error.equals(response.getType()));
 	}
 }

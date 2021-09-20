@@ -442,7 +442,7 @@ public class JabberIqRegister
 								 String email, Map<String, String> reg_params)
 			throws XMPPProcessorException, TigaseStringprepException, TigaseDBException {
 
-		final BareJID jid = BareJID.bareJIDInstanceNS(user_name, domain.getVhost().getDomain());
+		final BareJID jid = BareJID.bareJIDInstance(user_name, domain.getVhost().getDomain());
 
 		if (validators != null) {
 			for (AccountValidator validator : validators) {
@@ -451,8 +451,7 @@ public class JabberIqRegister
 		}
 
 		try {
-			session.getAuthRepository()
-					.addUser(BareJID.bareJIDInstance(user_name, domain.getVhost().getDomain()), password);
+			session.getAuthRepository().addUser(jid, password);
 
 			boolean confirmationRequired = false;
 			if (validators != null) {
