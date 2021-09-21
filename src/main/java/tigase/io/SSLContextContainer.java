@@ -67,6 +67,8 @@ public class SSLContextContainer
 	/* @formatter:off */
 	private static final String EPHEMERAL_DH_KEYSIZE_KEY = "jdk.tls.ephemeralDHKeySize";
 	private static final int EPHEMERAL_DH_KEYSIZE_VALUE = 4096;
+	private static final String MAX_TLS_HANDSHAKE_MESSAGE_SIZE_KEY = "jdk.tls.maxHandshakeMessageSize";
+	private static final int MAX_TLS_HANDSHAKE_MESSAGE_SIZE_VALUE = (int)Math.pow(2, 16);
 	private static final String[] TLS_WORKAROUND_CIPHERS = new String[]{"SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA",
 																		"SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA",
 																		"SSL_DHE_DSS_WITH_DES_CBC_SHA",
@@ -133,6 +135,8 @@ public class SSLContextContainer
 	private String[] enabledProtocols;
 	@ConfigField(desc = "Sets ephemeral DH Key Size", alias = "ephemeral-key-size")
 	private int ephemeralDHKeySize = EPHEMERAL_DH_KEYSIZE_VALUE;
+	@ConfigField(desc = "Sets max Handshake Message Size", alias = "max-handshake-message-size")
+	private int maxHandshakeMessageSize = MAX_TLS_HANDSHAKE_MESSAGE_SIZE_VALUE;
 	@ConfigField(desc = "TLS/SSL hardened mode", alias = "hardened-mode")
 	private HARDENED_MODE hardenedMode = HARDENED_MODE.secure;
 	@Inject(bean = "rootSslContextContainer", type = Root.class, nullAllowed = true)
@@ -337,6 +341,7 @@ public class SSLContextContainer
 	@Override
 	public void initialize() {
 		System.setProperty(EPHEMERAL_DH_KEYSIZE_KEY, String.valueOf(ephemeralDHKeySize));
+		System.setProperty(MAX_TLS_HANDSHAKE_MESSAGE_SIZE_KEY, String.valueOf(maxHandshakeMessageSize));
 		try {
 			final SSLContext sslContext = SSLContext.getDefault();
 			SSLEngine tmpEngine = sslContext.createSSLEngine();

@@ -219,6 +219,12 @@ public class S2SConnManDomainTest
 	}
 
 	@Test
+	public void testS2S_dreckshal_de() {
+		setupCID("tigase.im", "dreckshal.de");
+		testS2STigaseConnectionManager("tigase.im", null);
+	}
+
+	@Test
 	@Ignore
 	public void testS2S_expired_badxmpp_eu() {
 		setupCID("tigase.im", "expired.badxmpp.eu");
