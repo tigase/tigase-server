@@ -105,6 +105,7 @@ public class BruteForceLockerBean
 			return Optional.ofNullable(session.getConnectionId())
 					.map(JID::getResource)
 					.map(res -> res.split("_")[2])
+					.filter(ip -> !"null".equals(ip))
 					.orElse(null);
 		} catch (Exception e) {
 			return null;
@@ -119,7 +120,7 @@ public class BruteForceLockerBean
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Adding new entry, JID: {0}, ip: {1}, time: {2}", new Object[]{jid, ip, currentTime});
 		}
-		if (ip == null) {
+		if (ip == null || "null".equals(ip)) {
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "IP is null. Skip adding entry.");
 			}
