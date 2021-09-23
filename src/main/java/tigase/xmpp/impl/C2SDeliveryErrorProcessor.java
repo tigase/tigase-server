@@ -101,19 +101,11 @@ public class C2SDeliveryErrorProcessor {
 	 */
 	public static Packet makeDeliveryError(Packet packet, Long stamp) {
 		Packet result = packet.copyElementOnly();
+		result.setStableId(packet.getStableId());
 		result.setPacketFrom(packet.getPacketTo());
 		Element error = new Element(ELEM_NAME, new String[]{"xmlns"}, new String[]{XMLNS});
 		if (stamp != null) {
 			error.setAttribute("stamp", String.valueOf(stamp));
-		}
-		if (packet.getStanzaFrom() != null) {
-			String by = packet.getStanzaTo().getBareJID().toString();
-			Element stanzaIdEl = packet.getElement()
-					.findChild(el -> el.getName() == "stanza-id" && el.getXMLNS() == "urn:xmpp:sid:0" &&
-							by.equals(el.getAttributeStaticStr("by")));
-			if (stanzaIdEl != null) {
-				result.getElement().removeChild(stanzaIdEl);
-			}
 		}
 		result.getElement().addChild(error);
 		return result;
