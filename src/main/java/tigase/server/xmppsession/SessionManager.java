@@ -463,12 +463,12 @@ public class SessionManager
 
 	@Override
 	public int processingInThreads() {
-		return Runtime.getRuntime().availableProcessors() * 16;
+		return Runtime.getRuntime().availableProcessors() * 8;
 	}
 
 	@Override
 	public int processingOutThreads() {
-		return Runtime.getRuntime().availableProcessors() * 16;
+		return Runtime.getRuntime().availableProcessors() * 8;
 	}
 
 	@Override
