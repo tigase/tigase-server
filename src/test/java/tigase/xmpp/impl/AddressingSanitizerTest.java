@@ -39,24 +39,24 @@ import static org.junit.Assert.assertFalse;
 /**
  * @author Wojtek
  */
-public class BindResourceTest
+public class AddressingSanitizerTest
 		extends ProcessorTestCase {
 
-	private static final Logger log = TestLogger.getLogger(BindResourceTest.class);
+	private static final Logger log = TestLogger.getLogger(AddressingSanitizerTest.class);
 
-	private BindResource bindResource;
+	private AddressingSanitizer addressingSanitizer;
 
-	public BindResourceTest() {
+	public AddressingSanitizerTest() {
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		bindResource = new BindResource();
+		addressingSanitizer = new AddressingSanitizer();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		bindResource = null;
+		addressingSanitizer = null;
 	}
 
 	@Test
@@ -75,24 +75,40 @@ public class BindResourceTest
 
 		// message / non-presence
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
+		assertEquals(senderJid.copyWithoutResource(), p.getStanzaTo());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().setAttribute("from", senderJid.getBareJID().toString());
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
+		assertEquals(senderJid.copyWithoutResource(), p.getStanzaTo());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().removeAttribute("from");
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
+		assertEquals(senderJid.copyWithoutResource(), p.getStanzaTo());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
+
+		messageEl.setAttribute("from", senderJid.getBareJID().toString());
+		messageEl.setAttribute("to", recipientJid.toString());
+		p = Packet.packetInstance(messageEl);
+		p.setPacketFrom(senderSession.getConnectionId());
+		log.log(Level.FINE, p.getElement() + "");
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
+		assertEquals(0, results.size());
+		assertEquals(senderJid, p.getStanzaFrom());
+		assertEquals(recipientJid, p.getStanzaTo());
+		log.log(Level.FINE, p.getStanzaFrom() + "\n");
+
+		messageEl.removeAttribute("to");
 
 		// presence -- non-sub
 		log.log(Level.FINE, "=====");
@@ -102,21 +118,21 @@ public class BindResourceTest
 		p.setPacketFrom(senderSession.getConnectionId());
 
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().setAttribute("from", senderJid.getBareJID().toString());
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().removeAttribute("from");
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(senderJid, p.getStanzaFrom());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
@@ -130,21 +146,21 @@ public class BindResourceTest
 		p.setPacketFrom(senderSession.getConnectionId());
 
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(JID.jidInstance(senderJid.getBareJID()), p.getStanzaFrom());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().setAttribute("from", senderJid.getBareJID().toString());
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(JID.jidInstance(senderJid.getBareJID()), p.getStanzaFrom());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
 
 		p.getElement().removeAttribute("from");
 		log.log(Level.FINE, p.getElement() + "");
-		assertFalse(bindResource.preProcess(p, senderSession, null, results, settings));
+		assertFalse(addressingSanitizer.preProcess(p, senderSession, null, results, settings));
 		assertEquals(0, results.size());
 		assertEquals(JID.jidInstance(senderJid.getBareJID()), p.getStanzaFrom());
 		log.log(Level.FINE, p.getStanzaFrom() + "\n");
