@@ -28,6 +28,7 @@ import tigase.xmpp.*;
 import tigase.xmpp.jid.JID;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +39,7 @@ public class AddressingSanitizer
 		implements XMPPPreprocessorIfc {
 
 	private static final Logger log = Logger.getLogger(AddressingSanitizer.class.getName());
-	
+
 	private static final String[] COMPRESS_PATH = {"compress"};
 
 	@Inject
@@ -67,7 +68,7 @@ public class AddressingSanitizer
 				C2SDeliveryErrorProcessor.isDeliveryError(packet)) {
 			return false;
 		}
-		
+
 		try {
 			if (session.getConnectionId().equals(packet.getPacketFrom())) {
 				// After authentication we require resource binding packet and
@@ -82,40 +83,12 @@ public class AddressingSanitizer
 					JID from_jid = session.getJID();
 
 					if (from_jid != null) {
-
-						// http://xmpp.org/rfcs/rfc6120.html#stanzas-attributes-from
-						if (packet.getElemName() == tigase.server.Presence.ELEM_NAME &&
-								StanzaType.getSubsTypes().contains(packet.getType()) &&
-								(packet.getStanzaFrom() == null ||
-										!from_jid.getBareJID().equals(packet.getStanzaFrom().getBareJID()) ||
-										packet.getStanzaFrom().getResource() != null)) {
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
-							}
-							sanitizePacket(packet, from_jid.copyWithoutResource());
-						} else if ((packet.getStanzaFrom() == null) ||
-								((packet.getElemName() == tigase.server.Presence.ELEM_NAME &&
-										!StanzaType.getSubsTypes().contains(packet.getType()) ||
-										packet.getElemName() != tigase.server.Presence.ELEM_NAME) &&
-										!from_jid.equals(packet.getStanzaFrom()))) {
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST, "Setting correct from attribute: {0}", from_jid);
-							}
-							sanitizePacket(packet, from_jid);
-						} else {
-							if (log.isLoggable(Level.FINEST)) {
-								log.log(Level.FINEST,
-										"Skipping setting correct from attribute: {0}, is already correct.",
-										packet.getStanzaFrom());
-							}
-						 	sanitizePacket(packet, packet.getStanzaFrom());
-						}
+						sanitizePacket(packet, from_jid);
 					} else {
 						log.log(Level.WARNING, "Session is authenticated but session.getJid() is empty: {0}",
 								packet.toStringSecure());
 					}
 				} else {
-
 					// We do not accept anything without resource binding....
 					results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
 																				  "You must bind the resource first: " +
@@ -141,16 +114,40 @@ public class AddressingSanitizer
 
 			return false;
 		}
-		
+
 		return false;
 	}
 
 	protected void sanitizePacket(Packet packet, JID stanzaFrom) {
-		if (Message.ELEM_NAME == packet.getElemName() && packet.getStanzaTo() == null && stanzaFrom != null) {
-			packet.initVars(stanzaFrom, stanzaFrom.copyWithoutResource());
-		} else if (!stanzaFrom.equals(packet.getStanzaFrom())) {
+		Objects.requireNonNull(packet);
+		Objects.requireNonNull(stanzaFrom);
+		if (Message.ELEM_NAME == packet.getElemName() && packet.getStanzaTo() == null) {
+			packet.initVars(packet.getStanzaFrom(), stanzaFrom.copyWithoutResource());
+		}
+
+		// http://xmpp.org/rfcs/rfc6120.html#stanzas-attributes-from
+		if (packet.getElemName() == tigase.server.Presence.ELEM_NAME &&
+				StanzaType.getSubsTypes().contains(packet.getType()) && (packet.getStanzaFrom() == null ||
+				!stanzaFrom.getBareJID().equals(packet.getStanzaFrom().getBareJID()) ||
+				packet.getStanzaFrom().getResource() != null)) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Setting correct from attribute: {0}", stanzaFrom);
+			}
+			packet.initVars(stanzaFrom.copyWithoutResource(), packet.getStanzaTo());
+		} else if ((packet.getStanzaFrom() == null) || ((packet.getElemName() == tigase.server.Presence.ELEM_NAME &&
+				!StanzaType.getSubsTypes().contains(packet.getType()) ||
+				packet.getElemName() != tigase.server.Presence.ELEM_NAME) &&
+				!stanzaFrom.equals(packet.getStanzaFrom()))) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Setting correct from attribute: {0}", stanzaFrom);
+			}
 			packet.initVars(stanzaFrom, packet.getStanzaTo());
+		} else {
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Skipping setting correct from attribute: {0}, is already correct.",
+						packet.getStanzaFrom());
+			}
+			packet.initVars(packet.getStanzaFrom(), packet.getStanzaTo());
 		}
 	}
-	
 }
