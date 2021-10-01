@@ -75,6 +75,9 @@ public class AbstractPushNotifications
 
 	@Inject(bean = "sess-man")
 	private PacketWriterWithTimeout writer;
+
+	@ConfigField(desc = "Notification to display for encrypted messages", alias = "encrypted-message-body")
+	private String encryptedMessageBody = "New secure message. Open to see the message.";
 	
 	protected boolean shouldDisablePush(Authorization error) {
 		if (error == null) {
@@ -252,8 +255,10 @@ public class AbstractPushNotifications
 				DataForm.addFieldValue(notification, "last-message-sender", packet.getStanzaFrom().toString());
 			}
 			if (withBody) {
-				DataForm.addFieldValue(notification, "last-message-body",
-									   packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH));
+				boolean isEncrypted = packet.getElemChild("encrypted", "eu.siacs.conversations.axolotl") != null ||
+						packet.getElemChild("encrypted", "urn:xmpp:omemo:1") != null;
+				DataForm.addFieldValue(notification, "last-message-body", isEncrypted ? encryptedMessageBody :
+										   packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH));
 			}
 			if (withSender && packet.getElemName() == Message.ELEM_NAME && packet.getType() == StanzaType.groupchat) {
 				Element mix = packet.getElement().getChild("mix", "urn:xmpp:mix:core:1");
