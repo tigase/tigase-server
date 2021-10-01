@@ -18,6 +18,7 @@
 package tigase.xmpp.impl.push;
 
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.util.Base64;
@@ -57,6 +58,9 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 			new Element("feature", new String[]{"var"}, new String[]{AES128GCM_FEATURE})};
 
 	private final SecureRandom random = new SecureRandom();
+	
+	@ConfigField(desc = "Notification to display for encrypted messages", alias = "encrypted-message-body")
+	private String encryptedMessageBody = "New secure message. Open to see the message.";
 
 	@Override
 	public Element[] getDiscoFeatures() {
@@ -124,7 +128,9 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 
 		String content = valueToString(payload);
 
-		String body = packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH);
+		boolean isEncrypted = packet.getElemChild("encrypted", "eu.siacs.conversations.axolotl") != null ||
+				packet.getElemChild("encrypted", "urn:xmpp:omemo:1") != null;
+		String body = isEncrypted ? encryptedMessageBody : packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH);
 		if (body != null) {
 			int currentContentLength = content.getBytes(UTF8).length + 64;
 			while (maxSize < (currentContentLength + body.getBytes(UTF8).length)) {
