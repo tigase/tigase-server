@@ -230,6 +230,54 @@ public class PushNotificationsTest
 	}
 
 	@Test
+	public void test_notificationGenerationForOMEMO() throws Exception {
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  new Element("settings", new String[]{"jid", "node"},
+															  new String[]{pushServiceJid.toString(),
+																		   "push-node"}).toString());
+
+		String msgBody = "Message body " + UUID.randomUUID().toString();
+		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		msg.addChild(new Element("encrypted", new String[]{"xmlns"}, new String[]{"eu.siacs.conversations.axolotl"}));
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Packet expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid,
+																			   "push-node",
+																			   PushNotificationHelper.createPlainNotification(
+																					   1, senderJid, msgBody));
+
+		assertElementEquals(expNotification.getElement(), results.poll().packet.getElement());
+
+		msgBody = "Message body " + UUID.randomUUID().toString();
+		msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+						  new String[]{"jabber:client"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		results.clear();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid, "push-node",
+																		PushNotificationHelper.createPlainNotification(2,
+																													   senderJid,
+																													   "New secure message. Open to see the message."));
+
+		assertElementEquals(expNotification.getElement(), results.poll().packet.getElement());
+	}
+	
+	@Test
 	public void test_notificationGenerationForMUCwhenOnlineOLD() throws Exception {
 		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
 												  pushServiceJid + "/push-node",
@@ -466,6 +514,49 @@ public class PushNotificationsTest
 		byte[] decoded = cipher.doFinal(enc);
 
 		assertTrue(new String(decoded).contains(msgBody));
+	}
+
+	@Test
+	public void testEncryptedNotificationForOMEMO() throws TigaseDBException, NoSuchPaddingException, NoSuchAlgorithmException,
+												   InvalidAlgorithmParameterException, InvalidKeyException,
+												   BadPaddingException, IllegalBlockSizeException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		SecureRandom random = new SecureRandom();
+		byte[] key = new byte[128/8];
+		random.nextBytes(key);
+		settings.withElement("encrypt", "tigase:push:encrypt:0", el -> {
+			el.setCData(Base64.encode(key));
+			el.setAttribute("alg", "aes-128-gcm");
+		});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		String msgBody = "Message body " + UUID.randomUUID().toString();
+		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		msg.addChild(new Element("encrypted", new String[]{"xmlns"}, new String[]{"eu.siacs.conversations.axolotl"}));
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Element notificationElem = results.remove().packet.getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		Element encrypted = notificationElem.getChild("encrypted", "tigase:push:encrypt:0");
+		byte[] enc = Base64.decode(encrypted.getCData());
+		byte[] iv = Base64.decode(encrypted.getAttributeStaticStr("iv"));
+
+		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+		cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, iv));
+		byte[] decoded = cipher.doFinal(enc);
+
+		assertTrue(new String(decoded).contains("New secure message. Open to see the message."));
 	}
 
 	@Test

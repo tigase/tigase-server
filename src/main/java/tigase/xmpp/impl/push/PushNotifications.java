@@ -174,7 +174,7 @@ public class PushNotifications
 	public void unregister(Kernel kernel) {
 
 	}
-
+	
 	@Override
 	protected Element createSettingsElement(JID jid, String node, Element enableElem, Element optionsForm) {
 		Element settingsEl = super.createSettingsElement(jid, node, enableElem, optionsForm);
