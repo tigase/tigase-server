@@ -18,8 +18,8 @@
 package tigase.stats;
 
 import java.time.LocalDate;
+import java.util.AbstractQueue;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -27,12 +27,12 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 /**
  * A queue implementation which stores highest added value on a given day
  * and has limited size.
- *
- * */
+ */
 public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
-		extends ConcurrentLinkedDeque<E> {
+		extends AbstractQueue<E> {
 
 	private final int maxQueueLength;
+	private ConcurrentLinkedDeque<E> deque = new ConcurrentLinkedDeque<>();
 	private LocalDate lastDailyStatsReset = LocalDate.now();
 	private String toString = "[]";
 
@@ -40,30 +40,15 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		this.maxQueueLength = maxQueueLength;
 	}
 
-	@Override
-	public boolean add(E added) {
-		if (isNextItem() || this.peekLast() == null) {
-			super.add(added);
-		} else if (this.peekLast().compareTo(added) < 0) {
-			this.removeLast();
-			super.add(added);
-		}
-		while (size() > maxQueueLength) {
-			super.remove();
-		}
-		toString = super.toString();
-		return true;
-	}
-
 	public Optional<E> getMaxValue() {
 		return getMaxValueInRange(maxQueueLength);
 	}
 
 	public Optional<E> getMaxValueInRange(int range) {
-		range = Math.min(range, this.maxQueueLength);
+		range = Math.min(range, maxQueueLength);
 
 		E result = null;
-		final Iterator<E> iterator = this.descendingIterator();
+		final Iterator<E> iterator = deque.descendingIterator();
 		while (iterator.hasNext() && range > 0) {
 			range--;
 
@@ -83,7 +68,7 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 	 * @return indicating whether <b>any</b> item in the collection surpass the limit
 	 */
 	public boolean isLimitSurpassed(E limit) {
-		return isLimitSurpassed(this.maxQueueLength, limit);
+		return isLimitSurpassed(maxQueueLength, limit);
 	}
 
 	/**
@@ -106,7 +91,7 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 	 * @return indicating whether all items in the collection surpass the limit
 	 */
 	public boolean isLimitSurpassedAllItems(E limit) {
-		return isLimitSurpassedAllItems(this.maxQueueLength, limit);
+		return isLimitSurpassedAllItems(maxQueueLength, limit);
 	}
 
 	/**
@@ -119,9 +104,9 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 	 */
 	public boolean isLimitSurpassedAllItems(int range, E limit) {
 		boolean result = true;
-		range = Math.min(range, this.maxQueueLength);
+		range = Math.min(range, maxQueueLength);
 
-		final Iterator<E> iter = this.descendingIterator();
+		final Iterator<E> iter = deque.descendingIterator();
 		while (iter.hasNext() && range > 0) {
 			range--;
 
@@ -133,16 +118,56 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 		return result;
 	}
 
+	@Override
+	public Iterator<E> iterator() {
+		return deque.iterator();
+	}
+
+	@Override
+	public boolean offer(E added) {
+		if (isNextItem() || deque.peekLast() == null) {
+			deque.offer(added);
+		} else if (deque.peekLast().compareTo(added) < 0) {
+			deque.pollLast();
+			deque.offer(added);
+		}
+		while (deque.size() > maxQueueLength) {
+			deque.remove();
+		}
+		toString = deque.toString();
+		return true;
+	}
+
+	@Override
+	public E peek() {
+		return deque.peek();
+	}
+
+	@Override
+	public E poll() {
+		return deque.poll();
+	}
+
+	@Override
+	public int size() {
+		return deque.size();
+	}
+
 	public ArrayDeque<E> subQueue(int range) {
 		final ArrayDeque<E> result = new ArrayDeque<E>(range);
-		range = Math.min(range, this.maxQueueLength);
+		range = Math.min(range, maxQueueLength);
 
-		final Iterator<E> iter = this.descendingIterator();
+		final Iterator<E> iter = deque.descendingIterator();
 		while (iter.hasNext() && range > 0) {
 			range--;
 			result.add(iter.next());
 		}
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return toString;
 	}
 
 	protected boolean isNextItem() {
@@ -155,10 +180,4 @@ public class MaxDailyCounterQueue<E extends Number & Comparable<E>>
 			return false;
 		}
 	}
-
-	@Override
-	public String toString() {
-		return toString;
-	}
-
 }
