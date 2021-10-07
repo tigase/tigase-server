@@ -65,6 +65,7 @@ public class ConfigureTaskCommand
 			} else if (data == null) {
 				final ConfigurableTask taskInstance = kernel.getInstance(request.getIq().getStanzaTo().getResource());
 				Form form = taskInstance.getCurrentConfiguration();
+				form.setType("form");
 				response.getElements().add(form.getElement());
 				response.startSession();
 			} else {
