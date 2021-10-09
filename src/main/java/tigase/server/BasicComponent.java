@@ -1246,12 +1246,15 @@ public class BasicComponent
 		@Override
 		public void addCommandFields(String prefix, Packet packet, boolean forDefault) {
 			Element command = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
-			DataForm.addFieldListMultiValue(command, prefix + "-abuse", abuseAddresses, "Abuse reporting addresses");
-			DataForm.addFieldListMultiValue(command, prefix + "-admin", adminAddresses, "Admin addresses");
-			DataForm.addFieldListMultiValue(command, prefix + "-feedback", feedbackAddresses, "Feedback addresses");
-			DataForm.addFieldListMultiValue(command, prefix + "-sales", salesAddresses, "Sales addresses");
-			DataForm.addFieldListMultiValue(command, prefix + "-security", securityAddresses, "Security addresses");
-			DataForm.addFieldListMultiValue(command, prefix + "-support", supportAddresses, "Support addresses");
+			// Usage of `addFieldMultiValue()` was intentional and should result in `text-multi` fields.
+			// Those fields are for editing list of JIDs and usage of `list-multi` will not work as it does not allow
+			// editing those JIDs - allows only selection.
+			DataForm.addFieldMultiValue(command, prefix + "-abuse", abuseAddresses, "Abuse reporting addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-admin", adminAddresses, "Admin addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-feedback", feedbackAddresses, "Feedback addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-sales", salesAddresses, "Sales addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-security", securityAddresses, "Security addresses");
+			DataForm.addFieldMultiValue(command, prefix + "-support", supportAddresses, "Support addresses");
 		}
 
 		@Override
