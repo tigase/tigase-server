@@ -1247,8 +1247,8 @@ public class BasicComponent
 		public void addCommandFields(String prefix, Packet packet, boolean forDefault) {
 			Element command = packet.getElemChild(Command.COMMAND_EL, Command.XMLNS);
 			// Usage of `addFieldMultiValue()` was intentional and should result in `text-multi` fields.
-			// Those fields are for editing list of JIDs and usage of `list-multi` will not work as it does not allow
-			// editing those JIDs - allows only selection.
+			// Those fields are for editing list of JIDs in VHost configuration and usage
+			// of `list-multi` will not work as it does not allow editing those JIDs - allows only selection.
 			DataForm.addFieldMultiValue(command, prefix + "-abuse", abuseAddresses, "Abuse reporting addresses");
 			DataForm.addFieldMultiValue(command, prefix + "-admin", adminAddresses, "Admin addresses");
 			DataForm.addFieldMultiValue(command, prefix + "-feedback", feedbackAddresses, "Feedback addresses");
