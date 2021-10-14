@@ -22,6 +22,7 @@ import tigase.db.*;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.sys.TigaseRuntime;
+import tigase.xmpp.jid.BareJID;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,6 +45,7 @@ public class ClConSQLRepository
 		           RepositoryVersionAware {
 
 	private static final Logger log = Logger.getLogger(ClConSQLRepository.class.getName());
+	private static final BareJID repoUser =  BareJID.bareJIDInstanceNS(ClConRepoDefaults.getConfigKey());
 
 	//J-
 	/* @formatter:off */
@@ -131,7 +133,7 @@ public class ClConSQLRepository
 			log.log(Level.FINEST, "Removing item form database: {0}", key);
 		}
 		try {
-			PreparedStatement removeItem = data_repo.getPreparedStatement(null, DELETE_ITEM_QUERY);
+			PreparedStatement removeItem = data_repo.getPreparedStatement(repoUser, DELETE_ITEM_QUERY);
 			synchronized (removeItem) {
 				removeItem.setString(1, key);
 				removeItem.executeUpdate();
@@ -149,8 +151,8 @@ public class ClConSQLRepository
 			log.log(Level.FINEST, "Storing item to repository: {0}", item);
 		}
 		try {
-			PreparedStatement updateItemSt = data_repo.getPreparedStatement(null, UPDATE_ITEM_QUERY);
-			PreparedStatement insertItemSt = data_repo.getPreparedStatement(null, INSERT_ITEM_QUERY);
+			PreparedStatement updateItemSt = data_repo.getPreparedStatement(repoUser, UPDATE_ITEM_QUERY);
+			PreparedStatement insertItemSt = data_repo.getPreparedStatement(repoUser, INSERT_ITEM_QUERY);
 
 			// relatively most DB compliant UPSERT
 			Date date = new Date();
@@ -203,7 +205,7 @@ public class ClConSQLRepository
 
 		try {
 			ResultSet rs = null;
-			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(null, GET_ALL_ITEMS_QUERY);
+			PreparedStatement getAllItemsSt = data_repo.getPreparedStatement(repoUser, GET_ALL_ITEMS_QUERY);
 
 			synchronized (getAllItemsSt) {
 				try {
@@ -226,6 +228,10 @@ public class ClConSQLRepository
 			}
 		} catch (SQLException e) {
 			log.log(Level.WARNING, "Problem getting elements from DB: ", e);
+
+			//if there is a SQLException we should return to avoid triggering `removeObsoloteItems()` method as
+			// possibly not items have been properly reloaded and some may have stale update-date information.
+			return;
 		}
 		// make sure we remove items which are gone from the database after timeout (those have last update not updated)
 		// and are not removed from in-memory cache by above query
