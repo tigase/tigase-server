@@ -18,7 +18,10 @@
 package tigase.auth.credentials;
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.db.AuthRepository;
 import tigase.xmpp.jid.BareJID;
+
+import static tigase.db.AuthRepository.*;
 
 /**
  * Interface implemented by classes handling user login credentials. In implementations of this interface multiple
@@ -39,18 +42,6 @@ public interface Credentials {
 	boolean canLogin();
 
 	/**
-	 * Returns bare jid of an account
-	 *
-	 * @return bare jid of an account
-	 */
-	BareJID getUser();
-
-	/**
-	 * Checks if account is disabled
-	 */
-	boolean isAccountDisabled();
-
-	/**
 	 * Find a credential for specified mechanism
 	 *
 	 * @return instance of an entry if available or null
@@ -65,17 +56,27 @@ public interface Credentials {
 	Entry getFirst();
 
 	/**
+	 * Returns bare jid of an account
+	 *
+	 * @return bare jid of an account
+	 */
+	BareJID getUser();
+
+	/**
+	 * Checks if account is disabled
+	 */
+	boolean isAccountDisabled();
+
+	/**
+	 * @return account status of the account
+	 */
+	AccountStatus getAccountStatus();
+
+	/**
 	 * Interface implemented by credentials decoder converting from value stored in database to the form represented by
 	 * implementation of Entry interface.
 	 */
 	interface Decoder {
-
-		/**
-		 * Name of mechanism for which decoder works
-		 *
-		 * @return name of mechanism for which decoder works
-		 */
-		String getName();
 
 		/**
 		 * Decode password stored in database to more suitable form.
@@ -84,6 +85,13 @@ public interface Credentials {
 		 */
 		Entry decode(BareJID user, String value);
 
+		/**
+		 * Name of mechanism for which decoder works
+		 *
+		 * @return name of mechanism for which decoder works
+		 */
+		String getName();
+
 	}
 
 	/**
@@ -91,13 +99,6 @@ public interface Credentials {
 	 * database.
 	 */
 	interface Encoder {
-
-		/**
-		 * Name of mechanism for which encoder works
-		 *
-		 * @return name of mechanism for which encoder works
-		 */
-		String getName();
 
 		/**
 		 * Encrypt plaintext password for user
@@ -109,6 +110,13 @@ public interface Credentials {
 		 */
 		String encode(BareJID user, String password);
 
+		/**
+		 * Name of mechanism for which encoder works
+		 *
+		 * @return name of mechanism for which encoder works
+		 */
+		String getName();
+
 	}
 
 	/**
@@ -118,13 +126,11 @@ public interface Credentials {
 
 		/**
 		 * Name of the mechanism for which it will work
-		 *
 		 */
 		String getMechanism();
 
 		/**
 		 * Check if plaintext password will match stored credential
-		 *
 		 */
 		boolean verifyPlainPassword(String plain);
 
@@ -137,13 +143,11 @@ public interface Credentials {
 
 		/**
 		 * Name of mechanism
-		 *
 		 */
 		String getMechanism();
 
 		/**
 		 * Encoded value
-		 *
 		 */
 		String getValue();
 

@@ -17,6 +17,8 @@
  */
 package tigase.auth.mechanisms;
 
+import tigase.auth.XmppSaslException;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -70,6 +72,8 @@ public abstract class AbstractSasl
 	protected void handleCallbacks(Callback... callbacks) throws SaslException {
 		try {
 			callbackHandler.handle(callbacks);
+		} catch (XmppSaslException e) {
+			throw e;
 		} catch (IOException e) {
 			throw new SaslException(e.getMessage(), e);
 		} catch (UnsupportedCallbackException e) {

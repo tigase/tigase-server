@@ -328,6 +328,11 @@ public interface AuthRepository
 			return accountStatus == AccountStatus.disabled;
 		}
 
+		@Override
+		public AccountStatus getAccountStatus() {
+			return accountStatus;
+		}
+
 		public static class RawEntry
 				implements Credentials.RawEntry {
 
@@ -398,6 +403,11 @@ public interface AuthRepository
 		@Override
 		public boolean isAccountDisabled() {
 			return accountStatus == AccountStatus.disabled;
+		}
+
+		@Override
+		public AccountStatus getAccountStatus() {
+			return accountStatus;
 		}
 
 		@Override

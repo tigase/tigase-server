@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import tigase.auth.XmppSaslException;
 import tigase.util.Algorithms;
 import tigase.util.Base64;
 import tigase.xmpp.jid.BareJID;
@@ -305,6 +306,16 @@ public class AuthRepositoryImpl
 							user_name = nc.getDefaultName();
 						}      // end of if (name == null)
 						jid = BareJID.bareJIDInstanceNS(user_name, (String) options.get(REALM_KEY));
+
+						try {
+							final AccountStatus accountStatus = getAccountStatus(jid);
+							if (accountStatus.isInactive()) {
+								throw XmppSaslException.getExceptionFor(accountStatus);
+							}
+						} catch (TigaseDBException e) {
+							throw new IOException("Account Status retrieving problem.", e);
+						}
+
 						options.put(USER_ID_KEY, jid);
 						if (log.isLoggable(Level.FINEST)) {
 							log.finest("NameCallback: " + user_name);

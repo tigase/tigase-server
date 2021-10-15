@@ -84,7 +84,8 @@ public class PlainSPCallbackHandler
 		}
 
 		try {
-			if (repo.getAccountStatus(jid).isInactive()) {
+			final AuthRepository.AccountStatus accountStatus = repo.getAccountStatus(jid);
+			if (accountStatus.isInactive()) {
 				authCallback.setAuthorized(false);
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "User {0} is disabled", jid);

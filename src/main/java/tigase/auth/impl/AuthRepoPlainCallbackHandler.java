@@ -20,6 +20,7 @@ package tigase.auth.impl;
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.AuthRepositoryAware;
 import tigase.auth.DomainAware;
+import tigase.auth.XmppSaslException;
 import tigase.auth.callbacks.VerifyPasswordCallback;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.db.AuthRepository;
@@ -32,11 +33,14 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
+import javax.security.sasl.SaslException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.db.AuthRepository.*;
 
 /**
  * This is implementation of {@linkplain CallbackHandler} to use with old {@linkplain AuthRepository AuthRepositories}.
@@ -75,7 +79,7 @@ public class AuthRepoPlainCallbackHandler
 	}
 
 	@SuppressWarnings("unused")
-	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
+	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) throws SaslException {
 		String authenId = authCallback.getAuthenticationID();
 
 		if (log.isLoggable(Level.FINEST)) {
@@ -83,12 +87,12 @@ public class AuthRepoPlainCallbackHandler
 		}
 
 		try {
-			if (repo.getAccountStatus(jid).isInactive()) {
-				authCallback.setAuthorized(false);
+			final AccountStatus accountStatus = repo.getAccountStatus(jid);
+			if (accountStatus.isInactive()) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "User {0} is disabled", jid);
+					log.log(Level.FINEST, "User {0} is disabled, status: {1}", new Object[] {jid, accountStatus});
 				}
-				return;
+				throw XmppSaslException.getExceptionFor(accountStatus);
 			}
 		} catch (TigaseDBException e) {
 			if (log.isLoggable(Level.FINEST)) {
@@ -147,11 +151,11 @@ public class AuthRepoPlainCallbackHandler
 		try {
 			Map<String, Object> map = new HashMap<String, Object>();
 
-			map.put(AuthRepository.PROTOCOL_KEY, AuthRepository.PROTOCOL_VAL_NONSASL);
-			map.put(AuthRepository.USER_ID_KEY, jid);
-			map.put(AuthRepository.PASSWORD_KEY, passwd);
-			map.put(AuthRepository.REALM_KEY, jid.getDomain());
-			map.put(AuthRepository.SERVER_NAME_KEY, jid.getDomain());
+			map.put(PROTOCOL_KEY, PROTOCOL_VAL_NONSASL);
+			map.put(USER_ID_KEY, jid);
+			map.put(PASSWORD_KEY, passwd);
+			map.put(REALM_KEY, jid.getDomain());
+			map.put(SERVER_NAME_KEY, jid.getDomain());
 			pc.setVerified(repo.otherAuth(map));
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "VerifyPasswordCallback: {0}", "******");
