@@ -44,6 +44,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static tigase.xmpp.Authorization.NOT_ALLOWED;
+import static tigase.xmpp.impl.CaptchaProvider.CaptchaItem;
+
 /**
  * JEP-0077: In-Band Registration
  * <br>
@@ -67,6 +70,9 @@ public class JabberIqRegister
 	public static final String OAUTH_CONSUMERKEY_PROP_KEY = "oauth-consumer-key";
 	public static final String OAUTH_CONSUMERSECRET_PROP_KEY = "oauth-consumer-secret";
 	public static final String SIGNED_FORM_REQUIRED_PROP_KEY = "signed-form-required";
+	private final static String INSTRUCTION = "Please provide the following information to sign up for an account";
+	private final static String INSTRUCTION_EMAIL_REQUIRED = INSTRUCTION +
+			"\n\nPlease also provide your e-mail address (must be valid!) to which we will send confirmation link.";
 	private static final int REMOTE_ADDRESS_IDX = 2;
 	private static final String[][] ELEMENTS = {Iq.IQ_QUERY_PATH};
 	private static final String[] XMLNSS = {"jabber:iq:register"};
@@ -266,74 +272,55 @@ public class JabberIqRegister
 		}
 		try {
 
-			// I think it does not make sense to check the 'to', just the
-			// connection
-			// ID
-			// if ((id.equals(session.getDomain()) ||
-			// id.equals(session.getUserId().toString()))
-			// && packet.getFrom().equals(session.getConnectionId())) {
-			// Wrong thinking. The user may send an request from his own account
-			// to register with a transport or any other service, then the
-			// connection
-			// ID matches the session id but this is still not a request to the
-			// local
-			// server. The TO address must be checked too.....
-			// if (packet.getPacketFrom().equals(session.getConnectionId())) {
+			// The user may send an request from his own account to register with a transport or any other service,
+			// then the connection ID matches the session id but this is still not a request to the local server.
+			// The TO address must be checked too.....
 			if ((packet.getPacketFrom() != null) && packet.getPacketFrom().equals(session.getConnectionId()) &&
 					(!session.isAuthorized() ||
 							(session.isUserId(id) || session.isLocalDomain(id.toString(), false)))) {
 
-				// We want to allow password change but not user registration if
-				// registration is disabled. The only way to tell apart
-				// registration
-				// from password change is to check whether the user is
-				// authenticated.
-				// For authenticated user the request means password change,
-				// otherwise
-				// registration attempt.
-				// Account deregistration is also called under authenticated
-				// session, so
-				// it should be blocked here if registration for domain is
-				// disabled.
-				// Assuming if user cannot register account he cannot also
-				// deregister account
+				// We want to allow password change but not user registration if registration is disabled. The only
+				// way to tell apart registration from password change is to check whether the user is authenticated.
+				// For authenticated user the request means password change or account removal, otherwise registration
+				// attempt. Account removal is also called under authenticated session, so it should be blocked if
+				// registration for domain is disabled. If user cannot register account he cannot also remove account.
 				Element request = packet.getElement();
-				boolean remove = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH) != null;
+				boolean isRemoveAccount = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH) != null;
 
-				if (!session.isAuthorized() || remove) {
+				if (!session.isAuthorized() || isRemoveAccount) {
 					if (!isRegistrationAllowedForConnection(packet.getFrom())) {
-						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-																				   "Registration is not allowed for this connection.",
-																				   true));
+						results.offer(NOT_ALLOWED.getResponseMessage(packet,
+																	 "Registration is not allowed for this connection.",
+																	 true));
 						++statsInvalidRegistrations;
 						return;
 					}
 
 					if (!session.getDomain().isRegisterEnabled()) {
-						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-																				   "Registration is not allowed for this domain.",
-																				   true));
+						results.offer(NOT_ALLOWED.getResponseMessage(packet,
+																	 "Registration is not allowed for this domain.",
+																	 true));
 						++statsInvalidRegistrations;
 						return;
 					}
 
 					if (!isTokenInBucket(packet.getFrom())) {
-						results.offer(Authorization.NOT_ALLOWED.getResponseMessage(packet,
-																				   "Server is busy. Too many registrations. Try later.",
-																				   true));
+						results.offer(NOT_ALLOWED.getResponseMessage(packet,
+																	 "Server is busy. Too many registrations. Try later.",
+																	 true));
 						++statsInvalidRegistrations;
 						return;
 					}
 				}
 
-				Authorization result = Authorization.NOT_AUTHORIZED;
 				StanzaType type = packet.getType();
-
+				boolean isChangePassword = session.isAuthorized() && !isRemoveAccount;
 				switch (type) {
 					case set:
-						Element removeElem = request.findChildStaticStr(IQ_QUERY_REMOVE_PATH);
-						if (removeElem != null) {
+						if (isRemoveAccount) {
 							doRemoveAccount(packet, request, session, results);
+						} else if (isChangePassword) {
+							doChangePassword(packet, request, session, results);
 						} else {
 							doRegisterNewAccount(packet, request, session, results);
 						}
@@ -345,16 +332,13 @@ public class JabberIqRegister
 					case result:
 						// It might be a registration request from transport for example...
 						Packet pack_res = packet.copyElementOnly();
-
 						pack_res.setPacketTo(session.getConnectionId());
 						results.offer(pack_res);
-
 						break;
 
 					default:
 						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, "Message type is incorrect",
 																				   true));
-
 						break;
 				} // end of switch (type)
 			} else {
@@ -482,7 +466,6 @@ public class JabberIqRegister
 	protected void doGetRegistrationForm(Packet packet, Element request, XMPPResourceConnection session,
 										 Queue<Packet> results) throws XMPPProcessorException, NoConnectionIdException {
 		if (captchaRequired) {
-			// captcha
 			results.offer(packet.okResult(prepareCaptchaRegistrationForm(session), 0));
 		} else if (signedFormRequired) {
 			results.offer(packet.okResult(prepareSignedRegistrationForm(session), 0));
@@ -500,9 +483,8 @@ public class JabberIqRegister
 								   final Queue<Packet> results)
 			throws XMPPProcessorException, NoConnectionIdException, PacketErrorTypeException, NotAuthorizedException,
 				   TigaseStringprepException, TigaseDBException {
-		// Yes this is registration cancel request
-		// According to JEP-0077 there must not be any
-		// more subelements apart from <remove/>
+		// Yes this is registration cancel request. According to JEP-0077 there
+		// must not be any more subelements apart from <remove/>
 		Element elem = request.findChildStaticStr(Iq.IQ_QUERY_PATH);
 		if (elem.getChildren().size() > 1) {
 			throw new XMPPProcessorException(Authorization.BAD_REQUEST);
@@ -576,112 +558,29 @@ public class JabberIqRegister
 		return new Message(messageEl, session.getDomainAsJID(), jid);
 	}
 
+	private void doChangePassword(Packet packet, Element request, XMPPResourceConnection session, Queue<Packet> results)
+			throws XMPPProcessorException, NoConnectionIdException, TigaseStringprepException, NotAuthorizedException,
+				   TigaseDBException {
+		String user_name = request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
+		String password = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
+		if (null != password) {
+			password = XMLUtils.unescape(password);
+		}
+
+		if ((user_name == null) || user_name.isBlank() || (password == null) || password.isBlank()) {
+			throw new XMPPProcessorException(Authorization.NOT_ACCEPTABLE);
+		}
+
+		session.setRegistration(user_name, password, Collections.emptyMap());
+		results.offer(packet.okResult((String) null, 0));
+	}
+
 	private void doRegisterNewAccount(Packet packet, Element request, XMPPResourceConnection session,
 									  Queue<Packet> results)
 			throws XMPPProcessorException, NoConnectionIdException, TigaseStringprepException, NotAuthorizedException,
 				   TigaseDBException {
-		// Is it registration cancel request?
-		String user_name;
-		String password;
-		String email;
-		if (captchaRequired) {
-			CaptchaProvider.CaptchaItem captcha = (CaptchaProvider.CaptchaItem) session.getSessionData(
-					"jabber:iq:register:captcha");
-
-			if (captcha == null) {
-				log.finest("CAPTCHA is required");
-				throw new XMPPProcessorException(Authorization.BAD_REQUEST,
-												 "CAPTCHA is required. Please reload your registration form.");
-			}
-
-			Element queryEl = request.getChild("query", "jabber:iq:register");
-			Element formEl = queryEl == null ? null : queryEl.getChild("x", "jabber:x:data");
-			Form form = new Form(formEl);
-
-			String capResp = form.getAsString("captcha");
-
-			if (!captcha.isResponseValid(session, capResp)) {
-				captcha.incraseErrorCounter();
-				log.finest("Invalid captcha");
-
-				if (captcha.getErrorCounter() >= maxCaptchaRepetition) {
-					log.finest("Blocking session with not-solved captcha");
-					session.removeSessionData("jabber:iq:register:captcha");
-				}
-				throw new XMPPProcessorException(Authorization.NOT_ALLOWED, "Invalid captcha");
-			}
-
-			user_name = form.getAsString("username");
-			password = form.getAsString("password");
-			email = form.getAsString("email");
-		} else if (signedFormRequired) {
-			final String expectedToken = UUID.nameUUIDFromBytes(
-					(session.getConnectionId() + "|" + session.getSessionId()).getBytes()).toString();
-
-			FormSignatureVerifier verifier = new FormSignatureVerifier(oauthConsumerKey, oauthConsumerSecret);
-			Element queryEl = request.getChild("query", "jabber:iq:register");
-			Element formEl = queryEl == null ? null : queryEl.getChild("x", "jabber:x:data");
-			if (formEl == null) {
-				throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Use Signed Registration Form");
-			}
-			Form form = new Form(formEl);
-			if (!expectedToken.equals(form.getAsString("oauth_token"))) {
-				log.finest("Received oauth_token is different that sent one.");
-				throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Unknown oauth_token");
-			}
-			if (!oauthConsumerKey.equals(form.getAsString("oauth_consumer_key"))) {
-				log.finest("Unknown oauth_consumer_key");
-				throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Unknown oauth_consumer_key");
-			}
-			try {
-				long timestamp = verifier.verify(packet.getStanzaTo(), form);
-				user_name = form.getAsString("username");
-				password = form.getAsString("password");
-				email = form.getAsString("email");
-			} catch (FormSignerException e) {
-				log.fine("Form Signature Validation Problem: " + e.getMessage());
-				throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Invalid form signature");
-			}
-		} else {
-			// No, so assuming this is registration of a new user
-			// or change registration details for existing user
-			Element queryEl = request.getChild("query", "jabber:iq:register");
-			Element formEl = queryEl == null ? null : queryEl.getChild("x", "jabber:x:data");
-			if (formEl != null) {
-				Form form = new Form(formEl);
-				user_name = form.getAsString("username");
-				password = form.getAsString("password");
-				email = form.getAsString("email");
-			} else {
-				user_name = request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
-				password = request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
-				email = request.getChildCDataStaticStr(IQ_QUERY_EMAIL_PATH);
-			}
-		}
-		if (null != password) {
-			password = XMLUtils.unescape(password);
-		}
-		Map<String, String> reg_params = Collections.emptyMap();
-
-		if ((email != null) && !email.trim().isEmpty()) {
-			reg_params = new LinkedHashMap<String, String>();
-			reg_params.put("email", email.trim());
-		}
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-		if ((user_name == null) || user_name.equals("") || (password == null) || password.equals("")) {
-			throw new XMPPProcessorException(Authorization.NOT_ACCEPTABLE);
-		}
-
-		if (session.isAuthorized()) {
-			session.setRegistration(user_name, password, reg_params);
-			results.offer(packet.okResult((String) null, 0));
-			return;
-		}
 
 		final VHostItem domain = session.getDomain();
-
 		if (!domain.isRegisterEnabled()) {
 			throw new NotAuthorizedException("Registration is now allowed for this domain");
 		}
@@ -698,9 +597,45 @@ public class JabberIqRegister
 			}
 		}
 
-		createAccount(session, user_name, domain, password, email, reg_params);
+		Element queryEl = request.getChild("query", "jabber:iq:register");
+		Element formEl = queryEl == null ? null : queryEl.getChild("x", "jabber:x:data");
+		Form form = formEl == null ? null : new Form(formEl);
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		if ((captchaRequired || signedFormRequired) && (form == null)) {
+			throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Use proper DataForm registration");
+		}
+
+		if (captchaRequired) {
+			validatCapchaForm(session, form);
+		} else if (signedFormRequired) {
+			validateSignedForm(packet, session, form);
+		}
+
+		String user_name =
+				form != null ? form.getAsString("username") : request.getChildCDataStaticStr(IQ_QUERY_USERNAME_PATH);
+		String password =
+				form != null ? form.getAsString("password") : request.getChildCDataStaticStr(IQ_QUERY_PASSWORD_PATH);
+		String email = form != null ? form.getAsString("email") : request.getChildCDataStaticStr(IQ_QUERY_EMAIL_PATH);
+
+		if (null != password) {
+			password = XMLUtils.unescape(password);
+		}
+
+		if ((user_name == null) || user_name.equals("") || (password == null) || password.equals("")) {
+			throw new XMPPProcessorException(Authorization.NOT_ACCEPTABLE);
+		}
+
+		if (emailRequired && (email == null || email.isBlank())) {
+			throw new XMPPProcessorException(Authorization.NOT_ACCEPTABLE);
+		}
+
+		Map<String, String> reg_params = Collections.emptyMap();
+		if ((email != null) && !email.isBlank()) {
+			reg_params = new LinkedHashMap<>();
+			reg_params.put("email", email.trim());
+		}
+
+		createAccount(session, user_name, domain, password, email, reg_params);
 
 		session.removeSessionData("jabber:iq:register:captcha");
 		String localPart = BareJID.parseJID(user_name)[0];
@@ -712,30 +647,72 @@ public class JabberIqRegister
 			results.offer(msg);
 		}
 
-		results.offer(packet.okResult((String) null, 0));
+//		if (emailRequired) {
+//			Element query = new Element("query");
+//			query.setXMLNS("jabber:iq:register");
+//			query.addChild(new Element("instructions",
+//									   "Please click on a link sent co provided e-mail address to activate your account"));
+//			query.addChild(new Element("email-confirmation-required"));
+//			results.offer(packet.okResult(query, 0));
+//		} else {
+			results.offer(packet.okResult((String) null, 0));
+//		}
+	}
+
+	private void validateSignedForm(Packet packet, XMPPResourceConnection session, Form form)
+			throws NoConnectionIdException, XMPPProcessorException {
+		final String expectedToken = UUID.nameUUIDFromBytes(
+				(session.getConnectionId() + "|" + session.getSessionId()).getBytes()).toString();
+
+		FormSignatureVerifier verifier = new FormSignatureVerifier(oauthConsumerKey, oauthConsumerSecret);
+		if (!expectedToken.equals(form.getAsString("oauth_token"))) {
+			log.finest("Received oauth_token is different that sent one.");
+			throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Unknown oauth_token");
+		}
+		if (!oauthConsumerKey.equals(form.getAsString("oauth_consumer_key"))) {
+			log.finest("Unknown oauth_consumer_key");
+			throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Unknown oauth_consumer_key");
+		}
+		try {
+			long timestamp = verifier.verify(packet.getStanzaTo(), form);
+		} catch (FormSignerException e) {
+			log.fine("Form Signature Validation Problem: " + e.getMessage());
+			throw new XMPPProcessorException(Authorization.BAD_REQUEST, "Invalid form signature");
+		}
+	}
+
+	private void validatCapchaForm(XMPPResourceConnection session, Form form) throws XMPPProcessorException {
+		CaptchaItem captcha = (CaptchaItem) session.getSessionData("jabber:iq:register:captcha");
+
+		if (captcha == null) {
+			log.finest("CAPTCHA is required");
+			throw new XMPPProcessorException(Authorization.BAD_REQUEST,
+											 "CAPTCHA is required. Please reload your registration form.");
+		}
+
+		String capResp = form.getAsString("captcha");
+
+		if (!captcha.isResponseValid(session, capResp)) {
+			captcha.incraseErrorCounter();
+			log.finest("Invalid captcha");
+
+			if (captcha.getErrorCounter() >= maxCaptchaRepetition) {
+				log.finest("Blocking session with not-solved captcha");
+				session.removeSessionData("jabber:iq:register:captcha");
+			}
+			throw new XMPPProcessorException(NOT_ALLOWED, "Invalid captcha");
+		}
 	}
 
 	private Element prepareCaptchaRegistrationForm(final XMPPResourceConnection session)
 			throws NoConnectionIdException {
 		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
-		query.addChild(new Element("instructions", "Use the enclosed form to register."));
-		Form form = new Form("form", "Account Registration",
-							 "Please provide the following information to sign up for an account!");
-		form.addField(Field.fieldHidden("FORM_TYPE", "jabber:iq:register"));
+		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED : INSTRUCTION)));
+		Form form = prepareGenericRegistrationForm();
 
-		Field field = Field.fieldTextSingle("username", "", "Username");
-		field.setRequired(true);
-		form.addField(field);
-		field = Field.fieldTextPrivate("password", "", "Password");
-		field.setRequired(true);
-		form.addField(field);
-		field = Field.fieldTextSingle("email", "", "Email");
-		field.setRequired(true);
-		form.addField(field);
-
-		CaptchaProvider.CaptchaItem captcha = captchaProvider.generateCaptcha();
+		CaptchaItem captcha = captchaProvider.generateCaptcha();
 		session.putSessionData("jabber:iq:register:captcha", captcha);
-		field = Field.fieldTextSingle("captcha", "", captcha.getCaptchaRequest(session));
+		Field field = Field.fieldTextSingle("captcha", "", captcha.getCaptchaRequest(session));
 		field.setRequired(true);
 		form.addField(field);
 
@@ -745,13 +722,8 @@ public class JabberIqRegister
 
 	private Element prepareSignedRegistrationForm(final XMPPResourceConnection session) throws NoConnectionIdException {
 		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
-		query.addChild(new Element("instructions", "Use the enclosed form to register."));
-		Form form = new Form(SignatureCalculator.SUPPORTED_TYPE, "Account Registration",
-							 "Please provide the following information to sign up for an account!");
-
-		form.addField(Field.fieldTextSingle("username", "", "Username"));
-		form.addField(Field.fieldTextPrivate("password", "", "Password"));
-		form.addField(Field.fieldTextSingle("email", "", "Email"));
+		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED : INSTRUCTION)));
+		Form form = prepareGenericRegistrationForm();
 
 		SignatureCalculator sc = new SignatureCalculator(oauthConsumerKey, oauthConsumerSecret);
 		sc.setOauthToken(UUID.nameUUIDFromBytes((session.getConnectionId() + "|" + session.getSessionId()).getBytes())
@@ -763,14 +735,17 @@ public class JabberIqRegister
 	}
 
 	private Element prepareEmailRegistrationForm() throws NoConnectionIdException {
-
 		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
-		query.addChild(new Element("instructions",
-								   "Choose a user name and password for use with this service." + "\n\n" +
-										   "Please also provide your e-mail address (must be valid!) to which we will send confirmation link."));
-		Form form = new Form("form", "Account Registration",
-							 "Choose a user name and password for use with this service." + "\n\n" +
-									 "Please also provide your e-mail address (must be valid!) to which we will send confirmation link.");
+		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED : INSTRUCTION)));
+		Form form = prepareGenericRegistrationForm();
+		query.addChild(form.getElement());
+		return query;
+	}
+
+
+	private Form prepareGenericRegistrationForm() {
+		Form form = new Form("form", "Account Registration", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED : INSTRUCTION));
+
 		form.addField(Field.fieldHidden("FORM_TYPE", "jabber:iq:register"));
 
 		Field field = Field.fieldTextSingle("username", "", "Username");
@@ -779,12 +754,13 @@ public class JabberIqRegister
 		field = Field.fieldTextPrivate("password", "", "Password");
 		field.setRequired(true);
 		form.addField(field);
-		field = Field.fieldTextSingle("email", "", "Email (MUST BE VALID!)");
-		field.setRequired(true);
+		field = Field.fieldTextSingle("email", "", "Email");
+		if (emailRequired) {
+			field.setRequired(true);
+			field.setLabel("Email (MUST BE VALID!)");
+		}
 		form.addField(field);
-
-		query.addChild(form.getElement());
-		return query;
+		return form;
 	}
 
 	public interface AccountValidator {
