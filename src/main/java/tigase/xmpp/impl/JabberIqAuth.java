@@ -20,6 +20,7 @@ package tigase.xmpp.impl;
 import tigase.auth.BruteForceLockerBean;
 import tigase.auth.TigaseSaslProvider;
 import tigase.auth.callbacks.VerifyPasswordCallback;
+import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -169,6 +170,28 @@ public class JabberIqAuth
 					try {
 						BareJID user_id = BareJID.bareJIDInstance(user_name,
 																  session.getDomain().getVhost().getDomain());
+
+						AuthRepository.AccountStatus status = session.getAuthRepository().getAccountStatus(user_id);
+						switch (status) {
+							case pending:
+								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+																							  "Account is pending verification, please confirm the email address by clicking on the link sent to you",
+																							  false));
+								results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+																	  session.nextStanzaId()));
+								return;
+							case disabled:
+							case banned:
+							case spam:
+							case undefined_inactive:
+								results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet,
+																							  "Account was disabled, please contact the support",
+																							  false));
+								results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
+																	  session.nextStanzaId()));
+								return;
+						}
+
 						Authorization result = doAuth(repo, settings, session, user_id, password, digest);
 
 						if (result == Authorization.AUTHORIZED) {

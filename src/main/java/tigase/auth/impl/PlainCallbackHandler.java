@@ -37,6 +37,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
+import javax.security.sasl.SaslException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -156,12 +157,20 @@ public class PlainCallbackHandler
 		try {
 			Credentials credentials = repo.getCredentials(jid, credentialId);
 
+			log.log(Level.FINE,
+					"Fetched credentials for: " + jid + " with credentialsId: " + credentialId + ", credentials: " +
+							credentials);
+
 			Credentials.Entry entry = credentials.getEntryForMechanism("PLAIN");
 			if (entry == null) {
 				entry = credentials.getFirst();
 			}
 
 			loggingInForbidden = !credentials.canLogin();
+
+			if (loggingInForbidden) {
+				throw XmppSaslException.getExceptionFor(credentials.getAccountStatus());
+			}
 
 			final boolean verified = !loggingInForbidden && entry != null && entry.verifyPlainPassword(password);
 			if (log.isLoggable(Level.FINEST)) {
@@ -172,6 +181,9 @@ public class PlainCallbackHandler
 		} catch (UserNotFoundException e) {
 			log.log(Level.FINE, "User not found: " + e);
 			pc.setVerified(false);
+		} catch (SaslException e) {
+			log.log(Level.FINE, "User inactive: " + e);
+			throw e;
 		} catch (Exception e) {
 			throw new IOException("Password verification problem.", e);
 		}

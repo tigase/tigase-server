@@ -18,6 +18,7 @@
 package tigase.db.jdbc;
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.auth.XmppSaslException;
 import tigase.auth.credentials.Credentials;
 import tigase.db.*;
 import tigase.db.util.RepositoryVersionAware;
@@ -1064,6 +1065,15 @@ public class TigaseCustomAuth
 						} // end of if (name == null)
 
 						jid = BareJID.bareJIDInstanceNS(user_name, (String) options.get(REALM_KEY));
+						try {
+							final AccountStatus accountStatus = getAccountStatus(jid);
+							if (accountStatus.isInactive()) {
+								throw XmppSaslException.getExceptionFor(accountStatus);
+							}
+						} catch (TigaseDBException e) {
+							throw new IOException("Account Status retrieving problem.", e);
+						}
+
 						options.put(USER_ID_KEY, jid);
 
 						if (log.isLoggable(Level.FINEST)) {

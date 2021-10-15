@@ -17,10 +17,7 @@
  */
 package tigase.auth.impl;
 
-import tigase.auth.AuthRepositoryAware;
-import tigase.auth.DomainAware;
-import tigase.auth.MechanismNameAware;
-import tigase.auth.SessionAware;
+import tigase.auth.*;
 import tigase.auth.callbacks.*;
 import tigase.auth.credentials.Credentials;
 import tigase.auth.credentials.entries.PlainCredentialsEntry;
@@ -37,6 +34,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.AuthorizeCallback;
+import javax.security.sasl.SaslException;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.cert.Certificate;
@@ -96,7 +94,7 @@ public class ScramCallbackHandler
 		this.session = session;
 	}
 
-	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) {
+	protected void handleAuthorizeCallback(AuthorizeCallback authCallback) throws SaslException {
 		String authenId = authCallback.getAuthenticationID();
 
 		if (log.isLoggable(Level.FINEST)) {
@@ -156,7 +154,7 @@ public class ScramCallbackHandler
 		}
 	}
 
-	protected void handlePBKDIterationsCallback(PBKDIterationsCallback callback) {
+	protected void handlePBKDIterationsCallback(PBKDIterationsCallback callback) throws SaslException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "PBKDIterationsCallback: {0}", jid);
 		}
@@ -166,7 +164,7 @@ public class ScramCallbackHandler
 		}
 	}
 
-	protected void handleSaltCallback(SaltCallback callback) {
+	protected void handleSaltCallback(SaltCallback callback) throws SaslException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "SaltCallback: {0}", jid);
 		}
@@ -179,7 +177,7 @@ public class ScramCallbackHandler
 		}
 	}
 
-	protected void handleSaltedPasswordCallbackCallback(SaltedPasswordCallback callback) {
+	protected void handleSaltedPasswordCallbackCallback(SaltedPasswordCallback callback) throws SaslException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "PasswordCallback: {0}", jid);
 		}
@@ -236,13 +234,17 @@ public class ScramCallbackHandler
 		}
 	}
 
-	private void fetchCredentials() {
+	private void fetchCredentials() throws SaslException {
 		if (credentialsFetched) {
 			return;
 		}
 
 		try {
 			Credentials credentials = repo.getCredentials(jid, credentialId);
+
+			log.log(Level.FINE,
+					"Fetched credentials for: " + jid + " with credentialsId: " + credentialId + ", credentials: " +
+							credentials);
 
 			if (credentials == null) {
 				loggingInForbidden = true;
@@ -262,7 +264,12 @@ public class ScramCallbackHandler
 				}
 
 				loggingInForbidden = !credentials.canLogin();
+				if (loggingInForbidden) {
+					throw XmppSaslException.getExceptionFor(credentials.getAccountStatus());
+				}
 			}
+		} catch (SaslException e) {
+			throw e;
 		} catch (Exception ex) {
 			log.log(Level.FINE, "Could not retrieve credentials for user " + jid + " with credentialId " + credentialId, ex);
 		}

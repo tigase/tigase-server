@@ -17,6 +17,8 @@
  */
 package tigase.auth;
 
+import tigase.db.AuthRepository;
+
 import javax.security.sasl.SaslException;
 
 public class XmppSaslException
@@ -110,4 +112,19 @@ public class XmppSaslException
 		return saslError == null ? null : saslError.getElementName();
 	}
 
+	public static XmppSaslException getExceptionFor(AuthRepository.AccountStatus status) {
+		switch (status) {
+			case disabled:
+			case banned:
+			case spam:
+			case undefined_inactive:
+				return new XmppSaslException(SaslError.account_disabled, "Your account has been disabled, please contact the administration");
+			case system:
+				return new XmppSaslException(SaslError.invalid_authzid);
+			case pending:
+				return new XmppSaslException(SaslError.temporary_auth_failure, "Your account hasn't been activated yet. Please cheek your email for activation link");
+			default:
+				return new XmppSaslException(SaslError.not_authorized);
+		}
+	}
 }
