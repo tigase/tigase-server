@@ -48,7 +48,7 @@ import static tigase.xmpp.Authorization.NOT_ALLOWED;
 import static tigase.xmpp.impl.CaptchaProvider.CaptchaItem;
 
 /**
- * JEP-0077: In-Band Registration
+ * XEP-0077: In-Band Registration
  * <br>
  * Created: Thu Feb 16 13:14:06 2006
  *
@@ -70,8 +70,8 @@ public class JabberIqRegister
 	public static final String OAUTH_CONSUMERKEY_PROP_KEY = "oauth-consumer-key";
 	public static final String OAUTH_CONSUMERSECRET_PROP_KEY = "oauth-consumer-secret";
 	public static final String SIGNED_FORM_REQUIRED_PROP_KEY = "signed-form-required";
-	private final static String INSTRUCTION = "Please provide the following information to sign up for an account";
-	private final static String INSTRUCTION_EMAIL_REQUIRED = INSTRUCTION +
+	private final static String INSTRUCTION_DEF = "Please provide the following information to sign up for an account";
+	private final static String INSTRUCTION_EMAIL_REQUIRED_DEF = INSTRUCTION_DEF +
 			"\n\nPlease also provide your e-mail address (must be valid!) to which we will send confirmation link.";
 	private static final int REMOTE_ADDRESS_IDX = 2;
 	private static final String[][] ELEMENTS = {Iq.IQ_QUERY_PATH};
@@ -94,6 +94,10 @@ public class JabberIqRegister
 	private boolean emailRequired = true;
 	@Inject
 	private EventBus eventBus;
+	@ConfigField(desc = "Instruction displayed during account registration")
+	private String instruction = INSTRUCTION_DEF;
+	@ConfigField(desc = "Instruction displayed during account registration when e-mail is required")
+	private String instructionEmailRequired = INSTRUCTION_EMAIL_REQUIRED_DEF;
 	@ConfigField(desc = "Maximum CAPTCHA repetition in session")
 	private int maxCaptchaRepetition = 3;
 	@ConfigField(desc = "OAuth consumer key", alias = OAUTH_CONSUMERKEY_PROP_KEY)
@@ -483,7 +487,7 @@ public class JabberIqRegister
 								   final Queue<Packet> results)
 			throws XMPPProcessorException, NoConnectionIdException, PacketErrorTypeException, NotAuthorizedException,
 				   TigaseStringprepException, TigaseDBException {
-		// Yes this is registration cancel request. According to JEP-0077 there
+		// Yes this is registration cancel request. According to XEP-0077 there
 		// must not be any more subelements apart from <remove/>
 		Element elem = request.findChildStaticStr(Iq.IQ_QUERY_PATH);
 		if (elem.getChildren().size() > 1) {
@@ -707,7 +711,7 @@ public class JabberIqRegister
 	private Element prepareCaptchaRegistrationForm(final XMPPResourceConnection session)
 			throws NoConnectionIdException {
 		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
-		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED : INSTRUCTION)));
+		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED_DEF : INSTRUCTION_DEF)));
 		Form form = prepareGenericRegistrationForm();
 
 		CaptchaItem captcha = captchaProvider.generateCaptcha();
@@ -722,7 +726,7 @@ public class JabberIqRegister
 
 	private Element prepareSignedRegistrationForm(final XMPPResourceConnection session) throws NoConnectionIdException {
 		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
-		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED : INSTRUCTION)));
+		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED_DEF : INSTRUCTION_DEF)));
 		Form form = prepareGenericRegistrationForm();
 
 		SignatureCalculator sc = new SignatureCalculator(oauthConsumerKey, oauthConsumerSecret);
@@ -736,7 +740,7 @@ public class JabberIqRegister
 
 	private Element prepareEmailRegistrationForm() throws NoConnectionIdException {
 		Element query = new Element("query", new String[]{"xmlns"}, XMLNSS);
-		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED : INSTRUCTION)));
+		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED_DEF : INSTRUCTION_DEF)));
 		Form form = prepareGenericRegistrationForm();
 		query.addChild(form.getElement());
 		return query;
@@ -744,7 +748,8 @@ public class JabberIqRegister
 
 
 	private Form prepareGenericRegistrationForm() {
-		Form form = new Form("form", "Account Registration", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED : INSTRUCTION));
+		Form form = new Form("form", "Account Registration", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED_DEF
+																			: INSTRUCTION_DEF));
 
 		form.addField(Field.fieldHidden("FORM_TYPE", "jabber:iq:register"));
 

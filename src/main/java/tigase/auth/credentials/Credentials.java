@@ -79,9 +79,9 @@ public interface Credentials {
 	interface Decoder {
 
 		/**
-		 * Decode password stored in database to more suitable form.
+		 * Decode credentials stored in database to more suitable form.
 		 *
-		 * @return password stored in database in more suitable form
+		 * @return credentials stored in database in more suitable form
 		 */
 		Entry decode(BareJID user, String value);
 
