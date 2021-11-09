@@ -28,7 +28,7 @@ import tigase.xmpp.jid.JID;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author andrzej
@@ -51,7 +51,80 @@ public class MessageCarbonsTest
 		super.setUp();
 		carbonsProcessor = getInstance(MessageCarbons.class);
 	}
-	
+
+	@Test
+	public void testDisco() throws Exception {
+		assertTrue(Arrays.stream(carbonsProcessor.supDiscoFeatures(null))
+						   .anyMatch(el -> "urn:xmpp:carbons:2".equals(el.getAttributeStaticStr("var"))));
+		assertTrue(Arrays.stream(carbonsProcessor.supDiscoFeatures(null))
+						   .anyMatch(el -> "urn:xmpp:carbons:rules:0".equals(el.getAttributeStaticStr("var"))));
+	}
+
+	@Test
+	public void testDeliveryOfMessageWithBody() throws Exception {
+		Packet packet = Packet.packetInstance(new Element("message", new Element[] { new Element("body") }, new String[] { "type"}, new String[] {"chat"}));
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, null));
+		packet = Packet.packetInstance(new Element("message", new Element[] { new Element("body") }, new String[] { "type"}, new String[] {"normal"}));
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, null));
+		packet = Packet.packetInstance(new Element("message", new Element[] { new Element("body") }, null, null));
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, null));
+		packet = Packet.packetInstance(new Element("message", new Element[] { new Element("body") }, new String[] { "type"}, new String[] {"groupchat"}));
+		assertFalse(carbonsProcessor.shouldSendCarbons(packet, null));
+	}
+
+	@Test
+	public void testDeliveryOfMessageWithIMPayload() throws Exception {
+		Packet packet = Packet.packetInstance(new Element("message"));
+		assertFalse(carbonsProcessor.shouldSendCarbons(packet, null));
+
+		packet.getElement().setChildren(List.of(new Element("received", new String[]{"xmlns"}, new String[] {"urn:xmpp:receipts"})));
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, null));
+		packet.getElement().setChildren(List.of(new Element("active", new String[]{"xmlns"}, new String[] {"http://jabber.org/protocol/chatstates"})));
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, null));
+		packet.getElement().setChildren(List.of(new Element("received", new String[]{"xmlns"}, new String[] {"urn:xmpp:chat-markers:0"})));
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, null));
+	}
+
+	@Test
+	public void testDeliveryOfMucMessage_Groupchat() throws Exception {
+		Packet packet = Packet.packetInstance(new Element("message", new Element[] { new Element("body") }, new String[] { "type"}, new String[] {"groupchat"}));
+		assertFalse(carbonsProcessor.shouldSendCarbons(packet, null));
+	}
+
+	@Test
+	public void testDeliveryOfMucMessage_DirectInvitation() throws Exception {
+		Packet packet = Packet.packetInstance(new Element("message"));
+		packet.getElement()
+				.setChildren(List.of(new Element("x", new Element[]{new Element("invite")}, new String[]{"xmlns"},
+												 new String[]{"http://jabber.org/protocol/muc#user"})));
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, null));
+	}
+
+	@Test
+	public void testDeliveryOfMucMessage_SentPM() throws Exception {
+		JID sender = JID.jidInstanceNS("user@domain.com/res-1");
+		JID recipient = JID.jidInstanceNS("room@muc.domain.com/Julia");
+		XMPPResourceConnection session = getSession(sender, sender);
+		Packet packet = Packet.packetInstance(new Element("message", new Element[] { new Element("body"), new Element("x", new String[]{"xmlns"}, new String[]{"http://jabber.org/protocol/muc#user"}) }, new String[] { "type"}, new String[] {"chat"}), sender, recipient);
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, session));
+	}
+
+	@Test
+	public void testDeliveryOfMucMessage_ReceivedPM() throws Exception {
+		JID recipient = JID.jidInstanceNS("user@domain.com/res-1");
+		JID sender = JID.jidInstanceNS("room@muc.domain.com/Julia");
+		XMPPResourceConnection session = getSession(recipient, recipient);
+		Packet packet = Packet.packetInstance(new Element("message", new Element[] { new Element("body"), new Element("x", new String[]{"xmlns"}, new String[]{"http://jabber.org/protocol/muc#user"}) }, new String[] { "type"}, new String[] {"chat"}), sender, recipient);
+		assertFalse(carbonsProcessor.shouldSendCarbons(packet, session));
+	}
+
+	@Test
+	public void testDeliveryOfMucMessage_MediatedInvitation() throws Exception {
+		Packet packet = Packet.packetInstance(new Element("message"));
+		packet.getElement().setChildren(List.of(new Element("x", new String[]{"xmlns"}, new String[] {"jabber:x:conference"})));
+		assertTrue(carbonsProcessor.shouldSendCarbons(packet, null));
+	}
+
 	@Test
 	public void testResourceSelectionForMessageDeliveryForBareJid() throws Exception {
 		BareJID userJid = BareJID.bareJIDInstance("user1@example.com");

@@ -58,6 +58,9 @@ public class MessageCarbons
 	private static final String[] XMLNSS = {XMPPProcessor.CLIENT_XMLNS, XMLNS, XMLNS};
 
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
+	private static final Element[] DISCO_FEATURES_WITH_RULES = {
+			new Element("feature", new String[]{"var"}, new String[]{XMLNS}),
+			new Element("feature", new String[]{"var"}, new String[]{"urn:xmpp:carbons:rules:0"})};
 
 	private static final String ENABLED_KEY = XMLNS + "-enabled";
 
@@ -73,14 +76,25 @@ public class MessageCarbons
 		return new ConcurrentHashMap<JID, Boolean>();
 	};
 
+	private static final ElementMatcher[] DEF_MSG_CARBON_PATHS = {
+			new ElementMatcher(new String[]{Message.ELEM_NAME, "body"}, null, true),
+			// handling recipts, markers and states..
+			new ElementMatcher(new String[]{Message.ELEM_NAME, "received"}, "urn:xmpp:receipts", true),
+			new ElementMatcher(new String[]{Message.ELEM_NAME}, true, "urn:xmpp:chat-markers:0", null, true),
+			new ElementMatcher(new String[]{Message.ELEM_NAME}, true, "http://jabber.org/protocol/chatstates", null, true),
+			// handling MUC invitations..
+			new ElementMatcher(new String[]{Message.ELEM_NAME, "x"},"jabber:x:conference", true),
+			new ElementMatcher(new String[]{Message.ELEM_NAME, "x", "invite"}, null, true)
+	};
+
 	private final EventBus eventBus = EventBusFactory.getInstance();
 	@Inject
 	private MessageDeliveryLogic messageProcessor;
 
-	@ConfigField(desc = "Send carbons of messages of type normal with mathing paths", alias = "msg-carbons-paths")
-	private ElementMatcher[] msgCarbonPaths = {
-			new ElementMatcher(new String[]{Message.ELEM_NAME, "received"}, "urn:xmpp:receipts", true)
-	};
+	@ConfigField(desc = "Send carbons of messages of type normal with matching paths", alias = "msg-carbons-paths")
+	private ElementMatcher[] msgCarbonPaths = DEF_MSG_CARBON_PATHS;
+
+	private boolean usesDefCarbonRules = true;
 
 	/**
 	 * Returns true if session is enabled for receiving carbon copy messages
@@ -138,6 +152,9 @@ public class MessageCarbons
 			}
 		}
 		msgCarbonPaths = matchers.toArray(new ElementMatcher[0]);
+		usesDefCarbonRules = Arrays.equals(
+				Arrays.stream(DEF_MSG_CARBON_PATHS).map(matcher -> matcher.toString()).toArray(String[]::new),
+				matcherStrs);
 	}
 
 	@Override
@@ -277,7 +294,11 @@ public class MessageCarbons
 
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
-		return DISCO_FEATURES;
+		if (usesDefCarbonRules) {
+			return DISCO_FEATURES_WITH_RULES;
+		} else {
+			return DISCO_FEATURES;
+		}
 	}
 
 	@Override
@@ -393,10 +414,27 @@ public class MessageCarbons
 	}
 
 	protected boolean shouldSendCarbons(Packet packet, XMPPResourceConnection session) {
+		if (packet.getElemChild("private", "urn:xmpp:carbons:2") != null) {
+			return false;
+		}
+		if (packet.getElemChild("no-copy", "urn:xmpp:hints") != null) {
+			return false;
+		}
+
 		if (packet.getType() == StanzaType.chat) {
+			JID to = packet.getStanzaTo();
+			if (to != null && packet.getElemChild("x", "http://jabber.org/protocol/muc#user") != null && session.isAuthorized()) {
+				try {
+					if (session.isUserId(to.getBareJID())) {
+						return false;
+					}
+				} catch (NotAuthorizedException ex) {
+					// we can ignore this..
+				}
+			}
 			return true;
 		}
-		
+
 		if (packet.getType() == null || packet.getType() == StanzaType.normal) {
 			for (ElementMatcher matcher : msgCarbonPaths) {
 				if (matcher.matches(packet)) {
