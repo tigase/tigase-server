@@ -28,6 +28,7 @@ import tigase.mix.model.MixLogic;
 import tigase.pubsub.repository.IPubSubRepository;
 import tigase.server.Packet;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 import tigase.xmpp.rsm.RSM;
@@ -67,6 +68,17 @@ public class DiscoveryModule extends tigase.pubsub.modules.DiscoveryModule {
 		} else {
 			return super.getAvailableFeatures(serviceJID, node, senderJID);
 		}
+	}
+
+	@Override
+	protected void processDiscoInfo(Packet packet, JID jid, String node, JID senderJID)
+			throws ComponentException, RepositoryException {
+		if (node == null && jid.getLocalpart() != null) {
+			if (mixRepository.getChannelConfiguration(jid.getBareJID()) == null) {
+				throw new ComponentException(Authorization.ITEM_NOT_FOUND);
+			}
+		}
+		super.processDiscoInfo(packet, jid, node, senderJID);
 	}
 
 	@Override
