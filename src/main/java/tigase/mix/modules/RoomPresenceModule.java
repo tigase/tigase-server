@@ -49,10 +49,14 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Bean(name = "roomPresenceModule", parent = IMixComponent.class, active = true)
 public class RoomPresenceModule
 		extends AbstractPubSubModule implements Initializable, UnregisterAware {
+
+	private static final Logger logger = Logger.getLogger(RoomPresenceModule.class.getCanonicalName());
 
 	public static final String MUC_XMLNS = "http://jabber.org/protocol/muc";
 	public static final String MUC_USER_XMLNS = MUC_XMLNS + "#user";
@@ -195,9 +199,14 @@ public class RoomPresenceModule
 
 		for (JID recipient : roomPresenceRepository.getRoomParticipantJids(event.getChannelJID())) {
 			if (shouldBroadcast(recipient)) {
+				logger.log(Level.FINEST, () -> "sending message from " + event.getChannelJID() + " + with id " +
+						event.message.getAttributeStaticStr("id") + " to " + recipient);
 				packetWriter.write(Packet.packetInstance(event.getMessage().clone(),
 														 JID.jidInstanceNS(event.getChannelJID(),
 																		   event.getSenderNick()), recipient));
+			} else {
+				logger.log(Level.FINEST, () -> "not sending message from " + event.getChannelJID() + " + with id " +
+						event.message.getAttributeStaticStr("id") + " to " + recipient);
 			}
 		}
 	}
