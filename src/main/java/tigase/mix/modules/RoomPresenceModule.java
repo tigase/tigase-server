@@ -223,7 +223,7 @@ public class RoomPresenceModule
 	@Override
 	public void beforeUnregister() {
 		if (eventBus != null) {
-			eventBus.registerAll(this);
+			eventBus.unregisterAll(this);
 		}
 	}
 
