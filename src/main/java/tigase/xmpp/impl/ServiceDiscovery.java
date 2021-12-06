@@ -183,9 +183,18 @@ public class ServiceDiscovery
 	@Override
 	public void processNullSessionPacket(Packet packet, NonAuthUserRepository repo, Queue<Packet> results,
 										 Map<String, Object> settings) throws PacketErrorTypeException {
-		results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
-																			 "The target is unavailable at this time.",
-																			 true));
+		if (packet.getElemName() == Iq.ELEM_NAME && (packet.getType().equals(StanzaType.error) || packet.getType().equals(StanzaType.result))) {
+			// https://xmpp.org/rfcs/rfc6120.html#stanzas-semantics-iq
+			// An entity that receives a stanza of type "result" or "error" MUST NOT respond to the stanza
+			// by sending a further IQ response of type "result" or "error"; however, the requesting entity
+			// MAY send another request (e.g., an IQ of type "set" to provide obligatory information discovered
+			// through a get/result pair).
+			return;
+		} else {
+			results.offer(Authorization.RECIPIENT_UNAVAILABLE.getResponseMessage(packet,
+																				 "The target is unavailable at this time.",
+																				 true));
+		}
 	}
 
 	@Override

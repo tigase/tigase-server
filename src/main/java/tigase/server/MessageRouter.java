@@ -36,10 +36,7 @@ import tigase.sys.TigaseRuntime;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.util.updater.UpdatesChecker;
 import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.PacketErrorTypeException;
-import tigase.xmpp.PacketInvalidTypeException;
-import tigase.xmpp.StanzaType;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.PresenceCapabilitiesManager;
 import tigase.xmpp.jid.JID;
 
@@ -468,9 +465,11 @@ public class MessageRouter
 				Packet res = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, null, true);
 				results.offer(res);
 			} catch (PacketInvalidTypeException e) {
-				log.log(Level.FINE, "Packet: {0} processing exception: {1}", new Object[]{packet.toString(), e});
+				log.log(Level.FINE, "Packet: {0} processing exception (I expect command (Iq) packet here): {1}", new Object[]{packet.toString(), e});
+			} catch (PacketInvalidAddressException e) {
+				log.log(Level.WARNING, "Packet processing exception (I expect command (Iq) packet here): ", e);
 			} catch (PacketErrorTypeException e) {
-				log.log(Level.WARNING, "Packet processing exception: ", e);
+				log.log(Level.WARNING, "Packet processing exception (I expect command (Iq) packet here): ", e);
 			}
 
 			return;
@@ -484,8 +483,12 @@ public class MessageRouter
 				results.offer(res);
 
 				// processPacket(res);
+			} catch (PacketInvalidTypeException e) {
+				log.log(Level.FINE, "Packet: {0} processing exception (not authorised): {1}", new Object[]{packet.toString(), e});
+			} catch (PacketInvalidAddressException e) {
+				log.log(Level.WARNING, "Packet processing exception (not authorised): ", e);
 			} catch (PacketErrorTypeException e) {
-				log.warning("Packet processing exception: " + e);
+				log.log(Level.WARNING, "Packet processing exception (not authorised): ", e);
 			}
 
 			return;
