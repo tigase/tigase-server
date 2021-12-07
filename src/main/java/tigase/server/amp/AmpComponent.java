@@ -193,7 +193,7 @@ public class AmpComponent
 		}
 		if (exec_def) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.finest("Executing default action: " + def.getName());
+				log.finest("Executing default action: " + def.getName() + ", packet: " + packet);
 			}
 			def.execute(packet, null);
 		}
@@ -229,7 +229,7 @@ public class AmpComponent
 				boolean result = action.execute(packet, rule);
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Matched action: " + action.getName() + ", result: " + result);
+					log.finest("Matched action: " + action.getName() + ", result: " + result + ", packet: " + packet);
 				}
 
 				return result;
@@ -254,7 +254,7 @@ public class AmpComponent
 				;
 
 				if (log.isLoggable(Level.FINEST)) {
-					log.finest("Matched condition: " + condition.getName() + ", result: " + result);
+					log.finest("Matched condition: " + condition.getName() + ", result: " + result + ", packet: " + packet);
 				}
 
 				return result;
