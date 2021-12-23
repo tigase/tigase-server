@@ -250,7 +250,7 @@ public class ClusterConnectionManager
 			return packet.getStanzaTo().hashCode();
 		}
 
-		return packet.getTo().hashCode();
+		return packet.getTo() != null ? packet.getTo().hashCode() : packet.toString().hashCode();
 	}
 
 	@Override
