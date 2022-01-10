@@ -134,7 +134,6 @@ public class ChannelCreateModule extends AbstractPubSubModule {
 			getRepository().addToRootCollection(channelJID, Mix.Nodes.INFO);
 
 			config = new LeafNodeConfig(Mix.Nodes.AVATAR_DATA);
-			config.setValue(PUBSUB + "max_items", "1");
 			config.setValue(PUBSUB + "access_model", AccessModel.whitelist.name());
 			config.setValue(PUBSUB + "publish_model",PublisherModel.publishers.name());
 			config.setValue(PUBSUB + "send_last_published_item", SendLastPublishedItem.never.name());
