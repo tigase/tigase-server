@@ -332,13 +332,31 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 			}
 			return jids.stream().map(jid -> {
 				try {
-					authRepository.addUser(jid, pwd);
-					return Result.ok;
+					try {
+						authRepository.getAccountStatus(jid);
+						log.log(Level.WARNING, "Skipping user " + jid + " creation, user already exists!");
+						return Result.skipped;
+					} catch (UserNotFoundException ex) {
+						// we are creating user only if it does not exist..
+						authRepository.addUser(jid, pwd);
+						return Result.ok;
+					}
 				} catch (TigaseDBException ex) {
 					log.log(Level.WARNING, ex.getMessage());
 					return Result.warning;
 				}
-			}).anyMatch(result -> result == Result.warning) ? Result.warning : Result.ok;
+			}).reduce(Result.ok, (r1, r2) -> {
+				if (r1 == Result.error || r2 == Result.error) {
+					return Result.error;
+				}
+				if (r1 == Result.warning || r2 == Result.warning) {
+					return Result.warning;
+				}
+				if (r1 == Result.skipped || r2 == Result.skipped) {
+					return Result.skipped;
+				}
+				return Result.ok;
+			});
 		};
 	}
 

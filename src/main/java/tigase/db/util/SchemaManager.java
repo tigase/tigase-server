@@ -123,7 +123,12 @@ public class SchemaManager {
 				"Force reloading all schema files")
 							.defaultValue(DBSchemaLoader.PARAMETERS_ENUM.FORCE_RELOAD_ALL_SCHEMA_FILES.getDefaultValue())
 			.build();
-
+	private CommandlineParameter ADMIN_JID = new CommandlineParameter.Builder("J", DBSchemaLoader.PARAMETERS_ENUM.ADMIN_JID.getName()).description(
+				"Comma separated list of administrator JID(s)").build();
+	private CommandlineParameter ADMIN_JID_PASS = new CommandlineParameter.Builder("N", DBSchemaLoader.PARAMETERS_ENUM.ADMIN_JID_PASS.getName()).description(
+				"Password that will be used for the entered JID(s) - one for all configured administrators")
+							.secret()
+							.build();
 
 	private Boolean dbRootAsk = false;
 	private String adminPass = null;
@@ -361,6 +366,10 @@ public class SchemaManager {
 
 		Map<String, Object> config = holder.getProperties();
 
+		admins = getProperty(props, ADMIN_JID).map(
+						str -> Arrays.stream(str.split(",")).map(BareJID::bareJIDInstanceNS).collect(Collectors.toList()))
+				.orElse(null);
+		adminPass = getProperty(props, ADMIN_JID_PASS).orElse(null);
 		dbRootAsk = getProperty(props, ROOT_ASK, Boolean::parseBoolean).orElse(false);
 		getProperty(props, LOG_LEVEL, Level::parse).ifPresent(result -> logLevel = result);
 		getProperty(props, FORCE_RELOAD_SCHEMA, Boolean::parseBoolean).ifPresent(result -> forceReloadSchema = result);
@@ -608,7 +617,7 @@ public class SchemaManager {
 	}
 
 	private List<CommandlineParameter> upgradeSchemaParametersSupplier() {
-		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, ROOT_ASK, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE, LOG_LEVEL, FORCE_RELOAD_SCHEMA);
+		return Arrays.asList(ROOT_USERNAME, ROOT_PASSWORD, ROOT_ASK, TDSL_CONFIG_FILE, PROPERTY_CONFIG_FILE, LOG_LEVEL, FORCE_RELOAD_SCHEMA, ADMIN_JID, ADMIN_JID_PASS);
 	}
 
 	private boolean isErrorPresent(Map<DataSourceInfo, List<ResultEntry>> results) {
