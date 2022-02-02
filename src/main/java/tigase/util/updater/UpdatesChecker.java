@@ -19,6 +19,7 @@ package tigase.util.updater;
 
 import tigase.component.ScheduledTask;
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -232,7 +233,7 @@ public class UpdatesChecker
 		}
 	}
 
-	public static class UpdatedVersionDiscovered {
+	public static class UpdatedVersionDiscovered implements EventBusEvent {
 
 		private final Version version;
 

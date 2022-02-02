@@ -15,30 +15,15 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.eventbus.events;
 
-import tigase.eventbus.EventBusEvent;
+package tigase.eventbus;
 
-import java.io.Serializable;
+import tigase.xml.Element;
 
-/**
- * Created: Feb 19, 2009 12:17:03 PM
- *
- * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
-*/
-public class StartupFinishedEvent
-		implements Serializable, EventBusEvent {
+public interface XMLEventBusEvent<E extends EventBusEvent> extends EventBusEvent {
 
-	String node;
+	Element serialize();
 
-	public StartupFinishedEvent() {
-	}
+	E deserialize(Element element);
 
-	public StartupFinishedEvent(String node) {
-		this.node = node;
-	}
-
-	public String getNode() {
-		return node;
-	}
 }

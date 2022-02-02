@@ -21,6 +21,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
@@ -413,7 +414,7 @@ public class PresenceOffline
 	}
 
 	public class StartStopEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		public StartStopEvent() {}
 

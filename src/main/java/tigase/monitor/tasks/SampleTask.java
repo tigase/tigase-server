@@ -18,6 +18,7 @@
 package tigase.monitor.tasks;
 
 import tigase.eventbus.EventBus;
+import tigase.eventbus.XMLEventBusEvent;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
@@ -27,6 +28,7 @@ import tigase.monitor.MonitorComponent;
 import tigase.xml.Element;
 
 import java.util.Date;
+import java.util.Map;
 
 @Bean(name = "sample-task", parent = MonitorComponent.class, active = true)
 public class SampleTask
@@ -47,7 +49,7 @@ public class SampleTask
 	@Override
 	public void initialize() {
 		super.initialize();
-		eventBus.registerEvent("tigase.monitor.tasks.SampleTaskEnabled", "Sample task", false);
+		eventBus.registerEvent(SampleTaskEvent.class, "Sample task", false);
 	}
 
 	@Override
@@ -66,9 +68,7 @@ public class SampleTask
 	protected void enable() {
 		super.enable();
 
-		Element event = new Element("tigase.monitor.tasks.SampleTaskEnabled");
-		event.addChild(new Element("timestamp", "" + (new Date())));
-		event.addChild(new Element("message", this.message));
+		final SampleTaskEvent event = new SampleTaskEvent(this.message);
 		this.message = "<->";
 		eventBus.fire(event);
 
@@ -77,5 +77,27 @@ public class SampleTask
 
 	@Override
 	protected void run() {
+	}
+
+	public static class SampleTaskEvent
+			extends TasksEvent {
+
+		String message;
+
+		public SampleTaskEvent(String message) {
+			super("SampleTaskEvent", "Sample task");
+			this.message = message;
+		}
+
+		@Override
+		public Map<String, String> getAdditionalData() {
+			// @formatter:off
+			return Map.of("log", "" + message);
+			// @formatter:onn
+		}
+
+		public String getMessage() {
+			return message;
+		}
 	}
 }

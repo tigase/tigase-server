@@ -24,15 +24,7 @@ All handlers are called in a different thread than the thread that initially fir
 
 === Events
 
-Events may be defined in two ways: as a XML element or as a class.
-
-.XML Element event
-[source,xml]
--------
-<EventName xmlns="tigase:demo">
-  <sample_value>1</sample_value>
-</EventName>
--------
+Events may be defined in two ways: as a class +++<del>+++or as an XML element+++<del>+++ (XML/Element based events are deprecated since version 8.2 and will be removed in version 9.0).
 
 .Serialized event class
 [source,java]
@@ -62,6 +54,15 @@ public class SampleEvent {
 }
 ----
 
+.+++<del>+++XML Element event+++<del>+++ (deprecated)
+[source,xml]
+-------
+<EventName xmlns="tigase:demo">
+  <sample_value>1</sample_value>
+</EventName>
+-------
+
+
 NOTE: Events defined as XML element and class implementing `Serializable` interface will be distributed to all servers in cluster.
 Event `SampleEvent` will be broadcast only in the same instance what fired the event.
 
@@ -88,14 +89,6 @@ Name of XML element is taken from full name of class:
 
 To fire event, just get instance of EventBus and call method `fire()`.
 
-.Firing event based on XML Element
-[source,java]
-----
-EventBus eventBus = EventBusFactory.getInstance();
-Element event = new Element("tigase.eventbus.impl.Event1");
-eventBus.fire(event)
-----
-
 .Firing serialized event
 [source,java]
 ----
@@ -111,6 +104,16 @@ EventBus eventBus = EventBusFactory.getInstance();
 SampleEvent event = new SampleEvent();
 eventBus.fire(event)
 ----
+
+.+++<del>+++Firing event based on XML Element+++<del>+++ (deprecated)
+[source,java]
+----
+EventBus eventBus = EventBusFactory.getInstance();
+Element event = new Element("tigase.eventbus.impl.Event1");
+eventBus.fire(event)
+----
+
+
 
 === Handling events
 
@@ -152,7 +155,11 @@ public class SomeConsumer {
 }
 ----
 
-==== Handling XML events
+==== +++<del>+++Handling XML events+++<del>+++
+
+.Click to see details (XML/Element based events are deprecated since version 8.2 and will be removed in version 9.0)
+[%collapsible]
+====
 
 To handle XML events we have to register listener for specific event package and name.
 In our example, package is empty because event name has no package declared (see also <<Filtering events>>).
@@ -185,6 +192,7 @@ eventBus.addListener("net.tigase.sample", "SampleSerializedEvent", new EventList
     }
 });
 ----
+====
 
 [IMPORTANT]
 ====

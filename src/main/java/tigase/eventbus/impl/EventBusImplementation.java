@@ -17,6 +17,7 @@
  */
 package tigase.eventbus.impl;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.eventbus.*;
 import tigase.xml.Element;
 
@@ -73,19 +74,29 @@ public class EventBusImplementation
 		fireListenerAddedEvent(packageName, eventName);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 	public void addListener(String packageName, String eventName, tigase.eventbus.EventListener<Element> listener) {
 		AbstractListenerHandler handler = new ElementListenerHandler(packageName, eventName, listener);
 		addHandler(handler);
 		fireListenerAddedEvent(packageName, eventName);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 	public void addListener(String packageName, String eventName, EventSourceListener<Element> listener) {
 		AbstractListenerHandler handler = new ElementSourceListenerHandler(packageName, eventName, listener);
 		addHandler(handler);
 		fireListenerAddedEvent(packageName, eventName);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 	public void fire(Object event) {
+		fire(event, null, false);
+	}
+
+	public void fire(EventBusEvent event) {
 		fire(event, null, false);
 	}
 
@@ -271,6 +282,8 @@ public class EventBusImplementation
 		return result;
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 	HashSet<AbstractHandler> getListenersForEvent(final String packageName, final String eventName) {
 		final HashSet<AbstractHandler> result = new HashSet<>();
 		result.addAll(listeners.get(packageName, eventName));

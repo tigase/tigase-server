@@ -28,10 +28,8 @@ import tigase.monitor.InfoTask;
 import tigase.monitor.MonitorComponent;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.util.datetime.TimestampHelper;
-import tigase.xml.Element;
 
-import java.util.Date;
-import java.util.HashSet;
+import java.util.Map;
 
 @Bean(name = "load-checker-task", parent = MonitorComponent.class, active = true)
 public class LoadCheckerTask
@@ -40,7 +38,7 @@ public class LoadCheckerTask
 
 	public static final String MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoadAverageMonitorEvent";
 	private final static TimestampHelper dtf = new TimestampHelper();
-	private final HashSet<String> triggeredEvents = new HashSet<String>();
+	private boolean triggered = false;
 	@ConfigField(desc = "Average Load Threshold")
 	private long averageLoadThreshold = 10;
 	@Inject
@@ -80,7 +78,7 @@ public class LoadCheckerTask
 	@Override
 	public void initialize() {
 		super.initialize();
-		eventBus.registerEvent(MONITOR_EVENT_NAME, "Fired when load is too high", false);
+		eventBus.registerEvent(LoadCheckerTaskEvent.class, "Fired when load is too high", false);
 	}
 
 	@Override
@@ -97,21 +95,35 @@ public class LoadCheckerTask
 	protected void run() {
 		double curAverageLoad = runtime.getLoadAverage();
 		if (curAverageLoad >= averageLoadThreshold) {
-			Element event = new Element(MONITOR_EVENT_NAME);
-			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
-			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			event.addChild(new Element("averageLoad", Double.toString(curAverageLoad)));
-			event.addChild(new Element("message",
-									   "Average Load is higher than " + averageLoadThreshold + " and it is equals " +
-											   curAverageLoad));
-
-			if (!triggeredEvents.contains(event.getName())) {
+			final LoadCheckerTaskEvent event = new LoadCheckerTaskEvent(curAverageLoad);
+			if (!triggered) {
 				eventBus.fire(event);
-				triggeredEvents.add(event.getName());
+				triggered = true;
 			}
 		} else {
-			triggeredEvents.remove(MONITOR_EVENT_NAME);
+			triggered = false;
 		}
 	}
 
+	static class LoadCheckerTaskEvent
+			extends TasksEvent {
+
+		double averageLoad;
+
+		public LoadCheckerTaskEvent(double averageLoad) {
+			super("DiskUsageEvent", "Fired when load is too high");
+			this.averageLoad = averageLoad;
+		}
+
+		@Override
+		public Map<String, String> getAdditionalData() {
+			// @formatter:off
+			return Map.of("averageLoad", "" + averageLoad);
+			// @formatter:onn
+		}
+
+		public double getAverageLoad() {
+			return averageLoad;
+		}
+	}
 }

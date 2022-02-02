@@ -21,6 +21,7 @@ import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.io.repo.CertificateItem;
@@ -656,7 +657,7 @@ public class CertificateContainer
 	 * Event indicating certificate change that will be distributed in the cluster.
 	 */
 	public static class CertificateChange
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private String alias;
 		private transient boolean local = false;
@@ -722,7 +723,7 @@ public class CertificateContainer
 		}
 	}
 
-	public class CertificateChanged {
+	public class CertificateChanged implements EventBusEvent {
 
 		Set<String> domains = new ConcurrentSkipListSet<>();
 		private String alias;

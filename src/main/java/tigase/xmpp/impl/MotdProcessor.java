@@ -22,6 +22,7 @@ import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
@@ -187,7 +188,7 @@ public class MotdProcessor
 	}
 
 	public static class MotdUpdatedEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private String message;
 		private Long timestamp;

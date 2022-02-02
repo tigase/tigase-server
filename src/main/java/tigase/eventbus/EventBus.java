@@ -17,6 +17,7 @@
  */
 package tigase.eventbus;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xml.Element;
 
 public interface EventBus {
@@ -39,6 +40,8 @@ public interface EventBus {
 	 * with specific package name.
 	 * @param listener listener.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 	void addListener(String packageName, String eventName, EventListener<Element> listener);
 
 	/**
@@ -46,7 +49,16 @@ public interface EventBus {
 	 *
 	 * @param event event to fire.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 	void fire(Object event);
+
+	/**
+	 * Fires event.
+	 *
+	 * @param event event to fire.
+	 */
+	void fire(EventBusEvent event);
 
 	/**
 	 * Register all methods annotated with {@link HandleEvent @HandleEvent} as events handlers to EventBus.
@@ -57,7 +69,11 @@ public interface EventBus {
 	 */
 	void registerAll(Object eventConsumer);
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 	void registerEvent(String event, String description, boolean privateEvent);
+
+	public void registerEvent(Class<?> event, String description, boolean privateEvent);
 
 	/**
 	 * Removes listener from Eventbus.

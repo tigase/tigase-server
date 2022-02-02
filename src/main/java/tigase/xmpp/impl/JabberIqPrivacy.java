@@ -22,6 +22,7 @@ import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.ConfigField;
@@ -690,7 +691,7 @@ public class JabberIqPrivacy
 		all
 	}
 
-	public static class PrivacyListUpdatedEvent extends UserSessionEvent {
+	public static class PrivacyListUpdatedEvent extends UserSessionEvent implements EventBusEvent {
 
 		private String privacyListName;
 

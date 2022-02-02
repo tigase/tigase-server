@@ -32,6 +32,7 @@ import tigase.xml.Element;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 
 @Bean(name = "memory-checker-task", parent = MonitorComponent.class, active = true)
 public class MemoryCheckerTask
@@ -41,7 +42,7 @@ public class MemoryCheckerTask
 	public final static String HEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.HeapMemoryMonitorEvent";
 	public final static String NONHEAP_MEMORY_MONITOR_EVENT_NAME = "tigase.monitor.tasks.NonHeapMemoryMonitorEvent";
 	private final static TimestampHelper dtf = new TimestampHelper();
-	private final HashSet<String> triggeredEvents = new HashSet<String>();
+	private final HashSet<String> triggeredEvents = new HashSet<>();
 	@Inject
 	private MonitorComponent component;
 	@Inject
@@ -113,8 +114,7 @@ public class MemoryCheckerTask
 	@Override
 	public void initialize() {
 		super.initialize();
-		eventBus.registerEvent(HEAP_MEMORY_MONITOR_EVENT_NAME, "Fired when HEAP memory is too low", false);
-		eventBus.registerEvent(NONHEAP_MEMORY_MONITOR_EVENT_NAME, "Fired when NON-HEAP memory is too low", false);
+		eventBus.registerEvent(MemoryCheckerTaskEvent.class, "Fired when HEAP memory is too low", false);
 	}
 
 	@Override
@@ -133,19 +133,17 @@ public class MemoryCheckerTask
 	@Override
 	protected void run() {
 		float curHeapMemUsagePercent = runtime.getHeapMemUsage();
+		float curNonHeapMemUsagePercent = runtime.getNonHeapMemUsage();
 		if (curHeapMemUsagePercent >= maxHeapMemUsagePercentThreshold) {
-			Element event = new Element(HEAP_MEMORY_MONITOR_EVENT_NAME);
-			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
-			event.addChild(new Element("heapMemUsage", Float.toString(curHeapMemUsagePercent)));
-			event.addChild(new Element("heapMemMax", Long.toString(runtime.getHeapMemMax())));
-			event.addChild(new Element("heapMemUsed", Long.toString(runtime.getHeapMemUsed())));
-			event.addChild(new Element("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax())));
-			event.addChild(new Element("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed())));
-			event.addChild(new Element("directMemUsed", Long.toString(runtime.getDirectMemUsed())));
-			event.addChild(new Element("message",
-									   "Heap memory usage is higher than " + maxHeapMemUsagePercentThreshold +
-											   " and it equals " + curHeapMemUsagePercent));
+			MemoryCheckerTaskEvent event = new MemoryCheckerTaskEvent(HEAP_MEMORY_MONITOR_EVENT_NAME,
+																	  "Fired when HEAP memory is too low",
+																	  curHeapMemUsagePercent, curNonHeapMemUsagePercent,
+																	  runtime.getHeapMemMax(), runtime.getHeapMemUsed(),
+																	  runtime.getNonHeapMemMax(),
+																	  runtime.getNonHeapMemUsed(),
+																	  runtime.getDirectMemUsed(),
+																	  "Heap memory usage is higher than " + maxHeapMemUsagePercentThreshold +
+											  								 " and it equals " + curHeapMemUsagePercent);
 
 			if (!triggeredEvents.contains(event.getName())) {
 				eventBus.fire(event);
@@ -155,21 +153,16 @@ public class MemoryCheckerTask
 			triggeredEvents.remove(HEAP_MEMORY_MONITOR_EVENT_NAME);
 		}
 
-		float curNonHeapMemUsagePercent = runtime.getNonHeapMemUsage();
 		if (curNonHeapMemUsagePercent >= maxNonHeapMemUsagePercentThreshold) {
-			Element event = new Element(NONHEAP_MEMORY_MONITOR_EVENT_NAME);
-			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
-			event.addChild(new Element("nonHeapMemUsage", Float.toString(curNonHeapMemUsagePercent)));
-			event.addChild(new Element("heapMemMax", Long.toString(runtime.getHeapMemMax())));
-			event.addChild(new Element("heapMemUsed", Long.toString(runtime.getHeapMemUsed())));
-			event.addChild(new Element("nonHeapMemMax", Long.toString(runtime.getNonHeapMemMax())));
-			event.addChild(new Element("nonHeapMemUsed", Long.toString(runtime.getNonHeapMemUsed())));
-			event.addChild(new Element("directMemUsed", Long.toString(runtime.getDirectMemUsed())));
-			event.addChild(new Element("message",
-									   "Non-Heap memory usage is higher than " + maxNonHeapMemUsagePercentThreshold +
-											   " and it equals " + curHeapMemUsagePercent));
-
+			MemoryCheckerTaskEvent event = new MemoryCheckerTaskEvent(NONHEAP_MEMORY_MONITOR_EVENT_NAME,
+																	  "Fired when Non-HEAP memory is too low",
+																	  curHeapMemUsagePercent, curNonHeapMemUsagePercent,
+																	  runtime.getHeapMemMax(), runtime.getHeapMemUsed(),
+																	  runtime.getNonHeapMemMax(),
+																	  runtime.getNonHeapMemUsed(),
+																	  runtime.getDirectMemUsed(),
+																	  "Heap memory usage is higher than " + maxNonHeapMemUsagePercentThreshold +
+																			  " and it equals " + curNonHeapMemUsagePercent);
 			if (!triggeredEvents.contains(event.getName())) {
 				eventBus.fire(event);
 				triggeredEvents.add(event.getName());
@@ -178,5 +171,79 @@ public class MemoryCheckerTask
 			triggeredEvents.remove(NONHEAP_MEMORY_MONITOR_EVENT_NAME);
 		}
 	}
+	static class MemoryCheckerTaskEvent
+			extends TasksEvent {
 
+		float heapMemUsage;
+		float nonHeapMemUsage;
+		long heapMemMax;
+		long heapMemUsed;
+		long nonHeapMemMax;
+		long nonHeapMemUsed;
+		long directMemUsed;
+		String message;
+
+		public MemoryCheckerTaskEvent(String name, String description, float heapMemUsage, float nonHeapMemUsage,
+									  long heapMemMax, long heapMemUsed, long nonHeapMemMax, long nonHeapMemUsed,
+									  long directMemUsed, String message) {
+			super(name, description);
+			this.heapMemUsage = heapMemUsage;
+			this.nonHeapMemUsage = nonHeapMemUsage;
+			this.heapMemMax = heapMemMax;
+			this.heapMemUsed = heapMemUsed;
+			this.nonHeapMemMax = nonHeapMemMax;
+			this.nonHeapMemUsed = nonHeapMemUsed;
+			this.directMemUsed = directMemUsed;
+			this.message = message;
+
+		}
+
+		@Override
+		public Map<String, String> getAdditionalData() {
+			// @formatter:off
+			return Map.of(
+				"heapMemUsage", Float.toString(heapMemUsage),
+				"nonHeapMemUsage", Float.toString(nonHeapMemUsage),
+				"heapMemMax", Long.toString(heapMemMax),
+				"heapMemUsed", Long.toString(heapMemUsed),
+				"nonHeapMemMax", Long.toString(nonHeapMemMax),
+				"nonHeapMemUsed", Long.toString(nonHeapMemUsed),
+				"directMemUsed", Long.toString(directMemUsed),
+				"message", message
+			);
+			// @formatter:onn
+		}
+
+		public float getHeapMemUsage() {
+			return heapMemUsage;
+		}
+
+		public float getNonHeapMemUsage() {
+			return nonHeapMemUsage;
+		}
+
+		public long getHeapMemMax() {
+			return heapMemMax;
+		}
+
+		public long getHeapMemUsed() {
+			return heapMemUsed;
+		}
+
+		public long getNonHeapMemMax() {
+			return nonHeapMemMax;
+		}
+
+		public long getNonHeapMemUsed() {
+			return nonHeapMemUsed;
+		}
+
+		public long getDirectMemUsed() {
+			return directMemUsed;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+	}
 }

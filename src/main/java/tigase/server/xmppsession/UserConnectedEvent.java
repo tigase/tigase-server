@@ -17,12 +17,13 @@
  */
 package tigase.server.xmppsession;
 
+import tigase.eventbus.EventBusEvent;
 import tigase.xmpp.jid.JID;
 
 import java.io.Serializable;
 
 public class UserConnectedEvent
-		implements Serializable {
+		implements Serializable, EventBusEvent {
 
 	private JID userJid;
 

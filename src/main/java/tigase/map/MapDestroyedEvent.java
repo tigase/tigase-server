@@ -17,9 +17,11 @@
  */
 package tigase.map;
 
+import tigase.eventbus.EventBusEvent;
+
 import java.util.Map;
 
-public class MapDestroyedEvent {
+public class MapDestroyedEvent implements EventBusEvent {
 
 	private final Map map;
 	private final String uid;

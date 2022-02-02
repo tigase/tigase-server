@@ -18,6 +18,7 @@
 package tigase.map;
 
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.impl.EventName;
@@ -207,7 +208,7 @@ public class ClusterMapFactory {
 	}
 
 	public static class ElementAddEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private String key;
 		private String uid;
@@ -239,7 +240,7 @@ public class ClusterMapFactory {
 	}
 
 	public static class ElementRemoveEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private String key;
 		private String uid;
@@ -262,7 +263,7 @@ public class ClusterMapFactory {
 	}
 
 	public static class MapClearEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private String uid;
 
@@ -276,7 +277,7 @@ public class ClusterMapFactory {
 	}
 
 	public static class MapDestroyEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private String uid;
 
@@ -290,7 +291,7 @@ public class ClusterMapFactory {
 	}
 
 	public static class NewMapCreatedEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private Class keyClass;
 		private String[] params;

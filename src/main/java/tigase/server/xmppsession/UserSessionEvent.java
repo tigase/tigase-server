@@ -17,6 +17,7 @@
  */
 package tigase.server.xmppsession;
 
+import tigase.eventbus.EventBusEvent;
 import tigase.xmpp.XMPPSession;
 import tigase.xmpp.jid.JID;
 
@@ -29,7 +30,7 @@ import java.io.Serializable;
  * @author andrzej
  */
 public class UserSessionEvent
-		implements Serializable {
+		implements Serializable, EventBusEvent {
 
 	private JID sender;
 	private transient XMPPSession session;

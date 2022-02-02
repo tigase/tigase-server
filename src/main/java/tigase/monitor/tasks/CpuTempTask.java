@@ -26,14 +26,12 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
 import tigase.util.datetime.TimestampHelper;
-import tigase.xml.Element;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +52,7 @@ public class CpuTempTask
 
 	private static final String THROTT_DIR = "/proc/acpi/processor/CPU";
 	private static final String THROTT_FILE = "/throttling";
-	private final HashSet<String> triggeredEvents = new HashSet<String>();
+	private boolean triggered = false;
 	@Inject
 	private MonitorComponent component;
 	@ConfigField(desc = "CPU Temperature threshold")
@@ -88,8 +86,9 @@ public class CpuTempTask
 	}
 
 	@Override
-	public void initialize() {super.initialize();
-		eventBus.registerEvent(CPU_TEMP_MONITOR_EVENT_NAME, "Fired when CPU temperature is too high", false);
+	public void initialize() {
+		super.initialize();
+		eventBus.registerEvent(CpuTempEvent.class, "Fired when CPU temperature is too high", false);
 	}
 
 	@Override
@@ -109,18 +108,15 @@ public class CpuTempTask
 		// checkCPUThrottling();
 
 		if (cpu_temp >= cpuTempThreshold) {
-			Element event = new Element(CPU_TEMP_MONITOR_EVENT_NAME);
-			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
-			event.addChild(new Element("cpuTemp", "" + cpu_temp));
+			final CpuTempEvent event = new CpuTempEvent(cpu_temp);
 
-			if (!triggeredEvents.contains(event.getName())) {
+			if (!triggered) {
 				eventBus.fire(event);
-				triggeredEvents.add(event.getName());
+				triggered = true;
 			}
 
 		} else {
-			triggeredEvents.remove(CPU_TEMP_MONITOR_EVENT_NAME);
+			triggered = false;
 		}
 	}
 
@@ -178,6 +174,27 @@ public class CpuTempTask
 			} catch (Exception ex) {
 				log.log(Level.WARNING, "Can''t read file: " + THROTT_DIR + i + THROTT_FILE, ex);
 			}
+		}
+	}
+
+	static class CpuTempEvent extends TasksEvent {
+
+		private final int cpu_temp;
+
+		public CpuTempEvent(int cpu_temp) {
+			super("CpuTempEvent", "Fired when CPU temperature is too high");
+			this.cpu_temp = cpu_temp;
+		}
+
+		@Override
+		public Map<String, String> getAdditionalData() {
+			// @formatter:off
+			return Map.of("cpuTemp", "" + cpu_temp);
+			// @formatter:onn
+		}
+
+		public int getCpu_temp() {
+			return cpu_temp;
 		}
 	}
 }

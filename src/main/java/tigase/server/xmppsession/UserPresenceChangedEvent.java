@@ -17,6 +17,7 @@
  */
 package tigase.server.xmppsession;
 
+import tigase.eventbus.EventBusEvent;
 import tigase.server.Packet;
 import tigase.xmpp.XMPPSession;
 
@@ -29,7 +30,7 @@ import tigase.xmpp.XMPPSession;
  *
  * @author andrzej
  */
-public class UserPresenceChangedEvent {
+public class UserPresenceChangedEvent implements EventBusEvent {
 
 	/**
 	 * Packet containing new presence with "from" attribute set to full jid of connection which changed presence.

@@ -17,9 +17,12 @@
  */
 package tigase.eventbus.impl;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.eventbus.EventListener;
 import tigase.xml.Element;
 
+@Deprecated
+@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 class ElementListenerHandler
 		extends AbstractListenerHandler<EventListener<Element>> {
 
