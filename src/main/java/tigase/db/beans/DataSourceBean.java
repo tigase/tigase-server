@@ -23,6 +23,7 @@ import tigase.db.DataSource;
 import tigase.db.DataSourceHelper;
 import tigase.db.DataSourcePool;
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.UnregisterAware;
@@ -196,7 +197,7 @@ public class DataSourceBean
 	 * Event emitted by {@link tigase.db.beans.DataSourceBean} using {@link tigase.eventbus.EventBus} when instance of
 	 * {@link tigase.db.DataSource} for some name changes.
 	 */
-	public static class DataSourceChangedEvent {
+	public static class DataSourceChangedEvent implements EventBusEvent {
 
 		private final DataSourceBean bean;
 		private final String domain;

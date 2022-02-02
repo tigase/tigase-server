@@ -18,6 +18,7 @@
 package tigase.auth;
 
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.eventbus.HandleEvent;
 import tigase.kernel.DefaultTypesConverter;
 import tigase.kernel.TypesConverter;
@@ -568,7 +569,7 @@ public class BruteForceLockerBean
 	}
 
 	public static class StatisticsEmitEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private String nodeName;
 

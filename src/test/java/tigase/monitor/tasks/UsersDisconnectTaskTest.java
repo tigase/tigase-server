@@ -18,53 +18,49 @@
 package tigase.monitor.tasks;
 
 import org.junit.Test;
-import tigase.xml.Element;
+
+import java.util.Optional;
 
 import static org.junit.Assert.*;
-import static tigase.monitor.tasks.ConnectionsTask.createAlarmEvent;
+import static tigase.monitor.tasks.ConnectionsTask.createUserDisconnectedEvent;
 
 public class UsersDisconnectTaskTest {
 
 	@Test
 	public void testCreateAlarmEvent() throws Exception {
-		Element e = createAlarmEvent(100, 200, 10, 50);
+		Optional<ConnectionsTask.UserDisconnectedEvent> e = createUserDisconnectedEvent(100, 200, 10, 50);
 
-		assertNotNull(e);
-		assertEquals(100, Integer.parseInt(
-				e.getCData(new String[]{"tigase.monitor.tasks.UsersDisconnected", "disconnections"})));
-		assertEquals(50f, Float.parseFloat(
-				e.getCData(new String[]{"tigase.monitor.tasks.UsersDisconnected", "disconnectionsPercent"})), 0);
+		assertTrue(e.isPresent());
 
-		e = createAlarmEvent(99, 250, 10, 50);
-		assertNotNull(e);
-		assertEquals(151, Integer.parseInt(
-				e.getCData(new String[]{"tigase.monitor.tasks.UsersDisconnected", "disconnections"})));
-		assertEquals(60.4, Float.parseFloat(
-				e.getCData(new String[]{"tigase.monitor.tasks.UsersDisconnected", "disconnectionsPercent"})), 0.01);
+		assertEquals(100, e.get().getDisconnections());
+		assertEquals(50f, e.get().getDisconnectionsPercent(), 0);
 
-		e = createAlarmEvent(0, 99, 10, 50);
-		assertNotNull(e);
-		assertEquals(99, Integer.parseInt(
-				e.getCData(new String[]{"tigase.monitor.tasks.UsersDisconnected", "disconnections"})));
-		assertEquals(100.0, Float.parseFloat(
-				e.getCData(new String[]{"tigase.monitor.tasks.UsersDisconnected", "disconnectionsPercent"})), 0.01);
+		e = createUserDisconnectedEvent(99, 250, 10, 50);
+		assertTrue(e.isPresent());
+		assertEquals(151, e.get().getDisconnections());
+		assertEquals(60.4, e.get().getDisconnectionsPercent(), 0.01);
 
-		e = createAlarmEvent(99, 250, 152, 50);
-		assertNull(e);
+		e = createUserDisconnectedEvent(0, 99, 10, 50);
+		assertTrue(e.isPresent());
+		assertEquals(99, e.get().getDisconnections());
+		assertEquals(100.0, e.get().getDisconnectionsPercent(), 0.01);
 
-		e = createAlarmEvent(99, 250, 10, 61);
-		assertNull(e);
+		e = createUserDisconnectedEvent(99, 250, 152, 50);
+		assertFalse(e.isPresent());
 
-		e = createAlarmEvent(250, 0, 10, 50);
-		assertNull(e);
+		e = createUserDisconnectedEvent(99, 250, 10, 61);
+		assertFalse(e.isPresent());
 
-		e = createAlarmEvent(0, 0, 10, 50);
-		assertNull(e);
+		e = createUserDisconnectedEvent(250, 0, 10, 50);
+		assertFalse(e.isPresent());
 
-		e = createAlarmEvent(1, 1, 10, 50);
-		assertNull(e);
+		e = createUserDisconnectedEvent(0, 0, 10, 50);
+		assertFalse(e.isPresent());
 
-		e = createAlarmEvent(0, 1, 10, 50);
-		assertNull(e);
+		e = createUserDisconnectedEvent(1, 1, 10, 50);
+		assertFalse(e.isPresent());
+
+		e = createUserDisconnectedEvent(0, 1, 10, 50);
+		assertFalse(e.isPresent());
 	}
 }

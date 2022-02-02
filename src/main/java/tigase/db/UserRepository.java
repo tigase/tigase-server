@@ -18,6 +18,7 @@
 package tigase.db;
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.eventbus.EventBusEvent;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.Collections;
@@ -446,7 +447,7 @@ public interface UserRepository
 	 */
 	boolean userExists(BareJID user);
 
-	public static class UserRemovedEvent {
+	public static class UserRemovedEvent implements EventBusEvent {
 
 		public final BareJID jid;
 

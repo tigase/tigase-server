@@ -17,7 +17,7 @@
  */
 package tigase.eventbus;
 
-public class TickMinuteEvent {
+public class TickMinuteEvent implements EventBusEvent {
 
 	private final long timestamp;
 

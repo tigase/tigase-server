@@ -27,15 +27,13 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
 import tigase.util.common.OSUtils;
 import tigase.util.datetime.TimestampHelper;
-import tigase.xml.Element;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +47,6 @@ public class DiskTask
 	protected final static TimestampHelper dtf = new TimestampHelper();
 
 	private static final Logger log = Logger.getLogger(DiskTask.class.getName());
-	protected final HashSet<String> triggeredEvents = new HashSet<String>();
 	@Inject
 	protected MonitorComponent component;
 	@Inject
@@ -57,6 +54,7 @@ public class DiskTask
 	@ConfigField(desc = "Disk usage threshold")
 	protected float threshold = 0.8F;
 	private File[] roots;
+	private boolean triggered = false;
 
 	public DiskTask() {
 		setPeriod(1000 * 60);
@@ -72,7 +70,7 @@ public class DiskTask
 	@Override
 	public void initialize() {
 		super.initialize();
-		eventBus.registerEvent(DISK_USAGE_MONITOR_EVENT_NAME, "Fired if disk usage is too high", false);
+		eventBus.registerEvent(DiskUsageEvent.class, "Fired if disk usage is too high", false);
 		findAllRoots();
 	}
 
@@ -95,21 +93,16 @@ public class DiskTask
 		for (File file : roots) {
 			if (file.getUsableSpace() < file.getTotalSpace() * (1 - threshold)) {
 
-				Element event = new Element(DISK_USAGE_MONITOR_EVENT_NAME);
-				event.addChild(new Element("hostname", component.getDefHostName().toString()));
-				event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
-				event.addChild(new Element("hostname", component.getDefHostName().toString()));
-				event.addChild(new Element("root", file.toString()));
-				event.addChild(new Element("usableSpace", "" + file.getUsableSpace()));
-				event.addChild(new Element("totalSpace", "" + file.getTotalSpace()));
+				final DiskUsageEvent event = new DiskUsageEvent(file.toString(), file.getUsableSpace(),
+																file.getTotalSpace());
 
-				if (!triggeredEvents.contains(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file)) {
+				if (!triggered) {
 					eventBus.fire(event);
-					triggeredEvents.add(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file);
+					triggered = true;
 				}
 
 			} else {
-				triggeredEvents.remove(DISK_USAGE_MONITOR_EVENT_NAME + ":" + file);
+				triggered = false;
 			}
 		}
 	}
@@ -196,4 +189,28 @@ public class DiskTask
 		return File.listRoots();
 	}
 
+	static class DiskUsageEvent
+			extends TasksEvent {
+
+		String root;
+		long totalSpace;
+		long usableSpace;
+
+		public DiskUsageEvent(String root, long usableSpace, long totalSpace) {
+			super("DiskUsageEvent", "Fired if disk usage is too high");
+			this.root = root;
+			this.usableSpace = usableSpace;
+			this.totalSpace = totalSpace;
+		}
+
+		@Override
+		public Map<String, String> getAdditionalData() {
+			// @formatter:off
+				return Map.of("root", root,
+				"usableSpace", "" + usableSpace,
+				"totalSpace", "" + totalSpace);
+			// @formatter:onn
+
+		}
+	}
 }

@@ -17,12 +17,13 @@
  */
 package tigase.eventbus.impl;
 
+import tigase.eventbus.EventBusEvent;
 import tigase.xml.Element;
 import tigase.xmpp.jid.JID;
 
 import java.util.HashSet;
 
-public class Event1 {
+public class Event1 implements EventBusEvent {
 
 	private Element elementField;
 	private String emptyField;

@@ -17,6 +17,7 @@
  */
 package tigase.monitor.tasks;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.eventbus.EventBus;
 import tigase.form.Field;
 import tigase.form.Form;
@@ -32,6 +33,8 @@ import tigase.util.datetime.TimestampHelper;
 import tigase.xml.Element;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,6 +66,8 @@ public class ConnectionsTask
 	 *
 	 * @return event or <code>null</code>.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "Class based events should be used")
 	public static Element createAlarmEvent(int currentOnlineUsers, int lastOnlineUsers, int thresholdMinimal,
 										   int threshold) {
 		final int delta = currentOnlineUsers - lastOnlineUsers;
@@ -87,6 +92,29 @@ public class ConnectionsTask
 			return event;
 		} else {
 			return null;
+		}
+	}
+
+	public static Optional<UserDisconnectedEvent> createUserDisconnectedEvent(int currentOnlineUsers,
+																			  int lastOnlineUsers, int thresholdMinimal,
+																			  int threshold) {
+		final int delta = currentOnlineUsers - lastOnlineUsers;
+		final float percent = (lastOnlineUsers == 0 ? 1 : ((float) delta) / (float) lastOnlineUsers) * 100;
+
+		if (log.isLoggable(Level.FINE)) {
+			log.fine("Data: lastOnlineUsers=" + lastOnlineUsers + "; currentOnlineUsers=" + currentOnlineUsers +
+							 "; delta=" + delta + "; percent=" + percent + "; thresholdMinimal=" + thresholdMinimal +
+							 "; threshold=" + threshold);
+		}
+
+		if (-1 * delta >= thresholdMinimal && -1 * percent >= threshold) {
+			if (log.isLoggable(Level.FINE)) {
+				log.fine("Creating event!");
+			}
+
+			return Optional.of(new UserDisconnectedEvent(delta, percent));
+		} else {
+			return Optional.empty();
 		}
 	}
 
@@ -128,8 +156,9 @@ public class ConnectionsTask
 	@Override
 	public void initialize() {
 		super.initialize();
-		eventBus.registerEvent(USERS_DISCONNECTEED_EVENT_NAME,
+		eventBus.registerEvent(UserDisconnectedEvent.class,
 							   "Fired when too many users disconnected in the same time", false);
+		eventBus.registerAll(this);
 	}
 
 	@Override
@@ -157,12 +186,40 @@ public class ConnectionsTask
 
 		final int currentOnlineUsers = sess.getOpenUsersConnectionsAmount();
 
-		Element event = createAlarmEvent(currentOnlineUsers, lastOnlineUsers, thresholdMinimal, threshold);
-		if (event != null) {
-			event.addChild(new Element("hostname", component.getDefHostName().toString()));
-			eventBus.fire(event);
-		}
+		Optional<UserDisconnectedEvent> event = createUserDisconnectedEvent(currentOnlineUsers, lastOnlineUsers,
+																			thresholdMinimal, threshold);
+		event.ifPresent(userDisconnectedEvent -> eventBus.fire(userDisconnectedEvent));
 
 		this.lastOnlineUsers = currentOnlineUsers;
+	}
+
+	static class UserDisconnectedEvent
+			extends TasksEvent {
+
+		private final int disconnections;
+		private final float disconnectionsPercent;
+
+		public UserDisconnectedEvent(int delta, float percent) {
+			super("UserDisconnectedEvent", "Fired when too many users disconnected in the same time");
+			this.disconnections = -1 * delta;
+			this.disconnectionsPercent = -1 * percent;
+		}
+
+		@Override
+		public Map<String, String> getAdditionalData() {
+			// @formatter:off
+			return Map.of("disconnections", "" + (disconnections),
+						  "disconnectionsPercent", "" + (disconnectionsPercent)
+			);
+			// @formatter:onn
+		}
+
+		public int getDisconnections() {
+			return disconnections;
+		}
+
+		public float getDisconnectionsPercent() {
+			return disconnectionsPercent;
+		}
 	}
 }

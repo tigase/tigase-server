@@ -19,6 +19,7 @@ package tigase.xmpp.impl;
 
 import tigase.db.*;
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.eventbus.HandleEvent;
 import tigase.form.*;
 import tigase.kernel.beans.*;
@@ -871,7 +872,7 @@ public class JabberIqRegister
 		}
 	}
 
-	public static class UserRegisteredEvent {
+	public static class UserRegisteredEvent implements EventBusEvent {
 
 		private boolean confirmationRequired;
 		private String email;
@@ -920,7 +921,7 @@ public class JabberIqRegister
 	}
 
 	public static class WelcomeMessageChangedEvent
-			implements Serializable {
+			implements Serializable, EventBusEvent {
 
 		private String message;
 

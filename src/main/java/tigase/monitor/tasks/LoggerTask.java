@@ -27,14 +27,11 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.monitor.MonitorComponent;
 import tigase.util.StringUtilities;
 import tigase.util.datetime.TimestampHelper;
-import tigase.util.dns.DNSResolverFactory;
-import tigase.util.dns.DNSResolverIfc;
 import tigase.util.log.LogFormatter;
-import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 
-import java.util.Date;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.*;
 
 @Bean(name = "logger-task", parent = MonitorComponent.class, active = true)
@@ -44,8 +41,6 @@ public class LoggerTask
 
 	public static final Logger log = Logger.getLogger(LoggerTask.class.getName());
 	protected final static TimestampHelper dtf = new TimestampHelper();
-//	private static final String[] decoded = {"&", "<", ">", "\"", "\'"};
-//	private static final String[] encoded = {"&amp;", "[", "]", "&quot;", "&apos;"};
 	private static final String LOGGER_MONITOR_EVENT_NAME = "tigase.monitor.tasks.LoggerMonitorEvent";
 	@Inject
 	protected MonitorComponent component;
@@ -104,13 +99,7 @@ public class LoggerTask
 	}
 
 	public void sendWarningOut(String logBuff) {
-		Element event = new Element(LOGGER_MONITOR_EVENT_NAME);
-		final DNSResolverIfc dnsResolver = DNSResolverFactory.getInstance();
-		event.addChild(new Element("timestamp", "" + dtf.format(new Date())));
-		event.addChild(new Element("hostname", String.valueOf(dnsResolver.getDefaultHost())));
-		event.addChild(new Element("external_hostname", String.valueOf(dnsResolver.getSecondaryHost())));
-		event.addChild(new Element("log", logBuff));
-
+		final LoggerTaskEvent event = new LoggerTaskEvent(logBuff);
 		eventBus.fire(event);
 	}
 
@@ -212,6 +201,28 @@ public class LoggerTask
 			String logEntry = XMLUtils.escape(formatter.format(record));
 			String unicodeLiteral = StringUtilities.convertNonPrintableCharactersToLiterals(logEntry, true);
 			logs.add(unicodeLiteral);
+		}
+	}
+
+	static class LoggerTaskEvent
+			extends TasksEvent {
+
+		String log;
+
+		public LoggerTaskEvent(String log) {
+			super("LoggerEvent", "Fired when logger receives with specific level");
+			this.log = log;
+		}
+
+		@Override
+		public Map<String, String> getAdditionalData() {
+			// @formatter:off
+			return Map.of("log", "" + log);
+			// @formatter:onn
+		}
+
+		public String getLog() {
+			return log;
 		}
 	}
 }

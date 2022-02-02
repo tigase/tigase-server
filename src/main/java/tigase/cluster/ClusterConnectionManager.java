@@ -30,6 +30,7 @@ import tigase.db.comp.ComponentRepository;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -994,7 +995,7 @@ public class ClusterConnectionManager
 		}
 	}
 
-	public static class ClusterInitializedEvent {
+	public static class ClusterInitializedEvent implements EventBusEvent {
 
 		public ClusterInitializedEvent() {
 
