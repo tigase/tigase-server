@@ -183,6 +183,13 @@ public class MemoryCheckerTask
 		long directMemUsed;
 		String message;
 
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public MemoryCheckerTaskEvent(String name, String description) {
+			super(name, description);
+		}
+
 		public MemoryCheckerTaskEvent(String name, String description, float heapMemUsage, float nonHeapMemUsage,
 									  long heapMemMax, long heapMemUsed, long nonHeapMemMax, long nonHeapMemUsed,
 									  long directMemUsed, String message) {

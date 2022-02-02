@@ -209,6 +209,13 @@ public class LoggerTask
 
 		String log;
 
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public LoggerTaskEvent(String name, String description) {
+			super(name, description);
+		}
+
 		public LoggerTaskEvent(String log) {
 			super("LoggerEvent", "Fired when logger receives with specific level");
 			this.log = log;

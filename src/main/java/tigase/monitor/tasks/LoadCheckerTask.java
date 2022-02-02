@@ -110,6 +110,13 @@ public class LoadCheckerTask
 
 		double averageLoad;
 
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public LoadCheckerTaskEvent(String name, String description) {
+			super(name, description);
+		}
+
 		public LoadCheckerTaskEvent(double averageLoad) {
 			super("DiskUsageEvent", "Fired when load is too high");
 			this.averageLoad = averageLoad;

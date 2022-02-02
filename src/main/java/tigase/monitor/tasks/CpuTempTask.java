@@ -179,7 +179,14 @@ public class CpuTempTask
 
 	static class CpuTempEvent extends TasksEvent {
 
-		private final int cpu_temp;
+		private int cpu_temp;
+
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public CpuTempEvent(String name, String description) {
+			super(name, description);
+		}
 
 		public CpuTempEvent(int cpu_temp) {
 			super("CpuTempEvent", "Fired when CPU temperature is too high");

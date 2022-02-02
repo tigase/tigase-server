@@ -84,6 +84,13 @@ public class SampleTask
 
 		String message;
 
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public SampleTaskEvent(String name, String description) {
+			super(name, description);
+		}
+
 		public SampleTaskEvent(String message) {
 			super("SampleTaskEvent", "Sample task");
 			this.message = message;

@@ -196,6 +196,13 @@ public class DiskTask
 		long totalSpace;
 		long usableSpace;
 
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public DiskUsageEvent(String name, String description) {
+			super(name, description);
+		}
+
 		public DiskUsageEvent(String root, long usableSpace, long totalSpace) {
 			super("DiskUsageEvent", "Fired if disk usage is too high");
 			this.root = root;

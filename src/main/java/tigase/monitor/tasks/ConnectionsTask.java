@@ -196,8 +196,15 @@ public class ConnectionsTask
 	static class UserDisconnectedEvent
 			extends TasksEvent {
 
-		private final int disconnections;
-		private final float disconnectionsPercent;
+		private int disconnections;
+		private float disconnectionsPercent;
+
+		/**
+		 * Empty constructor to be able to serialize/deserialize event
+		 */
+		public UserDisconnectedEvent(String name, String description) {
+			super(name, description);
+		}
 
 		public UserDisconnectedEvent(int delta, float percent) {
 			super("UserDisconnectedEvent", "Fired when too many users disconnected in the same time");
