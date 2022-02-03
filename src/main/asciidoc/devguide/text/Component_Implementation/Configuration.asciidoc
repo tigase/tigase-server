@@ -18,6 +18,18 @@ Let's create the following private variables in our component *TestModule*:
 
 [source,java]
 -----
+private String[] packetTypes = {"message", "presence", "iq"};
+private String prependText = "My packet: ";
+private boolean secureLogging = false;
+-----
+
+To make them configurable we have to annote them with `@ConfigField` annotation. It requires `desc` field (describing configuration option) and has following optional properties:
+* `alias` - alternative name of the variable
+* `allowAliasFromParent` - specifies whether value from alias from parent bean should be allowed
+* `type` - specifies general type of the field, which impacts possible obfuscation of the value in the logs/"config-dump" file; possible values: `Plain` (no changes), `Password` (complete value will be obfuscated) and `JdbcUrl` (only password part will be obfuscated from the URL)
+
+[source,java]
+-----
 @ConfigField(desc = "Logged packet types", alias = "packet-types")
 private String[] packetTypes = {"message", "presence", "iq"};
 @ConfigField(desc = "Prefix", alias = "log-prepend")

@@ -707,11 +707,12 @@ public class ConfigHolder {
 				throw new RuntimeException(ex.getMessage(), ex);
 			}
 		}
-
-		try (Writer w = new StringWriter()) {
-			new ConfigWriter().resolveVariables().write(w, props);
-			log.log(Level.CONFIG, "Loaded configuration:\n" + w.toString());
-		}
+//// We can't rely on ConfigField type annotation here to determine which fields should be obfuscated
+//// thus we won't be including parsed configuration in console-log file.
+//		try (Writer w = new StringWriter()) {
+//			new ConfigWriter().resolveVariables().write(w, props);
+//			log.log(Level.CONFIG, "Loaded configuration:\n" + w.toString());
+//		}
 
 		return output;
 	}

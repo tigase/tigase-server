@@ -26,6 +26,7 @@ import tigase.kernel.beans.Initializable;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.ConfigField;
+import tigase.kernel.beans.config.ConfigFieldType;
 import tigase.kernel.beans.config.ConfigurationChangedAware;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
@@ -60,7 +61,7 @@ public abstract class MDPoolConfigBean<A, B extends MDPoolConfigBean<A, B>>
 	protected String poolCls;
 	@ConfigField(alias = POOL_SIZE, desc = "Pool size", allowAliasFromParent = false)
 	protected int poolSize = RepositoryFactory.USER_REPO_POOL_SIZE_PROP_VAL;
-	@ConfigField(alias = REPO_URI, desc = "URI for repository", allowAliasFromParent = false)
+	@ConfigField(alias = REPO_URI, desc = "URI for repository", allowAliasFromParent = false, type = ConfigFieldType.JdbcUrl)
 	protected String uri;
 	@Inject(nullAllowed = true)
 	private Set<A> instances;

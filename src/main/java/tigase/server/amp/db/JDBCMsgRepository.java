@@ -18,6 +18,7 @@
 package tigase.server.amp.db;
 
 import tigase.db.*;
+import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Packet;
@@ -94,7 +95,7 @@ public class JDBCMsgRepository
 			log.log(Level.WARNING, "MsgRepository not initialized due to exception",
 					ExceptionUtilities.getExceptionRootCause(ex, true));
 			throw new RuntimeException(
-					"Could not initialize JDBCMsgRepository instance for " + data_repo.getResourceUri(), ex);
+					"Could not initialize JDBCMsgRepository instance for " + JDBCPasswordObfuscator.obfuscatePassword(data_repo.getResourceUri()), ex);
 		}
 
 		this.data_repo = data_repo;

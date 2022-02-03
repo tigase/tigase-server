@@ -19,6 +19,7 @@ package tigase.component;
 
 import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigWriter;
+import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.RegistrarBean;
 import tigase.kernel.beans.config.*;
@@ -231,20 +232,26 @@ public class DSLBeanConfigurator
 							bc.getState() != BeanConfig.State.initialized ? getConfiguration(bc) : null;
 					Set<String> validProps = new HashSet<>();
 					if (defaults != null) {
-						defaults.forEach((field, v) -> {
+						defaults.forEach((field, defaultValue) -> {
 							ConfigField cf = field.getAnnotation(ConfigField.class);
-//						if (forBean.containsKey(field.getName()) || (cf != null && !cf.alias().isEmpty() && forBean.containsKey(cf.alias()))) {
-//							return;
-//						}
-							Object v1 = null;
+							Object configuredValue = null;
 							if (cfg != null) {
-								v1 = cfg.get(field.getName());
-								if (v1 == null && cf != null && !cf.alias().isEmpty()) {
-									v1 = cfg.get(cf.alias());
+								configuredValue = cfg.get(field.getName());
+								if (configuredValue == null && cf != null && !cf.alias().isEmpty()) {
+									configuredValue = cfg.get(cf.alias());
 								}
 							}
 							String prop = (cf == null || cf.alias().isEmpty()) ? field.getName() : cf.alias();
-							forBean.put(prop, v1 == null ? v : v1);
+							Object value = configuredValue == null ? defaultValue : configuredValue;
+
+							if (cf.type() != null) {
+								if (cf.type().equals(ConfigFieldType.Password) ) {
+									value = "*".repeat((Objects.toString(value)).length());
+								} else if (cf.type().equals(ConfigFieldType.JdbcUrl)) {
+									value = JDBCPasswordObfuscator.obfuscatePassword(Objects.toString(value));
+								}
+							}
+							forBean.put(prop, value);
 							validProps.add(prop);
 						});
 					}

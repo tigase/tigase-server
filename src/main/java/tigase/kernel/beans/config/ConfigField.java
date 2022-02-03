@@ -48,4 +48,6 @@ public @interface ConfigField {
 	 * If not set to <code>true</code>, it is possible to use alias only on the config level of the bean.
 	 */
 	boolean allowAliasFromParent() default true;
+
+	ConfigFieldType type() default ConfigFieldType.Plain;
 }

@@ -19,6 +19,7 @@ package tigase.db.jdbc;
 
 import tigase.db.*;
 import tigase.db.Repository.Meta;
+import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.util.Algorithms;
 import tigase.util.Base64;
 import tigase.xmpp.jid.BareJID;
@@ -126,9 +127,9 @@ public class DrupalWPAuth
 				status_val = WP_OK_STATUS_VAL;
 				status_fld = WP_STATUS_FLD;
 				pass_fld = WP_PASS_FLD;
-				log.log(Level.INFO, "Initializing Wordpress repository: {0}", connection_str);
+				log.log(Level.INFO, "Initializing Wordpress repository: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
 			} else {
-				log.log(Level.INFO, "Initializing Drupal repository: {0}", connection_str);
+				log.log(Level.INFO, "Initializing Drupal repository: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
 			}
 
 			String query = "select " + pass_fld + " from " + users_tbl + " where " + name_fld + " = ?";

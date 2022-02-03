@@ -19,6 +19,7 @@ package tigase.db.jdbc;
 
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
+import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.util.cache.SimpleCache;
 import tigase.xmpp.jid.BareJID;
@@ -508,7 +509,7 @@ public class JDBCRepository
 			auth = new AuthRepositoryImpl(this);
 
 			// initRepo();
-			log.log(Level.INFO, "Initialized database connection: {0}", connection_str);
+			log.log(Level.INFO, "Initialized database connection: {0}", JDBCPasswordObfuscator.obfuscatePassword(connection_str));
 		} catch (SQLException ex) {
 			data_repo = null;
 			throw new DBInitException("Could not initialize repository", ex);

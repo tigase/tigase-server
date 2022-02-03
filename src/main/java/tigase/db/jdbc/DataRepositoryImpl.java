@@ -20,6 +20,7 @@ package tigase.db.jdbc;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
 import tigase.db.Repository;
+import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.stats.CounterValue;
@@ -320,7 +321,7 @@ public class DataRepositoryImpl
 			throw new DBInitException("Database initialization failed", ex);
 		}
 
-		log.log(Level.INFO, "Initialized database connection: {0}", resource_uri);
+		log.log(Level.INFO, "Initialized database connection: {0}", JDBCPasswordObfuscator.obfuscatePassword(resource_uri));
 	}
 
 	public static dbTypes parseDatabaseType(String resource_uri) {
