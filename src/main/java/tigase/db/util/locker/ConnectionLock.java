@@ -20,6 +20,7 @@ package tigase.db.util.locker;
 
 import tigase.db.DataRepository;
 import tigase.db.jdbc.DataRepositoryImpl;
+import tigase.db.util.JDBCPasswordObfuscator;
 
 import java.sql.*;
 import java.util.Optional;
@@ -100,9 +101,9 @@ abstract public class ConnectionLock {
 		}
 
 		if (isLocked) {
-			log.log(Level.INFO, "Obtained lock for connection: " + jdbcConnection);
+			log.log(Level.INFO, "Obtained lock for connection: " + JDBCPasswordObfuscator.obfuscatePassword(jdbcConnection));
 		} else {
-			log.log(Level.WARNING, "FAILED to obtain lock for connection: " + jdbcConnection);
+			log.log(Level.WARNING, "FAILED to obtain lock for connection: " + JDBCPasswordObfuscator.obfuscatePassword(jdbcConnection));
 		}
 		return isLocked;
 	}
