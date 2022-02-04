@@ -21,6 +21,7 @@ import tigase.annotations.TigaseDeprecated;
 import tigase.net.IOService;
 import tigase.server.ConnectionManager;
 import tigase.server.Packet;
+import tigase.server.xmppclient.StreamManagementIOProcessor;
 import tigase.server.xmppclient.XMPPIOProcessor;
 import tigase.util.StringUtilities;
 import tigase.util.stringprep.TigaseStringprepException;
@@ -142,8 +143,10 @@ public class XMPPIOService<RefObject>
 				log.log(Level.FINEST, "Added req {1} for packet: {2} [{0}]", new Object[]{toString(), req, packet});
 			}
 		}
-		++packetsSent;
-		++totalPacketsSent;
+		if (shouldCountPacket(packet)) {
+			++packetsSent;
+			++totalPacketsSent;
+		}
 		waitingPackets.offer(packet);
 	}
 
@@ -443,15 +446,22 @@ public class XMPPIOService<RefObject>
 				return;
 			}
 		}
+		
 		if (packet.getElemName() == ACK_NAME) {
 			String ack_id = packet.getAttributeStaticStr(ID_ATT);
 		} else {
 			sendAck(packet);
-			++packetsReceived;
-			++totalPacketsReceived;
+			if (shouldCountPacket(packet)) {
+				++packetsReceived;
+				++totalPacketsReceived;
+			}
 			setLastXmppPacketReceiveTime();
 			receivedPackets.offer(packet);
 		}
+	}
+
+	protected boolean shouldCountPacket(Packet packet) {
+		return packet.getXMLNS() != StreamManagementIOProcessor.XMLNS;
 	}
 
 	protected String prepareStreamClose() {
