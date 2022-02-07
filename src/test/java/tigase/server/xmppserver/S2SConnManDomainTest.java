@@ -49,6 +49,9 @@ public class S2SConnManDomainTest
 		TestLogger.configureLogger(log, Level.INFO);
 		log = Logger.getLogger("tigase.server.xmppserver");
 		TestLogger.configureLogger(log, Level.FINEST);
+//		TestLogger.configureLogger(Logger.getLogger("tigase.server"), Level.FINEST);
+//		TestLogger.configureLogger(Logger.getLogger("tigase.cert"), Level.FINEST);
+//		TestLogger.configureLogger(Logger.getLogger("tigase.io"), Level.FINEST);
 	}
 
 	@Test
