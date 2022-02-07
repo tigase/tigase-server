@@ -133,20 +133,6 @@ public class CIDConnections {
 			log.log(Level.FINER, "Connection is authenticated. Direction: {1} [{0}]", new Object[]{serv, direction});
 		}
 		serv.addCID(cid, direction);
-		if (serv.isAuthenticated()) {
-			handler.serviceConnected(serv);
-		}
-		if (isOutgoing) {
-
-			// Release the 'lock'
-			outgoingOpenInProgress.set(false);
-
-			S2SConnection s2s_conn = serv.getS2SConnection();
-
-			outgoing_handshaking.remove(s2s_conn);
-			outgoing.add(s2s_conn);
-			sendPacket(null);
-		}
 	}
 
 	public void connectionStopped(S2SIOService serv) {
@@ -479,10 +465,30 @@ public class CIDConnections {
 		}
 	}
 
+	public void streamNegotiationCompleted(S2SIOService serv) {
+
+		log.log(Level.FINER, "Marking the stream as negotiated, sending packets. [{0}]", cid);
+		final boolean isOutgoing = serv.connectionType() == ConnectionType.connect;
+		if (serv.isAuthenticated()) {
+			handler.serviceConnected(serv);
+		}
+		if (isOutgoing) {
+
+			// Release the 'lock'
+			outgoingOpenInProgress.set(false);
+
+			S2SConnection s2s_conn = serv.getS2SConnection();
+
+			outgoing_handshaking.remove(s2s_conn);
+			outgoing.add(s2s_conn);
+			sendPacket(null);
+		}
+	}
+
 	private void checkOpenConnections() {
 		if (outgoingOpenInProgress.compareAndSet(false, true)) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Scheduling task for openning a new connection for: {0}", cid);
+				log.log(Level.FINEST, "Scheduling task for opening a new connection for: {0}", cid);
 			}
 			connectionsOpenerService.schedule(new Runnable() {
 				@Override
@@ -563,7 +569,7 @@ public class CIDConnections {
 					}
 				}
 			}
-			if (firstWaitingTime + max_waiting_time <= System.currentTimeMillis()) {
+			if (hasExceededMaxWaitingTime()) {
 				sendPacketsBack();
 				firstWaitingTime = 0;
 				if (log.isLoggable(Level.FINEST)) {
@@ -642,6 +648,10 @@ public class CIDConnections {
 		}
 
 		return result;
+	}
+
+	protected boolean hasExceededMaxWaitingTime() {
+		return firstWaitingTime + max_waiting_time <= System.currentTimeMillis();
 	}
 
 	private void sendPacketsBack() {

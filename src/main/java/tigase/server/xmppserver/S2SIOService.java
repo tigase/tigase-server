@@ -43,6 +43,7 @@ public class S2SIOService
 	 */
 	private Set<CID> authenticatedCIDsOUT = new CopyOnWriteArraySet<CID>();
 	private Set<CID> authenticatedCIDsIN = new CopyOnWriteArraySet<CID>();
+	private boolean streamNegotiationCompleted = false;
 	private CIDConnections cid_conns = null;
 	private String dbKey = null;
 	private S2SConnection s2s_conn = null;
@@ -120,6 +121,15 @@ public class S2SIOService
 		return getSessionData().get(HANDSHAKING_ONLY_KEY) != null;
 	}
 
+	public boolean isStreamNegotiationCompleted() {
+		return streamNegotiationCompleted;
+	}
+
+	public void streamNegotiationCompleted() {
+		log.log(Level.FINEST, "Marking the service as negotiated: " + this);
+		this.streamNegotiationCompleted = true;
+	}
+
 	public void setDBKey(String key) {
 		dbKey = key;
 	}
@@ -129,7 +139,7 @@ public class S2SIOService
 		CID cid = (CID) getSessionData().get("cid");
 
 		return "CID: " + cid + ", IN: " + authenticatedCIDsIN.size() + ", OUT: " + authenticatedCIDsOUT.size() +
-				", authenticated: " + isAuthenticated() + ", remote-session-id: " + getSessionId() + ", " +
-				super.toString();
+				", authenticated: " + isAuthenticated() + ", remote-session-id: " + getSessionId()
+				+ ", streamNegotiationCompleted: " + streamNegotiationCompleted + ", " + super.toString();
 	}
 }

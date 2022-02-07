@@ -20,8 +20,7 @@ package tigase.server.xmppserver.proc;
 import tigase.kernel.beans.Bean;
 import tigase.net.ConnectionType;
 import tigase.server.Packet;
-import tigase.server.xmppserver.S2SConnectionManager;
-import tigase.server.xmppserver.S2SIOService;
+import tigase.server.xmppserver.*;
 import tigase.xml.Element;
 
 import java.util.List;
@@ -37,9 +36,54 @@ import java.util.logging.Logger;
 */
 @Bean(name = "streamFeatures", parent = S2SConnectionManager.class, active = true)
 public class StreamFeatures
-		extends S2SAbstractProcessor {
+		extends S2SAbstractProcessor
+		implements S2SFilterIfc {
 
 	private static final Logger log = Logger.getLogger(StreamFeatures.class.getName());
+
+	private static boolean hasEmptyOrOnlyObligatoryFeatures(Packet p) {
+		return p.getElement().getChildren() == null || p.getElement().getChildren().isEmpty() ||
+				p.getElement().findChildren(item -> item.getChild("required") != null).isEmpty();
+	}
+
+	@Override
+	public boolean filter(Packet p, S2SIOService serv, Queue<Packet> results) {
+		// https://xmpp.org/rfcs/rfc6120.html#streams-negotiation-complete
+		// The receiving entity indicates completion of the stream negotiation process by sending to the initiating entity
+		// either an empty `<features/>` element or a `<features/>` element that contains only voluntary-to-negotiate features.
+		//
+		// if there is a stream features packet and we are authenticated and either it doesn't have any features or only have
+		// non-mandatory features we should mark the service as "completely negotiated" as no other Processor handled the packet
+		//
+		// This should be done in filter to make sure there aren't any other processors that would want to negotiate more features.
+
+		final boolean hasEmptyOrNonObligatoryFeatures = hasEmptyOrOnlyObligatoryFeatures(p);
+		log.log(Level.FINEST,
+				"Processing stream features and verifying if steam negotiation is complete; authenticated: {0}, completed: {1}, hasEmptyOrNonObligatoryFeatures: {2}, packet: {3} [{4}]",
+				new Object[]{serv.isAuthenticated(), serv.isStreamNegotiationCompleted(),
+							 hasEmptyOrNonObligatoryFeatures, p, serv});
+
+		if (p.isElement(FEATURES_EL, FEATURES_NS) && serv.isAuthenticated() && hasEmptyOrNonObligatoryFeatures) {
+			if (!serv.isStreamNegotiationCompleted()) {
+				CID cid = (CID) serv.getSessionData().get("cid");
+				if (cid != null) {
+					CIDConnections cid_conns = null;
+					try {
+						cid_conns = handler.getCIDConnections(cid, false);
+						if (cid_conns != null) {
+							cid_conns.streamNegotiationCompleted(serv);
+						}
+					} catch (NotLocalhostException | LocalhostException e) {
+						//can be ignored
+					}
+				}
+				serv.streamNegotiationCompleted();
+			}
+			return true;
+		}
+
+		return false;
+	}
 
 	@Override
 	public int order() {
@@ -48,13 +92,13 @@ public class StreamFeatures
 
 	@Override
 	public boolean process(Packet p, S2SIOService serv, Queue<Packet> results) {
-		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Stream features received: {1} [{0}]", new Object[]{serv, p});
-			}
-
-			return true;
-		}
+//		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null && !p.getElement().getChildren().isEmpty()) {
+//			if (log.isLoggable(Level.FINEST)) {
+//				log.log(Level.FINEST, "Stream features received: {1} [{0}]", new Object[]{serv, p});
+//			}
+//
+//			return true;
+//		}
 
 		return false;
 	}

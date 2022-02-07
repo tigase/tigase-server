@@ -183,10 +183,25 @@ class S2SConnManAbstractTest
 		final fastCIDConnections connections = handler.createNewCIDConnections(cid);
 		connections.openConnections();
 
+		try {
+			final Packet packet = Iq.packetInstance("iq_version_query_test" + UUID.randomUUID(), cid.getLocalHost(),
+													cid.getRemoteHost(), StanzaType.get);
+			final Element iqElement = packet.getElement();
+			iqElement.setAttribute("id", UUID.randomUUID().toString());
+			final Element query = new Element("query");
+			query.setXMLNS("jabber:iq:version");
+			iqElement.addChild(query);
+
+			handler.addPacket(packet);
+		} catch (Exception e) {
+
+		}
+
 		S2SIOService s2SIOService = null;
 		int delayRetryLimit = 100;
 		boolean connected = false;
 		boolean authenticated = false;
+		boolean completed = false;
 		CertCheckResult trusted = CertCheckResult.none;
 		boolean dialbackCompleted = false;
 		do {
@@ -198,13 +213,15 @@ class S2SConnManAbstractTest
 			if (s2SIOService != null) {
 				connected = s2SIOService.isConnected();
 				authenticated = s2SIOService.isAuthenticated();
+				completed = s2SIOService.isStreamNegotiationCompleted();
 				trusted = (CertCheckResult) s2SIOService.getSessionData().get(CERT_CHECK_RESULT);
 				dialbackCompleted = "completed".equals(s2SIOService.getSessionData().get("dialback"));
 			}
-		} while ((s2SIOService == null || !connected || !authenticated || !CertCheckResult.trusted.equals(trusted)) &&
+		} while ((s2SIOService == null || !connected || !authenticated || !completed || !CertCheckResult.trusted.equals(trusted)) &&
 				delayRetryLimit-- > 0);
 		log.log(Level.INFO, cid + ": isConnected(): " + connected);
 		log.log(Level.INFO, cid + ": isAuthenticated(): " + authenticated);
+		log.log(Level.INFO, cid + ": isStreamNegotiationCompleted(): " + completed);
 		log.log(Level.INFO, cid + ": getSessionData().get(CERT_CHECK_RESULT): " + trusted);
 
 		// Dialback may fail, we should check if handshake was completed successfully..
@@ -231,21 +248,7 @@ class S2SConnManAbstractTest
 //		authenticatedConsumer.accept(authenticated);
 
 		if (s2SIOService.isConnected()) {
-			try {
-				final Packet packet = Iq.packetInstance("iq_version_query_test" + UUID.randomUUID(), cid.getLocalHost(),
-														cid.getRemoteHost(), StanzaType.get);
-				final Element iqElement = packet.getElement();
-				iqElement.setAttribute("id", UUID.randomUUID().toString());
-				final Element query = new Element("query");
-				query.setXMLNS("jabber:iq:version");
-				iqElement.addChild(query);
-
-				handler.addPacket(packet);
-			} catch (Exception e) {
-
-			}
-
-			TimeUnit.SECONDS.sleep(1);
+			TimeUnit.SECONDS.sleep(5);
 		}
 
 		handler.serviceStopped(s2SIOService);
@@ -453,6 +456,11 @@ class S2SConnManAbstractTest
 
 		public S2SIOService getS2SIOService() {
 			return s2s_conn.getS2SIOService();
+		}
+
+		@Override
+		protected boolean hasExceededMaxWaitingTime() {
+			return false;
 		}
 
 		public void openConnections() {
