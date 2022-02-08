@@ -27,9 +27,10 @@ public class JDBCPasswordObfuscator {
 		String passwordParameter = "password=";
 		final int passwordIndex = url.lastIndexOf(passwordParameter);
 		final String urlReminder = url.substring(passwordIndex + passwordParameter.length());
-		final int passwordLenght = urlReminder.indexOf(separatorCharacter);
-		url = url.substring(0, passwordIndex + passwordParameter.length()) + "*".repeat(passwordLenght) +
-				urlReminder.substring(passwordLenght);
+		int nextSectionIndex = urlReminder.indexOf(separatorCharacter);
+		int passwordLength = nextSectionIndex > 0 ? nextSectionIndex : urlReminder.length();
+		url = url.substring(0, passwordIndex + passwordParameter.length()) + "*".repeat(passwordLength) +
+				urlReminder.substring(passwordLength);
 		return url;
 	}
 
