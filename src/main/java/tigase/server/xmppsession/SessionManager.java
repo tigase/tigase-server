@@ -2694,13 +2694,13 @@ public class SessionManager
 			} catch (NotAuthorizedException e) {
 				log.log(Level.INFO, "Session hasn't been authorised yet! Error: {0}, packet: {1}",
 						new String[]{e.getLocalizedMessage(), item.getPacket().toStringSecure()});
-				sendErrorBack(item.getPacket(), Authorization.NOT_AUTHORIZED);
+				sendErrorBack(item.getPacket(), Authorization.NOT_AUTHORIZED, null);
 			} catch (XMPPProcessorException e) {
 				log.log(Level.FINEST, "Exception during packet processing: " + item.getPacket().toStringSecure(), e);
-				sendErrorBack(item.getPacket(), e.getErrorCondition());
+				sendErrorBack(item.getPacket(), e.getErrorCondition(), e.getMessage());
 			} catch (XMPPException e) {
 				log.log(Level.WARNING, "Exception during packet processing: " + item.getPacket().toStringSecure(), e);
-				sendErrorBack(item.getPacket(), Authorization.INTERNAL_SERVER_ERROR);
+				sendErrorBack(item.getPacket(), Authorization.INTERNAL_SERVER_ERROR, null);
 			}
 		}
 
@@ -2711,10 +2711,10 @@ public class SessionManager
 			return worker;
 		}
 
-		private void sendErrorBack(Packet packet, Authorization errorCondition) {
+		private void sendErrorBack(Packet packet, Authorization errorCondition, String message) {
 			if (packet.getType() != StanzaType.error) {
 				try {
-					addOutPacket(errorCondition.getResponseMessage(packet, null, true));
+					addOutPacket(errorCondition.getResponseMessage(packet, message, true));
 				} catch (PacketErrorTypeException ex) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Problem during generate error response", ex);
