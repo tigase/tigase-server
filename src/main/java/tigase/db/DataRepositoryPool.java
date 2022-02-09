@@ -19,6 +19,7 @@ package tigase.db;
 
 import tigase.db.jdbc.DataRepositoryImpl;
 import tigase.db.util.DBInitForkJoinPoolCache;
+import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.util.Version;
@@ -208,7 +209,7 @@ public class DataRepositoryPool
 
 	@Override
 	public void getStatistics(String compName, StatisticsList list) {
-		list.add(compName, "uri", getResourceUri(), Level.FINE);
+		list.add(compName, "uri", JDBCPasswordObfuscator.obfuscatePassword(getResourceUri()), Level.FINE);
 		list.add(compName, "connections count", repoPool.size(), Level.FINE);
 		for (DataRepository repo : repoPool) {
 			if (repo instanceof StatisticsProviderIfc) {

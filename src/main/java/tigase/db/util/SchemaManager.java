@@ -656,7 +656,7 @@ public class SchemaManager {
 		});
 		results.forEach((k, v) -> {
 			output.add("");
-			output.add("Data source: " + k.getName() + " with uri " + k.getResourceUri());
+			output.add("Data source: " + k.getName() + " with uri " + JDBCPasswordObfuscator.obfuscatePassword(k.getResourceUri()));
 			v.forEach(r -> {
 				output.add("\t" + r.name + "\t" + r.result);
 				if (r.result != SchemaLoader.Result.ok && r.message != null) {

@@ -18,6 +18,7 @@
 package tigase.db;
 
 import tigase.component.exceptions.RepositoryException;
+import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.db.util.SchemaVersionCheckerLogger;
 import tigase.kernel.core.Kernel;
@@ -76,7 +77,7 @@ public interface DataSource
 
 			if (!automaticSchemaManagement()) {
 				if (log.isLoggable(Level.WARNING)) {
-					log.log(Level.WARNING, "Automatic schema management is disabled for " + this.getResourceUri() +
+					log.log(Level.WARNING, "Automatic schema management is disabled for " + JDBCPasswordObfuscator.obfuscatePassword(this.getResourceUri()) +
 							", skipping version check for " + dataSourceID + "(" + datasourceClass.getSimpleName() +
 							")");
 					return true;

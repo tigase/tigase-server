@@ -20,6 +20,7 @@ package tigase.cluster.repo;
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.comp.ComponentRepositoryDataSourceAware;
+import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.db.util.RepositoryVersionAware;
 import tigase.sys.TigaseRuntime;
 import tigase.xmpp.jid.BareJID;
@@ -264,7 +265,7 @@ public class ClConSQLRepository
 			TigaseRuntime.getTigaseRuntime()
 					.shutdownTigase(new String[]{"ERROR! Terminating the server process.",
 												 "Problem initializing the server: missing tig_cluster_nodes table on " +
-														 data_repo.getResourceUri(),
+														 JDBCPasswordObfuscator.obfuscatePassword(data_repo.getResourceUri()),
 												 "Please fix the problem and start the server again."}, 1);
 		}
 	}
