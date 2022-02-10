@@ -635,6 +635,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		return "<stream:error xmlns:stream=\"http://etherx.jabber.org/streams\">" + err_el.get(0).toString() + "</stream:error>";
 	}
 
+	public PortsConfigBean getPortsConfigBean() {
+		return portsConfigBean;
+	}
+
 	@Override
 	public void getStatistics(StatisticsList list) {
 		super.getStatistics(list);
@@ -908,7 +912,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	}
 
 	protected abstract long getMaxInactiveTime();
-
+	
 	protected Map<String, Object> getParamsForPort(int port) {
 		return null;
 	}
@@ -1023,6 +1027,14 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		}
 
+		public int getPort() {
+			return name;
+		}
+
+		public boolean isSecure() {
+			return socket == SocketType.tls || socket == SocketType.ssl;
+		}
+
 		@Override
 		public void beanConfigurationChanged(Collection<String> changedFields) {
 			if (connectionManager == null || !connectionManager.isInitializationComplete() ||
@@ -1117,6 +1129,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		public PortsConfigBean() {
 
+		}
+
+		public PortConfigBean[] getPortsBeans() {
+			return portsBeans;
 		}
 
 		@Override

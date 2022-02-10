@@ -117,10 +117,15 @@ public class MessageRouter
 
 	}
 
+	public Set<ServerComponent> getComponentsAll() {
+		return componentsAll;
+	}
+
 	public void setComponentsAll(Set<ServerComponent> components) {
 		if (components == null) {
 			return;
 		}
+		componentsAll = components;
 
 		HashSet<ServerComponent> removeComponents = new HashSet<>(this.components.values());
 		removeComponents.removeAll(components);
