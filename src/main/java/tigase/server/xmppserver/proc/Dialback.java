@@ -97,8 +97,10 @@ public class Dialback
 
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
-		results.add(features);
-		authenticatorSelectorManager.getAuthenticationProcessors(serv).add(this);
+		if (!serv.isAuthenticated()) {
+			results.add(features);
+			authenticatorSelectorManager.getAuthenticationProcessors(serv).add(this);
+		}
 	}
 
 	@Override
