@@ -343,6 +343,13 @@ public class Dialback
 				if (p.getType() == StanzaType.valid) {
 					if (wasResultRequested(serv, p.getStanzaFrom().toString())) {
 						authenticatorSelectorManager.authenticateConnection(serv, cid_conns, cid_packet);
+
+						// As per specification:
+						// If the value of the 'type' attribute is "valid", then the connection between the domain pair
+						// is considered verified and the Initiating Server can send any outbound stanzas
+						// it has queued up for routing to the Receiving Server for the domain pair
+						cid_conns.streamNegotiationCompleted(serv);
+						serv.streamNegotiationCompleted();
 					} else if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE, "Received result with type valid for {0} but it was not requested!",
 								p.getStanzaFrom());
@@ -388,6 +395,13 @@ public class Dialback
 											 null, p.getStanzaId(), null, false);
 					if (p.getType() == StanzaType.valid) {
 						authenticatorSelectorManager.authenticateConnection(p.getStanzaId(), cid_conns, cid_packet);
+
+						// As per specification:
+						// If the value of the 'type' attribute is "valid", then the connection between the domain pair
+						// is considered verified and the Initiating Server can send any outbound stanzas
+						// it has queued up for routing to the Receiving Server for the domain pair
+						cid_conns.streamNegotiationCompleted(serv);
+						serv.streamNegotiationCompleted();
 					}
 				} else {
 					if (log.isLoggable(Level.FINE)) {
