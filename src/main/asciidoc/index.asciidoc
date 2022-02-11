@@ -9,4 +9,5 @@ v{revnumber}, {localdate}
 Welcome to Tigase Mediated Information eXchange (MIX) component guide. The MIX component allows you to have multi user group chats (channels), which are better suited for multi device usage.
 
 include::text/Overview.asciidoc[leveloffset=+1]
+include::text/tigase-mix-release-notes.asciidoc[leveloffset=+2]
 include::text/Configuration.asciidoc[leveloffset=+1]

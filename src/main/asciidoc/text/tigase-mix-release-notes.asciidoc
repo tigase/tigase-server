@@ -1,0 +1,6 @@
+= Tigase MIX Release Notes
+:author: Wojciech Kapcia
+
+Welcome to Tigase MIX 1.0.0! This is a feature release for with a number of fixes and updates.
+
+include::tigase-mix-current.asciidoc[leveloffset=+1]

@@ -1,0 +1,32 @@
+= Tigase MIX 1.0.0 Release Notes
+:author: Wojciech Kapcia
+:date: 2022-02-08
+
+== Major Changes
+
+This is the introductory version of https://xmpp.org/extensions/xep-0369.html#family[MIX specification family]
+
+== All Changes
+
+* https://projects.tigase.net/issue/mix-2[#mix-2]:Implement XEP-0369: Mediated Information eXchange (MIX)
+* https://projects.tigase.net/issue/mix-3[#mix-3]:Implement XEP-0406: Mediated Information eXchange (MIX): MIX Administration
+* https://projects.tigase.net/issue/mix-6[#mix-6]:Create tests for MIX CORE & Participants Server Requirements
+* https://projects.tigase.net/issue/mix-8[#mix-8]:Improve caching
+* https://projects.tigase.net/issue/mix-9[#mix-9]:Add support for MIX-MUC integration
+* https://projects.tigase.net/issue/mix-10[#mix-10]:Invalid response for disco#items
+* https://projects.tigase.net/issue/mix-14[#mix-14]:Add configuration to limit who can create channels in component
+* https://projects.tigase.net/issue/mix-15[#mix-15]:NPE in MAMItemHandler
+* https://projects.tigase.net/issue/mix-16[#mix-16]:Add MIX to installer as option.
+* https://projects.tigase.net/issue/mix-17[#mix-17]:Could not parse new configuration of channel: PubSubException: Only participants and information nodes are supported!
+* https://projects.tigase.net/issue/mix-18[#mix-18]:NPE when sending requests to removed channel nodes
+* https://projects.tigase.net/issue/mix-19[#mix-19]:MAM:2 is not advertised
+* https://projects.tigase.net/issue/mix-20[#mix-20]:MIX component is broadcasting messages with bare JID
+* https://projects.tigase.net/issue/mix-21[#mix-21]:Possibility of duplicated subscription of a node
+* https://projects.tigase.net/issue/mix-22[#mix-22]:Nickname not returned in response after being set
+* https://projects.tigase.net/issue/mix-23[#mix-23]:Remove banned participants from participants list and subscriptions
+* https://projects.tigase.net/issue/mix-24[#mix-24]:NPE in MIXProcessor
+* https://projects.tigase.net/issue/mix-25[#mix-25]:Create MIX component documentation and publish it
+* https://projects.tigase.net/issue/mix-26[#mix-26]:Allow installation admins to manager MIX channels if domain admins are allowed
+* https://projects.tigase.net/issue/mix-27[#mix-27]:MIX-MUC message duplication
+* https://projects.tigase.net/issue/mix-28[#mix-28]:NPE in `Affiliations.getSubscriberAffiliation`
+* https://projects.tigase.net/issue/mix-29[#mix-29]:Weird "open channel" behaviour
