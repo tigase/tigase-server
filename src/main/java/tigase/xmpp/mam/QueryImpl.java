@@ -109,4 +109,18 @@ public class QueryImpl
 		return rsm;
 	}
 
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("QueryImpl{");
+		sb.append("xmlns='").append(xmlns).append('\'');
+		sb.append(", componentJID=").append(componentJID);
+		sb.append(", questionerJID=").append(questionerJID);
+		sb.append(", id='").append(id).append('\'');
+		sb.append(", start=").append(start);
+		sb.append(", end=").append(end);
+		sb.append(", with=").append(with);
+		sb.append(", rsm=").append(rsm);
+		sb.append('}');
+		return sb.toString();
+	}
 }
