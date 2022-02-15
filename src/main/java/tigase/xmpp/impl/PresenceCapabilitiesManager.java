@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 
 public class PresenceCapabilitiesManager {
 
-	public static final String CAPS_NODE = "https://tigase.net/tigase-xmpp-server";
+	public static final String CAPS_NODE = "https://tigase.net/xmpp-server";
 	public final static String HASH_ALGORITHM = "SHA-1";
 	public final static String charsetName = "UTF-8";
 	// Map<capsNode,Set<feature>>
