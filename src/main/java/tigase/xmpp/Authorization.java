@@ -428,6 +428,7 @@ public enum Authorization {
 	protected static final String ERR_TYPE_CANCEL = "cancel";
 	protected static final String ERR_TYPE_MODIFY = "modify";
 	protected static final String ERR_TYPE_WAIT = "wait";
+	private final static System.Logger log = System.getLogger(Authorization.class.getName());
 
 	private static final Map<String, Authorization> BY_CONDITION = new ConcurrentHashMap<String, Authorization>();
 
@@ -471,6 +472,10 @@ public enum Authorization {
 	 */
 	public Packet getResponseMessage(Packet packet, String text, boolean includeOriginalXML)
 			throws PacketErrorTypeException {
+		log.log(System.Logger.Level.TRACE,
+				() -> "Generating response message with text: " + text + ", including original XML: " +
+						includeOriginalXML + ", using error type: " + this + "/" + getCondition() + "/" +
+						getErrorType() + ", for packet from " + packet.getFrom() + ", packet: " + packet);
 		if (packet.getFrom() == null) {
 			throw new PacketInvalidAddressException("The packet does not have 'from' address, can't generate error response: " + packet.toString());
 		}

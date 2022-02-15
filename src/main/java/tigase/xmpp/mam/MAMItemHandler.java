@@ -38,7 +38,8 @@ public class MAMItemHandler
 		implements MAMRepository.ItemHandler {
 
 	private static final TimestampHelper TIMESTAMP_FORMATTER = new TimestampHelper();
-	
+	private final static System.Logger log = System.getLogger(MAMItemHandler.class.getName());
+
 	@Inject
 	private PacketWriter packetWriter;
 
@@ -72,6 +73,8 @@ public class MAMItemHandler
 			query.getRsm().setFirst(item.getId());
 		}
 		query.getRsm().setLast(item.getId());
+		log.log(System.Logger.Level.TRACE,
+				() -> "Processing item: " + item + " from query: " + query + ", resulting packet: " + packet);
 
 		packetWriter.write(packet);
 	}

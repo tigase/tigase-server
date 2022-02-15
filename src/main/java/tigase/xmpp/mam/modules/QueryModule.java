@@ -52,6 +52,8 @@ public class QueryModule
 	@Inject(bean = "mamQueryParser")
 	private QueryParser queryParser;
 
+	private final static System.Logger log = System.getLogger(QueryModule.class.getName());
+
 	@Override
 	public String[] getFeatures() {
 		return (String[]) queryParser.getXMLNSs().toArray(String[]::new);
@@ -74,8 +76,8 @@ public class QueryModule
 
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
-		Query query = mamRepository.newQuery();
-		query = queryParser.parseQuery(query, packet);
+		Query query = queryParser.parseQuery(mamRepository.newQuery(), packet);
+		log.log(System.Logger.Level.TRACE, () -> "Retrieving items for packet: " + packet + " using query: " + query);
 		try {
 			mamRepository.queryItems(query, itemHandler);
 		} catch (RepositoryException ex) {
