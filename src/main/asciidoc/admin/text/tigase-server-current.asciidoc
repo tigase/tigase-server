@@ -10,7 +10,7 @@ Tigase XMPP Server 8.2.0 Change notes
 * *Improvements to s2s connection*: Version 8.2.0 brings a lot of improvements related to s2s connectivity: support for TLS1.3, improved logic during authentication and stream negotiation solving connectivity issues with various deployments
 * *Better handling of certificates*: It's now possible to store certificates in the database making it easier to manage them in clustered environment.
 * Deprecation of `Element` based events in favour of Object based events
-* Improved performance: reduced memory usage and increased startup time
+* Improved performance: reduced memory usage and decrease startup time
 
 == All Minor Features & Behavior Changes
 
