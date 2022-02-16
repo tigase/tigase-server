@@ -79,7 +79,7 @@ public class BindResource
 			return;
 		}    // end of if (session == null)
 		if (!session.isAuthorized()) {
-			results.offer(session.getAuthState().getResponseMessage(packet, "Session is not yet authorized.", false));
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "Session is not yet authorized.", false));
 
 			return;
 		}    // end of if (!session.isAuthorized())
@@ -129,7 +129,7 @@ public class BindResource
 					break;
 			}    // end of switch (type)
 		} catch (NotAuthorizedException e) {
-			results.offer(session.getAuthState().getResponseMessage(packet, "Session is not yet authorized.", false));
+			results.offer(Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "Session is not yet authorized.", false));
 		}    // end of try-catch
 	}
 

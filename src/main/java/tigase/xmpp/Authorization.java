@@ -51,8 +51,17 @@ public enum Authorization {
 		}
 
 		@Override
-		public Packet getResponseMessage(Packet p, String t, boolean i) {
-			return p.okResult(t, 0);
+		public Packet getResponseMessage(Packet packet, String text, boolean includeOriginalXML)
+				throws PacketErrorTypeException {
+			log.log(System.Logger.Level.TRACE,
+					() -> "Generating response message with text: " + text + ", including original XML: " +
+							includeOriginalXML + ", using type: " + this + "/" + getCondition() + ", for packet from " +
+							packet.getFrom() + ", packet: " + packet);
+			if (packet.getFrom() == null) {
+				throw new PacketInvalidAddressException(
+						"The packet does not have 'from' address, can't generate response: " + packet.toString());
+			}
+			return packet.okResult(text, 0);
 		}
 	},
 	BAD_REQUEST {

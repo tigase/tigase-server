@@ -94,7 +94,7 @@ public class MobileV3
 		if (!session.isAuthorized()) {
 			try {
 				results.offer(
-						session.getAuthState().getResponseMessage(packet, "Session is not yet authorized.", false));
+						Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "Session is not yet authorized.", false));
 			} catch (PacketErrorTypeException ex) {
 				log.log(Level.FINEST, "ignoring packet from not authorized session which is already of type error");
 			}
