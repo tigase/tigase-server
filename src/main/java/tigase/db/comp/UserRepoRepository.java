@@ -47,7 +47,7 @@ public abstract class UserRepoRepository<Item extends RepositoryItem>
 
 	private String items_list_pkey = "items-lists";
 	@Inject
-	private UserRepository repo = null;
+	protected UserRepository repo = null;
 
 	public abstract BareJID getRepoUser();
 
