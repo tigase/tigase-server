@@ -42,8 +42,12 @@ public class StreamFeatures
 	private static final Logger log = Logger.getLogger(StreamFeatures.class.getName());
 
 	private static boolean hasEmptyOrOnlyObligatoryFeatures(Packet p) {
-		return p.getElement().getChildren() == null || p.getElement().getChildren().isEmpty() ||
-				p.getElement().findChildren(item -> item.getChild("required") != null).isEmpty();
+		return hasEmptyOrOnlyObligatoryFeatures(p.getElement());
+	}
+
+	private static boolean hasEmptyOrOnlyObligatoryFeatures(Element featuresElement) {
+		return featuresElement.getChildren() == null || featuresElement.getChildren().isEmpty() ||
+				featuresElement.findChildren(item -> item.getChild("required") != null).isEmpty();
 	}
 
 	@Override
@@ -64,21 +68,7 @@ public class StreamFeatures
 							 hasEmptyOrNonObligatoryFeatures, p, serv});
 
 		if (p.isElement(FEATURES_EL, FEATURES_NS) && serv.isAuthenticated() && hasEmptyOrNonObligatoryFeatures) {
-			if (!serv.isStreamNegotiationCompleted()) {
-				CID cid = (CID) serv.getSessionData().get("cid");
-				if (cid != null) {
-					CIDConnections cid_conns = null;
-					try {
-						cid_conns = handler.getCIDConnections(cid, false);
-						if (cid_conns != null) {
-							cid_conns.streamNegotiationCompleted(serv);
-						}
-					} catch (NotLocalhostException | LocalhostException e) {
-						//can be ignored
-					}
-				}
-				serv.streamNegotiationCompleted();
-			}
+			stremNegotiationComplete(serv);
 			return true;
 		}
 
@@ -129,10 +119,38 @@ public class StreamFeatures
 				}
 
 				serv.addPacketToSend(Packet.packetInstance(featuresElement, null, null));
+
+				final boolean hasEmptyOrNonObligatoryFeatures = hasEmptyOrOnlyObligatoryFeatures(featuresElement);
+				log.log(Level.FINEST,
+						"Sending stream features and verifying if steam negotiation is complete; authenticated: {0}, completed: {1}, hasEmptyOrNonObligatoryFeatures: {2}, features: {3} [{4}]",
+						new Object[]{serv.isAuthenticated(), serv.isStreamNegotiationCompleted(),
+									 hasEmptyOrNonObligatoryFeatures, featuresElement, serv});
+
+				if (serv.isAuthenticated() && hasEmptyOrNonObligatoryFeatures) {
+					stremNegotiationComplete(serv);
+				}
 			}
 		}
 
 		return null;
+	}
+
+	private void stremNegotiationComplete(S2SIOService serv) {
+		if (!serv.isStreamNegotiationCompleted()) {
+			CID cid = (CID) serv.getSessionData().get("cid");
+			if (cid != null) {
+				CIDConnections cid_conns = null;
+				try {
+					cid_conns = handler.getCIDConnections(cid, false);
+					if (cid_conns != null) {
+						cid_conns.streamNegotiationCompleted(serv);
+					}
+				} catch (NotLocalhostException | LocalhostException e) {
+					//can be ignored
+				}
+			}
+			serv.streamNegotiationCompleted();
+		}
 	}
 }
 

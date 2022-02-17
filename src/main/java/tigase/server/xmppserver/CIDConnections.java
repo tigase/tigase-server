@@ -133,6 +133,9 @@ public class CIDConnections {
 			log.log(Level.FINER, "Connection is authenticated. Direction: {1} [{0}]", new Object[]{serv, direction});
 		}
 		serv.addCID(cid, direction);
+		if (serv.isAuthenticated()) {
+			handler.serviceConnected(serv);
+		}
 	}
 
 	public void connectionStopped(S2SIOService serv) {
