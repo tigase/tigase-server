@@ -707,13 +707,8 @@ public class PresenceState
 					Element pres = conn.getPresence();
 
 					if (pres != null) {
-						JID to;
-						if (probeFullJID) {
-							to = packet.getStanzaFrom();
-						} else {
-							to = packet.getStanzaFrom().copyWithoutResource();
-						}
-						sendPresence(null, null, to, results, pres);
+						JID to = probeFullJID ? packet.getStanzaFrom(): packet.getStanzaFrom().copyWithoutResource();
+						sendPresence(null, conn.getJID(), to, results, pres);
 						roster_util.setPresenceSent(session, packet.getStanzaFrom(), true);
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Received probe, sending presence response to: {0}", to);
@@ -751,7 +746,7 @@ public class PresenceState
 					Element pres = conn.getPresence();
 
 					if (pres != null) {
-						sendPresence(null, null, packet.getStanzaFrom(), results, pres);
+						sendPresence(null, conn.getJID(), packet.getStanzaFrom(), results, pres);
 						if (log.isLoggable(Level.FINEST)) {
 							log.log(Level.FINEST, "Received probe, sending presence response to: {0}",
 									packet.getStanzaFrom());
@@ -903,7 +898,7 @@ public class PresenceState
 			Element pres = session.getPresence();
 
 			if (pres != null) {
-				sendPresence(null, null, buddy, results, pres);
+				sendPresence(null, session.getJID(), buddy, results, pres);
 				roster_util.setPresenceSent(session, buddy, true);
 			}
 		}

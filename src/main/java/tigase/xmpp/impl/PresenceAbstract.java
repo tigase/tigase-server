@@ -31,6 +31,7 @@ import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -182,6 +183,8 @@ public abstract class PresenceAbstract
 	 * @return an instance of {@link Packet} holding Presence stanza created from provided parameters.
 	 */
 	public static Packet sendPresence(StanzaType t, JID from, JID to, Queue<Packet> results, Element pres) {
+		Objects.requireNonNull(from);
+		Objects.requireNonNull(to);
 		Element presence = null;
 		Packet result = null;
 
@@ -466,11 +469,11 @@ public abstract class PresenceAbstract
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, session.getBareJID() + " | Sending presence probe to: " + buddy);
 					}
-					sendPresence(null, null, buddy, results, presProbe);
+					sendPresence(null, session.getBareJID(), buddy.getBareJID(), results, presProbe);
 					if (log.isLoggable(Level.FINEST)) {
-						log.log(Level.FINEST, session.getBareJID() + " | Sending intial presence to: " + buddy);
+						log.log(Level.FINEST, session.getBareJID() + " | Sending initial presence to: " + buddy);
 					}
-					sendPresence(null, null, buddy, results, presInit);
+					sendPresence(null, session.getBareJID(), buddy.getBareJID(), results, presInit);
 					roster_util.setPresenceSent(session, buddy, true);
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
@@ -495,7 +498,7 @@ public abstract class PresenceAbstract
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, session.getBareJID() + " | Sending probe to: " + buddy);
 					}
-					sendPresence(null, null, buddy, results, presProbe);
+					sendPresence(null, session.getBareJID(), buddy.getBareJID(), results, presProbe);
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, session.getBareJID() + " | Skipping sending presence probe to: " + buddy);
@@ -520,7 +523,7 @@ public abstract class PresenceAbstract
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, session.getBareJID() + " | Sending initial presence to: " + buddy);
 					}
-					sendPresence(null, null, buddy, results, presInit);
+					sendPresence(null, session.getBareJID(), buddy.getBareJID(), results, presInit);
 					roster_util.setPresenceSent(session, buddy, true);
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
