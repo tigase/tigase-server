@@ -327,7 +327,7 @@ public class PresenceSubscription
 			if (delay != null) {
 				// offline packet, lets send probe
 				Element presProbe = prepareProbe(session);
-				sendPresence(null, null, packet.getStanzaFrom(), results, presProbe);
+				sendPresence(null, session.getJID(), packet.getStanzaFrom(), results, presProbe);
 			}
 
 		}
