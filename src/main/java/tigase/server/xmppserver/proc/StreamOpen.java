@@ -122,14 +122,14 @@ public class StreamOpen
 			serv.getSessionData().put(VERSION_ATT_NAME, version);
 		}
 
-		if (remote_hostname == null) {
-			generateStreamError(false, "improper-addressing", serv);
-		}
-
 		if (cid == null) {
 			if ((remote_hostname != null) && (local_hostname != null)) {
 				cid = new CID(local_hostname, remote_hostname);
 			}
+		}
+
+		if (remote_hostname == null && (cid == null || cid.getRemoteHost() == null)) {
+			generateStreamError(false, "improper-addressing", serv);
 		}
 
 		try {
