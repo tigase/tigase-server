@@ -17,6 +17,7 @@
  */
 package tigase.xmpp.impl.roster;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.db.UserRepository;
@@ -96,6 +97,8 @@ public class RosterFlat
 		return result;
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public RosterElement addTempBuddy(JID buddy, XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElementInstance(buddy.copyWithoutResource(), null, null, session);
@@ -112,12 +115,16 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public void addBuddy(XMPPResourceConnection session, JID buddy, String name, String[] groups, SubscriptionType subscription, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
 		this.addBuddy(session, buddy, name, groups, subscription, null, otherData);
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public void addBuddy(XMPPResourceConnection session, JID buddy, String name, String[] groups, SubscriptionType subscription, String mixParticipantId, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
 
@@ -193,6 +200,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean addBuddyGroup(XMPPResourceConnection session, JID buddy, String[] groups)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -211,6 +220,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean containsBuddy(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -219,6 +230,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public JID[] getBuddies(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
 
@@ -241,6 +254,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public String[] getBuddyGroups(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -268,6 +283,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public Element getBuddyItem(final XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -280,6 +297,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public String getBuddyName(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -292,6 +311,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public SubscriptionType getBuddySubscription(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -309,6 +330,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public String getMixParticipantId(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -320,6 +343,8 @@ public class RosterFlat
 		}
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public RosterElement getRosterElementInstance(JID buddy, String name, String[] groups,
 												  XMPPResourceConnection session) {
 		return new RosterElement(buddy.copyWithoutResource(), name, groups);
@@ -349,6 +374,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean isOnline(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -361,6 +388,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean presenceSent(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -369,6 +398,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean removeBuddy(XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
@@ -387,6 +418,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public void setBuddyName(XMPPResourceConnection session, JID buddy, String name)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -415,6 +448,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public void setBuddySubscription(XMPPResourceConnection session, SubscriptionType subscription, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -430,6 +465,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public void setOnline(XMPPResourceConnection session, JID buddy, boolean online)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -441,6 +478,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public void setPresenceSent(XMPPResourceConnection session, JID buddy, boolean sent)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement relem = getRosterElement(session, buddy);
@@ -452,6 +491,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public RosterElement getRosterElement(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		Map<BareJID, RosterElement> roster = getUserRoster(session);
@@ -486,6 +527,8 @@ public class RosterFlat
 		return roster;
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public Function<JID, RosterElement> rosterElementProvider(XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException {
 		XMPPSession commonSession = session.getParentSession();
@@ -502,6 +545,8 @@ public class RosterFlat
 	}
 
 	@Override
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public Element getCustomChild(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 		RosterElement rel = getRosterElement(session, buddy);

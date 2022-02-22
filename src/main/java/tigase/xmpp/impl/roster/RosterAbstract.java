@@ -506,6 +506,8 @@ public abstract class RosterAbstract {
 		return results;
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public Queue<Packet> removeJidFromRoster(UserRepository repository, XMPPSession session, BareJID owner, JID jid)
 			throws TigaseDBException, NotAuthorizedException, NoConnectionIdException {
 		ArrayDeque<Packet> results = new ArrayDeque<>();
@@ -535,10 +537,14 @@ public abstract class RosterAbstract {
 		throw new UnsupportedOperationException("Feature not implemented in " + this.getClass().getCanonicalName());
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
 								  SubscriptionType subscription, String mixParticipantId, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract void addBuddy(XMPPResourceConnection session, JID jid, String name, String[] groups,
 								  SubscriptionType subscription, String otherData)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException;
@@ -551,12 +557,18 @@ public abstract class RosterAbstract {
 		addBuddy(session, jid, name, groups, null, otherData);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract boolean addBuddyGroup(final XMPPResourceConnection session, JID buddy, final String[] groups)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract boolean containsBuddy(final XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public String groupNode(JID buddy) {
 		return ROSTER + "/" + buddy.getBareJID();
 	}
@@ -566,9 +578,13 @@ public abstract class RosterAbstract {
 
 	public abstract void logout(XMPPResourceConnection session);
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract boolean presenceSent(XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract boolean removeBuddy(final XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException;
 
@@ -591,6 +607,8 @@ public abstract class RosterAbstract {
 		}
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean updateBuddySubscription(final XMPPResourceConnection session, final PresenceType presence, JID jid)
 			throws NotAuthorizedException, TigaseDBException, PolicyViolationException {
 		SubscriptionType current_subscription = getBuddySubscription(session, jid);
@@ -640,9 +658,13 @@ public abstract class RosterAbstract {
 		session.putSessionData(ROSTERHASH, roster_hash);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract JID[] getBuddies(final XMPPResourceConnection session)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public JID[] getBuddies(final XMPPResourceConnection session, final EnumSet<SubscriptionType> subscrs)
 			throws NotAuthorizedException, TigaseDBException {
 
@@ -672,6 +694,8 @@ public abstract class RosterAbstract {
 		return ((hash != null) ? hash : "");
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract String[] getBuddyGroups(final XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException;
 
@@ -716,15 +740,23 @@ public abstract class RosterAbstract {
 		return item;
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract String getBuddyName(final XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract SubscriptionType getBuddySubscription(final XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract Element getCustomChild(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public List<Element> getCustomChildren(XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException {
 
@@ -737,6 +769,8 @@ public abstract class RosterAbstract {
 		return result;
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract String getMixParticipantId(final XMPPResourceConnection session, JID buddy)
 			throws NotAuthorizedException, TigaseDBException;
 	
@@ -800,9 +834,13 @@ public abstract class RosterAbstract {
 		return null;
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract RosterElement getRosterElement(XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract Function<JID, RosterElement> rosterElementProvider(XMPPResourceConnection session) throws NotAuthorizedException, TigaseDBException;
 
 	public List<Element> getRosterItems(XMPPResourceConnection session)
@@ -828,9 +866,13 @@ public abstract class RosterAbstract {
 	 */
 	public abstract boolean isRosterLoaded(XMPPResourceConnection session);
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract boolean isOnline(XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean isPendingIn(final XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
@@ -838,6 +880,8 @@ public abstract class RosterAbstract {
 		return PENDING_IN.contains(subscr);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean isSubscribedFrom(final XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
@@ -849,6 +893,8 @@ public abstract class RosterAbstract {
 		return FROM_SUBSCRIBED.contains(subscr);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean isSubscribedTo(final XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
@@ -856,6 +902,8 @@ public abstract class RosterAbstract {
 		return TO_SUBSCRIBED.contains(subscr);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public boolean isPreApproved(final XMPPResourceConnection session, JID jid)
 			throws NotAuthorizedException, TigaseDBException {
 		SubscriptionType subscr = getBuddySubscription(session, jid);
@@ -863,15 +911,23 @@ public abstract class RosterAbstract {
 		return PRE_APPROVED.contains(subscr);
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract void setBuddyName(final XMPPResourceConnection session, JID buddy, final String name)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract void setBuddySubscription(final XMPPResourceConnection session, final SubscriptionType subscription,
 											  JID buddy) throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract void setOnline(XMPPResourceConnection session, JID jid, boolean online)
 			throws NotAuthorizedException, TigaseDBException;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 	public abstract void setPresenceSent(XMPPResourceConnection session, JID jid, boolean sent)
 			throws NotAuthorizedException, TigaseDBException;
 
@@ -1032,6 +1088,8 @@ public abstract class RosterAbstract {
 		public RosterModifiedEvent() {
 		}
 
+		@Deprecated
+		@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 		public RosterModifiedEvent(JID sender, JID userJid, XMPPSession session, RosterElement rosterElement) {
 			super(sender, userJid, session, null);
 			this.jid = rosterElement.getJid();
@@ -1041,6 +1099,8 @@ public abstract class RosterAbstract {
 			this.mixParticipantId = rosterElement.getMixParticipantId();
 		}
 
+		@Deprecated
+		@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 		public RosterModifiedEvent(JID sender, JID userJid, XMPPSession session, JID jid,
 								   SubscriptionType subscription) {
 			super(sender, userJid, session, null);
@@ -1050,6 +1110,8 @@ public abstract class RosterAbstract {
 			this.groups = null;
 		}
 
+		@Deprecated
+		@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0", note = "We should only allow BareJIDs")
 		public JID getJid() {
 			return jid;
 		}
