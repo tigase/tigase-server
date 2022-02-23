@@ -49,10 +49,6 @@ public class CertificateRepository
 
 	@ConfigField(desc = "Automatically migrate certificates from filesystem to repository (and make backup)", alias = "move-from-filesystem-to-repository")
 	protected boolean moveFromFilesystemToRepository = true;
-	@ConfigField(desc = "Automatically migrate certificates from single-item-storage", alias = "migrate-from-single-item-storage")
-	@Deprecated
-	@TigaseDeprecated(since = "8.2.0", removeIn = "8.3.0", note = "This is a temporary solution to mitigate upgrades from any 8.2.0-SNAPSHOT, development releases that could have used this feature previously")
-	private boolean migrateFromSingleItem = true;
 
 	public CertificateRepository() {
 		this.autoReloadInterval = TimeUnit.HOURS.toSeconds(1);
@@ -154,33 +150,6 @@ public class CertificateRepository
 		}
 	}
 
-	@Deprecated
-	@TigaseDeprecated(since = "8.2.0", removeIn = "8.3.0", note = "This override can be removed once migration from single-item is no longer needed")
-	@Override
-	public void setRepo(UserRepository userRepository) {
-		log.log(Level.FINEST, "Setting repository!");
-		this.repo = userRepository;
-		try {
-			if (!repo.userExists(getRepoUser())) {
-				repo.addUser(getRepoUser());
-			}
-		} catch (UserExistsException e) {
-
-			// This is expected when the Items repository has been already running on
-			// this databaseso and can be ignored.
-		} catch (Exception e) {
-
-			// This is not expected so let's signal an error:
-			log.log(Level.SEVERE, "Problem with adding '" + getRepoUser() + "' user to the database", e);
-		}
-
-		if (migrateFromSingleItem) {
-			migrateFromSingleItem();
-		}
-
-		reload();
-	}
-
 	@Override
 	public void store() {
 		if (repo != null && isInitialized()) {
@@ -191,29 +160,6 @@ public class CertificateRepository
 					log.log(Level.SEVERE, "Error storing items list in the repository", e);
 				}
 			}
-		}
-	}
-
-	@Deprecated
-	@TigaseDeprecated(since = "8.2.0", removeIn = "8.3.0", note = "This is a temporary solution to mitigate upgrades from any 8.2.0-SNAPSHOT, development releases that could have used this feature previously")
-	private void migrateFromSingleItem() {
-		log.log(Level.CONFIG, "Migrating certificates from single-item format to multi-item format");
-		if (repo == null) {
-			log.log(Level.SEVERE, "Repository is not initialised - skipping migration");
-			return;
-		}
-
-		try {
-			final String data = repo.getData(getRepoUser(), getItemsListPKey());
-			if (data != null) {
-				super.reload();
-				for (CertificateItem item : items.values()) {
-					repo.setData(getRepoUser(), getItemsListPKey(), item.getKey(), item.toElement().toString());
-				}
-				repo.removeData(getRepoUser(), getItemsListPKey());
-			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "Error migrating items", e);
 		}
 	}
 
