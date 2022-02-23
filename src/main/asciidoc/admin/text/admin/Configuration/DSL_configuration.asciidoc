@@ -166,6 +166,7 @@ Keys and values can be written in separate lines _(recommended)_:
 or in single line _(separation with spaces is not required)_:
 ----
 { test = true, ssl = false, ssl-certificate = '/test/cert.pem' }
+----
 |=============================================
 
 as a plain string::
@@ -181,6 +182,7 @@ Very similar to properties based configuration, in fact values are passed in sam
 | list | List needs to be written as comma separated list of values, ie. `test,abc,efg` or `1,2,3`
 | map | Not possible
 |=============================================
+
 
 [[dslEnv]]
 === Using values from System Properties and Environment Variables

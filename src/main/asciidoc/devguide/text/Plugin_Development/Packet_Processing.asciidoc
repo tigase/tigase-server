@@ -1,4 +1,4 @@
-[[packetProcess]]
+[#packetprocess]
 = How Packets are Processed by the SM and Plugins
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.1 September 2017. Reformatted for v8.0.0.

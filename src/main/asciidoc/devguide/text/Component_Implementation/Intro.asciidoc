@@ -21,5 +21,4 @@ Creating components for Tigase server is an essential part of the server develop
 . xref:cil6[Component implementation - Lesson 6 - Scripting Support]
 . xref:cil7[Component implementation - Lesson 7 - Data Repository]
 . xref:cil8[Component implementation - Lesson 8 - Startup Time]
-. xref:configurationAPI[Configuration API]
 . xref:packetfiltering[Packet Filtering in Component]

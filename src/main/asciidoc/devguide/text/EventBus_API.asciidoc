@@ -226,11 +226,11 @@ In case of class based events, EventBus is checking class inheritance.
 class MainEvent { }
 class SpecificEvent extends MainEvent {}
 
-eventBus.addListener(SpecificEvent.class, event -> {}); <3>
-eventBus.addListener(MainEvent.class, event -> {}); <4>
+eventBus.addListener(SpecificEvent.class, event -> {}); <1>
+eventBus.addListener(MainEvent.class, event -> {}); <2>
 
 eventBus.fire(new SpecificEvent());
 ----
 
-3. Will be called, because this is listener stricte for `SpecificEvent`.
-4. Will be called, because `SpecificEvent` extends  `MainEvent`.
+<1> Will be called, because this is listener stricte for `SpecificEvent`.
+<2> Will be called, because `SpecificEvent` extends  `MainEvent`.

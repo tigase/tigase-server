@@ -1,4 +1,4 @@
-[[tigase3xconfiguration]]
+[#tigase3xconfiguration]
 = Configuration Wizards
 :author: Artur Hefczyc <artur.hefczyc@tigase.net>
 :version: v2.0, June 2014: Reformatted for v8.0.0.

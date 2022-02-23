@@ -1,4 +1,4 @@
-[[loadBalancing]]
+[#loadBalancing]
 = Tigase Load Balancing
 :author: Wojciech Kapcia <wojciech.kapcia@tigase.org>
 //incomplete

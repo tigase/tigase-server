@@ -85,7 +85,7 @@ action:: Specifies the action to be taken which can be *disc* which disconnects 
 
 ==== cm-see-other-host
 This allows the specific use of a load balancing mechanism by selecting `SeeOtherHostIfc` implementation.
-For more details, see xref:loadBalanding[Tigase Load Balancing] documentation.
+For more details, see xref:loadBalancing[Tigase Load Balancing] documentation.
 
 == Old configuration method
 
@@ -114,6 +114,7 @@ You may specify a password and port to specific cluster servers if that is requi
 'cluster-nodes' = [ 'serv1.xmpp-test.org:domainpass:5600' ]
 -----
 
+[[tigaseTip_CheckingClusterConnections]]
 == Checking Cluster Connections
 
 After setting up clustering you may want to verify that the clusters are operational. Right now it can be done in two manners - first by checking that there are actual network connections established between cluster nodes. The other is to check internal status of the server.

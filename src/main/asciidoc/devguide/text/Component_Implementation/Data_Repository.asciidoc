@@ -298,12 +298,12 @@ The above command will load current configuration, information about all configu
 
 Depending on the type of the database (or specified annotation), how the upgrade procedure is handled internally is slightly different.
 
-[[update-relational]]
+[#update-relational]
 ===== Relational databases (external handling)
 
 For all relational databases (MySQL, PostgreSQL, MS SQL Server, etc…) we highly recommend storing complete database schema in external files with following naming convention: `<database_type>-<component_name>-<version>.sql`, for example complete schema for our Test component version 0.0.5 intended for MySQL would be stored in file named `mysql-test-0.0.5.sql`. What's more - schema files must be stored under `database/` subdirectory in Tigase XMPP Server installation directory.
 
-NOTE: this can be controlled with `external` property of `Repository.SchemaId` annotation, which defaults to "true", if set to `false` then handling will be done as described in <<update-relationa>>
+NOTE: this can be controlled with `external` property of `Repository.SchemaId` annotation, which defaults to "true", if set to `false` then handling will be done as described in <<update-relational>>
 
 For example:
 

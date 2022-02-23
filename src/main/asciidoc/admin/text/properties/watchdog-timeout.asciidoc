@@ -29,8 +29,8 @@ c2s {
 
 All related configuration options:
 
-- xref:watchdog_ping_type[watchdog_Ping_Type]
-- xref:watchdog_Delay[watchdog_delay]
+- xref:watchdogPingType[watchdog_Ping_Type]
+- xref:watchdogDelay[watchdog_delay]
 - watchdog_timeout
 
 *Available since:* 8.0.0

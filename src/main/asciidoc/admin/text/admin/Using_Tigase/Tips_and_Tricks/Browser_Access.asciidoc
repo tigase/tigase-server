@@ -1,4 +1,4 @@
-[[bestWebPrax]]
+[#bestWebPrax]
 == Best Practices for Connecting to Tigase XMPP server From Web Browser
 :author: Andrzej Wojcik <andrzejw@tigase.org>
 :version: v2.1, June 2017: Reformatted for v8.0.0.

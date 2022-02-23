@@ -37,7 +37,7 @@ So for example, to subscribe to `<EventName xmlns="tigase:demo">`, node must be:
 If client is subscribed to `&#42;|tigase:demo node`, then events will not be sent from node `&#42;|tigase:demo`, but from the *real* node (in this case: `EventName|tigase:demo`).
 ===============================
 
-[[availableTasks]]
+[#availableTasks]
 == Available Tasks
 Monitor Component has several pre-defined tasks that can be monitored and set to trigger. What follows is the list of tasks with the options attributed to each task.
 
@@ -201,8 +201,8 @@ Alternatively, you can update specific settings by editing a single field withou
 To set any other values, do not forget that certain parts may need to be changed, specifically the
 `<field type="boolean" var=x-task#enabled">` fields:
 
-* Your field type will be defined by the type of variable specified in the xref:availableTasks [Available Tasks] section. +
-* `var=x task#` will be followed by the property value taken directly from the xref:availableTasks [Available Tasks] section.
+* Your field type will be defined by the type of variable specified in the xref:availableTasks[Available Tasks] section. +
+* `var=x task#` will be followed by the property value taken directly from the xref:availableTasks[Available Tasks] section.
 
 == Getting the Message
 Without a place to send messages to, monitor will just trigger and shut down. There are two different methods that monitor can deliver alarm messages and relevant data; XMPP messages and using the mailer extension.

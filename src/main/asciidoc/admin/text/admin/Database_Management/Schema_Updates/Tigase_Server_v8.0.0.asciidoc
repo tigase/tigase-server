@@ -134,7 +134,7 @@ WARNING: During execution of `upgrade-schema` task, passwords will be removed fr
 As a part of Tigase HTTP API component and Tigase Extras, we developed a mechanism which allows user to reset their password.
 To use this mechanism HTTP API component and its REST module *must* to be enabled on Tigase XMPP Server installation.
 
-NOTE: Additionally this mechanism need to be enabled in the configuration file. For more information about configuration of this mechanism please check Tigase xref:hTTPAPI[HTTP API component] documentation.
+NOTE: Additionally this mechanism need to be enabled in the configuration file. For more information about configuration of this mechanism please check Tigase HTTP API component documentation.
 
 Assuming that HTTP API component is configured to run on port 8080 _(default)_, then after accessing address http://localhost:8080/rest/user/resetPassword in the web browser it will present a web form.
 By filling and submitting this form, the user will initiate a password reset process.

@@ -17,7 +17,7 @@ NOTE: COMMERCIAL COMPONENTS REQUIRE THE USE OF A LICENSE.
 
 There are currently two ways for registering for a license with Tigase commercial products. **The easiest and recommended method is using the built in automatic registration function**. However, you may also register via a web portal if your installation has limitations on network connectivity.
 
-[AutomaticLicenceRegistration]
+[#AutomaticLicenceRegistration]
 === Automatic Registration (recommended)
 
 Once a commercial component is activated on Tigase XMPP Server, the program will then retrieve an _Installation ID_ from our servers, and make a file called `installation-id` in your `etc/` directory including the _Installation ID_ for your instance. An installation ID is generated using the complete cluster map and all machines within the same cluster should have the same _Installation ID_.

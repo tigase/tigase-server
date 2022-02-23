@@ -29,8 +29,8 @@ for example (for ClusterConnectionManager):
 
 All related configuration options:
 
-- xref:watchdog_ping_type[watchdog_Ping_Type]
+- xref:watchdogPingType[watchdog_Ping_Type]
 - watchdog_delay
-- xref:watchdog_Timeout[watchdog_timeout]
+- xref:watchdogTimeout[watchdog_timeout]
 
 *Available since:* 8.0.0

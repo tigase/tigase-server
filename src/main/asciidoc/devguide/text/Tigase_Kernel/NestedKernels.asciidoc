@@ -17,6 +17,7 @@ Kernel child = new Kernel("child");
 parent.registerBean(child.getName()).asInstance(child).exec();
 ----
 
+[#registrarBean]
 == Usage of RegistrarBean
 You may create a bean which implements the `RegistrarBean` interfaces.
 For all beans that implement this interface, subkernels are created. You can access this new kernel within an instance of `RegistrarBean` class as `register(Kernel)` and `unregister(Kernel)` methods are called once the `RegistrarBean` instance is created or destroyed.

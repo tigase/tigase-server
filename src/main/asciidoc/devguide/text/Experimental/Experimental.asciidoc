@@ -10,4 +10,4 @@ The guide contains description of non-standard or experimental functionality of 
 
 - xref:dynamicRosters[Dynamic Rosters]
 - xref:mobileoptimizations[Mobile Optimizations]
-- xref:boshsessioncashe[Bosh Session Cache]
+- xref:boshsessioncache[Bosh Session Cache]

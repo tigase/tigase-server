@@ -30,7 +30,7 @@ cl-comp {
 All related configuration options:
 
 - watchdog_ping_type
-- xref:watchdog_delay[watchdog_Delay]
+- xref:watchdogDelay[watchdog_Delay]
 - watchdog_timeout
 
 *Available since:* 8.0.0
