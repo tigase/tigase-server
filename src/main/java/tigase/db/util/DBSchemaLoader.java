@@ -1408,7 +1408,7 @@ public class DBSchemaLoader
 		private String dbPass = null;
 		private String dbRootPass;
 		private String dbRootUser;
-		private boolean dbRootAsk = false;
+		private Boolean dbRootAsk = false;
 		private String dbType;
 		private String dbUser = null;
 		private String file;
@@ -1465,7 +1465,7 @@ public class DBSchemaLoader
 		}
 
 		public boolean isDbRootAsk() {
-			return (dbRootUser == null || dbRootPass == null) && dbRootAsk;
+			return (dbRootUser == null || dbRootPass == null) && dbRootAsk != null && dbRootAsk;
 		}
 
 		@Override
