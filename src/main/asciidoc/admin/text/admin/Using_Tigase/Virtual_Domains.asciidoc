@@ -7,12 +7,12 @@ Tigase XMPP Server offers an easy to use and very flexible way to add and manage
 
 There are two ways of managing domains you host on your server:
 
-* using web-based admin management console - <<adminUI,Admin UI>>
+* using web-based admin management console - <<usingAdminUI,Admin UI>>
 * using XMPP ad-hoc commands by XMPP client, ie. link:http://psi-im.org/[Psi]
 
 NOTE: To use any of those ways, you need to be an administrator of the server, which means that you have a XMPP account created on this XMPP server and your account JID is added to <<admins,the list of the administrators>> in the Tigase XMPP Server configuration file.
 
-[#adminUI]
+[#usingAdminUI]
 == Using Admin UI
 
 First, you need to open Admin UI web page. By default Admin UI is enabled and available at the port `8080` at path `/admin/` on the XMPP server. Assuming that your are logged on the same machine which hosts Tigase XMPP Server, it will be available at http://localhost:8080/admin/.
