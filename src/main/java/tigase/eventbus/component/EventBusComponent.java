@@ -32,6 +32,7 @@ import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.stats.StatisticsList;
+import tigase.sys.TigaseRuntime;
 import tigase.xmpp.jid.JID;
 
 import javax.script.ScriptEngineManager;
@@ -91,6 +92,16 @@ public class EventBusComponent
 	@Override
 	public void processPacket(tigase.server.Packet packet) {
 		super.processPacket(packet);
+	}
+
+	@Override
+	public int processingInThreads() {
+		return TigaseRuntime.getTigaseRuntime().getCPUsNumber();
+	}
+
+	@Override
+	public int processingOutThreads() {
+		return TigaseRuntime.getTigaseRuntime().getCPUsNumber();
 	}
 
 	@Override

@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class TasksEvent
-		implements Serializable, EventBusEvent {
+		implements EventBusEvent {
 
 	private final static TimestampHelper dtf = new TimestampHelper();
 	private final DNSResolverIfc dnsResolver = DNSResolverFactory.getInstance();

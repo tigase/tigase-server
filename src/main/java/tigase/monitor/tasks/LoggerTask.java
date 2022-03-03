@@ -32,6 +32,7 @@ import tigase.xml.XMLUtils;
 
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 
 @Bean(name = "logger-task", parent = MonitorComponent.class, active = true)
@@ -51,7 +52,11 @@ public class LoggerTask
 	private Level levelTreshold = Level.WARNING;
 	private long logWarings = 0;
 	private int loggerSize = 50;
-	private int maxLogBuffer = 1000 * 1000;
+	// We only allow 50k of text by default
+	@ConfigField(desc = "Log size limit")
+	private int maxLogBuffer = 1000 * 50;
+	@ConfigField(desc = "Minimum notification interval limit")
+	private final int minimumIntervalInMinutes = 5;
 	private MemoryHandlerFlush memoryHandler = null;
 	private MonitorHandler monitorHandler = null;
 
@@ -176,7 +181,8 @@ public class LoggerTask
 		@Override
 		public synchronized void flush() {
 			++logWarings;
-			if (System.currentTimeMillis() - lastWarningSent > 5 * 60000) {
+
+			if (System.currentTimeMillis() - lastWarningSent > TimeUnit.MINUTES.toMillis(minimumIntervalInMinutes)) {
 				String logBuff = logsToString();
 				// We don't want to flood the system with this in case of
 				// some frequent error....
