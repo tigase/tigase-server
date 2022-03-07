@@ -3,7 +3,7 @@
 :author: Wojciech Kapcia
 :date: 2019-02-22
 
-Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Suites 2018]
+Based on https://xmpp.org/extensions/xep-0459.html[XEP-0459: XMPP Compliance Suites 2022]
 
 == Core Compliance Suite
 
@@ -12,6 +12,7 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 |===
 | Support | Specification | Name | Comment
 | ✓ | https://tools.ietf.org/html/rfc6120[RFC6120] | Extensible Messaging and Presence Protocol (XMPP): Core |
+| ✓ | https://www.rfc-editor.org/info/rfc7590[RFC7590] | Use of Transport Layer Security (TLS) in the Extensible Messaging and Presence Protocol (XMPP) |
 | ⍻ | https://tools.ietf.org/html/rfc7622[RFC7622] | Extensible Messaging and Presence Protocol (XMPP): Address Format | We support previous version of the specification: RFC6122
 | ✓ | https://tools.ietf.org/html/rfc7590[RFC7590] | Use of Transport Layer Security (TLS) in the Extensible Messaging and Presence Protocol (XMPP) |
 | ✓ | https://xmpp.org/extensions/xep-0368.html[XEP-0368] | SRV records for XMPP over TLS | Requires adding DNS entries pointing to port 5223
@@ -30,6 +31,7 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 | ✓ | https://tools.ietf.org/html/rfc7395[RFC7395] | An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for WebSocket |
 | ✓ | https://xmpp.org/extensions/xep-0206.html[XEP-0206] | XMPP Over BOSH |
 | ✓ | https://xmpp.org/extensions/xep-0124.html[XEP-0124] | Bidirectional-streams Over Synchronous HTTP (BOSH) |
+| ✓ | https://xmpp.org/extensions/xep-0156.html[XEP-0156] | Discovering Alternative XMPP Connection Methods |
 |===
 
 == IM Compliance Suite
@@ -38,8 +40,8 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 [cols="^1,^2,5a,3a"]
 |===
 | Support | Specification | Name | Comment
-| ✓ | https://tools.ietf.org/html/rfc6120[RFC6120] | Extensible Messaging and Presence Protocol (XMPP): Instant Messaging and Presence |
-| ✓ | https://xmpp.org/extensions/xep-0084.html[XEP-0084] | User Avatar |
+| ✓ | https://tools.ietf.org/html/rfc6121[RFC6121] | Extensible Messaging and Presence Protocol (XMPP): Instant Messaging and Presence |
+| ✕ | https://xmpp.org/extensions/xep-0398.html[XEP-0398] | User Avatar to vCard-Based Avatars Conversion |
 | ✓ | https://xmpp.org/extensions/xep-0153.html[XEP-0153] | vCard-Based Avatars |
 | ✓ | https://xmpp.org/extensions/xep-0054.html[XEP-0054] | vcard-temp |
 | ✓ | https://xmpp.org/extensions/xep-0280.html[XEP-0280] | Message Carbons |
@@ -47,10 +49,13 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 | ✓ | https://xmpp.org/extensions/xep-0045.html[XEP-0045] | Multi-User Chat |
 | ✓ | https://xmpp.org/extensions/xep-0249.html[XEP-0249] | Direct MUC Invitations |
 | ✓ | https://xmpp.org/extensions/xep-0048.html[XEP-0048] | Bookmarks |
+| ✓ | https://xmpp.org/extensions/xep-0410.html[XEP-0410] | MUC Self-Ping (Schrödinger's Chat) |
+| ✓ | https://xmpp.org/extensions/xep-0411.html[XEP-0411] | Bookmarks Conversion |
 | ✓ | https://xmpp.org/extensions/xep-0223.html[XEP-0223] | Persistent Storage of Private Data via PubSub |
 | ✓ | https://xmpp.org/extensions/xep-0049.html[XEP-0049] | Private XML Storage |
 | ✓ | https://xmpp.org/extensions/xep-0198.html[XEP-0198] | Stream Management | Both `Session Resumption` and `Stanza Acknowledgements`
 | ✓ | https://xmpp.org/extensions/xep-0313.html[XEP-0313] | Message Archive Management |
+| ✓ | https://xmpp.org/extensions/xep-0363.html[XEP-0363] | HTTP File Upload |
 |===
 
 == Mobile Compliance Suite
@@ -61,6 +66,17 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 | Support | Specification | Name | Comment
 | ✓ | https://tools.ietf.org/html/rfc7395[RFC7395] | An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for WebSocket |
 | ✓ | https://xmpp.org/extensions/xep-0198.html[XEP-0198] | Stream Management | Both `Session Resumption` and `Stanza Acknowledgements`
+| ✓ | https://xmpp.org/extensions/xep-0352.html[XEP-0352] | Client State Indication |
+| ✓ | https://xmpp.org/extensions/xep-0357.html[XEP-0357] | Push Notifications |
+|===
+
+== A/V Calling Compliance Suite
+
+.A/V Calling Compliance Suite
+[cols="^1,^2,5a,3a"]
+|===
+| Support | Specification | Name | Comment
+| ✓ | https://xmpp.org/extensions/xep-0215.html[XEP-0215] | External Service Discovery |
 | ✓ | https://xmpp.org/extensions/xep-0352.html[XEP-0352] | Client State Indication |
 | ✓ | https://xmpp.org/extensions/xep-0357.html[XEP-0357] | Push Notifications |
 |===
@@ -165,6 +181,19 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 | ✓ | https://xmpp.org/extensions/xep-0333.html[XEP-0333] | Chat Markers |
 | ✓ | https://xmpp.org/extensions/xep-0363.html[XEP-0363] | HTTP File Upload |
 | ✓ | https://xmpp.org/extensions/xep-0387.html[XEP-0387] | XMPP Compliance Suites 2018 |
+| ✓ | https://xmpp.org/extensions/xep-0403.html[XEP-0403] | Mediated Information eXchange (MIX): Presence Support |
+| ✓ | https://xmpp.org/extensions/xep-0404.html[XEP-0404] | Mediated Information eXchange (MIX): JID Hidden Channels |
+| ✓ | https://xmpp.org/extensions/xep-0405.html[XEP-0405] | Mediated Information eXchange (MIX): Participant Server Requirements |
+| ✓ | https://xmpp.org/extensions/xep-0406.html[XEP-0406] | Mediated Information eXchange (MIX): MIX Administration |
+| ✓ | https://xmpp.org/extensions/xep-0407.html[XEP-0407] | Mediated Information eXchange (MIX): Miscellaneous Capabilities |
+| ✓ | https://xmpp.org/extensions/xep-0408.html[XEP-0408] | Mediated Information eXchange (MIX): Co-existence with MUC |
+| ✓ | https://xmpp.org/extensions/xep-0410.html[XEP-0410] | MUC Self-Ping (Schrödinger's Chat) |
+| ✓ | https://xmpp.org/extensions/xep-0411.html[XEP-0411] | Bookmarks Conversion |
+| ✓ | https://xmpp.org/extensions/xep-0412.html[XEP-0412] | XMPP Compliance Suites 2019 |
+| ✓ | https://xmpp.org/extensions/xep-0423.html[XEP-0423] | XMPP Compliance Suites 2020 |
+| ✓ | https://xmpp.org/extensions/xep-0443.html[XEP-0443] | XMPP Compliance Suites 2021 |
+| ✓ | https://xmpp.org/extensions/xep-0453.html[XEP-0453] | DOAP usage in XMPP 	Informational |
+| ✓ | https://xmpp.org/extensions/xep-0459.html[XEP-0459] | XMPP Compliance Suites 2022 |
 |===
 
 == Full, ordered list of supported RFCs and XEPs:
@@ -292,5 +321,18 @@ Based on https://xmpp.org/extensions/xep-0387.html[XEP-0387: XMPP Compliance Sui
 | ✓ | https://xmpp.org/extensions/xep-0363.html[XEP-0363] | HTTP File Upload |
 | ✓ | https://xmpp.org/extensions/xep-0368.html[XEP-0368] | SRV records for XMPP over TLS | Requires adding DNS entries pointing to port 5223
 | ✓ | https://xmpp.org/extensions/xep-0387.html[XEP-0387] | XMPP Compliance Suites 2018 |
+| ✓ | https://xmpp.org/extensions/xep-0403.html[XEP-0403] | Mediated Information eXchange (MIX): Presence Support |
+| ✓ | https://xmpp.org/extensions/xep-0404.html[XEP-0404] | Mediated Information eXchange (MIX): JID Hidden Channels |
+| ✓ | https://xmpp.org/extensions/xep-0405.html[XEP-0405] | Mediated Information eXchange (MIX): Participant Server Requirements |
+| ✓ | https://xmpp.org/extensions/xep-0406.html[XEP-0406] | Mediated Information eXchange (MIX): MIX Administration |
+| ✓ | https://xmpp.org/extensions/xep-0407.html[XEP-0407] | Mediated Information eXchange (MIX): Miscellaneous Capabilities |
+| ✓ | https://xmpp.org/extensions/xep-0408.html[XEP-0408] | Mediated Information eXchange (MIX): Co-existence with MUC |
+| ✓ | https://xmpp.org/extensions/xep-0410.html[XEP-0410] | MUC Self-Ping (Schrödinger's Chat) |
+| ✓ | https://xmpp.org/extensions/xep-0411.html[XEP-0411] | Bookmarks Conversion |
+| ✓ | https://xmpp.org/extensions/xep-0412.html[XEP-0412] | XMPP Compliance Suites 2019 |
+| ✓ | https://xmpp.org/extensions/xep-0423.html[XEP-0423] | XMPP Compliance Suites 2020 |
+| ✓ | https://xmpp.org/extensions/xep-0443.html[XEP-0443] | XMPP Compliance Suites 2021 |
+| ✓ | https://xmpp.org/extensions/xep-0453.html[XEP-0453] | DOAP usage in XMPP 	Informational |
+| ✓ | https://xmpp.org/extensions/xep-0459.html[XEP-0459] | XMPP Compliance Suites 2022 |
 |===
 
