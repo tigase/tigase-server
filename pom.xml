@@ -181,7 +181,7 @@
 		<dependency>
 			<groupId>tigase</groupId>
 			<artifactId>tigase-xmltools</artifactId>
-			<version>3.5.0</version>
+			<version>3.5.1</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
