@@ -57,8 +57,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/tigase/tigase-server.git</connection>
 		<developerConnection>scm:git:https://github.com/tigase/tigase-server.git</developerConnection>
-		<url>https://github.com/tigase/tigase-server/</url>
-    <tag>tigase-server-7.1.6</tag>
+		<url>https://github.com/tigase/tigase-server</url>
   </scm>
 
 	<organization>
@@ -111,7 +110,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
+				<version>3.0.0-M5</version>
 				<configuration>
 					<tagNameFormat>tigase-server-@{project.version}</tagNameFormat>
 				</configuration>
