@@ -41,7 +41,7 @@ Based on https://xmpp.org/extensions/xep-0459.html[XEP-0459: XMPP Compliance Sui
 |===
 | Support | Specification | Name | Comment
 | ✓ | https://tools.ietf.org/html/rfc6121[RFC6121] | Extensible Messaging and Presence Protocol (XMPP): Instant Messaging and Presence |
-| ✕ | https://xmpp.org/extensions/xep-0398.html[XEP-0398] | User Avatar to vCard-Based Avatars Conversion |
+| ✓ | https://xmpp.org/extensions/xep-0398.html[XEP-0398] | User Avatar to vCard-Based Avatars Conversion |
 | ✓ | https://xmpp.org/extensions/xep-0153.html[XEP-0153] | vCard-Based Avatars |
 | ✓ | https://xmpp.org/extensions/xep-0054.html[XEP-0054] | vcard-temp |
 | ✓ | https://xmpp.org/extensions/xep-0280.html[XEP-0280] | Message Carbons |
