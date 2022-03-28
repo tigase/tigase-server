@@ -117,6 +117,7 @@ public class JabberIqAuth
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Session after logout: {0}", session.toString());
 				}
+				return;
 			}
 
 			Element request = packet.getElement();
@@ -165,6 +166,7 @@ public class JabberIqAuth
 																					  false));
 						results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
 															  session.nextStanzaId()));
+						return;
 					}
 
 					try {

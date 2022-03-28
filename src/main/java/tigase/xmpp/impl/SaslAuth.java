@@ -134,6 +134,7 @@ public class SaslAuth
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Session after logout: {0}", session.toString());
 				}
+				return;
 			} else {
 				Element request = packet.getElement();
 				try {
