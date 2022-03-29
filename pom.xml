@@ -391,7 +391,7 @@
         <dependency>
             <groupId>tigase</groupId>
             <artifactId>tigase-xmltools</artifactId>
-            <version>4.1.0</version>
+            <version>4.2.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
