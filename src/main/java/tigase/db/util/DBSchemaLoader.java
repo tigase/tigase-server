@@ -307,8 +307,8 @@ public class DBSchemaLoader
 					log.log(Level.WARNING, "Could not obtain lock, skipping");
 					return Result.error;
 				}
-			} catch (SQLException e) {
-				log.log(Level.WARNING, e.getMessage());
+			} catch (Throwable e) {
+				log.log(Level.WARNING, "Problem validating database connection: " + e, e);
 				return Result.error;
 			}
 		}
