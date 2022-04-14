@@ -60,10 +60,8 @@ public class CertificateItem
 		Objects.requireNonNull(entry);
 		if ("default".equals(alias)) {
 			this.isDefault = true;
-			this.alias = CertificateUtil.getCertCName((X509Certificate) entry.getCertificate().get());
-		} else {
-			this.alias = alias;
 		}
+		this.alias = CertificateUtil.getCertCName((X509Certificate) entry.getCertificate().get());
 		this.entry = entry;
 		try {
 			if (entry.getCertificate().isPresent()) {

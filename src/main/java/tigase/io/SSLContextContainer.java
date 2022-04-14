@@ -18,6 +18,7 @@
 package tigase.io;
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.cert.CertificateUtil;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.eventbus.HandleEvent;
@@ -443,8 +444,7 @@ public class SSLContextContainer
 
 	private boolean validateDomainCertificate(final SSLHolder holder, final String alias) throws Exception {
 		// for self-signed certificates only
-		if (holder != null && holder.domainCertificate != null &&
-				holder.domainCertificate.getIssuerDN().equals(holder.domainCertificate.getSubjectDN())) {
+		if (holder != null && holder.domainCertificate != null && CertificateUtil.isSelfSigned(holder.domainCertificate)){
 			try {
 				holder.domainCertificate.checkValidity();
 			} catch (CertificateException e) {

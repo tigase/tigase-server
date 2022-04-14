@@ -75,8 +75,6 @@ public class CertificateContainer
 	private File defaultCertDirectory = null;
 	private String email = "admin@tigase.org";
 	private char[] emptyPass = new char[0];
-	@ConfigField(desc = "Whether generated certificate should be wildcard")
-	private boolean generateWildcardCertificate = true;
 	private Map<String, KeyManagerFactory> kmfs = new ConcurrentSkipListMap<String, KeyManagerFactory>();
 	private KeyManager[] kms = new KeyManager[]{new SniKeyManager()};
 	private String o = "Tigase.org";
@@ -245,6 +243,9 @@ public class CertificateContainer
 	public void itemAdded(CertificateItem item) {
 		try {
 			addCertificateEntry(item.getCertificateEntry(), item.getAlias(), false);
+			if (item.isDefault()) {
+				addCertificateEntry(item.getCertificateEntry(), "default", false);
+			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem adding certificate while reloading from repository", e);
 		}
@@ -254,6 +255,9 @@ public class CertificateContainer
 	public void itemUpdated(CertificateItem item) {
 		try {
 			addCertificateEntry(item.getCertificateEntry(), item.getAlias(), false);
+			if (item.isDefault()) {
+				addCertificateEntry(item.getCertificateEntry(), "default", false);
+			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem adding certificate while reloading from repository", e);
 		}
@@ -263,6 +267,10 @@ public class CertificateContainer
 	public void itemRemoved(CertificateItem item) {
 		kmfs.remove(item.getAlias());
 		cens.remove(item.getAlias());
+		if (item.isDefault()) {
+			kmfs.remove("default");
+			cens.remove("default");
+		}
 	}
 
 	@Override
@@ -367,14 +375,13 @@ public class CertificateContainer
 		}
 
 		if (store) {
-			String filename = alias.startsWith("*.") ? alias.substring(2) : alias;
 			if (repository != null) {
-				final CertificateItem item = new CertificateItem(filename, entry);
+				final CertificateItem item = new CertificateItem(alias, entry);
 				log.log(Level.FINEST, "Storing to repository, certificate entry for alias: {0} with SerialNumber: {1}",
 						new Object[]{alias, item.getSerialNumber()});
 				repository.addItem(item);
 			} else {
-				storeCertificateToFile(entry, filename);
+				storeCertificateToFile(entry, alias);
 			}
 		}
 
@@ -528,7 +535,6 @@ public class CertificateContainer
 	private KeyManagerFactory createCertificateKmf(String alias)
 			throws NoSuchAlgorithmException, CertificateException, IOException, InvalidKeyException,
 				   NoSuchProviderException, SignatureException, KeyStoreException, UnrecoverableKeyException {
-		alias = !def_cert_alias.equals(alias) && !alias.startsWith("*.") && generateWildcardCertificate ? "*." + alias : alias;
 		CertificateEntry entry = CertificateUtil.createSelfSignedCertificate(email, alias, ou, o, null, null, null,
 																			 () -> CertificateUtil.createKeyPair(1024,
 																												 "secret"));
