@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import tigase.cert.CertificateEntry;
+import tigase.cert.CertificateUtil;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
@@ -87,12 +88,12 @@ public class CertificateContainerTest {
 		certificateContainer.addCertificates(params);
 	}
 
-	private void testDomain(String hostname, boolean exists) throws Exception {
+	private void testDomain(String hostname, boolean expectsExist) throws Exception {
 		CertificateEntry certificateEntry = certificateContainer.getCertificateEntry(hostname);
 
 		LOGGER.log(Level.INFO, "Certificate for hostname " + hostname + ": " +
 				(certificateEntry != null ? certificateEntry.toString(true) : "n/a"));
-		if (exists) {
+		if (expectsExist) {
 			Assert.assertNotNull(certificateEntry);
 		} else {
 			Assert.assertNull(certificateEntry);
@@ -103,11 +104,13 @@ public class CertificateContainerTest {
 																							false, new TrustManager[0]);
 		Assert.assertNotNull(ssl);
 		Assert.assertNotNull(ssl.domainCertificate);
-		if (exists) {
+		final String CName = CertificateUtil.getCertCName(ssl.domainCertificate);
+		if (expectsExist) {
 			Assert.assertEquals(certificateEntry.getCertChain()[0], ssl.domainCertificate);
-			Assert.assertTrue(ssl.domainCertificate.getSubjectDN().getName().contains(domain));
+			Assert.assertTrue(CName.contains(domain));
 		} else {
-			Assert.assertFalse(ssl.domainCertificate.getSubjectDN().getName().contains(domain));
+
+			Assert.assertFalse(CName.contains(domain));
 		}
 	}
 
