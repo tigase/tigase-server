@@ -30,9 +30,10 @@ import tigase.xmpp.jid.JID;
 import tigase.xmpp.rsm.RSM;
 
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implementation of parser for XEP-0313: Message Archive Management
@@ -47,7 +48,15 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 
 	private final TimestampHelper timestampHelper = new TimestampHelper();
 
-	private static final Set<String> XMLNNS = Collections.singleton(MAM_XMLNS);
+	private final Set<String> XMLNNS;
+
+	public MAMQueryParser() {
+		this(Stream.empty());
+	}
+
+	protected MAMQueryParser(Stream<String> additionalNamespaces) {
+		XMLNNS = Stream.concat(additionalNamespaces, Stream.of(MAM_XMLNS)).collect(Collectors.toUnmodifiableSet());
+	}
 
 	@Override
 	public Set<String> getXMLNSs() {
@@ -110,7 +119,7 @@ public class MAMQueryParser<Query extends tigase.xmpp.mam.Query>
 	}
 
 	@Override
-	public Element prepareForm(Element elem, String xmlns) {
+	public Element prepareForm(Element elem, String xmlns, Packet packet) {
 		Element x = DataForm.addDataForm(elem, Command.DataType.form);
 		DataForm.addHiddenField(elem, "FORM_TYPE", xmlns);
 

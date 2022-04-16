@@ -29,6 +29,7 @@ import tigase.server.Priority;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.mam.ExtendedQuery;
 import tigase.xmpp.mam.MAMRepository;
 import tigase.xmpp.mam.Query;
 import tigase.xmpp.mam.QueryParser;
@@ -86,9 +87,13 @@ public class QueryModule
 
 		Element fin = new Element("fin");
 		fin.setXMLNS(query.getXMLNS());
-		fin.addChild(query.getRsm().toElement());
-		if (query.getRsm().getIndex() + query.getRsm().getMax() >= query.getRsm().getCount()) {
-			fin.setAttribute("complete", "true");
+		if (query instanceof ExtendedQuery && !((ExtendedQuery) query).getIds().isEmpty()) {
+			// do not add RSM, as we were asked about items with specified list of ids
+		} else {
+			fin.addChild(query.getRsm().toElement());
+			if (query.getRsm().getIndex() + query.getRsm().getMax() >= query.getRsm().getCount()) {
+				fin.setAttribute("complete", "true");
+			}
 		}
 
 		Packet result = packet.okResult(fin, 0);
