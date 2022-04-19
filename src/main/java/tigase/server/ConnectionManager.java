@@ -788,6 +788,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		watchdog.setDaemon(true);
 	}
 
+	public void setWatchdogPingType(WATCHDOG_PING_TYPE watchdogPingType) {
+		this.watchdogPingType = watchdogPingType;
+	}
+
 	protected Watchdog newWatchdog() {
 		return new Watchdog();
 	}

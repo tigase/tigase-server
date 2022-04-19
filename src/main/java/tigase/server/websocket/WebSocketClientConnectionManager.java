@@ -32,6 +32,8 @@ import tigase.xmpp.impl.StartTLS;
 import tigase.xmpp.jid.BareJID;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +47,21 @@ import java.util.stream.Collectors;
 public class WebSocketClientConnectionManager
 		extends tigase.server.xmppclient.ClientConnectionManager {
 
+	private static final Logger log = Logger.getLogger(WebSocketClientConnectionManager.class.getName());
 	private static final String XMLNS_FRAMING = "urn:ietf:params:xml:ns:xmpp-framing";
+
+	public WebSocketClientConnectionManager() {
+		super();
+		watchdogPingType = WATCHDOG_PING_TYPE.XMPP;
+	}
+
+	@Override
+	public void setWatchdogPingType(WATCHDOG_PING_TYPE watchdogPingType) {
+		super.setWatchdogPingType(watchdogPingType);
+		if (watchdogPingType.equals(WATCHDOG_PING_TYPE.WHITESPACE)) {
+			log.log(Level.SEVERE, "Setting watchdog ping type as WHITESPACE for WebSocket connection manager violates RFC7395 specification and can break numerous clients");
+		}
+	}
 
 	@Inject
 	private WebSocketProtocolIfc[] enabledProtocolVersions;
