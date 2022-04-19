@@ -1,3 +1,7 @@
 *.iml
 .idea/
 target/
+
+*sphinx documentation .ignore file
+src/main/restructured/_build/
+src/main/restructured/locale/pl/LC_MESSAGES/*.mo
