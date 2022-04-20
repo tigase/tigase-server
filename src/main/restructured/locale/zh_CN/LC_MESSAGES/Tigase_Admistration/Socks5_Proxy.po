@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-31 12:21-0700\n"
+"POT-Creation-Date: 2022-04-20 13:23-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -436,517 +436,529 @@ msgid ""
 "running on the single machine."
 msgstr ""
 
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:252
-msgid "Welcome to Tigase Push component guide"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:280
-msgid "13.1. Tigase Push Component"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:282
-msgid ""
-"Tigase Push component is a Push notifications component implementing "
-"`XEP-0357: Push Notifications "
-"<https://xmpp.org/extensions/xep-0357.html>`__. It is a gateway between "
-"Push Notification services and XMPP servers. It is configured by default "
-"to run under name of ``push``."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:286
-msgid ""
-"Tigase Push component requires at the minimum version 8.0.0 of Tigase "
-"XMPP Server."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:288
-msgid ""
-"Push notifications enable messages and pertinent information for clients,"
-" even if they are offline as long as they are registered with the push "
-"service. Tigase Messenger for iOS and Tigase Messenger for Android both "
-"have support for this feature."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:291
-msgid "13.1.1. Workflow"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:293
-msgid "The workflow for enabling and using push notifications works as follows:"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:296
-msgid "Enabling notifications"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:298
-msgid ""
-"In order to receieve notifications, clients will require registration "
-"with a push service. Although this process is mainly invisible to the "
-"user, the steps in registration are listed here:"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:300
-msgid ""
-"The client registers and bootstraps too it’s assicoated push service. "
-"This is done automatically."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:302
-msgid ""
-"The client registers itself with the push service server which then will "
-"dedicate a node for the device."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:304
-msgid ""
-"Node information is passed back to the client and is shared with "
-"necessary components."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:307
-msgid "Receiving notifications"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:309
-msgid ""
-"Notifications sent from the server are recieved the following "
-"(simplified) way:"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:311
-msgid ""
-"A message is published on the XMPP node which is then sent to the push "
-"service on the same server."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:313
-msgid ""
-"The push service will then inform the user agent (an application on the "
-"device running in the background) that a push notification has been sent."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:315
-msgid ""
-"The user agent will then publish the notification to the client for a "
-"user to see, waking up or turning on the client if is not running or "
-"suspended."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:318
-msgid "13.2. Tigase Push Release Notes"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:320
-msgid ""
-"Welcome to Tigase Push 1.2.0! This is a feature release for with a number"
-" of fixes and updates."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:323
-msgid "13.2.1. Tigase Push 1.2.0 Release Notes"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:326
-msgid "Major Changes"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:328
-msgid "Added support for sending VoIP push notifications using PushKit"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:330
-msgid ""
-"Support for storing APNS certificates in repository instead of filesystem"
-" for easier cluster deployments"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:332
-msgid ""
-"Add priority detection for push notifications to avoid excessive pushes "
-"to devices"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:334
-msgid ""
-"Inclusion of APNS certificate validity task that notifies if it’s about "
-"to expire"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:337
-msgid "All Changes"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:339
-msgid ""
-"`#push-29 <https://projects.tigase.net/issue/push-29>`__ Added support "
-"for sending VoIP push notifications using PushKit"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:341
-msgid ""
-"`#push-30 <https://projects.tigase.net/issue/push-30>`__ Added REST API "
-"handler for quick unregistration of a device"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:343
-msgid ""
-"`#push-32 <https://projects.tigase.net/issue/push-32>`__ Fixed issue with"
-" APNS certificate validation"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:345
-msgid ""
-"`#push-33 <https://projects.tigase.net/issue/push-33>`__ Added statistics"
-" gathering"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:347
-msgid ""
-"`#push-35 <https://projects.tigase.net/issue/push-35>`__ Added support "
-"for APNS certificate in PEM"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:349
-msgid ""
-"`#push-36 <https://projects.tigase.net/issue/push-36>`__ Improved "
-"priority detection of push notifications"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:351
-msgid ""
-"`#push-37 <https://projects.tigase.net/issue/push-37>`__ Enable APNS "
-"certificates to be stored in UserRepository - management is done via ad-"
-"hoc command;"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:353
-msgid ""
-"`#push-39 <https://projects.tigase.net/issue/push-39>`__ Changes to "
-"improve error handling"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:355
-msgid ""
-"`#push-41 <https://projects.tigase.net/issue/push-41>`__ Fixed issue with"
-" ``ApnsService`` exceptions not being thown logged"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:357
-msgid ""
-"`#push-42 <https://projects.tigase.net/issue/push-42>`__ Fixed error type"
-" reported back on ``tooManyRequestsForDeviceToken``"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:359
-msgid ""
-"`#push-47 <https://projects.tigase.net/issue/push-47>`__ Added task to "
-"periodically validate SSL certificates for Push notifications"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:361
-msgid ""
-"`#push-48 <https://projects.tigase.net/issue/push-48>`__ Fixed handling "
-"events by APNsBinaryApiProvider"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:363
-msgid ""
-"`#push-49 <https://projects.tigase.net/issue/push-49>`__ Added "
-"enforcement to use HTTP/2 protocol (with use of ALPN)"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:366
-msgid "13.3. Configuration"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:369
-msgid "13.3.1. Enabling component"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:371
-msgid ""
-"Push notifications may be sent by Tigase XMPP Server with or without use "
-"of Push component. Push Component is only required if you have your own "
-"application for mobile devices for which you want to send push "
-"notifications."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:373
-msgid ""
-"This component is not loaded and enabled by default as it requires "
-"implementations of Push notifications providers and additional "
-"configuration (including credentials required to authorize to push "
-"services). Following entries will activate component:"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:382
-msgid ""
-"You need to enable and configure push providers implementations before it"
-" will be possible to send push notifications. For more details about this"
-" process, please check documentations of push service provider projects."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:385
-msgid "13.4. Usage"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:388
-msgid "13.4.1. Sending notifications"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:390
-msgid ""
-"When you will register a device for a Push Notifications, you will "
-"receive name of the PubSub node where you should publish items. "
-"Publishing items to this node, as specified in `XEP-0357: Push "
-"Notifications <https://xmpp.org/extensions/xep-0357.html>`__ will result "
-"in push notifications being delivered to the registered device."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:394
-msgid "13.4.2. Registering device"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:396
-msgid ""
-"To register a device you need to execute the adhoc command ``register-"
-"device`` available at Push Notification component. This command will "
-"return a form which needs to be filled."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:398
-msgid "Form consists of following fields:"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:401
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:416
-msgid "**provider**"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:401
-msgid ""
-"ID of a provider for which you want to register a device. It contains a "
-"list of available providers and you need to select a proper one."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:404
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:419
-msgid "**device-token**"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:404
-msgid ""
-"Unique token which your application retrieved from a device or client "
-"library and which should be used to identify device you want to register "
-"for push notifications."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:406
-msgid ""
-"When you submit this form, it will be processed and will respond with a "
-"``result`` type form. Within this form you will find a ``node`` field "
-"which will contain a PubSub node name created by the Push Notifications "
-"component, to which you should publish notification items. This returned "
-"node with jid of the Push Notifications Component should be passed to "
-"your XMPP server as the address of the XMPP Push Service."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:409
-msgid "13.4.3. Unregistering device"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:411
-msgid ""
-"To unregister a device, you need to execute the adhoc command "
-"``unregister-device`` available within the Push Notification component. "
-"This command will return a form which needs to be filled out."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:413
-msgid "This form consists of the following fields:"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:416
-msgid "ID of a provider for which your devices was registered."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:419
-msgid ""
-"Unique token which your application retrieved from a device or client "
-"library and was registered at this push notifications component."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:421
-msgid ""
-"When you submit this form, it will be processed and will respond with a "
-"``result`` form to notify you that device was successfully unregistered "
-"from the push notifications component."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:424
-msgid "13.4.4. Unregistering device via HTTPS"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:426
-msgid ""
-"There is REST API handler (in form of ``UnregisterDeviceHandler.groovy`` "
-"script) which placed in ``/scripts/rest/push/`` directory in Tigase XMPP "
-"Server installation directory will enable endpoint (documented in "
-"Development Guide) allowing client to disable their push notifications "
-"even without authentication to their XMPP server."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:430
-msgid ""
-"It is recommended to not expose this endpoint using HTTP but only with "
-"HTTPS."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:433
-msgid "13.5. Providers"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:435
-msgid ""
-"Providers availability depends on the deployed binaries, by default "
-"Tigase includes following providers:"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:438
-msgid "13.5.1. Tigase Push Component - FCM provider"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:441
-msgid "13.5.2. Overview"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:443
-msgid ""
-"Tigase Push Component - FCM provider is an implementation of FCM provider"
-" for Tigase Push Component. It allows Tigase Push Component to connect to"
-" Firebase Cloud Messaging and send notifications using this service."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:446
-msgid "13.5.3. Configuration"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:449
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:511
-msgid "Enabling provider"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:451
-msgid ""
-"To enable this provider, you need to enable fcm-xmpp-api bean within push"
-" component configuration scope."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:453
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:474
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:490
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:515
-msgid "**Example.**"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:465
-msgid "You need to pass FCM configuration parameters to make it work, see below."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:468
-msgid "Setting FCM credentials"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:470
-msgid ""
-"FCM XMPP API provider will not work properly without API key and project "
-"id as this values are required for authorization by FCM. You need to get "
-"information from FCM account."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:472
-msgid ""
-"When you have this data, you need to pass sender id as sender-id property"
-" and server key as server-key property."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:486
-msgid "Connection pool"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:488
-msgid ""
-"By default this provider uses single client to server connection to FCM "
-"for sending notifications. If in your use case it is to small (as you "
-"need better performance), you should adjust value of pool-size "
-"configuration property. Setting it to ``5`` will open five connections to"
-" FCM for better performance."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:501
-msgid "13.5.4. Tigase Push Component - APNs provider"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:503
-msgid "13.5.5. Overview"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:505
-msgid ""
-"Tigase Push Component - APNs provider is an implementation of APNs "
-"provider for Tigase Push Component. It allows Tigase Push Component to "
-"connect to Apple Push Notification service and send notifications using "
-"this service."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:508
-msgid "13.5.6. Configuration"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:513
-msgid ""
-"To enable this provider, you need to enable apns-binary-api bean within "
-"push component configuration scope."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:527
-msgid "You need to pass APNs configuration parameters to make it work, see below."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:530
-msgid "Setting APNs credentials"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:532
-msgid ""
-"APNs binary API provider will not work properly without certificate file "
-"required for authorization by APNs and password to decrypt this "
-"certificate file. You need to get certificate using Apple Developer "
-"Account."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:534
-msgid ""
-"When you have this certificate, you need to pass path to certificate file"
-" as cert-file property, password as cert-password and APNS topic (bundle "
-"id) as apns-topic."
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:536
-msgid "**Example for /etc/apns-cert.p12, Pa$$word and com.bundle.id.**"
-msgstr ""
-
-#: ../../Tigase_Admistration/Socks5_Proxy.rst:548
-msgid ""
-"Alternatively, certificate can be stored in the database and in that case"
-" the TDSL configuration file should only contain ``'apns-topic'`` entry "
-"and the certificate and the password should be updated via ad-hoc command"
-" (Service discovery → Push component → Set APNS certificate). In the ad-"
-"hoc you should select the APNS provider from the list and include base64 "
-"encoded certificate obtained from Apple (``.p12`` file), for example:"
-msgstr ""
-
 #~ msgid "13. Tigase Push Component"
+#~ msgstr ""
+
+#~ msgid "Welcome to Tigase Push component guide"
+#~ msgstr ""
+
+#~ msgid "13.1. Tigase Push Component"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tigase Push component is a Push "
+#~ "notifications component implementing `XEP-0357: "
+#~ "Push Notifications "
+#~ "<https://xmpp.org/extensions/xep-0357.html>`__. It is "
+#~ "a gateway between Push Notification "
+#~ "services and XMPP servers. It is "
+#~ "configured by default to run under "
+#~ "name of ``push``."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tigase Push component requires at the"
+#~ " minimum version 8.0.0 of Tigase XMPP"
+#~ " Server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Push notifications enable messages and "
+#~ "pertinent information for clients, even "
+#~ "if they are offline as long as "
+#~ "they are registered with the push "
+#~ "service. Tigase Messenger for iOS and"
+#~ " Tigase Messenger for Android both "
+#~ "have support for this feature."
+#~ msgstr ""
+
+#~ msgid "13.1.1. Workflow"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The workflow for enabling and using "
+#~ "push notifications works as follows:"
+#~ msgstr ""
+
+#~ msgid "Enabling notifications"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In order to receieve notifications, "
+#~ "clients will require registration with a"
+#~ " push service. Although this process "
+#~ "is mainly invisible to the user, "
+#~ "the steps in registration are listed "
+#~ "here:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The client registers and bootstraps too"
+#~ " it’s assicoated push service. This "
+#~ "is done automatically."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The client registers itself with the "
+#~ "push service server which then will "
+#~ "dedicate a node for the device."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Node information is passed back to "
+#~ "the client and is shared with "
+#~ "necessary components."
+#~ msgstr ""
+
+#~ msgid "Receiving notifications"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Notifications sent from the server are"
+#~ " recieved the following (simplified) way:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A message is published on the XMPP"
+#~ " node which is then sent to the"
+#~ " push service on the same server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The push service will then inform "
+#~ "the user agent (an application on "
+#~ "the device running in the background)"
+#~ " that a push notification has been"
+#~ " sent."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The user agent will then publish "
+#~ "the notification to the client for "
+#~ "a user to see, waking up or "
+#~ "turning on the client if is not"
+#~ " running or suspended."
+#~ msgstr ""
+
+#~ msgid "13.2. Tigase Push Release Notes"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Welcome to Tigase Push 1.2.0! This "
+#~ "is a feature release for with a"
+#~ " number of fixes and updates."
+#~ msgstr ""
+
+#~ msgid "13.2.1. Tigase Push 1.2.0 Release Notes"
+#~ msgstr ""
+
+#~ msgid "Major Changes"
+#~ msgstr ""
+
+#~ msgid "Added support for sending VoIP push notifications using PushKit"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Support for storing APNS certificates in"
+#~ " repository instead of filesystem for "
+#~ "easier cluster deployments"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Add priority detection for push "
+#~ "notifications to avoid excessive pushes "
+#~ "to devices"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Inclusion of APNS certificate validity "
+#~ "task that notifies if it’s about "
+#~ "to expire"
+#~ msgstr ""
+
+#~ msgid "All Changes"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-29 <https://projects.tigase.net/issue/push-29>`__ "
+#~ "Added support for sending VoIP push "
+#~ "notifications using PushKit"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-30 <https://projects.tigase.net/issue/push-30>`__ "
+#~ "Added REST API handler for quick "
+#~ "unregistration of a device"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-32 <https://projects.tigase.net/issue/push-32>`__ "
+#~ "Fixed issue with APNS certificate "
+#~ "validation"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-33 <https://projects.tigase.net/issue/push-33>`__ "
+#~ "Added statistics gathering"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-35 <https://projects.tigase.net/issue/push-35>`__ "
+#~ "Added support for APNS certificate in"
+#~ " PEM"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-36 <https://projects.tigase.net/issue/push-36>`__ "
+#~ "Improved priority detection of push "
+#~ "notifications"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-37 <https://projects.tigase.net/issue/push-37>`__ "
+#~ "Enable APNS certificates to be stored"
+#~ " in UserRepository - management is "
+#~ "done via ad-hoc command;"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-39 <https://projects.tigase.net/issue/push-39>`__ "
+#~ "Changes to improve error handling"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-41 <https://projects.tigase.net/issue/push-41>`__ "
+#~ "Fixed issue with ``ApnsService`` exceptions"
+#~ " not being thown logged"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-42 <https://projects.tigase.net/issue/push-42>`__ "
+#~ "Fixed error type reported back on "
+#~ "``tooManyRequestsForDeviceToken``"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-47 <https://projects.tigase.net/issue/push-47>`__ "
+#~ "Added task to periodically validate SSL"
+#~ " certificates for Push notifications"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-48 <https://projects.tigase.net/issue/push-48>`__ "
+#~ "Fixed handling events by APNsBinaryApiProvider"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`#push-49 <https://projects.tigase.net/issue/push-49>`__ "
+#~ "Added enforcement to use HTTP/2 protocol"
+#~ " (with use of ALPN)"
+#~ msgstr ""
+
+#~ msgid "13.3. Configuration"
+#~ msgstr ""
+
+#~ msgid "13.3.1. Enabling component"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Push notifications may be sent by "
+#~ "Tigase XMPP Server with or without "
+#~ "use of Push component. Push Component"
+#~ " is only required if you have "
+#~ "your own application for mobile devices"
+#~ " for which you want to send "
+#~ "push notifications."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This component is not loaded and "
+#~ "enabled by default as it requires "
+#~ "implementations of Push notifications "
+#~ "providers and additional configuration "
+#~ "(including credentials required to authorize"
+#~ " to push services). Following entries "
+#~ "will activate component:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You need to enable and configure "
+#~ "push providers implementations before it "
+#~ "will be possible to send push "
+#~ "notifications. For more details about "
+#~ "this process, please check documentations "
+#~ "of push service provider projects."
+#~ msgstr ""
+
+#~ msgid "13.4. Usage"
+#~ msgstr ""
+
+#~ msgid "13.4.1. Sending notifications"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "When you will register a device "
+#~ "for a Push Notifications, you will "
+#~ "receive name of the PubSub node "
+#~ "where you should publish items. "
+#~ "Publishing items to this node, as "
+#~ "specified in `XEP-0357: Push Notifications "
+#~ "<https://xmpp.org/extensions/xep-0357.html>`__ will result"
+#~ " in push notifications being delivered "
+#~ "to the registered device."
+#~ msgstr ""
+
+#~ msgid "13.4.2. Registering device"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To register a device you need to"
+#~ " execute the adhoc command ``register-"
+#~ "device`` available at Push Notification "
+#~ "component. This command will return a"
+#~ " form which needs to be filled."
+#~ msgstr ""
+
+#~ msgid "Form consists of following fields:"
+#~ msgstr ""
+
+#~ msgid "**provider**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "ID of a provider for which you "
+#~ "want to register a device. It "
+#~ "contains a list of available providers"
+#~ " and you need to select a "
+#~ "proper one."
+#~ msgstr ""
+
+#~ msgid "**device-token**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Unique token which your application "
+#~ "retrieved from a device or client "
+#~ "library and which should be used "
+#~ "to identify device you want to "
+#~ "register for push notifications."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "When you submit this form, it will"
+#~ " be processed and will respond with"
+#~ " a ``result`` type form. Within this"
+#~ " form you will find a ``node`` "
+#~ "field which will contain a PubSub "
+#~ "node name created by the Push "
+#~ "Notifications component, to which you "
+#~ "should publish notification items. This "
+#~ "returned node with jid of the Push"
+#~ " Notifications Component should be passed"
+#~ " to your XMPP server as the "
+#~ "address of the XMPP Push Service."
+#~ msgstr ""
+
+#~ msgid "13.4.3. Unregistering device"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To unregister a device, you need "
+#~ "to execute the adhoc command "
+#~ "``unregister-device`` available within the "
+#~ "Push Notification component. This command "
+#~ "will return a form which needs to"
+#~ " be filled out."
+#~ msgstr ""
+
+#~ msgid "This form consists of the following fields:"
+#~ msgstr ""
+
+#~ msgid "ID of a provider for which your devices was registered."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Unique token which your application "
+#~ "retrieved from a device or client "
+#~ "library and was registered at this "
+#~ "push notifications component."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "When you submit this form, it will"
+#~ " be processed and will respond with"
+#~ " a ``result`` form to notify you "
+#~ "that device was successfully unregistered "
+#~ "from the push notifications component."
+#~ msgstr ""
+
+#~ msgid "13.4.4. Unregistering device via HTTPS"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "There is REST API handler (in form"
+#~ " of ``UnregisterDeviceHandler.groovy`` script) "
+#~ "which placed in ``/scripts/rest/push/`` "
+#~ "directory in Tigase XMPP Server "
+#~ "installation directory will enable endpoint"
+#~ " (documented in Development Guide) allowing"
+#~ " client to disable their push "
+#~ "notifications even without authentication to"
+#~ " their XMPP server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "It is recommended to not expose "
+#~ "this endpoint using HTTP but only "
+#~ "with HTTPS."
+#~ msgstr ""
+
+#~ msgid "13.5. Providers"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Providers availability depends on the "
+#~ "deployed binaries, by default Tigase "
+#~ "includes following providers:"
+#~ msgstr ""
+
+#~ msgid "13.5.1. Tigase Push Component - FCM provider"
+#~ msgstr ""
+
+#~ msgid "13.5.2. Overview"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tigase Push Component - FCM provider "
+#~ "is an implementation of FCM provider "
+#~ "for Tigase Push Component. It allows "
+#~ "Tigase Push Component to connect to "
+#~ "Firebase Cloud Messaging and send "
+#~ "notifications using this service."
+#~ msgstr ""
+
+#~ msgid "13.5.3. Configuration"
+#~ msgstr ""
+
+#~ msgid "Enabling provider"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To enable this provider, you need "
+#~ "to enable fcm-xmpp-api bean within"
+#~ " push component configuration scope."
+#~ msgstr ""
+
+#~ msgid "**Example.**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You need to pass FCM configuration "
+#~ "parameters to make it work, see "
+#~ "below."
+#~ msgstr ""
+
+#~ msgid "Setting FCM credentials"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "FCM XMPP API provider will not "
+#~ "work properly without API key and "
+#~ "project id as this values are "
+#~ "required for authorization by FCM. You"
+#~ " need to get information from FCM "
+#~ "account."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "When you have this data, you need"
+#~ " to pass sender id as sender-id"
+#~ " property and server key as "
+#~ "server-key property."
+#~ msgstr ""
+
+#~ msgid "Connection pool"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "By default this provider uses single "
+#~ "client to server connection to FCM "
+#~ "for sending notifications. If in your"
+#~ " use case it is to small (as"
+#~ " you need better performance), you "
+#~ "should adjust value of pool-size "
+#~ "configuration property. Setting it to "
+#~ "``5`` will open five connections to "
+#~ "FCM for better performance."
+#~ msgstr ""
+
+#~ msgid "13.5.4. Tigase Push Component - APNs provider"
+#~ msgstr ""
+
+#~ msgid "13.5.5. Overview"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tigase Push Component - APNs provider"
+#~ " is an implementation of APNs "
+#~ "provider for Tigase Push Component. It"
+#~ " allows Tigase Push Component to "
+#~ "connect to Apple Push Notification "
+#~ "service and send notifications using "
+#~ "this service."
+#~ msgstr ""
+
+#~ msgid "13.5.6. Configuration"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To enable this provider, you need "
+#~ "to enable apns-binary-api bean "
+#~ "within push component configuration scope."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You need to pass APNs configuration "
+#~ "parameters to make it work, see "
+#~ "below."
+#~ msgstr ""
+
+#~ msgid "Setting APNs credentials"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "APNs binary API provider will not "
+#~ "work properly without certificate file "
+#~ "required for authorization by APNs and"
+#~ " password to decrypt this certificate "
+#~ "file. You need to get certificate "
+#~ "using Apple Developer Account."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "When you have this certificate, you "
+#~ "need to pass path to certificate "
+#~ "file as cert-file property, password "
+#~ "as cert-password and APNS topic "
+#~ "(bundle id) as apns-topic."
+#~ msgstr ""
+
+#~ msgid "**Example for /etc/apns-cert.p12, Pa$$word and com.bundle.id.**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Alternatively, certificate can be stored "
+#~ "in the database and in that case"
+#~ " the TDSL configuration file should "
+#~ "only contain ``'apns-topic'`` entry and"
+#~ " the certificate and the password "
+#~ "should be updated via ad-hoc "
+#~ "command (Service discovery → Push "
+#~ "component → Set APNS certificate). In"
+#~ " the ad-hoc you should select "
+#~ "the APNS provider from the list "
+#~ "and include base64 encoded certificate "
+#~ "obtained from Apple (``.p12`` file), for"
+#~ " example:"
 #~ msgstr ""
 
