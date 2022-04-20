@@ -1,0 +1,1473 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:2
+msgid "8. Tigase Message Archiving Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:4
+msgid "Welcome to Tigase Message Archiving component guide"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:7
+msgid "8.1. Tigase Message Archiving Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:9
+msgid ""
+"Tigase Message Archiving Component originated as implementation of "
+"`XEP-0136: Message Archiving "
+"<http://xmpp.org/extensions/xep-0136.html:>`__ to add support for "
+"archiving of messages exchanged using Tigase XMPP Server. In current "
+"version component supports also `XEP-0313: Message Archive Management "
+"<http://xmpp.org/extensions/xep-0313.html>`__ specification to allow "
+"easier access to archived messages."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:12
+msgid "8.2. Tigase Message Archiving Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:14
+msgid ""
+"Welcome to Tigase Message Archiving 3.0.0! This is a feature release for "
+"with a number of fixes and updates."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:17
+msgid "8.2.1. Tigase Message Archiving 3.0.0 Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:20
+msgid "Major Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:22
+msgid "Add support for urn:xmpp:mam:2"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:24
+msgid ""
+"Add support for `XEP-0308: Last Message Correction "
+"<https://xmpp.org/extensions/xep-0308.html>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:27
+msgid "All Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:29
+msgid ""
+"`#mam-47 <https://projects.tigase.net/issue/mam-47>`__: Add support for "
+"urn:xmpp:mam:2"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:31
+msgid ""
+"`#mam-49 <https://projects.tigase.net/issue/mam-49>`__: Historical "
+"message duplication"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:33
+msgid ""
+"`#mam-50 <https://projects.tigase.net/issue/mam-50>`__: XEP-0308: Last "
+"Message Correction"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:35
+msgid ""
+"`#mam-51 <https://projects.tigase.net/issue/mam-51>`__: Fix OMEMO "
+"encrypted messages are not stored by MA or MAM"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:37
+msgid ""
+"`#mam-54 <https://projects.tigase.net/issue/mam-54>`__: Fix NPE in "
+"MAM/Message Archiving"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:39
+msgid ""
+"`#mam-55 <https://projects.tigase.net/issue/mam-55>`__: Fix "
+"IllegalArgumentException in MessageArchiveVHostItemExtension"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:41
+msgid ""
+"`#mam-56 <https://projects.tigase.net/issue/mam-56>`__: Fix upgrade-"
+"schema failes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:43
+msgid ""
+"`#mam-58 <https://projects.tigase.net/issue/mam-58>`__: Change message "
+"archiving rules"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:45
+msgid ""
+"`#mam-60 <https://projects.tigase.net/issue/mam-60>`__: Fix Message "
+"carbons stored in MAM"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:47
+msgid ""
+"`#mam-61 <https://projects.tigase.net/issue/mam-61>`__: Adjust schema to "
+"use new primary keys"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:49
+msgid ""
+"`#mam-65 <https://projects.tigase.net/issue/mam-65>`__: Fix "
+"archiveMessage: Data truncation: Data too long for column ``_body``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:51
+msgid ""
+"`#mam-66 <https://projects.tigase.net/issue/mam-66>`__: Fix NPE in "
+"AbstractMAMProcessor.updatePrefrerences()"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:53
+msgid ""
+"`#mam-67 <https://projects.tigase.net/issue/mam-67>`__: Fix Incorrect "
+"datetime value in JDBCMessageArchiveRepository"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:55
+msgid ""
+"`#mam-68 <https://projects.tigase.net/issue/mam-68>`__: Add option to "
+"disable local MAM archive"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:57
+msgid ""
+"`#mam-69 <https://projects.tigase.net/issue/mam-69>`__: Fix Data "
+"truncation: Data too long for column '_stanzaId'"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:59
+msgid ""
+"`#mam-70 <https://projects.tigase.net/issue/mam-70>`__: Fix Schema is "
+"inconsistent (tigase.org mysql vs clean postgresql)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:61
+msgid ""
+"`#mam-72 <https://projects.tigase.net/issue/mam-72>`__: Fix Deadlock on "
+"inserting message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:64
+msgid "8.2.2. Previous Releases"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:67
+msgid "Tigase Message Archiving 2.x release"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:70
+msgid "Major changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:72
+msgid ""
+"Tigase Message Archiving component has undergone a few major changes to "
+"our code and structure. To continue to use Tigase Message Archiving "
+"component, a few changes may be needed to be made to your systems. Please"
+" see them below:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:74
+msgid "Database schema changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:76
+msgid ""
+"We decided to no longer use *in-code* database upgrade to update database"
+" schema of Message Archiving component and rather provide separate schema"
+" files for every supported database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:78
+msgid ""
+"Additionally we moved from *in-code* generated SQL statements to stored "
+"procedures which are now part of provided database schema files."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:80
+msgid ""
+"To continue usage of new versions of Message Archiving component it is "
+"required to manually load new component database schema, see `??? "
+"<#Preparation of database>`__ section for informations about that."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:84
+msgid ""
+"Loading of new database schema is required to use new version of Message "
+"Archiving component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:87
+msgid "New features"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:89
+msgid "Support for Message Archive Management protocol"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:91
+msgid ""
+"Now Tigase Message Archiving component supports searching of archived "
+"message using `XEP-0313: Message Archive Management "
+"<http://xmpp.org/extensions/xep-0313.html:>`__ protocol."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:93
+msgid ""
+"For details on how to enable this feature look into `??? <#Support for "
+"MAM>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:95
+msgid "Support for using separate database for different domains"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:97
+msgid ""
+"Since this version it is possible to use separate archived messages based"
+" on domains. This allows you to configure component to store archived "
+"message for particular domain to different database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:99
+msgid ""
+"For more informations please look into `??? <#Using separate store for "
+"archived messages>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:102
+msgid "8.3. Additional features"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:104
+msgid ""
+"Tigase Message Archiving Component contains few additional features "
+"useful for working with message archives."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:107
+msgid "8.3.1. Querying in all messages"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:109
+msgid ""
+"Feature allows user to search all of his archived messages without a need"
+" to specify who was send/receiver of this message. To search in all "
+"messages, request sent to retrieve archived messages should not contain "
+"``with`` attribute. As a result, when ``with`` attribute is omitted "
+"``<chat/>`` element of response will not contain ``with`` attribute but "
+"every ``<to/>`` and ``<from/>`` element will contain ``with`` attribute."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:112
+msgid "8.3.2. Querying by part of message body"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:114
+msgid ""
+"This feature allows user to query for messages or collections containing "
+"messages which in body of a message contained text passed by user."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:116
+msgid ""
+"To execute request in which user wants to find messages with \"test "
+"failed\" string XMPP client needs to add following element"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:124
+msgid "as child element of @retrieve@ or @list@ element of request."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:127
+msgid "Example query requests"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:130
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:193
+msgid "Example 1"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:132
+msgid ""
+"Retrieving messages with \"test failed\" string with user "
+"``juliet@capulet.com`` between ``2014-01-01 00:00:00`` and ``2014-05-01 "
+"00:00:00``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:149
+msgid "Example 2"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:151
+msgid ""
+"Retrieving collections containing messages with \"test failed\" string "
+"with user ``juliet@capulet.com`` between ``2014-01-01 00:00:00`` and "
+"``2014-05-01 00:00:00``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:168
+msgid "8.3.3. Querying by tags"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:170
+msgid ""
+"This feature adds support for tagging messages archived by Message "
+"Archiving component and by default is disabled (to learn how to enable "
+"this feature please see `??? <#Enabling support for tags>`__ section)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:172
+msgid ""
+"Tagging can be done only by user sending message as to tag message tag "
+"needs to be included in message content (message body to be exact)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:174
+msgid "Currently there are 2 types of tags supported:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:176
+msgid ""
+"``hashtag`` - words prefixed by \"hash\" (#) are stored with prefix and "
+"used as tag, i.e. ``#Tigase``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:178
+msgid ""
+"``mention`` - words prefixed by \"at\" (@) are stored with prefix and "
+"used as tag, i.e. ``@Tigase``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:180
+msgid ""
+"Custom feature allows user to query/retrieve messages or collections from"
+" archive only containing particular tag or tags. To execute request in "
+"which user wants to retrieve only messages tagged with ``@User1`` and "
+"``#People`` XMPP client executing request needs to add following element "
+"as child element of ``<retrieve/>`` element or ``<list/>`` element:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:190
+msgid "Querying/retrieving list of messages or collections"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:195
+msgid ""
+"Request to retrieve messages tagged with ``@User1`` and ``#People`` from "
+"chat with user ``juliet@capulet.com`` between ``2014-01-01 00:00:00`` and"
+" ``2014-05-01 00:00:00``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:212
+msgid "Example 2:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:214
+msgid ""
+"Request to retrieve collections containing messages tagged with "
+"``@User1`` and ``#People`` from chat with user ``juliet@capulet.com`` "
+"between ``2014-01-01 00:00:00`` and ``2014-05-01 00:00:00``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:232
+msgid "Retrieving list of tags used by user starting with some text"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:234
+msgid ""
+"To search for hashtags or user names already used following request might"
+" be used:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:242
+msgid ""
+"which will return suggested similar hashtags which where found in "
+"database for particular user if following response:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:260
+msgid "8.3.4. Automatic archiving of MUC messages"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:262
+msgid ""
+"If this feature is enabled MUC messages are stored in Message Archiving "
+"repository and are added in same way as for any other messages and "
+"``jid`` of MUC room is used as ``jid`` of message sender, so if MUC "
+"message sent from ``test@muc.example.com`` was stored then to retrieve "
+"this messages ``test@muc.example.com`` needs to be passed as ``with`` "
+"attribute to message retrieve request. Retrieved MUC messages will be "
+"retrieved in same format as normal message with one exception - each "
+"message will contain ``name`` attribute with name of occupant in room "
+"which sent this message."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:264
+msgid ""
+"This feature is by default disabled but it is possible to enable it for "
+"particular user. Additionally it is possible to change default setting on"
+" installation level and on hosted domain level to enable this feature, "
+"disable feature or allow user to decide if user want this feature to be "
+"enabled. For more information about configuration of this feature look at"
+" `??? <#Configuration of automatic archiving of MUC messages>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:268
+msgid ""
+"It is worth to mention that even if more than on user resource joined "
+"same room and each resource will receive same messages then only single "
+"message will be stored in Message Archving repository."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:270
+msgid ""
+"It is also important to note that MUC messages are archived to user "
+"message archive only when user is joined to MUC room (so if message was "
+"sent to room but it was not sent to particular user)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:273
+msgid "8.4. Database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:276
+msgid "8.4.1. Preparation of database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:278
+msgid ""
+"Before you will be able to use Tigase Message Archiving Component and "
+"store messages in particular database you need to initialize this "
+"database. We provide few schemas for this component for MySQL, "
+"PostgreSQL, SQLServer and DerbyDB."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:280
+msgid ""
+"They are placed in ``database/`` directory of installation package and "
+"named in ``dbtype-message-archiving-version.sql``, where ``dbname`` in "
+"name of database type which this schema supports and ``version`` is "
+"version of a Message Archiving Component for which this schema is "
+"designed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:282
+msgid ""
+"You need to manually select schema for correct database and component and"
+" load this schema to database. For more information about loading "
+"database schema look into `??? <#Database Preparation>`__ section of `???"
+" <#Tigase XMPP Server Administration Guide>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:285
+msgid "8.4.2. Upgrade of database schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:287
+msgid ""
+"Database schema for our components may change between versions and if so "
+"it needs to be updated before new version may be started. To upgrade "
+"schema please follow instructions from `Preparation of database "
+"<#_preparation_of_database>`__ section."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:291
+msgid ""
+"If you use SNAPSHOT builds then schema may change for same version as "
+"this are versions we are still working on."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:294
+msgid "8.4.3. Schema description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:296
+msgid ""
+"Tigase Message Archiving component uses few tables and stored procedures."
+" To make it easier to find them on database level they are prefixed with "
+"``tig_ma_``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:299
+msgid "Table ``tig_ma_jids``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:301
+msgid ""
+"This table stores all jids related to stored messages, ie. from ``to`` "
+"and ``from`` attributes of archived stanzas."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:304
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:323
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:351
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:366
+msgid "Field"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:304
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:323
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:351
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:366
+msgid "Description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:304
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:323
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:351
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:366
+msgid "Comments"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:306
+msgid "jid_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:306
+msgid "Database ID of a JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:308
+msgid "jid"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:308
+msgid "Value of a bare JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:310
+msgid "jid_sha1"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:310
+msgid "SHA1 value of lowercased bare JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:310
+msgid "Used for proper bare JID comparison during lookup."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:312
+msgid "(N/A to PostgreSQL schema)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:314
+msgid "domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:314
+msgid "Domain part of a bare JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:314
+msgid "Stored for easier lookup of messages owned by users of a particular domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:318
+msgid "Table ``tig_ma_msgs``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:320
+msgid "Table stores archived messages."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:325
+msgid "stable_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:325
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:370
+msgid "Database ID of a message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:325
+msgid "Unique with matching ``owner_id``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:327
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:355
+msgid "owner_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:327
+msgid "ID of a bare JID of a message owner"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:327
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:329
+msgid "References ``jid_id`` from ``tig_ma_jids``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:329
+msgid "buddy_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:329
+msgid "ID of a bare JID of a message recipient/sender (different than owner)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:331
+msgid "ts"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:331
+msgid "Timestamp of a message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:331
+msgid "Timestamp of archivization or delayed delivery"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:333
+msgid "body"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:333
+msgid "Body of a message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:335
+msgid "msg"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:335
+msgid "Serialized message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:337
+msgid "stanza_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:337
+msgid "ID attribute of archived message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:339
+msgid "is_ref"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:339
+msgid "Marks if message is a reference to other message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:341
+msgid "ref_stable_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:341
+msgid "``stable_id`` of referenced message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:346
+msgid "Table ``tig_ma_tags``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:348
+msgid ""
+"Table stores tags of archived messages. It stores one tag for many "
+"messages using ``tig_ma_msgs_tags`` to store relation between tag and a "
+"message."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:353
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:372
+msgid "tag_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:353
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:372
+msgid "Database ID of a tag"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:355
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:368
+msgid "ID of a bare JID of a tag owner"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:355
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:368
+msgid "ID of bare JID of owner for which messages with this tag were archived"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:357
+msgid "tag"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:357
+msgid "Actual tag value"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:361
+msgid "Table ``tig_ma_msgs_tags``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:363
+msgid "Table stores relations between tags and archived messages with this tags."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:368
+msgid "msg_owner_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:370
+msgid "msg_stable_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:370
+msgid "Unique with matching ``msg_owner_id``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:372
+msgid "References ``tag_id`` from ``tig_ma_tags``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:376
+msgid "8.5. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:378
+msgid ""
+"To enable Tigase Message Archiving Component you need to add following "
+"block to ``etc/config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:385
+msgid ""
+"It will enable component and configure it under name ``message-archive``."
+" By default it will also use database configured as ``default`` data "
+"source to store data."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:388
+msgid "8.5.1. Custom Database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:390
+msgid ""
+"You can specify a custom database to be used for message archiving. To do"
+" this, define the archive-repo-uri property."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:398
+msgid "Here, ``messagearchivedb`` hosted on localhost is used."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:401
+msgid "8.5.2. XEP-0136 Support"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:403
+msgid ""
+"To be able to use Message Archiving component with `XEP-0136: Message "
+"Archiving <http://xmpp.org/extensions/xep-0136.html:>`__ protocol, you "
+"additionally need to enable ``message-archive-xep-0136`` SessionManager "
+"processor:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:412
+msgid "This is required for some advanced options."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:415
+msgid "8.5.3. Support for MAM"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:417
+msgid ""
+"If you want to use Message Archiving component with `XEP-0313: Message "
+"Archive Management <http://xmpp.org/extensions/xep-0313.html:>`__ "
+"protocol, then you need to enable ``urn:xmpp:mam:1`` SessionManager "
+"processor:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:428
+msgid "8.5.4. Setting default value of archiving level for message on a server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:430
+msgid ""
+"Setting this property will change default archiving level for messages "
+"for every account on server for which per account default archiving level"
+" is not set. User will be able to change this value setting default modes"
+" as described in `XEP-0136 section 2.4 "
+"<http://xmpp.org/extensions/xep-0136.html#pref-default>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:432
+msgid "Possible values are:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:435
+msgid "**false**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:435
+msgid "Messages are not archived"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:438
+msgid "**body**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:438
+msgid ""
+"Only message body will be stored. Message without a body will not be "
+"stored with this value set"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:441
+msgid "**message**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:441
+msgid ""
+"While message stanza will be archived (if message should be stored, see "
+"`Saving Options <#nonBodyStore>`__)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:444
+msgid "**stream**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:444
+msgid "In this mode every stanza should be archived. *(Not supported)*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:446
+msgid ""
+"To set default level to ``message`` you need to set ``default-store-"
+"method`` of ``message-archive`` processor to ``message``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:458
+msgid "8.5.5. Setting required value of archiving level for messages on a server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:460
+msgid ""
+"Setting this property will change required archiving level for messages "
+"for every account on server. User will be able to change this to any "
+"lower value by setting default modes as described in `XEP-0136 section "
+"2.4 <http://xmpp.org/extensions/xep-0136.html#pref-default>`__ but user "
+"will be allowed to set higher archiving level. If this property is set to"
+" higher value then default archiving level is set then this setting will "
+"be used as default archiving level setting."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:462
+msgid ""
+"Possible values for this setting are the same as values for default "
+"archiving level setting, see `Setting default value of archiving level "
+"for message on a server "
+"<#_setting_default_value_of_archiving_level_for_message_on_a_server>`__ "
+"for list of possible values."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:464
+msgid ""
+"To set required level to ``body`` you need to set ``required-store-"
+"method`` of ``message-archive`` processor to ``body``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:476
+msgid "8.5.6. Enabling support for tags"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:478
+msgid ""
+"To enable this feature Message Archiving component needs to be configured"
+" properly. You need to add ``tags-support = true`` line to ``message-"
+"archiving`` configuration section of ``etc/config.tdsl`` file. Like in "
+"following example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:486
+msgid "where:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:488
+msgid ""
+"``message-archive`` - is name of configuration section under which "
+"Message Archiving component is configured to run"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:491
+msgid "Saving Options"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:493
+msgid ""
+"By default, Tigase Message Archive will only store the message body with "
+"some metadata, this can exclude messages that are lacking a body. If you "
+"decide you wish to save non-body elements within Message Archive, you can"
+" now can now configure this by setting ``msg-archive-paths`` to list of "
+"elements paths which should trigger saving to Message Archive. To "
+"additionally store messages with ``<subject/>`` element:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:503
+msgid ""
+"Where above will set the archive to store messages with <body/> or "
+"<subject/> elements and for message with ``<result "
+"xmlns=\"urn:xmpp:mam:1\"/>`` element not to be stored."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:507
+msgid ""
+"It is recommended to keep entry for not storing message with ``<result "
+"xmlns=\"urn:xmpp:mam:1\"/>`` element as this are results of MAM query and"
+" contain messages already stored in archive!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:511
+msgid ""
+"Enabling this for elements such as iq, or presence will quickly load the "
+"archive. Configure this setting carefully!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:514
+msgid "8.5.7. Configuration of automatic archiving of MUC messages"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:516
+msgid ""
+"As mentioned above no additional configuration options than default "
+"configuration of Message Archiving component and plugin is needed to let "
+"user decide if he wants to enable or disable this feature (but it is "
+"disabled by default). In this case user to enable this feature needs to "
+"set settings of message archiving adding ``muc-save`` attribute to "
+"``<default/>`` element of request with value set to ``true`` (or to "
+"``false`` to disable this feature)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:518
+msgid ""
+"To configure state of this feature on installation level, it is required "
+"to set ``store-muc-messages`` property of ``message-archive`` "
+"SessionManager processor:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:528
+msgid "where ``value`` may be one of following values:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:531
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:542
+msgid "``user``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:531
+msgid ""
+"allows value to be set on domain level or by user if domain level setting"
+" allows that"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:534
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:545
+msgid "``true``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:534
+msgid ""
+"enables feature for every user in every hosted domain (cannot be "
+"overridden by on domain or user level)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:537
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:549
+msgid "``false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:537
+msgid ""
+"disables feature for every user in every hosted domain (cannot be "
+"overridden by on domain or user level)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:539
+msgid ""
+"To configure state of this feature on domain level, you need to execute "
+"vhost configuration command. In list of fields to configure domain, field"
+" to set this will be available with following values:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:542
+msgid "allows user to stat of this feature (if allowed on installation level)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:545
+msgid ""
+"enables feature for users of configured domain (user will not be able to "
+"disable)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:548
+msgid ""
+"disables feature for users of configured domain (user will not be able to"
+" disable)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:552
+msgid "8.5.8. Purging Information from Message Archive"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:554
+msgid ""
+"This feature allows for automatic removal of entries older than a "
+"configured number of days from the Message Archive. It is designed to "
+"clean up database and keep its size within reasonable boundaries. If it "
+"is set to 1 day and entry is older than 24 hours then it will be removed,"
+" i.e. entry from yesterday from 10:11 will be removed after 10:11 after "
+"next execution of purge."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:556
+msgid "There are 3 settings available for this feature: To enable the feature:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:564
+msgid ""
+"This setting changes the initial delay after the server is started to "
+"begin removing old entries. In other words, MA purging will not take "
+"place until the specified time after the server starts. Default setting "
+"is PT1H, or one hour."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:570
+msgid ""
+"This setting sets how long MA purging will wait between passes to check "
+"for and remove old entries. Default setting is P1D which is once a day."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:576
+msgid "You may use all settings at once if you wish."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:578
+msgid ""
+"**NOTE** that these commands are also compatible with ``unified-archive``"
+" component, just replace ``message`` with ``unified``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:582
+msgid "Configuration of number of days in VHost"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:584
+msgid ""
+"VHost holds a setting that determines how long a message needs to be in "
+"archive for it to be considered old and removed. This can be set "
+"independently per Vhost. This setting can be modified by either using the"
+" HTTP admin, or the update item execution in adhoc command."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:586
+msgid ""
+"This configuration is done by execution of Update item configuration "
+"adhoc command of vhost-man component, where you should select domain for "
+"which messages should be removed and then in field XEP-0136 - retention "
+"type select value Number of days and in field XEP-0136 - retention period"
+" (in days) enter number of days after which events should be removed from"
+" MA."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:588
+msgid ""
+"In adhoc select domain for which messages should be removed and then in "
+"field XEP-0136 - retention type select value Number of days and in field "
+"XEP-0136 - retention period (in days) enter number of days after which "
+"events should be removed from MA."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:590
+msgid ""
+"In HTTP UI select Other, then Update Item Configuration (Vhost-man), "
+"select the domain, and from there you can set XEP-0136 retention type, "
+"and set number of days at XEP-0136 retention period (in days)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:593
+msgid "8.5.9. Using separate store for archived messages"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:595
+msgid ""
+"It is possible to use separate store for archived messages, to do so you "
+"need to configure new ``DataSource`` in ``dataSource`` section. Here we "
+"will use ``message-archive-store`` as a name of a data source. "
+"Additionally you need to pass name of newly configured data source to "
+"``dataSourceName`` property of ``default`` repository of Message "
+"Archiving component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:597
+msgid "Example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:615
+msgid ""
+"It is also possible to configure separate store for particular domain, "
+"i.e. ``example.com``. Here we will configure data source with name "
+"``example.com`` and use it to store data for archive:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:635
+msgid ""
+"With this configuration messages for other domains than ``example.com`` "
+"will be stored in default data source."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:638
+msgid "8.5.10. Setting Pool Sizes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:640
+msgid ""
+"There are a high number of prepared statements which are used to process "
+"and archive messages as they go through the server, and you may "
+"experience an increase in resource use with the archive turned on. It is "
+"recommended to decrease the repository connection pool to help balance "
+"server load from this component using the `Pool Size "
+"<#dataRepoPoolSize>`__ property:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:650
+msgid "8.5.11. Message Tagging Support"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:652
+msgid ""
+"Tigase now is able to support querying message archives based on tags "
+"created for the query. Currently, Tigase can support the following tags "
+"to help search through message archives: - ``hashtag`` Words prefixed by "
+"a hash (#) are stored with a prefix and used as a tag, for example "
+"#Tigase - ``mention`` Words prefixed by an at (@) are stored with a "
+"prefix and used as a tag, for example @Tigase"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:654
+msgid ""
+"**NOTE:** Tags must be written in messages from users, they do not act as"
+" wildcards. To search for #Tigase, a message must have #Tigase in the "
+"<body> element."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:656
+msgid ""
+"This feature allows users to query and retrieve messages or collections "
+"from the archive that only contain one or more tags."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:659
+msgid "Activating Tagging"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:661
+msgid ""
+"To enable this feature, the following line must be in the config.tdsl "
+"file (or may be added with Admin or Web UI)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:670
+msgid "Usage"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:672
+msgid ""
+"To execute a request, the tags must be individual children elements of "
+"the ``retrieve`` or ``list`` element like the following request:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:681
+msgid ""
+"You may also specify specific senders, and limit the time and date that "
+"you wish to search through to keep the resulting list smaller. That can "
+"be accomplished by adding more fields to the retrieve element such as "
+"``'with'``, ``'from’, and ’end'`` . Take a look at the below example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:697
+msgid ""
+"This stanza is requesting to retrieve messages tagged with @User1 and "
+"#people from chats with the user juliet@capulet.com between January 1st, "
+"2014 at 00:00 to May 1st, 2014 at 00:00."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:699
+msgid "**NOTE:** All times are in Zulu or GMT on a 24h clock."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:701
+msgid ""
+"You can add as many tags as you wish, but each one is an **AND** "
+"statement; so the more tags you include, the smaller the results."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:704
+msgid "8.6. Usage"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:706
+msgid ""
+"Now that we have the archive component running, how do we use it? "
+"Currently, the only way to activate and modify the component is through "
+"XMPP stanzas. Lets first begin by getting our default settings from the "
+"component:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:714
+msgid ""
+"It’s a short stanza, but it will tell us what we need to know, Note that "
+"you do not need a from or a to for this stanza. The result is as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:728
+msgid "See below for what these settings mean."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:731
+msgid "8.6.1.  XEP-0136 Field Values"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:740
+msgid "<**auto**/>"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:734
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:776
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:809
+msgid "**Required Attributes**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:736
+msgid "``save=`` Boolean turning archiving on or off"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:738
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:769
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:802
+msgid "**Optional Settings**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:740
+msgid ""
+"``scope=`` Determines scope of archiving, default is ``'stream'`` which "
+"turns off after stream end, or may be ``'global'`` which keeps auto save "
+"permanent,"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:771
+msgid "<**default**/>"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:743
+msgid ""
+"Default element sets default settings for OTR and save modes, includes an"
+" option for archive expiration."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:745
+msgid "**Required Attribures**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:747
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:780
+msgid ""
+"``otr=`` Specifies setting for Off The Record mode. Available settings "
+"are:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:749
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:782
+msgid "``approve`` The user MUST explicitly approve OTR communication."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:751
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:784
+msgid "``concede`` Communications MAY be OTR if requested by another user."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:753
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:786
+msgid "``forbid`` Communications MUST NOT be OTR."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:755
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:788
+msgid "``oppose`` Communications SHOULD NOT be OTR."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:757
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:790
+msgid "``prefer`` Communications SHOULD be OTR."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:759
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:792
+msgid "``require`` Communications MUST be OTR."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:761
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:794
+msgid ""
+"``save=`` Specifies the portion of messages to archive, by default it is "
+"set to ``body``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:763
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:796
+msgid "``body`` Archives only the items within the <body/> elements."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:765
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:798
+msgid "``message`` Archive the entire XML content of each message."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:767
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:800
+msgid ""
+"``stream`` Archive saves every byte of communication between server and "
+"client. (Not recommended, high resource use)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:771
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:804
+msgid ""
+"``expire=`` Specifies after how many seconds should the server delete "
+"saved messages."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:804
+msgid "<**item**/>"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:774
+msgid ""
+"The Item element specifies settings for a particular entity. These "
+"settings will override default settings for the specified JIDS."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:778
+msgid ""
+"``JID=`` The Jabber ID of the entity that you wish to put these settings "
+"on, it may be a full JID, bare JID, or just a domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:825
+msgid "<**method**/>"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:807
+msgid ""
+"This element specifies the user preference for available archiving "
+"methods."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:811
+msgid "``type=`` The type of archiving to set"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:813
+msgid "``auto`` Preferences for use of automatic archiving on the user’s server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:815
+msgid "``local`` Set to use local archiving on user’s machine or device."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:817
+msgid "``manual`` Preferences for use of manual archiving to the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:819
+msgid "``use=`` Sets level of use for the type"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:821
+msgid "``prefer`` The selected method should be used if it is available."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:823
+msgid "``concede`` This will be used if no other methods are available."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:825
+msgid "``forbid`` The associated method MUST not be used."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:827
+msgid ""
+"Now that we have established settings, lets send a stanza changing a few "
+"of them:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:841
+msgid ""
+"This now sets archiving by default for all users on the domain.com "
+"server, forbids OTR, and prefers auto save method for archiving."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:844
+msgid "8.6.2. Manual Activation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:846
+msgid ""
+"Turning on archiving requires a simple stanza which will turn on "
+"archiving for the use sending the stanza and using default settings."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:856
+msgid "A sucessful result will yield this response from the server:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:862
+msgid ""
+"Once this is turned on, incoming and outgoing messages from the user will"
+" be stored in ``tig_ma_msgs`` table in the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:865
+msgid "8.7. Limitations"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:867
+msgid ""
+"Component groups messages in collections using date of a messages instead"
+" of id of message thread, due to fact that some clients are sending "
+"messages with no thread id (ie. Psi, Psi+)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Message_Archiving.rst:869
+msgid "Only bare JID is stored of sender or recipient."
+msgstr ""
+

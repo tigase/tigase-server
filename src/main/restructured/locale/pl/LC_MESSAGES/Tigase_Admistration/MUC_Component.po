@@ -1,0 +1,884 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/MUC_Component.rst:2
+msgid "11. Tigase MUC Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:4
+msgid "Welcome to Tigase Multi User Chat component guide"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:7
+msgid "11.1. Overview"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:9
+msgid ""
+"Tigase MUC Component is implementation of `XEP-0045: Multi-User Chat "
+"<http://xmpp.org/extensions/xep-0045.html:>`__ which provides support for"
+" multi user chats to Tigase XMPP Server. This component also supports "
+"`XEP-0313: Message Archive Management "
+"<http://xmpp.org/extensions/xep-0313.html:>`__ protocol for easier "
+"retrieval of MUC room chat history."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:12
+msgid "11.2. Tigase MUC Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:14
+msgid ""
+"Welcome to Tigase MUC 3.2.0! This is a feature release for with a number "
+"of fixes and updates."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:17
+msgid "11.2.1. Tigase MUC 3.2.0 Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:20
+msgid "Major Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:22
+msgid "Bring MUC specification support up to date"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:24
+msgid "Improve handling of multiple user session using same nickname"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:26
+msgid "Fixes and improvements to ad-hoc scripts"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:29
+msgid "All Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:31
+msgid ""
+"`#muc-133 <https://projects.tigase.net/issue/muc-133>`__: Add component "
+"option to let only admins create rooms"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:33
+msgid ""
+"`#muc-134 <https://projects.tigase.net/issue/muc-134>`__: Better MUC "
+"Converter log"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:35
+msgid ""
+"`#muc-136 <https://projects.tigase.net/issue/muc-136>`__: MUC "
+"specification supported by Tigase MUC is out of data"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:37
+msgid ""
+"`#muc-137 <https://projects.tigase.net/issue/muc-137>`__: Add support for"
+" <iq/> forwarding with multiple resources joined"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:39
+msgid ""
+"`#muc-138 <https://projects.tigase.net/issue/muc-138>`__: "
+"tigase@muc.tigase.org kicks my clients if I use them both"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:41
+msgid ""
+"`#muc-139 <https://projects.tigase.net/issue/muc-139>`__: Create script "
+"to (mass) delete MUC rooms"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:43
+msgid ""
+"`#muc-140 <https://projects.tigase.net/issue/muc-140>`__: There is no "
+"empty ``<subject/>`` element for persistent room sent after re-joining"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:45
+msgid ""
+"`#muc-141 <https://projects.tigase.net/issue/muc-141>`__: "
+"StringIndexOutOfBoundsException in IqStanzaForwarderModule"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:47
+msgid ""
+"`#muc-142 <https://projects.tigase.net/issue/muc-142>`__: "
+"NullPointerException when processing message with subject"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:49
+msgid ""
+"`#muc-143 <https://projects.tigase.net/issue/muc-143>`__: Fix MUC "
+"scripts: \"No such property: mucRepository for class: "
+"tigase.admin.Script151\""
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:51
+msgid ""
+"`#muc-144 <https://projects.tigase.net/issue/muc-144>`__: No signature of"
+" method: tigase.muc.cluster.RoomClustered.addAffiliationByJid()"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:54
+msgid "11.3. Announcement"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:57
+msgid "11.3.1. Major changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:59
+msgid ""
+"Tigase MUC component has undergone a few major changes to our code and "
+"structure. To continue to use Tigase MUC component, a few changes may be "
+"needed to be made to your systems. Please see them below:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:62
+msgid "Database schema changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:64
+msgid ""
+"We decided to improve performance of MUC repository storage and to do so "
+"we needed to change database schema of MUC component. Additionally we "
+"decided to no longer use *in-code* database upgrade to update database "
+"schema of MUC component and rather provide separate schema files for "
+"every supported database."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:66
+msgid ""
+"To continue usage of new versions of MUC component it is required to "
+"manually load new component database schema, see `??? <#Preparation of "
+"database>`__ section for informations about that."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:68
+msgid ""
+"Moreover we no longer store rooms list and configurations inside "
+"``UserRepository`` of default Tigase XMPP Server database. Instead we use"
+" separate tables which are part of new schema. Due to that it is required"
+" to execute converter which will move room configurations from "
+"``UserRepository`` to new tables. It needs to be executed **AFTER** new "
+"database schema is loaded to database."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:72
+msgid ""
+"If you used separate database to store messages history we strongly "
+"suggest to use same database for new schema and storage of rooms "
+"configurations as well. In other case message history will not be moved "
+"to new schema."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:74
+msgid ""
+"In ``database`` directory of installation package there is a ``muc-db-"
+"migrate`` utility which takes 2 parameters:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:77
+msgid "-in 'jdbc_uri_to_user_repository'"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:77
+msgid "To set JDBC URI of UserRepository"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:80
+msgid "-out 'jdbc_uri_to_muc_database'"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:80
+msgid "To set JDBC URI of database with loaded database schema."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:84
+msgid "Both JDBC uri’s may be the same."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:88
+msgid "During this opeartion it removes room configurations from old storage."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:91
+msgid "Examples"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:93
+msgid "UNIX / Linux / OSX"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:99
+msgid "Windows"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:106
+msgid "Support for MAM"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:108
+msgid ""
+"In this version we added support for `XEP-0313: Message Archive "
+"Management <http://xmpp.org/extensions/xep-0313.html:>`__ protocol which "
+"allows any MAM compatible XMPP client with MUC support to retrieve room "
+"chat history using MAM and more advanced queries than retrieval of last X"
+" messages or messages since particular date supported by MUC"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:111
+msgid "Disabled support for XEP-0091: Legacy Delayed Delivery"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:113
+msgid ""
+"In this version we disabled by default support for `XEP-0091: Legacy "
+"Delayed Delivery <https://xmpp.org/extensions/xep-0091.html:>`__. This "
+"decision was made due to the fact that usage of XEP-0091 is not "
+"recommended any more and should be used only for backward compatibility. "
+"Moreover, it added overhead to each transmitted message sent from MUC "
+"room history, while the same information was already available in "
+"`XEP-0203: Delayed Delivery "
+"<https://xmpp.org/extensions/xep-0203.html:>`__ format. For more "
+"information see `Enabling support for XEP-0091: Legacy Delayed Delivery "
+"<#legacyDelayedDeliveryEnabled>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:116
+msgid "11.4. Database"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:119
+msgid "11.4.1. Preparation of database"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:121
+msgid ""
+"Before you will be able to use Tigase MUC Component you need to "
+"initialize this database. We provide few schemas for this component for "
+"MySQL, PostgreSQL, SQLServer and DerbyDB."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:123
+msgid ""
+"They are placed in ``database/`` directory of installation package and "
+"named in ``dbtype-mucversion.sql``, where ``dbname`` in name of database "
+"type which this schema supports and ``version`` is version of a MUC "
+"component for which this schema is designed."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:125
+msgid ""
+"You need to manually select schema for correct database and component and"
+" load this schema to database. For more information about loading "
+"database schema look into `??? <#Database Preparation>`__ section of `???"
+" <#Tigase XMPP Server Administration Guide>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:128
+msgid "1.4.2. Upgrade of database schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:130
+msgid ""
+"Database schema for our components may change between versions and if so "
+"it needs to be updated before new version may be started. To upgrade "
+"schema please follow instuctions from `Preparation of database "
+"<#_preparation_of_database>`__ section."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:134
+msgid ""
+"If you use SNAPSHOT builds then schema may change for same version as "
+"this are versions we are still working on."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:137
+msgid "11.4.3. Schema description"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:139
+msgid ""
+"Tigase MUC component uses few tables and stored procedures. To make it "
+"easier to find them on database level they are prefixed with "
+"``tig_muc_``."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:142
+msgid "Table ``tig_muc_rooms``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:144
+msgid "This table stores list of rooms and configuration of rooms."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:147
+#: ../../Tigase_Admistration/MUC_Component.rst:179
+#: ../../Tigase_Admistration/MUC_Component.rst:199
+msgid "Field"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:147
+#: ../../Tigase_Admistration/MUC_Component.rst:179
+#: ../../Tigase_Admistration/MUC_Component.rst:199
+msgid "Description"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:147
+#: ../../Tigase_Admistration/MUC_Component.rst:179
+#: ../../Tigase_Admistration/MUC_Component.rst:199
+msgid "Comments"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:149
+#: ../../Tigase_Admistration/MUC_Component.rst:181
+msgid "room_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:149
+msgid "Database ID of a room"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:151
+#: ../../Tigase_Admistration/MUC_Component.rst:183
+msgid "jid"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:151
+#: ../../Tigase_Admistration/MUC_Component.rst:201
+msgid "Room JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:153
+#: ../../Tigase_Admistration/MUC_Component.rst:185
+msgid "jid_sha1"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:153
+#: ../../Tigase_Admistration/MUC_Component.rst:203
+msgid "SHA1 value of lowercased room JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:153
+#: ../../Tigase_Admistration/MUC_Component.rst:185
+#: ../../Tigase_Admistration/MUC_Component.rst:203
+msgid "Used for proper bare JID comparison during lookup."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:155
+#: ../../Tigase_Admistration/MUC_Component.rst:187
+#: ../../Tigase_Admistration/MUC_Component.rst:205
+msgid "(Not exists in PostgreSQL schema)"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:157
+msgid "name"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:157
+msgid "Room name"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:159
+msgid "config"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:159
+msgid "Serialized room configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:161
+msgid "creator"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:161
+msgid "Bare JID of room creator"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:163
+msgid "creation_date"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:163
+msgid "Room creation date"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:165
+msgid "subject"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:165
+msgid "Room subject"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:167
+msgid "subject_creator_nick"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:167
+msgid "Nick of participant who set subject"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:169
+msgid "subject_date"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:169
+msgid "Timestamp of subject"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:174
+msgid "Table ``tig_muc_room_affiliations``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:176
+msgid "Table stores rooms affiliations."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:181
+msgid "ID of a room"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:181
+msgid "References ``room_id`` from ``tig_muc_rooms``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:183
+msgid "JID of affiliate"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:185
+msgid "SHA1 value of lowercased affiliate JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:189
+msgid "affiliation"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:189
+msgid "Affiliation between room and affiliate"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:194
+msgid "Table ``tig_muc_room_history``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:196
+msgid "Table stores room messages history."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:201
+msgid "room_jid"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:203
+msgid "room_jid_sha1"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:207
+msgid "event_type"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:207
+msgid "For future use, if we decide to store other events as well."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:209
+msgid "ts"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:209
+msgid "Timestamp of a message"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:211
+msgid "sender_jid"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:211
+msgid "JID of a sender"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:213
+msgid "sender_nickname"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:213
+msgid "Nickname of a message sender"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:215
+msgid "body"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:215
+msgid "Body of a message"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:217
+msgid "public_event"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:217
+msgid "Mark public events"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:219
+msgid "msg"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:219
+msgid "Serialized message"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:223
+msgid "11.5. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:225
+msgid ""
+"To enable Tigase MUC Component you need to add following block to "
+"``etc/init.properties`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:232
+msgid ""
+"It will enable component and configure it under name ``muc``. By default "
+"it will also use database configured as ``default`` data source to store "
+"data - including room configuration, affiliations and chat history."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:235
+msgid "11.5.1. Using separate storage"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:237
+msgid ""
+"As mentioned above, by default Tigase MUC component uses ``default`` data"
+" source configured for Tigase XMPP Server. It is possible to use separate"
+" store by MUC component. To do so you need to configure new "
+"``DataSource`` in ``dataSource`` section. Here we will use ``muc-store`` "
+"as name of newly configured data source. Additionally you need to pass "
+"name of newly configured data source to ``dataSourceName`` property of "
+"``default`` DAO of MUC component."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:255
+msgid ""
+"It is also possible to configure separate store for particular domain, "
+"ie. ``muc.example.com``. Here we will configure data source with name "
+"``muc.example.com`` and use it to store data for MUC rooms hosted at "
+"``muc.example.com``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:275
+msgid ""
+"With this configuration room data for other domains than example.com will"
+" be stored in default data source."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:278
+msgid "11.5.2. Configuring default room configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:280
+msgid ""
+"It is possible to define value for every room option by setting it’s "
+"value to ``defaultRoomConfig`` as a property:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:290
+msgid "for example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:301
+msgid "11.5.3. Enabling and configuring MUC room logging"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:303
+msgid "MUC component supports logging inforamtions about"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:305
+msgid "joining room"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:307
+msgid "leaving room"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:309
+msgid "broadcasting message by room"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:311
+msgid "setting room chat subject"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:313
+msgid "to HTML, XML or plain text files."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:315
+msgid ""
+"To enable this functionality you need to modify ``etc/init.properties`` "
+"file to enable ``muc-logger`` in MUC component, like this:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:324
+msgid ""
+"By default files are stored in ``logs`` subdirectory of Tigase XMPP "
+"Server installation directory. You may change it by setting ``room-log-"
+"directory`` property of MUC component to path where you want to store "
+"room logs."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:334
+msgid ""
+"We provide default logger for room events, but if you want, you may set "
+"your own custom logger. Here we set ``com.example.CustomLogger`` as "
+"logger for MUC rooms:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:345
+msgid "11.5.4. Disable message filtering"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:347
+msgid ""
+"MUC component by default filters messages and allows only ``<body/>`` "
+"element to be delivered to participants. To disable this filtering it is "
+"required to set ``message-filter-enabled`` property of MUC component to "
+"``false``."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:356
+msgid "11.5.5. Disable presence filtering"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:358
+msgid ""
+"To disable filter and allow MUC transfer all subelements in <presence/>, "
+"``presence-filter-enabled`` property of MUC component needs to be set to "
+"``false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:367
+msgid "11.5.6. Configuring discovering of disconnected participants"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:369
+msgid ""
+"MUC component automatically discovers disconnected participants by "
+"checking if user is still connected every 5 minutes."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:371
+msgid ""
+"It is possible to increase checking frequency by setting ``search-ghosts-"
+"every-minute`` property of MUC component to ``true``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:379
+msgid ""
+"It is also possible to disable this discovery by setting ``ghostbuster-"
+"enabled`` property of MUC component to ``false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:388
+msgid "11.5.7. Allow chat states in rooms"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:390
+msgid ""
+"To allow transfer of chat-states in MUC messages set ``muc-allow-chat-"
+"states`` property of MUC component to ``true``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:399
+msgid "11.5.8. Disable locking of new rooms"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:401
+msgid ""
+"To turn off default locking newly created rooms set ``muc-lock-new-room``"
+" property of MUC component to \\`false’ by default new room will be "
+"locked until owner submits a new room configuration."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:410
+msgid "11.5.9. Disable joining with multiple resources under same nickname"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:412
+msgid ""
+"To disable joining from multiple resources under single nickname set "
+"``muc-multi-item-allowed`` property of MUC component to ``false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:421
+msgid "11.5.10. Enabling support for XEP-0091: Legacy Delayed Delivery"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:423
+msgid ""
+"To enable support for XEP-0091 you need to set ``legacy-delayed-delivery-"
+"enabled`` property of MUC component to ``true``"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:432
+msgid "11.6. Room configuration options"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:434
+msgid ""
+"In addition to the default Room configuration options defined in the MUC "
+"specification Tigase offers following as well:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:457
+msgid "**Tigase MUC Options**"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:437
+msgid ""
+"tigase#presence_delivery_logic - allows configuring logic determining "
+"which presence should be used by occupant in the room while using "
+"multiple-resource connections under one nickname, following options are "
+"available:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:439
+msgid "PREFERE_PRIORITY"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:441
+msgid "PREFERE_LAST"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:443
+msgid ""
+"tigase#presence_filtering - (boolean) when enabled broadcasts presence "
+"only to selected affiliation groups"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:445
+msgid ""
+"tigase#presence_filtered_affiliations - when enabled "
+"tigase#presence_filtering is enabled one can select affiliation which "
+"should receive presences, following are possible to select from:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:447
+msgid "owner"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:449
+msgid "admin"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:451
+msgid "member"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:453
+msgid "none"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:455
+msgid "outcast"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:457
+msgid "muc#roomconfig_maxusers - Allows configuring of maximum users of room."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:460
+msgid "**Configuring default room configuration in init.properties**"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:460
+msgid ""
+"For more informations look into `??? <#Configuring default room "
+"configuration>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:463
+msgid "**Configuration per-room**"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:463
+msgid ""
+"Per room configuration is done using IQ stanzas defined in the "
+"specification, for example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:481
+msgid "11.7. Offline users"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:483
+msgid ""
+"If user affiliation is marked as persistent (which can be done using "
+"admin ad-hoc commands), MUC delivers presence to occupants in name of "
+"offline user. MUC generates presence with ``extended away`` info:"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:491
+msgid ""
+"This presence is sent to occupants, when user goes offline and when "
+"persistent occupant is added to room (but he is offline). If persistent "
+"user if online in room, then MUC sens real presence of occupant."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:495
+msgid "11.7.1. Entering the room"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:499
+msgid "When user is joining to room, he MUST use his BareJID as room nickname!"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:501
+msgid "**Example of entering to room.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:514
+msgid "11.7.2. Messages"
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:516
+msgid ""
+"Room members marked as persistent are able to send message to room, when "
+"they not in room. Message will be treated as sent from online user, and "
+"delivered to all occupants."
+msgstr ""
+
+#: ../../Tigase_Admistration/MUC_Component.rst:518
+msgid ""
+"All groupchat messages will be also sent to offline members if they are "
+"marked as persistent."
+msgstr ""
+

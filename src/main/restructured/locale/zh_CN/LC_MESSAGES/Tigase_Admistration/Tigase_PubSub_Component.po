@@ -1,0 +1,2007 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:2
+msgid "9. Tigase PubSub Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:4
+msgid "Welcome to Tigase PubSub component guide"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:7
+msgid "9.1. PubSub Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:9
+msgid ""
+"Tigase’s Publish Subscribe component is an `XEP-0060 "
+"<http://www.xmpp.org/extensions/xep-0060.html>`__ compliant plugin "
+"handling all publish and subscribe activity within Tigase server. This is"
+" enabled as default with the pubsub name, however you may include the "
+"following line if you wish to customize it’s configuration."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:15
+msgid ""
+"You may change the name so long as you specify the pubsub class within "
+"parenthesis."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:18
+msgid "9.1.1. Tigase Pubsub Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:20
+msgid ""
+"Welcome to Tigase Pubsub 5.0.0! This is a feature release for with a "
+"number of fixes and updates."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:23
+msgid "Tigase PubSub 5.0.0 Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:26
+msgid "Major Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:28
+msgid "Add publishing executor with rate limiting"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:30
+msgid "Optimisations and fixes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:34
+msgid "All Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:36
+msgid ""
+"`#pubsub-102 <https://projects.tigase.net/issue/pubsub-102>`__: Add "
+"publishing executor with rate limiting"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:38
+msgid ""
+"`#pubsub-103 <https://projects.tigase.net/issue/pubsub-103>`__: Empty "
+"message notification id attribute"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:40
+msgid ""
+"`#pubsub-105 <https://projects.tigase.net/issue/pubsub-105>`__: NPE in "
+"RetrieveItemsModule"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:42
+msgid ""
+"`#pubsub-106 <https://projects.tigase.net/issue/pubsub-106>`__: NPE in "
+"PubsubPublishModule?Eventbus"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:44
+msgid ""
+"`#pubsub-107 <https://projects.tigase.net/issue/pubsub-107>`__: "
+"disco#items feature returned on disco#info request for PubSub node item"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:46
+msgid ""
+"`#pubsub-108 <https://projects.tigase.net/issue/pubsub-108>`__: Fix "
+"Missing notification for published events"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:48
+msgid ""
+"`#pubsub-110 <https://projects.tigase.net/issue/pubsub-110>`__: Fix "
+"Deadlock in TigPubSubRemoveService SP on MySQL"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:50
+msgid ""
+"`#pubsub-111 <https://projects.tigase.net/issue/pubsub-111>`__: Fix "
+"SQLException: At least one parameter to the current statement is "
+"uninitialized."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:52
+msgid ""
+"`#pubsub-113 <https://projects.tigase.net/issue/pubsub-113>`__: Fix "
+"StackOverflowError in LRUCacheWithFuture"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:54
+msgid ""
+"`#pubsub-114 <https://projects.tigase.net/issue/pubsub-114>`__: Fix "
+"pubsub#persist_items is not advertised"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:56
+msgid ""
+"`#pubsub-115 <https://projects.tigase.net/issue/pubsub-115>`__: Fix "
+"Cannot add or update a child row: a foreign key constraint fails "
+"(``tigasedb``.\\ ``tig_pubsub_items``, CONSTRAINT "
+"``tig_pubsub_items_ibfk_1`` FOREIGN KEY (``node_id``) REFERENCES "
+"``tig_pubsub_nodes`` (``node_id``))"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:58
+msgid ""
+"`#pubsub-119 <https://projects.tigase.net/issue/pubsub-119>`__: Fix NPE "
+"in DiscoveryModule"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:60
+msgid ""
+"`#pubsub-120 <https://projects.tigase.net/issue/pubsub-120>`__: Fix Empty"
+" element in POST payload is incorrectly parsed"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:62
+msgid ""
+"`#pubsub-121 <https://projects.tigase.net/issue/pubsub-121>`__: Use "
+"String.intern() for PEP CAPS nodes string"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:64
+msgid ""
+"`#pubsub-124 <https://projects.tigase.net/issue/pubsub-124>`__: Fix "
+"PubSub sends notifications about last published item on each presence "
+"received from subscriber."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:66
+msgid ""
+"`#pubsub-125 <https://projects.tigase.net/issue/pubsub-125>`__: Reported "
+"features ``pubsub#metadata`` should be ``pubsub#meta-data``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:68
+msgid ""
+"`#pubsub-126 <https://projects.tigase.net/issue/pubsub-126>`__: Fix "
+"Deadlocks in MySQL schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:70
+msgid ""
+"`#pubsub-127 <https://projects.tigase.net/issue/pubsub-127>`__: Fix NPE "
+"in UserEntry.remove"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:72
+msgid ""
+"`#pubsub-128 <https://projects.tigase.net/issue/pubsub-128>`__: Fix "
+"PatternSyntaxException for users with emoticons in resource"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:75
+msgid "Previous Releases"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:78
+msgid "Announcement"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:80
+msgid "Major changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:82
+msgid ""
+"Tigase pubsub component has undergone a few major changes to our code and"
+" structure. To continue to use Tigase pubsub component, a few changes may"
+" be needed to be made to your systems. Please see them below:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:84
+msgid "Database schema changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:86
+msgid ""
+"Current version comes with changes to database schema to improve JID "
+"comparison during lookup of nodes, subscriptions, affiliations, etc."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:88
+msgid ""
+"To continue usage of new versions of pubsub component it is required to "
+"manually load new component database schema, see `database preparation "
+"<#databasePreparation>`__ section for more information."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:92
+msgid ""
+"Loading of new database schema is required to use new version of pubsub "
+"component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:94
+msgid "Changes in REST API"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:96
+msgid ""
+"We continuously work on improving usability and making our REST API "
+"easier to use we added support for handling JSON requests in REST API for"
+" pubsub. At the same time we decided to slightly modify responses in XML "
+"sent by REST API to make responses in JSON and XML similar."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:98
+msgid ""
+"For more informations about current REST API please look into `Rest API "
+"<#restAPI>`__ section."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:100
+msgid "New features Support for using separate database for different domains"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:103
+msgid ""
+"Since this version it is possible to use separate pubsub nodes and items "
+"based on domains. This allows you to configure component to store "
+"informations about nodes and items for particular domain to different "
+"database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:105
+msgid ""
+"For more informations please look into `using multiple databases "
+"<#multidb>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:107
+msgid "Support for MAM"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:109
+msgid ""
+"In this version we added support for `XEP-0313: Message Archive "
+"Management <http://xmpp.org/extensions/xep-0313.html:>`__ protocol which "
+"allows any MAM compatible XMPP client with pubsub support to retrieve "
+"items published on pubsub nodes using MAM protocol for querying."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:112
+msgid "9.1.2. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:115
+msgid "Pubsub naming"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:117
+msgid ""
+"Within Tigase, all pubsub component address MUST be domain-based address "
+"and not a JID style address. This was made to simplify communications "
+"structure. Tigase will automatically set component names to "
+"pubsub.domain, however any messages send to pubsub@domain will result in "
+"a ``SERVICE_UNAVAILABLE`` error."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:119
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1817
+msgid ""
+"Pubsub nodes within Tigase can be found as a combination of JID and node "
+"where nodes will be identified akin to service discovery. For example, to"
+" address a friendly node, use the following structure:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:129
+msgid "Configure Roster Maximum size"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:131
+msgid ""
+"Administrators can configure the maximum allowable roster size per user "
+"via the config.tdsl file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:141
+msgid ""
+"This sets the roster limit to 100 entries per user. It can be set to any "
+"integer, however by default no limit is set and no configuration is set "
+"in ``config.tdsl`` file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:144
+msgid "Store Full XML of Last Presence"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:146
+msgid ""
+"Tigase can store a more detailed ``<unavailable/>`` presence stanza to "
+"include timestamps and other information."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:149
+msgid "Requirements"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:151
+msgid ""
+"Ensure that ``presence-offline`` plugin is enabled in config.tdsl. To do "
+"this, add be sure ``presence-offline`` is listed under ``sess-man``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:159
+msgid ""
+"The following two lines in ``sess-man`` configure options to broadcast "
+"probes to offline users."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:168
+msgid ""
+"Without these lines, Tigase will not send presence probes to users that "
+"the server knows to be offline."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:170
+msgid ""
+"The full XML presence is stored under the tig_pairs table with a pkey of "
+"``last-unavailable-presence`` will look like this:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:178
+msgid ""
+"As you can see, the plugin has added a delay stamp which indicates the "
+"last time they were seen online. This may be suppressed by using the "
+"following line in your config.tdsl file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:186
+msgid "You may also limit probe responses only to newly connected resources."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:194
+msgid ""
+"When a user logs on, they will receive the same full unavailable presence"
+" statements from contacts not logged in. Also the repository entry "
+"containing their last unavailable presence will be removed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:196
+msgid ""
+"**NOTE: This will increase traffic with users with many people on their "
+"rosters.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:199
+msgid "Using separate store"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:201
+msgid ""
+"As mentioned above, by default Tigase pubsub component uses default data "
+"source configured for Tigase XMPP Server. It is possible to use separate "
+"store by pubsub component. To do so you need to configure new "
+"``DataSource`` in ``dataSource`` section. Here we will use ``pubsub-"
+"store`` as name of newly configured data source. Additionally you need to"
+" pass name of newly configured data source to ``dataSourceName`` property"
+" of default DAO of pubsub component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:219
+msgid ""
+"It is also possible to configure separate store for particular domain, "
+"ie. ``pubsub.example.com``. Here we will configure data source with name "
+"``pubsub.example.com`` and use it to store data for pubsub nodes and "
+"items at ``pubsub.example.com``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:239
+msgid ""
+"With this configuration, data for other domains than "
+"``pubsub.example.com`` will be stored in default data source."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:243
+msgid "Enabling PEP support"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:245
+msgid ""
+"To enable `XEP-0163: Personal Eventing Protocol "
+"<http://xmpp.org/extensions/xep-0163.html>`__ support it is required to "
+"set ``persistent-pep`` property of pubsub component to ``true``, set "
+"``send-last-published-item-on-presence`` property of component to "
+"``true`` and enable ``pep`` SessionManager processor."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:261
+msgid ""
+"If your pubsub component uses different name than ``pubsub`` then you "
+"need to set ``pubsub-jid`` property of ``pep`` processor to JID of pubsub"
+" component make it aware of a different name of a pubsub component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:263
+msgid ""
+"**Example with pubsub component named ``events`` hosted at server named "
+"``servername.com`` and enabled PEP.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:279
+msgid "Enabling REST API"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:281
+msgid "To use REST API for pubsub component it is required that:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:283
+msgid ""
+"Tigase HTTP API component is installed and configured properly. For "
+"information about HTTP API component installation please look into `HTTP "
+"component documentation <#compHTTPAPI>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:285
+msgid ""
+"Tigase pubsub REST scripts are copied to HTTP API REST scripts directory "
+"In installation package this is already done and scripts are in proper "
+"locations. dd\\* JID of HTTP API component needs to be added to list of "
+"trusted jids of Tigase pubsub component ``trusted`` property (if ``http``"
+" is name of HTTP API component)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:294
+msgid "Changing nodes cache size"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:296
+msgid ""
+"By default Tigase pubsub component caches node configuration of 2000 last"
+" loaded nodes. If there are many requests to database to load node "
+"configuration and your installation contains many nodes it may be a good "
+"idea to increase number of cached nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:298
+msgid ""
+"To do this you need to set ``pubsub-repository-cache-size`` property of "
+"pubsub component to new size."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:308
+msgid "Enable sending last published item on presence"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:310
+msgid ""
+"By default it is not possible to use delivery of last published item when"
+" users broadcasts initial presence. To do so you need to set ``send-last-"
+"published-item-on-presence`` of pubsub component to ``true``. This will "
+"allow you to configure nodes to send last published item on presence."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:320
+msgid "Throttling sending notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:322
+msgid ""
+"Notifications sent by PubSub component may be sent in large batches, if "
+"you have a nodes with a lot of subscribers. In those cases, it is useful "
+"to throttle publications to improve behaviour and performance of other "
+"parts of Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:324
+msgid ""
+"To achieve that, PubSub throttles generate notifications to specified "
+"throughput. By default it is set to 5k packets for each CPU core "
+"available per second."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:326
+msgid ""
+"To set it to a different value, you can set ``limit`` property of "
+"``publishExecutor`` bean to the expected number of publications per "
+"second, ie. 100000;"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:330
+msgid ""
+"This value is a number of total throughput, and will not be adjusted by "
+"the number of available CPU cores."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:340
+#, python-format
+msgid ""
+"Publication rate is also adjusted to current memory usage on a 4 point "
+"scale adjusted to the value of two configuration options: "
+"``highMemoryUsageLimit`` and ``criticalMemoryUsageLimit`` (with default "
+"values: 90% and 98% respectively): \\* ``normal`` - if memory usage is "
+"below ``highMemoryUsageLimit`` (i.e. below 90%) \\* ``high`` - memory "
+"usage less than halfway between ``highMemoryUsageLimit`` and ``veryHigh``"
+" (i.e. between 90% and 94%) \\* ``veryHigh`` - memory usage more than "
+"halfway between ``highMemoryUsageLimit`` and ``veryHigh`` (i.e. between "
+"94% and 98%) \\* ``critical`` - if memory usage is above "
+"``criticalMemoryUsageLimit`` (i.e. above 98%)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:342
+msgid ""
+"It’s possible to adjust values of the high and critical limits in "
+"publisher bean:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:355
+msgid "Disable automatic subscription of node creator"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:357
+msgid ""
+"During creation of node pubsub component subscribes creator to pubsub "
+"node and delivers notifications to creator. If in your case you do not "
+"want this behavior, you may set ``auto-subscribe-node-creator`` property "
+"of pubsub component to ``false``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:366
+msgid "9.1.3. Database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:369
+msgid "Preparation of database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:371
+msgid ""
+"Before you will be able to use Tigase PubSub Component you need to "
+"initialize database. We provide few schemas for this component for MySQL,"
+" PostgreSQL, SQLServer and DerbyDB."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:373
+msgid ""
+"They are placed in ``database/`` directory of installation package and "
+"named in ``dbtype-pubsub-version.sql``, where ``dbname`` in name of "
+"database type which this schema supports and ``version`` is version of a "
+"PubSub component for which this schema is designed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:375
+msgid ""
+"You need to manually select schema for correct database and component and"
+" load this schema to database. For more information about loading "
+"database schema look into `database preperation <#databasePreperation>`__"
+" section of this guide."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:378
+msgid "Upgrade of database schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:380
+msgid ""
+"Database schema for our components may change between versions and if so "
+"it needs to be updated before new version may be started. To upgrade "
+"schema please follow instructions from the `database preperation "
+"<#databasePreperation>`__ section."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:384
+msgid ""
+"If you use SNAPSHOT builds then schema may change for same version as "
+"this are versions we are still working on."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:387
+msgid "Schema description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:389
+msgid ""
+"Tigase PubSub component uses few tables and stored procedures. To make it"
+" easier to identify tables and stored procedures used by PubSub component"
+" they are prefixed with ``tig_pubsub_``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:392
+msgid "Table ``tig_pubsub_service_jids``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:394
+msgid "This table stores all jids for which PubSub component contains nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:397
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:414
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:431
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:466
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:481
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:498
+msgid "Field"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:397
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:414
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:431
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:466
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:481
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:498
+msgid "Description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:397
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:414
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:431
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:466
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:481
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:498
+msgid "Comments"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:399
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:435
+msgid "service_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:399
+msgid "Database ID of a service JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:401
+msgid "service_jid"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:401
+msgid "Value of a service JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:403
+msgid "service_jid_sha1"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:403
+msgid "SHA1 value of lowercased service JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:403
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:420
+msgid "Used for proper bare JID comparison during lookup."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:405
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:422
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:441
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:506
+msgid "(N/A to PostgreSQL schema)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:409
+msgid "Table ``tig_pubsub_jids``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:411
+msgid ""
+"This table stores all jids related to PubSub nodes, ie. subscriber, "
+"affiliates, creators, publishers, etc."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:416
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:470
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:485
+msgid "jid_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:416
+msgid "Database ID of a bare JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:418
+msgid "jid"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:418
+msgid "Value of a bare JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:420
+msgid "jid_sha1"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:420
+msgid "SHA1 value of lowercased bare JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:426
+msgid "Table ``tig_pubsub_nodes``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:428
+msgid "Table stores nodes tree structure and node configuration."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:433
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:468
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:483
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:500
+msgid "node_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:433
+msgid "Database ID of a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:435
+msgid "ID of service JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:435
+msgid "References ``service_id`` from ``tig_pubsub_service_jids``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:437
+msgid "name"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:437
+msgid "Name of PubSub node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:439
+msgid "name_sha1"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:439
+msgid "SHA1 of PubSub node name"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:439
+msgid "Used for indexing and faster lookup."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:443
+msgid "type"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:443
+msgid "Type of PubSub node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:443
+msgid "0 - collection"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:445
+msgid "1 - leaf"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:447
+msgid "title"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:447
+msgid "Title of PubSub node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:449
+msgid "description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:449
+msgid "Description of a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:451
+msgid "creator_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:451
+msgid "ID of JID of creator"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:451
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:470
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:485
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:510
+msgid "References ``jid_id`` from ``tig_pubsub_jids``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:453
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:508
+msgid "creation_date"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:453
+msgid "Timestamp of creation time"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:455
+msgid "configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:455
+msgid "Serialized configuration of PubSub node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:457
+msgid "collection_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:457
+msgid "Points collection (parent node)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:457
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:468
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:483
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:500
+msgid "References ``node_id`` from ``tig_pubsub_nodes``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:461
+msgid "Table ``tig_pubsub_affiliations``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:463
+msgid "Table stores affiliations between PubSub nodes and jids."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:468
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:483
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:500
+msgid "ID of a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:470
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:485
+msgid "ID of a user JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:472
+msgid "affiliation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:472
+msgid "Affiliation value"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:476
+msgid "Table ``tig_pubsub_subscriptions``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:478
+msgid "Table stores subscriptions of jids to PubSub nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:487
+msgid "subscription"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:487
+msgid "Subscription value"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:489
+msgid "subscription_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:489
+msgid "Id of a subscription"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:493
+msgid "Table ``tig_pubsub_items``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:495
+msgid "Table stores items of PubSub nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:502
+msgid "id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:502
+msgid "Id of an items"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:504
+msgid "id_sha1"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:504
+msgid "SHA1 of item id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:504
+msgid "Indexed and used for faster lookup"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:508
+msgid "Creation date"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:510
+msgid "publisher_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:510
+msgid "ID of publisher JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:512
+msgid "update_date"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:512
+msgid "Timestamp of last item modification"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:514
+msgid "data"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:514
+msgid "Item payload"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:518
+msgid "PubSub Schema Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:520
+msgid ""
+"Tigase PubSub Component is currently version 3.3.0 which is introduced in"
+" Tigase server v8.0.0."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:523
+msgid "PubSub 3.2.0 Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:525
+msgid ""
+"PubSub v 3.2.0 adds a new procedure TigPubSubGetNodeMeta which supports "
+"PubSub metadata retrieval while conducting a disco#info query on nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:527
+msgid ""
+"You will need to upgrade your database if you are not using v3.2.0 "
+"schema. Tigase will report being unable to load PubSub component if you "
+"do not have this schema version."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:529
+msgid ""
+"The MySQL schema can be found `Here <https://projects.tigase.org/projects"
+"/tigase-pubsub/repository/revisions/master/entry/database/mysql-pubsub-"
+"schema-3.2.0.sql>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:531
+msgid ""
+"The Derby schema can be found `Here <https://projects.tigase.org/projects"
+"/tigase-pubsub/repository/changes/database/derby-pubsub-"
+"schema-3.2.0.sql>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:533
+msgid ""
+"The PostGRESQL schema can be found `Here "
+"<https://projects.tigase.org/projects/tigase-"
+"pubsub/repository/changes/database/postgresql-pubsub-"
+"schema-3.2.0.sql>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:535
+msgid ""
+"The MS SQL schema can be found `Here "
+"<https://projects.tigase.org/projects/tigase-"
+"pubsub/repository/changes/database/sqlserver-pubsub-schema-3.2.0.sql>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:537
+msgid ""
+"The same files are also included in all distributions of v8.0.0 in "
+"``[tigaseroot]/database/`` . All changes to database schema are meant to "
+"be backward compatible."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:539
+msgid ""
+"For instructions how to manually upgrade the databases, please refer to "
+"`Tigase v7.1.0 Schema Updates section <#tigaseServer71>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:542
+msgid "Upgrading older installations (pre-v3.0.0 Schema)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:544
+msgid ""
+"To update older installations of Tigase to the PubSub Schema v3.0.0 "
+"follow these instructions. Note this should be done before upgrading to "
+"PubSub v3.1.0."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:546
+msgid "Step by Step guide."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:548
+msgid "Prepare Old Database for Upgrade"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:550
+msgid ""
+"In ``database`` directory of Tigase installation you will find SQL files "
+"which will prepare old database schema for upgrade using following this "
+"naming pattern: ``<database_type>-pubsub-schema-3.0.0-pre-upgrade.sql`` "
+"Where ``<database_type>`` can be one of the following: ``mysql``, "
+"``sqlserver``, ie. for MySQL you will find the file ``mysql-pubsub-"
+"schema-3.0.0-pre-upgrade.sql``. You need to execute statements from this "
+"file on your source database, which will drop old procedures and "
+"functions used to access database and also this statements will rename "
+"old tables by adding suffix \\_1 to each of old tables. Example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:553
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:579
+msgid "**MySQL**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:553
+msgid ""
+"``mysql -u tigase -p tigase_pubsub < database/mysql-pubsub-schema-3.0.0"
+"-pre-upgrade.sql``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:556
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:582
+msgid "**MS SQL**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:556
+#, python-format
+msgid ""
+"``sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i "
+"database\\sqlserver-pubsub-schema-3.0.0-pre-upgrade.sql``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:558
+msgid "Update Tigase PubSub Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:560
+msgid ""
+"For this you need to copy the Tigase PubSub Component jar file to jars "
+"directory inside Tigase XMPP Server installation directory. It is also "
+"recommended to copy files from database directory of Tigase PubSub "
+"Component to database directory in Tigase XMPP Server installation "
+"directory."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:562
+msgid ""
+"If you happen to use one of the the distribution packaged (either "
+"installer or -dist-max flavored archive) then all required files are "
+"already available - both new schema files will be available in "
+"``database/`` directory as well as both versions of PubSub component will"
+" be present in ``jars/`` directory - PubSub3 as tigase-pubsub.jar and "
+"PubSub2 as tigase-pubsub-2.2.0.jar.old (provided for compatibility "
+"reasons)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:564
+msgid "Load New Schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:566
+msgid ""
+"In the ``database`` directory you will find files containing new schemas "
+"for:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:568
+msgid "MySQL - ``mysql-pubsub-schema-3.0.0.sql``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:570
+msgid "PostgreSQL - ``postgresql-pubsub-schema-3.0.0.sql``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:572
+msgid "MSSQL - ``sqlserver-pubsub-schema-3.0.0.sql``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:574
+msgid ""
+"DerbyDB - ``derby-pubsub-schema-3.0.0.sql`` and ``pubsub-db-create-"
+"derby.sh``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:576
+msgid ""
+"For most databases, with the exception of Derby, you only need to execute"
+" statements from the proper file. For example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:579
+msgid ""
+"``mysql -u tigase -p tigase_pubsub < database/mysql-pubsub-"
+"schema-3.0.0.sql``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:582
+#, python-format
+msgid ""
+"``sqlcmd -S %servername% -U %root_user% -P %root_pass% -d %database% -i "
+"database\\sqlserver-pubsub-schema-3.0.0.sql``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:585
+msgid "**PostgreSQL**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:585
+msgid ""
+"``psql -h $DB_HOST -q -U ${USR_NAME} -d $DB_NAME -f database/sqlserver-"
+"pubsub-schema-3.0.0.sql``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:587
+msgid ""
+"For DerbyDB you need to execute the ``pubsub-db-create-derby.sh`` script "
+"and pass proper JDBC URI to database to which you want to load schema (if"
+" database does not exist, it will be created)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:593
+msgid ""
+"**NOTE:** It is possible to use same database which was used before - "
+"then after upgrade you will have new tables and old tables with \\_1 "
+"suffix."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:595
+msgid "Execute Migration Utility"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:597
+msgid ""
+"In the ``/database`` directory you will find the ``pubsub-db-migrate.sh``"
+" file which you need to execute and pass arguments with JDBC URIs needed "
+"to connect to source and destination database. If you used dedicated "
+"tables for PubSub you will also need to pass a class name used to access "
+"database (value of ``pubsub-repo-class`` variable from "
+"``etc/config.tdsl`` file)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:599
+msgid "Example for dedicated table used for PubSub:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:607
+msgid "Example for use without dedicated PubSub tables:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:615
+msgid "Example for use with dedicated tables in a Windows environment:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:623
+msgid ""
+"During execution this utility will report information about migration of "
+"PubSub data to the new schema, and the same information will be store in "
+"``pubsub_db_migration.log``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:625
+msgid "Finish"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:627
+msgid ""
+"After successful migration you will have all data copied to new tables. "
+"Old tables will be renamed by adding suffix \\_1. After verification that"
+" everything works OK, you can delete old tables and it’s content as it "
+"want be used any more."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:630
+msgid "9.1.4. Features"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:633
+msgid "9.1.5. AdHoc Commands"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:635
+msgid ""
+"Similar to the HTTP API, AdHoc commands based on groovy scripts can be "
+"sent to this component to do a number of tasks. All scripts for these Ad-"
+"hoc commands are found at ``sec/main/groovy/tigase/admin`` in source "
+"distributions, or at `this link <https://projects.tigase.org/projects"
+"/tigase-"
+"pubsub/repository/revisions/master/show/src/main/groovy/tigase/admin>`__."
+" To use them, the scripts need to be copied into the "
+"``scripts/admin/pubsub`` folder in the Tigase installation directory. For"
+" all examples, the component address will be ``pubsub.example.com``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:638
+msgid "Create a Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:640
+msgid "Ad-hoc command node: ``create-node`` Required role: Service Administrator"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:642
+msgid ""
+"Command requires fields ``node`` and ``pubsub#node_type`` to be filled "
+"with proper values for execution. - ``node`` Field containing id of node "
+"to create. - ``pubsub#node_type`` Contains one of two possible values. "
+"\\* ``leaf-node`` Node that will be published. \\* ``collection`` Node "
+"that will contain other nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:644
+msgid ""
+"Other fields are optional fields that can be set to change configuration "
+"of newly create node to different configuration than default."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:646
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:659
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:672
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:686
+msgid "Example call using TCLMT:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:653
+msgid "Delete a Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:655
+msgid "Ad-hoc command node: ``delete-node`` Required role: Service Administrator"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:657
+msgid ""
+"Command requires ``node`` field to be filled. - ``node`` Field containing"
+" id of node to delete."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:666
+msgid "Subscribe to a Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:668
+msgid ""
+"Ad-hoc command node: ``subscribe-node`` Required role: Service "
+"Administrator"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:670
+msgid ""
+"Command requires ``node`` and ``jids`` nodes to be filled. - ``node`` "
+"Field containing node to subscribe to. - ``jids`` Field containing list "
+"of JIDs to subscribe to the node."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:680
+msgid "Unsubscribe to a Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:682
+msgid ""
+"Ad-hoc command node: ``unsubscribe-node`` Required role: Service "
+"Administrator"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:684
+msgid ""
+"Command requires ``node`` and ``jids`` nodes to be filled. - ``node`` "
+"Field containing node to unsubscribe to. - ``jids`` Field containing list"
+" of JIDs to unsubscribe to the node."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:694
+msgid "Publish an item to a Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:696
+msgid "Ad-hoc command node: ``publish-item`` Required role: Service Administrator"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:698
+msgid ""
+"Command requires fields ``node`` and ``entry`` to be filled. - ``node`` "
+"Field containing id of node to publish to. - ``item-id`` Field may "
+"contain id of entry to publish, can be empty. - ``entry`` Field should "
+"contain multi-line entry content that should be valid XML values for "
+"items."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:700
+msgid ""
+"This command due to it’s complexity cannot be easily executed by TCLMT "
+"using default remote script which provides support for basic adhoc "
+"commands. Example call using TCLMT:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:706
+msgid "Example Groovy script to execute create-node command using JAXMPP2"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:768
+msgid "PubSub Node Presence Protocol"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:770
+msgid "**Occupant Use Case**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:773
+msgid "Log in to Pubsub Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:775
+msgid ""
+"To log in to PubSub Node user must send presence to PubSub component with"
+" additional information about node:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:786
+msgid "Component will publish this information in node:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:809
+msgid ""
+"And then will send notification with presences of all occupants to new "
+"occupant."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:812
+msgid "Log out from PubSub Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:814
+msgid ""
+"To logout from single node, user must send presence stanza with type "
+"unavailable:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:825
+msgid "Component will send events to all occupants as described:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:839
+msgid ""
+"If component receives presence stanza with type unavailable without "
+"specified node, then component will log out user from all nodes he logged"
+" before and publish events."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:842
+msgid "Retrieving list of all Node Subscribers"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:844
+msgid ""
+"To retrieve list of node subscribers, node configuration option "
+"``tigase#allow_view_subscribers`` must be set to true:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:864
+msgid ""
+"When option is enabled, each subscriber may get list of subscribers the "
+"same way `as owner <http://xmpp.org/extensions/xep-0060.html#owner-"
+"subscriptions-retrieve>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:877
+msgid "There is extension to filter returned list:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:894
+msgid ""
+"In this example will be returned all subscriptions of users from domain "
+"\"denmark.lit\"."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:897
+msgid "Offline Message Sink"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:899
+msgid ""
+"Messages sent to offline users is published in pubsub node, from where "
+"that message is sent to all the node subscribers as a pubsub "
+"notification."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:919
+msgid "Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:921
+msgid "The pubsub node must be created and configured beforehand:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:924
+msgid "Create node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:936
+msgid "After that is done, you need to add SessionManager as a publisher:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:939
+msgid "Add sess-man as publisher"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:953
+msgid ""
+"Finally, the 'msgoffline' offline messages processor must be configured "
+"as well"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:956
+msgid "config.tdsl configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:970
+msgid "Usage"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:972
+msgid ""
+"Because these sinks use a standard pubsub component, administration of "
+"the sink node is identical to any other pubsub node. `XEP-0060 "
+"<http://www.xmpp.org/extensions/xep-0060>`__ defines standard pubsub "
+"usage and management."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:975
+msgid "Managing Subscriptions"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:977
+msgid "Add new Subscriber"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:992
+msgid "Remove Subscriber"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1007
+msgid "9.1.6. REST API"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1009
+msgid ""
+"All example calls to pubsub REST API are prepared for pubsub component "
+"running at ``pubsub.example.com``. It is required to replace this value "
+"with JID of pubsub component from your installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1011
+msgid "It is possible to provide parameters to requests as:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1014
+msgid "**XML**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1014
+msgid ""
+"All parameters passed in content of HTTP request needs to be wrapped with"
+" ``<data/>`` tag as root tag of XML document, while returned parameters "
+"will be wrapped ``<result/>`` tag as root tag of XML document."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1017
+msgid "**JSON**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1017
+msgid ""
+"Parameters must be passed as serialized JSON object. Additionally "
+"``Content-Type`` header of HTTP request needs to be set to "
+"``application/json``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1020
+msgid "Create a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1022
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/create-node``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1024
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1093
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1155
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1227
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1298
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1477
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1541
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1583
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1657
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1747
+msgid "Available HTTP methods:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1027
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1097
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1158
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1230
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1301
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1480
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1544
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1587
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1660
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1750
+msgid "GET"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1029
+msgid ""
+"Method returns example content which contains all required and optional "
+"parameters that may be passed to newly created node."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1032
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1103
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1163
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1235
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1306
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1484
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1592
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1665
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1755
+msgid "POST"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1034
+msgid ""
+"Command requires fields ``node`` and ``pubsub#node_type`` to be filled "
+"with proper values for execution."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1036
+msgid "``node`` - field should contain id of node to create"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1038
+msgid ""
+"``owner`` - field may contains jid which should be used as jid of owner "
+"of newly created node (will use jid of Tigase HTTP API Component if not "
+"passed)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1040
+msgid ""
+"``pubsub#node_type`` - should contain type of node to create (two values "
+"are possible: ``leaf`` - node to which items will be published, "
+"``collection`` - node which will contain other nodes)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1042
+msgid ""
+"Example content to create node of id ``example`` and of type ``leaf`` and"
+" with owner set to ``admin@example.com``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1044
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1111
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1174
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1245
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1320
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1494
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1600
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1675
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1765
+msgid "Using XML"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1046
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1113
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1176
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1247
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1335
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1371
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1496
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1602
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1677
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1767
+msgid "**Request in XML.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1058
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1121
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1188
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1259
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1351
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1384
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1505
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1610
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1686
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1776
+msgid "**Response in XML.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1068
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1131
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1199
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1270
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1395
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1516
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1627
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1712
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1787
+msgid "Using JSON"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1070
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1133
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1201
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1272
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1410
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1443
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1518
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1629
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1714
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1789
+msgid "**Request in JSON.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1080
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1141
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1213
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1284
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1424
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1457
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1527
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1637
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1723
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1798
+msgid "**Response in JSON.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1089
+msgid "Delete a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1091
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/delete-node``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1099
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1160
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1232
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1303
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1481
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1589
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1662
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1752
+msgid ""
+"Method returns example content which contains all required and optional "
+"parameters that may be passed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1105
+msgid "Command requires field ``node`` to be filled."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1107
+msgid "``node`` - field should contain id of node to delete"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1109
+msgid "Example content to delete node with id ``example``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1151
+msgid "Subscribe to a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1153
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/subscribe-node``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1165
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1237
+msgid "Command requires fields ``node`` and ``jids`` to be filled."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1167
+msgid "``node`` - field should contain id of node to subscribe to"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1169
+msgid "``jids`` - field should contain list of jids to be subscribed to node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1171
+msgid ""
+"Example content to subscribe to node with id ``example`` users with jid "
+"``test1@example.com`` and ``test2@example.com``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1223
+msgid "Unsubscribe from a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1225
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/unsubscribe-node``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1239
+msgid "``node`` - field should contain id of node to unsubscribe from"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1241
+msgid "``jids`` - field should contain list of jids to be unsubscribed from node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1243
+msgid ""
+"Example content to unsubscribe from node with id ``example`` users "
+"``test1@example.com`` and ``test2@example.com``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1294
+msgid "Publish an item to a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1296
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/publish-item``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1308
+msgid "Command requires fields ``node`` and ``entry`` to be filled"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1310
+msgid "``node`` - field should contain id of node to publish to"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1312
+msgid "``item-id`` - field may contain id of entry to publish"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1314
+msgid ""
+"``expire-at`` - field may contain timestamp (in `XEP-0082 "
+"<http://xmpp.org/extensions/xep-0082.html>`__ format) after which item "
+"should not be delivered to user"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1316
+msgid ""
+"``entry`` - field should contain multi-line entry content which should be"
+" valid XML value for an item"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1318
+msgid ""
+"Example content to publish item with id ``item-1`` to node with id "
+"``example`` and with content in example field. P"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1322
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1397
+msgid "with XML payload"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1324
+msgid "In this example we will use following XML payload:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1326
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1365
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1401
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1437
+msgid "**Payload.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1361
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1433
+msgid "with JSON payload"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1363
+msgid ""
+"It is possible to publish JSON payload as value of published XML element."
+" In example below we are publishing following JSON object:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1399
+msgid ""
+"To publish XML using JSON you need to set serialized XML payload as value"
+" for ``entry`` key. In this example we will use following XML payload:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1435
+msgid ""
+"As JSON needs to be set as a value of an XML element it will be wrapped "
+"on server side as a value for ``<payload/>`` element."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1465
+msgid "**Published item.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1473
+msgid "Delete an item from a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1475
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/delete-item``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1486
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1667
+msgid "Command requires fields ``node`` and ``item-id`` to be filled"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1488
+msgid "``node`` - field contains id of node to publish to"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1490
+msgid "``item-id`` - field contains id of entry to publish"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1492
+msgid ""
+"Example content to delete an item with id ``item-1`` from node with id "
+"``example``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1537
+msgid "List available nodes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1539
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/list-nodes``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1546
+msgid ""
+"Method returns list of available pubsub nodes for domain passed as part "
+"of URI (``pubsub.example.com``)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1548
+msgid "**Example response in XML.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1561
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1576
+msgid ""
+"in which we see nodes: ``test``, ``node_54idf40037`` and "
+"``node_3ws5lz0037``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1563
+msgid "**Example response in JSON.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1579
+msgid "List published items on node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1581
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/list-items``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1594
+msgid "Command requires field ``node`` to be filled"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1596
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1669
+msgid "``node`` - field contains id of node which items we want to list"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1598
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1673
+msgid "Example content to list of items published on node with id ``example``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1625
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1650
+msgid ""
+"where ``item-1`` and ``item-2`` are identifiers of published items for "
+"node ``example``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1653
+msgid "Retrieve item published on node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1655
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/retrieve-item``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1671
+msgid "``item-id`` - field contains id of item to retrieve"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1710
+msgid ""
+"inside item element there is XML encoded element which is published on "
+"node ``example`` with id ``item-1``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1743
+msgid "Retrieve user subscriptions"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1745
+msgid "HTTP URI: ``/rest/pubsub/pubsub.example.com/retrieve-user-subscriptions``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1757
+msgid "Command requires field ``jid`` to be filled."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1759
+msgid ""
+"``jid`` - field contains JID of a user for which we want to retrieve "
+"subscriptions"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1761
+msgid ""
+"``node-pattern`` - field contains regex pattern to match. When field is "
+"not empty, request will return only subscribed nodes which match this "
+"pattern. If field should be empty it may be omitted in a request."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1763
+msgid ""
+"Example content to retrieve list of nodes to which user "
+"``test@example.com`` is subscribed at ``pubsub.example.com`` which starts"
+" with ``test-`` (pattern ``test-.*``)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1810
+msgid "9.2. Limitations"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1813
+msgid "9.2.1. Addressing"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_PubSub_Component.rst:1815
+msgid ""
+"Within Tigase, all pubsub component address MUST be domain-based address "
+"and not a JID style address. This was made to simplify communications "
+"structure. Tigase will automatically set component names to "
+"``pubsub.domain``, however any messages send to ``pubsub@domain`` will "
+"result in a ``SERVICE_UNAVAILABLE`` error."
+msgstr ""
+

@@ -1,0 +1,482 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/HTTP_File.rst:2
+msgid "6. HTTP File Upload component"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:4
+msgid ""
+"Tigase’s HTTP File Upload component is an implementation of `XEP-0363 "
+"HTTP File Upload <http://xmpp.org/extensions/xep-0363.html:>`__ "
+"specification. This allows file transfer between XMPP clients by "
+"uploading a file to HTTP server and sending only link to download file to"
+" recipient."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:6
+msgid ""
+"This implementation makes use of the HTTP server used by Tigase XMPP "
+"Server and Tigase HTTP API component to provide web server for file "
+"upload and download."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:8
+msgid ""
+"By default this component is **disabled** and needs to be enabled in "
+"configuration file before it can be used. Another requirement is that the"
+" proper database schema needs to be applied to database which will be "
+"used by component."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:11
+msgid "6.1. Enabling HTTP File Upload Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:13
+msgid "**Configuration.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:20
+msgid "6.2. Metadata repository"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:22
+msgid ""
+"Running the component requires a repository where it can store "
+"information about allocated slots. For this, a metadata repository is "
+"used. It is possible to specify a specific implementation of "
+"``FileUploadRepository`` for every domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:24
+msgid ""
+"By default, metadata for all domains will be stored in the ``default`` "
+"repository. Implementation of which will be selected based on kind of "
+"data source defined as ``default``."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:27
+msgid "6.2.1. DummyFileUploadRepository"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:29
+msgid ""
+"This is very simple repository which does not store any data. Due to "
+"that, it can be very fast! However, it is not able to remove old uploads "
+"and apply any upload limits."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:32
+msgid "6.2.2. JDBCFileUploadRepository"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:33
+msgid ""
+"This repository implementation stores data in database used to store "
+"procedures and functions. By default, data should be stored in the "
+"``tig_hfu_slots`` table but it can be changed by modification of stored "
+"procedures or reconfiguration of the repository implementation to use "
+"different stored procedures and functions than provided."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:36
+msgid "6.3. Storage"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:38
+msgid ""
+"Component contains a pluggable storage mechanism, which means that it is "
+"relatively easy to implement custom storage provisions. By default "
+"``DirectoryStore`` based storage is used."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:40
+msgid "Currently following storage providers are available out of the box."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:43
+msgid "6.3.1. DirectoryStore"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:45
+msgid ""
+"This storage mechanism places files in subdirectories with names that "
+"correspond to the id of `allocated slot "
+"<http://xmpp.org/extensions/xep-0363.html#intro:>`__. If required, it is "
+"possible to group all slot directories allocated by single user in a "
+"directory containing this user name."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:47
+msgid ""
+"By default there is no redundancy if this store is used in clustered "
+"environment. Every file will be stored on a single cluster node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:49
+#: ../../Tigase_Admistration/HTTP_File.rst:63
+#: ../../Tigase_Admistration/HTTP_File.rst:132
+msgid "Available properties:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:52
+msgid "**path**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:52
+msgid ""
+"Contains path to directory in which subdirectory with files will be "
+"created on the local machine. **(default: ``data/upload``)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:56
+msgid "**group-by-user**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:55
+msgid ""
+"Configures if slots directories should be grouped in user directories. "
+"**(default: false)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:59
+msgid "6.4. Logic"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:61
+msgid ""
+"Logic is responsible for generation of URI and applying limits. It groups"
+" all configuration settings related to allocation of slots, etc."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:66
+msgid "**local-only**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:66
+msgid ""
+"Allow only users with accounts on the local XMPP server to use this "
+"component for slot allocation. **(default: true)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:69
+msgid "**max-file-size**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:69
+msgid ""
+"Set maximum size of a single allocated slot (maximum file size) in bytes."
+" **(default: 5000)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:72
+#: ../../Tigase_Admistration/HTTP_File.rst:104
+msgid "**port**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:72
+msgid ""
+"Specifies the port which should be used in generating the upload and "
+"download URI. If it is not set, then secured (HTTPS) server port will be "
+"used if available, and plain HTTP in other case. **(default: not set)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:79
+msgid "**protocol**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:75
+msgid ""
+"Protocol which should be used. **This is only used in conjunction with "
+"``port``**. Possible values are:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:77
+msgid "http"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:79
+msgid "https"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:82
+#: ../../Tigase_Admistration/HTTP_File.rst:101
+msgid "**serverName**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:82
+msgid ""
+"Server name to use as domain part in generated URI. **(default: server "
+"hostname)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:85
+msgid "**upload-uri-format**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:85
+msgid ""
+"Template used in generation of URI for file upload. **(default: "
+"``{proto}://{serverName}:{port}/upload/{userJid}/{slotId}/{filename}``)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:88
+msgid "**download-uri-format**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:88
+msgid ""
+"Template used in generation of URI for file download. **(default: "
+"``{proto}://{serverName}:{port}/upload/{slotId}/{filename}``)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:91
+msgid "6.4.1. URI template format"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:93
+msgid ""
+"Every block in the template between ``{`` and ``}`` is a named part which"
+" will be replaced by the property value during generation of URI for "
+"slot."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:95
+msgid "Blocks possible to use:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:98
+msgid "**proto**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:98
+msgid "Name of protocol."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:101
+msgid "Domain name of server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:104
+msgid "Port on which HTTPS (or HTTP) server is listening."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:107
+msgid "**userJid**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:107
+msgid "JID of user requesting slot allocation."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:110
+msgid "**domain**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:110
+msgid "Domain of user requesting slot allocation."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:113
+msgid "**slotId**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:113
+msgid "Generated ID of slot."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:116
+msgid "**filename**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:116
+msgid "Name of file to upload."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:120
+msgid "``slotId`` and ``filename`` are required to be part of every URI template."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:124
+msgid ""
+"Inclusion of ``userJid`` or ``domain`` will speed up the lookup for slot "
+"id during upload and download operation if more than one metadata "
+"repository is configured. However, this may lead to leak of user JID or "
+"user domain if message with URI containing this part will be send to "
+"recipient which is unaware of the senders' JID (ie. in case of anonymous "
+"MUC room)."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:128
+msgid "6.5. File upload expiration"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:130
+msgid ""
+"From time to time it is required to remove expired file to make place for"
+" new uploads. This is done by the ``expiration`` task."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:135
+msgid "**expiration-time**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:135
+msgid ""
+"How long the server will keep uploaded files. Value in `Java Period "
+"format <https://docs.oracle.com/javase/8/docs/api/java/time/Period.html"
+"#parse-java.lang.CharSequence-:>`__ **(default: P30D - 30 days)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:138
+msgid "**period**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:138
+msgid ""
+"How often the server should look for expired files to remove. Value in "
+"`Java Period format "
+"<https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-"
+"java.lang.CharSequence-:>`__ **(default: P1D - 1 day)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:141
+msgid "**delay**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:141
+msgid ""
+"Time since server start up before the server should look for expired "
+"files to remove. Value in `Java Period format "
+"<https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-"
+"java.lang.CharSequence-:>`__ **(default: 0)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:144
+msgid "**limit**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:144
+msgid ""
+"Maximum number of files to remove during a single execution of "
+"``expiration``. **(default: 10000)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:147
+msgid "6.6. Examples"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:150
+msgid "6.6.1. Complex configuration example"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:152
+msgid ""
+"Configuration with a separate repository for metadata to ``example.com`` "
+"pointing to ``file_upload`` data source, custom upload and download URI, "
+"maximum file size set to 10MB, expiration done every 6 hours and grouping"
+" of slot folders by user jid."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:154
+msgid "**Complex configuration example.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:183
+msgid "6.6.2. Example configuration for clustering with HA"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:185
+msgid ""
+"Configuration for high availability in a cluster with common storage at "
+"``/mnt/shared`` and both servers available as ``upload.example.com``"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:187
+msgid "**Example configuration with HA.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:203
+msgid "6.7. S3 support for HTTP File Upload"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:205
+msgid ""
+"By default HTTP File Upload component shipped with Tigase XMPP Server "
+"stores uploaded files locally in the directory structure. If you are "
+"using AWS it may be better to store data using external service like S3 "
+"which are better suited for this task and are more resilient."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:209
+msgid ""
+"For this feature to work please make sure that you are using all required"
+" dependencies (either by using ``-dist-max`` package or obtaining them "
+"from `tigase-extras ``aws`` module <https://github.com/tigase/tigase-"
+"extras/tree/master/aws>`__)"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:213
+msgid "6.7.1. Enabling storage in S3"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:215
+msgid ""
+"To enable storage in S3, you need to add following lines to your "
+"configuration file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:225
+msgid ""
+"This will enable HTTP File Upload component and configure it to be used "
+"with S3 bucket named ``bucket-name`` in the same region as your EC2 "
+"instance on which Tigase XMPP Server is running."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:229
+msgid ""
+"You would need to manually create this S3 bucket and allow your EC2 "
+"instance to access it (read and write). Alternatively, you could add "
+"``autocreateBucket = true`` inside ``store`` block, which will enable "
+"Tigase XMPP Server to create this S3 bucket in the local AWS region."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:231
+msgid ""
+"If you wish to use S3 bucket from another AWS region, you can do that by "
+"adding setting ``region`` property in the ``store`` block to the id of "
+"the AWS region, ie. set to ``us-west-2`` to use ``US West (Oregon)`` "
+"region:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:242
+msgid ""
+"If you wish to share the same S3 bucket between different installations "
+"of Tigase XMPP Server, you should configure ``bucketKeyPrefix`` property "
+"of ``store`` with different identifiers for each installation. That will "
+"allow you to easily filter data uploaded for each installation and will "
+"allow Tigase XMPP Server to provide you with correct storage usage for "
+"each installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_File.rst:253
+msgid "S3Store requires appropriate IAM policy:"
+msgstr ""
+

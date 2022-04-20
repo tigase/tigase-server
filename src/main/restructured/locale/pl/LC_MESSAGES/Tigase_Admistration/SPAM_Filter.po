@@ -1,0 +1,433 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:2
+msgid "15. Tigase SPAM Filter"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:4
+msgid "Welcome to Tigase SPAM Filter guide."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:7
+msgid "15.1. Overview"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:9
+msgid ""
+"This Tigase SPAM Filter project contains additional features provided for"
+" Tigase XMPP Server to reduce number of sent/received SPAM messages."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:12
+msgid "15.2. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:14
+msgid ""
+"To enable default set of SPAM filters with default settings you need to "
+"enable SessionManager processor spam-filter:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:16
+msgid "**Enabling default SPAM filters.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:25
+msgid "15.2.1. Changing active SPAM filters"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:27
+msgid ""
+"You can configure active SPAM filters by setting enabling and disabling "
+"SPAM filters (subbeans of spam-filter processor bean)."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:29
+msgid "**Enabling message-same-long-body filter.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:40
+msgid "15.2.2. Sending error when packet is dropped"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:42
+msgid ""
+"By default, due to nature of SPAM, you do not want to send error packet "
+"when SPAM packet is dropped as sending error back will:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:44
+msgid ""
+"increase traffic on a server (which in rare cases may lead to overload of"
+" a XMPP server)"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:46
+msgid "notify spammer that it was not possible to delivery message"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:48
+msgid ""
+"It is possible to configure spam-filter to send error back, by setting "
+"true to spam-filter return-error property:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:50
+msgid "**Allow sending error.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:61
+msgid "15.2.3. Enabling logging of dropped messages"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:63
+msgid ""
+"It is possible to enable logging of dropped messages by adding ``spam`` "
+"to comma separate list of values for ``--debug`` property."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:70
+msgid "15.3. Filters"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:72
+msgid ""
+"In this section there is a list of available filters and detailed "
+"description of each filtering algorithm."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:75
+msgid "15.3.1. Same long message body"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:77
+msgid ""
+"When there is a SPAM being sent using XMPP server in most cases number of"
+" messages with longer ``body`` size increases and in most cases every "
+"SPAM message contains same ``body`` part. This filter is identified by "
+"following id ``message-same-long-body``."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:79
+msgid "Detection is based on:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:81
+msgid "message body being longer that particular value"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:83
+msgid "multiple messages being sent with same long body"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:85
+#: ../../Tigase_Admistration/SPAM_Filter.rst:242
+msgid ""
+"Below is list of possible settings which may be modified to adjust this "
+"filter behaviour."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:88
+msgid "Message body length"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:90
+msgid ""
+"SPAM messages are usually longer messages (over 100 chars). To reduce "
+"overhead of filtering and memory required for filtering we check length "
+"of message body and process it further only if message exceeds declared "
+"message body length *(default: 100 chars)*."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:92
+msgid ""
+"You can also check messages with smaller body (ie. only 50 chars) by "
+"setting ``body-size`` property to ``50``."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:94
+msgid "**Setting filter to check message with body bigger that 50 chars.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:107
+msgid "Number of allowed message with same body"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:109
+msgid ""
+"In most cases message with same body is sent to multiple users. Filter "
+"will count messages with same body (which is bigger that declared message"
+" body length) and if it exceeds message number limit then any further "
+"message with same body will be detected and marked as SPAM. By default we"
+" allow 20 messages with same body to be processed by SessionManager. If "
+"you wish to change this limit set ``number-limit`` to appropriate value."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:111
+msgid "**Setting number of allowed message to 10.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:124
+msgid "Size of counters cache"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:126
+msgid ""
+"We process every message and for every body of message which body length "
+"exceeds body length limit we needs to keep counter. This counters are "
+"kept in cache which size is configurable and by default equals ``10000``."
+" To change size of counters cache assign proper value to ``counter-size-"
+"limit``."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:128
+msgid "**Increasing cache size to 1000000.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:141
+msgid "15.3.2. Error message and missing <error/> child"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:143
+msgid ""
+"Some of SPAM messages are sent as stanzas which are invalid if we compare"
+" them with XMPP specification, ie. ``<message/>`` stanza with ``type`` "
+"attribute set to ``error`` are sent without child element ``<error/>`` "
+"which is required for all packets of type ``error``. This filter detects "
+"this kind of messages and marks them as SPAM."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:145
+msgid ""
+"This filter is identified by following id ``message-error-ensure-error-"
+"child``."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:148
+msgid "15.3.3. Groupchat messages sent to bare JID"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:150
+msgid ""
+"In some cases SPAM messages are being sent as groupchat messages "
+"(messages with ``type`` attribute set to ``groupchat``). With this type "
+"of messages we cannot use filtering based on number of message sent with "
+"same body as in case of MUC messages we must accept a lot of messages "
+"with same body, because there may be many users which are participants of"
+" same MUC room and should receive same message."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:152
+msgid ""
+"To address this issue we decided to drop all groupchat messages which are"
+" sent to our server XMPP users with ``to`` attribute set to bare jid, as "
+"real MUC component is aware of user resources which joined particular "
+"room and will send messages only to this particular resource by "
+"addressing message with full jid. This filter is identified by following "
+"id ``muc-message-ensure-to-full-jid``."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:155
+msgid "15.3.4. Known spammers"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:157
+msgid ""
+"To deal with spam it is required to filter every messages to verify if it"
+" is spam or not. Usually spammers are using same accounts to send bigger "
+"number of messages. This filter takes it as an advantage of this to "
+"reduce time required for filtering spam messages as when any other filter"
+" marks message as spam this filter will be notified and will mark senders"
+" jid as a spammer. This will result in a ban for any packet exchange with"
+" this user for configured `ban time <#ban-time>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:159
+msgid ""
+"If user will send a burst of spam messages then he will be banned for "
+"configured ban time for every spam message, ie. if user would send 20 "
+"messages and ban time will be set to 15 minutes then users will be banned"
+" for 300 minutes (5 hours)."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:161
+msgid "This filter is identified by following id ``known-spammers``."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:163
+msgid ""
+"Time in minutes for which user marked as spammer will not be able to "
+"exchange packets with any other users. By default this value is set to 15"
+" minutes and if you would like to increase it to 30 minutes just add "
+"following line to ``etc/init.properties`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:176
+msgid "Cache time"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:178
+msgid ""
+"Time in minutes for which user will be remembered as a spammer. It will "
+"be able to exchange messages with other users (after ban time passes), "
+"but if the situation repeats within this time and our algorithm will be "
+"sure that user is a spammer - it may disable local user account."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:191
+msgid "Disabling account"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:193
+msgid ""
+"If filter, depending on other filter reports, will establish that user is"
+" for sure a spammer it may not only ban user for some time, but it may "
+"disable that user account. This is done by default, if you wish to "
+"disable account deactivation add following line to "
+"``etc/init.properties`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:206
+msgid "Print list of detected spammers"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:208
+msgid ""
+"It is possible to request filter to print full list of known spammer "
+"which are currently banned every minute. To do so, you need to set "
+"``print-spammers`` property to ``true``."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:221
+msgid "Frequency of printing list of spammers"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:223
+msgid ""
+"By default, list of detected spammers is printed to logs every day. If "
+"you wish you can adjust this value to 1 hour, then add following entry to"
+" ``etc/init.properties`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:236
+msgid "15.3.5. Presence subscription filter"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:238
+msgid ""
+"When there is a presence-based SPAM being sent using XMPP server in most "
+"cases there is a lot of ``presence`` of type ``subscribe`` being sent "
+"from the single JID. This behavior is annoying and has negative impact on"
+" the XMPP server as according to the XMPP specification each ``presence``"
+" of type ``subscribe`` sent from JID which is not in the users roster "
+"causes adding this JID to the user’s roster until user declines "
+"subscription request."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:240
+msgid ""
+"Detection is based on counting subscription request being sent from the "
+"same bare JID within a period of time."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:245
+msgid "Number of allowed subscription requests per minute"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:247
+msgid ""
+"Be default filter allows 5 subscription requests to be sent from the "
+"single JID per minute. If some client will send more than 5 subscription "
+"requests it will be marked as a spammer."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:249
+msgid "**Setting filter to allow 7 subscription requests per minute.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:262
+msgid "15.4. Development"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:264
+msgid ""
+"You can easily add a new methods of detection if a packet is a spam or "
+"not. Simplest way is to implement a new filter."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:267
+msgid "15.4.1. Implementation of a new filter"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:269
+msgid ""
+"Each class used as a filter by ``SpamProcessor`` needs to implement "
+"``SpamFilter`` interface."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:271
+msgid ""
+"There are 3 important methods which need to be implemented by in "
+"``SpamFilter`` interface:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:273
+msgid "``String getId()`` - returns id of a filter"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:275
+msgid ""
+"``double getSpamProbability()`` - returns probability of sender being a "
+"spammer after detection of a single message which is blocked *(from 0.0 "
+"to 1.0 where 1.0 means that it is a spammer)*"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:277
+msgid ""
+"``boolean filter(Packet packet, XMPPResourceConnection session)`` - "
+"method checking if a stanza is a spam (return ``false`` to stop stanza "
+"from being delivered)"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:279
+msgid ""
+"Simple filter with id ``dummy-detector`` which would look for messages "
+"with text ``dummy``, block them and then mark sender as a spammer after 5"
+" messages would look like this:"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:281
+msgid "**Example filter.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:318
+msgid ""
+"If you expect packet to be processed multiple times (ie. by filter of a "
+"sender and filer of a received), then you should take that into account "
+"when you estimate value returned by ``getSpamProbability()``."
+msgstr ""
+
+#: ../../Tigase_Admistration/SPAM_Filter.rst:322
+msgid ""
+"We have added ``@Bean`` annotation to automatically enable this filter in"
+" the ``SpamProcessor`` in the Tigase XMPP Server and to be able to easily"
+" configure it without specifying full name of a class."
+msgstr ""
+

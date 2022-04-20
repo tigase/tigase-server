@@ -1,0 +1,87 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:2
+msgid "3. Tigase Server Extras - mDNS support"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:5
+msgid "3.1. Overview"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:7
+msgid ""
+"Tigase mDNS component provides you with ability to publish domain name of"
+" your XMPP server (ending with ``.local``) in the local network using "
+"multicast DNS (also known as DNS-SD, Zeroconf or Bonjour)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:11
+msgid "3.2. Enabling mDNS"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:13
+msgid ""
+"To enable this component you need to add mDNS component to your "
+"configuration file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:20
+msgid ""
+"This lines will enable mDNS support and will start broadcasting hostname "
+"of your host in the local network as ``hostname.local`` and will "
+"broadcast DNS records for XMPP server hosted at this domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:23
+msgid "3.3. Using different domain name"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:25
+msgid ""
+"If you are hosting different domain than hostname of your server with "
+"``.local`` suffix, then you can set it in mDNS component settings by "
+"setting ``serverHost`` property to the name of your domain without suffix"
+" ``.local``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:27
+msgid "**Example of broadcasting mDNS for domain ``example.local``.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:37
+msgid "3.4. Forcing single server for domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:39
+msgid ""
+"It is possible to enforce Tigase mDNS component to check if there is no "
+"other host providing services for chosen domain name. By setting property"
+" ``singleServer`` to ``true``. If this feature is enabled, then mDNS "
+"component checks if chosen domain is already in use (broadcasted in "
+"multicast DNS) and if so it stops startup of the server. This feature "
+"make it possible to start up Tigase and broadcast XMPP server mDNS "
+"information if already existing mDNS information resolves to the IP "
+"address of the host on which you are starting Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Tigase_Server_Extras.rst:41
+msgid "**Example enabling single server mode.**"
+msgstr ""
+
