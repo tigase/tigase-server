@@ -29,6 +29,7 @@ import tigase.server.Priority;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.mam.ExtendedQuery;
 import tigase.xmpp.mam.MAMRepository;
 import tigase.xmpp.mam.Query;
@@ -77,7 +78,7 @@ public class QueryModule
 
 	@Override
 	public void process(Packet packet) throws ComponentException, TigaseStringprepException {
-		Query query = queryParser.parseQuery(mamRepository.newQuery(), packet);
+		Query query = queryParser.parseQuery(mamRepository.newQuery(getArchiveOwner(packet)), packet);
 		log.log(System.Logger.Level.TRACE, () -> "Retrieving items for packet: " + packet + " using query: " + query);
 		try {
 			mamRepository.queryItems(query, itemHandler);
@@ -102,4 +103,12 @@ public class QueryModule
 
 		packetWriter.write(result);
 	}
+
+	protected BareJID getArchiveOwner(Packet packet) {
+		if (packet.getStanzaTo() != null) {
+			return packet.getStanzaTo().getBareJID();
+		}
+		return packet.getStanzaFrom().getBareJID();
+	}
+	
 }

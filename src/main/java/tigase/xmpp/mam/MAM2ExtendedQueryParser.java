@@ -61,7 +61,7 @@ public class MAM2ExtendedQueryParser<Query extends tigase.xmpp.mam.Query> extend
 
 	@Override
 	public Element prepareForm(Element elem, String xmlns, Packet packet) {
-		Element form = super.prepareForm(elem);
+		Element form = super.prepareForm(elem, xmlns, packet);
 		Element x = form.getChild("x", "jabber:x:data");
 		if (x != null && xmlns == MAM2_XMLNS) {
 			JID from = packet.getStanzaFrom();
