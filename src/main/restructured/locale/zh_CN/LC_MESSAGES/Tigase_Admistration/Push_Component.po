@@ -1,0 +1,538 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Push_Component.rst:2
+msgid "13. Tigase Push Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:4
+msgid "Welcome to Tigase Push component guide"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:7
+msgid "13.1. Tigase Push Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:9
+msgid ""
+"Tigase Push component is a Push notifications component implementing "
+"`XEP-0357: Push Notifications "
+"<https://xmpp.org/extensions/xep-0357.html>`__. It is a gateway between "
+"Push Notification services and XMPP servers. It is configured by default "
+"to run under name of ``push``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:13
+msgid ""
+"Tigase Push component requires at the minimum version 8.0.0 of Tigase "
+"XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:15
+msgid ""
+"Push notifications enable messages and pertinent information for clients,"
+" even if they are offline as long as they are registered with the push "
+"service. Tigase Messenger for iOS and Tigase Messenger for Android both "
+"have support for this feature."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:18
+msgid "13.1.1. Workflow"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:20
+msgid "The workflow for enabling and using push notifications works as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:23
+msgid "Enabling notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:25
+msgid ""
+"In order to receieve notifications, clients will require registration "
+"with a push service. Although this process is mainly invisible to the "
+"user, the steps in registration are listed here:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:27
+msgid ""
+"The client registers and bootstraps too it’s assicoated push service. "
+"This is done automatically."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:29
+msgid ""
+"The client registers itself with the push service server which then will "
+"dedicate a node for the device."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:31
+msgid ""
+"Node information is passed back to the client and is shared with "
+"necessary components."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:34
+msgid "Receiving notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:36
+msgid ""
+"Notifications sent from the server are recieved the following "
+"(simplified) way:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:38
+msgid ""
+"A message is published on the XMPP node which is then sent to the push "
+"service on the same server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:40
+msgid ""
+"The push service will then inform the user agent (an application on the "
+"device running in the background) that a push notification has been sent."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:42
+msgid ""
+"The user agent will then publish the notification to the client for a "
+"user to see, waking up or turning on the client if is not running or "
+"suspended."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:45
+msgid "13.2. Tigase Push Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:47
+msgid ""
+"Welcome to Tigase Push 1.2.0! This is a feature release for with a number"
+" of fixes and updates."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:50
+msgid "13.2.1. Tigase Push 1.2.0 Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:53
+msgid "Major Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:55
+msgid "Added support for sending VoIP push notifications using PushKit"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:57
+msgid ""
+"Support for storing APNS certificates in repository instead of filesystem"
+" for easier cluster deployments"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:59
+msgid ""
+"Add priority detection for push notifications to avoid excessive pushes "
+"to devices"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:61
+msgid ""
+"Inclusion of APNS certificate validity task that notifies if it’s about "
+"to expire"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:64
+msgid "All Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:66
+msgid ""
+"`#push-29 <https://projects.tigase.net/issue/push-29>`__ Added support "
+"for sending VoIP push notifications using PushKit"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:68
+msgid ""
+"`#push-30 <https://projects.tigase.net/issue/push-30>`__ Added REST API "
+"handler for quick unregistration of a device"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:70
+msgid ""
+"`#push-32 <https://projects.tigase.net/issue/push-32>`__ Fixed issue with"
+" APNS certificate validation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:72
+msgid ""
+"`#push-33 <https://projects.tigase.net/issue/push-33>`__ Added statistics"
+" gathering"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:74
+msgid ""
+"`#push-35 <https://projects.tigase.net/issue/push-35>`__ Added support "
+"for APNS certificate in PEM"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:76
+msgid ""
+"`#push-36 <https://projects.tigase.net/issue/push-36>`__ Improved "
+"priority detection of push notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:78
+msgid ""
+"`#push-37 <https://projects.tigase.net/issue/push-37>`__ Enable APNS "
+"certificates to be stored in UserRepository - management is done via ad-"
+"hoc command;"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:80
+msgid ""
+"`#push-39 <https://projects.tigase.net/issue/push-39>`__ Changes to "
+"improve error handling"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:82
+msgid ""
+"`#push-41 <https://projects.tigase.net/issue/push-41>`__ Fixed issue with"
+" ``ApnsService`` exceptions not being thown logged"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:84
+msgid ""
+"`#push-42 <https://projects.tigase.net/issue/push-42>`__ Fixed error type"
+" reported back on ``tooManyRequestsForDeviceToken``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:86
+msgid ""
+"`#push-47 <https://projects.tigase.net/issue/push-47>`__ Added task to "
+"periodically validate SSL certificates for Push notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:88
+msgid ""
+"`#push-48 <https://projects.tigase.net/issue/push-48>`__ Fixed handling "
+"events by APNsBinaryApiProvider"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:90
+msgid ""
+"`#push-49 <https://projects.tigase.net/issue/push-49>`__ Added "
+"enforcement to use HTTP/2 protocol (with use of ALPN)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:93
+msgid "13.3. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:96
+msgid "13.3.1. Enabling component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:98
+msgid ""
+"Push notifications may be sent by Tigase XMPP Server with or without use "
+"of Push component. Push Component is only required if you have your own "
+"application for mobile devices for which you want to send push "
+"notifications."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:100
+msgid ""
+"This component is not loaded and enabled by default as it requires "
+"implementations of Push notifications providers and additional "
+"configuration (including credentials required to authorize to push "
+"services). Following entries will activate component:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:109
+msgid ""
+"You need to enable and configure push providers implementations before it"
+" will be possible to send push notifications. For more details about this"
+" process, please check documentations of push service provider projects."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:112
+msgid "13.4. Usage"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:115
+msgid "13.4.1. Sending notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:117
+msgid ""
+"When you will register a device for a Push Notifications, you will "
+"receive name of the PubSub node where you should publish items. "
+"Publishing items to this node, as specified in `XEP-0357: Push "
+"Notifications <https://xmpp.org/extensions/xep-0357.html>`__ will result "
+"in push notifications being delivered to the registered device."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:121
+msgid "13.4.2. Registering device"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:123
+msgid ""
+"To register a device you need to execute the adhoc command ``register-"
+"device`` available at Push Notification component. This command will "
+"return a form which needs to be filled."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:125
+msgid "Form consists of following fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:128
+#: ../../Tigase_Admistration/Push_Component.rst:143
+msgid "**provider**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:128
+msgid ""
+"ID of a provider for which you want to register a device. It contains a "
+"list of available providers and you need to select a proper one."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:131
+#: ../../Tigase_Admistration/Push_Component.rst:146
+msgid "**device-token**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:131
+msgid ""
+"Unique token which your application retrieved from a device or client "
+"library and which should be used to identify device you want to register "
+"for push notifications."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:133
+msgid ""
+"When you submit this form, it will be processed and will respond with a "
+"``result`` type form. Within this form you will find a ``node`` field "
+"which will contain a PubSub node name created by the Push Notifications "
+"component, to which you should publish notification items. This returned "
+"node with jid of the Push Notifications Component should be passed to "
+"your XMPP server as the address of the XMPP Push Service."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:136
+msgid "13.4.3. Unregistering device"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:138
+msgid ""
+"To unregister a device, you need to execute the adhoc command "
+"``unregister-device`` available within the Push Notification component. "
+"This command will return a form which needs to be filled out."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:140
+msgid "This form consists of the following fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:143
+msgid "ID of a provider for which your devices was registered."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:146
+msgid ""
+"Unique token which your application retrieved from a device or client "
+"library and was registered at this push notifications component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:148
+msgid ""
+"When you submit this form, it will be processed and will respond with a "
+"``result`` form to notify you that device was successfully unregistered "
+"from the push notifications component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:151
+msgid "13.4.4. Unregistering device via HTTPS"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:153
+msgid ""
+"There is REST API handler (in form of ``UnregisterDeviceHandler.groovy`` "
+"script) which placed in ``/scripts/rest/push/`` directory in Tigase XMPP "
+"Server installation directory will enable endpoint (documented in "
+"Development Guide) allowing client to disable their push notifications "
+"even without authentication to their XMPP server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:155
+msgid "**Note**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:157
+msgid ""
+"It is recommended to not expose this endpoint using HTTP but only with "
+"HTTPS."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:160
+msgid "13.5. Providers"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:162
+msgid ""
+"Providers availability depends on the deployed binaries, by default "
+"Tigase includes following providers:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:165
+msgid "13.5.1. Tigase Push Component - FCM provider"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:168
+msgid "13.5.2. Overview"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:170
+msgid ""
+"Tigase Push Component - FCM provider is an implementation of FCM provider"
+" for Tigase Push Component. It allows Tigase Push Component to connect to"
+" Firebase Cloud Messaging and send notifications using this service."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:173
+msgid "13.5.3. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:176
+#: ../../Tigase_Admistration/Push_Component.rst:238
+msgid "Enabling provider"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:178
+msgid ""
+"To enable this provider, you need to enable fcm-xmpp-api bean within push"
+" component configuration scope."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:180
+#: ../../Tigase_Admistration/Push_Component.rst:201
+#: ../../Tigase_Admistration/Push_Component.rst:217
+#: ../../Tigase_Admistration/Push_Component.rst:242
+msgid "**Example.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:192
+msgid "You need to pass FCM configuration parameters to make it work, see below."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:195
+msgid "Setting FCM credentials"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:197
+msgid ""
+"FCM XMPP API provider will not work properly without API key and project "
+"id as this values are required for authorization by FCM. You need to get "
+"information from FCM account."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:199
+msgid ""
+"When you have this data, you need to pass sender id as sender-id property"
+" and server key as server-key property."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:213
+msgid "Connection pool"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:215
+msgid ""
+"By default this provider uses single client to server connection to FCM "
+"for sending notifications. If in your use case it is to small (as you "
+"need better performance), you should adjust value of pool-size "
+"configuration property. Setting it to ``5`` will open five connections to"
+" FCM for better performance."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:228
+msgid "13.5.4. Tigase Push Component - APNs provider"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:230
+msgid "13.5.5. Overview"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:232
+msgid ""
+"Tigase Push Component - APNs provider is an implementation of APNs "
+"provider for Tigase Push Component. It allows Tigase Push Component to "
+"connect to Apple Push Notification service and send notifications using "
+"this service."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:235
+msgid "13.5.6. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:240
+msgid ""
+"To enable this provider, you need to enable apns-binary-api bean within "
+"push component configuration scope."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:254
+msgid "You need to pass APNs configuration parameters to make it work, see below."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:257
+msgid "Setting APNs credentials"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:259
+msgid ""
+"APNs binary API provider will not work properly without certificate file "
+"required for authorization by APNs and password to decrypt this "
+"certificate file. You need to get certificate using Apple Developer "
+"Account."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:261
+msgid ""
+"When you have this certificate, you need to pass path to certificate file"
+" as cert-file property, password as cert-password and APNS topic (bundle "
+"id) as apns-topic."
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:263
+msgid "**Example for /etc/apns-cert.p12, Pa$$word and com.bundle.id.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Push_Component.rst:275
+msgid ""
+"Alternatively, certificate can be stored in the database and in that case"
+" the TDSL configuration file should only contain ``'apns-topic'`` entry "
+"and the certificate and the password should be updated via ad-hoc command"
+" (Service discovery → Push component → Set APNS certificate). In the ad-"
+"hoc you should select the APNS provider from the list and include base64 "
+"encoded certificate obtained from Apple (``.p12`` file), for example:"
+msgstr ""
+

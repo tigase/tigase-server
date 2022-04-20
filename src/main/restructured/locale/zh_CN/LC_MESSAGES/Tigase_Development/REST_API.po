@@ -1,0 +1,792 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-26 00:59-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Development/REST_API.rst:2
+msgid "2. REST API"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:4
+msgid ""
+"Tigase’s HTTP API component uses the REST module and Groovy scripts "
+"responsible for handling and processing incoming HTTP. The end result is "
+"Tigase’s REST API. This API may be useful for various integration "
+"scenarios."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:6
+msgid ""
+"In these sections we will describe the basic REST endpoints provided by "
+"Tigase HTTP API and explain the basics of creating new custom endpoints."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:8
+msgid ""
+"Other endpoints, specific to particular Tigase XMPP Server modules, are "
+"described in documentation for the modules providing them. You may also "
+"look at ``http://localhost:8080/rest/`` on your local Tigase XMPP Server "
+"installation at HTTP API, which will provide you with basic usage "
+"examples for REST endpoints available at your installation."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:10
+msgid ""
+"For more informations about configuration of REST module please see "
+"section about `??? <#REST module>`__."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:13
+msgid "2.1. Scripting introduction"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:15
+msgid "Scripts in the HTTP API component are used for processing all of requests."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:17
+msgid ""
+"To add a new action to the HTTP API component, you will need to create a "
+"script written in Groovy for which there will be implementation of class "
+"extending ``tigase.http.rest.Handler`` class. The URI of script will be "
+"created from the file’s location of in the scripts folder. For example, "
+"if script ``TestHandler`` with regular expression will be set to "
+"``/test`` and will be placed in ``scripts/rest/tested``, the handler will"
+" be called for using the following URI: ``/rest/tested/test``."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:20
+msgid "2.1.1. Properties"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:22
+msgid "If you are extending classes you will need to set following properties:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:24
+msgid ""
+"**regex** - Regular expression which is used to match the request URI and"
+" parse parameters embedded in the URI. For example: "
+"``/\\/([@\\/]+)@([@\\/]+)/``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:26
+msgid ""
+"**requiredRole** - Required role of user in order to be able to access "
+"this URI. Available values are: null, \"user\", and \"admin\". If "
+"``requiredRole`` is not null, authentication will be required."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:28
+msgid ""
+"**isAsync** - If set to true, it will be possible to wait for results, "
+"for example waiting for an response IQ stanza."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:30
+msgid ""
+"**decodeContent** - If set to false, then content of the request will not"
+" be parsed and your script will receive instance of "
+"``HttpServletRequest`` to handle incoming content."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:33
+msgid "2.1.2. Properties containing closures"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:35
+msgid ""
+"Extended class should also set closures for one or more of following "
+"properties: execGet, execPut, execPost, and execDelete depending on which"
+" HTTP action or actions you need to support for the URI. **Each closure "
+"has a dynamic arguments list**. Below is list of arguments passed to "
+"closure which describes how and when the list of arguments changes:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:37
+msgid ""
+"**service** - Implementation of Service interface. This is used to access"
+" the server database or send/receive XMPP stanzas."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:39
+msgid ""
+"**callback** - The ``callback`` closure needs to be called to return "
+"data. ``callback`` accepts only one argument of type String,byte[],Map. "
+"If data is type of Map it will be encoded to JSON or XML depending of "
+"'Content-Type' header."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:41
+msgid ""
+"**user** - Will be passed only if ``requiredRole`` is not null. **In all "
+"other cases this argument will not be in arguments list!**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:43
+msgid ""
+"**request** - Will be passed only if declared as instance of "
+"``HttpServletRequest`` and it will be instance of ``HttpServletRequest`` "
+"of the current HTTP request."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:45
+msgid ""
+"**content** - Parsed content of request. This closure will not be in "
+"arguments list if Content-Length of request is empty. If Content-Type is "
+"XML or JSON returned as Map, otherwise (or if ``decodeContent`` is set to"
+" ``false``) it will be an instance of ``HttpServletRequest``."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:47
+msgid ""
+"**x** - Additional arguments passed to callback are groups from regular "
+"expression matching the URI. **Groups are not passed as a list, but are "
+"added to list of arguments as next arguments.**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:49
+msgid ""
+"If property for corresponding HTTP action is not set, then the component "
+"will return a 404 HTTP error."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:53
+msgid "2.1.3. Accessing beans"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:55
+msgid ""
+"It is possible to gain access to beans managed by Tigase XMPP Server from"
+" within groovy script implementing REST handler. To achieve that "
+"implementation of the handler class within groovy script needs to be "
+"annotated with ``@Bean`` annotation. In this annotation, you need to pass"
+" at least one parameter ``name``, which should contain desired name of "
+"the bean under which this handler will be available within the REST "
+"module kernel scope."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:57
+msgid ""
+"With that in place, it is possible to use ``@Inject`` annotation on any "
+"field of the ``Handler`` implementation class to tell Tigase Kernel to "
+"inject instance of a particular class (or instance of class implementing "
+"particular interface)."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:59
+msgid ""
+"For more details about Tigase Kernel and beans please check ``Tigase "
+"Kernel`` section of the Tigase XMPP Server Development Guide."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:61
+msgid "**Example.**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:77
+msgid ""
+"Please remember that your bean is created and registered within the scope"
+" of the REST module kernel. So other beans needs to be accessible there "
+"for you to access them."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:80
+msgid "2.2. Usage Examples"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:83
+msgid "2.2.1. Retrieving user avatar"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:85
+msgid ""
+"Request using GET method for url /rest/avatar/admin@test-domain.com will "
+"return an avatar image for user admin@test-domain.com if an avatar is set"
+" in user vCard or will otherwise return a http error 404. Example of full"
+" url for avatar of user admin@domain.com"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:91
+msgid ""
+"Entering this url in will execute GET request. It may be possible to use "
+"the url in your browser."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:94
+msgid "2.2.2. Retrieving list of available adhoc commands"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:97
+msgid "Using XML format"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:99
+msgid ""
+"To retrieve a list of available adhoc commands, make a request using GET "
+"method for ``/rest/adhoc/sess-man@domain.com`` where ``sess-"
+"man@domain.com`` is jid of component you wish to see commands for. For "
+"example, entering the following url: http://localhost:8080/rest/adhoc"
+"/sess-man@domain.com in your browser will retrieve a list of all ad-hoc "
+"commands available at ``sess-man@domain.com``. This action is protected "
+"by authentication done using ``HTTP Basic Authentication``. Valid "
+"credentials will be those of users available in user database of this "
+"Tigase XMPP Server installation (username in barejid form)."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:101
+msgid "Below is example result of that request:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:125
+msgid "Using JSON format"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:127
+msgid ""
+"To retrieve a list of available adhoc commands in JSON, we need to pass "
+"``Content-Type: application/json`` to HTTP header of request or add "
+"``type`` parameter set to ``application/json``. Example result below:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:153
+msgid "2.2.3. Retrieving command form"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:155
+msgid ""
+"In order to retrieve form with required fields for particular command, "
+"you have to sent ``POST`` request with only ``jid`` and ``name`` from the"
+" list with all available commands (returned using above command)"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:158
+#: ../../Tigase_Development/REST_API.rst:274
+#: ../../Tigase_Development/REST_API.rst:377
+#: ../../Tigase_Development/REST_API.rst:494
+#: ../../Tigase_Development/REST_API.rst:598
+#: ../../Tigase_Development/REST_API.rst:784
+msgid "Using XML"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:160
+msgid ""
+"For example, to get form for adding VHost item make a request using "
+"``POST`` method for ``/rest/adhoc/vhost-man@domain.com`` sending the "
+"following content (request requires authentication using Basic HTTP "
+"Authentication):"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:168
+#: ../../Tigase_Development/REST_API.rst:307
+msgid "Below is example result for request presented above:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:212
+#: ../../Tigase_Development/REST_API.rst:326
+#: ../../Tigase_Development/REST_API.rst:426
+#: ../../Tigase_Development/REST_API.rst:542
+#: ../../Tigase_Development/REST_API.rst:650
+#: ../../Tigase_Development/REST_API.rst:835
+#: ../../Tigase_Development/REST_API.rst:981
+msgid "Using JSON"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:214
+msgid ""
+"For example, to get form for adding VHost item make a request using "
+"``POST`` method for ``/rest/adhoc/vhost-man@domain.com`` using ``Content-"
+"Type: application/json`` and sending the following content (request "
+"requires authentication using Basic HTTP Authentication) :"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:224
+#: ../../Tigase_Development/REST_API.rst:350
+msgid "Below is an example result for request presented above:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:268
+msgid "2.2.4. Executing example ad-hoc commands"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:271
+msgid "Retrieving list of active users"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:276
+msgid ""
+"To execute the command to get a list of active users, make a request "
+"using POST method for ``/rest/adhoc/sess-man@domain.com`` sending the "
+"following content (request requires authentication using Basic HTTP "
+"Authentication):"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:294
+msgid ""
+"In this request we passed all the parameters needed to execute adhoc "
+"command. We passed the node of the adhoc command and values for fields "
+"required by that command. We passed values of \"domain.com\" for "
+"\"domainjid\" field and \"25\" for \"max_items\" field. We also need to "
+"pass ``Content-Type: text/xml`` to HTTP header of request or add ``type``"
+" parameter set to ``text/xml``."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:296
+#: ../../Tigase_Development/REST_API.rst:498
+#: ../../Tigase_Development/REST_API.rst:546
+#: ../../Tigase_Development/REST_API.rst:654
+#: ../../Tigase_Development/REST_API.rst:896
+msgid "**Note**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:298
+msgid "In case of multi value fields use following format:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:328
+msgid ""
+"To execute the command to get active users in JSON format, make a request"
+" using POST method for /rest/adhoc/sess-man@domain.com sending the "
+"following content (this request also requires authentication using Basic "
+"HTTP Authentication):"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:348
+msgid ""
+"In this request we passed all parameters needed to execute adhoc command."
+" We passed the node of adhoc command and values for fields required by "
+"adhoc command. In this case we passed value of \"domain.com\" for "
+"\"domainjid\" field and \"25\" for \"max_items\" field."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:372
+msgid "Ending a user session"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:374
+msgid ""
+"To execute the end user session command, make a request using POST method"
+" for ``/rest/adhoc/sess-man@domain.com``. The Context of what is sent, "
+"may differ depending on circumstance. For example, it may require "
+"authentication using *Basic HTTP Authentication* with admin credentials. "
+"*sess-man@domain.com* in URL is the JID of session manager component "
+"which usually is in form of *sess-man@domain* where ``domain`` is hosted "
+"domain name."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:379
+msgid ""
+"To execute the command using XML content you need to set HTTP header "
+"``Content-Type`` to ``application/xml``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:395
+msgid "Where ``test@domain.com`` is JID of user which should be disconnected."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:397
+#: ../../Tigase_Development/REST_API.rst:819
+msgid "As a result server will return following XML:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:413
+msgid ""
+"This will confirm that user ``test@domain.com`` with resource "
+"``resource`` was connected and has been disconnected."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:415
+msgid "If the user was not connected server will return following response:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:428
+msgid ""
+"To execute the command using JSON you will need to set HTTP header "
+"``Content-Type`` to ``application/json``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:446
+msgid "Where ``test@domain.com`` is JID of user who will be disconnected"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:448
+#: ../../Tigase_Development/REST_API.rst:870
+msgid "As a result, the server will return following JSON:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:468
+#: ../../Tigase_Development/REST_API.rst:704
+msgid ""
+"To confirm that user ``test@domain.com`` with resource ``resource`` was "
+"connect and it was disconnected."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:470
+#: ../../Tigase_Development/REST_API.rst:706
+msgid "If user was not connected server will return the following response:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:483
+msgid "2.2.5. Operations on VHosts/Domains"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:486
+msgid ""
+"All operations on VHosts are done by making a ``POST`` request to "
+"``/rest/adhoc/vhost-man@domain.com`` (it may require authentication using"
+" *Basic HTTP Authentication* with admin credentials). When deciding to "
+"use XML or JSON set relevant ``Content-Type`` header."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:489
+msgid "Adding VHost"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:491
+msgid ""
+"Adding domain is done using ``comp-repo-item-add`` command sent with all "
+"required and desired fields (if something is missing form-to-fill-out "
+"will be returned). For the instructions how to retrieve the "
+"form/available fields please see `Retrieving command form "
+"<#RetrievingCommandForm>`__."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:496
+#: ../../Tigase_Development/REST_API.rst:600
+msgid ""
+"To execute the command using XML content you need to set HTTP header "
+"``Content-Type`` to ``application/xml`` and the filled out form (below is"
+" trimmed example, see `Retrieving command form "
+"<#RetrievingCommandForm>`__ for details how to get complete form):"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:500
+#: ../../Tigase_Development/REST_API.rst:548
+msgid ""
+"It’s essential to include ``command-marker`` in the request, otherwise "
+"the form will be returned without adding the VHost."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:524
+#: ../../Tigase_Development/REST_API.rst:574
+#: ../../Tigase_Development/REST_API.rst:632
+#: ../../Tigase_Development/REST_API.rst:686
+msgid ""
+"If the domain was added correctly you will receive response with "
+"``Operation successful.`` Note field:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:544
+#: ../../Tigase_Development/REST_API.rst:652
+msgid ""
+"To execute the command using XML content you need to set HTTP header "
+"``Content-Type`` to ``application/json`` and the filled out form (below "
+"is trimmed example, see `Retrieving command form "
+"<#RetrievingCommandForm>`__ for details how to get complete form):"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:593
+msgid "Configuring VHost"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:595
+msgid ""
+"Modifying domain configuration is done using ``comp-repo-item-update`` "
+"command sent with all required and desired fields (if something is "
+"missing form-to-fill-out will be returned). For the instructions how to "
+"retrieve the form/available fields please see `Retrieving command form "
+"<#RetrievingCommandForm>`__."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:604
+#: ../../Tigase_Development/REST_API.rst:656
+msgid ""
+"It’s essential to include ``command-marker`` in the request (otherwise "
+"the form will be returned without adding the VHost) and ``item-list`` "
+"with value set to the name of the VHost that’s being configured."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:720
+msgid "2.2.6. Sending any XMPP Stanza"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:722
+msgid ""
+"XMPP messages or any other XMPP stanza can be sent using this API by "
+"sending an HTTP POST request to (by default) "
+"``http://localhost:8080/rest/stream/?api-key=API_KEY`` with serialized "
+"XMPP stanza as a content, where ``API_KEY`` is the API key for HTTP API. "
+"This key is set in `etc/config.tdsl <#restModuleConfig>`__. Also, each "
+"request needs to be authorized by sending a valid administrator JID and "
+"password as user and password of BASIC HTTP authorization method. Content"
+" of HTTP request should be encoded in ``UTF-8`` and ``Content-Type`` "
+"should be set to ``application/xml``."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:725
+msgid "Handling of request"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:727
+msgid ""
+"If the sent XMPP stanza does not contain a ``from`` attribute, then the "
+"HTTP API component will provide it’s own JID. If ``iq`` stanza is being "
+"sent, and no ``from`` attribute is set then the received response will be"
+" returned as the content of the HTTP response. Successful requests will "
+"return HTTP response code 200."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:730
+msgid "Examples"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:733
+msgid ""
+"**Sending an XMPP message with from set to HTTP API component to full "
+"JID.**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:735
+msgid ""
+"Data needs to be sent as a HTTP POST request content to ``/rest/stream"
+"/?api-key=API_KEY`` URL of the HTTP API component to deliver the message "
+"*Example message 1* to *test@example.com/resource-1*."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:744
+msgid ""
+"**Sending an XMPP message with ``from`` set to HTTP API component to a "
+"bare JID.**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:746
+msgid ""
+"Data needs to be sent as a HTTP POST request content to ``/rest/stream"
+"/?api-key=API_KEY`` URL of the HTTP API component to deliver message "
+"*Example message 2* to *test@example.com*."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:754
+msgid ""
+"**Sending an XMPP message with ``from`` set to specified JID and to a "
+"recipients' full JID.**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:756
+msgid ""
+"Data needs to be sent as a HTTP POST request content to ``/rest/stream"
+"/?api-key=API_KEY`` URL of the HTTP API component to deliver message "
+"*Example message 3* to *test@example.com/resource-1* with sender of "
+"message set to *sender@example.com*."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:765
+msgid "2.2.7. Setting XMPP user status"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:767
+msgid ""
+"By default XMPP user is visible as unavailable when his client is "
+"disconnected. However in some cases we may want to present user a active "
+"with some particular presence being set. To control this presence of "
+"unavailable XMPP user we can use this feature."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:769
+msgid ""
+"Example contents shown below needs to be sent to (by default) "
+"``http://localhost:8080/rest/user/{user-jid}/status?api-key=API_KEY``, "
+"where:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:771
+msgid "``API_KEY`` is the API key for HTTP API"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:773
+msgid ""
+"``{user-jid}`` is a bare jid of the user for which you want to set "
+"presence."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:777
+msgid ""
+"You may add ``/{resource}`` to the URL after ``/status`` part, where "
+"``{resource}`` is name of the resource for which you want to set "
+"presence."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:781
+msgid ""
+"You need to add ``'user-status-endpoint@http.{clusterNode}'`` to the list"
+" of trusted jids to allow UserStatusEndpoint module to properly integrate"
+" with Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:786
+msgid ""
+"To set user status you need to set HTTP header ``Content-Type`` to "
+"``application/xml``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:797
+#: ../../Tigase_Development/REST_API.rst:848
+msgid "where:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:799
+#: ../../Tigase_Development/REST_API.rst:850
+msgid "``available`` - may be:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:801
+#: ../../Tigase_Development/REST_API.rst:852
+msgid "``true`` - user is available/connected **(default)**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:803
+#: ../../Tigase_Development/REST_API.rst:854
+msgid "``false`` - user is unavailable/disconnected"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:805
+#: ../../Tigase_Development/REST_API.rst:856
+msgid ""
+"``priority`` - an integer of presence priority. *(It should be always set"
+" as a negative value to make sure that messages are not dropped)* "
+"**(default: -1)**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:807
+#: ../../Tigase_Development/REST_API.rst:858
+msgid "``show`` - may be one of ``presence/show`` element values **(optional)**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:809
+#: ../../Tigase_Development/REST_API.rst:860
+msgid "``chat``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:811
+#: ../../Tigase_Development/REST_API.rst:862
+msgid "``away``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:813
+#: ../../Tigase_Development/REST_API.rst:864
+msgid "``xa``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:815
+#: ../../Tigase_Development/REST_API.rst:866
+msgid "``dnd``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:817
+#: ../../Tigase_Development/REST_API.rst:868
+msgid ""
+"``status`` - message which should be sent as a presence status message "
+"**(optional)**"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:832
+#: ../../Tigase_Development/REST_API.rst:885
+msgid ""
+"This will confirm that user ``test@domain.com`` with resource ``tigase-"
+"external`` has it presence changed (look for ``success`` element value)."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:837
+msgid ""
+"To set user status you need to set HTTP header ``Content-Type`` to "
+"``application/json``"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:888
+msgid "2.3. BOSH HTTP Pre-Binding"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:891
+msgid "2.3.1. Bosh (HTTP) Pre-Binding"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:894
+msgid ""
+"Binding a user session is done by sending a request using HTTP POST "
+"method for ``/rest/adhoc/bosh@domain.com`` with the following content:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:898
+msgid "Request requires authentication using Basic HTTP Authentication"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:922
+msgid "2.3.2. Configuration"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:924
+msgid "The Following parameters can be adjusted:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:926
+msgid ""
+"**from** This will be the JID of the user. You may change the "
+"``<value/>`` node of the item identified by the ``from`` variable; this "
+"can be either a FullJID or a BareJID. In the latter case, a random "
+"resource will be generated for the session being bound."
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:928
+msgid ""
+"**hold** value. By changing value of ``<value/>`` node of the item "
+"identified by ``hold`` variable. This value matches the ``hold`` "
+"attribute specified in `XEP-0124: Session Creation Response "
+"<http://xmpp.org/extensions/xep-0124.html#session-request>`__"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:930
+msgid ""
+"**wait** value. By changing value of ``<value/>`` node of the item "
+"identified by ``wait`` variable. This value matches the ``wait`` "
+"attribute specified in `XEP-0124: Session Creation Response "
+"<http://xmpp.org/extensions/xep-0124.html#session-request>`__"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:932
+msgid ""
+"As a response one will receive and XML with the result containing "
+"additionally available session and RID that can be used in the client to "
+"attach to the session, e.g.:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:973
+msgid ""
+"For example, having the above XML request stored in ``prebind`` file, one"
+" can execute the request using ``$curl``:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:983
+msgid ""
+"To execute the command to pre-bind BOSH session in JSON format, make a "
+"request using POST method to ``/rest/adhoc/bosh@domain.com`` sending the "
+"following content:"
+msgstr ""
+
+#: ../../Tigase_Development/REST_API.rst:1007
+msgid "This example replicates the same request presented above in XML format."
+msgstr ""
+

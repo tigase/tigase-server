@@ -1,0 +1,161 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/STUN_Component.rst:2
+msgid "14. Tigase STUN Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:4
+msgid "Welcome to Tigase STUN component guide"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:7
+msgid "14.1. Tigase STUN Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:9
+msgid ""
+"Tigase STUN Component allows for the use of a STUN server to handle XMPP "
+"and related communications to allow for smoother server operations behind"
+" a NAT."
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:12
+msgid "14.1.1. What is STUN?"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:14
+msgid ""
+"STUN stands for Simple Traversal of UDP[User Datagram Protocol] Through "
+"NAT[Network Address Translators]. It allows for computers behind a NAT "
+"router to host and provide UDP information without having to create rule "
+"exceptions on the router, or provide specific information to the NAT "
+"service. When specified within Tigase, XMPP and UDP communications can be"
+" directed to a specific STUN server which will then handle incoming "
+"requests to your network. You may use a public, or your own STUN server "
+"with Tigase."
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:17
+msgid "14.1.2. Requirements"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:19
+msgid ""
+"The only requirement (aside from configuration) is that you are operating"
+" on a network that is not a Symmetric NAT as STUN by itself will not "
+"function correctly."
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:22
+msgid "14.2. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:24
+msgid ""
+"Below is an example configuration for STUN component. Note that the 2 "
+"``stun-primary`` and 2 ``stun-secondary`` settings are required, where "
+"external settings are not."
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:41
+msgid "Primary port should be set to 3478 as it is default port for STUN servers."
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:44
+msgid "14.2.1. Setting descriptions"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:46
+msgid ""
+"``stun-primary-ip`` - primary IP address of STUN server used for binding "
+"(and sending to client if stun-primary-external-ip)"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:48
+msgid ""
+"``stun-primary-port`` - primary port of STUN server used for binding (and"
+" sending to client if stun-primary-external-port)"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:50
+msgid ""
+"``stun-secondary-ip`` - secondary IP address of STUN server used for "
+"binding (and sending to client if stun-secondary-external-ip)"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:52
+msgid ""
+"``stun-secondary-ip`` - secondary port of STUN server used for binding "
+"(and sending to client if stun-secondary-external-port)"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:54
+msgid ""
+"If you wish to have a secondary STUN server as a backup, or to provide "
+"multiple addresses for STUN services, the following may be used."
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:56
+msgid ""
+"``stun-primary-external-ip`` - primary external IP address of STUN server"
+" used for sending to client if set"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:58
+msgid ""
+"``stun-primary-external-port`` - primary external port of STUN server "
+"used for sending to client if set"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:60
+msgid ""
+"``stun-secondary-external-ip`` - secondary external IP address of STUN "
+"server used for sending to client if set"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:62
+msgid ""
+"``stun-secondary-external-port`` - secondary external port of STUN server"
+" used for sending to client if set"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:66
+msgid "14.2.2. Logback configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:68
+msgid ""
+"You man want to use logback for STUN server to append normal server logs."
+" To do this, specify the logback xml file within java options in the "
+"``tigase.conf`` file."
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:74
+msgid ""
+"You may configure the logback by editing the xml included with "
+"distributions at logback.xml."
+msgstr ""
+
+#: ../../Tigase_Admistration/STUN_Component.rst:76
+msgid ""
+"What is included is a basic logback configuration that just adds the stun"
+" logging."
+msgstr ""
+

@@ -1,0 +1,2577 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-21 14:27-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:2
+msgid "5. HTTP API component"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:4
+msgid ""
+"Tigase HTTP API component is a generic container used to provide other "
+"HTTP related features as modules. It is configured by default to run "
+"under name of http. Installations of Tigase XMPP Server run this "
+"component enabled by default under the same name even if not configured."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:7
+msgid "5.1. Tigase HTTP-API Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:9
+msgid ""
+"Welcome to Tigase HTTP-API 2.2.0! This is a feature release for with a "
+"number of fixes and update"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:12
+msgid "5.1.1. Tigase HTTP-API 2.2.0 Release Notes"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:15
+msgid "Major Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:17
+msgid ""
+"Enable HTTP File Upload by default with additional, optional, AWS S3 "
+"compatible backend"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:19
+msgid "Improvements to Web Setup to make installation even more straightforward"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:21
+msgid ""
+"Allow exposing ``.well-known`` in the root context to facilitate "
+"`XEP-0156: Discovering Alternative XMPP Connection Methods "
+"<https://xmpp.org/extensions/xep-0156.html>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:23
+msgid "Add option to redirect requests from http to https"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:26
+msgid "All Changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:28
+msgid ""
+"`#http-65 <https://projects.tigase.net/issue/http-65>`__: More detailed "
+"logs"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:30
+msgid ""
+"`#http-86 <https://projects.tigase.net/issue/http-86>`__: Add s3 backend "
+"for http-upload"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:32
+msgid ""
+"`#http-91 <https://projects.tigase.net/issue/http-91>`__: Items in setup "
+"on Features screen are misaligned"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:34
+msgid ""
+"`#http-93 <https://projects.tigase.net/issue/http-93>`__: Update web-"
+"installer documentation"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:36
+msgid ""
+"`#http-95 <https://projects.tigase.net/issue/http-95>`__: Enable HTTP "
+"File Upload by default"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:38
+msgid ""
+"`#http-96 <https://projects.tigase.net/issue/http-96>`__: Enabling "
+"cluster mode / ACS doesn’t add it to resulting configuration file"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:40
+msgid ""
+"`#http-98 <https://projects.tigase.net/issue/http-98>`__: Setup tests are"
+" failing since Septempter"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:42
+msgid ""
+"`#http-99 <https://projects.tigase.net/issue/http-99>`__: Enforce max-"
+"file-size limit"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:44
+msgid ""
+"`#http-100 <https://projects.tigase.net/issue/http-100>`__: Prevent "
+"enabling all Message\\* plugins"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:46
+msgid ""
+"`#http-101 <https://projects.tigase.net/issue/http-101>`__: Prevent "
+"enabling all Mobile\\* plugins"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:48
+msgid ""
+"`#http-102 <https://projects.tigase.net/issue/http-102>`__: Last activity"
+" plugins handling should be improved"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:50
+msgid ""
+"`#http-103 <https://projects.tigase.net/issue/http-103>`__: Enabling "
+"http-upload should give an info about requirement to set domain/store"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:52
+msgid ""
+"`#http-105 <https://projects.tigase.net/issue/http-105>`__: Handle "
+"forbidden characters in filenames"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:54
+msgid ""
+"`#http-106 <https://projects.tigase.net/issue/http-106>`__: Can’t remove "
+"user for non-existent VHost"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:56
+msgid ""
+"`#http-107 <https://projects.tigase.net/issue/http-107>`__: Allow "
+"exposing ``.well-known`` in the root context"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:58
+msgid ""
+"`#http-108 <https://projects.tigase.net/issue/http-108>`__: Add option to"
+" redirect requests from http to https"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:60
+msgid ""
+"`#http-109 <https://projects.tigase.net/issue/http-109>`__: openAccess "
+"option is missing after migrating the component to TK"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:62
+msgid ""
+"`#http-110 <https://projects.tigase.net/issue/http-110>`__: Add support "
+"for querying and managing uploaded files"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:64
+msgid ""
+"`#http-111 <https://projects.tigase.net/issue/http-111>`__: "
+"DefaultLogic.removeExpired removal of slot failed"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:66
+msgid ""
+"`#http-113 <https://projects.tigase.net/issue/http-113>`__: Add condition"
+" to redirect only if the X-Forwarded-Proto has certain value"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:68
+msgid ""
+"`#http-114 <https://projects.tigase.net/issue/http-114>`__: "
+"TigaseDBException: Could not allocate slot"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:70
+msgid ""
+"`#http-116 <https://projects.tigase.net/issue/http-116>`__: Limiting list"
+" of VHosts doesn’t work for JDK based http-server"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:72
+msgid ""
+"`#http-117 <https://projects.tigase.net/issue/http-117>`__: Http "
+"redirection doesn’t work in docker"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:74
+msgid ""
+"`#http-119 <https://projects.tigase.net/issue/http-119>`__: Can’t change "
+"VHost configuration via Admin WebUI"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:76
+msgid ""
+"`#http-120 <https://projects.tigase.net/issue/http-120>`__: Improve S3 "
+"support for HTTP File Upload to accept custom URL and credentials for S3 "
+"storage configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:78
+msgid ""
+"`#http-121 <https://projects.tigase.net/issue/http-121>`__: Deprecate "
+"DnsWebService and rewrite /.well-known/host-meta generator"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:82
+msgid "5.2. Available modules"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:85
+msgid "5.2.1. Admin UI module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:87
+msgid ""
+"This is very simple module for administration of Tigase XMPP Server using"
+" HTTP browser. It allows administrators to execute ad-hoc commands from "
+"HTTP browser allowing to change some configuration options at runtime. It"
+" can be accessed by pointing your browser to "
+"http://server.address:8080/admin/ and logging in with admin credentials."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:90
+msgid "5.2.2. Index module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:92
+msgid ""
+"This module is deployed at ``/`` by default and provides list of "
+"installed and available modules for the virtual host when requested."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:95
+msgid "5.2.3. REST module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:97
+msgid ""
+"This module provides REST-like API for accessing Tigase XMPP Server. It "
+"uses Groovy scripts to process HTTP requests and prepare responses."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:100
+msgid "5.2.4. Server status module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:104
+msgid "This module is still a work in progress!"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:106
+msgid ""
+"This module is designed to present current server status and report "
+"possible issues."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:109
+msgid "5.2.5. Setup module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:111
+msgid ""
+"Module is created to act as a web based installer and configuration "
+"utility for Tigase XMPP Server. Allows you to modify basic Tigase XMPP "
+"Server settings, ie. related to database access. Changes may be saved to "
+"configuration file from this module."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:114
+msgid "5.2.6. Web UI module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:116
+msgid ""
+"This module contains full web client based on `Tigase JaXMPP "
+"<http://www.tigase.net/content/jaxmpp-library:>`__ client library "
+"allowing user to chat, manage contacts list (roster), browse message "
+"archive, etc. For more information on this module, consult the "
+"`Administration Guide <http://docs.tigase.org/tigase-"
+"server/snapshot/Administration_Guide/html/#_use_of_the_http_api>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:119
+msgid "5.2.7. DNS Web Service module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:121
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:257
+msgid ""
+"For web based XMPP clients it is not possible to execute DNS SRV requests"
+" to find address of XMPP server hosting for particular domain. To solve "
+"this the DNS Web Service module was created."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:123
+msgid ""
+"It handles incoming HTTP GET request and using ``Host`` HTTP header "
+"executes DNS requests as specified in `XEP-0156: Discovering Alternative "
+"XMPP Connection Methods <https://xmpp.org/extensions/xep-0156.html>`__. "
+"Results are returned in XML or JSON as specified in the XEP mentioned "
+"before."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:125
+msgid ""
+"By default it is deployed at ``dns-webservice`` and path for XML response"
+" is ``/dns-webservice/.well-known/host-meta`` and for JSON is ``/dns-"
+"webservice/-known/host-meta.json``."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:128
+msgid "5.2.8. User Status Endpoint module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:130
+msgid ""
+"This module is designed as an endpoint required for REST API User Status "
+"to work properly. It is not accessible using HTTP/REST API, so it can "
+"(and in most cases should) be active."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:133
+msgid "5.3. Common module configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:136
+msgid "5.3.1. Enabling/disabling module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:138
+msgid ""
+"Every module can be activated or disabled by adjusting it’s activity in "
+"following way:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:148
+msgid ""
+"You need to replace ``%module_id%`` with the id of module which you want "
+"to change activity (in this case, it will disable module)."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:150
+msgid "**Disabling REST module.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:159
+msgid "5.3.2. Context path"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:161
+msgid ""
+"This property allows you to change the context path that is used by "
+"module. In other words, it allows you to change the prefix used by "
+"module. By default every module (with exception of the Index module) uses"
+" a context path that is the same as module id. For example, the REST "
+"module ID results in the context path ``/rest``"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:163
+msgid "**Changing context path for REST module to ``/api``.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:175
+msgid "5.3.3. List of virtual hosts"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:177
+msgid ""
+"This provides the ability to limit modules to be available only on listed"
+" virtual hosts, and allows to set context path to ``/`` for more than one"
+" module. Property accepts list of strings, which in the case of "
+"config.tdsl file format is list of comma separated domain names and in "
+"DSL it is written as list of strings (see `Complex Example "
+"<#complexExample>`__)."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:179
+msgid ""
+"**Moving the REST module to be available only for requests directed to "
+"``api.example.com``.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:190
+msgid "5.3.4. Complex example"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:192
+msgid ""
+"In this example we will disable the Index module and move REST module to "
+"``http://api.example.com/`` and ``http://rest.example.com``."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:205
+msgid "5.4. Module specific configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:207
+msgid ""
+"Tigase will try to start a standalone Jetty HTTP server at port 8080 and "
+"start up the default modules, including ``RestModule`` which will add "
+"context for REST API in the /rest path. ``RestModule`` will also load all"
+" groovy scripts located in ``scripts/rest/*`` directories and will bind "
+"them to proper actions for the ``/rest/*`` paths."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:209
+msgid ""
+"**NOTE:** Scripts that handle HTTP requests are available in the "
+"component repository in ``src/scriopts/groovy/tigase/rest/`` directory."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:211
+msgid ""
+"Tigase’s REST Component comes with two modules that can be enabled, "
+"disabled, and configured separately. Common settings for modules for "
+"component properties are used in the following format: ``component_name "
+"(module: value) {}`` the following settings are available for both listed"
+" modules:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:213
+msgid "``active`` - Boolean values true/false to enable or disable the module."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:215
+msgid ""
+"``context-path`` - Path of HTTP context under which the module should be "
+"available."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:217
+msgid ""
+"``vhosts`` - Comma separated list of virtual hosts for which the module "
+"should be available. If not configured, the module will be available for "
+"all vhosts."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:220
+msgid "5.4.1. Rest Module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:222
+msgid ""
+"This is the Module that provides support for the REST API. Available "
+"properties:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:224
+msgid ""
+"``rest-scripts-dir`` - Provides ability to specify path to scripts "
+"processing REST requests if you do not wish to use default "
+"(scripts/rest)."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:227
+msgid "API keys"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:229
+msgid ""
+"In previous version it was possible to configure ``api-keys`` for REST "
+"module using entries within configuration file. In the recent version we "
+"decided to remove this configuration option. Now, by default Tigase XMPP "
+"Server requires API key to be passed to all requests and you need to "
+"configure them before you will be able to use REST API."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:231
+msgid "Instead, you should use ad-hocs available on the REST module JID to:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:233
+msgid "Add API key (``api-key-add``)"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:235
+msgid "Update API key (``api-key-update``)"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:237
+msgid "Remove API key (``api-key-remove``);"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:241
+msgid ""
+"If you have Admin UI enabled, you may log in using admin credentials to "
+"this UI and when you select ``CONFIGURATION`` section on the left "
+"sidebar, it will expand and allow you to execute any of those ad-hoc "
+"commands mentioned above."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:243
+msgid ""
+"Requests made to the HTTP service must conclude with one of the API keys "
+"defined using ad-hoc commands: ``http://localhost:8080/rest/adhoc/sess-"
+"man@domain.com?api-key=test1``"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:247
+msgid ""
+"If you want to allow access to REST API without usage of any keys, it is "
+"possible. To do so, you need to add an API key with ``API key`` field "
+"value equal ``open_access``."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:251
+msgid ""
+"You can also completely disable api-keys by adding ``'open-access' = "
+"true`` to the TDSL configuration file, either in ``http`` bean or any of "
+"the modules of that bean, e.g. ``rest``, \\`admin, etc"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:255
+msgid "5.4.2. DNS Web Service module"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:259
+msgid ""
+"It handles incoming HTTP GET request and using passed ``domain`` and "
+"``callback`` HTTP parameters executes DNS requests as specified in "
+"`XEP-0156: Discovering Alternative XMPP Connection Methods "
+"<https://xmpp.org/extensions/xep-0156.html>`__. Results are returned in "
+"JSON format for easy processing by web based XMPP client."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:261
+msgid "By default it is deployed at ``dns-webservice``"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:264
+msgid "Parameters"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:267
+msgid "**domain**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:267
+msgid "Domain name to look for XMPP SRV client records."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:271
+msgid "**callback**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:270
+msgid ""
+"Due to security reasons web based client may not be able to access some "
+"DNS Web Service due to cross-domain AJAX requests. Passing optional "
+"``callback`` parameter sets name of callback for JSONP requests and "
+"results proper response in JSONP format."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:274
+msgid "Discover way to connect to XMPP server"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:277
+msgid "Using ``host-meta``"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:279
+msgid ""
+"You should access endpoint available at ``/dns-webservice/.well-known"
+"/host-meta``."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:281
+msgid ""
+"To make it follow specification you should configure a redirection from "
+"the root path of your http server to above path. For example, using "
+"nginx:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:292
+msgid "Query particular domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:294
+msgid ""
+"If we want to know connectivity options for ``sure.im`` we should send "
+"HTTP GET request to ``http://our-xmpp-server:8080/dns-"
+"webservice/?domain=sure.im&version=2``. We will receive following "
+"response:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:320
+msgid ""
+"As you can see in here we have names and IP address of XMPP servers "
+"hosting ``sure.im`` domain as well as list of URI for establishing "
+"connections using BOSH or WebSocket."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:322
+msgid ""
+"This module is activated by default. However, if you are operating in a "
+"test environment where you may not have SRV and A records setup to the "
+"domain you are using, you may want to disable this in your config.tdsl "
+"file with the following line:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:331
+msgid "5.4.3. Enabling password reset mechanism"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:333
+msgid ""
+"It is possible to provide users with a mechanism for a password change in"
+" case if they forgot their password to the XMPP account. To do that you "
+"need to have ``tigase-extras.jar`` in your classpath (it is part of "
+"``-dist-max`` distribution package), enable ``mailer`` and ``account-"
+"email-password-resetter``."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:335
+msgid "**Example configuration.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:350
+msgid "You need to replace example configuration parameters with correct ones."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:352
+msgid ""
+"With this configuration in place and after restart of Tigase XMPP Server "
+"at url http://localhost:8080/rest/user/resetPassword will be available "
+"web form which may be used for password reset."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:356
+msgid ""
+"This mechanism will only work if user provided real email address during "
+"account registration and if user still remembers and has access to email "
+"address used during registration."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:359
+msgid "5.5. Admin UI Guide"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:361
+msgid ""
+"The Admin User Interface is an HTTP-based interface that sends REST "
+"commands to the server to update configurations, change settings, and "
+"retrieve statistics."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:364
+msgid "5.5.1. A Note about REST"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:366
+msgid ""
+"REST stands for REpresentational State Transfer which is a stateless "
+"communication method that in our case passes commands using HTTP GET, "
+"PUT, POST, and DELETE commands to resources within the Tigase server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:369
+msgid "5.5.2. General overview of the UI"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:371
+msgid ""
+"After navigating to the Admin WebUI you will see basic information about "
+"navigation. The panel itself consists of two main parts: \\* left "
+"navigation menu, which groups all configuration items into categories; "
+"\\* central, main configuration page displaying configuration options of "
+"the selected items."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:373
+msgid "|adminUI main|"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:947
+msgid "adminUI main"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:375
+msgid ""
+"Each configuration item has name (upper line) and associated component "
+"(lower line) as some features can be executed in the context of different"
+" component (for example ``Update Item Configuration`` can be executed for"
+" VirtualHost Manager or ExternalConnection Manager)"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:378
+msgid "5.5.3. Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:380
+msgid ""
+"Allows you to configure some of the servers settings, such as message of "
+"the day, welcome message or initialize shutdown of the cluster node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:383
+msgid "5.5.4. Example Scripts"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:385
+msgid ""
+"This is a list of script examples that can be run and do menial functions"
+" for each component. They may not have particular value themselves, but "
+"are present to be used as reference when writing custom scripts. Get list"
+" of available commands is one script, that is present for every component"
+" that is active on the server, and as its title implies, will provide a "
+"list of all commands for that component. Lastly, the two scripts from the"
+" `Scripting section <#scriptingSupport>`__ of this guide. Generally, "
+"there is not much needed to see in this section."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:388
+msgid "5.5.5. Notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:390
+msgid ""
+"This section has one simple command: to be able to send a mass message to"
+" all logged in users. There are three types of messages that can be sent "
+"from this section: - **normal** Messages will show as a pop-up in most "
+"clients. - **headline** Certain clients will take headline messages and "
+"insert them into MUC or chats between users, otherwise it will create a "
+"pop-up like normal messages. - **chat** Chat messages will open up a chat"
+" dialog with users."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:393
+msgid "5.5.6. Other"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:395
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1039
+msgid ""
+"This section contains a considerable list of options and settings "
+"affecting server functions."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:398
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1042
+msgid "Activate log tracker for a user"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:400
+msgid ""
+"This allows you to set a log file to track a specific user. Set the bare "
+"or full JID of the user you want to log, and a name of the files you wish"
+" the log to be written to. The files will be written in the root Tigase "
+"directory unless you give a directory like logs/filename. The log files "
+"will be named with a .0 extension and will be named .1, .2, .3 and so on "
+"as each file reaches 10MB by default. filename.0 will always be the most "
+"recent. Logging will start once the command has been issued, and cease "
+"once the server restarts."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:403
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1047
+msgid "Add SSL certificate"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:405
+msgid ""
+"Here you can add SSL certificates from PEM files to specific virtual "
+"hosts. Although Tigase can generate its own self-signed certificates, "
+"this will override any default certificates. The certificates cannot "
+"contain a passphrase, or be encrypted. Be sure that the contents contain "
+"both the certificate and private key data. You also have the option to "
+"save the certificate to disk, making the change permanent."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:408
+msgid "Add listener script"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:410
+msgid ""
+"This section allows you to create a custom function for the eventbus "
+"component. These scripts can have the server conduct certain operations "
+"if set criteria are met. You may write the script in either Groovy or "
+"EMCAscript. Please see the `eventbus section <#eventbus>`__ for more "
+"details."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:413
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1052
+msgid "Add Monitor Task"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:415
+msgid ""
+"You can write scripts for Groovy or ECMAScript to add to monitor tasks "
+"here. This only adds the script to available scripts however, you will "
+"need to run it from another prompt. Note that these scripts may only work"
+" with the monitor component."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:418
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1057
+msgid "Add Monitor Timer Task"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:420
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1059
+msgid ""
+"This section allows you to add monitor scripts in Groovy while using a "
+"delay setting which will delay the start of the script."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:424
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1062
+msgid "Add New Item - ext"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:426
+msgid ""
+"Depending on whether you have any external components loaded or not, this"
+" may show. This allows you to add additional external components to the "
+"running instance of Tigase."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:429
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1067
+msgid "Add New Item - Vhost"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:431
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1069
+msgid ""
+"This allows you to add new virtual hosts to the XMPP server. A breakdown "
+"of the fields is as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:433
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:740
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1071
+msgid ""
+"Domain name: the full domain name of the new vhost. Tigase will not add "
+"anything to this domain, so if it is ti be a subdomain of example.com, "
+"you will need to enter sub.domain.com."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:435
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:742
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1073
+msgid "Enabled: Whether the domain is turned on or off."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:437
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:744
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1075
+msgid "Anonymous enabled: Allow anonymous logins."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:439
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:746
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1077
+msgid ""
+"In-band registration: Whether or not to allow users to register accounts "
+"upon login."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:441
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:748
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1079
+msgid ""
+"TLS required: Require logins to the vhost to conduct a TLS handshake "
+"before opening streams."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:443
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:750
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1081
+msgid ""
+"S2S secret: a server-generated code to differentiate traffic between "
+"servers, typically there is no need to enter your own, but you may if you"
+" need to get into low level code."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:445
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:752
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1083
+msgid ""
+"Domain filter policy: Sets the filter policy for this domain, see `This "
+"section <#domainBasedPacketFiltering>`__ for a description of the rules."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:447
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:754
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1085
+msgid ""
+"Domain filter domains: a specific setting to restrict or control cross "
+"domain traffic."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:449
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:756
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1087
+msgid "Max users: maximum users allowed to be registered to the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:451
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:758
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1089
+msgid ""
+"Allowed C2S, BOSH, Websocket ports: Comma separated list of ports that "
+"this vhost will check for all of these services."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:453
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:760
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1091
+msgid ""
+"Presence forward address: specific address where presence information is "
+"forwarded too. This may be handy if you are looking to use a single "
+"domain for presence processing and handling."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:455
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:762
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1093
+msgid ""
+"Message forward address: Specific address where all messages will be sent"
+" too. This may be useful to you if you have a single server handling AMP "
+"or message storage and want to keep the load there."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:457
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:764
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1095
+msgid ""
+"Other Parameters: Other settings you may wish to pass to the server, "
+"consider this a section for options after a command."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:459
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:766
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1097
+msgid ""
+"Owner: The owner of the vhost who will also be considered an "
+"administrator."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:461
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:768
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1099
+msgid ""
+"Administrators: comma separated list of JIDs who will be considered "
+"admins for the vhost."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:463
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:770
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1101
+msgid ""
+"XEP-0136 Message Archiving Enabled: Whether to turn on or off this "
+"feature."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:465
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:772
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1103
+msgid ""
+"XEP-0136 Required store method: If XEP-0136 is turned on, you may "
+"restrict the portion of message that is saved. This is required for any "
+"archiving, if null, any portion of the message may be stored."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:467
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:774
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1105
+msgid ""
+"Client certificate required: Whether the client should submit a "
+"certificate to login."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:469
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1107
+msgid ""
+"Client certificate CA: The Certificate Authority of the client "
+"certificate."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:471
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1109
+msgid ""
+"XEP-0136 retention period: integer of number of days message archives "
+"will be set."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:473
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:780
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1111
+msgid ""
+"Trusted JIDs: Comma separated list of JIDs who will be added to the "
+"trusted list, these are JIDS that may conduct commands, edit settings, or"
+" other secure work without needed secure logins."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:475
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:782
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1113
+msgid ""
+"XEP-0136 retention type: Sets the type of data that retention period will"
+" use. May be User defined (custom number type), Unlimited, or Number of "
+"Days."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:477
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:784
+msgid ""
+"XEP-0136 - store MUC messages: Whether or not to store MUC messages for "
+"archiving. Default is user, which allows users to individually set this "
+"setting, otherwise true/false will override."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:479
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:786
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1117
+msgid ""
+"see-other-host redirection enabled: in servers that have multiple "
+"clusters, this feature will help to automatically repopulate the cluster "
+"list if one goes down, however if this is unchecked, that list will not "
+"change and may attempt to send traffic to a down server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:481
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:788
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1119
+msgid ""
+"XEP-0136 Default store method: The default section of messages that will "
+"be stored in the archive."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:484
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1122
+msgid "Change user inter-domain communication permission"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:486
+msgid ""
+"Here you can restrict users to be able to communicate on specific "
+"domains, this works similar to the domain filtering policy using the same"
+" rule sets. For more details, see `Domain Based Packet Filtering "
+"<#domainBasedPacketFiltering>`__ section for rule details and specifics. "
+"Note that the changes may be made to multiple JIDs at the same time."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:489
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1128
+msgid "Connections Time"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:491
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1130
+msgid "Lists the longest and average connection time from clients to servers."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:494
+msgid "Create Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:496
+msgid ""
+"This section allows you to create a new node for the pubsub component. "
+"Here is a breakdown of the fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:498
+msgid "The node to create: this is the name of the node that will be created."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:500
+msgid "Owner JID: user JID who will be considered the owner of the node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:502
+msgid ""
+"pubsub#node type: sets the type of node the the new node will be. Options"
+" include:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:504
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1142
+msgid "**leaf** Node that can publish and be published too."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:506
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1144
+msgid "**collection** A collection of other nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:508
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1146
+msgid ""
+"A friendly name for the node: Allows spaces and other characters to help "
+"differentiate it from other nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:510
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1148
+msgid ""
+"Whether to deliver payloads with event notifications: as it says, to "
+"publish events or not."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:512
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1150
+msgid "Notify subscribers when the configuration changes: default is false"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:514
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1152
+msgid ""
+"Persist items to storage: whether or not to physically store items in the"
+" node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:516
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1154
+msgid ""
+"Max # of items to persist: Limit how many items are kept in the node "
+"archive."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:518
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1156
+msgid ""
+"The collection with which the node is affiliated: If the node is to be in"
+" a collection, place that node name here."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:520
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1158
+msgid ""
+"Specify the subscriber model: Choose what type of subscriber model will "
+"be used for this node. Options include:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:522
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1160
+msgid ""
+"**authorize** - Requires all subscriptions to be approved by the node "
+"owner before items will be published to the user. Also only subscribers "
+"may retrieve items."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:524
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1162
+msgid "**open** - All users may subscribe and retrieve items from the node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:526
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1164
+msgid ""
+"**presence** - Typically used in an instant message environment. Provides"
+" a system under which users who are subscribed to the owner JID’s "
+"presence with a from or both subscription may subscribe from and retrieve"
+" items from the node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:528
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1166
+msgid ""
+"**roster** - This is also used in an instant message environments, Users "
+"who are both subscribed to the owners presence AND is placed in specific "
+"allowed groups by the roster are able to subscribe to the node and "
+"retrieve items from it."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:530
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1168
+msgid ""
+"**whitelist** - Only explicitly allowed JIDs are allowed to subscribe and"
+" retrieve items from the node, this list is set by the "
+"owner/administrator."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:532
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1170
+msgid ""
+"Specify the Publisher model: Choose what type of publisher model will be "
+"used for this node. Options include:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:534
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1172
+msgid "**open** - Any user may publish to this node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:536
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1174
+msgid "**publishers** - Only users listed as publishers may be able to publish."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:538
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1176
+msgid "**subscribers** - Only subscribers may publish to this node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:540
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1178
+msgid ""
+"When to send the last published item: This allows you to decide if and "
+"when the last published item to the node may be sent to newly subscribed "
+"users."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:542
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1180
+msgid "**never** - Do not send the last published item."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:544
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1182
+msgid ""
+"**on_sub** - Send the last published item when a user subscribes to the "
+"node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:546
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1184
+msgid ""
+"**on_sub_and_presence** - Send the last published item to the user after "
+"a subscription is made, and the user is available."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:548
+msgid ""
+"The domains allowed to access this node: Comma separated list of domains "
+"for which users can access this node. By default is is blank, and there "
+"is no domain restriction."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:550
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1188
+msgid ""
+"Whether to deliver items to available users only: Items will only be "
+"published to users with available status if this is selected."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:552
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1190
+msgid ""
+"Whether to subscription expired when subscriber going offline: This will "
+"make all subscriptions to the node valid for a single session and will "
+"need to be re-subscribed upon reconnect."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:554
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1192
+msgid ""
+"The XSL transformation which can be applied to payloads in order to "
+"generate an appropriate message body element: Since you want a properly "
+"formatted <body> element, you can add an XSL transformation here to "
+"address any payloads or extra elements to be properly formatted here."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:556
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1194
+msgid ""
+"The URL of the XSL transformation which can be applied to payloads in "
+"order to generate an appropriate message body element: This would be the "
+"URL of the XSL Transform, e.g. http://www.w3.org/1999/XSL/Transform."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:558
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1196
+msgid ""
+"Roster groups allowed to subscribe: a list of groups for whom users will "
+"be able to subscribe. If this is blank, no user restriction will be "
+"imposed."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:560
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1198
+msgid ""
+"Notify subscribers when owner changes their subscription or affiliation "
+"state: This will have the node send a message in the case of an owner "
+"changing affiliation or subscription state."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:562
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1200
+msgid ""
+"Allows get list of subscribers for each subscriber: Allows subscribers to"
+" produce a list of other subscribers to the node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:564
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1202
+msgid ""
+"Whether to sort collection items by creation date or update time: options"
+" include"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:566
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1204
+msgid ""
+"**byCreationDate** - Items will be sorted by the creation date, i.e. when"
+" the item was made."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:568
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1206
+msgid ""
+"**byUpdateTime** - Items will be sorted by the last update time, i.e. "
+"when the item was last edited/published/etc.."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:571
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1133
+msgid "DNS Query"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:573
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1135
+msgid "A basic DNS Query form."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:576
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1138
+msgid "Default config - Pubsub"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:578
+msgid ""
+"Here you may set the default configuration for any new pubsub node. These"
+" changes will be made for all future nodes, but will not affect currently"
+" active nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:581
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1209
+msgid "Default room config"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:583
+msgid ""
+"This page allows admins to set the default configuration for any new MUC "
+"rooms that may be made on the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:586
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1215
+msgid "Delete Monitor Task"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:588
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1217
+msgid ""
+"This removes a monitor task from the list of available monitor scripts. "
+"This action is not permanent as it will revert to initial settings on "
+"server restart."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:591
+msgid "Delete Node"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:593
+msgid ""
+"Provides a space to remove a node from the server. It must be the full "
+"name of the node, and only one node can be removed at a time."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:596
+msgid "Deleting ALL Nodes"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:598
+msgid ""
+"This page allows the logged in admin to delete all nodes from the "
+"associated vhost. This change is irreversible, be sure to read and check "
+"the box before submitting the command."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:601
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1221
+msgid "Fix User’s Roster"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:603
+msgid ""
+"You can fix a users roster from this prompt. Fill out the bare JID of the"
+" user and the names you wish to add or remove from the roster. This will "
+"NOT edit a user’s roster, but rather compare client roster to database "
+"and fix any errors between them."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:606
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1226
+msgid "Fix User’s Roster on Tigase Cluster"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:608
+msgid ""
+"This does the same as the Fix User’s Roster, but can apply to users who "
+"may not be logged into the local vhost, but are logged into a clustered "
+"server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:611
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1231
+msgid "Get User Roster"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:613
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1233
+msgid ""
+"As the title implies this gets a users' roster and displays it on screen."
+" You can use a bare or full JID to get specific rosters."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:616
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1236
+msgid "Get any file"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:618
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1238
+msgid ""
+"Enables you to see the contents of any file in the tigase directory. By "
+"default you are in the root directory, if you wish to go into directory "
+"use the following format: logs/tigase.log.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:621
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1241
+msgid "Get Configuration File"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:623
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1243
+msgid ""
+"If you don’t want to type in the location of a configuration file, you "
+"can use this prompt to bring up the contents of either tigase.conf or "
+"config.tdsl."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:626
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1247
+msgid "Get config.tdsl File"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:628
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1249
+msgid ""
+"Will output the current config.tdsl file, this includes any modifications"
+" made during the current server session."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:631
+msgid "Get list available commands"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:633
+msgid ""
+"This may be listed multiple times for different components, but this will"
+" do as the section suggest and list available commands for that "
+"particular component."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:636
+msgid "Load test"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:638
+msgid ""
+"Here you can run a test with the pubsub component on any node to test "
+"functionality and proper settings for the node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:641
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1253
+msgid "Load Errors"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:643
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1255
+msgid ""
+"Will display any errors the server encounters in loading and running. Can"
+" be useful if you need to address any issues."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:646
+msgid "New command script"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:648
+msgid ""
+"This space allows you to create a new command script that will work "
+"within the associated component. Note that under the hyperlinked title, "
+"there is a listing of muc.server.org or pubsub.server.org, use these to "
+"determine where the new command will operate."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:651
+msgid "OAuth Credentials"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:653
+msgid ""
+"This allows the setting of new custom OAuth credentials for the server, "
+"and you can also require the use of OAuth tokens for users when they "
+"login. This is a setting for the specific host you are logged into. If "
+"you are logged into xmpp1.domain.com, it will not affect settings for "
+"xmpp2.domain.com."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:656
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1276
+msgid "Pre-Bind BOSH user session"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:658
+msgid ""
+"This allows a JID to be paired with a BOSH session before that user logs "
+"in, can reduce CPU use if you have a user that logs in via BOSH on a "
+"regular basis, or a web client that will regularly connect. You may also "
+"specify HOLD and WAIT integers to affect how BOSH operates with the "
+"associated JID."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:661
+msgid "Publish item to node"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:663
+msgid ""
+"This window allows you to not only test, but publish an item to the "
+"specified node. All fields must be filled in in order to avoid the server"
+" dropping an improperly formatted stanza."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:666
+msgid "Read ALL nodes"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:668
+msgid ""
+"This will load a tree of pubsub nodes in memory, it will not output "
+"anything as it is mainly for developer use."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:671
+msgid "Rebuild database"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:673
+msgid ""
+"This will force Tigase to rebuild databases for the pubsub component, "
+"this may be useful for pubsub subscribers who continue to get pushed "
+"events after they unsubscribe."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:676
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1281
+msgid "Reload component repository"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:678
+msgid ""
+"This will reload any vhosts that the server is running. This may be "
+"useful if one is disconnected or broken during runtime."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:681
+msgid "Remove an item"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:683
+msgid ""
+"This will remove a running vhost from the server, you will be presented "
+"with a list to pick from."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:686
+msgid "Remove command script"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:688
+msgid ""
+"Like new command script, take a look at the subheading to determine which"
+" component you want to remove the script from. Once there, select the "
+"command you wish to remove from the server. If remove from disk is "
+"selected, then the change will be permanent. Otherwise, the command will "
+"be removed until the next server restart."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:691
+msgid "Remove listener script"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:693
+msgid ""
+"Select from a list the listener script you wish to remove. This will only"
+" affect custom listener scripts added to the eventbus component."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:696
+msgid "Remove room"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:698
+msgid ""
+"This provides fields to remove a room from the MUC component. you may "
+"suggest an alternative room which will move occupants to the alternative "
+"room once the current one is removed."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:701
+msgid "Retrieve items"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:703
+msgid ""
+"Here you can retrieve items from PubSub nodes, this simulates the get IQ "
+"stanza from the pubsub component. - Service name - The address of the "
+"pubsub component. - Node name - Item node to retrieve items from. - Item "
+"ID - The item ID of the item you wish to retrieve. - Items Since - UTC "
+"timestamp to start search from: YYYY-MM-DDTHH:MM:SSZ"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:706
+msgid "S2S Bad State Connections"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:708
+msgid ""
+"This will list any connections to other servers that are considered bad "
+"or stale. This will populate very rarely as Tigase automatically adjusts "
+"around clustered servers that go down. In the event a connection stays "
+"bad, it is recommended to reset those connections in the next space."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:711
+msgid "S2S Reset Bad State Connections"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:713
+msgid ""
+"This will reset the connections with other servers that are considered "
+"bad and have shown up in the S2S Bad State Connections page."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:716
+msgid "S2S Get CID Connection State"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:718
+msgid "For internal developer use only."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:721
+msgid "Subscribe to a node"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:723
+msgid ""
+"This provides a space for an administrator to manually have a JID "
+"subscribe to a particular node."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:726
+msgid "Unsubscribe from node"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:728
+msgid ""
+"Here you can unsubscribe users from a particular node. Users can be a "
+"comma separated list."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:731
+msgid "Update item configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:733
+msgid ""
+"Typically you will see only one item for vhost-man, but some additional "
+"components (ie. ext) may provided them as well. They each have their own "
+"sections, but provide for a plethora of server options. Changes to the "
+"server are done in real time, and may not be permanent."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:736
+msgid "vhost-man"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:738
+msgid ""
+"You will be presented with a list of domains that Tigase is currently "
+"hosting, you will be able to change settings for one domain at a time "
+"using this function. Once a domain is selected, you will be able to set "
+"or change the following settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:776
+msgid "Client certificate CA: Client Certificate Authority."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:778
+msgid ""
+"XEP-0136 retention period: Integer of number of days message archives "
+"will be set."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:791
+msgid "Update user roster entry"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:793
+msgid ""
+"This section allows admins to edit individual users rosters, although it "
+"provides similar functionality to fix users roster, this is designed for "
+"precision editing of a user roster."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:795
+msgid "Roster owner JID: The BareJID of the user roster you wish to edit."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:797
+msgid "JID to manipulate: The specific BareJID you want to add/remove/change."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:799
+msgid "Comma separated groups: Groups you wish to add the JID too."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:801
+msgid "Operation Type: What function will be performed?"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:803
+msgid "**Add** - Add the JID to manipulate to the owner JID’s roster and groups."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:805
+msgid ""
+"**Remove** - Remove the JID to manipulate from the owner JID’s roster and"
+" groups."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:807
+msgid ""
+"Subscription type: The type of subscription stanza that will be sent to "
+"the server, and subsequently between the two users will be employed."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:809
+msgid ""
+"**None** - Select this if neither the owner or the user to be manipulated"
+" wishes to receive presence information."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:811
+msgid ""
+"**From** - The Roster Owner will not receive presence information from "
+"the JID to manipulate, but the opposite will be true."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:813
+msgid ""
+"**To** - The JID to manipulate will not receive presence information from"
+" the Roster Owner, but the opposite will be true."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:815
+msgid "**Both** - Both JIDs will receive presence information about each other."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:818
+msgid "Update user roster entry extended version"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:820
+msgid ""
+"This section is an expanded version of the previous one, all fields "
+"already specified are the same with these additions:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:822
+msgid ""
+"Roster owner name: A friendly name or nickname if you wish to "
+"change/create one. **not required**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:824
+msgid ""
+"Comma separated of owner groups: Groups that the user wants to "
+"join/leave. **not required**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:826
+msgid "Roster item JID: The specific JID that needs to be edited."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:828
+msgid ""
+"Roster item name: A friendly name or nickname that will be "
+"changed/created. **not required**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:830
+msgid ""
+"Comma separated list of item groups: A group or list of groups that the "
+"roster item JID will be added to/removed from."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:832
+msgid "Action:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:834
+msgid ""
+"**Add/update item** - Will add or update the item JID in the roster "
+"owner’s roster."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:836
+msgid "**Remove item** - Will remove the item JID from the roster owner’s roster."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:838
+msgid ""
+"**Add/update both rosters** - Will add or update the item in both roster "
+"owner and roster item’s roster."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:840
+msgid ""
+"**Remove from both rosters** - Will remove the item from both roster "
+"owner and roster item’s roster."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:844
+msgid "5.5.7. Scripts"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:846
+msgid ""
+"This section will enable administrators to custom write or enter their "
+"own scripts for specific components. Each active component will have an "
+"entry for new and remove command scripts and scripts written there will "
+"be for that component."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:849
+msgid "New Command Script"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:851
+msgid ""
+"Description: A friendly name of the script, will be the title of the link"
+" in the menu on the left."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:853
+msgid ""
+"Command ID: Internal command that Tigase will use when referencing this "
+"script."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:855
+msgid ""
+"Group: The group for the script, which may be any of the headings on the "
+"left (Configuration, Example scripts, Notifications, Other etc..) or your"
+" own. If no group exists, a new one will be created."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:857
+msgid ""
+"Language: The language the script is written in. Currently Tigase "
+"supports Groovy and EMCAScript."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:859
+msgid "Script text: the fulltext of the script."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:861
+msgid ""
+"Save to disk: Scripts that are saved to disk will be permanently stored "
+"in the server’s directory /scripts/admin/[Component]/commandID.js "
+"**NOTE** Scripts that are NOT saved to disk will not survive a server "
+"restart."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:864
+msgid "Remove Command Script"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:866
+msgid ""
+"As with New Command Script, there is an entry for each component. This "
+"page will provide a space to remove commands for the selected component. "
+"You will be provided a list of scripts associated with that component. "
+"You also have the open to remove from disk, which will permanently delete"
+" the script from the hard drive the server is on. If this is unchecked, "
+"the script will be unavailable until the next restart."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:869
+msgid "5.5.8. Statistics"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:871
+msgid ""
+"This section is more useful to test statistics scripts and components, as"
+" many of them produce very small amounts of information, however these "
+"may be collected by other components or scripts for a better information "
+"display."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:874
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1298
+msgid "Get User Statistics"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:876
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1300
+msgid ""
+"Provides a script output of user statistics including how many active "
+"sessions are in use, number of packets used, specific connections and "
+"their packet usage and location. All resources will return individual "
+"stats along with IP addresses."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:879
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1303
+msgid "Get Active User List"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:881
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1305
+msgid ""
+"Provides a list of active users under the selected domain within the "
+"server. An active user is considered a user currently logged into the "
+"XMPP server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:884
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1309
+msgid "Get list of idle users"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:886
+msgid "Provides a list of users who are idle on the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:889
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1315
+msgid "Get list of online users"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:891
+msgid "Provides a list of users who are currently online."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:894
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1320
+msgid "Get number of active users"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:896
+msgid "Provides a list of active users, users who are not idle or away."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:899
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1325
+msgid "Get number of idle users"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:901
+msgid "Provides a number of idle users."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:904
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1329
+msgid "Get top active users"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:906
+msgid ""
+"Will produce a list of user-limited users who are considered most active "
+"in packets sent."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:909
+msgid "5.5.9. Users"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:912
+msgid "Add User"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:914
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1340
+msgid ""
+"Here you can add new users to any domain handled by vHosts, users are "
+"added to database immediately and are able to login. **NOTE: You cannot "
+"bestow admin status to these users in this section.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:917
+msgid "Change User Password"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:919
+msgid ""
+"This enables you to change the password of any user in the database. "
+"Although changes will take effect immediately, users currently logged in "
+"will not know the password has been changed until they try to log in "
+"again."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:922
+msgid "Delete User"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:924
+msgid ""
+"This removes the user or users (comma separated) from the database. The "
+"deleted users will be kicked from the server once submit is clicked."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:927
+msgid "End user session"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:929
+msgid ""
+"Disconnects the current selected user by ending their session with the "
+"server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:932
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1353
+msgid "Get User Info"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:934
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1355
+msgid ""
+"This section allows admins to get information about a specific user "
+"including current connections as well as offline and online messages "
+"awaiting delivery."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:938
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1358
+msgid "Get registered user list"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:940
+msgid ""
+"This will display all registered users for the selected domain up to the "
+"number specified."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:943
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1363
+msgid "Modify User"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:945
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1365
+msgid ""
+"Allows you to modify some user details including E-mail and whether it is"
+" an active user."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:950
+msgid "5.6. Tigase Web Client"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:952
+msgid ""
+"Tigase now has a fully featured XMPP client built right into the HTTP "
+"interface. Everything you would expect from an XMPP client can now be "
+"done from the comfort of your browser window with no software install "
+"required!"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:954
+msgid ""
+"The web client is active and available by default on servers v7.2.0 and "
+"later."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:956
+msgid ""
+"To access the client, point a browser to the following address: xmpp"
+".your-server.net:8080/ui/"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:958
+msgid ""
+"It will ask you for a login, any bare JID of users registered with the "
+"server will work. **NOTE: Use your bare JID for login**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:960
+msgid ""
+"Once you have logged in successfully, you will be presented with the "
+"following screen."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:962
+msgid "|WebUI Home|"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1367
+msgid "WebUI Home"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:964
+msgid ""
+"The commands are broken into categories shown here. All changes made in "
+"these sections are instant and should be seen the same as if you were "
+"using an external XMPP client like Psi."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:966
+msgid ""
+"**NOTE** The BOSH client will automatically translate all requests to the"
+" server name. In some rare cases this may not be resolvable by the "
+"browser and you will be unable to login. Should that happen, you may "
+"disable that feature using the following line in your config.tdsl:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:974
+msgid ""
+"You may have to specifically designate the bosh URL when using the "
+"advanced tag in the login screen."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:977
+msgid "5.6.1. Chat"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:979
+msgid ""
+"This is the default window, and your main interface for chatting inside "
+"XMPP with this server. **NOTE: you can only communicate to users logged "
+"onto the current server, or connected clusters** Users from your roster "
+"will be on the left panel, the right all active discussions and MUCs, as "
+"well as the currently selected chat will be available."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:981
+msgid "|WebUI Chat|"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1368
+msgid "WebUI Chat"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:983
+msgid ""
+"Users that are logged in and on your roster will be displayed on the left"
+" side. Double-clicking will bring up a new chat window with the user. You"
+" can Right-click on them to bring up a sub menu with the following;"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:985
+msgid "|WebUI Usersubmenu|"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1369
+msgid "WebUI Usersubmenu"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:987
+msgid "**Chat** replicates a double-click and opens a new window for chat."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:989
+msgid ""
+"**Modify** brings up a dialogue that allows you to change the JID of the "
+"contact, a nickname, and group."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:991
+msgid ""
+"**Delete** removes the user from your roster. This will also remove "
+"subscription authorization for the selected user to receive presence "
+"information effectively removing you from their roster. **NOTE: this will"
+" not block user packets from your JID**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:993
+msgid ""
+"**Info** brings up the User Info (this is the disco#info command for the "
+"selected user)"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:995
+msgid ""
+"The top right section has a few icons with specific functionality, they "
+"are;"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:997
+msgid "|WebUI Chat Add New| adds a new user to your roster."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1370
+msgid "WebUI Chat Add New"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:999
+msgid "|WebUI Chat NewMUC| creates a new Multi-user chatroom."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1371
+msgid "WebUI Chat NewMUC"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1001
+msgid ""
+"|WebUI Chat Profile| allows you to edit your user information such as "
+"picture and nickname."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1372
+msgid "WebUI Chat Profile"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1003
+msgid "|WebUI Chat CloseWindow| closes the active chat window."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1373
+msgid "WebUI Chat CloseWindow"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1005
+msgid ""
+"|WebUI Chat settings| provides a place to change your password or publish"
+" changes to your user info. **NOTE: you are limited to changing the "
+"General fields**"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1374
+msgid "WebUI Chat settings"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1009
+msgid "5.6.2. Discovery"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1011
+msgid ""
+"This is your service discovery panel, which breaks down by component in "
+"the sidebar. Each component name and its associated JID is listed to help"
+" you find what you need. Most components give you an option to Execute "
+"commands with a few exceptions allowing browsing and the ability to join "
+"a MUC."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1013
+msgid ""
+"**Browse** allows you to dig deeper into certain components; for example "
+"list the chatrooms available in the MUC component. At the top of the page"
+" the specific JID of the component are you in will be displayed. This is "
+"a text field, and can be edited to reflect the JID of the component (or "
+"just the server name) to navigate."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1015
+msgid "|WebUI Browse Comp|"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1375
+msgid "WebUI Browse Comp"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1017
+msgid ""
+"**Join to Room** will join you to a MUC room that is selected. "
+"Alternatively, selecting Join to Room while MUC component is selected, "
+"you can join and start a new MUC room."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1019
+msgid ""
+"**Execute Command** Provides a hierarchy of commands and options to view "
+"and edit settings, run commands and scripts, view contents of files, and "
+"see statistics. Since each Component can have a unique structure it is "
+"best to explore each to see what options are available."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1022
+msgid "5.6.3. Management"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1024
+msgid ""
+"This is an advanced window for settings and management for the XMPP "
+"server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1027
+msgid "Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1029
+msgid "Here you can manage some of the server settings."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1032
+msgid "Notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1034
+msgid ""
+"This section has one simple command: to be able to send a mass message to"
+" all logged in users. You may choose to change the type of message to "
+"headline or Normal which will show as a pop-up in most XMPP clients. Chat"
+" messages will open up a chat dialog with users."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1037
+msgid "Other"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1044
+msgid ""
+"This allows you to set a log file to track a specific user. Set the bare "
+"or full JID of the user you want to log, and a name of the files you wish"
+" the log to be written to. The files will be written in the root Tigase "
+"directory unless you give a directory like logs/filename. The log files "
+"will be named with a .0 extension and will be named .1, .2, .3 and so on "
+"as each file reaches 10MB by default. filename.0 will always be the most "
+"recent. Logging will cease once the server restarts."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1049
+msgid ""
+"Here you can add SSL certificates from PEM files to specific virtual "
+"hosts. Although Tigase can generate its own self-signed certificates, "
+"this will override those default certificates."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1054
+msgid ""
+"You can write scripts for Groovy or ECMAScript to add to monitor tasks "
+"here. This only adds the script to available scripts however, you will "
+"need to run it from another prompt."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1064
+msgid ""
+"Provides a method to add external components to the server. By default "
+"you are considered the owner, and the Tigase load balancer is "
+"automatically filled in."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1115
+msgid ""
+"XEP-0136 - store MUC messages: Whether or not to store MUC messages for "
+"archiving. Default is user, which allows users to individually set this "
+"setting, otherwise tue/false will override."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1124
+msgid ""
+"You can restrict users to only be able to send and receive packets to and"
+" from certain virtual hosts. This may be helpful if you want to lock "
+"users to a specific domain, or prevent them from getting information from"
+" a statistics component."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1140
+msgid ""
+"This section enables you to change the default pubsub node configuration "
+"for all future nodes. **Note: these changes will be reset on server "
+"restart.** - pubsub#node type: sets the type of node the the new node "
+"will be. Options include:"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1186
+msgid ""
+"The domains allowed to access this node: Comma separated list of domains "
+"for which users can access this node. If left blank there is no domain "
+"restriction."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1211
+msgid ""
+"Allows you to set the default configuration for new MUC rooms. This will "
+"not be able to modify current in use and persistent rooms."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1223
+msgid ""
+"You can fix a users roster from this prompt. Fill out the bare JID of the"
+" user and the names you wish to add or remove from the roster. You can "
+"edit a users roster using this tool, and changes are permanent."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1228
+msgid ""
+"This does the same as the Fix User’s Roster, but can apply to users in "
+"clustered servers."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1259
+msgid "New command script - Monitor"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1261
+msgid ""
+"Allows you to write command scripts in Groovy and store them physically "
+"so they can be saved past server restart and run at any time. Scripts "
+"written here will only be able to work on the Monitor component."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1264
+msgid "New command script - MUC"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1266
+msgid ""
+"Allows you to write command scripts in Groovy and store them physically "
+"so they can be saved past server restart and run at any time. Scripts "
+"written here will only be able to work on the MUC component."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1270
+msgid "OAUth credentials"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1272
+msgid ""
+"Uses OAuth to set new credentials and enable or disable a registration "
+"requirement with a signed form."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1278
+msgid ""
+"Allows admins to pre-bind a BOSH session with a full or bare JID (with "
+"the resource automatically populated on connection). You may also specify"
+" HOLD or WAIT parameters."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1283
+msgid ""
+"This will show if you have any external components and will reload them "
+"in case of any stuck threads."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1286
+msgid "Scripts"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1288
+msgid ""
+"This section provides a list of command scripts for all active "
+"components. Each component has the following options - **New command "
+"script** provides a method to author new command scripts for specific "
+"components written in EMCAScript or Groovy. You do have an option to save"
+" the script to disk which will make the script permanent within the "
+"server. - **Remove command script** allows you to remove the selected "
+"script from the repository. If Remove from disk is not checked, the "
+"script will be unavailable until server restart. If it is, it will be "
+"permanently removed from the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1290
+msgid ""
+"Newly made commands will be listed under the Group listing in the left "
+"column."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1293
+msgid "Statistics"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1295
+msgid ""
+"These statistics might be more useful as script results yield small bits "
+"of data, but you may find them useful when looking for server loads or "
+"finding user issues."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1311
+msgid "This will list all idle users separated by vhost."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1317
+msgid ""
+"This will list users separated by the vhost they are connected to. The "
+"list will include the bare JID as well as any resources for that JID."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1322
+msgid "This displays the number of current active users."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1327
+msgid "This section returns the number of active users per specific vhost."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1331
+msgid ""
+"This will list the top number of active users by packets sent and online "
+"time. This list will only be built with users currently online and from "
+"all vhosts."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1335
+msgid "Users"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1338
+msgid "Add New User"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1343
+msgid "Change user password"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1345
+msgid ""
+"Allows for admins to change the password of a specific user without "
+"needing to know the original password for the selected bare JID. Users "
+"currently logged in will not know password has been changed until they "
+"attempt to re-login."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1348
+msgid "Delete user"
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1350
+msgid ""
+"Provides a text window for admins to input the bare JID of the user they "
+"wish to remove from the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/HTTP_API_Component.rst:1360
+msgid ""
+"Provides a list of vhosts to search and a maximum number of users to "
+"list. Once run, the script will display a list of registered bare JIDs of"
+" users from the selected vhost."
+msgstr ""
+
