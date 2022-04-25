@@ -22,7 +22,6 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.mix.IMixComponent;
 import tigase.mix.modules.RoomPresenceModule;
-import tigase.pubsub.modules.mam.Query;
 import tigase.server.Packet;
 
 @Bean(name = "mamQueryParser", parent = IMixComponent.class, active = true)
@@ -35,8 +34,8 @@ public class MAMQueryParser extends tigase.pubsub.modules.mam.MAMQueryParser {
 	}
 
 	@Override
-	protected String parseQueryForNode(Query query, Packet packet) throws ComponentException {
-		String node = super.parseQueryForNode(query, packet);
+	protected String parseQueryForNode(Packet packet) throws ComponentException {
+		String node = super.parseQueryForNode(packet);
 		if (node == null && roomPresenceModule != null) {
 			return "urn:xmpp:mix:nodes:messages";
 		}

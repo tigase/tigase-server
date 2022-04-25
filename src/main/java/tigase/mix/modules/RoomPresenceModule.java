@@ -33,7 +33,7 @@ import tigase.mix.model.*;
 import tigase.pubsub.AbstractPubSubModule;
 import tigase.pubsub.CollectionItemsOrdering;
 import tigase.pubsub.exceptions.PubSubException;
-import tigase.pubsub.modules.mam.Query;
+import tigase.pubsub.modules.mam.PubSubQuery;
 import tigase.pubsub.repository.IItems;
 import tigase.server.Packet;
 import tigase.util.datetime.TimestampHelper;
@@ -112,7 +112,7 @@ public class RoomPresenceModule
 					}
 					if (join(channelJID, packet.getStanzaFrom(), nick)) {
 						Element historyEl = x.getChild("history");
-						Query query = getRepository().newQuery();
+						PubSubQuery query = getRepository().newQuery();
 						query.setComponentJID(JID.jidInstanceNS(channelJID));
 						query.setQuestionerJID(packet.getStanzaFrom());
 						query.getRsm().setHasBefore(true);
