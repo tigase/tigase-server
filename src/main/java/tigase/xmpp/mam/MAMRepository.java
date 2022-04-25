@@ -17,9 +17,11 @@
  */
 package tigase.xmpp.mam;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.exceptions.RepositoryException;
 import tigase.xml.Element;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.Date;
 
@@ -35,7 +37,13 @@ public interface MAMRepository<Q extends Query, I extends MAMRepository.Item> {
 
 	void queryItems(Q query, ItemHandler<Q, I> itemHandler) throws RepositoryException, ComponentException;
 
+	@TigaseDeprecated(removeIn = "9.0.0", note = "Use method with `jid` containing jid of queried entity archive", since = "8.3.0")
+	@Deprecated
 	Q newQuery();
+
+	default Q newQuery(BareJID jid) {
+		return newQuery();
+	}
 
 	interface Item {
 

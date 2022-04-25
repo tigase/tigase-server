@@ -67,7 +67,7 @@ public class GetFormModule
 		Element query = new Element("query");
 		query.setXMLNS(reqQuery.getXMLNS());
 
-		queryParser.prepareForm(query, reqQuery.getXMLNS());
+		queryParser.prepareForm(query, reqQuery.getXMLNS(), packet);
 
 		packetWriter.write(packet.okResult(query, 0));
 	}

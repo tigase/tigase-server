@@ -17,6 +17,7 @@
  */
 package tigase.xmpp.mam;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.component.exceptions.ComponentException;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -37,9 +38,17 @@ public interface QueryParser<Q extends Query> {
 
 	Q parseQuery(Q query, Packet packet) throws ComponentException;
 
+	default Element prepareForm(Element elem, String xmlns, Packet packet) {
+		return prepareForm(elem, xmlns);
+	}
+
+	@TigaseDeprecated(removeIn = "9.0.0", note = "Use method with `xmlns` and `packet` paramters", since = "8.3.0")
+	@Deprecated
 	default Element prepareForm(Element elem, String xmlns) {
 		return prepareForm(elem);
 	}
 
+	@TigaseDeprecated(removeIn = "9.0.0", note = "Use method with `xmlns` and `packet` paramters", since = "8.3.0")
+	@Deprecated
 	Element prepareForm(Element elem);
 }
