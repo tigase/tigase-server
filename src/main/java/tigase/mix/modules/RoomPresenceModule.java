@@ -112,7 +112,7 @@ public class RoomPresenceModule
 					}
 					if (join(channelJID, packet.getStanzaFrom(), nick)) {
 						Element historyEl = x.getChild("history");
-						PubSubQuery query = getRepository().newQuery();
+						PubSubQuery query = getRepository().newQuery(channelJID);
 						query.setComponentJID(JID.jidInstanceNS(channelJID));
 						query.setQuestionerJID(packet.getStanzaFrom());
 						query.getRsm().setHasBefore(true);
