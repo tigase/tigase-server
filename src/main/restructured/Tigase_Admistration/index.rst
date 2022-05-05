@@ -1,19 +1,17 @@
 .. toctree::
    :caption: Tigase Administration Guide -Version 8.3.0
    :titlesonly:
+   :numbered:
 
-   Release_Notes
-   Administration_Guide
-   Tigase_Server_Extras
-   ACS
-   HTTP_API_Component
-   HTTP_File
-   HTTP_Server
-   Tigase_Message_Archiving
-   Tigase_PubSub_Component
-   MIX_Component
-   MUC_Component
-   Socks5_Proxy
-   Push_Component
-   STUN_Component
-   SPAM_Filter
+   User_Guide
+   About_Tigase_XMPP_Server
+   Licensing_Open_Source
+   Tigase_Server_Binary_Updates
+   Quick_Start_Guide
+   Configuration
+   Security
+   Database_Management
+   Components
+   Using_Tigase
+   Statistics_Description
+   Properties_Guide
