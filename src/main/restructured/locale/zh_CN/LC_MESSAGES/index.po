@@ -18,15 +18,14 @@ msgstr ""
 "Generated-By: Babel 2.9.1\n"
 
 #: ../../index.rst:6
-#, fuzzy
 msgid "Tigase XMPP Server Distribution Administration Guide -Version 8.3.0"
-msgstr "Przewodnik po Tigase - wersja 8.3.0"
+msgstr ""
 
 #: ../../index.rst:13
 msgid "Tigase Development Guide -Version 8.3.0"
-msgstr "Przewodnik rozwoju Tigase — wersja 8.3.0"
+msgstr ""
 
 #: ../../index.rst:4
 msgid "Tigase Documentation"
-msgstr "Dokumentacja tigazy"
+msgstr ""
 

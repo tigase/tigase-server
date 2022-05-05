@@ -1,0 +1,135 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-05 11:44-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:2
+msgid "Cluster Map Interface"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:4
+msgid ""
+"Starting with v7.1.0, a cluster map interface has been implemented. The "
+"cluster map is aided by use of the distributed event bus system to "
+"communicate between all clusters."
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:7
+msgid "Requirements"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:9
+msgid ""
+"Any full distribution of Tigase will support the Cluster Map API so long "
+"as the eventbus component is not disabled. JDK v8 is required for this "
+"feature, however since Tigase requires this, you should already have it "
+"installed."
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:11
+msgid ""
+"The cluster map is stored in memory and follows the "
+"``map.util.interface`` java standards can be used to improve cluster "
+"connections, and help clustered servers keep track of each other."
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:14
+msgid "Map Creation"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:16
+msgid "Map must be created with the following command:"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:22
+msgid ""
+"Where \"type\" is the map ID. This creates the map locally and then fires"
+" an event to all clustered servers. Each cluster server has an event "
+"handler waiting for, in this case, ``NewMapCreate`` event. Map Key class "
+"and Map Value class are used to type conversion. Arrays of strings are "
+"parameters, for example ID of user session. Once received, the "
+"distributed eventbus will create a local map."
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:32
+msgid "A brief example of a map creation is shown here:"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:38
+msgid ""
+"This will fire event ``MapCreatedEvent`` on all other cluster nodes. "
+"Strings \"Very_Important_Map_In_User_Session\" and \"user-session-"
+"identifier-123\" are given as parameters in :literal:`onMapCreated()\\`` "
+"method. The event consumer code must know what to do with map with type "
+"\"Very_Important_Map_In_User_Session\". It may retrieve user session "
+"\"user-session-identifier-123\" and put this map in this session. It "
+"should be used to tell other nodes how to treat the event with a newly "
+"created map, and it should be stored in user session."
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:41
+msgid "Map Changes"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:43
+msgid ""
+"Changes to the map on one cluster will trigger ``AddValue`` or "
+"``RemoveValue`` events in eventbus. Stanzas sent between clusters will "
+"look something like this:"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:59
+msgid "Code to handle adding an item:"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:68
+msgid ""
+"Where the element 'event' is the UID, and the name string is the name of "
+"the map key/value pair."
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:70
+msgid ""
+"This example removes an element from the cluster map. Removal of items "
+"look similar:"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:82
+msgid "with the code also being similar:"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:93
+msgid "Map Destruction"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:95
+msgid ""
+"Java Garbage Collector will normally remove a local map if it is no "
+"longer used. Clustered maps however are not removed in this manner. These"
+" maps must be destroyed manually if they are no longer used:"
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:101
+msgid "Calling this, the map named clmap will be destroyed on each cluster node."
+msgstr ""
+
+#: ../../Tigase_Development/Cluster_Map_Interface.rst:103
+msgid ""
+"The event handler will catch event when map is destroyed on another "
+"cluster node:"
+msgstr ""
+

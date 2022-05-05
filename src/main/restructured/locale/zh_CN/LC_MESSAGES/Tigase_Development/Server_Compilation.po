@@ -1,0 +1,143 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-05 11:44-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Development/Server_Compilation.rst:2
+msgid "Server Compilation"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:4
+msgid ""
+"Tigase XMPP Server Project uses Maven for compilation. For details on "
+"Maven and it’s use, please see the `Maven Guide. <#usingMaven>`__"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:7
+msgid "Distribution Packages"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:9
+msgid "Once Compiled, Tigase creates two separate distribution archives:"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:11
+msgid ""
+"**-dist** is a minimal version containing only tigase-server, tigase-"
+"xmltools and tigase-utils, MUC, Pubsub, and HTTP."
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:13
+msgid ""
+"**-dist-max** is a version containing all additional tigase components as"
+" well as dependencies required by those components."
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:15
+msgid "They will be available as both zip and tarball."
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:18
+msgid "Building Server and Generating Packages"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:21
+msgid "Server binary and it’s documentation"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:23
+msgid "After cloning tigase-server repository:"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:30
+msgid "You compile server with maven :"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:36
+msgid "This will: - Build Tigase XMPP tigase-server jar in tigase-server/target."
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:38
+msgid ""
+"If you wish to include compilation of the documentation use "
+"*distribution* profile:"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:44
+msgid ""
+"This will - compile server binaries. - generate javadoc and manual "
+"documentation ``tigase-server/target/_docs`` directory."
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:47
+msgid "Server distribution packages"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:49
+msgid ""
+"Distribution building is handled by separate project (`Tigase Server "
+"Distribution <https://github.com/tigase/tigase-server-distribution>`__)"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:51
+msgid ""
+"In order to build distribution packages \\* clone tigase-server-"
+"distribution repository:"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:58
+msgid "and compile it using maven with *distribution* profile:"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:64
+msgid "This will:"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:66
+msgid ""
+"compile all documentation sources (including dependencies) and place them"
+" in ``tigase-server-distribution/target/_docs`` directory"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:68
+msgid ""
+"download all dependencies in defined versions and put them in ``tigase-"
+"server-distribution/target/dist/jars/`` directory."
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:70
+msgid ""
+"create both types of distribution packages (-dist and -dist-max) and "
+"place them in ``tigase-server-distribution/target/_dist/`` directory."
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:73
+msgid "Running Server"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:75
+msgid ""
+"Afterwards you can run the server with the regular shell script from "
+"within ``server`` module:"
+msgstr ""
+
+#: ../../Tigase_Development/Server_Compilation.rst:82
+msgid ""
+"Please bear in mind, that you need to provide correct setup in "
+"etc/config.tdsl configuration files for the server to work correctly."
+msgstr ""
+
