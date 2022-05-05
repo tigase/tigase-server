@@ -1,4 +1,4 @@
-asic Information
+Basic Information
 ========================
 
 Tigase Architecture

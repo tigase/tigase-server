@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-05 11:44-0700\n"
+"POT-Creation-Date: 2022-05-05 15:34-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Generated-By: Babel 2.9.1\n"
 
 #: ../../Tigase_Development/Basic_Information.rst:2
-msgid "asic Information"
+msgid "Basic Information"
 msgstr ""
 
 #: ../../Tigase_Development/Basic_Information.rst:5
@@ -299,4 +299,7 @@ msgid ""
 "element it contains (swap to/from values, put type=result attribute and "
 "others)."
 msgstr ""
+
+#~ msgid "asic Information"
+#~ msgstr ""
 
