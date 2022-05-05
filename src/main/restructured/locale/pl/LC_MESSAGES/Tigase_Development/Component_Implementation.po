@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-05 11:44-0700\n"
+"POT-Creation-Date: 2022-05-05 16:01-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,7 +82,7 @@ msgid "`Packet Filtering in Component <#packetfiltering>`__"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ #cil1"
+msgid "_ cil1"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:31
@@ -325,8 +325,8 @@ msgid ""
 "useful code."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ #cil2"
+#: ../../Tigase_Development/Component_Implementation.rst:182
+msgid ": _cil2:"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:185
@@ -421,7 +421,7 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ #cil3"
+msgid "_ cil3"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:273
@@ -576,7 +576,7 @@ msgid "**Example module code.**"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ #cil4"
+msgid "_ cil4"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:514
@@ -807,7 +807,7 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ #cil5"
+msgid "_ cil5"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:794
@@ -919,7 +919,7 @@ msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1017
 #: ../../Tigase_Development/Component_Implementation.rst:1315
-msgid ": _#cil6:"
+msgid ": _cil6:"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1020
@@ -1753,4 +1753,22 @@ msgid ""
 " ``RegistrarBean`` called to give component a way to unregister beans (if"
 " needed)."
 msgstr ""
+
+#~ msgid "_ #cil1"
+#~ msgstr ""
+
+#~ msgid "_ #cil2"
+#~ msgstr ""
+
+#~ msgid "_ #cil3"
+#~ msgstr ""
+
+#~ msgid "_ #cil4"
+#~ msgstr ""
+
+#~ msgid "_ #cil5"
+#~ msgstr ""
+
+#~ msgid ": _#cil6:"
+#~ msgstr ""
 
