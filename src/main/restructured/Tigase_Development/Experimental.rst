@@ -9,6 +9,7 @@ The guide contains description of non-standard or experimental functionality of 
 
 -  `Bosh Session Cache <#boshsessioncache>`__
 
+
 .. _dynamicRosters:
 
 Dynamic Rosters

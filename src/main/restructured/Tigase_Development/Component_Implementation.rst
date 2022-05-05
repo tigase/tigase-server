@@ -25,7 +25,7 @@ Creating components for Tigase server is an essential part of the server develop
 
 9. `Packet Filtering in Component <#packetfiltering>`__
 
-:_ #cil1:
+:_ cil1:
 
 Component Implementation - Lesson 1 - Basics
 ------------------------------------------------
@@ -179,7 +179,7 @@ If this is a case we can be sure that everything works as expected and all we no
 .. |commands list test 200| image:: ../../asciidoc/devguide/images/commands-list-test-200.png
 .. |service disco stats 200| image:: ../../asciidoc/devguide/images/service-disco-stats-200.png
 
-:_ #cil2:
+: _cil2:
 
 Component Implementation - Lesson 2 - Configuration
 ----------------------------------------------------------------
@@ -267,7 +267,7 @@ Of course we can do much more useful packet processing in the ``process(…​)`
 
    Here we used a setter **setPacketType(String[] packetTypes)** which is a setter for field **packetTypes**. Tigase Kernel will use it instead of assigning value directly to a field which gives up opportunity to convert value to different type and update other field - in our case we updated **CRITERIA** field which will result in change of packet types which for which method **void process(…​)** will be called.
 
-:_ #cil3:
+:_ cil3:
 
 Component Implementation - Lesson 3 - Multi-Threading
 -------------------------------------------------------------
@@ -508,7 +508,7 @@ Here is a code of an example component and module which uses all the API discuss
      }
    }
 
-:_ #cil4:
+:_ cil4:
 
 Component Implementation - Lesson 4 - Service Discovery
 ----------------------------------------------------------
@@ -788,7 +788,7 @@ Of course all these setting can be applied to any service discovery create or up
 .. |spam filtering disco small| image:: ../../asciidoc/devguide/images/spam-filtering-disco-small.png
 .. |spam filter counter small| image:: ../../asciidoc/devguide/images/spam-filter-counter-small.png
 
-:_ #cil5:
+:_ cil5:
 
 Component Implementation - Lesson 5 - Statistics
 ------------------------------------------------------
@@ -1014,7 +1014,7 @@ As you can see, the API for generating and presenting component statistics is ve
 
 .. |spam statitics small| image:: ../../asciidoc/devguide/images/spam-statitics-small.png
 
-: _#cil6:
+: _cil6:
 
 Component Implementation - Lesson 6 - Scripting Support
 ---------------------------------------------------------
@@ -1312,7 +1312,7 @@ Here is a complete code of the test component with the new method described at t
 .. |test comp newscript| image:: ../../asciidoc/devguide/images/test-comp-newscript.png
 .. |badwords list script| image:: ../../asciidoc/devguide/images/badwords-list-script.png
 
-: _#cil6:
+: _cil6:
 
 Component Implementation - Lesson 7 - Data Repository
 ---------------------------------------------------------------
