@@ -4,7 +4,7 @@ Tigase Documentation
 ===================================
 
 .. toctree::
-   :caption: Tigase Admistration Guide -Version 8.3.0
+   :caption: Tigase XMPP Server Distribution Administration Guide -Version 8.3.0
    :titlesonly:
 
    Tigase_Admistration/index.rst
