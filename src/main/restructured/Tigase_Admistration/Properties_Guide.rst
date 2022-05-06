@@ -1218,6 +1218,8 @@ To make the second component (PubSub) visible we would need to open another conn
 
 **Available since:** 5.0.0
 
+.. _virtHosts:
+
 default-virtual-host
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

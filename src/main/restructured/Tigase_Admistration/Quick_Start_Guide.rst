@@ -35,6 +35,8 @@ This is a set of documents allowing you to quickly start with our software. Ever
 
 -  `Running Tigase XMPP Server as a service <#tigaseScriptStart>`__
 
+.. _webinstall:
+
 Installation Using Web Installer
 -----------------------------------
 
@@ -211,6 +213,8 @@ From here, you have a few options how to run Tigase; ``run.bat`` will operate Ti
 Once this setup is finished, web installer will continue the same from `here <#connecttoWebInstall>`__.
 
 .. |web install 01| image:: ../../asciidoc/admin/images/admin/web-install-01.png
+
+.. _manualinstall:
 
 Manual Installation in Console Mode
 ----------------------------------------
@@ -529,6 +533,8 @@ The first 2 files are the most interesting for us: **tigase-console.log** and **
 
 Now you can connect with an XMPP client of your choice with the administrator account you setup earlier.
 
+.. _windowsInstallation:
+
 Windows Installation
 -----------------------
 
@@ -671,6 +677,8 @@ When the system is up and running you can connect with any XMPP client (Psi for 
 .. |sql9| image:: ../../asciidoc/admin/images/admin/sql9.JPG
 .. |sql10| image:: ../../asciidoc/admin/images/admin/sql10.JPG
 .. |sql11| image:: ../../asciidoc/admin/images/admin/sql11.JPG
+
+.. _setupTigaseServer:
 
 Tigase Server Network Instructions
 ------------------------------------
@@ -839,6 +847,9 @@ Both ports should be setup to use TCP only. If for any reason you want to make s
    .. code:: bash
 
       iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 5291
+
+
+.. _tigaseScriptStart:
 
 Tigase Script Selection
 --------------------------

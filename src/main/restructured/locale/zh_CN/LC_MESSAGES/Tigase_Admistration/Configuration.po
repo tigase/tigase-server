@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-05 11:44-0700\n"
+"POT-Creation-Date: 2022-05-05 17:04-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1585,8 +1585,8 @@ msgstr ""
 
 #: ../../Tigase_Admistration/Configuration.rst:976
 msgid ""
-"The :ref:`'default-virtual-host' <virtHosts>` property allows to define "
-"name of the single vhost domain which will be considered a default vhost "
+"The `'default-virtual-host' <#virtHosts>`_ property allows to define name"
+" of the single vhost domain which will be considered a default vhost "
 "domain for this installation. It allows you just to configure the domain "
 "name. Any additional configuration needs to be configured using ad-hoc "
 "commands."
@@ -1595,10 +1595,10 @@ msgstr ""
 #: ../../Tigase_Admistration/Configuration.rst:978
 msgid ""
 "Virtual hosts should be managed using ad-hoc commands or admin ui, visit "
-":ref:`Add and Manage Domains <addManageDomain>` for description of vhosts"
-" management process or visit :ref:`Specification for ad-hoc Commands Used"
-" to Manage Virtual Domains <ad-hocCommands>` for more information about "
-"ad-hoc commands."
+"`Add and Manage Domains <#addManageDomain>` for description of vhosts "
+"management process or visit `Specification for ad-hoc Commands Used to "
+"Manage Virtual Domains <#adhocCommands>` for more information about ad-"
+"hoc commands."
 msgstr ""
 
 #: ../../Tigase_Admistration/Configuration.rst:980
@@ -1612,8 +1612,8 @@ msgstr ""
 #: ../../Tigase_Admistration/Configuration.rst:982
 msgid ""
 "You may also want to reference the Vhosts API for additional information:"
-" - :ref:`API Description for Virtual Domains Management in Tigase Server "
-"<addManageDomain>`."
+" - `API Description for Virtual Domains Management in Tigase Server "
+"<#addManageDomain>`."
 msgstr ""
 
 #: ../../Tigase_Admistration/Configuration.rst:990
@@ -1634,7 +1634,7 @@ msgid ""
 "of Tigase XMPP Server it is possible to configure Virtual Host defaults "
 "using ad-hoc commands by modifying values for ``default`` using ad-hoc as"
 " described in `Specification for ad-hoc Commands Used to Manage Virtual "
-"Domains <#ad-hocCommands>`__."
+"Domains <#adhocCommands>`__."
 msgstr ""
 
 #: ../../Tigase_Admistration/Configuration.rst:1012
@@ -1644,35 +1644,35 @@ msgid ""
 " available at ``http://localhost:8080/admin/``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1015
+#: ../../Tigase_Admistration/Configuration.rst:1017
 msgid "Specification for ad-hoc Commands Used to Manage Virtual Domains"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1017
+#: ../../Tigase_Admistration/Configuration.rst:1019
 msgid ""
 "There are 3 ad-hoc commands for virtual domains management in the Tigase "
 "server:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1019
+#: ../../Tigase_Admistration/Configuration.rst:1021
 msgid ""
 "``VHOSTS_RELOAD`` used to reload virtual domains list from the repository"
 " (database)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1021
+#: ../../Tigase_Admistration/Configuration.rst:1023
 msgid ""
 "``VHOSTS_UPDATE`` used to add a new virtual domain or update information "
 "for existing one."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1023
+#: ../../Tigase_Admistration/Configuration.rst:1025
 msgid ""
 "``VHOSTS_REMOVE`` used to remove an existing virtual host from the "
 "running server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1025
+#: ../../Tigase_Admistration/Configuration.rst:1027
 msgid ""
 "Syntax of the commands follows the specification described in `XEP-0050 "
 "<http://xmpp.org/extensions/xep-0050.html>`__. Extra information required"
@@ -1680,7 +1680,7 @@ msgid ""
 "<http://xmpp.org/extensions/xep-0004.html>`__."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1027
+#: ../../Tigase_Admistration/Configuration.rst:1029
 msgid ""
 "All commands are accepted by the server only when send by the "
 "installation administrator. If the command is sent from any other account"
@@ -1689,7 +1689,7 @@ msgid ""
 "configuration file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1029
+#: ../../Tigase_Admistration/Configuration.rst:1031
 msgid ""
 "Commands are sent to the 'vhost-man' server component and the 'to' "
 "attribute of the stanza must contain a full JID of the VHostManager on "
@@ -1700,45 +1700,45 @@ msgid ""
 "'vhost-man@existing.domain.com'."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1032
+#: ../../Tigase_Admistration/Configuration.rst:1034
 msgid "Reloading the Domains List from the Database"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1034
+#: ../../Tigase_Admistration/Configuration.rst:1036
 msgid ""
 "In order to reload virtual domains from the permanent repository other "
 "than configuration file, you have to send ``VHOSTS_RELOAD`` ad-hoc "
 "command to the VHostManager on the server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1036
+#: ../../Tigase_Admistration/Configuration.rst:1038
 msgid "The reload command request is of the form:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1047
+#: ../../Tigase_Admistration/Configuration.rst:1049
 msgid ""
 "The server sends a response upon successful completion of the command "
 "with current number of virtual domains server by the installation:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1066
+#: ../../Tigase_Admistration/Configuration.rst:1068
 msgid ""
 "If the command is sent from an account other than admin, the server "
 "returns an error:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1085
+#: ../../Tigase_Admistration/Configuration.rst:1087
 msgid ""
 "The response doesn’t have any special meaning other then end-user "
 "information. The client may ignore the response as it is sent after the "
 "command has been executed."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1088
+#: ../../Tigase_Admistration/Configuration.rst:1090
 msgid "Adding a New Domain or Updating Existing One"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1090
+#: ../../Tigase_Admistration/Configuration.rst:1092
 msgid ""
 "In order to add a new domain or update existing one you have to send an "
 "ad-hoc command ``VHOSTS_UPDATE`` with at least one domain name in the "
@@ -1750,43 +1750,43 @@ msgid ""
 "parameters not specified yet."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1092
+#: ../../Tigase_Admistration/Configuration.rst:1094
 msgid "The domain add/update command request is of the form:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1114
+#: ../../Tigase_Admistration/Configuration.rst:1116
 msgid ""
 "Please note: Character case in the command field variable names does "
 "matter."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1116
-#: ../../Tigase_Admistration/Configuration.rst:1158
+#: ../../Tigase_Admistration/Configuration.rst:1118
+#: ../../Tigase_Admistration/Configuration.rst:1160
 msgid ""
 "Upon successful completion of the command the server sends a response "
 "back to the client with information of the existing number of virtual "
 "hosts on the server:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1136
+#: ../../Tigase_Admistration/Configuration.rst:1138
 msgid "Removing a Virtual Domain From the Server"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1138
+#: ../../Tigase_Admistration/Configuration.rst:1140
 msgid ""
 "In order to remove a virtual domain you have to send ``VHOSTS_REMOVE`` "
 "command to the server with the domain name."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1140
+#: ../../Tigase_Admistration/Configuration.rst:1142
 msgid "The domain remove command is sent by the client:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1178
+#: ../../Tigase_Admistration/Configuration.rst:1182
 msgid "Virtual Components for the Cluster Mode"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1180
+#: ../../Tigase_Admistration/Configuration.rst:1184
 msgid ""
 "Let’s assume you have a cluster installation and you want to include a "
 "component in your installation which doesn’t support the cluster mode "
@@ -1796,7 +1796,7 @@ msgid ""
 "connected to this one node only."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1182
+#: ../../Tigase_Admistration/Configuration.rst:1186
 msgid ""
 "Ideally you would like to have a mechanism to install it on one node and "
 "put some redirections on other nodes to forward all packets for this "
@@ -1806,7 +1806,7 @@ msgid ""
 "nodes."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1184
+#: ../../Tigase_Admistration/Configuration.rst:1188
 msgid ""
 "This is where the virtual components are handy. They are visible to users"
 " as a local normal component, they seem to be a real local component but "
@@ -1814,7 +1814,7 @@ msgid ""
 "the real component is working."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1186
+#: ../../Tigase_Admistration/Configuration.rst:1190
 msgid ""
 "Virtual component is a very lightweight ServerComponent implementation in"
 " Tigase server. It can pretend to be any kind of component and can "
@@ -1823,7 +1823,7 @@ msgid ""
 "component protocol (XEP-0114)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1188
+#: ../../Tigase_Admistration/Configuration.rst:1192
 msgid ""
 "Configuration is very simple and straightforward, in fact it is very "
 "similar to configuration of any Tigase component. You set a real "
@@ -1833,146 +1833,146 @@ msgid ""
 " name of the component is: ``muc``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1194
+#: ../../Tigase_Admistration/Configuration.rst:1198
 msgid ""
 "This is pretty much all you need to load a virtual component. A few other"
 " options are needed to point to correct destination addresses for packets"
 " forwarding and to set correct service discovery parameters:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1208
+#: ../../Tigase_Admistration/Configuration.rst:1212
 msgid "That’s it."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1211
+#: ../../Tigase_Admistration/Configuration.rst:1215
 msgid "Settings for Custom Logging in Tigase"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1213
+#: ../../Tigase_Admistration/Configuration.rst:1217
 msgid ""
 "Logging can be an important tool to monitor your server’s health and "
 "performance. Logging may be controlled and customized on a per-component "
 "basis."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1215
+#: ../../Tigase_Admistration/Configuration.rst:1219
 msgid ""
 "A ``logging`` bean has been implemented to allow more flexible "
 "configuration of logging in the Tigase XMPP Server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1218
+#: ../../Tigase_Admistration/Configuration.rst:1222
 msgid "Configuring logging"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1221
+#: ../../Tigase_Admistration/Configuration.rst:1225
 msgid "In the config file"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1223
+#: ../../Tigase_Admistration/Configuration.rst:1227
 msgid ""
 "Default logging configuration for your installation is kept in the config"
 " file and it may be adjusted there."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1254
+#: ../../Tigase_Admistration/Configuration.rst:1258
 msgid ""
 "You only need to specify the settings you wish to customize, otherwise "
 "they will be left as default."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1256
+#: ../../Tigase_Admistration/Configuration.rst:1260
 msgid ""
 "``packet-debug-full`` - controls whether log entries should be obfuscated"
 " (all CData of all elements will be replaced by ``CData size: <length in "
 "bytes of the replaced string>``) or not; default: ``false``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1258
+#: ../../Tigase_Admistration/Configuration.rst:1262
 msgid ""
 "``rootLevel`` - Defines the root level of logging for all components not "
 "otherwise defined. Default is CONFIG"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1260
+#: ../../Tigase_Admistration/Configuration.rst:1264
 msgid ""
 "``loggers`` - Defines the level of logging for packages running in tigase"
 " server. This is similar to the --debug setting, however you must use "
 "``tigase.{package}`` format. Default is NONE."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1262
+#: ../../Tigase_Admistration/Configuration.rst:1266
 msgid ""
 "``handlers`` - Defines the level of logging for File output and Console "
 "output."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1264
+#: ../../Tigase_Admistration/Configuration.rst:1268
 msgid ""
 "``FileHandler`` - is the file output for log files, with the following "
 "options:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1266
+#: ../../Tigase_Admistration/Configuration.rst:1270
 msgid "``level`` - specifies the level of logs to be written, default is ALL."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1268
+#: ../../Tigase_Admistration/Configuration.rst:1272
 msgid ""
 "``append`` - whether to append to the log or replace it during restart. "
 "Default is true."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1270
+#: ../../Tigase_Admistration/Configuration.rst:1274
 msgid ""
 "``count`` - number of individual log files to keep at set limit. Default "
 "is 5. (default settings will continue appending logs until 5 files at "
 "10MB are reached, then the oldest file will be overwritten.)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1272
-#: ../../Tigase_Admistration/Configuration.rst:1282
+#: ../../Tigase_Admistration/Configuration.rst:1276
+#: ../../Tigase_Admistration/Configuration.rst:1286
 msgid ""
 "``formatter`` - specifies the package to format logging output. Default "
 "is tigase.util.LogFormatter."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1274
+#: ../../Tigase_Admistration/Configuration.rst:1278
 msgid "``limit`` - Byte limit for each log file. Default is 10000000 or 10MB."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1276
+#: ../../Tigase_Admistration/Configuration.rst:1280
 msgid ""
 "``pattern`` - Directory and filename of the log file with respect to the "
 "Tigase installation directory. Default is logs/tigase.log."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1278
+#: ../../Tigase_Admistration/Configuration.rst:1282
 msgid ""
 "``ConsoleHandler`` - Determines the formatting for Tigase output to "
 "console."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1280
+#: ../../Tigase_Admistration/Configuration.rst:1284
 msgid "``level`` - specifies the level of logs to be written, default is WARNING."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1286
+#: ../../Tigase_Admistration/Configuration.rst:1290
 msgid "Disabling colored output"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1288
+#: ../../Tigase_Admistration/Configuration.rst:1292
 msgid ""
 "If for some reason you don’t want colored output in the logs you can "
 "disable it by setting ``disable_logger_color`` to ``true``. For "
 "convenience, you can uncomment in ``etc/tigase.conf`` following line:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1295
+#: ../../Tigase_Admistration/Configuration.rst:1299
 msgid "Ad-hoc changes to the logging configuration"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1297
+#: ../../Tigase_Admistration/Configuration.rst:1301
 msgid ""
 "It is also possible to use ad-hoc command named **Set package logging** "
 "with id ``logging-set`` available at ``message-router@domain`` (where "
@@ -1980,20 +1980,20 @@ msgid ""
 "runtime without requirement of restarting the Tigase XMPP Server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1299
-#: ../../Tigase_Admistration/Configuration.rst:1333
+#: ../../Tigase_Admistration/Configuration.rst:1303
+#: ../../Tigase_Admistration/Configuration.rst:1337
 msgid "**Note**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1301
+#: ../../Tigase_Admistration/Configuration.rst:1305
 msgid "Those changes will be applied to this single cluster node."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1307
+#: ../../Tigase_Admistration/Configuration.rst:1311
 msgid "Using Admin UI"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1309
+#: ../../Tigase_Admistration/Configuration.rst:1313
 msgid ""
 "If your Tigase XMPP Server is running with HTTP server and with Admin UI "
 "enabled, then the easiest way to change logging configuration is by using"
@@ -2002,31 +2002,31 @@ msgid ""
 "you a form which you need to fill in with following fields:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1311
-#: ../../Tigase_Admistration/Configuration.rst:1322
+#: ../../Tigase_Admistration/Configuration.rst:1315
+#: ../../Tigase_Admistration/Configuration.rst:1326
 msgid ""
 "``Package name`` - should contain Java package or class name for which "
 "you wish to change logging level"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1313
-#: ../../Tigase_Admistration/Configuration.rst:1324
+#: ../../Tigase_Admistration/Configuration.rst:1317
+#: ../../Tigase_Admistration/Configuration.rst:1328
 msgid ""
 "``Level`` - select a logging level you wish to apply to entered package "
 "name *(``OFF`` means that logging will be disabled)*"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1315
+#: ../../Tigase_Admistration/Configuration.rst:1319
 msgid ""
 "After pressing ``Submit`` your form will be passed to the server for "
 "validation and selected changes will be applied."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1318
+#: ../../Tigase_Admistration/Configuration.rst:1322
 msgid "Using ad-hoc command"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1320
+#: ../../Tigase_Admistration/Configuration.rst:1324
 msgid ""
 "If you have access to the XMPP admin account of Tigase XMPP Server and "
 "XMPP client which supports ad-hoc command execution, you may connect with"
@@ -2039,30 +2039,30 @@ msgid ""
 "fields:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1326
+#: ../../Tigase_Admistration/Configuration.rst:1330
 msgid ""
 "After submitting the form, Tigase XMPP Server will validate your request "
 "and update logging configuration."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1329
+#: ../../Tigase_Admistration/Configuration.rst:1333
 msgid "Using REST API"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1331
+#: ../../Tigase_Admistration/Configuration.rst:1335
 msgid ""
 "If you have Tigase XMPP Server with REST API enabled, you can use it for "
 "configuring logging of Tigase XMPP Server as well."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1335
+#: ../../Tigase_Admistration/Configuration.rst:1339
 msgid ""
 "As with all HTTP REST API requests you will require a valid API key and "
 "in this case a valid admin credentials to authenticate a HTTP request "
 "using Basic HTTP Authentication."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1337
+#: ../../Tigase_Admistration/Configuration.rst:1341
 msgid ""
 "All you need to to is to send a HTTP POST request to ``/rest/adhoc"
 "/message-router@domain.com`` (where domain is your server name) with "
@@ -2070,18 +2070,18 @@ msgid ""
 "payload to set logging level of ``tigase.server`` package to ``ALL``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1360
+#: ../../Tigase_Admistration/Configuration.rst:1364
 msgid "Alternate loggers in Tigase - Logback"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1362
+#: ../../Tigase_Admistration/Configuration.rst:1366
 msgid ""
 "It’s possible to use Logback for logging purposes, which offers certain "
 "interesting features (async logging, better control over log rotation, on"
 " the fly changing logging configuration)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1364
+#: ../../Tigase_Admistration/Configuration.rst:1368
 msgid ""
 "Requirements: \\* slf4j-api.jar (provided in ``-dist-max`` package) \\* "
 "jul-to-slf4j.jar (provided in ``-dist-max`` package) \\* desired logger "
@@ -2089,18 +2089,18 @@ msgid ""
 "core.jar`` (provided in -dist-max)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1366
+#: ../../Tigase_Admistration/Configuration.rst:1370
 msgid ""
 "Configuration boils down to adding slf4j bridge handler to the list of "
 "build-in Java Logger handlers configuration, which in Tigase translates "
 "to adding following line to ``etc/config.tdsl``:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1374
+#: ../../Tigase_Admistration/Configuration.rst:1378
 msgid "After that ``etc/logback.xml`` configuration file will be used."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1376
+#: ../../Tigase_Admistration/Configuration.rst:1380
 msgid ""
 "As stated in [jul-to-slf4j bridge documentation](\\ "
 "http://www.slf4j.org/legacy.html#jul-to-slf4j) it’s essential to include "
@@ -2108,28 +2108,28 @@ msgid ""
 "log statements:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1385
+#: ../../Tigase_Admistration/Configuration.rst:1389
 msgid ""
 "NOTE, that it may be prudent to remove configuration of all old JUL "
 "logger by appending following to ``etc/logback.xml`` configuration:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1395
+#: ../../Tigase_Admistration/Configuration.rst:1399
 msgid "Tigase Advanced Options"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1397
+#: ../../Tigase_Admistration/Configuration.rst:1401
 msgid ""
 "This section is designed to include a number of advanced configuration "
 "options available within Tigase, but may not have a relevant section yet "
 "to house them."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1400
+#: ../../Tigase_Admistration/Configuration.rst:1404
 msgid "Using CAPTCHA for in-band registration"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1402
+#: ../../Tigase_Admistration/Configuration.rst:1406
 msgid ""
 "To reduce false or spam registrations to Tigase XMPP Server, there is now"
 " the ability to add CAPTCHA forms as a part of the in-band registration. "
@@ -2138,27 +2138,27 @@ msgid ""
 "option of enabling registration in config.tdsl:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1416
+#: ../../Tigase_Admistration/Configuration.rst:1420
 msgid ""
 "3 unsuccessful attempts will result in the captcha being invalidated and "
 "a client will receive an error message."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1420
+#: ../../Tigase_Admistration/Configuration.rst:1424
 msgid "Enabling Empty Nicknames"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1422
+#: ../../Tigase_Admistration/Configuration.rst:1426
 msgid ""
 "Tigase can now support users with empty nicknames. This can be enabled by"
 " adding the following code in config.tdsl."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1434
+#: ../../Tigase_Admistration/Configuration.rst:1438
 msgid "Enable Silent Ignore on Packets Delivered to Unavailable Resources"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1436
+#: ../../Tigase_Admistration/Configuration.rst:1440
 msgid ""
 "You can now have Tigase ignore packets delivered to unavailable resources"
 " to avoid having a packet bounce around and create unnecessary traffic. "
@@ -2166,23 +2166,23 @@ msgid ""
 "within the AMP component using the following settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1438
+#: ../../Tigase_Admistration/Configuration.rst:1442
 msgid "Globally:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1446
+#: ../../Tigase_Admistration/Configuration.rst:1450
 msgid "Message Processing Only:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1456
+#: ../../Tigase_Admistration/Configuration.rst:1460
 msgid "AMP Component:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1466
+#: ../../Tigase_Admistration/Configuration.rst:1470
 msgid "Mechanism to count errors within Tigase"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1468
+#: ../../Tigase_Admistration/Configuration.rst:1472
 msgid ""
 "A new processor within statistics has been added to count the number of "
 "errors that Tigase returns. This processor, named ``error-counter``, will"
@@ -2193,35 +2193,35 @@ msgid ""
 "must ensure the processor is included in your ``sess-man`` configuration:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1477
+#: ../../Tigase_Admistration/Configuration.rst:1481
 msgid "Including stream errors"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1479
+#: ../../Tigase_Admistration/Configuration.rst:1483
 msgid ""
 "Stream ``ERROR`` packets are not included in the above counter by default"
 " as they are processed separately. To enable this to be added to the "
 "counter, the following line must be in your ``config.tdsl`` file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1490
+#: ../../Tigase_Admistration/Configuration.rst:1494
 msgid "Stream resumption default & max-timeout"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1492
+#: ../../Tigase_Admistration/Configuration.rst:1496
 msgid ""
 "``SteamManagementIOProcessor`` now has a setting that can be used to "
 "change the maximum timeout time it will wait for reconnection if a client"
 " does not send a time to wait. Two settings are now available:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1502
+#: ../../Tigase_Admistration/Configuration.rst:1506
 msgid ""
 "The above setting in ``config.tdsl`` file will change the default timeout"
 " period to 90 seconds."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1512
+#: ../../Tigase_Admistration/Configuration.rst:1516
 msgid ""
 "This setting will set the maximum time allowed for stream resumption to "
 "900 seconds. This can be handy if you expect a number of mobile phones to"
@@ -2229,11 +2229,11 @@ msgid ""
 "back and forth."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1515
+#: ../../Tigase_Admistration/Configuration.rst:1519
 msgid "Automatic subscription approval"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1517
+#: ../../Tigase_Admistration/Configuration.rst:1521
 msgid ""
 "You may setup a server to automatically approve presence subscriptions or"
 " roster authorizations for all users. Say you were hosting bots and "
@@ -2241,24 +2241,24 @@ msgid ""
 "settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1530
+#: ../../Tigase_Admistration/Configuration.rst:1534
 msgid ""
 "Both of these settings are false by default, and you may use them "
 "together or separately."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1536
+#: ../../Tigase_Admistration/Configuration.rst:1540
 msgid "The following behavior is followed when they are both activated:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1538
+#: ../../Tigase_Admistration/Configuration.rst:1542
 msgid ""
 "Upon sending a subscription request - Both contacts will each others' "
 "subscription and be added to each others' roster. Presence information "
 "will immediately be exchanged between both parties."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1540
+#: ../../Tigase_Admistration/Configuration.rst:1544
 msgid ""
 "Upon sending presence with type either unsubscribe or unsubscribed "
 "follows the rules defined in RFC regarding processing of these stanzas "
@@ -2268,18 +2268,18 @@ msgid ""
 "reflect changes to presence in user roster in a seamless manner."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1542
+#: ../../Tigase_Admistration/Configuration.rst:1546
 msgid ""
 "Simply adding an item to the roster (i.e. with <iq/> stanza with correct "
 "semantics) will also cause an automatic subscription between the user and"
 " the contact in a matter explained above."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1545
+#: ../../Tigase_Admistration/Configuration.rst:1549
 msgid "Abuse Contacts"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1547
+#: ../../Tigase_Admistration/Configuration.rst:1551
 msgid ""
 "Tigase has support for `XEP-0128: Service Discovery Extensions "
 "<https://xmpp.org/extensions/xep-0128.html>`__ for providing additional "
@@ -2290,7 +2290,7 @@ msgid ""
 "server administrators or abuse response team."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1549
+#: ../../Tigase_Admistration/Configuration.rst:1553
 msgid ""
 "To set abuse contact details you should set ``disco-extensions`` in "
 "property in ``etc/config.tdsl`` file with subproperty ``abuse-addresses``"
@@ -2298,11 +2298,11 @@ msgid ""
 "``mailto:`` and for XMPP address you need to prefix it with ``xmpp``):"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1558
+#: ../../Tigase_Admistration/Configuration.rst:1562
 msgid "Push Notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1560
+#: ../../Tigase_Admistration/Configuration.rst:1564
 msgid ""
 "Tigase XMPP Server comes with support for `XEP-0357: Push Notifications "
 "<https://xmpp.org/extensions/xep-0357.html>`__ allowing user to receive "
@@ -2310,43 +2310,43 @@ msgid ""
 "connected enabled by default."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1563
+#: ../../Tigase_Admistration/Configuration.rst:1567
 msgid "Disabling notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1565
+#: ../../Tigase_Admistration/Configuration.rst:1569
 msgid "You can disable this feature with following settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1573
+#: ../../Tigase_Admistration/Configuration.rst:1577
 msgid "Removing body and sender from notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1575
+#: ../../Tigase_Admistration/Configuration.rst:1579
 msgid ""
 "If you wish Tigase XMPP Server not to forward body of the message or "
 "sender details in the push notification you can disable that with "
 "following settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1586
+#: ../../Tigase_Admistration/Configuration.rst:1590
 msgid "Overriding body of notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1588
+#: ../../Tigase_Admistration/Configuration.rst:1592
 msgid ""
 "If you wish Tigase XMPP Server to override forward body of the encrypted "
 "message in the push notification (for example to avoid indicating that "
 "there is an \"error\") you can do that with following settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1599
+#: ../../Tigase_Admistration/Configuration.rst:1603
 msgid ""
 "Enabling push notifications for messages received when all resources are "
 "AWAY/XA/DND"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1601
+#: ../../Tigase_Admistration/Configuration.rst:1605
 msgid ""
 "Push notifications may also be sent by Tigase XMPP Server when new "
 "message is received and all resources of recipient are in AWAY/XA/DND "
@@ -2354,7 +2354,7 @@ msgid ""
 " push delivery extension named ``away`` in default push processor:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1611
+#: ../../Tigase_Admistration/Configuration.rst:1615
 msgid ""
 "As this behaviour may not be expected by users and users need a "
 "compatible XMPP client to properly handle this notifications (XMPP client"
@@ -2365,15 +2365,58 @@ msgid ""
 "server, as in following example:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1613
+#: ../../Tigase_Admistration/Configuration.rst:1617
 msgid "**Enabling Push notifications for away/xa/dnd account.**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration.rst:1625
+#: ../../Tigase_Admistration/Configuration.rst:1629
 msgid ""
 "If later on, user decides to disable notification for account in "
 "away/xa/dnd state, it may disable push notifications or once again send "
 "stanza to enable push notification but without ``away`` attribute being "
 "set:"
 msgstr ""
+
+#~ msgid ""
+#~ "The :ref:`'default-virtual-host' <virtHosts>`"
+#~ " property allows to define name of"
+#~ " the single vhost domain which will"
+#~ " be considered a default vhost domain"
+#~ " for this installation. It allows you"
+#~ " just to configure the domain name."
+#~ " Any additional configuration needs to "
+#~ "be configured using ad-hoc commands."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Virtual hosts should be managed using"
+#~ " ad-hoc commands or admin ui, "
+#~ "visit :ref:`Add and Manage Domains "
+#~ "<addManageDomain>` for description of vhosts"
+#~ " management process or visit "
+#~ ":ref:`Specification for ad-hoc Commands "
+#~ "Used to Manage Virtual Domains <ad-"
+#~ "hocCommands>` for more information about "
+#~ "ad-hoc commands."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You may also want to reference the"
+#~ " Vhosts API for additional information: "
+#~ "- :ref:`API Description for Virtual "
+#~ "Domains Management in Tigase Server "
+#~ "<addManageDomain>`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "After initial definition of default "
+#~ "configuration or after first startup of"
+#~ " Tigase XMPP Server it is possible"
+#~ " to configure Virtual Host defaults "
+#~ "using ad-hoc commands by modifying "
+#~ "values for ``default`` using ad-hoc "
+#~ "as described in `Specification for "
+#~ "ad-hoc Commands Used to Manage "
+#~ "Virtual Domains <#ad-hocCommands>`__."
+#~ msgstr ""
 

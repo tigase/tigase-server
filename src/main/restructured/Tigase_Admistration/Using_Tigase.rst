@@ -475,6 +475,8 @@ Inside the Tigase server `scripts/ <https://github.com/tigase/tigase-server/blob
 
 Any comments or suggestions, as usual, are very much appreciated.
 
+.. _addManageDomain:
+
 Add and Manage Domains (VHosts)
 ------------------------------------
 
