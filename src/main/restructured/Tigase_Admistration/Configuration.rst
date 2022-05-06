@@ -973,13 +973,13 @@ Tigase server supports multiple virtual hosts in a single server installation. V
 
 This document describes how virtual hosts work in Tigase server and how to get the most out of this feature in your installation.
 
-The :ref:`'default-virtual-host' <virtHosts>` property allows to define name of the single vhost domain which will be considered a default vhost domain for this installation. It allows you just to configure the domain name. Any additional configuration needs to be configured using ad-hoc commands.
+The `'default-virtual-host' <#virtHosts>`_ property allows to define name of the single vhost domain which will be considered a default vhost domain for this installation. It allows you just to configure the domain name. Any additional configuration needs to be configured using ad-hoc commands.
 
-Virtual hosts should be managed using ad-hoc commands or admin ui, visit :ref:`Add and Manage Domains <addManageDomain>` for description of vhosts management process or visit :ref:`Specification for ad-hoc Commands Used to Manage Virtual Domains <ad-hocCommands>` for more information about ad-hoc commands.
+Virtual hosts should be managed using ad-hoc commands or admin ui, visit `Add and Manage Domains <#addManageDomain>` for description of vhosts management process or visit `Specification for ad-hoc Commands Used to Manage Virtual Domains <#adhocCommands>` for more information about ad-hoc commands.
 
 If you have components that may not be able to handle multiple vhosts or cluster mode, we have developed a virtual component solution as well, details in the `Virtual Components for the Tigase Cluster <#virtualComponents>`__ section.
 
-You may also want to reference the Vhosts API for additional information: - :ref:`API Description for Virtual Domains Management in Tigase Server <addManageDomain>`.
+You may also want to reference the Vhosts API for additional information: - `API Description for Virtual Domains Management in Tigase Server <#addManageDomain>`.
 
 .. **Tip**::
 
@@ -1007,9 +1007,11 @@ It’s possible to specify initial default configuration for all Virtual Host in
        }
    }
 
-After initial definition of default configuration or after first startup of Tigase XMPP Server it is possible to configure Virtual Host defaults using ad-hoc commands by modifying values for ``default`` using ad-hoc as described in `Specification for ad-hoc Commands Used to Manage Virtual Domains <#ad-hocCommands>`__.
+After initial definition of default configuration or after first startup of Tigase XMPP Server it is possible to configure Virtual Host defaults using ad-hoc commands by modifying values for ``default`` using ad-hoc as described in `Specification for ad-hoc Commands Used to Manage Virtual Domains <#adhocCommands>`__.
 
 Alternatively, you may edit default Virtual Host configuration (configuration for domain ``default``) using Admin UI which by default is available at ``http://localhost:8080/admin/``.
+
+.. _adhocCommands:
 
 Specification for ad-hoc Commands Used to Manage Virtual Domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1173,6 +1175,8 @@ Upon successful completion of the command the server sends a response back to th
        </x>
      </command>
    </iq>
+
+.. _virtualComponents:
 
 Virtual Components for the Cluster Mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
