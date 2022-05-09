@@ -3,7 +3,7 @@
    :titlesonly:
    :numbered:
 
-   User_Guide
+   User/User_Guide
    About_Tigase_XMPP_Server
    Licensing_Open_Source
    Tigase_Server_Binary_Updates
