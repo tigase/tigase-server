@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 public class XMPPDomBuilderHandler<RefObject>
 		implements SimpleHandler {
 
-	private static final Logger log = Logger.getLogger(XMPPDomBuilderHandler.class.getName());
+	private static final Logger log = Logger.getLogger("tigase.debug.xmpp.XMPPDomBuilderHandler");
 
 	private static final String ELEM_STREAM_STREAM = "stream:stream";
 	private static ElementFactory defaultFactory = new DefaultElementFactory();
@@ -189,9 +189,8 @@ public class XMPPDomBuilderHandler<RefObject>
 	@Override
 	public void startElement(StringBuilder name, StringBuilder[] attr_names, StringBuilder[] attr_values) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.finest("Start element name: " + name);
-			log.finest("Element attributes names: " + Arrays.toString(attr_names));
-			log.finest("Element attributes values: " + Arrays.toString(attr_values));
+			log.finest("Start element name: " + name + ", element attributes names: " + Arrays.toString(attr_names) +
+							   ", element attributes values: " + Arrays.toString(attr_values));
 		}
 
 		// Look for 'xmlns:' declarations:
