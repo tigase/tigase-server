@@ -4,14 +4,15 @@
    :numbered:
 
    User/User_Guide
-   About_Tigase_XMPP_Server
+   XMPP_Server/About_Tigase_XMPP_Server
    Licensing_Open_Source
    Tigase_Server_Binary_Updates
-   Quick_Start_Guide
-   Configuration
+   Guide/Intro
+   Configuration/Config
    Security
    Database_Management
    Components
    Using_Tigase
    Statistics_Description
    Properties_Guide
+
