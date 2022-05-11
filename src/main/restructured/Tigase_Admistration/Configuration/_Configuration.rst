@@ -12,7 +12,7 @@ When the user tries to setup the client for the first time he comes across 2 con
 .. include:: Startup_Files.rst
 .. include:: Settings_for_High_Load_Systems.rst
 .. include:: JVM_settings.rst
-.. include:: Session_Manager.rst  
+.. include:: Session_Manager.inc  
 .. include:: Vhosts.rst
 .. include:: Logging.rst
 .. include:: Advanced_Options.rst

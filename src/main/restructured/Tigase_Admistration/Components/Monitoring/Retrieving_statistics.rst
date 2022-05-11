@@ -69,8 +69,8 @@ It takes following parameters:
 
 -  ``loadhistory``\ (bool) - indicates whether or not load statistics history from server (if such is enabled in Tigase)
 
-.. |roster-discovery| image:: ../../../../asciidoc/admin/images/admin/monitoring_xmpp_1.png
-.. |discovery-stats| image:: ../../../../asciidoc/admin/images/admin/monitoring_xmpp_2.png
-.. |server-stats| image:: ../../../../asciidoc/admin/images/admin/monitoring_xmpp_3.png
-.. |jconsole| image:: ../../../../asciidoc/admin/images/admin/monitoring_jmx_jconsole_1.png
-.. |jconsole-1| image:: ../../../../asciidoc/admin/images/admin/monitoring_jmx_jconsole_2.png
+.. |roster-discovery| image:: /../asciidoc/admin/images/admin/monitoring_xmpp_1.png
+.. |discovery-stats| image:: /../asciidoc/admin/images/admin/monitoring_xmpp_2.png
+.. |server-stats| image:: /../asciidoc/admin/images/admin/monitoring_xmpp_3.png
+.. |jconsole| image:: /../asciidoc/admin/images/admin/monitoring_jmx_jconsole_1.png
+.. |jconsole-1| image:: /../asciidoc/admin/images/admin/monitoring_jmx_jconsole_2.png
