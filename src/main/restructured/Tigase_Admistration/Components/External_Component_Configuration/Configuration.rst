@@ -53,5 +53,5 @@ Additional options may be left with defaults.
 
 Later on if you would like to modify this values, you can do that using Admin UI by clicking on ``Configuration`` and ``Remove an item`` or ``Update item configuration`` at ``ext`` component or by execution corresponding ad-hoc commands on ``ext`` component using ad-hoc capable XMPP client, ie. `Psi <http://psi-im.org>`__.
 
-.. |adminui ext add item button| image:: ../../../../asciidoc/admin/images/admin/adminui_ext_add_item_button.png
-.. |adminui ext add item form| image:: ../../../../asciidoc/admin/images/admin/adminui_ext_add_item_form.png
+.. |adminui ext add item button| image:: /../asciidoc/admin/images/admin/adminui_ext_add_item_button.png
+.. |adminui ext add item form| image:: /../asciidoc/admin/images/admin/adminui_ext_add_item_form.png

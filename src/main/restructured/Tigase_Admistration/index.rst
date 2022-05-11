@@ -9,7 +9,7 @@
    Tigase_Server_Binary_Updates
    Guide/Intro
    Configuration/_Configuration
-   Security/_Secruity
+   Security/_Security
    Database_Management/Management
    Components/_components
    Using_Tigase/_using_tigase
