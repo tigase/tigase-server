@@ -1,0 +1,15 @@
+.. include:: Components.rst
+.. include:: Advanced_Message_Processing.rst
+.. include:: Monitoring/Monitoring.rst
+.. include:: Monitoring/Setting_up.rst
+.. include:: Monitoring/Retrieving_statistics.rst
+.. include:: Monitoring/MonitorComponent.rst
+.. include:: Monitoring/Statistics_Logger_Config.rst
+.. include:: Server_to_Server_Protocol.rst
+.. include:: Load_Balancing.rst
+.. include:: External_Component_Configuration/Intro.rst
+.. include:: External_Component_Configuration/Configuration.rst
+.. include:: External_Component_Configuration/Tigase_as_External.rst
+.. include:: External_Component_Configuration/Load_Balancing.rst
+.. include:: C2S.rst
+.. include:: External_Service_Discovery_Component.rst

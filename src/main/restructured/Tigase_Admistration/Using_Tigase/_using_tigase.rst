@@ -1,0 +1,14 @@
+.. include:: Intro.rst
+.. include:: Offline_Messages.rst
+.. include:: LastActivity.rst 
+.. include:: Log_Guide.rst 
+.. include:: Debugging_Tigase.rst 
+.. include:: Basic_System_Checks.rst 
+.. include:: Virtual_Domains.rst 
+.. include:: Presence_Forwarding.rst 
+.. include:: Watchdog.rst 
+.. include:: Tips_and_Tricks.rst 
+.. include:: Licensing.rst 
+.. include:: Clustering.rst 
+.. include:: Anonymous_Users.rst 
+.. include:: Scripting/Scripting_Support.rst
