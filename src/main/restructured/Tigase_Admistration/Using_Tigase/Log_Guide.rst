@@ -1,3 +1,5 @@
+.. _logs:
+
 Tigase Log Guide
 --------------------
 

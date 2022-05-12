@@ -29,12 +29,12 @@ This will:
 Shutdown statistics
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Upon shutdown, statistics for the server’s runtime will be appended to the log file. For a description of the statistics and what they mean, refer to the `Statistics Description <#statsticsDescription>`__ portion of the documentation.
+Upon shutdown, statistics for the server’s runtime will be appended to the log file. For a description of the statistics and what they mean, refer to the :ref:`Statistics Description<statsticsDescription>` portion of the documentation.
 
 Shutdown StackTrace Dump
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To aid with troubleshooting purposes, the full stacktrace will be dumped to a seperate file located at $serverdir/logs/threads-dump.log.# Stacktrace logs will follow the same log file numbering scheme described in `Log file description <#logs>`__.
+To aid with troubleshooting purposes, the full stacktrace will be dumped to a seperate file located at $serverdir/logs/threads-dump.log.# Stacktrace logs will follow the same log file numbering scheme described in :ref:`Log file description<logs>`.
 
 This feature is enabled by default, however you may disable this by adding the following to your ``config.tdsl`` file:
 
