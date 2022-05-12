@@ -1,7 +1,7 @@
 .. _windowsInstallation:
 
 Windows Installation
------------------------
+----------------------------------
 
 Tigase XMPP Server can also work on Microsoft Windows systems and servers, although some slight modifications may be necessary to get things ready to run.
 
