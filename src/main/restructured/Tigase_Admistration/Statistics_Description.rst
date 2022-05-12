@@ -1,3 +1,5 @@
+.. _statsticsDescription:
+
 Appendix I - Statistics description
 ==========================================
 
