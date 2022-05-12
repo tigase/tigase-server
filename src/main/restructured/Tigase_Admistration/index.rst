@@ -1,6 +1,6 @@
 .. toctree::
    :caption: Tigase Administration Guide -Version 8.3.0
-   :titlesonly:
+   :maxdepth: 2
    :numbered:
 
    Tigase_User_Guide/User_Guide

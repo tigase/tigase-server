@@ -1,6 +1,6 @@
 .. toctree::
    :caption: Tigase Development Guide -Version 8.3.0
-   :titlesonly:
+   :maxdepth: 2
    :numbered:
 
    Basic_Information
