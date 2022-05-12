@@ -7,7 +7,7 @@ Tigase Auth Connector (DEPRECATED)
 
     Tigase Auth connector is **DEPRECATED** as of version 8.0.0 and will be removed in future releases
 
-The Tigase Auth connector with shortcut name: **tigase-auth** is implemented in the class: `tigase.db.jdbc.TigaseAuth <https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/db/jdbc/TigaseAuth.java>`__. It allows you to connect to any external database to perform user authentication. You can find more details how to setup a custom connector in the `Custom Authentication Connectors <#customAuthentication>`__ guide.
+The Tigase Auth connector with shortcut name: **tigase-auth** is implemented in the class: `tigase.db.jdbc.TigaseAuth <https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/db/jdbc/TigaseAuth.java>`__. It allows you to connect to any external database to perform user authentication. You can find more details how to setup a custom connector in the :ref:`Custom Authentication Connectors<customAuthentication>` guide.
 
 To make this connector working you have to prepare your database to offer set of stored procedures for Tigase server to perform all the authentication actions. The best description is the example schema with all the stored procedures defined - please refer to the Tigase repositories for the schema definition files (each component has it’s dedicated schema). For example:
 

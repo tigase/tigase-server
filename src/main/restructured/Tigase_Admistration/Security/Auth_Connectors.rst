@@ -1,3 +1,5 @@
+.. _customAuthentication:
+
 Custom Authentication Connectors
 -------------------------------------
 
@@ -13,9 +15,9 @@ At the moment Tigase offers following authentication connectors:
 
 -  ``drupal`` - is the authentication connector used to integrate the Tigase server with `Drupal CMS <http://drupal.org/>`__.
 
--  ``tigase-custom`` - is the authentication connector which can be used with any database. Unlike the 'tigase-auth' connector it allows you to define SQL queries in the configuration file. The advantage of this implementation is that you don’t have to touch your database. You can use either simple plain SQL queries or stored procedures. The configuration is more difficult as you have to enter carefully all SQL queries in the config file and changing the query usually involves restarting the server. For more details about this implementation and all configuration parameters please refer to `Tigase Custom Auth documentation <#custonAuthConnector>`__.
+-  ``tigase-custom`` - is the authentication connector which can be used with any database. Unlike the 'tigase-auth' connector it allows you to define SQL queries in the configuration file. The advantage of this implementation is that you don’t have to touch your database. You can use either simple plain SQL queries or stored procedures. The configuration is more difficult as you have to enter carefully all SQL queries in the config file and changing the query usually involves restarting the server. For more details about this implementation and all configuration parameters please refer to :ref:`Tigase Custom Auth documentation<custonAuthConnector>`.
 
--  ``tigase-auth`` (**DEPRECATED**) - is the authentication connector which can be used with any database. It executes stored procedures to perform all actions. Therefore it is a very convenient way to integrate the server with an external database if you don’t want to expose the database structure. You just have to provide a set of stored procedures in the database. While implementing all stored procedures expected by the server might be a bit of work it allows you to hide the database structure and change the SP implementation at any time. You can add more actions on user login/logout without restarting or touching the server. And the configuration on the server side is very simple. For detailed description of this implementation please refer to `Tigase Auth documentation <#tigaseAuthConnector>`__.
+-  ``tigase-auth`` (**DEPRECATED**) - is the authentication connector which can be used with any database. It executes stored procedures to perform all actions. Therefore it is a very convenient way to integrate the server with an external database if you don’t want to expose the database structure. You just have to provide a set of stored procedures in the database. While implementing all stored procedures expected by the server might be a bit of work it allows you to hide the database structure and change the SP implementation at any time. You can add more actions on user login/logout without restarting or touching the server. And the configuration on the server side is very simple. For detailed description of this implementation please refer to :ref:`Tigase Auth documentation<tigaseAuthConnector>`.
 
 As always the simplest way to configure the server is through the ``config.tdsl`` file. In the article describing this file you can find long list with all available options and all details how to handle it. For the authentication connector setup however we only need 2 options:
 
@@ -108,9 +110,9 @@ For example:
 
 If you are interested in even further customizing your authentication connector by writing your own queries or stored procedures, please have a look at the following guides:
 
-- :ref:`Tigase Auth guide <tigaseAuthConnector>`
+- :ref:`Tigase Auth guide<tigaseAuthConnector>`
 
-- :ref:`Tigase Custom Auth guide <custonAuthConnector>`
+- :ref:`Tigase Custom Auth guide<custonAuthConnector>`
 
 .. include:: Auth_Connectors/Tigase_Auth_Connector.rst
 .. include:: Auth_Connectors/Custom_Auth_Connector.rst
