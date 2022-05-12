@@ -29,9 +29,9 @@ This is a set of documents allowing you to quickly start with our software. Ever
 
 -  `Manual installation in console mode <#manualinstall>`__
 
--  `Installing Tigase on Windows <#windowsInstallation>`__
+-  `Installing Tigase on Windows <#windowsInstallation>`_
 
--  `Network settings for Tigase<setupTigaseServer>`__
+-  :ref:`Network settings for Tigase<setupTigaseServer>`
 
 -  `Running Tigase XMPP Server as a service <#tigaseScriptStart>`__
 
