@@ -1,7 +1,7 @@
 Server Certificates
 ---------------------
 
--  :ref:`Creating and Loading the Server Certificate in pem Files <certspem>`
+-  :ref:`Creating and Loading the Server Certificate in pem Files<certspem>`
 
 .. _certspem:
 
@@ -67,7 +67,7 @@ This command generates a certificate request using the file specified after ``-k
 
 **Sign the Certificate Request:.**
 
-Now the .csr file will be signed by a Certificate Authority. In this tutorial, we will be self-signging our certificate. This practice however is generally not recommended, and you will receive notifications that your certificate is not trusted. There are commercial offers from companies to sign your certificate from trusted sources. Please see the `Certificate From Other Providers <#OtherSources>`__ section for more information.
+Now the .csr file will be signed by a Certificate Authority. In this tutorial, we will be self-signging our certificate. This practice however is generally not recommended, and you will receive notifications that your certificate is not trusted. There are commercial offers from companies to sign your certificate from trusted sources. Please see the :ref:`Certificate From Other Providers<OtherSources>` section for more information.
 
 .. code:: bash
 
@@ -124,12 +124,14 @@ Installing and loading certificates is very easy. The server can load all certif
 
 It’s also possible to use: \* Admin ad-hoc command via XMPP client - you should navigate to Service Discovery of your server and in the list of commands for ``VHost Manager`` component select ``Add SSL Certificate`` and then follow instructions \* Admin WebUI - open ``http://<host>/admin``, navigate to ``Other`` category and in it select ``Add SSL Certificate`` and then follow instructions \* REST API - make a ``POST`` request to ``http://localhost:8080/rest/adhoc/vhost-man@domain.com`` with payload containing your certificate; to get the required form fields make ``GET`` request to the same endpoint
 
+.. _OtherSources:
+
 Certificate From Other Providers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There is number of certificate providers offering certificates either for free or for money. You can use any of them, however you have to be aware that sometimes certificates might not be recognized by all XMPP servers, especially if it’s one from a new provider. Here is an example list of providers:
 
--  LetsEncrypt - please see `??? <#LetsEncryptCertificate>`__ for details
+-  LetsEncrypt - please see `Installing LetsEncrypt Certificates in Your Linux System<LetsEncryptCertificate>` for details
 
 -  `CAcert <https://www.cacert.org/>`__ - free certificates with Web GUI. (WARNING: it’s not widely accepted)
 
@@ -147,6 +149,8 @@ Using one certificate for multiple domains
 .. Note::
 
    Tigase tries to be *smart* and automatically detects wildcard domain and alternative domains so it’s not needed to duplicate same certificate in multiple files to match domains - same file will be loaded and make available for all domains (CNames) available in the certificate.
+
+.. _LetsEncryptCertificate:
 
 Installing LetsEncrypt Certificates in Your Linux System
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -195,7 +199,7 @@ These are the root certificate, and the intermediate certificate signed by root 
 
 Take the contents of your ``privkey.pem``, certificate, and combine them with the contents of ``isrgrootx1.pem`` and ``lets-encrypt-r3.pem`` into a single pem certificate.
 
-Depending on your configuration you either need to name the file after your domain such as ``mydomain.com.pem`` and place it under ``certs/`` subdirectory of Tigase XMPP Server installation or update it using admin ad-hoc (see `??? <#certificateStorage>`__)
+Depending on your configuration you either need to name the file after your domain such as ``mydomain.com.pem`` and place it under ``certs/`` subdirectory of Tigase XMPP Server installation or update it using admin ad-hoc (see :ref:`Storing and managing certificates<certificateStorage>`)
 
 If you moved all certs to a single directory, you may combine them using the following command under \*nix operating systems:.
 
@@ -356,6 +360,8 @@ For greater automation it’s possible to automate updating certificate obtained
 .. Note::
 
    If you are not using wildcard certificate when you have to provide certificate for main domain as well as certificates for subdomains that mach all components that you want to expose (muc, pubsub, push, etc…)
+
+.. _certificateStorage:
 
 Storing and managing certificates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
