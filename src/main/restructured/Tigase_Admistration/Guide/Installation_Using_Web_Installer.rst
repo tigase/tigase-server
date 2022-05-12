@@ -163,6 +163,7 @@ You should see a list of listening ports.
    java    18387 tigase  151u  IPv6 22185837      0t0  TCP *:5280 (LISTEN)
    java    18387 tigase  152u  IPv6 22185838      0t0  TCP *:5269 (LISTEN)
 
+.. _winWebInstall:
 
 Windows Instructions for using Web Installer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
