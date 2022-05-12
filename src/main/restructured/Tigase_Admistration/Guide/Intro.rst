@@ -31,7 +31,7 @@ This is a set of documents allowing you to quickly start with our software. Ever
 
 -  `Installing Tigase on Windows <#windowsInstallation>`__
 
--  `Network settings for Tigase<#setupTigaseServer>`__
+-  `Network settings for Tigase<setupTigaseServer>`__
 
 -  `Running Tigase XMPP Server as a service <#tigaseScriptStart>`__
 
