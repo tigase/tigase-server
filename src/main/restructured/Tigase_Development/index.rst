@@ -1,6 +1,9 @@
+=============================================
+Tigase Development Guide -Version 8.3.0
+=============================================
+
 .. toctree::
-   :caption: Tigase Development Guide -Version 8.3.0
-   :maxdepth: 3
+   :titlesonly:
    :numbered:
 
    Basic_Information
