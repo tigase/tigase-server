@@ -1,3 +1,4 @@
+
 EventBus API in Tigase
 ============================
 
@@ -19,7 +20,7 @@ To create instance of EventBus use the following code:
 Events
 ^^^^^^^^^^^
 
-Events may be defined in two ways: as a class or as an XML element(XML/Element based events are deprecated since version 8.2 and will be removed in version 9.0).
+Events may be defined in two ways: as a class |ss| or as an XML element(XML/Element based events are deprecated since version 8.2 and will be removed in version 9.0)\. |se|\
 
 **Serialized event class.**
 
@@ -49,7 +50,7 @@ Events may be defined in two ways: as a class or as an XML element(XML/Element b
        }
    }
 
-**XML Element event(deprecated).**
+|ss| **XML Element event(deprecated)**\ |se|\
 
 .. code:: xml
 
@@ -104,7 +105,7 @@ To fire event, just get instance of EventBus and call method ``fire()``.
    SampleEvent event = new SampleEvent();
    eventBus.fire(event)
 
-**Firing event based on XML Element(deprecated).**
+|ss| **Firing event based on XML Element(deprecated)** |se|\
 
 .. code:: java
 
@@ -149,8 +150,8 @@ To make registering listeners more easy, you can use method ``registerAll()`` fr
    }
 
 
-Handling XML events
-~~~~~~~~~~~~~~~~~~~
+|ss| Handling XML events |se|\
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To handle XML events we have to register listener for specific event package and name. In our example, package is empty because event name has no package declared (see also `Filtering events <#_filtering_events>`__).
 
@@ -222,3 +223,11 @@ In case of class based events, EventBus is checking class inheritance.
 -  Will be called, because this is listener stricte for ``SpecificEvent``.
 
 -  Will be called, because ``SpecificEvent`` extends ``MainEvent``.
+
+
+.. |ss| raw:: html
+
+    <strike>
+.. |se| raw:: html
+
+    </strike>
