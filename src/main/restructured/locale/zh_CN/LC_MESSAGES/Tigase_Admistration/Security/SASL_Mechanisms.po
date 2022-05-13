@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:2
+msgid "SASL Mechanisms"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:4
+msgid ""
+"XMPP protocol supports many authentication methods, but most of them are "
+"used as `SASL <https://tools.ietf.org/html/rfc4422>`__ mechanisms. Tigase"
+" XMPP Server provides many SASL-based authentication mechanisms such as:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:6
+msgid "PLAIN *(enabled)*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:8
+msgid "ANONYMOUS"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:10
+msgid "EXTERNAL"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:12
+msgid "SCRAM-SHA-1 *(enabled)*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:14
+msgid "SCRAM-SHA-256 *(enabled)*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:16
+msgid "SCRAM-SHA-512"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:18
+msgid ""
+"Most of them are enabled by default on default Tigase XMPP Server "
+"installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:21
+msgid "Enabling and disabling SASL mechanisms (credentials encoder/decoder)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:23
+msgid ""
+"If you want to enable or disable one of password-based authentication "
+"mechanism such as ``SCRAM-SHA-1``, ``SCRAM-SHA-256`` or ``SCRAM-SHA-512``"
+" you can do that by enabling or disabling encoders and decoders used on "
+"your installation. By enabling encoders/decoders you are deciding in what"
+" form the password is stored in the database. Those changes may (and in "
+"most cases will) impact which SASL mechanisms may be allowed to use on "
+"your installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:27
+msgid ""
+"In most cases you should enable or disable both (credentials encoder and "
+"decoder) of the same type at the same time. The only exception of this "
+"rule is when you are changing those on already working installation. In "
+"this case you should only enable encoder of the type which you want to "
+"enable and request users to change their passwords. Then, after users "
+"will change their passwords, you should reconfigure server to enable "
+"decoder of the particular type. *(in other case user may loose a way to "
+"log in to your installation as system will reject their credentials as it"
+" may not have matching credentials for particular SASL mechanism)*."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:30
+msgid "**Enabling SCRAM-SHA-512 encoder**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:43
+msgid "**Disabling SCRAM-SHA-1 decoder**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/SASL_Mechanisms.rst:56
+msgid ""
+"It is strongly recommended not to disable encoders if you have enabled "
+"decoder of the same type as it may lead to the authentication issues, if "
+"client tries to use a mechanism which that is not available."
+msgstr ""
+

@@ -1,0 +1,93 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:2
+msgid "Using Tigase"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:4
+msgid ""
+"This section keeps set of documents which apply to all the Tigase server "
+"version and contain more generic or introductory information on general "
+"use and features."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:6
+msgid "`Tigase Log Guide <#Tigase-Log-Guide>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:8
+msgid "`Debugging Tigase <#Debuging-Tigase>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:10
+msgid "`Basic System Checks <#Basic-System-Checks>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:12
+msgid "`Add and Manage Domains <#Add-and-Manage-Domains-(VHosts)>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:14
+msgid "`Presence Forwarding <#Presence-Forwarding>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:16
+msgid "`Watchdog <#Watchdog>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:18
+msgid "`Runtime Environment Tip <#Tigase-Tip-Checking-the-Runtime-Environment>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:20
+msgid "`Checking Cluster Connections <#Checking-Cluster-Connections>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:22
+msgid ""
+"`Best Practices for Connecting to Tigase XMPP server From Web Browser "
+"<#Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-"
+"Browser>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:24
+msgid "`Scripting Support in Tigase <#Scripting-support-in-Tigase>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:26
+msgid ""
+"`Scripting Introduction - Hello World! <#Scripting-Introduction - Hello-"
+"World!>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:28
+msgid ""
+"`Tigase Scripting Version 4.4.x Update for Administrators <#Tigase-"
+"Scripting-Version-4.4.x-Update-for-Administrators>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:30
+msgid "`Tigase and Python Scripting <#Tigase-and-Python>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Intro.rst:32
+msgid "`Configuration Wizards <#tigase3xconfiguration>`__"
+msgstr ""
+

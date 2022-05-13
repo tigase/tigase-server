@@ -1,0 +1,691 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:2
+msgid "Schema Updates"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:4
+msgid ""
+"This is a repository for Schema updates in case you have to upgrade from "
+"older installations."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:6
+msgid ""
+"`Tigase Server Schema v7.1 Updates <#tigaseServer71>`__ Applies to v7.1.0"
+" and v8.0.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:9
+msgid "Changes to Schema in v8.0.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:11
+msgid ""
+"For version 8.0.0 of Tigase XMPP Server, we decided to improve "
+"authentication and security that was provided. In order to do this, "
+"implementation of repository and database schemas needed to be changed to"
+" achieve this goal. This document, as well one in the HTTP API, will "
+"describe the changes to the schemas in this new version."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:14
+msgid "Reasons"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:16
+msgid ""
+"Before version 8.0.0, user passwords were stored in plaintext in "
+"``user_pw`` database field within ``tig_users`` table, but in plaintext. "
+"It was possible to enable storage of the MD5 hash of the password "
+"instead, however this limited authentication mechanism SASL PLAIN only. "
+"However an MD5 hash of a password is not really a secure method as it is "
+"possible to revert this mechanism using rainbow tables."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:18
+msgid ""
+"Therefore, we decided to change this and store only encrypted versions of"
+" a password in ``PBKDF2`` form which can be easily used for ``SCRAM-"
+"SHA-1`` authentication mechanism or ``SCRAM-SHA-256``. SASL PLAIN "
+"mechanism can also used these encrypted passwords. The storage of "
+"encrypted passwords is now enabled **by default** in v8.0.0 of Tigase."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:21
+msgid "Summary of changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:23
+msgid "Added support for storage of encrypted password"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:25
+msgid "Passwords are no longer stored in plaintext on any database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:27
+msgid "Using same salt for any subsequent authentications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:29
+msgid ""
+"This allows clients to reuse calculated credentials and keep them instead"
+" of storing plaintext passwords."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:31
+msgid "Disabled usage of stored procedure for authentication"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:33
+msgid ""
+"In previous versions, Tigase used stored procedures "
+"``TigUserLoginPlainPw`` and ``TigUserLogin`` for SASL PLAIN "
+"authentication. From version 8.0.0, those procedures are no longer used, "
+"but they are updated to use passwords stored in ``tig_user_credentials`` "
+"table."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:35
+msgid ""
+"It is still possible to use this procedures for authentication, but to do"
+" that you need add:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:41
+msgid "to configuration block of **every** authentication repository."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:43
+msgid ""
+"To enable this for default repository, the ``authRepository`` "
+"configuration block will look like this:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:54
+msgid "Deprecated API"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:56
+msgid ""
+"Some methods of ``AuthRepository`` API were deprecated and should not be "
+"used. Most of them were used for authentication using stored procedures, "
+"retrieval of password in plaintext or for password change."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:58
+msgid ""
+"For most of these methods, new versions based on ``tig_user_credentials``"
+" table and user credentials storage are provided where possible."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:60
+msgid "Deprecated storage procedures"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:62
+msgid ""
+"Stored procedures for authentication and password manipulation were "
+"updated to a new form, so that will be possible to use them by older "
+"versions of Tigase XMPP Server during rolling updates of a cluster. "
+"However, these procedures will not be used any more and will be "
+"depreciated and removed in future versions of Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:64
+msgid "Usage of MD5 hashes of passwords"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:66
+msgid ""
+"If you have changed ``password-encoding`` database property in previous "
+"versions of Tigase XMPP Server, then you will need to modify your "
+"configuration to keep it working. If you wish only to allow access using "
+"old passwords and to store changed passwords in the new form, then you "
+"need to enable credentials decoder for the correct authentication "
+"repository. In this example we will provided changes required for "
+"``MD5-PASSWORD`` value of ``password-encoding`` database property. If you"
+" have used a different one, then just replace ``MD5-PASSWORD`` with ``MD5"
+"-USERNAME-PASSWORD`` or ``MD5-USERID-PASSWORD``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:68
+msgid "**Usage of MD5 decoder.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:80
+msgid ""
+"If you wish to store passwords in MD5 form then use following entries in "
+"your configuration file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:82
+msgid "**Usage of MD5 encoder.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:95
+msgid "Enabling and disabling credentials encoders/decoders"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:97
+msgid ""
+"You may enable which encoders and decoders used on your installation. By "
+"enabling encoders/decoders you are deciding in what form the password is "
+"stored in the database. Those changes may impact which SASL mechanisms "
+"may be allowed to use on your installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:99
+msgid "**Enabling PLAIN decoder.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:111
+msgid "**Disabling SCRAM-SHA-1 encoder.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:126
+msgid ""
+"It is strongly recommended not to disable encoders if you have enabled "
+"decoder of the same type as it may lead to the authentication issues, if "
+"client tries to use a mechanism which that is not available."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:128
+msgid "Schema changes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:130
+msgid ""
+"This change resulted in a creation of the new table "
+"``tig_user_credentials`` with following fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:133
+msgid "**uid**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:133
+msgid "id of a user row in ``tig_users``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:136
+msgid "**username**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:136
+msgid ""
+"username used for authentication (if ``authzid`` is not provided or "
+"``authzid`` localpart is equal to ``authcid`` then row with ``default`` "
+"value will be used)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:139
+msgid "**mechanism**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:139
+msgid ""
+"name of mechanism for which this credentials will be used, ie. ``SCRAM-"
+"SHA-1`` or ``PLAIN``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:142
+msgid "**value**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:142
+msgid "serialized value required for mechanism to confirm that credentials match."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:146
+msgid ""
+"During execution of ``upgrade-schema`` task, passwords will be removed "
+"from ``tig_users`` table from ``user_pw`` field and moved to "
+"``tig_user_credentials`` table."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:148
+msgid "Added password reset mechanism"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:150
+msgid ""
+"As a part of Tigase HTTP API component and Tigase Extras, we developed a "
+"mechanism which allows user to reset their password. To use this "
+"mechanism HTTP API component and its REST module **must** to be enabled "
+"on Tigase XMPP Server installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:154
+msgid ""
+"Additionally this mechanism need to be enabled in the configuration file."
+" For more information about configuration of this mechanism please check "
+"Tigase HTTP API component documentation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:156
+msgid ""
+"Assuming that HTTP API component is configured to run on port 8080 "
+"*(default)*, then after accessing address "
+"http://localhost:8080/rest/user/resetPassword in the web browser it will "
+"present a web form. By filling and submitting this form, the user will "
+"initiate a password reset process. During this process, Tigase XMPP "
+"Server will send an email to the user’s email address (provided during "
+"registration) with a link to the password change form."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:159
+msgid "Upgrading from v7.1.x"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:161
+msgid ""
+"When upgrading from previous versions of Tigase, it is recommended that "
+"you first backup the database. Refer to the documentation of your "
+"database software to find out how to export a copy. Once the backup is "
+"made, it will be time to run the schema upgrade. Be sure that your schema"
+" is up to date, and should be v7.1.0 Schema."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:163
+msgid "To upgrade, use the new ``upgrade-schema`` task of SchemaManager:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:165
+msgid "In linux"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:171
+msgid "In Windows"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:177
+msgid "You will need to configure the following switches:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "``-T`` Specifies Database Type"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid ""
+"Possible values are: ``mysql``, ``derby``, ``sqlserver``, ``postgresql``,"
+" ``mongodb``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "``-D`` Specifies Databse Name"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "The explicit name of the database you wish to upgrade."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "``-H`` Specifies Host address"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid ""
+"By default, this is localhost, but may be set to IP address or FQDNS "
+"address."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "``-U`` Specifies Username"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid ""
+"This is the username that is authorized to make changes to the database "
+"defined in -D."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "``-P`` Specifies Password"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "The password for username specified in -U."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:194
+msgid "``-R`` Password for Administrator or Root DB account."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:196
+msgid "``-A`` Password for Administrator or Root DB account."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:198
+msgid "``-J`` Jid of user authorized as admin user from Tigase."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:200
+msgid "``-N`` Password for user specified in -J."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "``-F`` Points to the file that will perform the upgrade."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst
+msgid "Will follow this form database/{dbname}-server-schema-8.0.0.sql"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:206
+msgid "Tigase Server Schema v7.2 Updates"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:209
+msgid "**FOR ALL USERS UPGRADING TO v8.0.0 FROM A v7.0.2 INSTALLATION**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:211
+msgid ""
+"The schema has changed for the main database, and the pubsub repository. "
+"In order to upgrade to the new schemas, you will need to do the "
+"following:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:213
+msgid ""
+"Upgrade the Main database schema to v7.1 using the ``database/${DB_TYPE"
+"}-schema-upgrade-to-7-1.sql`` file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:215
+msgid ""
+"Upgrade the Pubsub Schema to v3.1.0 using the ``database/${DB_TYPE"
+"}-pubsub-schema-3.1.0.sql`` file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:217
+msgid ""
+"Upgrade the Pubsub Schema to v3.2.0 using the ``database/${DB_TYPE"
+"}-pubsub-schema-3.2.0.sql`` file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:219
+msgid ""
+"Upgrade the Pubsub Schema to v3.3.0 using the ``database/${DB_TYPE"
+"}-pubsub-schema-3.3.0.sql`` file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:221
+msgid ""
+"All three commands may be done at the same time in that order, it is "
+"suggested you make a backup of your current database to prevent data "
+"loss."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:224
+msgid "Tigase Schema Change for v7.1"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:226
+msgid ""
+"Tigase has made changes to its database to include primary keys in the "
+"tig_pairs table to improve performance of the Tigase server. This is an "
+"auto-incremented column for Primary Key items appended to the previous "
+"schema."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:230
+msgid ""
+"You MUST update your database to be compliant with the new schema. If you"
+" do not, Tigase will not function properly.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:234
+msgid "*This change will affect all users of Tigase using v7.1.0 and newer.*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:236
+msgid ""
+"If you are installing a new version of v8.0.0 on a new database, the "
+"schema should automatically be installed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:238
+msgid ""
+"First, shut down any running instances of Tigase to prevent conflicts "
+"with database editing. Then from command line use the DBSchemaLoader "
+"class to run the -schema-upgrade-to-7.1.sql file to the database. The "
+"command is as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:240
+msgid "In a linux environment"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:246
+msgid "In a windows environment"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:252
+msgid "All variables will be required, they are as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:254
+msgid "``${HOSTNAME}`` - Hostname of the database you wish to upgrade."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:256
+msgid "``${DB_TYPE}`` - Type of database [derby, mysql, postgresql, sqlserver]."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:258
+msgid "``${ROOT_USER}`` - Username of root user."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:260
+msgid "``${ROOT_USER_PASS}`` - Password of specified root user."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:262
+msgid "``${DB_USER}`` - Login of user that can edit database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:264
+msgid "``${DB_USER_PASS}`` - Password of the specified user."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:266
+msgid "``${DB_NAME}`` - Name of the database to be edited."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:268
+msgid "``${DB_VERSION}`` - In this case, we want this to be 7.1."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:270
+msgid ""
+"``${ADMIN_JID}`` - Bare JID of a database user with admin privileges. "
+"Must be contained within quotation marks."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:272
+msgid "``${ADMIN_JID_PASS}`` - Password of associated admin JID."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:274
+msgid ""
+"Please note that the SQL file for the update will have an associated "
+"database with the filename. i.e. postgresql-update-to-7.1.sql for "
+"postgresql database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:276
+msgid "A finalized command will look something like this:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:282
+msgid ""
+"Once this has successfully executed, you may restart you server. Watch "
+"logs for any db errors that may indicate an incomplete schema upgrade."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:285
+msgid "Changes to Pubsub Schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:287
+msgid ""
+"Tigase has had a change to the PubSub Schema, to upgrade to PubSub Schema"
+" v7.1 without having to reform your databases, use this guide to update "
+"your databases to be compatible with the new version of Tigase."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:291
+msgid ""
+"Current PubSub Schema is v3.3.0, you will need to repeat these "
+"instructions for v3.1.0, v3.2.0 and then v3.3.0 before you run Tigase "
+"V7.1.0."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:293
+msgid ""
+"The PubSub Schema has been streamlined for better resource use, this "
+"change affects all users of Tigase. To prepare your database for the new "
+"schema, first be sure to create a backup! Then apply the appropriate "
+"PubSub schema to your MySQL and it will add the new storage procedure."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:295
+msgid ""
+"All these files should be in your /database folder within Tigase, however"
+" if you are missing the appropriate files, use the links below and place "
+"them into that folder."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:297
+msgid ""
+"The MySQL schema can be found `Here <https://github.com/tigase/tigase-"
+"pubsub/blob/master/src/main/database/mysql-pubsub-4.1.0.sql>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:299
+msgid ""
+"The Derby schema can be found `Here <https://github.com/tigase/tigase-"
+"pubsub/blob/master/src/main/database/derby-pubsub-4.1.0.sql>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:301
+msgid ""
+"The PostGRESQL schema can be found `Here <https://github.com/tigase"
+"/tigase-pubsub/blob/master/src/main/database/postgresql-"
+"pubsub-4.1.0.sql>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:303
+msgid ""
+"The same files are also included in all distributions of v8.0.0 in "
+"[tigaseroot]/database/ . All changes to database schema are meant to be "
+"backward compatible."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:305
+msgid ""
+"You can use a utility in Tigase to update the schema using the following "
+"command from the Tigase root:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:307
+msgid "Linux"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:313
+msgid "Windows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:321
+msgid ""
+"**Some variation may be necessary depending on how your java build uses "
+"``-cp`` option**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:323
+msgid "Use the following options to customize. Options in bold are required.:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:325
+msgid ""
+"``-dbType`` database_type {derby, mysql, postgresql, sqlserver} "
+"(*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:327
+msgid "``-schemaVersion`` schema version {4, 5, 5-1}"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:329
+msgid "``-dbName`` database name (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:331
+msgid "``-dbHostname`` database hostname (default is localhost)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:333
+msgid "``-dbUser`` tigase username"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:335
+msgid "``-dbPass`` tigase user password"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:337
+msgid "``-rootUser`` database root username (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:339
+msgid "``-rootPass`` database root password (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:341
+msgid "``-file path`` to sql schema file (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:343
+msgid "``-query`` sql query to execute"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:345
+msgid "``-logLevel`` java logger Level"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:347
+msgid "``-adminJID`` comma separated list of admin JIDs"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:349
+msgid "``-adminJIDpass`` password (one for all entered JIDs"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:353
+msgid "Arguments take following precedent: query, file, whole schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Schema_Updates.rst:355
+msgid "As a result your final command should look something like this:"
+msgstr ""
+

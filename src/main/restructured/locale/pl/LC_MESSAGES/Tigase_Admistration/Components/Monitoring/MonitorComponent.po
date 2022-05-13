@@ -1,0 +1,481 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:2
+msgid "Monitor Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:4
+msgid ""
+"Tigase includes an **Monitor Component** to help with monitoring has been"
+" implemented. This allows you to set thresholds for certain predefined "
+"tasks and you or other JIDs can be sent a message when those thresholds "
+"are passed. You can even configure a mailer extension to have an E-mail "
+"sent to system administrators to let them know an event has occurred! "
+"Lets begin with setup and requirements."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:6
+msgid ""
+"Monitor Component is based on eventbus which in turn is based on a "
+"limited `PubSub <http://www.xmpp.org/extensions/xep-0060.html>`__ "
+"specification. Events are delivered to subscribers as a normal PubSub "
+"notification."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:8
+msgid ""
+"Each component or client may subscribe for specific types of events. Only"
+" components on cluster nodes are allowed to publish events."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:11
+msgid "Setup"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:13
+msgid ""
+"Monitor Component is enabled by default on v7.1.0 b4001 and later, so no "
+"setup needed!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:16
+msgid "How it Works"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:18
+msgid ""
+"Events in Eventbus are identified by two elements: name of event and its "
+"namespace:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:26
+msgid "Where event name is ``EventName`` and namespace is ``tigase:demo``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:28
+msgid ""
+"Listeners may subscribe for a specific event or for all events with "
+"specific a namespace. Because in pubsub, only one node name exists, so we"
+" have to add a way to convert the event name and namespace to a node "
+"name:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:34
+msgid ""
+"So for example, to subscribe to ``<EventName xmlns=\"tigase:demo\">``, "
+"node must be: ``EventName|tigase:demo``. If you wish to subscribe to all "
+"events with a specific namespace, use an asterisk (``*``) instead of the "
+"event name: ``*|tigase:demo``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:36
+msgid "**Note**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:38
+msgid ""
+"If client is subscribed to ``*|tigase:demo node``, then events will not "
+"be sent from node ``*|tigase:demo``, but from the **real** node (in this "
+"case: ``EventName|tigase:demo``)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:41
+msgid "Available Tasks"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:43
+msgid ""
+"Monitor Component has several pre-defined tasks that can be monitored and"
+" set to trigger. What follows is the list of tasks with the options "
+"attributed to each task."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid "**disk-task** - Used to check disk usage."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid "Available Options"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:48
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:57
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:66
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:75
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:85
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:92
+msgid "``enabled`` - Enable or disable task, Boolean value."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:50
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:59
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:68
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:77
+msgid "``period`` - Period of running check, Integer value."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:52
+msgid "``threshold`` - Percentage of used space on disk, Float value."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid "**cpu-temp-task** - Used to check CPU temperature."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:61
+msgid "``cpuTempThreshold`` - Temperature threshold of CPU in °C."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid "**load-checker-task** - Used to check system load."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:70
+msgid "``averageLoadThreshold`` - Average percent load threshold, Long value."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid "**memory-checker-task** - Used to check memory usage."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:79
+msgid ""
+"``maxHeapMemUsagePercentThreshold`` - Alarm when percent of used Heap "
+"memory is larger than, Integer value."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:81
+msgid ""
+"``maxNonHeapMemUsagePercentThreshold`` - Alarm when percent of used Non "
+"Heap memory is larger than, Integer value."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid "**logger-task** - Used to transmit log entries depending on level entered."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:87
+msgid ""
+"``levelThreshold`` - Minimal log level that will be the threshold. "
+"Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, "
+"and ALL."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid "**connections-task** - Used to check users disconnections."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid ""
+"**NOTE: The event will be generated only if both thresholds (amount and "
+"percentage) will be fulfilled.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:94
+msgid "``period`` - Period of running check in ms, Integer value."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:96
+msgid ""
+"``thresholdMinimal`` - Minimal amount of disconnected users required to "
+"generate alarm."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:98
+msgid ""
+"``threshold`` - Minimal percent of disconnected users required to "
+"generate alarm."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:101
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:304
+msgid "Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:103
+msgid ""
+"Configuration of the monitor can be done one of two ways; either by lines"
+" in ``config.tdsl`` file, or by sending XMPP stanzas to the server. You "
+"may also send XMPP stanzas VIA HTTP REST. XMPP stanza configurations will"
+" override ones in config.tdsl, but they will only last until the server "
+"restarts."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:105
+msgid "config.tdsl"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:107
+msgid ""
+"Tasks can be configured in the ``config.tdsl`` file. See `available tasks"
+" <#availableTasks>`__ for the tasks that can be setup."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:109
+msgid "To enable a specific monitor task, use the following line:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:119
+msgid ""
+"Where monitor is the component name for ``MonitorComponent``, and "
+"``$TASKNAME`` is one of the `available task names <#availableTasks>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:121
+msgid ""
+"This format will be the same for other settings for tasks, and it’s best "
+"to group settings under one heading. For example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:132
+msgid ""
+"sets the check period to 1000 milliseconds and enables ``connections-"
+"task``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:136
+msgid ""
+"Once triggers have been activated, they will become dormant. Think of "
+"these as one-shot settings."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:139
+msgid "Subscription Limitations"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:141
+msgid "To define list of JIDs allowed to subscribe for events:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:151
+msgid "If this is not specified, all users can subscribe."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:153
+msgid "Configuration via XMPP"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:155
+msgid ""
+"We can also configure the eventbus monitor component using XMPP stanzas. "
+"This allows us to set and change configurations during server runtime. "
+"This is done using a series of ``iq`` stanzas send to the monitor "
+"component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:157
+msgid ""
+"We can query each component for its current settings using the following "
+"stanza."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:165
+msgid ""
+"The server will return the component current settings which will make "
+"things easier if you wish to edit them. In this case, the server has "
+"returned the following to us"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:188
+msgid ""
+"This tells us that the disk-task setting is not active, has a period of "
+"60000ms, and will trigger when disk usage is over 80%."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:190
+msgid ""
+"To send new settings to the monitor component, we can send a similar "
+"stanza back to the monitor component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:211
+msgid ""
+"To which a successful update will give you an XMPP success stanza to let "
+"you know everything is set correctly."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:213
+msgid ""
+"Alternatively, you can update specific settings by editing a single field"
+" without adding anything else. For example, if we just wanted to turn the"
+" disk-task on we could send the following stanza:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:227
+msgid ""
+"To set any other values, do not forget that certain parts may need to be "
+"changed, specifically the ``<field type=\"boolean\" "
+"var=x-task#enabled\">`` fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst
+msgid ""
+"Your field type will be defined by the type of variable specified in the "
+"`Available Tasks <#availableTasks>`__ section."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:231
+msgid ""
+"``var=x task#`` will be followed by the property value taken directly "
+"from the `Available Tasks <#availableTasks>`__ section."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:234
+msgid "Getting the Message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:236
+msgid ""
+"Without a place to send messages to, monitor will just trigger and shut "
+"down. There are two different methods that monitor can deliver alarm "
+"messages and relevant data; XMPP messages and using the mailer extension."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:238
+msgid "XMPP notification"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:240
+msgid ""
+"In order to retrieve notifications, a subscription to the "
+"``eventbus@<VHost>`` user must be made. Keep in mind that subscriptions "
+"are not persistent across server restarts, or triggers."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:241
+msgid ""
+"The monitor schema is very similar to most XMPP subscription requests but"
+" with a few tweaks to differentiate it if you wanted to subscribe to a "
+"certain task or all of them. Each task is considered a node, and each "
+"node has the following pattern: ``eventName|eventXMLNS``. Since each "
+"monitoring task has the ``tigase:monitor:event`` event XMLNS, we just "
+"need to pick the event name from the list of tasks. So like the above "
+"example, our event node for the disk task will be ``disk-"
+"task|tigase:monitor:event``. Applied to an XMPP stanza, it will look "
+"something like this:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:253
+msgid ""
+"Don’t forget to replace ``$USER_JID`` with the bare JID of the user you "
+"want to receive those messages. You can even have them sent to a MUC or "
+"any component with a JID."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:255
+msgid "Available events are as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:257
+msgid "DiskUsageMonitorEvent for ``disk-task``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:259
+msgid "LoggerMonitorEvent for ``logger-task``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:261
+msgid "HeapMemoryMonitorEvent for ``memory-checker-task``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:263
+msgid "LoadAverageMonitorEvent for ``load-checker-task``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:265
+msgid "CPUTempMonitorEvent for ``cpu-temp-task``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:267
+msgid "UsersDisconnected for ``connections-task``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:269
+msgid ""
+"Alternatively, you can also subscribe to all events within the eventbus "
+"by using a wildcard \\* in place of the event XMLNS like this example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:281
+msgid "Sample notification from Monitor"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:298
+msgid "Mailer Extension"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:300
+msgid ""
+"*Tigase Server Monitor Mailer Extension* (TSMME) can send messages from "
+"the monitor component to a specified E-mail address so system "
+"administrators who are not logged into the XMPP server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:302
+msgid ""
+"For v7.1.0 versions and later, TSMME is already included in your "
+"distribution package and no extra installation is needed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:306
+msgid ""
+"Tigase Mailer Extension may be configured via the ``config.tdsl`` file in"
+" the following manner:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:319
+msgid "Here is an explanation of those variables."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:321
+msgid "``mailer-smtp-host`` - SMTP Server hostname."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:323
+msgid "``mailer-smtp-port`` - SMTP Server port."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:325
+msgid "``mailer-smtp-usernam`` - name of sender account."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:327
+msgid "``mailer-smtp-password`` - password of sender account."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:329
+msgid ""
+"``mailer-from-address`` - sender email address. It will be set in field "
+"from in email."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:331
+msgid ""
+"``mailer-to-addresses`` - comma separated notification receivers email "
+"addresses."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/MonitorComponent.rst:333
+msgid ""
+"It is recommended to create a specific e-mail address in your mail server"
+" for this purpose only, as the account settings are stored in plaintext "
+"without encryption."
+msgstr ""
+

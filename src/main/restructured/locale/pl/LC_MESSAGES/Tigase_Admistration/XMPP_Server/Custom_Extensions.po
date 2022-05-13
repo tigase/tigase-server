@@ -1,0 +1,353 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:2
+msgid "Tigase Custom Extensions"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:5
+msgid "General features"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:7
+msgid "tabel 6.Monitoring"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:10
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:58
+msgid "Support"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:10
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:58
+msgid "Name"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:10
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:58
+msgid "Comment"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:12
+msgid "✓ [1]_"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:12
+msgid "AuditLog"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:12
+msgid ""
+"Ability functionality to log important events in a system (loggins, "
+"message exchanges, calls)"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:14
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:16
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:18
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:20
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:22
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:24
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:26
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:28
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:30
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:32
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:34
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:36
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:38
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:40
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:42
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:44
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:46
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:48
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:60
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:62
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:64
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:66
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:68
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:70
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:72
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:74
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:76
+msgid "✓"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:14
+msgid "Anti Abuse"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:14
+msgid "Fight stanza SPAM, DoS, brute-force attacks and other threats"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:16
+msgid "Virtual domains"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:16
+msgid ""
+"Ability to create and manage multiple virtual domains from a single "
+"instance and restart-less management"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:18
+msgid "MUC subscribe for offline push"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:18
+msgid ""
+"Option to register permanently to the room to receive push notifications "
+"about new messages."
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:20
+msgid "Scripting API"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:20
+msgid "Supports the Java Scripting API JSR-223"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:22
+msgid "JMX monitoring"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:22
+msgid ""
+"Advanced monitoring the server via JMX protocol with an API for "
+"connecting custom monitors and TCP/IP end-point for connecting general "
+"purpose JMX tools"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:24
+msgid "HTTP monitoring"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:24
+msgid "Basic monitoring via HTTP protocol"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:26
+msgid "XMPP Monitoring"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:26
+msgid ""
+"Pluggable, active monitoring via XMPP, retrieving detailed server "
+"statistics, receiving automatic notifications about possible problems "
+"discovered by the self-monitor mechanisms"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:28
+msgid "SNMP Monitoring"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:28
+msgid "Advanced server monitoring via SNMP."
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:30
+msgid "Bosh Cache"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:30
+msgid ""
+"Bosh Session Cache - a feature to quickly reload user data - roster, "
+"presences and messages history by the web client (for example after web "
+"page reload)"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:32
+msgid "Clustering"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:32
+msgid ""
+"Full clustering support for HA and LB with pluggabble clustering "
+"strategies for perfect optimising the cluster to the client’s system"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:34
+msgid "Advanced Clustering Strategy"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:34
+msgid "Dedicated, specialised clustering strategy for best possible performance"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:36
+msgid "MUC Clustered"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:36
+msgid "Support for clustering group chatrooms with various, pluggable strategies"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:38
+msgid "PubSub Clustered"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:38
+msgid "Support for clustering PubSub component with various, pluggable strategies"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:40
+msgid "Mobile optimisations"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:40
+msgid "Optimizations designed for Mobile Devices"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:42
+msgid "OSGi"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:42
+msgid ""
+"Support for running in OSGi environment, i.e. as embedded XMPP server in "
+"advanced application server"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:44
+msgid "Dynamic rosters"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:44
+msgid ""
+"Ability to create users' rosters entries on the fly based on data "
+"retrieved from any sources"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:46
+msgid "Command line admin tools"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:46
+msgid "Commandline utility to manage server"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:48
+msgid "Unified Archive"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:48
+msgid ""
+"An extension to XEP-0313 Message Archive Management, with greatly "
+"improved flexibility in terms of what can be archived."
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:53
+msgid "Repositories/Databases"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:55
+msgid "Table 7.Repositories/Databases"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:60
+msgid "DB per domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:60
+msgid "Ability to have multiple databases for specific domains."
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:62
+msgid "PostgreSQL"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:62
+msgid ""
+"Full support for PostgreSQL database with database schemas excluding "
+"dedicated DB schema for PubSub component"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:64
+msgid "MySQL"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:64
+msgid ""
+"Full support for MySQL database with database schemas, dedicated DB "
+"schema for PubSub component"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:66
+msgid "SQL Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:66
+msgid ""
+"Full support for MS SQL Server database with database schemas excluding "
+"dedicated DB schema for PubSub component, only in Tigase server version "
+"3.x"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:68
+msgid "Derby DB"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:68
+msgid ""
+"Full support for built-in Derby database with database schemas excluding "
+"dedicated DB schema for PubSub component"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:70
+msgid "JDBC"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:70
+msgid ""
+"Support for all JDBC enabled databases, although the database schemas are"
+" available for some databases"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:72
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:74
+msgid "Drupal Auth"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:72
+msgid ""
+"Drupal authentication - the Tigase server can share user authentication "
+"database with Drupal CMS and authenticate users agains Drupal user "
+"database"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:74
+msgid ""
+"Close integration with Drupal CMS, the Tigase can send notifications to "
+"subscribed users about new posts, comments and can also publish short "
+"news information via XMPP"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:76
+msgid "LDAP-Auth"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:76
+msgid "LDAP Authentication Connector Supported"
+msgstr ""
+
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:80
+msgid "Requires commercial license"
+msgstr ""
+

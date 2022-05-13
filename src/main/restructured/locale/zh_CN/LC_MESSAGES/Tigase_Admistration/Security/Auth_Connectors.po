@@ -1,0 +1,782 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:4
+msgid "Custom Authentication Connectors"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:6
+msgid ""
+"This article presents configuration options available to the "
+"administrator and describe how to set Tigase server up to use user "
+"accounts data from a different database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:8
+msgid ""
+"The first thing to know is that Tigase server always opens 2 separate "
+"connections to the database. One connection is used for user login data "
+"and the other is for all other user data like the user roster, vCard, "
+"private data storage, privacy lists and so on…​"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:10
+msgid ""
+"In this article we still assume that Tigase server keeps user data in "
+"it’s own database and only login data is retrieved from the external "
+"database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:12
+msgid "At the moment Tigase offers following authentication connectors:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:14
+msgid ""
+"``mysql``, ``pgsql``, ``derby`` - standard authentication connector used "
+"to load user login data from the main user database used by the Tigase "
+"server. In fact the same physical implementation is used for all JDBC "
+"databases."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:16
+msgid ""
+"``drupal`` - is the authentication connector used to integrate the Tigase"
+" server with `Drupal CMS <http://drupal.org/>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:18
+msgid ""
+"``tigase-custom`` - is the authentication connector which can be used "
+"with any database. Unlike the 'tigase-auth' connector it allows you to "
+"define SQL queries in the configuration file. The advantage of this "
+"implementation is that you don’t have to touch your database. You can use"
+" either simple plain SQL queries or stored procedures. The configuration "
+"is more difficult as you have to enter carefully all SQL queries in the "
+"config file and changing the query usually involves restarting the "
+"server. For more details about this implementation and all configuration "
+"parameters please refer to :ref:`Tigase Custom Auth "
+"documentation<custonAuthConnector>`."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:20
+msgid ""
+"|ss| ``tigase-auth``\\ |se|\\  (**DEPRECATED**) - is the authentication "
+"connector which can be used with any database. It executes stored "
+"procedures to perform all actions. Therefore it is a very convenient way "
+"to integrate the server with an external database if you don’t want to "
+"expose the database structure. You just have to provide a set of stored "
+"procedures in the database. While implementing all stored procedures "
+"expected by the server might be a bit of work it allows you to hide the "
+"database structure and change the SP implementation at any time. You can "
+"add more actions on user login/logout without restarting or touching the "
+"server. And the configuration on the server side is very simple. For "
+"detailed description of this implementation please refer to :ref:`Tigase "
+"Auth documentation<tigaseAuthConnector>`."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:22
+msgid ""
+"As always the simplest way to configure the server is through the "
+"``config.tdsl`` file. In the article describing this file you can find "
+"long list with all available options and all details how to handle it. "
+"For the authentication connector setup however we only need 2 options:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:38
+msgid ""
+"For example if you store authentication data in a ``drupal`` database on "
+"``localhost`` your settings would be:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:53
+msgid ""
+"You have to use a class name if you want to attach your own "
+"authentication connector."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:55
+msgid "Default is:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:65
+msgid ""
+"In the same exact way you can setup connector for any different database "
+"type."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:67
+msgid "For example, drupal configuration is below"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:77
+msgid "Or tigase-custom authentication connector."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:87
+msgid "The different ``cls`` or classes are:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:89
+msgid "Drupal - ``tigase.db.jdbc.DrupalWPAuth``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:91
+msgid ""
+"MySQL, Derby, PostgreSQL, MS SQL Server - "
+"``tigase.db.jdbc.JDBCRepository``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:93
+msgid ""
+"You can normally skip configuring connectors for the default Tigase "
+"database format: ``mysql``, ``pgsql`` and ``derby``, ``sqlserver`` as "
+"they are applied automatically if the parameter is missing."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:95
+msgid ""
+"One more important thing to know is that you will have to modify "
+"``authRepository`` if you use a custom authentication connector. This is "
+"because if you retrieve user login data from the external database this "
+"external database is usually managed by an external system. User accounts"
+" are added without notifying Tigase server. Then, when the user logs in "
+"and tries to retrieve the user roster, the server can not find such a "
+"user in the roster database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:99
+msgid ""
+"To keep user accounts in sync between the authentication database and the"
+" main user database you have to add following option to the end of the "
+"database connection URL: ``autoCreateUser=true``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:101
+msgid "For example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:111
+msgid ""
+"If you are interested in even further customizing your authentication "
+"connector by writing your own queries or stored procedures, please have a"
+" look at the following guides:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:113
+msgid ":ref:`Tigase Auth guide<tigaseAuthConnector>`"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors.rst:115
+msgid ":ref:`Tigase Custom Auth guide<custonAuthConnector>`"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:4
+msgid "Tigase Auth Connector (DEPRECATED)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:10
+msgid ""
+"The Tigase Auth connector with shortcut name: **tigase-auth** is "
+"implemented in the class: `tigase.db.jdbc.TigaseAuth "
+"<https://github.com/tigase/tigase-"
+"server/blob/master/src/main/java/tigase/db/jdbc/TigaseAuth.java>`__. It "
+"allows you to connect to any external database to perform user "
+"authentication. You can find more details how to setup a custom connector"
+" in the :ref:`Custom Authentication Connectors<customAuthentication>` "
+"guide."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:12
+msgid ""
+"To make this connector working you have to prepare your database to offer"
+" set of stored procedures for Tigase server to perform all the "
+"authentication actions. The best description is the example schema with "
+"all the stored procedures defined - please refer to the Tigase "
+"repositories for the schema definition files (each component has it’s "
+"dedicated schema). For example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:14
+msgid ""
+"`tigase-server <https://github.com/tigase/tigase-"
+"server/tree/master/src/main/database>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:16
+msgid ""
+"`tigase-pubsub <https://github.com/tigase/tigase-"
+"pubsub/tree/master/src/main/database>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:18
+msgid ""
+"`tigase-muc <https://github.com/tigase/tigase-"
+"muc/tree/master/src/main/database>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:20
+msgid ""
+"`tigase-message-archiving <https://github.com/tigase/tigase-message-"
+"archiving/tree/master/src/main/database>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:22
+msgid ""
+"`tigase-socks5 <https://github.com/tigase/tigase-"
+"socks5/tree/master/src/main/database>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:24
+msgid "The absolute minimum of stored procedures you have to implement is:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:26
+msgid ""
+"``TigUserLoginPlainPw`` - to perform user authentication. The procedure "
+"is always called when the user tries to login to the XMPP server. This is"
+" the only procedure which must be implemented and actually must work."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:28
+msgid ""
+"``TigUserLogout`` - to perform user logout. The procedure is always "
+"called when the user logouts or disconnects from the server. This "
+"procedure must be implemented but it can be empty and can do nothing. It "
+"just needs to exist because Tigase expect it to exist and attempts to "
+"call it."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:30
+msgid ""
+"With these 2 above stored procedures you can only perform user "
+"login/logouts on the external database. You can’t register a user "
+"account, change user password or remove the user. In many cases this is "
+"fine as all the user management is handled by the external system."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:32
+msgid ""
+"If you however want to allow for account management via XMPP you have to "
+"implement also following procedures:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:34
+msgid "``TigAddUserPlainPw`` - to add a new user account"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:36
+msgid "``TigRemoveUser`` - to remove existing user account"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Tigase_Auth_Connector.rst:38
+msgid ""
+"``TigUpdatePasswordPlainPw`` - to change a user password for existing "
+"account"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:4
+msgid "Tigase Custom Auth Connector"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:6
+msgid ""
+"The Tigase Custom Auth connector with shortcut name: **tigase-custom** is"
+" implemented in the class: `tigase.db.jdbc.TigaseCustomAuth "
+"<https://github.com/tigase/tigase-"
+"server/tree/master/src/main/java/tigase/db/jdbc/TigaseCustomAuth.java>`__."
+" It allows you to connect to any external database to perform user "
+"authentication and use a custom queries for all actions."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:8
+msgid ""
+"You can find more details how to setup a custom connector in the Custom "
+"Authentication Connectors guide."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:10
+msgid "The basic configuration is very simple:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:21
+msgid "That’s it."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:23
+msgid ""
+"The connector loads correctly and starts working using predefined, "
+"default list of queries. In most cases you also might want to define your"
+" own queries in the configuration file. The shortest possible description"
+" is the following example of the content from the ``config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:25
+msgid ""
+"This query is used to check connection to the database, whether it is "
+"still alive or not"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:35
+msgid ""
+"This is database initialization query, normally we do not use it, "
+"especially in clustered environment"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:47
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:127
+msgid ""
+"``online_status`` column does not exist and would need to be added for "
+"that query to work."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:49
+msgid ""
+"Below query performs user authentication on the database level. The "
+"Tigase server does not need to know authentication algorithm or password "
+"encoding type, it simply passes user id (BareJID) and password in form "
+"which was received from the client, to the stored procedure. If the "
+"authentication was successful the procedure returns user bare JID or null"
+" otherwise. Tigase checks whether the JID returned from the query matches"
+" JID passed as a parameter. If they match, the authentication is "
+"successful."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:62
+msgid ""
+"``TigUserLoginPlainPw`` is no longer part of a Tigase XMPP Server "
+"database schema and would need to be created."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:64
+msgid ""
+"Below query returns number of user accounts in the database, this is "
+"mainly used for the server metrics and monitoring components."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:74
+msgid "The Below query is used to add a new user account to the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:84
+msgid ""
+"Below query is used to remove existing account with all user’s data from "
+"the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:94
+msgid ""
+"This query is used for the user authentication if ``user-login-query`` is"
+" not defined, that is if there is no database level user authentication "
+"algorithm available. In such a case the Tigase server loads user’s "
+"password from the database and compares it with data received from the "
+"client."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:104
+msgid ""
+"Below query is used for user password update in case user decides to "
+"change his password."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:114
+msgid ""
+"This query is called on user logout event. Usually we use a stored "
+"procedure which records user logout time and marks user as offline in the"
+" database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:129
+msgid ""
+"This configuration specifies what non-sasl authentication mechanisms to "
+"expose to the client"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:139
+msgid ""
+"This setting to specify what sasl authentication mechanisms expose to the"
+" client"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:149
+msgid ""
+"Queries are defined in the configuration file and they can be either "
+"plain SQL queries or stored procedures. If the query starts with "
+"characters: ``{ call`` then the server assumes this is a stored procedure"
+" call, otherwise it is executed as a plain SQL query. Each configuration "
+"value is stripped from white characters on both ends before processing."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:151
+msgid ""
+"Please don’t use semicolon ``;`` at the end of the query as many JDBC "
+"drivers get confused and the query may not work."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:153
+msgid ""
+"Some queries can take arguments. Arguments are marked by question marks "
+"``?`` in the query. Refer to the configuration parameters description for"
+" more details about what parameters are expected in each query."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:155
+msgid ""
+"This example shows how to use a stored procedure to add a user as a query"
+" with 2 required parameters (username, and password)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:165
+msgid "The same query with plain SQL parameters instead:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:171
+msgid ""
+"The order of the query arguments is important and must be exactly as "
+"described in specification for each parameter."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:174
+msgid "Query Name"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:174
+msgid "Description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:174
+msgid "Arguments"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:174
+msgid "Example Query"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:176
+msgid "``conn-valid-query``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:176
+msgid "Query executed periodically to ensure active connection with the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:176
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:178
+msgid "Takes no arguments."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:176
+msgid "``select 1``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:178
+msgid "``init-db-query``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:178
+msgid "Database initialization query which is run after the server is started."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:178
+msgid "``update tig_users set online_status = 0``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:180
+msgid "``add-user-query``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:180
+msgid "Query adding a new user to the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:180
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:188
+msgid "Takes 2 arguments: ``(user_id (JID), password)``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:180
+msgid "``insert into tig_users (user_id, user_pw) values (?, ?)``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:182
+msgid "``del-user-query``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:182
+msgid "Removes a user from the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:182
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:184
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:190
+msgid "Takes 1 argument: ``(user_id (JID))``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:182
+msgid "``delete from tig_users where user_id = ?``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:184
+msgid "``get-password-query``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:184
+msgid "Retrieves user password from the database for given user_id (JID)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:184
+msgid "``select user_pw from tig_users where user_id = ?``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:186
+msgid "``update-password-query``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:186
+msgid "Updates (changes) password for a given user_id (JID)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:186
+msgid "Takes 2 arguments: ``(password, user_id (JID))``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:186
+msgid "``update tig_users set user_pw = ? where user_id = ?``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:188
+msgid "``user-login-query``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:188
+msgid ""
+"Performs user login. Normally used when there is a special SP used for "
+"this purpose. This is an alternative way to a method requiring retrieving"
+" user password. Therefore at least one of those queries must be defined: "
+"``user-login-query`` or ``get-password-query``. If both queries are "
+"defined then ``user-login-query`` is used. Normally this method should be"
+" only used with plain text password authentication or sasl-plain. Tigase "
+"expects a result set with user_id to be returned from the query if login "
+"is successful and empty results set if the login is unsuccessful."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:188
+msgid "``select user_id from tig_users where (user_id = ?) AND (user_pw = ?)``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:190
+msgid "``user-logout-query``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:190
+msgid ""
+"This query is called when user logs out or disconnects. It can record "
+"that event in the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:190
+msgid ""
+"``update tig_users, set online_status = online_status - 1 where user_id ="
+" ?``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:192
+msgid "``non-sasl-mechs``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:192
+msgid ""
+"Comma separated list of NON-SASL authentication mechanisms. Possible "
+"mechanisms are: ``password`` and ``digest``. The digest mechanism can "
+"work only with ``get-password-query`` active and only when password are "
+"stored in plain text format in the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:194
+msgid "``sasl-mechs``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Custom_Auth_Connector.rst:194
+msgid ""
+"Comma separated list of SASL authentication mechanisms. Possible "
+"mechanisms are all mechanisms supported by Java implementation. The most "
+"common are: ``PLAIN``, ``DIGEST-MD5``, ``CRAM-MD5``. \"Non-PLAIN\" "
+"mechanisms will work only with the ``get-password-query`` active and only"
+" when passwords are stored in plain text format in the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Drupal_Auth.rst:2
+msgid "Drupal Authentication"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Drupal_Auth.rst:4
+msgid ""
+"Currently, we can only check authentication against a **Drupal** database"
+" at the moment. Full **Drupal** authentication is not implemented as of "
+"yet."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Drupal_Auth.rst:6
+msgid ""
+"As **Drupal** keeps encrypted passwords in database the only possible "
+"authorization protocols are those based on PLAIN passwords."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Drupal_Auth.rst:8
+msgid ""
+"To protect your passwords **Tigase** server must be used with SSL or TLS "
+"encryption."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Drupal_Auth.rst:10
+msgid ""
+"Implementation of a **Drupal** database based authorization is located in"
+" ``tigase.db.jdbc.DrupalAuth`` class. Although this class is capable of "
+"adding new users to the repository I recommend to switch in-band "
+"registration off due to the caching problems in **Drupal.** Changes in "
+"database are not synchronized with **Drupal** yet. Functionality for "
+"adding new users is implemented only to ease user accounts migration from"
+" different repository types from earlier **Tigase** server installations."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Drupal_Auth.rst:12
+msgid ""
+"The purpose of that implementation was to allow all accounts "
+"administration tasks from **Drupal** like: account creation, all accounts"
+" settings, like e-mail, full name, password changes and so on."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Drupal_Auth.rst:14
+msgid ""
+"**Tigase** server uses following fields from **Drupal** database: name "
+"(user account name), pass (user account password), status (status of the "
+"account). Server picks up all changes instantly. If user status is not 1 "
+"then server won’t allow user to login trough XMPP even if user provides "
+"valid password."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/Drupal_Auth.rst:16
+msgid ""
+"There is no *Roster* management in **Drupal** yet. So Roster management "
+"have to be done from the XMPP client."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/LDAP_Auth.rst:2
+msgid "LDAP Authentication Connector"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/LDAP_Auth.rst:4
+msgid ""
+"Tigase XMPP Server offers support for authenticating users against an "
+"LDAP server in **Bind** **Authentication** mode."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/LDAP_Auth.rst:6
+msgid ""
+"Configuration for the LDAP support is really simple you just have to add "
+"a few lines to your ``config.tdsl`` file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/LDAP_Auth.rst:18
+msgid ""
+"Please note the ``USER_ID`` element, this is a special element of the "
+"configuration which is used to authenticate particular user. Tigase LDAP "
+"connector replaces it with appropriate data during authentication. You "
+"can control what Tigase should put into this part. In your configuration "
+"you must replace this string with one of the following:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/LDAP_Auth.rst:20
+msgid "``%1$s`` - use user name only for authentication (JabberID’s localpart)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/LDAP_Auth.rst:22
+msgid ""
+"``%2$s`` - use domain name only for authentication (JabberID’s domain "
+"part)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/LDAP_Auth.rst:24
+msgid "``%3$s`` - use the whole Jabber ID (JID) for authentication"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/LDAP_Auth.rst:28
+msgid ""
+"Please make sure that you included ``autoCreateUser=true`` in your main "
+"data source (UserRepository and **not** above AuthRepository) as outlined"
+" in `??? <#autoCreateUser>`__ - otherwise you may run into problems with "
+"data access."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/SASL_EXTERNAL.rst:2
+msgid "Configuration of SASL EXTERNAL"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/SASL_EXTERNAL.rst:4
+msgid ""
+"In order to enable SASL External set \"Client Certificate CA\" (``client-"
+"trust-extension-ca-cert-path``) to the path containing Certification "
+"Authority (CA) certificate in the VHost (domain) configuration, for "
+"example ``/path/to/cacert.pem``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/SASL_EXTERNAL.rst:6
+msgid ""
+"File ``cacert.pem`` contains Certificate Authority certificate which is "
+"used to sign clients certificate."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/SASL_EXTERNAL.rst:8
+msgid ""
+"Client certificate must include user’s Jabber ID as ``XmppAddr`` in "
+"``subjectAltName``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/SASL_EXTERNAL.rst:10
+msgid ""
+"As specified in RFC 3920 and updated in RFC 6120, during the stream "
+"negotiation process an XMPP client can present a certificate (a “client "
+"certificate”). If a JabberID is included in a client certificate, it is "
+"encapsulated as an id-on-xmppAddr Object Identifier (“xmppAddr”), i.e., a"
+" subjectAltName entry of type otherName with an ASN.1 Object Identifier "
+"of “id-on-xmppAddr” as specified in Section 13.7.1.4 of RFC 6120, "
+"`XEP-0178 <http://xmpp.org/extensions/xep-0178.html#c2s>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/SASL_EXTERNAL.rst:12
+msgid ""
+"It is possible to make client certificate **required** using same VHost "
+"configuration and enabling option ``Client Certificate Required`` "
+"(``client-trust-extension-cert-required``)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/SASL_EXTERNAL.rst:14
+msgid ""
+"If this option will be enabled, then client **must provide** certificate."
+" This certificate will be verified against ``clientCertCA``. If client "
+"does not provide certificate or certificate will be invalid, **TLS "
+"handshake will be interrupted and client will be disconnected**."
+msgstr ""
+
+#: ../../Tigase_Admistration/Security/Auth_Connectors/SASL_EXTERNAL.rst:16
+msgid ""
+"Using this options does not force client to use SASL EXTERNAL. Client "
+"still may authenticate with other SASL mechanisms."
+msgstr ""
+

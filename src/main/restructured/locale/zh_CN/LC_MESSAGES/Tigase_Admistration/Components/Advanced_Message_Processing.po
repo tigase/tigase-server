@@ -1,0 +1,167 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:2
+msgid "Advanced Message Processing - AMP XEP-0079"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:4
+msgid ""
+"Tigase server offers support for `XEP-0079: Advanced Message Processing "
+"<http://xmpp.org/extensions/xep-0079.html>`__ (often abbreviated to AMP)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:6
+msgid ""
+"It is enabled by default but there are several configuration options that"
+" you may tweak."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:8
+msgid ""
+"Configuration of AMP is not very complex, but as it is implemented as a "
+"component in the Tigase server it does needs a few settings to get it "
+"right."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:10
+msgid ""
+"Here is a first, brief overview of the AMP configuration and later "
+"detailed explanation of each parameter."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:24
+msgid "First of all: plugins"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:26
+msgid ""
+"Even though the whole functionality is implemented inside the component "
+"you need a way to forward messages with ``AMP`` payload to that "
+"component. This is what the ``amp`` plugin does. The ``amp`` plugin "
+"intercepts all ``<message/>`` packets even without AMP payload, "
+"redirecting some of the to the ``AMP`` component and others processing in"
+" a standard way. Therefore you no longer need ``message`` plugin or "
+"``msgoffline`` plugin. Those are all functions are offered by the ``amp``"
+" plugin now. Hence you have to switch ``message`` and ``msgoffline`` "
+"plugins off (the ``amp`` plugin is loaded by default):"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:36
+msgid ""
+"The ``amp`` plugin needs to know where to forward all the ``AMP`` "
+"packets. By default plugin uses hostname of the given machine as this is "
+"true to the most installations. However, this is configured by the last "
+"line of the example configuration, which forwards all packets to the "
+"address ``amp@your-domain.tld``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:47
+msgid "Secondly: component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:49
+msgid "By default Tigase loads the component with the standard name ``amp``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:52
+msgid "Optional parameters"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:54
+msgid ""
+"There is also one parameter shared between the component and the plugin. "
+"Connection to the database where offline messages are stored. The AMP "
+"component has a dedicated schema for storing offline messages designed "
+"for a high traffic and high load installations. It does not use "
+"``UserRepository`` for storing messages."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:56
+msgid ""
+"By default the same physical database as for ``UserRepository`` is used "
+"but you can change it and store messages in a completely separate "
+"location to reduce performance degradation of rest of the system. You can"
+" set a database connection string using following property:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:66
+msgid ""
+"The `XEP-0079 <http://xmpp.org/extensions/xep-0079.html>`__ specification"
+" has a `Section 9. - Security Considerations "
+"<http://xmpp.org/extensions/xep-0079.html#security>`__. As it describes, "
+"in some cases the AMP protocol can be used to reveal user’s presence "
+"information by other users who are not authorized for presence updates. "
+"There are a few possible ways to prevent this."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:68
+msgid ""
+"Tigase’s implementation offers 3 modes to handle ``AMP`` requests to "
+"prevent revealing user’s status to non-authorized users:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:74
+msgid ""
+"In this mode the server performs strict checking. The ``AMP`` "
+"specification is fully handled. This however involves roster loading for "
+"each offline user, hence it may impact the service performance. It may "
+"not be feasible or possible to run in this mode for services under a high"
+" load with lots of AMP messages."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:76
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:86
+msgid "In the XEP this mode is described in the following way:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:78
+msgid ""
+"*Accept the relevant condition only if the sender is authorized to "
+"receive the receiver’s presence, as a result of which the server MUST "
+"reply with a <not-acceptable/> error condition if the sender is not so "
+"authorized; this is the RECOMMENDED behavior. This is also the default in"
+" Tigase.*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:84
+msgid ""
+"Dummy checking is performed efficiently by just returning an error "
+"response every time there is a chance that the default action may reveal "
+"user status without looking into the user’s roster. This does not affect "
+"performance but it does impact the ``AMP`` compliance."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:88
+msgid ""
+"*Accept the relevant condition only if the action is \"drop\", as a "
+"result of which the server MUST reply with a <not-acceptable/> error "
+"condition if the action is \"alert\", \"error\", or \"notify\"; this is "
+"slightly less restrictive but still unnecessarily restricts the "
+"functionality of the system, so is NOT RECOMMENDED.*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Advanced_Message_Processing.rst:90
+msgid ""
+"It does not do any checking. It acts like all users are authorized to "
+"receive notifications, even if it may reveal user status to unauthorized "
+"users. It does not impact the server performance and it offers full AMP "
+"compliance."
+msgstr ""
+

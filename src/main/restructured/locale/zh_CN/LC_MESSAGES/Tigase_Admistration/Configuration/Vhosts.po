@@ -1,0 +1,298 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:2
+msgid "Virtual Hosts in Tigase Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:4
+msgid ""
+"Tigase server supports multiple virtual hosts in a single server "
+"installation. Virtual hosts can be added or removed, enabled or disabled "
+"during runtime without restarting the service or disrupting normal "
+"operation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:6
+msgid ""
+"This document describes how virtual hosts work in Tigase server and how "
+"to get the most out of this feature in your installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:8
+msgid ""
+"The `'default-virtual-host' <#virtHosts>`_ property allows to define name"
+" of the single vhost domain which will be considered a default vhost "
+"domain for this installation. It allows you just to configure the domain "
+"name. Any additional configuration needs to be configured using ad-hoc "
+"commands."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:10
+msgid ""
+"Virtual hosts should be managed using ad-hoc commands or admin ui, visit "
+"`Add and Manage Domains <#addManageDomain>` for description of vhosts "
+"management process or visit `Specification for ad-hoc Commands Used to "
+"Manage Virtual Domains <#adhocCommands>` for more information about ad-"
+"hoc commands."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:12
+msgid ""
+"If you have components that may not be able to handle multiple vhosts or "
+"cluster mode, we have developed a virtual component solution as well, "
+"details in the `Virtual Components for the Tigase Cluster "
+"<#virtualComponents>`__ section."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:14
+msgid ""
+"You may also want to reference the Vhosts API for additional information:"
+" - `API Description for Virtual Domains Management in Tigase Server "
+"<#addManageDomain>`."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:22
+msgid "Default VHost configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:24
+msgid ""
+"It’s possible to specify initial default configuration for all Virtual "
+"Host in TDSL configuration file (i.e. ``etc/config.tdsl``) for selected "
+"parameters. To do so you should specify each configuration option within "
+"``defaults`` bean belonging to ``vhost-man`` bean:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:42
+msgid ""
+"After initial definition of default configuration or after first startup "
+"of Tigase XMPP Server it is possible to configure Virtual Host defaults "
+"using ad-hoc commands by modifying values for ``default`` using ad-hoc as"
+" described in `Specification for ad-hoc Commands Used to Manage Virtual "
+"Domains <#adhocCommands>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:44
+msgid ""
+"Alternatively, you may edit default Virtual Host configuration "
+"(configuration for domain ``default``) using Admin UI which by default is"
+" available at ``http://localhost:8080/admin/``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:49
+msgid "Specification for ad-hoc Commands Used to Manage Virtual Domains"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:51
+msgid ""
+"There are 3 ad-hoc commands for virtual domains management in the Tigase "
+"server:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:53
+msgid ""
+"``VHOSTS_RELOAD`` used to reload virtual domains list from the repository"
+" (database)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:55
+msgid ""
+"``VHOSTS_UPDATE`` used to add a new virtual domain or update information "
+"for existing one."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:57
+msgid ""
+"``VHOSTS_REMOVE`` used to remove an existing virtual host from the "
+"running server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:59
+msgid ""
+"Syntax of the commands follows the specification described in `XEP-0050 "
+"<http://xmpp.org/extensions/xep-0050.html>`__. Extra information required"
+" to complete the command is carried as data forms described in `XEP-0004 "
+"<http://xmpp.org/extensions/xep-0004.html>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:61
+msgid ""
+"All commands are accepted by the server only when send by the "
+"installation administrator. If the command is sent from any other account"
+" ``<not-authorized />`` error is returned. To grant administrator rights "
+"to an account you have to set ``admins`` property in the ``config.tdsl`` "
+"configuration file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:63
+msgid ""
+"Commands are sent to the 'vhost-man' server component and the 'to' "
+"attribute of the stanza must contain a full JID of the VHostManager on "
+"the server. The full **JID** consists of the component name: 'vhost-man' "
+"and the local domain, that is domain which is already on the list of "
+"virtual domains and is active. Assuming 'existing.domain.com' one of "
+"domains already activated for the server installation the **JID** is: "
+"'vhost-man@existing.domain.com'."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:66
+msgid "Reloading the Domains List from the Database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:68
+msgid ""
+"In order to reload virtual domains from the permanent repository other "
+"than configuration file, you have to send ``VHOSTS_RELOAD`` ad-hoc "
+"command to the VHostManager on the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:70
+msgid "The reload command request is of the form:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:81
+msgid ""
+"The server sends a response upon successful completion of the command "
+"with current number of virtual domains server by the installation:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:100
+msgid ""
+"If the command is sent from an account other than admin, the server "
+"returns an error:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:119
+msgid ""
+"The response doesn’t have any special meaning other then end-user "
+"information. The client may ignore the response as it is sent after the "
+"command has been executed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:122
+msgid "Adding a New Domain or Updating Existing One"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:124
+msgid ""
+"In order to add a new domain or update existing one you have to send an "
+"ad-hoc command ``VHOSTS_UPDATE`` with at least one domain name in the "
+"command data form. You can also specify whether the domain is enabled or "
+"disabled but this is optional. Future releases may allow for setting "
+"additional parameters for the domain: maximum number of user accounts for"
+" this domain, anonymous login enabled/disabled for the domain, "
+"registration via XMPP enabled/disabled for this domain and some more "
+"parameters not specified yet."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:126
+msgid "The domain add/update command request is of the form:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:148
+msgid ""
+"Please note: Character case in the command field variable names does "
+"matter."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:150
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:192
+msgid ""
+"Upon successful completion of the command the server sends a response "
+"back to the client with information of the existing number of virtual "
+"hosts on the server:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:170
+msgid "Removing a Virtual Domain From the Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:172
+msgid ""
+"In order to remove a virtual domain you have to send ``VHOSTS_REMOVE`` "
+"command to the server with the domain name."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:174
+msgid "The domain remove command is sent by the client:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:214
+msgid "Virtual Components for the Cluster Mode"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:216
+msgid ""
+"Let’s assume you have a cluster installation and you want to include a "
+"component in your installation which doesn’t support the cluster mode "
+"yet. If you put it on all nodes as a separate instances they will work "
+"out of sync and overall functionality might be useless. If you put on one"
+" node only it will work correctly but it will be visible to users "
+"connected to this one node only."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:218
+msgid ""
+"Ideally you would like to have a mechanism to install it on one node and "
+"put some redirections on other nodes to forward all packets for this "
+"component to a node where this component is working. Redirection on it’s "
+"own is not enough because the component must be visible in service "
+"discovery list and must be visible somehow to users connected to all "
+"nodes."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:220
+msgid ""
+"This is where the virtual components are handy. They are visible to users"
+" as a local normal component, they seem to be a real local component but "
+"in fact they just forward all requests/packets to a cluster node where "
+"the real component is working."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:222
+msgid ""
+"Virtual component is a very lightweight ServerComponent implementation in"
+" Tigase server. It can pretend to be any kind of component and can "
+"redirect all packets to a given address. They can mimic native Tigase "
+"components as well as third-party components connected over external "
+"component protocol (XEP-0114)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:224
+msgid ""
+"Configuration is very simple and straightforward, in fact it is very "
+"similar to configuration of any Tigase component. You set a real "
+"component name as a name of the component and a virtual component class "
+"name to load. Let’s say we want to deploy MUC component this way. The MUC"
+" component is visible as ``muc.domain.oug`` in the installation. Thus the"
+" name of the component is: ``muc``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:230
+msgid ""
+"This is pretty much all you need to load a virtual component. A few other"
+" options are needed to point to correct destination addresses for packets"
+" forwarding and to set correct service discovery parameters:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Vhosts.rst:244
+msgid "That’s it."
+msgstr ""
+

@@ -1,0 +1,450 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:4
+msgid "Add and Manage Domains (VHosts)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:6
+msgid ""
+"Tigase XMPP Server offers an easy to use and very flexible way to add and"
+" manage domains hosted on installation (vhosts)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:8
+msgid "There are two ways of managing domains you host on your server:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:10
+msgid "using web-based admin management console - `Admin UI <#usingAdminUI>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:12
+msgid ""
+"using XMPP ad-hoc commands by XMPP client, ie. `Psi <http://psi-"
+"im.org/>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:16
+msgid ""
+"To use any of those ways, you need to be an administrator of the server, "
+"which means that you have a XMPP account created on this XMPP server and "
+"your account JID is added to `the list of the administrators <#admins>`__"
+" in the Tigase XMPP Server configuration file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:19
+msgid "Using Admin UI"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:21
+msgid ""
+"First, you need to open Admin UI web page. By default Admin UI is enabled"
+" and available at the port ``8080`` at path ``/admin/`` on the XMPP "
+"server. Assuming that your are logged on the same machine which hosts "
+"Tigase XMPP Server, it will be available at http://localhost:8080/admin/."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:23
+msgid ""
+"When you will be prompted for username and password to login to the Admin"
+" UI please fill username with full JID of your XMPP admin account and "
+"fill password field with password for this account. When you submit "
+"correct credentials you will get access to the Admin UI and Tigase XMPP "
+"Server configuration and management web-based interface."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:26
+msgid "Adding a new domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:28
+msgid ""
+"To add a new domain you need to open ``Configuration`` section of the "
+"Admin UI (by clicking on ``Configuration`` label and then selecting ``Add"
+" new item`` position which mentions ``vhost-man``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:30
+msgid "|adminui vhost add item button|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:136
+msgid "adminui vhost add item button"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:32
+msgid ""
+"After doing that, you will be presented with a form which you need to "
+"fill in. This form allows you to pass ``Domain name`` to add and other "
+"options (some of the are advanced options)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:34
+msgid "|adminui vhost add item form|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:137
+msgid "adminui vhost add item form"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:38
+msgid ""
+"All options with exception of ``Domain name`` may be changed later on by "
+"modifying vhost settings."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:40
+msgid ""
+"When you will be ready, please submit the form using button below the "
+"form. As a result you will be presented with a result of this operation. "
+"If it was successful it show ``Operation successful`` message and if "
+"something was not OK, it will display an error to help you fix this issue"
+" which you encountered."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:43
+msgid "Modifying domain settings"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:45
+msgid ""
+"Modifying a domain settings is very similar to adding a new domain. You "
+"need to open ``Configuration`` section of the Admin UI and then select "
+"``Update item configuration`` position which mentions ``vhost-man``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:47
+msgid "|adminui vhost update item button|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:138
+msgid "adminui vhost update item button"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:49
+msgid ""
+"You will be presented with a list of domains hosted on this Tigase XMPP "
+"Server installation. From them you should choose the one for which you "
+"wish to modify settings."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:51
+msgid "|adminui vhost update item domains list|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:139
+msgid "adminui vhost update item domains list"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:53
+msgid ""
+"After submitting this selection, you will be presented with a the same "
+"form as the one used during adding a new domain. It presents "
+"configuration options for this domain and currently used values."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:55
+msgid "|adminui vhost update item form|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:140
+msgid "adminui vhost update item form"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:57
+msgid ""
+"Now you should adjust them as you wish and submit this form using the "
+"button below the form."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:59
+msgid ""
+"As a result you will be presented with a result of this operation. If it "
+"was successful it show ``Operation successful`` message and if something "
+"was not OK, it will display an error to help you fix this issue which you"
+" encountered."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:62
+msgid "Removing a domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:64
+msgid ""
+"Removing a hosted domain from the Tigase XMPP Server installation is "
+"quite simple as well. You need to open ``Configuration`` section of the "
+"Admin UI and then select ``Remove an item`` position which mentions "
+"``vhost-man``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:66
+msgid "|adminui vhost remove item button|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:141
+msgid "adminui vhost remove item button"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:68
+msgid ""
+"You will be presented with a list of domains hosted on this Tigase XMPP "
+"Server installation. From them you should select the one which should be "
+"removed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:70
+msgid "|adminui vhost remove item domains list|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:142
+msgid "adminui vhost remove item domains list"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:72
+msgid ""
+"After submitting your selection, Tigase XMPP Server will try to remove "
+"this domain from the list of hosted domains and will present you with the"
+" result. If it was successful it show ``Operation successful`` message "
+"and if something was not OK, it will display an error to help you fix "
+"this issue which you encountered."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:75
+msgid "Using ad-hoc commands"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:77
+msgid ""
+"For everybody interested in using our service to host their own XMPP "
+"domain we have good news! You do not have to ask an administrator to add "
+"your domain or add users for your domain anymore. You can do it on your "
+"own."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:79
+msgid ""
+"Please note, this is very new stuff. Something may go wrong or may not be"
+" polished. Please report any problems, notices or suggestions."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:81
+msgid ""
+"This is the guide to walk you through the new functions and describes how"
+" to add a new domain and new users within your domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:83
+msgid ""
+"You can do everything from your XMPP client or you can use our web "
+"application that allows you to connect to the service and execute admin "
+"commands. I recommend `Psi <http://psi-im.org/>`__ because of its "
+"excellent support for parts of the XMPP protocol which are used for "
+"domains and user management. You may use other clients as well, but we "
+"can only offer support and help if you use Psi client."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:85
+msgid ""
+"Secondly, you need an account on the server. This is because all the "
+"commands and features described here are available to local users only. "
+"Therefore, if you do not have a registered domain with us yet, please go "
+"ahead and register an account on the website either the `Tigase.IM "
+"<http://www.tigase.im/>`__ or `Jabber.Today <http://jabber.today/>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:88
+msgid "Adding a New Domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:90
+msgid ""
+"Once you register an account on one of the websites, connect to the XMPP "
+"server using the account on the Psi client. We will be using the "
+"following account: green@tigase.im which is this guide."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:92
+msgid ""
+"When you are ready right click on the account name in Psi roster window "
+"to bring up context menu. Select **Service Discovery** element."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:94
+msgid "|service disco menu|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:143
+msgid "service disco menu"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:96
+msgid ""
+"A new windows pops up as in the example on the right. The service "
+"discovery window is where all the stuff installed on XMPP service should "
+"show up. Most of elements on the list are well known transports, MUC and "
+"PubSub components. The new stuff on the list, which we are interested in,"
+" are 2 elements: **VHost Manager** and **Session Manager**."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:98
+msgid "|service disco window vhost|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:144
+msgid "service disco window vhost"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:100
+msgid ""
+"**VHost Manager** component in Tigase is responsible for managing and "
+"controlling virtual hosts on the installation. It provides virtual hosts "
+"information to all other parts of the system and also allows you to add "
+"new hosts and remove/update existing virtual hosts."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:102
+msgid ""
+"**Session Manager** component in Tigase is responsible for managing "
+"users. In most cases online users but it can also perform some actions on"
+" user repository where all user data is stored."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:104
+msgid ""
+"Select **VHost Manager** and double click on it. A new windows shows up "
+"(might be hidden behind the service discovery window). The window "
+"contains another menu with a few items: **Add…​, Remove…​** and "
+"**Update…​** . These are for adding, removing and updating VHost "
+"information. For now, just select the first element **Add…​.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:106
+msgid "|command menu add vhost|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:145
+msgid "command menu add vhost"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:108
+msgid ""
+"Click **Execute** and you get a new window where you can enter all of "
+"your VHost configuration details. All fields should be self explanatory. "
+"Leave a blank field for **Other parameters** for now. **Owner** is you, "
+"that is Jabber ID which controls the domain and can change the domain "
+"configuration settings or can remove the domain from the service. "
+"**Administrators** field can be left blank or can contain comma separated"
+" list of Jabber IDs for people who can manage users within the domain. "
+"You do not need to add your user name to the list as Owners can always "
+"manage users for the domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:110
+msgid "|add vhost window|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:146
+msgid "add vhost window"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:112
+msgid ""
+"When you are ready click the **Finish** button. All done, hopefully. You "
+"can get either a window confirming everything went well or a window "
+"printing an error message if something went wrong. What can be wrong? "
+"There are some restrictions I decided to put on the service to prevent "
+"abuse. One of the restrictions is the maximum number of domains a user "
+"can register for himself which is **25** right now. Another restriction "
+"is that the domain which you add must have a valid DNS entry pointing to "
+"our service. The XMPP guide describes all the details about DNS settings."
+" Please refer to these instructions if you need more details."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:115
+msgid "Adding a New User"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:117
+msgid ""
+"Adding a new user process is quite similar, almost identical to adding a "
+"new domain. This time, however we have to select **Session Manager** in "
+"the service discovery window."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:119
+msgid "|service disco window sm|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:147
+msgid "service disco window sm"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:121
+msgid ""
+"Double click on the **Session Manager** and a window with SM’s commands "
+"list shows up. Right now, there is only one command available to domain "
+"administrators - **Add user**. I am going to make available more commands"
+" in the future and I am waiting for your suggestions."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:123
+msgid "|command menu add user|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:148
+msgid "command menu add user"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:125
+msgid ""
+"If you click **Execute** a window presented on the left shows up. Fill "
+"all fields accordingly and press **Finish**."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:127
+msgid "|add user window|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:149
+msgid "add user window"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:129
+msgid ""
+"If everything went well you have just added a new user and you should get"
+" a window confirming successful operation. If something went wrong, a "
+"window with an error message should show up. Possible errors may be you "
+"tried to add a user which is already present, or you may have tried to "
+"add a user for a domain to which you do not have permission or to non-"
+"existen domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:132
+msgid "SSL Certificate Management"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Virtual_Domains.rst:134
+msgid ""
+"SSL Certificate Management has been implemented, and certificates can be "
+"manipulated when in a .pem form. For more details, see `Creating and "
+"Loading the Server Certificate in pem Files <#certspem>`__ section of "
+"documentation for more information."
+msgstr ""
+

@@ -1,0 +1,494 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:2
+msgid "User connectivity"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:5
+msgid "bosh-close-connection"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:7
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:282
+msgid "**Default value:** ``false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:9
+msgid "**Example:** ``'bosh-close-connection' = true``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:11
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:286
+msgid "**Possible values:** ``true|false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:13
+msgid ""
+"**Description:** This property globally disables Bosh keep-alive support "
+"for Tigase server. It causes the Bosh connection manager to force close "
+"the HTTP connection each time data is sent to the Bosh client. To "
+"continue communication the client must open a new HTTP connection."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:15
+msgid ""
+"This setting is rarely required but on installations where the client "
+"cannot control/disable keep-alive Bosh connections and keep-alive does "
+"not work correctly for some reason."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:17
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:41
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:172
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:207
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:242
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:277
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:290
+msgid "**Available since:** 8.0.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:20
+msgid "bosh-extra-headers-file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:22
+msgid "*Default value:** ``'etc/bosh-extra-headers.txt'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:24
+msgid "**Example:** ``'bosh-extra-headers-file' = ''/path/to/file.txt'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:26
+msgid "**Possible values:** 'path to a file on the filesystem.'"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:28
+msgid ""
+"**Description:** This property allows you to specify a path to a text "
+"file with additional HTTP headers which will be sent to a Bosh client "
+"with each request. This gives some extra flexibility for Bosh clients "
+"running on some systems with special requirements for the HTTP headers "
+"and some additional settings."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:30
+msgid ""
+"By default a file distributed with the installation contains following "
+"content:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:39
+msgid ""
+"This can be modified, removed or replaced with a different content on "
+"your installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:44
+msgid "client-access-policy-file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:46
+msgid "**Default value:** ``etc/client-access-policy.xml``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:48
+msgid ""
+"**Example:** ``'client-access-policy-file' = ''/path/to/access-policy-"
+"file.xml'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:50
+msgid "**Possible values:** path to a file on the filesystem."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:52
+msgid ""
+"**Description:** The ``client-access-policy-file`` property allows "
+"control of the cross domain access policy for Silverlight based web "
+"applications. The cross domain policy is controlled via XML file which "
+"contains the policy and rules."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:54
+msgid ""
+"By default Tigase is distributed with an example policy file which allows"
+" for full access from all sources to the whole installation. This is "
+"generally okay for most Bosh server installations. The configuration "
+"through the property and XML files allows for a very easy and flexible "
+"modification of the policy on any installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:56
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:151
+msgid "**Available since:** 5.2.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:59
+msgid "client-port-delay-listening"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:61
+msgid ""
+"**Description:** The property allows to enabled or disable delaying of "
+"listening for client connections **in cluster mode** until the cluster is"
+" correctly connected."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:63
+msgid "**Default value:** ``true``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:65
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:160
+msgid "**Example:**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:73
+msgid "**Possible values:** ``true``, ``false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:75
+msgid ""
+"In cluster mode, in order to ensure correct user status broadcast, we are"
+" delaying opening client ports (components: ``c2s``, ``ws2s``, ``bosh``) "
+"and enable those only after cluster is fully and correctly connected "
+"(i.e. either there is only single node or in case of multiple nodes all "
+"nodes connected correctly)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:77
+msgid ""
+"It’s possible to enable/disable this on per-component basis with the "
+"following configuration:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:91
+msgid ""
+"Maximum delay time depends on the component and it’s multiplication of "
+"``ConnectionManager`` default connection delay times ``30s`` - in case of"
+" client connection manager this delay equals 60s."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:95
+msgid "Only applicable if **Cluster Mode** is active!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:97
+msgid "**Available since:** 7.1.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:100
+msgid "cross-domain-policy-file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:102
+msgid "**Default value:** ``etc/cross-domain-policy.xml``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:104
+msgid ""
+"**Example:** ``'cross-domain-policy-file' = ''/path/to/cross-domain-"
+"policy.xml'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:106
+msgid "**Possible values:** path to a file on the file system."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:108
+msgid ""
+"**Description:** This property allows you to set a path to a file with "
+"cross domain access policy for flash based clients. This is a standard "
+"XML file which is sent to the flash client upon request."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:110
+msgid ""
+"A default file distributed with Tigase installations allows for full "
+"access for all. This is good enough for most use cases but it can be "
+"changed by simply editing the file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:112
+msgid ""
+"This is a global property that can also be overridden by configuring "
+"connection managers [ c2s, s2s, ws2s, bosh, ext, etc] and they may all "
+"have their own policies."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:120
+msgid "**Available since:** 5.1.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:123
+msgid "domain-filter-policy"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:125
+msgid "**Default value:** ``ALL``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:127
+msgid "**Example:** ``domain-filter-policy' = 'LOCAL``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:129
+msgid ""
+"**Possible values:** "
+"``ALL|LOCAL|OWN|BLOCK|LIST=domain1;domain2|BLACKLIST=domain1;domain2``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:131
+msgid ""
+"**Description:** The ``domain-filter-policy`` property is a global "
+"setting for setting communication filtering for vhosts. This function is "
+"kind of an extension of the same property which could be set on a single "
+"user level. However, in many cases it is desired to control users "
+"communication not on per user-level but on the domain level. Domain "
+"filtering (communication filtering) allows you to specify with whom users"
+" can communicate for a particular domain. It enables restriction of "
+"communications for a selected domain or for the entire installation. A "
+"default value ``ALL`` renders users for the domain (by default for all "
+"domains) able to communicate with any user on any other domains. Other "
+"possible values are:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:133
+msgid ""
+"``ALL`` a default value allowing users to communicate with anybody on any"
+" other domain, including external servers."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:135
+msgid ""
+"``LOCAL`` allows users to communicate with all users on the same "
+"installation on any domain. It only blocks communication with external "
+"servers."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:137
+msgid ""
+"``OWN`` allows users to communicate with all other users on the same "
+"domain. Plus it allows users to communicate with subdomains such as "
+"**muc.domain**, **pubsub.domain**, etc…"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:139
+msgid ""
+"``BLOCK`` value completely blocks communication for the domain or for the"
+" user with anybody else. This could be used as a means to temporarily "
+"disable account or domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:141
+msgid ""
+"``LIST`` property allows to set a list of domains (users' JIDs) with "
+"which users on the domain can communicate (i.e. *whitelist*)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:143
+msgid ""
+"``BLACKLIST`` - user can communicate with everybody (like ``ALL``), "
+"except contacts on listed domains."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:145
+msgid ""
+"This is a global property which is overridden by settings for particular "
+"VHosts (see `??? <#addManageDomain>`__)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:147
+msgid ""
+"A default settings for all virtual hosts for which the configuration is "
+"not defined. This settings is useful mostly for installations with many "
+"virtual hosts listed in the init.property file for which there is no "
+"individual settings specified. It allows default value for all of "
+"servers, instead of having to provide individual configuration for each "
+"vhost."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:149
+msgid ""
+"``ALL`` is also applied as a default value for all new vhosts added at "
+"run-time."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:154
+msgid "see-other-host"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:156
+msgid ""
+"--cmSeeOtherHost has been replaced with using ``seeOtherHost`` setting, "
+"and can be configured for each connection manager (c2s, s2s, etc..)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:158
+msgid "**Default value:** ``tigase.server.xmppclient.SeeOtherHostHashed``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:168
+msgid "**Possible values:** 'none' 'or class implementing SeeOtherHostIfc.'"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:170
+msgid ""
+"**Description:** Allows you to specify a load balancing mechanism by "
+"specifying SeeOtherHostIfc implementation. More details about "
+"functionality and implementation details can be found in Tigase Load "
+"Balancing documentation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:175
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:205
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:275
+msgid "watchdog_timeout"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:177
+msgid "**Default value:** ``1740000``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:179
+msgid "**Example:** ``watchdog_timeout=60000``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:181
+msgid "**Possible values:** ``any integer.``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:183
+msgid ""
+"**Description:** The ``watchdog_timeout`` property allows for fine-tuning"
+" ConnectionManager Watchdog (service responsible for detecting broken "
+"connections and closing them). Timeout property relates to the amount of "
+"time (in miliseconds) after which lack of response/activity on a given "
+"connection will considered such connection as broken an close it. In "
+"addition to global configuration presented above a per component "
+"configuration is possible:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:191
+msgid "for example (for C2SConnectionManager):"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:199
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:234
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:269
+msgid "All related configuration options:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:201
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:236
+msgid "`watchdog_Ping_Type <#watchdogPingType>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:203
+msgid "`watchdog_delay <#watchdogDelay>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:210
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:238
+msgid "watchdog_delay"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:212
+msgid "**Default value:** ``600000``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:214
+msgid "**Example:** ``watchdog_delay = '30000'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:216
+msgid "**Possible values:** 'any integer.'"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:218
+msgid ""
+"**Description:** ``watchdog_delay`` configuration property allows "
+"configuring delay (in milliseconds) between subsequent checks that "
+"ConnectionManager Watchdog (service responsible for detecting broken "
+"connections and closing them) will use to verify the connection. In "
+"addition to global configuration presented above a per component "
+"configuration is possible:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:226
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:261
+msgid "for example (for ClusterConnectionManager):"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:240
+msgid "`watchdog_timeout <#watchdogTimeout>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:245
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:271
+msgid "watchdog_ping_type"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:247
+msgid "**Default value:** ``whitespace``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:249
+msgid "**Example:** ``watchdog_ping_type = 'XMPP'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:251
+msgid "**Possible values:** ``WHITESPACE``,\\ ``XMPP``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:253
+msgid ""
+"**Description:** ``watchdog_ping_type`` configuration property allows "
+"configuring of the type of ping that ConnectionManager Watchdog (service "
+"responsible for detecting broken connections and closing them) will use "
+"to check the connection. In addition to global configuration presented "
+"above a per component configuration is possible:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:273
+msgid "`watchdog_Delay <#watchdogDelay>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:280
+msgid "ws-allow-unmasked-frames"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:284
+msgid "**Example:** ``'ws-allow-unmasked-frames' = true``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:288
+msgid ""
+"**Description:** RFC 6455 specifies that all clients must mask frames "
+"that it sends to the server over Websocket connections. If unmasked "
+"frames are sent, regardless of any encryption, the server must close the "
+"connection. Some clients however, may not support masking frames, or you "
+"may wish to bypass this security measure for development purposes. This "
+"setting, when enabled true, will allow connections over websocket to be "
+"unmasked to the server, and may operate without Tigase closing that "
+"connection."
+msgstr ""
+

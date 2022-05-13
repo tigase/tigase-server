@@ -1,0 +1,171 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:2
+msgid "Upgrading to v8.0.0 from v7.1.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:4
+msgid ""
+"There have been a number of changes to the user and auth databases since "
+"v7.1.0. As a result, if you are upgrading from older versions, you will "
+"need to follow this guide."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:8
+msgid "We recommend installing Tigase XMPP Server 8.0.0 in a separate directory."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:11
+msgid "Backup your data"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:13
+msgid ""
+"As with any migration it is highly recommended that you backup your "
+"repository before conducting any upgrade operations."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:15
+msgid "For MySQL databases:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:23
+msgid "Setup Tigase XMPP Server 8.0.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:25
+msgid ""
+"After downloading Tigase XMPP Server 8.0.0 from our website, or using "
+"wget, extract the files to a separate directory."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:27
+msgid ""
+"Copy the ``tigase.conf`` and ``init.properties`` files from the old "
+"directory to v8.0.0 directory."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:35
+msgid "Import the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:45
+msgid "Upgrade configuration file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:47
+msgid ""
+"Tigase XMPP Server has a utility that can be called using ``upgrade-"
+"config`` that will update your old ``init.properties`` file and create a "
+"new file using DSL."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:53
+msgid "When everything is ready it will printout following information"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:64
+msgid "Connect new database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:66
+msgid ""
+"Edit your new ``config.tdsl`` file to connect to the new database you "
+"created during the import step."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:83
+msgid "Upgrade Database schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:85
+msgid ""
+"Upgrading database schemas is now possible using the ``upgrade-schema`` "
+"option. Do this now."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:94
+msgid "Your database schema MUST be v8 or conversion will not occur properly!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:96
+msgid "You will be asked the following prompts:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:104
+msgid "Upon success, you should see the following:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:125
+msgid "Start Tigase!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:129
+msgid "Help?"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:131
+msgid ""
+"Both ``upgrade`` commands also have a build in help function, they can be"
+" called if needed from the command line. You can also run these commands "
+"for help."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:140
+msgid "Upgrade/Restore with a script [experimental!]"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:142
+msgid ""
+"To make upgrade process easier it’s possible to utilize `tigase-"
+"upgrade.sh <files/tigase-upgrade.sh>`__ \\*nix shell script. It permits "
+"upgrading to new version (supports downloading version from provided "
+"URL)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:144
+msgid "It’s usage is as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:150
+msgid ""
+"Where: \\* ``{upgrade|rollback}`` - defines whether to perform upgrade or"
+" rollback to previous version \\* ``install_package`` - package to which "
+"perform upgrade (can be URL) in case of upgrade or backed-up installation"
+" (from which we want to restore) in case of rollback \\* "
+"``install_directory`` - destination directory (both in upgrade and "
+"rollback); can be symlink in which case it will be preserved with "
+"upgraded/restored path as target \\* ``[tar|dir]`` - (optional) type of "
+"backup (either simply copy directory or also archive it using ``tar`` "
+"command); by default ``dir`` is used."
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:152
+msgid ""
+"To upgrade installation to version ``tigase-server-8.0.0-SNAPSHOT-b5285"
+"-dist-max.tar.gz`` execute the script as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Quick_Start_Guide/Upgrading_from_Older_versions.rst:158
+msgid ""
+"To rollback from ``tigase-server-8.0.0-SNAPSHOT-"
+"b5264_backup-18-11-05_1712`` backup execute script as follows:"
+msgstr ""
+

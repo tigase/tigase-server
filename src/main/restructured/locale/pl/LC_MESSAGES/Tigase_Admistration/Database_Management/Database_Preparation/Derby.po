@@ -1,0 +1,97 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:2
+msgid "Prepare the Derby Database for the Tigase Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:4
+msgid ""
+"This guide describes how to prepare Derby database for connecting the "
+"Tigase server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:7
+msgid "Basic Setup"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:8
+msgid ""
+"Preparation of Derby database is quite simple, but the following "
+"assumptions are made"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:10
+msgid "``DerbyDB`` - Derby database name"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:12
+msgid "``database/`` directory contains all necessary schema files"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:14
+msgid "``jars/`` and ``libs/`` directories contains Tigase and Derby binaries"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:16
+msgid "General Approach"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:18
+msgid ""
+"From the main Tigase directory execute following commands (Linux and "
+"Windows accordingly)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:22
+msgid "You must use these sql files on order FIRST!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:24
+msgid "**Linux**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:30
+msgid "**Windows**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:36
+msgid ""
+"This will create Derby database named DerbyDB in the main Tigase "
+"directory and load common version for common v0.1."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:38
+msgid "You will need to repeat this process again in for following order:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:53
+msgid "Other components may require installation such as:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:62
+msgid "Connecting Tigase to database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:64
+msgid ""
+"Once the database is setup, configure the ``config.tdsl`` file in Tigase "
+"and add the following configuration:"
+msgstr ""
+

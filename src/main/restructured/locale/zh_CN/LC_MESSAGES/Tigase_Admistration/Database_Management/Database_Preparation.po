@@ -1,0 +1,1434 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:2
+msgid "Database Preparation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:4
+msgid ""
+"Tigase uses generally the same database schema and the same set of stored"
+" procedures and functions on every database. However, the schema creation"
+" scripts and code for stored procedures is different for each database. "
+"Therefore the manual process to prepare database is different for each "
+"database system."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:6
+msgid ""
+"Starting with v8.0.0, most of the database tasks have been automated and "
+"can be called using simple text, or using interactive question and answer"
+" style. We **DO NOT RECOMMEND** going through manual operation, however "
+"we have kept manual activation of different databases to the Appendix. If"
+" you are interested in how we manage and update our database schemas, you"
+" may visit the ` Schema files maintenance <#Schema-files-maintenance>`__ "
+"section of our Redmine installation for more detailed information."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:8
+msgid "`The DBSchemaLoader Utility <#Schema-Utility>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:10
+msgid "`Hashed User Passwords in Database <#Hashed-User-Passwords-in-Database>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:12
+msgid "`Support for MongoDB <#Preparing-Tigase-for-MongoDB>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:14
+msgid "Appendix entries"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:16
+msgid ""
+"`Manual installtion for MySQL <#Prepare-the-MySQL-Database-for-the-"
+"Tigase-Server>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:18
+msgid ""
+"`Manual installtion for Derby <#Prepare-the-Derby-Database-for-the-"
+"Tigase-Server>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:20
+msgid ""
+"`Manual installtion for SQLServer <#Prepare-the-MS-SQL-Server-Database-"
+"for-the-Tigase-Server>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation.rst:22
+msgid ""
+"`Manual installtion for PostGRESQL <#Prepare-the-PostgreSQL-Database-for-"
+"the-Tigase-Server>`__"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:2
+msgid "Schema Utility"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:4
+msgid ""
+"With the release of v8.0.0 calling the Tigase dbSchemaLoader utility now "
+"can be done using tasks instead of calling the specific method. Support "
+"for Derby, MySQL, PostgreSQL, MSSQL, and MongoDB is available."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:6
+msgid ""
+"In order to use this utility with any of the databases, you will need to "
+"first have the database environment up and running, and have established "
+"user credentials. You may use root or an account with administrator write"
+" privileges."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:9
+msgid "Operation & Variables"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:11
+msgid "Operation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:13
+msgid ""
+"Operating the schema utility is quite easy! To use it run this command "
+"from the installation directory:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:19
+msgid ""
+"Operations are now converted to tasks, of which there are now three: "
+"``install-schema``, ``upgrade-schema``, and ``destroy-schema``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:21
+msgid ""
+"``upgrade-schema``: Upgrade the schema of the database specified in your "
+"``config.tdsl`` configuration file. (options are ignored for this option)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:23
+msgid "``install-schema``: Install a schema to database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:25
+msgid "``destroy-schema``: Destroy database and schemas. **DANGEROUS**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:27
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:79
+msgid "Options"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:29
+msgid ""
+"Use the following options to customize. Options in bold are required, "
+"*{potential options are in brackets}*:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:31
+msgid "``--help`` Prints the help for the task."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:33
+msgid ""
+"``-I`` or ``--interactive`` - enables interactive mode which will prompt "
+"for parameters not defined."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:35
+msgid ""
+"``-T`` or ``--dbType`` - database type {derby, mongodb, mysql, "
+"postgresql, sqlserver}."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:37
+msgid ""
+"``-C`` or ``--components`` - Allows the specification of components for "
+"use when installing a schema."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:40
+msgid "Usage"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:42
+msgid "upgrade-schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:44
+msgid ""
+"This task will locate any schema versions above your current one, and "
+"will install them to the database configured in the ``config.tdsl`` file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:48
+msgid ""
+"To use this utility, you must have Tigase XMPP server fully setup with a "
+"configured configuration file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:54
+msgid "Windows users will need to run the command using the following command:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:60
+msgid "install-schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:62
+msgid "This task will install a schema using the parameters provided."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:64
+msgid ""
+"**If you are setting up a server manually, we HIGHLY recommend using this"
+" method**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:70
+msgid ""
+"This command will install tigase using a Derby database on one named "
+"``tigasedb`` hosted on ``localhost``. The username and password editing "
+"the database is ``tigase_pass`` and ``root``. Note that ``-J`` explicitly"
+" adds the administrator, this is highly recommended with the ``-N`` "
+"passing the password."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:72
+msgid "If you are using a windows system, you need to call the program directly:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:81
+msgid ""
+"Options for schema installation are as follows, required options are in "
+"bold"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:83
+msgid "``--help``, Outputs the help."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:85
+msgid ""
+"``-I``, ``--interactive`` - enables interactive mode, which will result "
+"in prompting for any missing parameters."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:87
+msgid ""
+"``-C``, ``--components=`` - list of enabled components identifiers (+/-),"
+" possible values: [``amp``, ``bosh``, ``c2s``, ``eventbus``, ``ext-"
+"disco``, ``http``, ``mdns``, ``message-archive``, ``monitor``, ``muc``, "
+"``pubsub``, ``push``, ``s2s``, ``socks5``, ``test``, ``unified-archive``,"
+" ``upload``, ``ws2s``] (default: amp,bosh,c2s,eventbus,http,message-"
+"archive,monitor,muc,pubsub,s2s,ws2s). **This is required for certain "
+"components like socks5.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:89
+msgid ""
+"``-T``, ``--dbType=`` - database server type, possible values are: "
+"[``derby``, ``mongodb``, ``mysql``, ``postgresql``, ``sqlserver``] "
+"(*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:91
+msgid ""
+"``-D``, ``--dbName=`` - name of the database that will be created (by "
+"default it is ``tigasedb``). (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:93
+msgid ""
+"``-H``, ``--dbHostname=`` - address of the database instance (by default "
+"it is ``localhost``). (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:95
+msgid ""
+"``-U``, ``--dbUser=`` - name of the user that will be created "
+"specifically to access Tigase XMPP Server database (default is "
+"``tigase_user``). (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:97
+msgid ""
+"``-P``, ``--dbPass=`` - password of the user that will be created "
+"specifically to access Tigase XMPP Server database (default is "
+"``tigase_pass``). (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:99
+msgid ""
+"``-R``, ``--rootUser=`` - database root account username used to create "
+"user and database (default is ``root``). (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:101
+msgid ""
+"``-A``, ``--rootPass=`` - database root account password used to create "
+"user and database (default is ``root``). (*required*)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:103
+msgid ""
+"``-S``, ``--useSSL`` - enable SSL support for database connection (if the"
+" database supports it) (default is false)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:105
+msgid ""
+"``-F``, ``--file=`` - comma separated list of SQL files that will be "
+"processed."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:107
+msgid ""
+"``-Q``, ``--query=`` - custom queries to be executed, see `Query function"
+" <#queryschema>`__ for details."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:109
+msgid ""
+"``-L``, ``--logLevel=`` - logger level used during loading process "
+"(default is ``CONFIG``)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:111
+msgid "``-J``, ``--adminJID=`` - comma separated list of administrator JID(s)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:113
+msgid ""
+"``-N``, ``--adminJIDpass=`` - password that will be used for the entered "
+"JID(s) - one password for all configured JIDs."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:115
+msgid "``--getURI=`` - generate database URI (default is ``false``)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:117
+msgid ""
+"``--ignoreMissingFiles=`` - force ignoring missing files errors (default "
+"is ``false``)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:119
+msgid "Query function"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:121
+msgid ""
+"Should you decide to customize your own functions, or have specific "
+"information you want to put into the database, you can use the -query "
+"function to perform a single query step."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:127
+msgid ""
+"Of course this would break the schema for tigasedb by adding an "
+"unexpected table, you will receive the following message:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:133
+msgid ""
+"But this is a demonstration how you may run a query through the database "
+"without the need to use another tool. Note that you will need to select "
+"the specific database for each query."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:135
+msgid "destroy-schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:138
+msgid "This will destroy the database specified in the configuration file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:142
+msgid "**THIS ACTION IS NOT REVERSIBLE**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:148
+msgid ""
+"Only use this if you wish to destroy a database and not have the "
+"information recoverable."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:150
+msgid "Windows users will need to call the method directly:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:157
+msgid "A note about MySQL"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:159
+msgid "If you are using these commands, you may result in the following error:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:165
+msgid ""
+"If this occurs, you will need to upgrade your version of MySQL using the "
+"following command:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/DbSchemaLoader.rst:171
+msgid ""
+"After entering the password and upgrading MySQL the schema error should "
+"no longer show when working with Tigase databases."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:2
+msgid "Prepare the MySQL Database for the Tigase Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:4
+msgid ""
+"This guide describes how to prepare MySQL database for connecting Tigase "
+"server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:6
+msgid ""
+"The MySQL database can be prepared in many ways. Most Linux distributions"
+" contain tools which allow you to go through all steps from the shell "
+"command line. To make sure it works on all platforms in the same way, we "
+"will first show how to do it under MySQL command line client."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:9
+msgid "Configuring from MySQL command line tool"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:11
+msgid ""
+"Run the MySQL command line client in either Linux or MS Windows "
+"environment and enter following instructions from the Tigase installation"
+" directory:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:17
+msgid "Once logged in, create the database for the Tigase server:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:23
+msgid ""
+"Add the ``tigase_user`` user and grant him access to the ``tigasedb`` "
+"database. Depending on how you plan to connect to the database (locally "
+"or over the network) use one of following commands or all if you are not "
+"sure:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:25
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:132
+msgid "Grant access to tigase_user connecting from any network address."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:32
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:141
+msgid "Grant access to tigase_user connecting from localhost."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:39
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:150
+msgid "Grant access to tigase_user connecting from local machine only."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:46
+msgid "And now you can update user permission changes in the database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:54
+msgid ""
+"It’s essential to enable `log_bin_trust_function_creators "
+"<https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-"
+"log.html#sysvar_log_bin_trust_function_creators>`__ option in MySQL "
+"server, for example by running:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:60
+msgid "Installing Schemas"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:62
+msgid ""
+"Starting with v8.0.0 the Schemas are no longer linked, and will need to "
+"manually be installed in the following order."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:64
+msgid "Switch to the database you have created:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:72
+msgid ""
+"We are assuming you run the mysql client in Linux from the Tigase "
+"installation directory, so all file links will be relative."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:74
+msgid "Next install the schema files:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:80
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:169
+msgid "You will need to repeat this process for the following files:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:53
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:71
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:95
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:184
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:60
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:113
+msgid "Other components may require installation such as:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:105
+msgid "Windows instructions:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:107
+msgid ""
+"On Windows you have probably to enter the full path, assuming Tigase is "
+"installed in C:\\Program Files\\Tigase:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:118
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:70
+msgid "Configuring From the Linux Shell Command Line"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:120
+msgid "Follow steps below to prepare the MySQL database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:122
+msgid "Create the database space for the Tigase server:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:128
+msgid ""
+"Add the ``tigase_user`` user and grant access to the tigasedb database. "
+"Depending on how you plan to connect to the database (locally or over the"
+" network) use one of following commands or all if you are not sure:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:130
+msgid "Selective access configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:159
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:31
+msgid "Schema Installation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:161
+msgid "Load the proper mysql schemas into the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:195
+msgid "Configuring MySQL for UTF-8 Support"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:197
+msgid "In my.conf put following lines:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:214
+msgid "Then connect to the database from the command line shell check settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:221
+msgid ""
+"If any of these shows something else then 'utf8' then you need to fix it "
+"using the command:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:227
+msgid ""
+"You can now also test your database installation if it accepts UTF-8 "
+"data. The easiest way to ensure this is to just to create an account with"
+" UTF-8 characters:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:233
+msgid "And then check that the account has been created:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:239
+msgid ""
+"If the last command gives you no results it means there is still "
+"something wrong with your settings. You might also want to check your "
+"shell settings to make sure your command line shell supports UTF-8 "
+"characters and passes them correctly to MySQL:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:247
+msgid ""
+"It seems that MySQL 5.0.x also needs extra parameters in the connection "
+"string: '&useUnicode=true&characterEncoding=UTF-8' while MySQL 5.1.x "
+"seems to not need it but it doesn’t hurt to have it for both versions. "
+"You have to edit ``etc/config.tdsl`` file and append this to the database"
+" connection string."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:249
+msgid ""
+"For MySQL 5.1.x, however, you need to also update code for all database "
+"stored procedures and functions used by the Tigase. They are updated for "
+"Tigase version 4.4.x and up, however if you use an older version of the "
+"Tigase server, you can reload stored procedures using the file from SVN."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:252
+msgid "Other MySQL Settings Worth Considering"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:254
+msgid ""
+"There are a number of other useful options, especially for performance "
+"improvements. Please note, you will have to review them as some of them "
+"may impact data reliability and are useful for performance or load tests "
+"installations only."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:262
+msgid "Some the general MySQL settings which mainly affect performance:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:277
+msgid "InnoDB specific settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:300
+msgid ""
+"These settings may not be fully optimized for your system, and have been "
+"only tested on our systems. If you have found better settings for your "
+"systems, feel free to `let us know <http://tigase.net/contact>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:303
+msgid "Support for emoji and other icons"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:305
+msgid ""
+"Tigase Database Schema can support emojis and other icons, however by "
+"using UTF-8 in ``mysqld`` settings will not allow this. To employ "
+"settings to support emojis and other icons, we recommend you use the "
+"following in your MySQL configuration file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:314
+msgid ""
+"Doing this, Tigase XMPP Server Database will still use ``utf8`` character"
+" set, with ``utf8_general_ci`` as collation, and only fields which "
+"require support for emojis will be converted to ``utf8mb4``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:318
+msgid ""
+"If for some reason, with above settings applied to your MySQL instance, "
+"you still receive :literal:`java.sql.SQLException: Incorrect string "
+"value: ` you should add to your database URI passed in Tigase XMPP Server"
+" following configuration `&useUnicode=true&characterEncoding=UTF-8`. If "
+"even this fails too, then you may try adding "
+"``&connectionCollation=utf8mb4_bin`` as a last resort. This changes "
+"situation from previous versions that shipped older MySQL JDBC connector."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:322
+msgid ""
+"Tigase XMPP Server databases should be created with ``utf8_general_ci`` "
+"collation as it will work properly and is fastest from "
+"``utf8mb4_general_ci`` collations supported by MySQL"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:2
+msgid "Prepare the Derby Database for the Tigase Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:4
+msgid ""
+"This guide describes how to prepare Derby database for connecting the "
+"Tigase server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:7
+msgid "Basic Setup"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:8
+msgid ""
+"Preparation of Derby database is quite simple, but the following "
+"assumptions are made"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:10
+msgid "``DerbyDB`` - Derby database name"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:12
+msgid "``database/`` directory contains all necessary schema files"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:14
+msgid "``jars/`` and ``libs/`` directories contains Tigase and Derby binaries"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:16
+msgid "General Approach"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:18
+msgid ""
+"From the main Tigase directory execute following commands (Linux and "
+"Windows accordingly)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:22
+msgid "You must use these sql files on order FIRST!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:24
+msgid "**Linux**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:30
+msgid "**Windows**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:36
+msgid ""
+"This will create Derby database named DerbyDB in the main Tigase "
+"directory and load common version for common v0.1."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:38
+msgid "You will need to repeat this process again in for following order:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:62
+msgid "Connecting Tigase to database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/Derby.rst:64
+msgid ""
+"Once the database is setup, configure the ``config.tdsl`` file in Tigase "
+"and add the following configuration:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:2
+msgid "Prepare the MS SQL Server Database for the Tigase Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:4
+msgid ""
+"This guide describes how to prepare the MS SQL Server database for "
+"connecting the Tigase server to it."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:6
+msgid ""
+"It’s expected that a working installation of Microsoft SQL Server is "
+"present. The following guide will describe the necessary configurations "
+"required for using MS SQL Server with Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:9
+msgid "Preparing MS SQL Server Instance"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:11
+msgid ""
+"After installation of MS SQL Server an instance needs to be configure to "
+"handle incoming JDBC connections. For that purpose it’s required to open "
+"*SQL Server Configuration Manager*. In the left-hand side panel navigate "
+"to *SQL Server Configuration Manager*, then *SQL Server Network "
+"Configuration → Protocols for ${INSTANCE_NAME}*. After selecting instance"
+" in the right-hand side panel select TCP/IP and open *Properties*, in the"
+" Protocol tab in General section select Yes for Enabled property. In the "
+"IP Addresses tab select Yes for Active and Enabled properties of all IP "
+"Addresses that you want MS SQL Server to handle. Subsequently set the TCP"
+" Port property (if missing) to the default value - 1433. A restart of the"
+" instance may be required afterwards."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:14
+msgid "Configuration using MS SQL Server Management Studio"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:16
+msgid ""
+"In order to prepare the database you can use either a wizard or execute "
+"queries directly in the Query Editor. Firstly you need to establish a "
+"connection to the MS SQL Server instance. From Object Explorer select "
+"Connect and in the Connect to Server dialog enter administrator "
+"credentials."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:18
+msgid "Using Wizards"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:20
+msgid "Create Login"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:22
+msgid ""
+"In the left-hand side panel select Security → Logins and from context "
+"menu choose New Login, in the Wizard window enter desired Login name, "
+"select SQL Server authentication and enter desired password subsequently "
+"confirming action with OK"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:24
+msgid "Create Database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:26
+msgid ""
+"From the Object Explorer select Databases node and from context menu "
+"select New Database; in the Wizard window enter desired Database name and"
+" enter previously created Login name into Owner field; subsequently "
+"confirming action with OK."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:29
+msgid "Using Queries"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:31
+msgid ""
+"From the Object Explorer root node’s context menu select New Query. In "
+"the Query windows execute following statements adjusting details to your "
+"liking:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:50
+msgid "Import Schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:52
+msgid ""
+"From the File menu Select Open → File (or use Ctrl+O) and then open "
+"following files:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:69
+msgid ""
+"These files must be done sequentially! They are not linked, and so may "
+"need to be done one at a time."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:80
+msgid ""
+"Subsequently select created database from the list of Available Databases"
+" (Ctrl+U) available on the toolbar and execute each of the opened files "
+"in the order listed above."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:83
+msgid "Configuring from command line tool"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:85
+msgid ""
+"Creation of the database and import of schema can be done from command "
+"line as well. In order to do that, execute following commands from the "
+"directory where Tigase XMPP Server is installed otherwise paths to the "
+"schema need to be adjusted accordingly:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:97
+msgid ""
+"Above can be automatized with provided script %tigase-server%\\scripts"
+"\\db-create-sqlserver.cmd (note: it needs to be executed from main Tigase"
+" XMPP Server directory due to maintain correct paths):"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:103
+msgid "If no parameters are provided then the following defaults are used:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:115
+msgid "Tigase configuration - config.tdsl"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:117
+msgid "Configuration of the MS SQL Server follows general database convention."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:127
+msgid "where any number of additional parameters can (and should) consist of:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:129
+msgid "``databaseName`` - name of the database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:131
+msgid "``user`` - username configured to access database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:133
+msgid "``password`` - password for the above username"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:135
+msgid "``schema`` - name of the database schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:137
+msgid ""
+"``lastUpdateCount`` - 'false' value causes all update counts to be "
+"returned, including those returned by server triggers"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:139
+msgid "Example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:150
+msgid "JDBC: jTDS vs MS JDBC driver"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:152
+msgid ""
+"Tigase XMPP Server supports two JDBC drivers intended to be used with "
+"Microsoft SQL Server - one created and provided by Microsoft itself and "
+"the alternative implementation - jTDS. Tigase is shipped with the latter "
+"in the distribution packages. Starting with the version 7.1.0 we "
+"recommend using jDTS driver that is shipped with Tigase as JDBC driver "
+"created by Microsoft can cause problems with some components in cluster "
+"installations. MS driver can be downloaded form the website: `JDBC "
+"Drivers 4.0, 4.1 for SQL Server <http://www.microsoft.com/en-"
+"us/download/details.aspx?displaylang=en&id=11774>`__ then unpack the "
+"archive. Copy sqljdbc_4.0/enu/sqljdbc4.jar file to ${tigase-server}/jars "
+"directory."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:154
+msgid "Depending on the driver used ``uri`` needs to be configured accordingly."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:156
+msgid "Microsoft driver:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MSSQL.rst:166
+msgid "jDTS driver"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:2
+msgid "Prepare the PostgreSQL Database for the Tigase Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:4
+msgid ""
+"This guide describes how to prepare PostgreSQL database for connecting to"
+" Tigase server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:6
+msgid ""
+"The PostgreSQL database can be prepared in many ways. Below are presented"
+" two possible ways. The following assumptions apply to both methods:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:8
+msgid "``admin_db_user`` - database user with admin rights"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:10
+msgid "``tigase_user`` - database user for Tigase"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:12
+msgid "``tigasedb`` - database for Tigase"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:15
+msgid "Configuring from PostgreSQL Command Line Tool"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:17
+msgid "Run the PostgreSQL command line client and enter following instructions:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:19
+msgid "Add the ``tigase_user``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:25
+msgid ""
+"Next, Create the database for the Tigase server with ``tigase_user`` as "
+"owner of database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:33
+msgid ""
+"Load database schema to initialize the Tigase server from the file that "
+"corresponds to the version of Tigase you want to use. First you need to "
+"switch to ``tigasedb``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:39
+msgid "Begin by applying the basic Schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:45
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:98
+msgid "Continue by adding the schema files listed below:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:72
+msgid "Follow steps below to prepare the PostgreSQL database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:74
+msgid "First, add the ``tigase_user``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:80
+msgid ""
+"You will be asked for credentials for admin_db_user and password for new "
+"database user."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:82
+msgid ""
+"Create the database for the Tigase server with tigase_user as owner of "
+"database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:88
+msgid "Database Schema Installation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:90
+msgid "Load database schema to initialize the Tigase server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:124
+msgid ""
+"The above commands should be executed from the main Tigase directory. The"
+" initialization schema file should be also available locally in database/"
+" directory of your Tigase installation."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:2
+msgid "Preparing Tigase for MongoDB"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:4
+msgid ""
+"Tigase now supports MongoDB for auth, settings, and storage repositories."
+" If you wish to use MongoDB for Tigase, please use this guide to help "
+"you."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:7
+msgid "Dependencies"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:9
+msgid ""
+"To run Tigase MongoDB support library requires drivers for MongoDB for "
+"Java which can be downloaded from `here <https://github.com/mongodb"
+"/mongo-java-driver/releases>`__. This driver needs to be placed in "
+"``jars/`` directory located in Tigase XMPP Server installation directory."
+" If you are using a dist-max distribution, it is already included."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:12
+msgid "Configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:14
+msgid ""
+"Note that fresh installations of MongoDB do not come with users or "
+"databases installed. Once you have setup MongoDB you will need to create "
+"a user to be used with Tigase. To do this, bring up the mongo console by "
+"running mongo.exe in a cmd window for windows, or run mongo in linux. "
+"Once connected, enter then following:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:26
+msgid ""
+"Be sure to give this user a ``root`` role in order to properly write to "
+"the database. Once you receive a ``user successfully created`` message, "
+"you are ready to install tigase on MongoDB."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:28
+msgid "Configuration of user repository for Tigase XMPP Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:30
+msgid ""
+"To configure Tigase XMPP Server to use MongoDB you need to set "
+"``dataSource`` in etc/config.tdsl file to proper MongoDB URI pointing to "
+"which MongoDB database should be used (it will be created by MongoDB if "
+"it does not exist). ``userRepository`` property should not be set to let "
+"Tigase XMPP Server auto-detect proper implementation of "
+"``UserRepository``. Tigase XMPP Server will create proper collections in "
+"MongoDB if they do not exist so no schema files are necessary."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:32
+msgid ""
+"Example configuration of XMPP Server pointing to MongoDB database "
+"``tigase_test`` in a local instance:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:48
+msgid ""
+"If Tigase Server is not able to detect a proper storage layer "
+"implementation, it can be forced to use one provided by Tigase using the "
+"following lines in ``etc/config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:63
+msgid ""
+"Every component should be able to use proper implementation to support "
+"MongoDB using this URI. Also MongoDB URI can be passed as any URI in "
+"configuration of any component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:65
+msgid "Configuration for MUC"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:67
+msgid ""
+"By default, MUC component will use MongoDB to store data if Tigase is "
+"configured to use it as a default store. However, if you would like to "
+"use a different MongoDB database to store MUC message archive, you can do"
+" this by adding the following lines to ``etc/config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:75
+msgid ""
+"If MUC components fails to detect and use a proper storage layer for "
+"MongoDB, you can force it to use one provided by Tigase by using the "
+"following line in the ``config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:84
+msgid "Configuration for PubSub"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:86
+msgid ""
+"By default, PubSub component will use MongoDB to store data if Tigase is "
+"configured to use it as a default store. However, if you would like to "
+"use a different MongoDB database to store PubSub component data, you can "
+"do this by adding the following lines to ``etc/config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:94
+msgid ""
+"If the PubSub components fails to detect and use a proper storage layer "
+"for MongoDB, you can force it to use one provided by Tigase by using the "
+"following line in the ``config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:103
+msgid "Configuration for Message Archiving"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:105
+msgid ""
+"By default, the Message Archiving component will use MongoDB to store "
+"data if Tigase is configured to use it as a default store. However, if "
+"you would like to use a different MongoDB database to store message "
+"archives, you can do this by adding the following lines to "
+"``etc/config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:113
+msgid ""
+"If Message Archiving component fails to detect and use a proper storage "
+"layer for MongoDB, you can force it to use one provided by Tigase by "
+"using the following line in the ``config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:123
+msgid "Schema Description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:125
+msgid ""
+"This description contains only basic description of schema and only basic"
+" part of it. More collections may be created if additional components of "
+"Tigase XMPP Server are loaded and configured to use MongoDB."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:128
+msgid "Tigase XMPP Server Schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:130
+msgid ""
+"Basic schema for UserRespository and AuthRepository consists of two "
+"collections: . tig_users - contains list of users . tig_nodes - contains "
+"data related to users in tree-like way"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:132
+msgid "``tig_users`` collection contains the following fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:134
+msgid "Table 9. tig_users"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:137
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:153
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:171
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:193
+msgid "Name"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:137
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:153
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:171
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:193
+msgid "Description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:139
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:155
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:195
+msgid "\\_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:139
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:157
+msgid "id of user which is SHA256 hash of users jid (raw byte array)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:141
+msgid "user_id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:141
+msgid "contains full user jid."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:143
+msgid "domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:143
+msgid "domain to which user belongs for easier lookup of users by domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:145
+msgid "password"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:145
+msgid "password of user (will be removed after upgrade to 8.0.0)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:148
+msgid "``tig_nodes`` collection contains the following fields"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:150
+msgid "Table 10. tig_nodes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:155
+msgid "id of row auto-generated by MongoDB."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:157
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:197
+msgid "uid"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:159
+msgid "node"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:159
+msgid "full path of node in tree-like structure separated by / (may not exist)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:161
+msgid "key"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:161
+msgid "key for which value for node is set."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:163
+msgid "value"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:163
+msgid "value which is set for node key."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:166
+msgid ""
+"Tigase XMPP Server also uses additional collections for storage of "
+"Offline Messages"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:168
+msgid "Table 11. msg_history collection"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:173
+msgid "from"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:173
+msgid "full user jid of message sender."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:175
+msgid "from_hash"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:175
+msgid "SHA256 hash of message sender jid as raw byte array."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:177
+msgid "to"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:177
+msgid "full users jid of message recipient."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:179
+msgid "to_hash"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:179
+msgid "SHA256 hash of message recipient full jid as raw byte array."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:181
+msgid "ts"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:181
+msgid "timestamp of message as date."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:183
+msgid "message"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:183
+msgid "serialized XML stanza containing message."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:185
+msgid "expire-at"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:185
+msgid ""
+"timestamp of expiration of message (if message contains AMP expire-at "
+"set)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:188
+msgid ""
+"Due to changes in authentication and credentials storage in "
+"AuthRepository, we moved ``password`` field from ``tig_users`` collection"
+" to a newly created collection called ``tig_user_credentials``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:190
+msgid "This new collection has following fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:195
+msgid "id of document automatically generated by MongoDB"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:197
+msgid "SHA256 hash of a user for which credentails are stored"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:199
+msgid "username"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:199
+msgid "username provided during authentication (or ``default``)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:201
+msgid "account_status"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:201
+msgid ""
+"name of an account state (copy of value stored in user document "
+"from`tig_users`)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:204
+msgid ""
+"Additionally for each mechanism we store separate field in this object, "
+"so for:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:206
+msgid "``PLAIN`` we have ``PLAIN`` field with value for this mechanism"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:208
+msgid ""
+"``SCRAM-SHA-1`` we have ``SCRAM-SHA-1`` field with value for this "
+"mechanism"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:210
+msgid "etc…​"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MongoDB.rst:212
+msgid ""
+"Upgrade is not done in one step, and rather will be done once a "
+"particular user will log in. During authentication if there is no data in"
+" ``tig_user_credentials``, Tigase XMPP Server will check if ``password`` "
+"field in ``tig_user`` exists. If it does, and it is filled credentials "
+"will be migrated to the new collection."
+msgstr ""
+
