@@ -141,7 +141,7 @@ There is number of certificate providers offering certificates either for free o
 
 To obtain certificate from a third party authority you have to go to its website and request the certificate using certificate request generated above. I cannot provide any instructions for this as each of the providers listed have different requirements and interfaces.
 
-We **highly** recommend using LetsEncrypt keys to self-sign and secure your domain. Instructions are in the `next section <#LetsEncryptCertificate>`__.
+We **highly** recommend using LetsEncrypt keys to self-sign and secure your domain. Instructions are in the :ref:`next section<LetsEncryptCertificate>`.
 
 Using one certificate for multiple domains
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
