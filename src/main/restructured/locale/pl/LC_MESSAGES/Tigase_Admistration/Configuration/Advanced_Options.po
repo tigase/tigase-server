@@ -1,0 +1,282 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:2
+msgid "Tigase Advanced Options"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:4
+msgid ""
+"This section is designed to include a number of advanced configuration "
+"options available within Tigase, but may not have a relevant section yet "
+"to house them."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:7
+msgid "Using CAPTCHA for in-band registration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:9
+msgid ""
+"To reduce false or spam registrations to Tigase XMPP Server, there is now"
+" the ability to add CAPTCHA forms as a part of the in-band registration. "
+"The CAPTCHA will generate a random math equation and ask the user "
+"registering a new account to answer it. This may be enabled as a sub-"
+"option of enabling registration in config.tdsl:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:23
+msgid ""
+"3 unsuccessful attempts will result in the captcha being invalidated and "
+"a client will receive an error message."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:27
+msgid "Enabling Empty Nicknames"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:29
+msgid ""
+"Tigase can now support users with empty nicknames. This can be enabled by"
+" adding the following code in config.tdsl."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:41
+msgid "Enable Silent Ignore on Packets Delivered to Unavailable Resources"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:43
+msgid ""
+"You can now have Tigase ignore packets delivered to unavailable resources"
+" to avoid having a packet bounce around and create unnecessary traffic. "
+"You may set this globally, within standard message handling only, or "
+"within the AMP component using the following settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:45
+msgid "Globally:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:53
+msgid "Message Processing Only:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:63
+msgid "AMP Component:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:73
+msgid "Mechanism to count errors within Tigase"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:75
+msgid ""
+"A new processor within statistics has been added to count the number of "
+"errors that Tigase returns. This processor, named ``error-counter``, will"
+" count all errors returned by Tigase, however by default the number is "
+"always zero if it is not enabled. It can be found as an MBean object in "
+"JMX under ``ErrorStatistics`` and contains values for packets with "
+"``ERROR`` and grouped by type. To enable counting of these errors, you "
+"must ensure the processor is included in your ``sess-man`` configuration:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:84
+msgid "Including stream errors"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:86
+msgid ""
+"Stream ``ERROR`` packets are not included in the above counter by default"
+" as they are processed separately. To enable this to be added to the "
+"counter, the following line must be in your ``config.tdsl`` file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:97
+msgid "Stream resumption default & max-timeout"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:99
+msgid ""
+"``SteamManagementIOProcessor`` now has a setting that can be used to "
+"change the maximum timeout time it will wait for reconnection if a client"
+" does not send a time to wait. Two settings are now available:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:109
+msgid ""
+"The above setting in ``config.tdsl`` file will change the default timeout"
+" period to 90 seconds."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:119
+msgid ""
+"This setting will set the maximum time allowed for stream resumption to "
+"900 seconds. This can be handy if you expect a number of mobile phones to"
+" connect to your server and want to avoid duplicate messages being sent "
+"back and forth."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:122
+msgid "Automatic subscription approval"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:124
+msgid ""
+"You may setup a server to automatically approve presence subscriptions or"
+" roster authorizations for all users. Say you were hosting bots and "
+"wanted to automate the process. This can be done with the following "
+"settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:137
+msgid ""
+"Both of these settings are false by default, and you may use them "
+"together or separately."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:143
+msgid "The following behavior is followed when they are both activated:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:145
+msgid ""
+"Upon sending a subscription request - Both contacts will each others' "
+"subscription and be added to each others' roster. Presence information "
+"will immediately be exchanged between both parties."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:147
+msgid ""
+"Upon sending presence with type either unsubscribe or unsubscribed "
+"follows the rules defined in RFC regarding processing of these stanzas "
+"(i.e. adjusting subscription type of user/contact), but without "
+"forwarding those stanzas to the receiving entity to avoid any "
+"notifications to the client. However, a roster push is generated to "
+"reflect changes to presence in user roster in a seamless manner."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:149
+msgid ""
+"Simply adding an item to the roster (i.e. with <iq/> stanza with correct "
+"semantics) will also cause an automatic subscription between the user and"
+" the contact in a matter explained above."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:152
+msgid "Abuse Contacts"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:154
+msgid ""
+"Tigase has support for `XEP-0128: Service Discovery Extensions "
+"<https://xmpp.org/extensions/xep-0128.html>`__ for providing additional "
+"information to the server and component discovery information. One of the"
+" important usages for this feature is `XEP-0157: Contact Addresses for "
+"XMPP Services <https://xmpp.org/extensions/xep-0157.html>`__ which "
+"describes usage of this feature for providing contact information to "
+"server administrators or abuse response team."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:156
+msgid ""
+"To set abuse contact details you should set ``disco-extensions`` in "
+"property in ``etc/config.tdsl`` file with subproperty ``abuse-addresses``"
+" set to your abuse address URI (for email you need to prefix it with "
+"``mailto:`` and for XMPP address you need to prefix it with ``xmpp``):"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:165
+msgid "Push Notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:167
+msgid ""
+"Tigase XMPP Server comes with support for `XEP-0357: Push Notifications "
+"<https://xmpp.org/extensions/xep-0357.html>`__ allowing user to receive "
+"notifications for messages received while his XMPP client is not "
+"connected enabled by default."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:170
+msgid "Disabling notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:172
+msgid "You can disable this feature with following settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:180
+msgid "Removing body and sender from notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:182
+msgid ""
+"If you wish Tigase XMPP Server not to forward body of the message or "
+"sender details in the push notification you can disable that with "
+"following settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:193
+msgid "Overriding body of notifications"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:195
+msgid ""
+"If you wish Tigase XMPP Server to override forward body of the encrypted "
+"message in the push notification (for example to avoid indicating that "
+"there is an \"error\") you can do that with following settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:206
+msgid ""
+"Enabling push notifications for messages received when all resources are "
+"AWAY/XA/DND"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:208
+msgid ""
+"Push notifications may also be sent by Tigase XMPP Server when new "
+"message is received and all resources of recipient are in AWAY/XA/DND "
+"state. To enable this type of notifications you need to enable additional"
+" push delivery extension named ``away`` in default push processor:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:218
+msgid ""
+"As this behaviour may not be expected by users and users need a "
+"compatible XMPP client to properly handle this notifications (XMPP client"
+" needs to retrieve message history from server to get actual message), in"
+" addition to enabling this plugin on the server, XMPP clients need to "
+"explicitly activate this feature. They can do that by including ``away`` "
+"attribute with value of ``true`` in push ``enable`` element send to the "
+"server, as in following example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:220
+msgid "**Enabling Push notifications for away/xa/dnd account.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:232
+msgid ""
+"If later on, user decides to disable notification for account in "
+"away/xa/dnd state, it may disable push notifications or once again send "
+"stanza to enable push notification but without ``away`` attribute being "
+"set:"
+msgstr ""
+

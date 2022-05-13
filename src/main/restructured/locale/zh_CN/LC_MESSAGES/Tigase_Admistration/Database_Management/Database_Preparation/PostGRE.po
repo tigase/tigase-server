@@ -1,0 +1,129 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:2
+msgid "Prepare the PostgreSQL Database for the Tigase Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:4
+msgid ""
+"This guide describes how to prepare PostgreSQL database for connecting to"
+" Tigase server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:6
+msgid ""
+"The PostgreSQL database can be prepared in many ways. Below are presented"
+" two possible ways. The following assumptions apply to both methods:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:8
+msgid "``admin_db_user`` - database user with admin rights"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:10
+msgid "``tigase_user`` - database user for Tigase"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:12
+msgid "``tigasedb`` - database for Tigase"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:15
+msgid "Configuring from PostgreSQL Command Line Tool"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:17
+msgid "Run the PostgreSQL command line client and enter following instructions:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:19
+msgid "Add the ``tigase_user``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:25
+msgid ""
+"Next, Create the database for the Tigase server with ``tigase_user`` as "
+"owner of database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:31
+msgid "Schema Installation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:33
+msgid ""
+"Load database schema to initialize the Tigase server from the file that "
+"corresponds to the version of Tigase you want to use. First you need to "
+"switch to ``tigasedb``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:39
+msgid "Begin by applying the basic Schema"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:45
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:98
+msgid "Continue by adding the schema files listed below:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:60
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:113
+msgid "Other components may require installation such as:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:70
+msgid "Configuring From the Linux Shell Command Line"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:72
+msgid "Follow steps below to prepare the PostgreSQL database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:74
+msgid "First, add the ``tigase_user``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:80
+msgid ""
+"You will be asked for credentials for admin_db_user and password for new "
+"database user."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:82
+msgid ""
+"Create the database for the Tigase server with tigase_user as owner of "
+"database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:88
+msgid "Database Schema Installation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:90
+msgid "Load database schema to initialize the Tigase server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/PostGRE.rst:124
+msgid ""
+"The above commands should be executed from the main Tigase directory. The"
+" initialization schema file should be also available locally in database/"
+" directory of your Tigase installation."
+msgstr ""
+

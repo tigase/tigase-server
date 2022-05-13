@@ -1,0 +1,199 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:2
+msgid "Retrieving statistics from the server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:4
+msgid ""
+"By default we can retrieve server statistics using XMPP, no additional "
+"setup is necessary."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:7
+msgid "Retrieving statistics using XMPP"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:9
+msgid ""
+"Accessing statistics over XMPP protocol requires any XMPP client capable "
+"of executing `XEP-0050: Ad-Hoc Commands "
+"<http://xmpp.org/extensions/xep-0050.html>`__. It’s essential to "
+"remember, that only administrator (a user whose JID is configured as "
+"administrative) can access the statistics."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:12
+msgid "Psi XMPP Client"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:14
+msgid ""
+"For the purpose of this guide `Psi <http://psi-im.org/>`__ client will be"
+" used. After successfully configuring and connecting to account with "
+"administrative privileges we need to access *Service Discovery*, either "
+"from application menu or from context menu of the particular account "
+"account:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:16
+msgid "|roster-discovery|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:72
+msgid "roster-discovery"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:18
+msgid ""
+"In the *Service Discovery* window we need to find *Server Statistics* "
+"component:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:20
+msgid "|discovery-stats|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:73
+msgid "discovery-stats"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:22
+msgid ""
+"We can either access statistics for all components or select particular "
+"component after expanding the tree. To execute ad-hoc command simply "
+"double click on the particular node which will open window with "
+"statistics:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:24
+msgid "|server-stats|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:74
+msgid "server-stats"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:26
+msgid ""
+"In this window, in addition to see the statistics, we can adjust *Stats "
+"level* by selecting desired level from the list and confirm by clicking "
+"*Finish*."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:29
+msgid "Retrieving statistics using JMX"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:31
+msgid ""
+"In order to access statistics over JMX we need to enable support for it "
+"in Tigase - `Monitoring Activation <#monitoring_activation>`__. "
+"Afterwards we can use a number of tools to get to the statistics, for "
+"example the following:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:34
+msgid "JConsole"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:36
+msgid ""
+"After opening JConsole we either select local process or provide details "
+"of the remote process, including IP, port and credentials from "
+"**etc/jmx.**\\ \\* files:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:38
+msgid "|jconsole|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:75
+msgid "jconsole"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:40
+msgid ""
+"Afterwards we navigate to the MBeans tab from where we can access the "
+"``tigase.stats`` MBean. It offers similar options to XMPP - either "
+"accessing statistics for all components or only for particular component "
+"as well as adjusting level for which we want to obtain statistics:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:42
+msgid "|jconsole-1|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:76
+msgid "jconsole-1"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:46
+msgid "StatsDumper.groovy"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:48
+msgid ""
+"In order to collect statistics over period of time following groovy "
+"script can be used: `StatsDumper.groovy <files/StatsDumper.groovy>`__. "
+"It’s a Simple JMX client that connects to Tigase and periodically saves "
+"all statistics to files."
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:50
+msgid "It takes following parameters:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:56
+msgid "``hostname`` - address of the instance"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:58
+msgid "``username`` - JMX username"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:60
+msgid "``password`` - JMX username"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:62
+msgid "``dir`` - directory to which save the files with statistics"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:64
+msgid "``port`` - port on which to make the connection"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:66
+msgid ""
+"``delay``\\ (ms) - initial delay in milliseconds after which statistics "
+"should be saved"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:68
+msgid "``interval``\\ (ms) - interval between each retrieval/saving of statistics"
+msgstr ""
+
+#: ../../Tigase_Admistration/Components/Monitoring/Retrieving_statistics.rst:70
+msgid ""
+"``loadhistory``\\ (bool) - indicates whether or not load statistics "
+"history from server (if such is enabled in Tigase)"
+msgstr ""
+

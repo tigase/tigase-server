@@ -1,0 +1,762 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:2
+msgid "Tigase Kernel"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:4
+msgid ""
+"Tigase Kernel is an implementation of `IoC "
+"<https://en.wikipedia.org/wiki/Inversion_of_control>`__ created for "
+"Tigase XMPP Server. It is responsible for maintaining object lifecycle "
+"and provides mechanisms for dependency resolutions between beans."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:6
+msgid ""
+"Additionally, as and optional feature, Tigase Kernel is capable of "
+"configuring beans using a provided bean configurator."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:9
+msgid "Basics"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:12
+msgid "What is kernel?"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:14
+msgid ""
+"Kernel is an instance of the ``Kernel`` class which is responsible for "
+"managing scope and visibility of beans. Kernel handles bean:"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:16
+msgid "registration of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:18
+msgid "unregistration of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:20
+msgid "initialization of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:22
+msgid "deinitialization of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:24
+msgid "dependency injection to the bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:26
+msgid "handling of bean lifecycle"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:28
+msgid ""
+"registration of additional beans based on annotations *(optionally using "
+"registered class implementing ``BeanConfigurator`` as "
+"``defaultBeanConfigurator``)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:30
+msgid ""
+"configuration of a bean *(optionally thru registered class implementing "
+"``BeanConfigurator`` as ``defaultBeanConfigurator``)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:32
+msgid ""
+"Kernel core is responsible for dependency resolution and maintaining "
+"lifecycle of beans. Other features, like proper configuration of beans "
+"are done by additional beans working inside the Kernel."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:34
+msgid ""
+"Kernel identifies beans by their name, so each kernel may have only one "
+"bean named ``abc``. If more than one bean has the same name, then the "
+"last one registered will be used as its registration will override "
+"previously registered beans. You may use whatever name you want to name a"
+" bean inside kernel but it cannot:"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:36
+msgid ""
+"be ``service`` as this name is used by Tigase Kernel internally when "
+"\\`RegistrarBean`s are in use (see `RegistrarBean <#registrarBean>`__"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:38
+msgid ""
+"end with ``#KERNEL`` as this names are also used by Tigase Kernel "
+"internally"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:42
+msgid ""
+"Kernel initializes beans using lazy initialization. This means that if a "
+"bean is not required by any other beans, or not retrieved from the kernel"
+" manually, an instance will not be created."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:44
+msgid ""
+"During registration of a bean, the kernel checks if there is any beans "
+"which requires this newly registered bean and if so, then instance of a "
+"newly registered bean will be created and injected to fields which "
+"require it."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:47
+msgid "What is a kernel scope?"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:49
+msgid ""
+"Each kernel has its own scope in which it can look for beans. By default "
+"kernel while injecting dependencies may look for them only in the same "
+"kernel instance in which new instance of a bean is created or in the "
+"direct parent kernel. This way it is possible to have separate beans "
+"named the same in the different kernel scopes."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:53
+msgid ""
+"If bean is marked as ``exportable``, it is also visible in all "
+"descendants kernel scopes."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:56
+msgid "What is a bean?"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:57
+msgid ""
+"A bean is a named instance of the class which has parameterless "
+"constructor and which is registered in the kernel."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:61
+msgid ""
+"Parameterless constructor is a required as it will be used by kernel to "
+"create an instance of the bean, see `bean lifecycle <#beanLifecycle>`__."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:64
+msgid "Lifecycle of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:67
+msgid "Creating instance of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:70
+msgid "Instantiation of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:72
+msgid ""
+"During this step, kernel creates instance of the class which was "
+"registered for this bean (for more details see **Registration of a "
+"bean**). Instance of a bean is created using paremeterless constructor of"
+" a class."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:76
+msgid ""
+"Bean instance is only created for required beans (i.e. beans that were "
+"injected somewhere)."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:80
+msgid ""
+"It’s possible to create bean instance without the need to inject it "
+"anywhere - such bean should be annoted with ``@Autostart`` annotation."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:83
+msgid "Configuring a bean *(optional)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:85
+msgid ""
+"In this step kernel passes class instance of a bean to the configurator "
+"bean (an instance of ``BeanConfigurator`` if available), for configuring "
+"it. During this step, ``BeanConfigurator`` instance, which is aware of "
+"the configuration loaded from the file, injects this configuration to the"
+" bean fields annotated with ``@ConfigField`` annotation. By default "
+"configurator uses reflections to access those fields. However, if a bean "
+"has a corresponding public ``setter``/``getter`` methods for a field "
+"annotated with ``@ConfigField`` (method parameter/return type matches "
+"field type), then configurator will use them instead of accessing a field"
+" via reflection."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:89
+msgid ""
+"If there is no value for a field specified in the configuration or value "
+"is equal to the current value of the field, then configurator will skip "
+"setting value for this field (It will also not call ``setter`` method "
+"even if it exists)."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:91
+msgid ""
+"At the end of the configuration step, if bean implements "
+"``ConfigurationChangedAware`` interface, then method "
+"``beanConfigurationChanged(Collection<String> changedFields)`` is being "
+"called, to notify bean about field names which values has changed. This "
+"is useful, if you need to update bean configuration, when you have all "
+"configuration available inside bean."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:95
+msgid ""
+"Configuration of the bean may be changed at runtime and it will be "
+"applied in the same way as initial configuration is passed to the bean. "
+"So please keep in mind that ``getter``/``setter`` may be called multiple "
+"times - even for already configured and initialized bean."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:98
+msgid "Injecting dependencies"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:100
+msgid ""
+"At this point kernel looks for the bean class fields annotated with "
+"``@Inject`` and looks for a value for each of this fields. During this "
+"step, kernel checks list of available beans in this kernel, which matches"
+" field type and additional constraints specified in the annotation."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:102
+msgid ""
+"When a required value (instance of a bean) is found, then kernel tries to"
+" inject it using reflection. However, if there is a matching "
+"``getter``/``setter`` defined for that field it will be called instead of"
+" reflection."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:106
+msgid ""
+"If dependency changes, ie. due to reconfiguration, then value of the "
+"dependent field will change and ``setter`` will be called if it exists. "
+"So please keep in mind that ``getter``/``setter`` may be called multiple "
+"times - even for already configured and initialized bean."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:109
+msgid "Initialization of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:111
+msgid ""
+"When bean is configured and dependencies are set, then initialization of "
+"a bean is almost finished. At this point, if bean implements "
+"``Initializable`` interface, kernel calls ``initialize()`` method to "
+"allow bean initialize properly if needed."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:114
+msgid "Destroying instance of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:116
+msgid ""
+"When bean is being unloaded, then reference to its instance is just "
+"dropped. However, if bean class implements ``UnregisterAware`` interface,"
+" then kernel calls ``beforeUnregister()`` method. This is very useful in "
+"case which bean acquires some resources during initialization and should "
+"release them now."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:120
+msgid ""
+"This method will not be called if bean was not initialized fully (bean "
+"initialization step was note passed)!"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:123
+msgid "Reconfiguration of a bean *(optional)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:125
+msgid ""
+"At any point in time bean may be reconfigured by default bean "
+"configurator (instance of ``BeanConfigurator``) registered in the kernel."
+" This will happen in the same way as it described in `Configuring a bean "
+"<#beanConfiguration>`__ in **Creating instace of a bean** section."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:128
+msgid "Updating dependencies"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:130
+msgid ""
+"It may happen, that due to reconfiguration or registration/unregistration"
+" or activation/deactivation of some other beans dependencies of a bean "
+"will change. As a result, Tigase Kernel will inject new dependencies as "
+"described in `Injecting dependencies <#beanInjectingDependencies>`__"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:133
+msgid "Registration of a bean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:135
+msgid "There are few ways to register a bean."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:138
+msgid "Using annotation *(recommended but optional)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:140
+msgid ""
+"To register a bean using annotation you need to annotate it with "
+"``@Bean`` annotation and pass values for following properties:"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:142
+msgid "``name`` - name under which item should be registered"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:144
+msgid ""
+"``active`` - ``true`` if bean should be enabled without enabling it in "
+"the configuration *(however it is still possible to disable it using "
+"configuration)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:146
+msgid ""
+"``parent`` - class of the parent bean which activation should trigger "
+"registration of your bean. **In most cases parent class should be "
+"implementing ``RegistrarBean``**"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:148
+msgid ""
+"``parents`` - array of classes which should be threaten as ``parent`` "
+"classes if more than one parent class is required *(optional)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:150
+msgid ""
+"``exportable`` - ``true`` if bean should be visible in all descendant "
+"kernels (in other case default visibility rules will be applied) "
+"*(optional)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:152
+msgid ""
+"``selectors`` - array of selector classes which will decide whether class"
+" should be registered or not *(optional)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:156
+msgid ""
+"If ``parent`` is set to ``Kernel.class`` it tells kernel to register this"
+" bean in the root/main kernel (top-level kernel)."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:158
+msgid ""
+"If you want your bean ``SomeDependencyBean`` to be registered when "
+"another bean ``ParentBean`` is being registered (like a required "
+"dependency), you may annotate your bean ``SomeDependencyBean`` with "
+"``@Bean`` annotation like this example:"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:169
+msgid ""
+"Works only if bean registered as ``defaultBeanConfigurator`` supports "
+"this feature. By default Tigase XMPP Server uses ``DSLBeanConfigurator`` "
+"which is subclass of ``AbstractBeanConfigurator`` which provides support "
+"for this feature."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:172
+msgid "Setting ``parent`` to class not implementing ``RegistrarBean`` interface"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:174
+msgid ""
+"If ``parent`` is set to the class which is not implementing "
+"``RegistrarBean`` interface, then your bean will be registered in the "
+"same kernel scope in which parent bean is registered. If you do so, ie. "
+"by setting parent to the class of the bean which is registered in the "
+"``kernel1`` and your bean will be also registered in ``kernel1``. As the "
+"result it will be exposed to other beans in the same kernel scope. This "
+"also means that if you will configure it in the same way as you would set"
+" ``parent`` to the ``parent`` of annotation of the class to which your "
+"``parent`` point to."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:176
+#: ../../Tigase_Development/Tigase_Kernel.rst:377
+msgid "**Example.**"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:194
+msgid ""
+"In this case it means that ``bean1`` is registered in the root/main "
+"kernel instance. At the same time, ``bean2`` is also registered to the "
+"root/main kernel as its value of ``parent`` property of annotation points"
+" to class not implementing ``RegistrarBean``."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:196
+msgid ""
+"To configure value of ``field1`` in instance of ``bean1`` and ``field2`` "
+"in instance of ``bean2`` in DSL (for more information about DSL format "
+"please check section ``DSL file format`` of the ``Admin Guide``) you "
+"would need to use following entry in the config file:"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:207
+msgid ""
+"As you can see, this resulted in the ``bean2`` configuration being on the"
+" same level as ``bean1`` configuration."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:210
+msgid "Calling kernel methods"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:213
+msgid "As a class"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:215
+msgid ""
+"To register a bean as a class, you need to have an instance of a Tigase "
+"Kernel execute it’s ``registerBean()`` method passing your ``Bean1`` "
+"class."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:223
+msgid ""
+"To be able to use this method you will need to annotate ``Bean1`` class "
+"with ``@Bean`` annotation and provide a bean name which will be used for "
+"registration of the bean."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:226
+msgid "As a factory"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:228
+msgid ""
+"To do this you need to have an instance of a Tigase Kernel execute it’s "
+"``registerBean()`` method passing your bean ``Bean5`` class."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:235
+msgid "As an instance"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:237
+msgid ""
+"For this you need to have an instance of a Tigase Kernel execute it’s "
+"``registerBean()`` method passing your bean ``Bean41`` class instance."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:246
+msgid ""
+"Beans registered as an instance will not inject dependencies. As well "
+"this bean instances will not be configured by provided bean "
+"configurators."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:249
+msgid "Using config file *(optional)*"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:251
+msgid ""
+"If there is registered a bean ``defaultBeanConfigurator`` which supports "
+"registration in the config file, it is possible to do so. By default "
+"Tigase XMPP Server uses ``DSLBeanConfigurator`` which provides support "
+"for that and registration is possible in the config file in DSL. As "
+"registration of beans using a config file is part of the admin of the "
+"Tigase XMPP Server tasks, it is described in explained in the Admin Guide"
+" in subsection ``Defining bean`` of ``DSL file format`` section."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:255
+msgid ""
+"This way allows admin to select different class for a bean. This option "
+"should be used to provide alternative implementations to the default "
+"beans which should be registered using annotations."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:259
+msgid ""
+"Works only if bean registered as ``defaultBeanConfigurator`` supports "
+"this feature. By default Tigase XMPP Server uses ``DSLBeanConfigurator`` "
+"which provides support for that."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:262
+msgid "Defining dependencies"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:264
+msgid "All dependencies are defined with annotations:"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:288
+msgid ""
+"Kernel automatically determines type of a required beans based on field "
+"type. As a result, there is no need to specify the type of a bean in case"
+" of ``bean4`` field."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:290
+msgid ""
+"When there are more than one bean instances matching required dependency "
+"fields, the type needs to be an array or collection. If kernel is unable "
+"to resolve dependencies, it will throw an exception unless ``@Inject`` "
+"annotation has ``nullAllowed`` set to ``true``. This is useful to make "
+"some dependencies optional. To help kernel select a single bean instance "
+"when more that one bean will match field dependency, you may set name of "
+"a required bean as shown in annotation to field ``bean3``."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:292
+msgid ""
+"Dependencies are inserted using getters/setters if those methods exist, "
+"otherwise they are inserted directly to the fields. Thanks to usage of "
+"setters, it is possible to detect a change of dependency instance and "
+"react as required, i.e. clear internal cache."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:296
+msgid ""
+"Kernel is resolving dependencies during injection only using beans "
+"visible in its scope. This makes it unable to inject an instance of a "
+"class which is not registered in the same kernel as a bean or not visible"
+" in this kernel scope (see `Scope and visibility <#kernelScope>`__)."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:300
+msgid ""
+"If two beans have bidirectional dependencies, then it is required to "
+"allow at least one of them be ``null`` (make it an optional dependency). "
+"In other case it will create circular dependency which cannot be "
+"satisfied and kernel will throw exceptions at runtime."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:303
+msgid "Nested kernels and exported beans"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:305
+msgid ""
+"Tigase Kernel allows the usage of nested kernels. This allows you to "
+"create complex applications and maintain proper separation and visibility"
+" of beans in scopes as each module (subkernel) may work within its own "
+"scope."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:307
+msgid "Subkernels may be created using one of two ways:"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:310
+msgid "Manual registration of new a new kernel"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:312
+msgid ""
+"You can create an instance of a new kernel and register it as a bean "
+"within the parent kernel."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:321
+msgid "Usage of RegistrarBean"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:323
+msgid ""
+"You may create a bean which implements the ``RegistrarBean`` interfaces. "
+"For all beans that implement this interface, subkernels are created. You "
+"can access this new kernel within an instance of ``RegistrarBean`` class "
+"as ``register(Kernel)`` and ``unregister(Kernel)`` methods are called "
+"once the ``RegistrarBean`` instance is created or destroyed."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:325
+msgid ""
+"There is also an interface named ``RegistrarBeanWithDefaultBeanClass``. "
+"This interface is very useful if you want or need to create a bean which "
+"would allow you to configure many subbeans which will have the same class"
+" but different names and you do not know names of those beans before "
+"configuration will be set. All you need to do is to implement this "
+"interface and in method ``getDefaultBeanClass()`` return class which "
+"should be used for all subbeans defined in configuration for which there "
+"will be no class configured."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:327
+msgid ""
+"As an example of such use case is ``dataSource`` bean, which allows "
+"administrator to easily configure many data sources without passing their"
+" class names, ie."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:337
+msgid ""
+"With this config we just defined 3 beans named ``default``, ``domain1`` "
+"and ``domain2``. All of those beans will be instances of a class returned"
+" by a ``getDefaultBeanClass()`` method of ``dataSource`` bean."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:340
+msgid "Scope and visibility"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:342
+msgid ""
+"Beans that are registered within a parent kernel are visible to beans "
+"registered within the first level of child kernels. However, **beans "
+"registered within child kernels are not available to beans registered in "
+"a parent kernel** with the exception that they are visible to bean that "
+"created the subkernel (an instance of ``RegistrarBean``)."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:344
+msgid ""
+"It is possible to export beans so they can be visible outside the first "
+"level of child kernels."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:346
+msgid ""
+"To do so, you need to mark the bean as exportable using annotations or by"
+" calling the ``exportable()`` method."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:348
+msgid "**Using annotation.**"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:356
+msgid "**Calling ``exportable()``.**"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:363
+msgid "Dependency graph"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:365
+msgid ""
+"Kernel allows the creation of a dependency graph. The following lines "
+"will generate it in a format supported by `Graphviz "
+"<http://www.graphviz.org>`__."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:373
+msgid "Configuration"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:375
+msgid ""
+"The kernel core does not provide any way to configure created beans. Do "
+"do that you need to use the ``DSLBeanConfigurator`` class by providing "
+"its instance within configuration and registration of this instances "
+"within kernel."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:390
+msgid "DSL and kernel scopes"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:392
+msgid ""
+"DSL is a structure based format explained in `Tigase XMPP Server "
+"Administration Guide: DSL file format section <http://docs.tigase.org"
+"/tigase-server/snapshot/Administration_Guide/html/#dslConfig>`__. **It is"
+" important to know that kernel and beans structure have an impact on what"
+" the configuration in DSL will look like.**"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:394
+msgid "**Example kernel and beans classes.**"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:448
+msgid "Following classes will produce following structure of beans:"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:450
+msgid "\"bean1\" of class ``Bean1``"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:452
+msgid "\"bean1_1\" of class ``Bean11``"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:454
+msgid "\"bean1_2\" of class ``Bean12``"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:456
+msgid "\"bean4\" of class ``Bean2``"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:458
+msgid "\"bean3\" of class ``Bean3``"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:462
+msgid ""
+"This is a simplified structure, the actual structure is slightly more "
+"complex. However. this version makes it easier to explain structure of "
+"beans and impact on configuration file structure."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:466
+msgid ""
+"Even though ``Bean2`` was annotated with name ``bean2``, it was "
+"registered with name ``bean4`` as this name was passed during "
+"registration of a bean in ``main()`` method."
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:470
+msgid ""
+"``Bean12`` was registered under name ``bean1_2`` as subbean of ``Bean1`` "
+"as a result of annotation of ``Bean12``"
+msgstr ""
+
+#: ../../Tigase_Development/Tigase_Kernel.rst:472
+msgid ""
+"As mentioned DSL file structure depends on structure of beans, a file to "
+"set a config field in each bean to bean name should look like that:"
+msgstr ""
+

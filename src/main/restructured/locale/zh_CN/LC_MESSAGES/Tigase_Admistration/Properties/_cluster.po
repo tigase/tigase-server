@@ -1,0 +1,153 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:2
+msgid "Cluster"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:5
+msgid "cl-comp"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:7
+msgid "**Description:** Container specifying cluster component configuration."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:9
+msgid ""
+"**Default value:** By default, the cl-comp container is not listed in the"
+" ``config.tdsl`` file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:11
+msgid "**Example:**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:20
+msgid "connect-all"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:22
+msgid ""
+"The ``cluster-connect-all`` property is used to open active connections "
+"to all nodes listed in the `cluster-nodes <#clusterNodes>`__ "
+"configuration property. This property should be used only on the node "
+"which is added to the live cluster at later time. Normally this new "
+"cluster node is not listed in the configuration of the existing cluster "
+"nodes. This is why they can not open connections the new node. The new "
+"node opens connection to all existing nodes instead. False is the default"
+" value and you can skip this option if you want to have it switched off "
+"which it is by default."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:24
+msgid "**Example**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:32
+msgid "This replaces the ``--cluster-connect-all`` property."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:34
+#: ../../Tigase_Admistration/Properties/_cluster.rst:47
+#: ../../Tigase_Admistration/Properties/_cluster.rst:66
+msgid "**Available since:** 8.0.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:37
+msgid "cluster-mode"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:39
+msgid ""
+"**Description:** The property is used to switch cluster mode on. The "
+"default value is ``false`` so you can normally skip the parameter if you "
+"don’t want the server to run in cluster mode. You can run the server in "
+"the cluster mode even if there is only one node running. The performance "
+"impact is insignificant and you will have the opportunity to connect mode"
+" cluster nodes at any time without restarting the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:41
+msgid ""
+"**Default value:** ``false`` Tigase by default does not run in clustered "
+"mode."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:43
+msgid "**Example:** ``'cluster-mode' = 'true'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:45
+msgid "**Possible values:** ``true|false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:50
+msgid "cluster-nodes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:52
+msgid "**Default value:** none"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:54
+msgid ""
+"**Example:** ``'cluster-nodes' = [ 'node1.domain:pass:port' , "
+"'node2.domain:pass:port' , 'node3.domain:pass:port' ]``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:56
+msgid "**Possible values:** a comma separated list of hostnames."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:58
+msgid ""
+"**Description:** The property is used to specify a list of cluster nodes "
+"running on your installation. The node is the full DNS name of the "
+"machine running the node. Please note the proper DNS configuration is "
+"critical for the cluster to work correctly. Make sure the 'hostname' "
+"command returns a full DNS name on each cluster node. Nodes don’t have to"
+" be in the same network although good network connectivity is also a "
+"critical element for an effective cluster performance."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:60
+msgid ""
+"All cluster nodes must be connected with each other to maintain user "
+"session synchronization and exchange packets between users connected to "
+"different nodes. Therefore each cluster node opens a 'cluster port' on "
+"which it is listening for connections from different cluster nodes. As "
+"there is only one connection between each two nodes Tigase server has to "
+"decide which nodes to connect to and which has to accept the connection. "
+"If you put the same list of cluster nodes in the configuration for all "
+"nodes this is not a problem. Tigase server has a way to find and void any"
+" conflicts that are found. If you however want to add a new node later "
+"on, without restarting and changing configuration on old nodes, there is "
+"no way the old nodes will try to establish a connection to the new node "
+"they don’t know them. To solve this particular case the next parameter is"
+" used."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_cluster.rst:64
+msgid ""
+"Cluster nodes are not required to be configured, as they can "
+"automatically find/add/remove cluster nodes. This is for installations "
+"where nodes will be limited and static!"
+msgstr ""
+

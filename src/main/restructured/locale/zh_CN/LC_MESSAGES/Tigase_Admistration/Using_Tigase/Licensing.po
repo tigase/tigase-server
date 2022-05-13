@@ -1,0 +1,310 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:2
+msgid "Licensing"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:4
+msgid ""
+"With the release of v7.1.0, users and commercial clients alike may now be"
+" able to register and request a license file from our servers on their "
+"own. This process makes it easier for everyone to obtain valid license "
+"file when needed. Users who do not wish to register will not be required "
+"to register. However, If you are using Tigase ACS or other commercial "
+"pieces of software, you will be required to register."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:8
+msgid ""
+"Tigase XMPP Server will shut down during license check if no "
+"installation-id or license is received within a given period of time."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:10
+msgid ""
+"**Again, Tigase XMPP Server will still be available free under AGPLv3, "
+"and free users will not need to register.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:14
+msgid "COMMERCIAL COMPONENTS REQUIRE THE USE OF A LICENSE."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:17
+msgid "Registering for a License"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:19
+msgid ""
+"There are currently two ways for registering for a license with Tigase "
+"commercial products. **The easiest and recommended method is using the "
+"built in automatic registration function**. However, you may also "
+"register via a web portal if your installation has limitations on network"
+" connectivity."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:22
+msgid "Automatic Registration (recommended)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:24
+msgid ""
+"Once a commercial component is activated on Tigase XMPP Server, the "
+"program will then retrieve an *Installation ID* from our servers, and "
+"make a file called ``installation-id`` in your ``etc/`` directory "
+"including the *Installation ID* for your instance. An installation ID is "
+"generated using the complete cluster map and all machines within the same"
+" cluster should have the same *Installation ID*. This *Installation ID* "
+"will then be sent along with server details to a license server, and "
+"appropriate license files will be made in your *tigasedir/etc* directory."
+" When the license is due to be expired, this mechanism will update your "
+"license file automatically."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:27
+msgid "Manual"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:31
+msgid ""
+"This method should be used only in extreme cases when `Automatic "
+"Registration (recommended) <#AutomaticLicenceRegistration>`__ can’t be "
+"used."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:33
+msgid ""
+"If you do not wish to use the automatic method, you may decide to "
+"generate a license file using our web portal. Offline installation may "
+"obtain *Installation IDs* from our web portal in a three-step process: "
+"registration, generating hash, and obtaining license file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:35
+msgid "Generating Installation ID"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:37
+msgid ""
+"For offline installations, you may obtain an *Installation ID* from this "
+"address: https://license.tigase.software/register."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:39
+msgid "Data Fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:41
+msgid ""
+"``Customer name``: Company or user name used to identify machines. "
+"Multiple clusters or servers can have the same customer name."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:43
+msgid ""
+"``VHosts``: Comma separated list of VHosts you will be using on this "
+"node. NOTE: these fields are case sensitive!"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:45
+msgid ""
+"``Legacy license hashes``: Copy the digest hash generated for all legacy "
+"licenses - it’s available in the ``etc/tigase-console.log`` after startup"
+" (if such licenses are present)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:47
+msgid ""
+"``Captcha question``: Enter the basic math answer for this form to prove "
+"you are not a robot."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:49
+msgid "The next page will provide you with an installation ID like the following:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:55
+msgid "Edit your ``config.tdsl`` file and add your installation-id"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:61
+msgid ""
+"Note that the ``installation-id`` file will be made automatically once "
+"the license file is installed and verified by the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:63
+msgid "Obtaining a Server Code"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:65
+msgid ""
+"Once you have the *Installation ID*, you will need to generate a server "
+"code. This can be done by accessing the admin UI page and navigating to "
+"the License section. Once there, click on Retrieve code for license. "
+"Select the component you wish to generate a code for and click Submit. "
+"You will see a fields with installation-id, module, VHosts filled out "
+"based on your server’s configuration. Copy the contents of the Code field"
+" and proceed to the next section."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:67
+msgid "Obtaining license file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:69
+msgid ""
+"Open a new browser and navigate to this address: "
+"https://license.tigase.software/retrieve once there, paste the generated "
+"code from the last step in the field and click submit. Afterwards you "
+"will be prompted to download a license file, place this file in your "
+"*etc/* folder and restart your server, your license is now activated and "
+"installed on your server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:71
+msgid ""
+"**If you are provided a manually produced license, you will need to place"
+" it in the same ``etc/`` directory with the name "
+"``<component_name>.license`` (e.g.: ``etc/acs.license``)**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:74
+msgid "What happens if I do not use a license file or it is expired?"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:76
+msgid ""
+"Tigase permits commercial products to be used without a license, but a "
+"validation process must complete otherwise the server will shutdown. "
+"Within the first hour of runtime, Tigase will check for the presence and "
+"validity of the license file. If none is found, or it is invalid or "
+"expired the server will then contact Tigase master server in order to "
+"obtain a valid one."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:78
+msgid ""
+"Communications will be made to license.tigase.software over https (port "
+"443) to verify the license or download a new one."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:81
+msgid "Demo mode"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:83
+msgid ""
+"If no valid license can be found, Tigase will revert to a demonstration "
+"mode. Most functions will be available and usable, but with a caveat. "
+"Statistics from that server will be sent to https://stats.tigase.software"
+" about your server and it’s usage. Details are in the next section. If "
+"this information cannot be sent, the server will assume unauthorized use "
+"and will shut down."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:86
+msgid "Statistics Sent"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:88
+msgid ""
+"Statistics of your server may be sent to Tigase server’s if the all of "
+"following happens:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:90
+msgid "You are using commercial Tigase components."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:92
+msgid "You have registered an ``installation-id``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:94
+msgid "You do not have a current license to run Tigase commercial components."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:96
+msgid ""
+"If these conditions exist, statistics will be sent to our servers and a "
+"warning will be posted in your logs. The following is an example of what "
+"information will be sent."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:100
+msgid ""
+"The text below has been better formatted for readability, but does not "
+"reflect the actual text being sent to Tigase."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:249
+msgid "Unauthorized use"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:251
+msgid ""
+"Tigase will consider itself unauthorized if the following conditions are "
+"met:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:253
+msgid "if Tigase XMPP Server does not have a valid license file and"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:255
+msgid ""
+"cannot contact the licensing server to obtain installation id and "
+"attached licenses."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:257
+msgid "Then the program will then attempt to send statistics."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:259
+msgid "if unable to sent statistics the server after a random number of retries."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:261
+msgid ""
+"if these retries are not successful within 10 attempts, the server will "
+"then shutdown."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:263
+msgid "If you are experiencing this condition, please contact Tigase."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:266
+msgid "Manual mode"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Licensing.rst:268
+msgid ""
+"If you cannot open communication to ``stats.tigase.software`` or "
+"``license.tigase.software`` over the required ports (https over port "
+"443), you may request to use manual mode. Manual mode requires Tigase to "
+"create a license file to be used on your machine locally. This must be "
+"placed in the same folder as the above information, and the license check"
+" system will not seek communication unless the license is invalid or "
+"expired."
+msgstr ""
+

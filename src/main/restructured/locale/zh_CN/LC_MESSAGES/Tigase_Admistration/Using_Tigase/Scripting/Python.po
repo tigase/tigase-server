@@ -1,0 +1,197 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:2
+msgid "Tigase and Python"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:4
+msgid ""
+"This article describes how to get Python working as a scripting language "
+"for ad-hoc commands in Tigase server. The first part is installation, and"
+" the second shows a few code examples with explanation of the differences"
+" between Python usage and some other languages."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:6
+msgid ""
+"*Please note, we are not a Python developer, and by no means this is "
+"Python development guide. All the code examples are used only to present "
+"the API available and there are certainly better ways to do it in the "
+"proper Python style. If you have any suggestions or have a better code "
+"examples I am happy to include them in the guide.*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:9
+msgid "Installation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:11
+msgid ""
+"In short, installation is extremely simple: just copy the file attached "
+"to this article to your Tigase installation, to the ``libs/`` directory. "
+"Restart the server and you are ready to start scripting and executing "
+"Python."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:13
+msgid ""
+"In theory the Tigase offers scripting support defined in `JSR-223 "
+"<http://www.jcp.org/en/jsr/detail?id=223>`__. You can use any language "
+"for which there is such support for JVM. This includes also stand-alone "
+"python implementations and the JSR-223 plugins acts just as a bridge. "
+"This, however, does not make much sense as you are not able to interact "
+"with JVM code (Tigase API). Therefore you need a language which is "
+"executed within JVM and can easily exchange data between the main "
+"application (Tigase server) and the script."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:15
+msgid "|lang list no python small|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:67
+msgid "lang list no python small"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:17
+msgid ""
+"The best way to go is to use Jython implementation. It works very well "
+"within JVM and more importantly, perfectly integrates with Tigase server."
+" Tigase server is tested with **Jython-2.2.1** and is confirmed to work "
+"fine. Version **Jython-2.5.1** is recommended however, and all the "
+"examples are executed with this version installed. Please note, "
+"*Jython-2.5.0* does not work at all. Both supported versions can be "
+"downloaded from the `Jython website "
+"<http://wiki.python.org/jython/DownloadInstructions>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:19
+msgid ""
+"**Version 2.5.1** is a bit simpler to install. When you download and run "
+"the Jython installer, find ``jython.jar`` file in the directory where you"
+" installed Jython. Copy the file to the Tigase’s **libs/** directory and "
+"all is ready to go. Please note, this is the same file as the one "
+"attached to this article for your convenience."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:21
+msgid ""
+"**Version 2.2.1** needs a little bit more work. The first part is the "
+"same. It is not, however enough to copy the ``jython.jar`` file. One more"
+" file is necessary for the Jython to work with the Tigase server. You "
+"have to install JSR-223 engine separately. The binary file has to be "
+"unpacked and ``jython-engine.jar`` file needs to be copied to the Tigase "
+"``libs/`` directory."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:23
+msgid ""
+"The best way to check if the Jython is installed correctly and support "
+"for Python is enabled, is by trying to submit a new script to the Tigase "
+"server. Browser the server service discovery, select \"*Session "
+"manager*\" component and run \"*Execute command*\" function. A new window"
+" should show with a list of all available ad-hoc commands. Select \"*New "
+"command script*\" item and click \"*Execute*\". Ad-hoc command dialog "
+"windows should show up. One of the field is \"*Language*\" with pull down"
+" list of available scripting languages. If \"*python*\" is on the list it"
+" means everything is ok and support for Python is enabled."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:25
+msgid "|lang list with python small|"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:68
+msgid "lang list with python small"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:28
+msgid "Writing Python Scripts"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:30
+msgid ""
+"Python scripts work in a similar way to Groovy or other languages "
+"scripts, except one significant difference. You cannot call \"*return*\" "
+"from the script itself. Hence you cannot simply pass script results by "
+"calling \"*return*\" statement directly from the script."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:32
+msgid ""
+"To overcome the problem, Tigase offers another way to pass script "
+"execution results. It checks the value of a special variables on the "
+"script completion: “result” and “packet”. By assigning value to one of "
+"these variables the Python (or any other language) can pass execution "
+"results back to the Tigase server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:34
+msgid ""
+"``result`` allows to return simple text (or characters String) from the "
+"script."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:36
+msgid ""
+"``packet`` allows to return Packet instance which is send back to the "
+"user."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:38
+msgid "The simplest possible Python script may look like this one:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:40
+msgid "``result = \"Hello world!\"``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:42
+msgid ""
+"For instructions how to load and execute the script, please refer to the "
+"`introductory article <#scriptingintro>`__ for scripting in Tigase "
+"server. There were some minor changes in Tigase 4.4.0 and later versions,"
+" so please have a look at the `article <#newElements>`__ describing new "
+"elements as well."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:44
+msgid ""
+"An example of a more advanced script asks the user for providing required"
+" parameters for the actual script execution:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:63
+msgid ""
+"Except this minor difference, the rest part of scripting in Python for "
+"the Tigase administrator commands is the same as all other languages. As "
+"all languages can return execution results via these special variables, "
+"it could be argued there is no difference at all."
+msgstr ""
+
+#: ../../Tigase_Admistration/Using_Tigase/Scripting/Python.rst:65
+msgid ""
+"In article *\"Component Implementation - Lesson 6 - Scripting Support\"* "
+"in Developer guide, I am going to present the Tigase server API available"
+" for scripting framework. My main language is Groovy as it offers the "
+"best integration with JVM and Tigase API, however I will try to include "
+"Python example code as well."
+msgstr ""
+

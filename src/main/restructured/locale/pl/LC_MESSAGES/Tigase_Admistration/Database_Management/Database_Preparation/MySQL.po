@@ -1,0 +1,280 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:2
+msgid "Prepare the MySQL Database for the Tigase Server"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:4
+msgid ""
+"This guide describes how to prepare MySQL database for connecting Tigase "
+"server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:6
+msgid ""
+"The MySQL database can be prepared in many ways. Most Linux distributions"
+" contain tools which allow you to go through all steps from the shell "
+"command line. To make sure it works on all platforms in the same way, we "
+"will first show how to do it under MySQL command line client."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:9
+msgid "Configuring from MySQL command line tool"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:11
+msgid ""
+"Run the MySQL command line client in either Linux or MS Windows "
+"environment and enter following instructions from the Tigase installation"
+" directory:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:17
+msgid "Once logged in, create the database for the Tigase server:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:23
+msgid ""
+"Add the ``tigase_user`` user and grant him access to the ``tigasedb`` "
+"database. Depending on how you plan to connect to the database (locally "
+"or over the network) use one of following commands or all if you are not "
+"sure:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:25
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:132
+msgid "Grant access to tigase_user connecting from any network address."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:32
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:141
+msgid "Grant access to tigase_user connecting from localhost."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:39
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:150
+msgid "Grant access to tigase_user connecting from local machine only."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:46
+msgid "And now you can update user permission changes in the database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:54
+msgid ""
+"It’s essential to enable `log_bin_trust_function_creators "
+"<https://dev.mysql.com/doc/refman/8.0/en/replication-options-binary-"
+"log.html#sysvar_log_bin_trust_function_creators>`__ option in MySQL "
+"server, for example by running:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:60
+msgid "Installing Schemas"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:62
+msgid ""
+"Starting with v8.0.0 the Schemas are no longer linked, and will need to "
+"manually be installed in the following order."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:64
+msgid "Switch to the database you have created:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:72
+msgid ""
+"We are assuming you run the mysql client in Linux from the Tigase "
+"installation directory, so all file links will be relative."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:74
+msgid "Next install the schema files:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:80
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:169
+msgid "You will need to repeat this process for the following files:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:95
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:184
+msgid "Other components may require installation such as:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:105
+msgid "Windows instructions:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:107
+msgid ""
+"On Windows you have probably to enter the full path, assuming Tigase is "
+"installed in C:\\Program Files\\Tigase:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:118
+msgid "Configuring From the Linux Shell Command Line"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:120
+msgid "Follow steps below to prepare the MySQL database:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:122
+msgid "Create the database space for the Tigase server:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:128
+msgid ""
+"Add the ``tigase_user`` user and grant access to the tigasedb database. "
+"Depending on how you plan to connect to the database (locally or over the"
+" network) use one of following commands or all if you are not sure:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:130
+msgid "Selective access configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:159
+msgid "Schema Installation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:161
+msgid "Load the proper mysql schemas into the database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:195
+msgid "Configuring MySQL for UTF-8 Support"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:197
+msgid "In my.conf put following lines:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:214
+msgid "Then connect to the database from the command line shell check settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:221
+msgid ""
+"If any of these shows something else then 'utf8' then you need to fix it "
+"using the command:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:227
+msgid ""
+"You can now also test your database installation if it accepts UTF-8 "
+"data. The easiest way to ensure this is to just to create an account with"
+" UTF-8 characters:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:233
+msgid "And then check that the account has been created:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:239
+msgid ""
+"If the last command gives you no results it means there is still "
+"something wrong with your settings. You might also want to check your "
+"shell settings to make sure your command line shell supports UTF-8 "
+"characters and passes them correctly to MySQL:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:247
+msgid ""
+"It seems that MySQL 5.0.x also needs extra parameters in the connection "
+"string: '&useUnicode=true&characterEncoding=UTF-8' while MySQL 5.1.x "
+"seems to not need it but it doesn’t hurt to have it for both versions. "
+"You have to edit ``etc/config.tdsl`` file and append this to the database"
+" connection string."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:249
+msgid ""
+"For MySQL 5.1.x, however, you need to also update code for all database "
+"stored procedures and functions used by the Tigase. They are updated for "
+"Tigase version 4.4.x and up, however if you use an older version of the "
+"Tigase server, you can reload stored procedures using the file from SVN."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:252
+msgid "Other MySQL Settings Worth Considering"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:254
+msgid ""
+"There are a number of other useful options, especially for performance "
+"improvements. Please note, you will have to review them as some of them "
+"may impact data reliability and are useful for performance or load tests "
+"installations only."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:262
+msgid "Some the general MySQL settings which mainly affect performance:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:277
+msgid "InnoDB specific settings:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:300
+msgid ""
+"These settings may not be fully optimized for your system, and have been "
+"only tested on our systems. If you have found better settings for your "
+"systems, feel free to `let us know <http://tigase.net/contact>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:303
+msgid "Support for emoji and other icons"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:305
+msgid ""
+"Tigase Database Schema can support emojis and other icons, however by "
+"using UTF-8 in ``mysqld`` settings will not allow this. To employ "
+"settings to support emojis and other icons, we recommend you use the "
+"following in your MySQL configuration file:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:314
+msgid ""
+"Doing this, Tigase XMPP Server Database will still use ``utf8`` character"
+" set, with ``utf8_general_ci`` as collation, and only fields which "
+"require support for emojis will be converted to ``utf8mb4``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:318
+msgid ""
+"If for some reason, with above settings applied to your MySQL instance, "
+"you still receive :literal:`java.sql.SQLException: Incorrect string "
+"value: ` you should add to your database URI passed in Tigase XMPP Server"
+" following configuration `&useUnicode=true&characterEncoding=UTF-8`. If "
+"even this fails too, then you may try adding "
+"``&connectionCollation=utf8mb4_bin`` as a last resort. This changes "
+"situation from previous versions that shipped older MySQL JDBC connector."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Database_Preparation/MySQL.rst:322
+msgid ""
+"Tigase XMPP Server databases should be created with ``utf8_general_ci`` "
+"collation as it will work properly and is fastest from "
+"``utf8mb4_general_ci`` collations supported by MySQL"
+msgstr ""
+

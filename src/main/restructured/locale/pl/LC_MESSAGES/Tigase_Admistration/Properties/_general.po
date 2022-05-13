@@ -1,0 +1,956 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Properties/_general.rst:2
+msgid "General"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:5
+msgid "admins"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:7
+msgid "**Description:** Specifies a list of administrator accounts."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:9
+msgid ""
+"**Default value:** the administration account created when the server is "
+"setup. Typically it would be something like ``admins = "
+"['admin@server.com']``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:11
+msgid "**Example:** ``admins = [ 'admin@domain.com', 'user2@domain.com' ]``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:13
+msgid "**Possible values:** Comma seperated values of Bare JIDs."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:15
+#: ../../Tigase_Admistration/Properties/_general.rst:142
+#: ../../Tigase_Admistration/Properties/_general.rst:168
+msgid "**Available since:** 2.0.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:18
+msgid "Certificate Container"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:20
+msgid ""
+"The certificate container houses all configuration related to SSL "
+"certificate configuration. This container replaces a number of former — "
+"properties."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:23
+msgid "ssl-certs-location"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:25
+msgid ""
+"This option allows you to specify the location where SSL certificates are"
+" stored. The meaning of this property depends on the SSL container `class"
+" implementation <#sslContainerClass>`__. By default it just points to the"
+" directory where the server SSL certificates are stored in files in PEM "
+"format."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:27
+msgid ""
+"Default location is ``/certs`` however it can be changed using the "
+"following setting:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:36
+msgid "This replaces the former ``--ssl-certs-location`` property."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:39
+msgid "ssl-def-cert-domain"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:41
+msgid ""
+"This property allows you to specify a default alias/domain name for "
+"certificate. It is mostly used to load certificates for unknown domain "
+"names during the SSL negotiation. Unlike in TLS protocol where the domain"
+" name is known at the handshaking time, for SSL domain name is not known,"
+" therefore, the server does not know which certificate to use. Specifying"
+" a domain name in this property allows you to use a certificate for a "
+"specific domain in such case. This property value is also sometimes used "
+"if there is no certificate for one of virtual domains and the container "
+"does not automatically generate a self-signed certificate, then it can "
+"use a default one."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:43
+msgid "This may be configured as follows:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:52
+msgid "This replaces the former ``--ssl-def-cert-domain`` property."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:55
+msgid "Component"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:57
+msgid ""
+"**Description:** Container specifying component configuration. All "
+"components if they require configuration must be called in the conf.tdsl "
+"file in the following manner:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:65
+msgid ""
+"DSL allows for custom naming of the component, and specifying of the "
+"class in the same line. This method replaces the old ``comp-class`` and "
+"``comp-name`` style of configuration."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:67
+msgid "For example, what used to be"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:76
+msgid "is now"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:83
+msgid ""
+"In fact, if you are using the default class & name for a component, you "
+"don’t need to specify it either, so MUC in this is now called by"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:89
+msgid ""
+"**Default value:** By default, component configuration runs of default, "
+"and does not need to be specified."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:91
+msgid ""
+"There are many many configuration options under each component, which are"
+" specified in `component documentation <#loadComponent>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:94
+msgid "Ports"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:96
+msgid ""
+"The ports property is a subclass of connections, which is used to set a "
+"ports list for a connection manager. 'list of ports' is a comma separated"
+" list of ports numbers. For example for the server to server connection "
+"manager named s2s the property would like like the example below:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:106
+msgid "Each port many be individually configured underneath ports"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:119
+msgid "this replaces the ``--cmpname-ports`` property."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:121
+#: ../../Tigase_Admistration/Properties/_general.rst:199
+#: ../../Tigase_Admistration/Properties/_general.rst:276
+#: ../../Tigase_Admistration/Properties/_general.rst:552
+#: ../../Tigase_Admistration/Properties/_general.rst:604
+#: ../../Tigase_Admistration/Properties/_general.rst:623
+#: ../../Tigase_Admistration/Properties/_general.rst:644
+#: ../../Tigase_Admistration/Properties/_general.rst:657
+msgid "**Available since:** 8.0.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:124
+msgid "config-type"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:126
+msgid ""
+"**Description:** This property sets the server type and determines what "
+"components are started up without needing to declare and configure all "
+"components. Possible values are listed below:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:128
+msgid ""
+"``setup`` - This setting will setup a basic server that is prepared for "
+"initial setup after unpacking. This is set by default, and starts up http"
+" component as well as basic server components. This should be changed "
+"after the server is configured."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:130
+msgid ""
+"``default`` - creates default configuration file. That is configuration "
+"which is most likely needed for a typical installation. Components "
+"included in configuration are: session manager, client-to-server "
+"connection manager and server-to-server connection manager."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:132
+msgid ""
+"``session-manager`` - creates configuration for instance with session "
+"manager and external component only. This is useful for distributed "
+"installation where you want to have session manager installed on separate"
+" machine and components managing network connections on different "
+"machines (one or more). Components included in configuration are: sm and "
+"ext2s."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:134
+msgid ""
+"``connection-managers`` - creates configuration for instance with "
+"components managing network connections. This is useful for distributed "
+"installation where you want to have session manager installed on separate"
+" machine and components managing network connections on different "
+"machines (one or more). Components included in configuration are: c2s, "
+"s2s, ext2s."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:136
+msgid ""
+"``component`` - generating a configuration with only one component - "
+"component managing external components connection, either XEP-0114 or "
+"XEP-0225. This is used to deploy a Tigase instance as external component "
+"connecting to the main server. You have to add more components handled by"
+" this instance, usually these are MUC, PubSub or any other custom "
+"components. You have to configure the external component connection, "
+"domain name, password, port, etc…​"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:138
+msgid "**Default value:** ``'config-type' = 'setup'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:140
+msgid ""
+"**Possible values:** ``setup``\\ \\|\\ ``default``\\ \\|\\ ``connection-"
+"managers``\\ \\|\\ ``session-manager``\\ \\|\\ ``connection-managers``\\ "
+"\\|\\ ``component``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:145
+msgid "debug-packages"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:147
+msgid ""
+"**Default value:** No default as Tigase does not expect custom classes "
+"out of the box."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:149
+msgid ""
+"**Example:** ``'debug-packages' = [ 'com.company.CustomPlugin' , "
+"'com.company.custom' ]``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:151
+msgid "**Possible values:** comma separated list of Java packages or classes."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:153
+msgid ""
+"**Description:** This property is used to turn debugging on for any "
+"package not located within the default Tigase packages. Be sure class "
+"case is correct."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:155
+#: ../../Tigase_Admistration/Properties/_general.rst:363
+msgid "**Available since:** 5.0.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:158
+msgid "debug"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:160
+msgid ""
+"**Description:** The ``debug`` property is used to turn on the debug log "
+"for the specified Tigase package. For example if you want to turn debug "
+"logs on for the ``tigase.server`` package, then you have to use the "
+"``server`` parameter. If you have any problems with your server the best "
+"way to get help from the Tigase team is to generate configuration with "
+"this enabled at a minimum and run the server. Then from the ``logs"
+"/tigase-console.log`` log file I can provide the best information for us "
+"to provide assistance. More details about server logging and adjusting "
+"logging level is described in the Debugging Tigase article in the admin "
+"guide. If you wish to debug packages not compiled with Tigase, use the "
+"`debug-packages <#debugPackages>`__ setting."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:162
+#: ../../Tigase_Admistration/Properties/_general.rst:232
+msgid "**Default value:** 'none'"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:164
+msgid "**Example:** ``debug = [ 'server', 'xmpp.impl' ]``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:166
+msgid "**Possible values:** Comma separated list of Tigase’s package names."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:171
+msgid "monitoring"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:173
+msgid ""
+"**Description:** This property activates monitoring interfaces through "
+"selected protocols on selected TCP/IP port numbers. For more details "
+"please refer to the `monitoring guide <#serverMonitoring>`__ in the user "
+"guide for details. Each monitoring protocol should be called in it’s own "
+"child bean under ``monitoring ()``. If a protocol is not specified, "
+"monitoring under that will not be available."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:175
+msgid "**Default value:** By default monitoring is disabled."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:177
+#: ../../Tigase_Admistration/Properties/_general.rst:234
+#: ../../Tigase_Admistration/Properties/_general.rst:319
+#: ../../Tigase_Admistration/Properties/_general.rst:576
+msgid "**Example:**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:195
+msgid "DO NOT CONFUSE monitoring with monitor component."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:197
+msgid "**Possible values:** 'list of monitoring protocols with port numbers.'"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:202
+msgid "plugins"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:204
+msgid ""
+"**Description:** The former ``--sm-plugins`` property has been replaced "
+"by a new style of formatting with DSL. The former long unbroken string of"
+" plusses and minuses have been replaced by a compartmentalized style. "
+"Plugins controlled under session manager will now be children of the "
+"``'sess-man'`` bean. For example, to turn on the personal eventing "
+"protocol, the following may be used:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:212
+msgid ""
+"Should any plugin require configuration, those configurations will be "
+"under it’s own brackets. For example, this section not only turns on "
+"jabber:iq:auth but also sets the treads to 16."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:222
+msgid ""
+"As you may have noticed, beans or configuration options that require "
+"escape characters such as ``:`` or ``-`` will fall into single quotes to "
+"contain any special characters. If no special characters are in the bean "
+"name, then no single quotes are not required. If you need to disable "
+"certain plugins, you can do so after declaring the bean."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:230
+msgid ""
+"Typically if a bean is called, it is automatically active. Session "
+"manager plugins will typically look like a list of plugins without "
+"configurations. The example section will show what one will look like."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:274
+msgid "**Possible values:** DSL format plugins list and configurations."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:279
+msgid "priority-queue-implementation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:281
+msgid "**Default value:** ``tigase.util.PriorityQueueRelaxed``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:283
+msgid ""
+"**Example:** ``'priority-queue-implementation' = "
+"'tigase.util.PriorityQueueStrict``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:285
+msgid ""
+"**Possible values:** class name extending "
+"``tigase.util.PriorityQueueAbstract``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:287
+msgid ""
+"**Description:** The ``priority-queue-implementation`` property sets "
+"Tigase’s internal queue implementation. You can choose between already "
+"available and ready to use or you can create own queue implementation and"
+" let Tigase load it instead of the default one. Currently following queue"
+" implementations are available:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:289
+msgid ""
+"**tigase.util.workqueue.PriorityQueueRelaxed** - specialized priority "
+"queue designed to efficiently handle very high load and prevent packets "
+"loss for higher priority queues. This means that sometimes, under the "
+"system overload packets may arrive out of order in cases when they could "
+"have been dropped. Packets loss (drops) can typically happen for the "
+"lowest priority packets (presences) under a very high load."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:291
+msgid ""
+"**tigase.util.workqueue.PriorityQueueStrict** - specialized priority "
+"queue designed to efficiently handle very high load but prefers packet "
+"loss over packet reordering. It is suitable for systems with a very high "
+"load where the packets order is the critical to proper system "
+"functioning. This means that the packets of the same priority with the "
+"same source and destination address are never reordered. Packets loss "
+"(drops) can typically happen for all packets with the same probability, "
+"depending which priority queue is overloaded."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:293
+msgid ""
+"**tigase.util.workqueue.NonpriorityQueue** - specialized non-priority "
+"queue. All packets are stored in a single physical collection, hence they"
+" are never reordered. Packets are not prioritized, hence system critical "
+"packets may have to wait for low priority packets to be processed. This "
+"may impact the server functioning and performance in many cases. "
+"Therefore this queue type should be chosen very carefully. Packets of the"
+" same type are never reordered. Packets loss (drops) can typically happen"
+" for all packets which do not fit into the single queue."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:297
+msgid ""
+"*Since the packets are processed by plugins in the SessionManager "
+"component and each plugin has own thread-pool with own queues packet "
+"reordering may happen regardless what queue type you set. The reordering "
+"may only happen, however between different packet types. That is "
+"'message' may take over 'iq' packet or 'iq' packet may take over "
+"'presence' packet and so on…​ This is unpredictable.*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:299
+msgid "**Available since:** 5.1.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:302
+msgid "roster-implementation"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:304
+msgid "**Default value:** ``RosterFlat.class.getCanonicalName()``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:306
+msgid "**Example:** ``'roster-implementation' = 'my.pack.CustomRosterImpl'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:308
+msgid ""
+"**Possible values:** Class extending "
+"tigase.xmpp.impl.roster.RosterAbstract."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:310
+msgid ""
+"**Description:** The ``roster-implementation`` property allows you to "
+"specify a different RosterAbstract implementation. This might be useful "
+"for a customized roster storage, extended roster content, or in some "
+"cases for some custom logic for certain roster elements."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:312
+#: ../../Tigase_Admistration/Properties/_general.rst:337
+msgid "**Available since:** 5.2.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:315
+msgid "s2s-secret"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:317
+#: ../../Tigase_Admistration/Properties/_general.rst:649
+msgid "**Default value:** ``none``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:329
+msgid "**Possible values:** 'ascii string.'"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:331
+msgid ""
+"**Description:** This property is a global setting for s2s secrets to "
+"generate dialback keys on the Tigase installation. By default it is null,"
+" which means the secret is automatically generated for each s2s "
+"connection and handshake."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:333
+msgid ""
+"This is a global property which is overridden by settings for each VHost "
+"(see `??? <#addManageDomain>`__)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:335
+msgid ""
+"As in the example provided, 'defaults' settings for all virtual hosts for"
+" which the configuration is not defined. This settings is useful mostly "
+"for installations with many virtual hosts listed in the init.property "
+"file for which there is no individual settings specified. It allows to "
+"configure a default values for all of them, instead of having to provide "
+"individual configuration for each vhost."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:340
+msgid "scripts-dir"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:342
+msgid "**Default value:** ``scripts/admin``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:344
+msgid "**Example:** ``'scripts-dir' = ''/opt/admin-scripts'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:346
+msgid "**Possible values:** path to a directory on the file system."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:348
+msgid ""
+"**Description:** This property sets the directory where all administrator"
+" scripts for ad-hoc commands are stored."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:350
+msgid "**Available since:** 4.3.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:353
+msgid "ssl-container-class"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:355
+msgid "*Default value:** ``tigase.io.SSLContextContainer``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:357
+msgid ""
+"**Example:** ``rootSslContextContainer (class: "
+"class.implementing.SSLContextContainerIFC) {}``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:359
+msgid ""
+"**Possible values:** a class implementing "
+"tigase.io.SSLContectContainerIfc."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:361
+msgid ""
+"**Description:** The ``rootSslContextContainer`` property allows you to "
+"specify a class implementing storage for SSL/TLS certificates. The class "
+"presented in the example to this description allows for loading "
+"certificates from PEM files which is a common storage used on many "
+"systems."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:366
+msgid "stats"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:368
+msgid ""
+"The stats block contains settings for statistics collection. To begin the"
+" stats block, use the following:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:374
+msgid ""
+"**Default value:** 'By default, stats is not listed in the "
+"``config.tdsl`` file'"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:376
+msgid "**Description**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:378
+msgid ""
+"Tigase XMPP Server can store server statistics internally for a given "
+"period of time. This allows you to connect to a running system and "
+"collect all the server metrics along with historic data which are stored "
+"on the server. This is very useful when something happens on your "
+"production system you can connect and see when exactly this happened and "
+"what other metrics looked around this time. **Please be aware that Tigase"
+" XMPP Server produces about 1,000 different metrics of the system. "
+"Therefore caching large number of statistics sets requires lots of "
+"memory.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:381
+msgid "stats-history-size"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:383
+msgid ""
+"Stats-history defines the size of the history buffer. That is how many "
+"complete sets of historic metrics to store in memory."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:392
+msgid "stats-history-interval"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:394
+msgid "Sets the interval for which statistics will be gathered from the server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:404
+msgid "stats-logger"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:406
+msgid ""
+"Allow enabling and configuring components responsible for storing "
+"statistic information. Note that this controls the logging system for "
+"retrieving using JMX, clients, or ad-hoc commands."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:416
+msgid "Currently following classes are available:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:418
+msgid ""
+"``tigase.stats.CounterDataArchivizer`` - every execution put current "
+"basic server metrics (CPU usage, memory usage, number of user "
+"connections, uptime) into database (overwrites previous entry)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:420
+msgid ""
+"``tigase.stats.CounterDataLogger`` - every execution insert new row with "
+"new set of number of server statistics (CPU usage, memory usage, number "
+"of user connections per connector, number of processed packets of "
+"different types, uptime, etc) into the database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:422
+msgid ""
+"``tigase.stats.CounterDataFileLogger`` - every execution store all server"
+" statistics into separate file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:424
+#: ../../Tigase_Admistration/Properties/_general.rst:457
+msgid "frequency"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:426
+msgid ""
+"stats-logger may also be controlled using frequency, which is the time "
+"interval between executions of the archiver ``.execute()`` method in "
+"seconds."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:443
+msgid "stats-file-logger"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:445
+msgid ""
+"This allows configuring of statistics gathering to an external file. This"
+" only has one class, and may be controlled independently from the "
+"internal statistics."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:459
+msgid ""
+"stats-file-logger may also be controlled using frequency, which is the "
+"time interval between executions of the archiver ``.execute()`` method in"
+" seconds."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:470
+msgid "file configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:472
+msgid ""
+"You can customize the file output for stats-file-logger using the "
+"following setting options, these are all optional."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:488
+msgid "**'stats-datetime'** - Whether to include date & time timestamp."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:490
+msgid ""
+"**'stats-datetime-format'** - Specifies the formatting of datetime "
+"timestamp."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:492
+msgid ""
+"**'stats-directory'** - The directory to which the statistics file should"
+" be saved."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:494
+msgid ""
+"**'stats-filename'** - The filename prefix to name the output statistics "
+"file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:496
+msgid "**'stats-level'** - Sets the level of statistics to be gathered."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:498
+msgid ""
+"**'stats-unixtime'** - Control the format of the timestamp to use java "
+"DateFormat pattern."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:500
+msgid ""
+"which configures accordingly: directory to which files should be saved, "
+"filename prefix, whether to include or not unix timestamp in filename, "
+"whether to include or not datetime timestamp, control format of timestamp"
+" (using java DateFormat pattern) and also set level of the statistics we "
+"want to save (using java Logger.Level)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:503
+msgid "Database logger"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:505
+msgid ""
+"This allows configuring of statistics gathering to a database. Without "
+"additional configuration ``default`` data source will be used but it’s "
+"possible to store statistics in any database - simply define new data "
+"source and configure logger with it’s name."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:507
+msgid "**Note**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:509
+msgid ""
+"After enabling the component it’s database schema should be loaded by "
+"executing ``./scripts/tigase.sh upgrade-schema etc/tigase.conf`` from the"
+" main Tigase directory"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:526
+msgid "Example configuration block"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:555
+msgid "stream-error-counter"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:557
+msgid ""
+"**Description:** Add stream-error-counter to comma separated processors "
+"of components for which you wish to count the number of stream errors "
+"made. Without enabling this, statistics will return 0. This setting turns"
+" on stream-error-counter for both c2s and ws2s:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:572
+msgid ""
+"You may if you wish turn off stream error counters by setting ``active = "
+"false``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:574
+msgid ""
+"**Default value:** Stream error counters are not turned on by default, "
+"thus no default value is set."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:585
+msgid "**Available since:** 7.1.0"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:588
+msgid "stringprep-processor"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:590
+msgid ""
+"**Description:** The ``'stringprep-processor'`` property sets the "
+"stringprep processor for all JIDs handled by Tigase. The default 'simple'"
+" implementation uses regular expressions to parse and check the user JID."
+" Although it does not fulfill the RFC-3920 requirements, it also puts "
+"much less stress on the server CPU, hence impact on the performance is "
+"very low."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:592
+msgid "Other possible values are:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:594
+msgid ""
+"``'libidn'`` - provides full stringprep processing exactly as described "
+"in the RFC-3920. It requires lots of CPU power and significantly impacts "
+"performance."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:596
+msgid ""
+"``'empty'`` - doesn’t do anything to JIDs. JIDs are accepted in the form "
+"they are received. No impact on the performance and doesn’t use any CPU. "
+"This is suitable for use in automated systems where JIDs are generated by"
+" some algorithm, hence there is no way incorrect JIDs may enter the "
+"system."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:598
+msgid "**Default value:** ``simple``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:600
+msgid "**Example:** ``'stringprep-processor' = 'libidn'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:602
+msgid "**Possible values:** ``simple|libidn|empty``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:607
+msgid "test"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:609
+msgid "*Default value:** By default test mode is disabled."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:611
+msgid ""
+"**Description:** This property sets the server for test mode, which means"
+" that all logging is turned off, offline message storage is off, and "
+"possibly some other changes to the system configuration are being made."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:613
+msgid ""
+"The idea behind this mode is to test Tigase XMPP Server with minimal "
+"performance impact from environment such as hard drive, database and "
+"others…​"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:615
+msgid "Test function has been replaced by the following setting:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:626
+msgid "tls-jdk-nss-bug-workaround-active"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:628
+msgid "**Default value:** ``false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:630
+msgid "**Example:** ``'tls-jdk-nss-bug-workaround-active' = true``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:632
+msgid "**Possible values:** ``true|false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:634
+msgid ""
+"**Description:** This is a workaround for TLS/SSL bug in new JDK7 using "
+"the native library for keys generation and connection encryption used "
+"with new version of nss library."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:636
+msgid ""
+"This caused a number of problems with Tigase installed on systems with "
+"JDK7 and the new library installed, such as hanging connections, or "
+"broken SSL/TLS. Our earlier suggestion was to avoid using either JDK7 or "
+"the problematic native library. Now we have a proper fix/workaround which"
+" allows you to run Tigase with JDK7."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:638
+msgid "http://stackoverflow.com/q/10687200/427545"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:640
+msgid "http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:642
+msgid ""
+"Note, while this setting is still supported, the issues mentioned above "
+"are fixed in v8 JDK."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:647
+msgid "trusted"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:651
+msgid "**Example:** ``trusted = [ 'user@domain.com' , 'user-2@domain2.com' ]``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:653
+msgid "**Possible values:** comma separated list of user bare JIDs."
+msgstr ""
+
+#: ../../Tigase_Admistration/Properties/_general.rst:655
+msgid ""
+"**Description:** The ``trusted`` property allows users to specify a list "
+"of accounts which are considered as trusted, thus whom can perform some "
+"specific actions on the server. They can execute some commands, send a "
+"broadcast message, set MOTD and so on. The configuration is similar to "
+"```admins`` <#admins>`__ setting."
+msgstr ""
+

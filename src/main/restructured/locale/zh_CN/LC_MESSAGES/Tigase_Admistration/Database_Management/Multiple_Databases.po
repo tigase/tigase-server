@@ -1,0 +1,125 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:2
+msgid "Tigase Server and Multiple Databases"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:4
+msgid ""
+"Splitting user authentication data from all other XMPP information such "
+"as roster, vcards, etc…​ was almost always possible in Tigase XMPP "
+"Server. Possible and quite simple thing to configure. Also it has been "
+"always possible and easy to assign a different database for each Tigase "
+"component (MUC, PubSub, AMP), for recording the server statistics. Almost"
+" every data type or component can store information in a different "
+"location, simple and easy to setup through the configuration file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:6
+msgid ""
+"However it is much less known that it is also possible to have a "
+"different database for each virtual domain. This applies to both the user"
+" repository and authentication repository. This allows for very "
+"interesting configuration such as user database sharing where each shard "
+"keeps users for a specific domain, or physically split data based on "
+"virtual domain if each domain refers to a different customer or group of "
+"people."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:8
+msgid "How can we do that then?"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:10
+msgid "This is very easy to do through the Tigase’s configuration file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:32
+msgid ""
+"This configuration defines just a default databases for both user "
+"repository and authentication repository. Default means it is used when "
+"there is no repository specified for a particular virtual domain. "
+"However, you can have a separate, both user and authentication repository"
+" for each virtual domain."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:34
+msgid "Here is, how it works:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:36
+msgid "First, let’s define our default database for all VHosts"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:58
+msgid ""
+"Now, we have VHost: domain1.com User authentication data for this VHost "
+"is stored in Drupal database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:74
+msgid "All other user data is stored in Tigase’s standard database in MySQL"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:87
+msgid ""
+"Next VHost: domain2.com User authentication is in LDAP server but all "
+"other user data is stored in Tigase’s standard database"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:99
+msgid ""
+"Now is something new, we have a custom authentication repository and "
+"separate user settings for a single domain. Please note how we define the"
+" VHost for which we set custom parameters"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:109
+msgid "All other user data is stored in the same as default repository"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:122
+msgid "When combined, the DSL output should look like this:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:142
+msgid ""
+"Next VHost: domain3.com Again user authentication is in LDAP server but "
+"pointing to a different LDAP server with different access credentials and"
+" parameters. User information is stored in a postgreSQL database."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:162
+msgid ""
+"For VHost: domain4.com all the data, both authentication and user XMPP "
+"data are stored on a separate MySQL server with custom stored procedures "
+"for both user login and user logout processing."
+msgstr ""
+
+#: ../../Tigase_Admistration/Database_Management/Multiple_Databases.rst:183
+msgid ""
+"As you can see, it requires some writing but flexibility is very "
+"extensive and you can setup as many separate databases as you need or "
+"want. If one database (recognized by the database connection string) is "
+"shared among different VHosts, Tigase still uses a single connection "
+"pool, so it won’t create an excessive number of connections to the "
+"database."
+msgstr ""
+

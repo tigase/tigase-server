@@ -1,0 +1,617 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:2
+msgid "DSL file format"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:4
+msgid ""
+"In previous Tigase XMPP Server releases configuration was stored in "
+"properties based configuration file. From Tigase XMPP Server 8.0.0 "
+"release it will be required to use new DSL based configuration file "
+"format. This file format was inspired by Groovy language syntax and new "
+"core feature of Tigase XMPP Server - Tigase Kernel Framework."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:7
+msgid "why new format?"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:9
+msgid ""
+"In properties configuration format each line contained key and value with"
+" optional definition of type of stored value:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:15
+msgid ""
+"where ``c2s/ports`` was name of property, ``[i]`` defined that type of "
+"value is array of integers, and ``5222,5223`` was comma separated list of"
+" values."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:17
+msgid ""
+"This format worked but in fact ``c2s/ports`` was not name of property you"
+" configured but key which was later split on ``/`` char to parts which "
+"defined by names path to property which name was in last part.From that "
+"you can see that it was domain based setting of properties."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:19
+msgid ""
+"Except from this multi-part keys we also used properties starting with "
+"``--`` which were global properties accessible for every part of "
+"application, i.e.: to add new component and set some properties you "
+"needed to write:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:28
+msgid ""
+"This lead to mistakes like duplicated definition of name and class for "
+"same number of component or redefined property value in other place of a "
+"configuration file - especially in cases where configuration was big."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:30
+msgid ""
+"In this configuration structure it was hard to tell where is "
+"configuration for particular component or what databases this "
+"installation uses. This could be defined all over the file."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:32
+msgid ""
+"In this release we are introducing Tigase Kernel Framework, which allows "
+"to configure beans in configuration file and even define usage of new "
+"beans loaded from external jars which can modify behavior of Tigase "
+"components. This would make configuration file even more complex, "
+"difficult and less readable."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:35
+msgid "What is DSL?"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:37
+msgid ""
+"DSL stands for domain-specific language - in this case language created "
+"for storage of configuration."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:39
+msgid ""
+"Now we use domain based configuration which means that our configuration "
+"file is not a flat key=value storage but it defines objects, it's "
+"properties and assigned values."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:41
+msgid ""
+"To illustrate it better let's start with a simple example. In properties "
+"file in order to configure PubSub component named ``pubsub`` you would "
+"use following properties:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:49
+msgid "In DSL based configuration this would be replaced by following block"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:58
+msgid ""
+"in which we define bean with name `pubsub` and set it's class inside "
+"``()`` block to ``tigase.pubsub.PubSubComponent``. We also use block "
+"between ``{}`` chars to define properties which are related to bean. "
+"Which means this properties will be passed only to this instance of "
+"Tigase PubSub Component, same as it was before where we needed to add "
+"prefix. Entries after ``\\#`` are comments, to pass ``#`` you need to "
+"wrap whole part containing it in ``''``, ie. ``'test#242'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:64
+msgid ""
+"If a string value assigned to a property contains any char from a "
+"following list ``=:,[]#+-*/`` it needs to be wrapped in a ``''``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:67
+msgid "Why DSL?"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:69
+msgid ""
+"DSL configuration format provides a number of advantages over the old "
+"system of configuration. All configurations for components are related in"
+" a single block, so they are not spread out over several different lines."
+" No need for long property names, no longer have to invoke a long string "
+"of settings for multiple values. Support is provided for environment "
+"variables. No longer need to escape certain characters, making settings "
+"far more readable at a glance. Values may be set using basic "
+"calculations, such as ``100 * 200 * 2`` rather than ``40000``. Parameter "
+"type values are no longer necessary, no more [i], [S], [B] etc.. Comma "
+"separated values can now be simplified lists with separate entries being "
+"able to be in multiple lines."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:71
+msgid ""
+"Although the format may seem more complex, looking like a section of java"
+" code, the formatting is consistent and can be far more readable. After "
+"some experience with DSL format, you'll find it's far more intuitive and "
+"user friendly than it may appear. Of course if there's any real "
+"confusion, Tigase can automatically convert old style properties files to"
+" the DSL format using the following command:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:78
+msgid "Setting property"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:80
+msgid ""
+"To set property you just write property name followed by `=` and value to"
+" set. This is always done in context of bean which configuration property"
+" you want to set."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:86
+msgid ""
+"It is also possible to set property in main context by placing property "
+"outside of any context. This sets property which value is available to "
+"access by any bean."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:90
+msgid "Setting global property"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:92
+msgid ""
+"Like in properties file it is still possible to use property names "
+"starting with ``--`` without any context or any other properties at "
+"global scope. Format is the same as in case of setting property but they "
+"are defined without scope (in global scope). This properties are global "
+"and accessible by any bean but also set as system property in JVM."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:95
+msgid "Defining bean"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:97
+msgid "You can configure bean by using following format:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:105
+msgid ""
+"where ``beanName`` is name under which you want to configure bean. "
+"`beanName` must be wrapped in ``''``, if ``beanName`` contains characters"
+" like ``=:,[]#+-*/`` and is recommended, if ``beanName`` is numeric only."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:108
+msgid "Inside block between ``(` and `)`` you can define:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:110
+msgid ""
+"``class`` which will be used as a bean, in example above we set class as "
+"``className``. *_(default: if you try to configure bean under name which "
+"has default class assigned with it in Tigase framework then this assigned"
+" class will be used. In other case you need to pass name of class to use "
+"as a bean)_*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:111
+msgid ""
+"``active`` (boolean) whether you want the bean to be active or not (beans"
+" with ``active`` set to ``false`` are not loaded). *_(default: true)_*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:112
+msgid ""
+"``exportable`` (boolean) defines if this bean should be exported and "
+"available for use for beans in inner scopes. This is advanced option in "
+"most cases it is recommended to omit this field in configuration. "
+"*_(default: false)_*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:114
+msgid ""
+"Spaces between ``beanName`` and block between ``()`` is optional as well "
+"as space between block ``()`` and block ``{}``. It is recommended that "
+"properties of bean would be placed in separate lines with indentation and"
+" first property will be placed in new line."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:119
+msgid ""
+"Usage of ``()`` block is very important. When this block is used in "
+"configuration it automatically sets ``active`` property of bean "
+"definition for bean for which it is used to to `true`. This is done due "
+"to fact that default value of ``active`` is ``true``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:121
+msgid ""
+"If you omit it in configuration, you will set bean configuration but it "
+"may remain ``inactive``. In this state bean will not be loaded and as a "
+"result will not be used by Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:124
+msgid "Configuring bean"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:126
+msgid ""
+"If you know that bean is defined and you do not want to change it's "
+"activity or class then you can just pass properties to configure bean in "
+"following way:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:136
+msgid ""
+"where ``beanName`` is name of bean to configure and `test` is name of "
+"property to set to ``true`` in this bean."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:139
+msgid "Format of values"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:141
+msgid ""
+"In properties based configuration file every property was defined as a "
+"string and only by defining expected format it was properly converted to "
+"expected value. In DSL it is possible to set values in two ways:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:144
+msgid "as an object"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:144
+msgid "Using this format you set list as a list and integer is set as an integer."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:149
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:203
+msgid "Type"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:149
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:203
+msgid "Description"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:151
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:205
+msgid "**string**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:151
+msgid "Wrap it in ``''``, ie. to set ``test`` as string you use ``'test'``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:153
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:207
+msgid "**integer**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:153
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:207
+msgid "Just put value, ie. to set ``543`` use ``543``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:155
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:209
+msgid "**long**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:155
+msgid ""
+"Put value and follow it with ``L``, ie. to set ``23645434`` as long use "
+"``23645434L``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:157
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:211
+msgid "**float**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:157
+msgid ""
+"Put value and follow it with ``f``, ie. to set ``231.342`` use "
+"``231.342f``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:159
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:213
+msgid "**boolean**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:159
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:213
+msgid "To set value just use ``true`` or ``false``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:161
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:215
+msgid "**list**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:161
+msgid ""
+"Lists can be of many types and to make it simple we decided to use as a "
+"comma separated list of values in proper format wrapped in ``[]``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:163
+msgid "of strings - ``[ 'alfa', 'beta', 'gamma' ]``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:165
+msgid "of integers - ``[ 1, 2, 3, 4]``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:167
+msgid "You can write it in multiple lines if you want:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:177
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:217
+msgid "**map**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:177
+msgid ""
+"Maps can be written as a block of properties wrapped in ``{}``. This "
+"format of map is the same as used for passing configuration to bean "
+"properties. Keys and values can be written in separate lines "
+"*(recommended)*:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:190
+msgid "or in single line *(separation with spaces is not required)*:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:198
+msgid "as a plain string"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:198
+msgid ""
+"Very similar to properties based configuration, in fact values are passed"
+" in same format and later are converted to correct type by checking type "
+"expected by bean. *(Not recommended)*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:205
+msgid "Just put value, ie. to set ``test`` use ``test``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:209
+msgid "Put value, ie. to set ``23645434`` as long use ``23645434``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:211
+msgid "Put value, ie. to set ``231.342`` use ``231.342``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:215
+msgid ""
+"List needs to be written as comma separated list of values, ie. "
+"``test,abc,efg`` or ``1,2,3``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:217
+msgid "Not possible"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:222
+msgid "Using values from System Properties and Environment Variables"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:224
+msgid ""
+"Now it is possible to use values of `system properties "
+"<https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html>`__"
+" and `environment variables "
+"<https://docs.oracle.com/javase/tutorial/essential/environment/env.html>`__"
+" and assign them to bean properties. For this purpose we added functions "
+"which can be used in DSL and which will return values of:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:227
+msgid "system property"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:227
+msgid "``prop('property-name')`` or ``prop('property-name','default value')``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:230
+msgid "environment variable"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:230
+msgid "``env('variable-name')``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:232
+msgid ""
+"**Example of setting value of system property and environment variable to"
+" bean ``user``.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:245
+msgid ""
+"For properties which accepts lists it is not allowed to set value using "
+"variable/property with comma separated values like ``value1,value2`` "
+"wrapped in ``[]``, ie. ``property = [ env('some-variable') ]``. It needs "
+"to be set in following way ``property = env('some-variable')``"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:248
+msgid "Computed values"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:250
+msgid ""
+"With DSL configuration format we introduce support for computable values "
+"for properties. It is now possible to set value which is result of a "
+"computation, ie. concatenation of a strings or very simple mathematical "
+"expression. We currently support only following mathematical operations:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:252
+msgid "add"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:254
+msgid "subtract"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:256
+msgid "multiply"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:258
+msgid "divide"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:260
+msgid ""
+"**Example of setting environment variable related path and computed "
+"timeout.**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:276
+msgid ""
+"For properties which accepts lists it is not allowed to set value using "
+"computed values with comma separated values like ``value1,value2`` "
+"wrapped in ``[]``, ie. ``property = [ env('some-variable') + ',other-"
+"value' ]``. It needs to be set in following way ``property = env('some-"
+"variable') + ',other-value'``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:279
+msgid "Period / Duration values"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:281
+msgid ""
+"Some configuration options allow control of execution of tasks with "
+"particular period or within certain duration. DSL file format accepts "
+"strings denoting particular amount of time, which follows Java’s native "
+"structures (see: `Period "
+"<https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-"
+"java.lang.CharSequence->`__ and `Duration "
+"<https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html#parse-"
+"java.lang.CharSequence->`__ for detailed explanation)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:283
+msgid ""
+"``Duration`` formats accepted are based on the ISO-8601 duration format "
+"``PnDTnHnMn.nS`` with days considered to be exactly 24 hours, for "
+"example:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:285
+msgid "``PT20.345S`` - 20.345 seconds"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:287
+msgid "``PT15M`` - 15 minutes (where a minute is 60 seconds)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:289
+msgid "``PT10H`` - 10 hours (where an hour is 3600 seconds)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:291
+msgid "``P2D`` - 2 days (where a day is 24 hours or 86400 seconds)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:293
+msgid "``P2DT3H4M`` - 2 days, 3 hours and 4 minutes"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:295
+msgid ""
+"``Period`` format is based on the ISO-8601 period formats PnYnMnD and "
+"PnW, for example, the following are valid inputs:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:297
+msgid "``P2Y`` - 2 years"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:299
+msgid "``P3M`` - 3 months"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:301
+msgid "``P4W`` - 4 weeks"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:303
+msgid "``P5D`` - 5 days"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:305
+msgid "``P1Y2M3D`` - 1 year, 2 months, 3 days"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:307
+msgid "``P1Y2M3W4D`` - 1 year, 2 months, 3 weeks, 4 days"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:311
+msgid "Example configuration file in DSL"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:389
+msgid "Default configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:391
+msgid ""
+"Tigase XMPP Server is packaged with a basic ``config.tdsl`` file that "
+"tells the server to start up in setup mode."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:404
+msgid ""
+"This tells Tigase to operate in a setup mode, and tells the http "
+"component to allow login with the username and password admin/tigase. "
+"With this you can enter the setup process that is covered in `this "
+"section <#webinstall>`__."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:406
+msgid ""
+"There are other options for config-type: ``default``, ``session-"
+"manager``, ``connection-managers``, and ``component``. For more "
+"information, visit `Config Type <#configType>`__ property description."
+msgstr ""
+

@@ -1,0 +1,289 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:2
+msgid "Settings for Custom Logging in Tigase"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:4
+msgid ""
+"Logging can be an important tool to monitor your server’s health and "
+"performance. Logging may be controlled and customized on a per-component "
+"basis."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:6
+msgid ""
+"A ``logging`` bean has been implemented to allow more flexible "
+"configuration of logging in the Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:9
+msgid "Configuring logging"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:12
+msgid "In the config file"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:14
+msgid ""
+"Default logging configuration for your installation is kept in the config"
+" file and it may be adjusted there."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:45
+msgid ""
+"You only need to specify the settings you wish to customize, otherwise "
+"they will be left as default."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:47
+msgid ""
+"``packet-debug-full`` - controls whether log entries should be obfuscated"
+" (all CData of all elements will be replaced by ``CData size: <length in "
+"bytes of the replaced string>``) or not; default: ``false``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:49
+msgid ""
+"``rootLevel`` - Defines the root level of logging for all components not "
+"otherwise defined. Default is CONFIG"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:51
+msgid ""
+"``loggers`` - Defines the level of logging for packages running in tigase"
+" server. This is similar to the --debug setting, however you must use "
+"``tigase.{package}`` format. Default is NONE."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:53
+msgid ""
+"``handlers`` - Defines the level of logging for File output and Console "
+"output."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:55
+msgid ""
+"``FileHandler`` - is the file output for log files, with the following "
+"options:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:57
+msgid "``level`` - specifies the level of logs to be written, default is ALL."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:59
+msgid ""
+"``append`` - whether to append to the log or replace it during restart. "
+"Default is true."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:61
+msgid ""
+"``count`` - number of individual log files to keep at set limit. Default "
+"is 5. (default settings will continue appending logs until 5 files at "
+"10MB are reached, then the oldest file will be overwritten.)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:63
+#: ../../Tigase_Admistration/Configuration/Logging.rst:73
+msgid ""
+"``formatter`` - specifies the package to format logging output. Default "
+"is tigase.util.LogFormatter."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:65
+msgid "``limit`` - Byte limit for each log file. Default is 10000000 or 10MB."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:67
+msgid ""
+"``pattern`` - Directory and filename of the log file with respect to the "
+"Tigase installation directory. Default is logs/tigase.log."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:69
+msgid ""
+"``ConsoleHandler`` - Determines the formatting for Tigase output to "
+"console."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:71
+msgid "``level`` - specifies the level of logs to be written, default is WARNING."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:77
+msgid "Disabling colored output"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:79
+msgid ""
+"If for some reason you don’t want colored output in the logs you can "
+"disable it by setting ``disable_logger_color`` to ``true``. For "
+"convenience, you can uncomment in ``etc/tigase.conf`` following line:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:86
+msgid "Ad-hoc changes to the logging configuration"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:88
+msgid ""
+"It is also possible to use ad-hoc command named **Set package logging** "
+"with id ``logging-set`` available at ``message-router@domain`` (where "
+"domain is your server name) to reconfigure logging level of packets at "
+"runtime without requirement of restarting the Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:90
+#: ../../Tigase_Admistration/Configuration/Logging.rst:124
+msgid "**Note**"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:92
+msgid "Those changes will be applied to this single cluster node."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:98
+msgid "Using Admin UI"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:100
+msgid ""
+"If your Tigase XMPP Server is running with HTTP server and with Admin UI "
+"enabled, then the easiest way to change logging configuration is by using"
+" Admin UI. After logging into web interface, open ``Configuration`` "
+"section and select ``Set package logging`` command. This will bring to "
+"you a form which you need to fill in with following fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:102
+#: ../../Tigase_Admistration/Configuration/Logging.rst:113
+msgid ""
+"``Package name`` - should contain Java package or class name for which "
+"you wish to change logging level"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:104
+#: ../../Tigase_Admistration/Configuration/Logging.rst:115
+msgid ""
+"``Level`` - select a logging level you wish to apply to entered package "
+"name *(``OFF`` means that logging will be disabled)*"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:106
+msgid ""
+"After pressing ``Submit`` your form will be passed to the server for "
+"validation and selected changes will be applied."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:109
+msgid "Using ad-hoc command"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:111
+msgid ""
+"If you have access to the XMPP admin account of Tigase XMPP Server and "
+"XMPP client which supports ad-hoc command execution, you may connect with"
+" your XMPP client to the Tigase XMPP Server and look for adh-hoc commands"
+" available at ``message-router@domain`` (where domain is your server "
+"name). Within found ad-hoc commands you should find command named ``Set "
+"package logging`` or ``logging-set`` (that depends what your XMPP client "
+"is showing, id or name of the command) and you should execute it. Tigase "
+"XMPP Server will return a form which you need to fill in with following "
+"fields:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:117
+msgid ""
+"After submitting the form, Tigase XMPP Server will validate your request "
+"and update logging configuration."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:120
+msgid "Using REST API"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:122
+msgid ""
+"If you have Tigase XMPP Server with REST API enabled, you can use it for "
+"configuring logging of Tigase XMPP Server as well."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:126
+msgid ""
+"As with all HTTP REST API requests you will require a valid API key and "
+"in this case a valid admin credentials to authenticate a HTTP request "
+"using Basic HTTP Authentication."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:128
+msgid ""
+"All you need to to is to send a HTTP POST request to ``/rest/adhoc"
+"/message-router@domain.com`` (where domain is your server name) with "
+"``Contect-Type`` set to ``application/xml`` and a following XML as a "
+"payload to set logging level of ``tigase.server`` package to ``ALL``."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:151
+msgid "Alternate loggers in Tigase - Logback"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:153
+msgid ""
+"It’s possible to use Logback for logging purposes, which offers certain "
+"interesting features (async logging, better control over log rotation, on"
+" the fly changing logging configuration)"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:155
+msgid ""
+"Requirements: \\* slf4j-api.jar (provided in ``-dist-max`` package) \\* "
+"jul-to-slf4j.jar (provided in ``-dist-max`` package) \\* desired logger "
+"libraries (for logback it’s ``logback-classic.jar`` and ``logback-"
+"core.jar`` (provided in -dist-max)."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:157
+msgid ""
+"Configuration boils down to adding slf4j bridge handler to the list of "
+"build-in Java Logger handlers configuration, which in Tigase translates "
+"to adding following line to ``etc/config.tdsl``:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:165
+msgid "After that ``etc/logback.xml`` configuration file will be used."
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:167
+msgid ""
+"As stated in [jul-to-slf4j bridge documentation](\\ "
+"http://www.slf4j.org/legacy.html#jul-to-slf4j) it’s essential to include "
+"``LevelChangePropagator`` to eliminate translation overhead for disabled "
+"log statements:"
+msgstr ""
+
+#: ../../Tigase_Admistration/Configuration/Logging.rst:176
+msgid ""
+"NOTE, that it may be prudent to remove configuration of all old JUL "
+"logger by appending following to ``etc/logback.xml`` configuration:"
+msgstr ""
+
