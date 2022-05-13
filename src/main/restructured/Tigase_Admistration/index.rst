@@ -1,5 +1,8 @@
+=============================================
+Tigase Administration Guide -Version 8.3.0
+=============================================
+
 .. toctree::
-   :caption: Tigase Administration Guide -Version 8.3.0
    :titlesonly:
    :numbered:
 
