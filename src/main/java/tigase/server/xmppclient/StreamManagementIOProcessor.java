@@ -27,7 +27,6 @@ import tigase.server.*;
 import tigase.stats.StatisticsList;
 import tigase.util.common.TimerTask;
 import tigase.util.dns.DNSResolverFactory;
-import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.StreamError;
@@ -70,6 +69,7 @@ public class StreamManagementIOProcessor
 
 	// various strings used as key to store data in maps
 	private static final String ACK_REQUEST_COUNT_KEY = "ack-request-count";
+	private static final String ACK_REQUEST_MIN_DELAY_KEY = "ack-request-min-delay";
 	private static final int DEF_ACK_REQUEST_COUNT_VAL = 10;
 	private static final String[] DELAY_PATH = {Message.ELEM_NAME, "delay"};
 	private static final String DELAY_XMLNS = "urn:xmpp:delay";
@@ -94,7 +94,7 @@ public class StreamManagementIOProcessor
 
 	private final ConcurrentHashMap<String, XMPPIOService> services = new ConcurrentHashMap<String, XMPPIOService>();
 	@ConfigField(desc = "Number of sent packets after should ask for confirmation of delivery", alias = ACK_REQUEST_COUNT_KEY)
-	private static int ack_request_count = DEF_ACK_REQUEST_COUNT_VAL;
+	private int ack_request_count = DEF_ACK_REQUEST_COUNT_VAL;
 	@Inject(bean = "service")
 	private ConnectionManager connectionManager;
 	@ConfigField(desc = "Ignore undelivered presence packets", alias = IGNORE_UNDELIVERED_PRESENCE_KEY)
@@ -105,6 +105,8 @@ public class StreamManagementIOProcessor
 	private int resumption_timeout = 60;
 	@ConfigField(desc = "Max allowed queue size of unacked packets", alias = "max-resumption-queue-size")
 	private int max_queue_size = 2000;
+	@ConfigField(desc = "Time since last ack received or ack request sent before which ack request should not be sent", alias = ACK_REQUEST_MIN_DELAY_KEY)
+	private long ack_request_min_delay = 200l;
 
 	/**
 	 * Method returns true if XMPPIOService has enabled SM.
@@ -144,6 +146,7 @@ public class StreamManagementIOProcessor
 				return false;
 			} else if (packet.getElemName() == ENABLE_NAME) {
 				OutQueue outQueue = newOutQueue();
+				outQueue.setAckRequestCount(ack_request_count);
 				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, outQueue);
 				service.getSessionData().putIfAbsent(IN_COUNTER_KEY, newCounter());
 
@@ -288,6 +291,7 @@ public class StreamManagementIOProcessor
 
 		OutQueue outQueue = (OutQueue) service.getSessionData().get(OUT_COUNTER_KEY);
 		if (outQueue != null && shouldRequestAck(service, outQueue)) {
+			outQueue.sendingRequest();
 			service.writeRawData("<" + REQ_NAME + " xmlns='" + XMLNS + "' />");
 		}
 	}
@@ -527,11 +531,20 @@ public class StreamManagementIOProcessor
 
 	/**
 	 * Override this method to define a custom behaviour for request ack. The default implementation will request an ack
-	 * if there are more than {@link #ack_request_count} packets waiting, so you probably want to OR your behaviour with
-	 * this.
+	 * if there are more than {@link #ack_request_count} packets waiting since last request for ack and last ack request
+	 * was not sent in last X ms, so you probably want to OR your behaviour with this.
 	 */
 	protected boolean shouldRequestAck(XMPPIOService service, OutQueue outQueue) {
-		return outQueue.waitingForAck() >= ack_request_count;
+		// send request for ack if there is at least X message since last ack or request for ack
+		if (Math.min(outQueue.unackedSinceLastRequest(), outQueue.waitingForAck()) >= ack_request_count) {
+			// do not send ack request if there was less than X ms since previous request
+			if (outQueue.gotAckOrSentRequestSince(System.currentTimeMillis() - ack_request_min_delay)) {
+				return false;
+			}
+			return true;
+		}
+
+		return false;
 	}
 
 	protected Counter newCounter() {
@@ -684,9 +697,11 @@ public class StreamManagementIOProcessor
 			extends Counter {
 
 		private final ArrayDeque<Entry> queue = new ArrayDeque<Entry>();
-
-		private boolean resumptionEnabled = false;
-
+		private long lastConfirmationAt = 0;
+		private long lastRequestSentAt = 0;
+		private int lastRequestSentFor = 0;
+		private int ackRequestCount = DEF_ACK_REQUEST_COUNT_VAL;
+		
 		/**
 		 * Method determines if we should check packets for falling within timeout. Currently we only check
 		 * the timeout if the queue size is bigger if the maximum count of packets that can be send
@@ -698,7 +713,7 @@ public class StreamManagementIOProcessor
 		 * server ack request, {@code false} otherwise.
 		 */
 		private boolean shouldCheckTimeout() {
-			return queue.size() > (ack_request_count + 3);
+			return queue.size() > (ackRequestCount + 3);
 		}
 
 		/**
@@ -748,13 +763,32 @@ public class StreamManagementIOProcessor
 				count = (Integer.MAX_VALUE - value) + get() + 1;
 			}
 
+			lastConfirmationAt = System.currentTimeMillis();
+
 			while (count < queue.size()) {
 				queue.poll();
 			}
 		}
 
+		/**
+		 * Method notifies class that request for ack is being sent
+		 */
+		public void sendingRequest() {
+			lastRequestSentAt = System.currentTimeMillis();
+			lastRequestSentFor = get();
+		}
+
+		/**
+		 * Sets ack request count value
+		 * @param ackRequestCount
+		 */
+		public void setAckRequestCount(int ackRequestCount) {
+			this.ackRequestCount = ackRequestCount;
+		}
+
+		@Deprecated
+		@TigaseDeprecated(removeIn = "9.0.0", since = "8.3.0", note = "Method will not be called any more")
 		public void setResumptionEnabled(boolean enabled) {
-			resumptionEnabled = enabled;
 		}
 
 		/**
@@ -769,6 +803,44 @@ public class StreamManagementIOProcessor
 		 */
 		protected ArrayDeque<Entry> getQueue() {
 			return queue;
+		}
+
+		/**
+		 * Method returns timestamp of the last received ack.
+		 * @return
+		 */
+		protected long getLastConfirmationAt() {
+			return lastConfirmationAt;
+		}
+
+		/**
+		 * Method returns timestamp of the last request for ack being sent.
+		 * @return
+		 */
+		protected long getLastRequestSentAt() {
+			return lastRequestSentAt;
+		}
+
+		/**
+		 * Method checks if any ack was received or request for ack was sent since passed timestamp.
+		 * @param since
+		 * @return
+		 */
+		protected boolean gotAckOrSentRequestSince(long since) {
+			return Math.max(lastConfirmationAt, lastRequestSentAt) > since;
+		}
+
+		/**
+		 * Method returns no. of unacked stanzas since last request for ack was sent.
+		 * @return
+		 */
+		protected int unackedSinceLastRequest() {
+			int count = get();
+			if (count >= lastRequestSentFor) {
+				return count - lastRequestSentFor;
+			} else {
+				return count + (Integer.MAX_VALUE - lastRequestSentFor);
+			}
 		}
 
 		public static class Entry {

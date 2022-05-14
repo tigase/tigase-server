@@ -26,6 +26,8 @@ import tigase.server.xmppclient.StreamManagementIOProcessor.OutQueue;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 
+import java.lang.reflect.Field;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -196,5 +198,38 @@ public class StreamManagementIOProcessorTest
 		queue.getQueue()
 				.forEach((OutQueue.Entry e) -> assertFalse(
 						e.getPacketWithStamp().isXMLNSStaticStr(new String[]{"iq", "delay"}, DELAY_XMLNS)));
+	}
+
+	@Test
+	public void testShouldRequestAck()
+			throws NoSuchFieldException, IllegalAccessException, TigaseStringprepException, InterruptedException {
+		StreamManagementIOProcessor processor = new StreamManagementIOProcessor();
+		Field ackRefMinDelayField = StreamManagementIOProcessor.class.getDeclaredField("ack_request_min_delay");
+		ackRefMinDelayField.setAccessible(true);
+		ackRefMinDelayField.set(processor, 20l);
+
+		OutQueue outQueue = new OutQueue();
+
+		assertFalse(processor.shouldRequestAck(null, outQueue));
+		for (int i = 0; i < 10; i++) {
+			Packet p = Packet.packetInstance(
+					new Element("message").withElement("body", null, "Test " + UUID.randomUUID().toString()));
+			outQueue.append(p, 2000, 2000);
+			assertEquals(i == 9, processor.shouldRequestAck(null, outQueue));
+		}
+		outQueue.sendingRequest();
+		assertFalse(processor.shouldRequestAck(null, outQueue));
+		for (int i = 0; i < 10; i++) {
+			Packet p = Packet.packetInstance(
+					new Element("message").withElement("body", null, "Test " + UUID.randomUUID().toString()));
+			outQueue.append(p, 2000, 2000);
+			assertFalse(processor.shouldRequestAck(null, outQueue));
+		}
+		Thread.sleep(21);
+		assertTrue(processor.shouldRequestAck(null, outQueue));
+		outQueue.ack(10);
+		assertFalse(processor.shouldRequestAck(null, outQueue));
+		Thread.sleep(21);
+		assertTrue(processor.shouldRequestAck(null, outQueue));
 	}
 }
