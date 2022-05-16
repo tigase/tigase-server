@@ -532,7 +532,7 @@ public class StreamManagementIOProcessor
 	/**
 	 * Override this method to define a custom behaviour for request ack. The default implementation will request an ack
 	 * if there are more than {@link #ack_request_count} packets waiting since last request for ack and last ack request
-	 * was not sent in last X ms, so you probably want to OR your behaviour with this.
+	 * was not sent in last X ms.
 	 */
 	protected boolean shouldRequestAck(XMPPIOService service, OutQueue outQueue) {
 		// send request for ack if there is at least X message since last ack or request for ack

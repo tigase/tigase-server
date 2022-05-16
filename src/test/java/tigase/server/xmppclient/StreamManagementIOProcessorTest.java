@@ -204,32 +204,33 @@ public class StreamManagementIOProcessorTest
 	public void testShouldRequestAck()
 			throws NoSuchFieldException, IllegalAccessException, TigaseStringprepException, InterruptedException {
 		StreamManagementIOProcessor processor = new StreamManagementIOProcessor();
+		// settings request for ACK minimal delay to 20ms
 		Field ackRefMinDelayField = StreamManagementIOProcessor.class.getDeclaredField("ack_request_min_delay");
 		ackRefMinDelayField.setAccessible(true);
 		ackRefMinDelayField.set(processor, 20l);
 
 		OutQueue outQueue = new OutQueue();
 
-		assertFalse(processor.shouldRequestAck(null, outQueue));
+		assertFalse("Requesting ACK if queue is empty", processor.shouldRequestAck(null, outQueue));
 		for (int i = 0; i < 10; i++) {
 			Packet p = Packet.packetInstance(
 					new Element("message").withElement("body", null, "Test " + UUID.randomUUID().toString()));
 			outQueue.append(p, 2000, 2000);
-			assertEquals(i == 9, processor.shouldRequestAck(null, outQueue));
+			assertEquals("Only call after adding 10th message should request ACK", i == 9, processor.shouldRequestAck(null, outQueue));
 		}
 		outQueue.sendingRequest();
-		assertFalse(processor.shouldRequestAck(null, outQueue));
+		assertFalse("ACK shouldn't be requested just after sending one!", processor.shouldRequestAck(null, outQueue));
 		for (int i = 0; i < 10; i++) {
 			Packet p = Packet.packetInstance(
 					new Element("message").withElement("body", null, "Test " + UUID.randomUUID().toString()));
 			outQueue.append(p, 2000, 2000);
-			assertFalse(processor.shouldRequestAck(null, outQueue));
+			assertFalse("ACK shouldn't be requested for 20ms after sending request for ACK", processor.shouldRequestAck(null, outQueue));
 		}
 		Thread.sleep(21);
-		assertTrue(processor.shouldRequestAck(null, outQueue));
+		assertTrue("Request for ACK should be sent as over 20ms passed", processor.shouldRequestAck(null, outQueue));
 		outQueue.ack(10);
-		assertFalse(processor.shouldRequestAck(null, outQueue));
+		assertFalse("Request for ACK shouldn't be sent for 20ms after receiving ACK", processor.shouldRequestAck(null, outQueue));
 		Thread.sleep(21);
-		assertTrue(processor.shouldRequestAck(null, outQueue));
+		assertTrue("Request for ACK should be sent as over 20ms passed", processor.shouldRequestAck(null, outQueue));
 	}
 }
