@@ -1,6 +1,8 @@
 General
 --------
 
+.. _admins:
+
 admins
 ^^^^^^^^^
 
