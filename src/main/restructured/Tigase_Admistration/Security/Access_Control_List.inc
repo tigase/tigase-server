@@ -3,7 +3,7 @@ Access Control Lists in Tigase
 
 Tigase offers support for **Access Control List (ACL)** to allow for fine grained access to administration commands on the server.
 
-By default, all administration commands are only accessible (visible through service discovery and can be executed) by the service administrators. Service administrators are existing accounts with JIDs (**BareJIDs**) listed in the ``config.tdsl`` file under ``admins = []`` (please see :ref:`admins <admins>` for details).
+By default, all administration commands are only accessible (visible through service discovery and can be executed) by the service administrators. Service administrators are existing accounts with JIDs (**BareJIDs**) listed in the ``config.tdsl`` file under ``admins = []`` (please see :ref:`admins<admins>` for details).
 
 Additionally, other XMPP users and entities can be assigned permissions to execute a command or commands using Tigase’s ACL capabilities.
 
