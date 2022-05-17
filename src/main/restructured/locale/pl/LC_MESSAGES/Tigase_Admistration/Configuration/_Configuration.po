@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"POT-Creation-Date: 2022-05-16 23:42-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,11 +57,11 @@ msgid ""
 "environment for Java VM and other tools needed."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:2
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:2
 msgid "DSL file format"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:4
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:4
 msgid ""
 "In previous Tigase XMPP Server releases configuration was stored in "
 "properties based configuration file. From Tigase XMPP Server 8.0.0 "
@@ -70,24 +70,24 @@ msgid ""
 "core feature of Tigase XMPP Server - Tigase Kernel Framework."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:7
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:7
 msgid "why new format?"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:9
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:9
 msgid ""
 "In properties configuration format each line contained key and value with"
 " optional definition of type of stored value:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:15
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:15
 msgid ""
 "where ``c2s/ports`` was name of property, ``[i]`` defined that type of "
 "value is array of integers, and ``5222,5223`` was comma separated list of"
 " values."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:17
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:17
 msgid ""
 "This format worked but in fact ``c2s/ports`` was not name of property you"
 " configured but key which was later split on ``/`` char to parts which "
@@ -95,7 +95,7 @@ msgid ""
 "you can see that it was domain based setting of properties."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:19
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:19
 msgid ""
 "Except from this multi-part keys we also used properties starting with "
 "``--`` which were global properties accessible for every part of "
@@ -103,21 +103,21 @@ msgid ""
 "needed to write:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:28
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:28
 msgid ""
 "This lead to mistakes like duplicated definition of name and class for "
 "same number of component or redefined property value in other place of a "
 "configuration file - especially in cases where configuration was big."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:30
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:30
 msgid ""
 "In this configuration structure it was hard to tell where is "
 "configuration for particular component or what databases this "
 "installation uses. This could be defined all over the file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:32
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:32
 msgid ""
 "In this release we are introducing Tigase Kernel Framework, which allows "
 "to configure beans in configuration file and even define usage of new "
@@ -126,35 +126,35 @@ msgid ""
 "difficult and less readable."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:35
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:35
 msgid "What is DSL?"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:37
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:37
 msgid ""
 "DSL stands for domain-specific language - in this case language created "
 "for storage of configuration."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:39
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:39
 msgid ""
 "Now we use domain based configuration which means that our configuration "
 "file is not a flat key=value storage but it defines objects, it's "
 "properties and assigned values."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:41
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:41
 msgid ""
 "To illustrate it better let's start with a simple example. In properties "
 "file in order to configure PubSub component named ``pubsub`` you would "
 "use following properties:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:49
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:49
 msgid "In DSL based configuration this would be replaced by following block"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:58
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:58
 msgid ""
 "in which we define bean with name `pubsub` and set it's class inside "
 "``()`` block to ``tigase.pubsub.PubSubComponent``. We also use block "
@@ -165,17 +165,17 @@ msgid ""
 "wrap whole part containing it in ``''``, ie. ``'test#242'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:64
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:64
 msgid ""
 "If a string value assigned to a property contains any char from a "
 "following list ``=:,[]#+-*/`` it needs to be wrapped in a ``''``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:67
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:67
 msgid "Why DSL?"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:69
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:69
 msgid ""
 "DSL configuration format provides a number of advantages over the old "
 "system of configuration. All configurations for components are related in"
@@ -190,7 +190,7 @@ msgid ""
 "able to be in multiple lines."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:71
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:71
 msgid ""
 "Although the format may seem more complex, looking like a section of java"
 " code, the formatting is consistent and can be far more readable. After "
@@ -200,29 +200,29 @@ msgid ""
 " the DSL format using the following command:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:78
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:78
 msgid "Setting property"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:80
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:80
 msgid ""
 "To set property you just write property name followed by `=` and value to"
 " set. This is always done in context of bean which configuration property"
 " you want to set."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:86
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:86
 msgid ""
 "It is also possible to set property in main context by placing property "
 "outside of any context. This sets property which value is available to "
 "access by any bean."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:90
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:90
 msgid "Setting global property"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:92
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:92
 msgid ""
 "Like in properties file it is still possible to use property names "
 "starting with ``--`` without any context or any other properties at "
@@ -231,26 +231,26 @@ msgid ""
 "and accessible by any bean but also set as system property in JVM."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:95
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:95
 msgid "Defining bean"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:97
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:97
 msgid "You can configure bean by using following format:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:105
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:105
 msgid ""
 "where ``beanName`` is name under which you want to configure bean. "
 "`beanName` must be wrapped in ``''``, if ``beanName`` contains characters"
 " like ``=:,[]#+-*/`` and is recommended, if ``beanName`` is numeric only."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:108
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:108
 msgid "Inside block between ``(` and `)`` you can define:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:110
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:110
 msgid ""
 "``class`` which will be used as a bean, in example above we set class as "
 "``className``. *_(default: if you try to configure bean under name which "
@@ -259,13 +259,13 @@ msgid ""
 "as a bean)_*"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:111
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:111
 msgid ""
 "``active`` (boolean) whether you want the bean to be active or not (beans"
 " with ``active`` set to ``false`` are not loaded). *_(default: true)_*"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:112
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:112
 msgid ""
 "``exportable`` (boolean) defines if this bean should be exported and "
 "available for use for beans in inner scopes. This is advanced option in "
@@ -273,7 +273,7 @@ msgid ""
 "*_(default: false)_*"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:114
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:114
 msgid ""
 "Spaces between ``beanName`` and block between ``()`` is optional as well "
 "as space between block ``()`` and block ``{}``. It is recommended that "
@@ -281,7 +281,7 @@ msgid ""
 " first property will be placed in new line."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:119
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:119
 msgid ""
 "Usage of ``()`` block is very important. When this block is used in "
 "configuration it automatically sets ``active`` property of bean "
@@ -289,139 +289,139 @@ msgid ""
 "to fact that default value of ``active`` is ``true``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:121
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:121
 msgid ""
 "If you omit it in configuration, you will set bean configuration but it "
 "may remain ``inactive``. In this state bean will not be loaded and as a "
 "result will not be used by Tigase XMPP Server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:124
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:124
 msgid "Configuring bean"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:126
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:126
 msgid ""
 "If you know that bean is defined and you do not want to change it's "
 "activity or class then you can just pass properties to configure bean in "
 "following way:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:136
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:136
 msgid ""
 "where ``beanName`` is name of bean to configure and `test` is name of "
 "property to set to ``true`` in this bean."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:139
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:139
 msgid "Format of values"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:141
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:141
 msgid ""
 "In properties based configuration file every property was defined as a "
 "string and only by defining expected format it was properly converted to "
 "expected value. In DSL it is possible to set values in two ways:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:144
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:144
 msgid "as an object"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:144
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:144
 msgid "Using this format you set list as a list and integer is set as an integer."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:149
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:203
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:149
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:203
 msgid "Type"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:149
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:203
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:149
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:203
 msgid "Description"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:151
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:205
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:151
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:205
 msgid "**string**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:151
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:151
 msgid "Wrap it in ``''``, ie. to set ``test`` as string you use ``'test'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:153
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:207
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:153
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:207
 msgid "**integer**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:153
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:207
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:153
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:207
 msgid "Just put value, ie. to set ``543`` use ``543``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:155
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:209
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:155
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:209
 msgid "**long**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:155
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:155
 msgid ""
 "Put value and follow it with ``L``, ie. to set ``23645434`` as long use "
 "``23645434L``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:157
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:211
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:157
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:211
 msgid "**float**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:157
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:157
 msgid ""
 "Put value and follow it with ``f``, ie. to set ``231.342`` use "
 "``231.342f``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:159
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:213
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:159
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:213
 msgid "**boolean**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:159
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:213
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:159
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:213
 msgid "To set value just use ``true`` or ``false``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:161
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:215
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:161
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:215
 msgid "**list**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:161
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:161
 msgid ""
 "Lists can be of many types and to make it simple we decided to use as a "
 "comma separated list of values in proper format wrapped in ``[]``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:163
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:163
 msgid "of strings - ``[ 'alfa', 'beta', 'gamma' ]``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:165
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:165
 msgid "of integers - ``[ 1, 2, 3, 4]``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:167
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:167
 msgid "You can write it in multiple lines if you want:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:177
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:217
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:177
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:217
 msgid "**map**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:177
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:177
 msgid ""
 "Maps can be written as a block of properties wrapped in ``{}``. This "
 "format of map is the same as used for passing configuration to bean "
@@ -429,48 +429,48 @@ msgid ""
 "*(recommended)*:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:190
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:190
 msgid "or in single line *(separation with spaces is not required)*:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:198
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:198
 msgid "as a plain string"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:198
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:198
 msgid ""
 "Very similar to properties based configuration, in fact values are passed"
 " in same format and later are converted to correct type by checking type "
 "expected by bean. *(Not recommended)*"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:205
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:205
 msgid "Just put value, ie. to set ``test`` use ``test``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:209
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:209
 msgid "Put value, ie. to set ``23645434`` as long use ``23645434``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:211
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:211
 msgid "Put value, ie. to set ``231.342`` use ``231.342``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:215
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:215
 msgid ""
 "List needs to be written as comma separated list of values, ie. "
 "``test,abc,efg`` or ``1,2,3``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:217
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:217
 msgid "Not possible"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:222
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:222
 msgid "Using values from System Properties and Environment Variables"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:224
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:224
 msgid ""
 "Now it is possible to use values of `system properties "
 "<https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html>`__"
@@ -480,29 +480,29 @@ msgid ""
 "which can be used in DSL and which will return values of:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:227
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:227
 msgid "system property"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:227
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:227
 msgid "``prop('property-name')`` or ``prop('property-name','default value')``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:230
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:230
 msgid "environment variable"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:230
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:230
 msgid "``env('variable-name')``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:232
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:232
 msgid ""
 "**Example of setting value of system property and environment variable to"
 " bean ``user``.**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:245
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:245
 msgid ""
 "For properties which accepts lists it is not allowed to set value using "
 "variable/property with comma separated values like ``value1,value2`` "
@@ -510,11 +510,11 @@ msgid ""
 "to be set in following way ``property = env('some-variable')``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:248
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:248
 msgid "Computed values"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:250
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:250
 msgid ""
 "With DSL configuration format we introduce support for computable values "
 "for properties. It is now possible to set value which is result of a "
@@ -522,29 +522,29 @@ msgid ""
 "expression. We currently support only following mathematical operations:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:252
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:252
 msgid "add"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:254
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:254
 msgid "subtract"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:256
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:256
 msgid "multiply"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:258
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:258
 msgid "divide"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:260
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:260
 msgid ""
 "**Example of setting environment variable related path and computed "
 "timeout.**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:276
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:276
 msgid ""
 "For properties which accepts lists it is not allowed to set value using "
 "computed values with comma separated values like ``value1,value2`` "
@@ -553,11 +553,11 @@ msgid ""
 "variable') + ',other-value'``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:279
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:279
 msgid "Period / Duration values"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:281
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:281
 msgid ""
 "Some configuration options allow control of execution of tasks with "
 "particular period or within certain duration. DSL file format accepts "
@@ -569,78 +569,78 @@ msgid ""
 "java.lang.CharSequence->`__ for detailed explanation)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:283
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:283
 msgid ""
 "``Duration`` formats accepted are based on the ISO-8601 duration format "
 "``PnDTnHnMn.nS`` with days considered to be exactly 24 hours, for "
 "example:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:285
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:285
 msgid "``PT20.345S`` - 20.345 seconds"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:287
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:287
 msgid "``PT15M`` - 15 minutes (where a minute is 60 seconds)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:289
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:289
 msgid "``PT10H`` - 10 hours (where an hour is 3600 seconds)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:291
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:291
 msgid "``P2D`` - 2 days (where a day is 24 hours or 86400 seconds)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:293
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:293
 msgid "``P2DT3H4M`` - 2 days, 3 hours and 4 minutes"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:295
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:295
 msgid ""
 "``Period`` format is based on the ISO-8601 period formats PnYnMnD and "
 "PnW, for example, the following are valid inputs:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:297
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:297
 msgid "``P2Y`` - 2 years"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:299
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:299
 msgid "``P3M`` - 3 months"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:301
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:301
 msgid "``P4W`` - 4 weeks"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:303
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:303
 msgid "``P5D`` - 5 days"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:305
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:305
 msgid "``P1Y2M3D`` - 1 year, 2 months, 3 days"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:307
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:307
 msgid "``P1Y2M3W4D`` - 1 year, 2 months, 3 weeks, 4 days"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:311
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:311
 msgid "Example configuration file in DSL"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:389
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:389
 msgid "Default configuration"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:391
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:391
 msgid ""
 "Tigase XMPP Server is packaged with a basic ``config.tdsl`` file that "
 "tells the server to start up in setup mode."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:404
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:404
 msgid ""
 "This tells Tigase to operate in a setup mode, and tells the http "
 "component to allow login with the username and password admin/tigase. "
@@ -648,45 +648,45 @@ msgid ""
 "section <#webinstall>`__."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/DSL_configuration.rst:406
+#: ../../Tigase_Admistration/Configuration/DSL_configuration.inc:406
 msgid ""
 "There are other options for config-type: ``default``, ``session-"
 "manager``, ``connection-managers``, and ``component``. For more "
 "information, visit `Config Type <#configType>`__ property description."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:2
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:2
 msgid "Startup File for tigase.sh - tigase.conf"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:4
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:4
 msgid ""
 "Property file names for ``tigase.sh`` startup script is a second "
 "parameter for the startup script. It can be skipped if environmental "
 "variables are set in different location or in different way."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:6
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:6
 msgid ""
 "Config file for startup script simply sets number of environment "
 "variables with the location of required components. Possible variables to"
 " set in this file are:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:8
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:8
 msgid ""
 "``JAVA_HOME`` - location of Java installation home directory. **Must be "
 "set**."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:10
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:10
 msgid ""
 "``TIGASE_HOME`` - location of Tigase installation home directory. *By "
 "default script try to find this location by searching directories from "
 "the location where the script has been run.*"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:12
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:12
 msgid ""
 "``TIGASE_CONSOLE_LOG`` - file to which all console messages will be "
 "redirected if server is run in background. By default it will be: "
@@ -695,19 +695,19 @@ msgid ""
 "/dev/null**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:14
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:14
 msgid ""
 "``TIGASE_PID`` location of the file with server PID number. By default it"
 " will be ``TIGASE_HOME/logs/tigase.pid``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:16
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:16
 msgid ""
 "``JAVA_OPTIONS`` - options for JVM like size of RAM allocated for the "
 "JVM, properties and so on."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:18
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:18
 msgid ""
 "``TIGASE_OPTIONS`` - (optional) additional options for Tigase server "
 "program. You can tweak initial parameters for your environment here. If "
@@ -715,11 +715,11 @@ msgid ""
 " use ``--config-file <path/to/config.tdsl>`` configuration"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:20
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:20
 msgid "Sample file to run **Tigase** with **PostgreSQL** database may look like:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:31
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:31
 msgid ""
 "Please note encoding settings. JVM by default uses encoding set in "
 "operating system environment. XMPP protocol, however uses ``UTF-8`` for "
@@ -727,7 +727,7 @@ msgid ""
 "all operations."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Startup_Files.rst:33
+#: ../../Tigase_Admistration/Configuration/Startup_Files.inc:33
 msgid ""
 "Another significant setting is \\\\'**CLASSPATH**'. It is intentionally "
 "set to an empty string. The **tigase.sh** startup script builds the "
@@ -739,18 +739,18 @@ msgid ""
 "and high system loads."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:2
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:2
 msgid "Linux Settings for High Load Systems"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:4
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:4
 msgid ""
 "There are a few basic settings you have to adjust for high load systems "
 "to make sure the server has enough resources to handle a big number of "
 "network connections."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:6
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:6
 msgid ""
 "The main parameter is a maximum number of opened files allowed for the "
 "process to keep at the same time. Each network connection uses a file "
@@ -758,13 +758,13 @@ msgid ""
 "handlers and the server can not accept any more connections."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:8
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:8
 msgid ""
 "This limit is set on 2 levels - on the kernel level (``fs.file-max``) and"
 " on the system level (``nofile``)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:10
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:10
 msgid ""
 "Another kernel property which can be important in certain configurations "
 "(like transports installations or when you use proxy for Bosh "
@@ -772,17 +772,17 @@ msgid ""
 "set the same way as the ``fs.file-max`` property."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:13
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:13
 msgid "fs.file-max"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:15
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:15
 msgid ""
 "The ``fs.file-max`` kernel property is set via sysctl command. You can "
 "see current settings by executing the command:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:22
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:22
 msgid ""
 "If you plan to run high load service with large number of server "
 "connections, then this parameter should be at least as twice big as the "
@@ -790,23 +790,23 @@ msgid ""
 "setting by executing the command:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:30
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:30
 msgid "net.ipv4.ip_local_port_range"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:32
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:32
 msgid "You can see current settings by executing the command:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:39
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:39
 msgid "You can change this setting by executing the command:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:47
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:47
 msgid "TCP_keepalive"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:49
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:49
 msgid ""
 "According to `Using TCP keepalive to Detect Network Errors "
 "<http://www.gnugk.org/keepalive.html>`__ and `TCP Keepalive HOWTO "
@@ -817,11 +817,11 @@ msgid ""
 "detection of broken connections faster."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:64
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:64
 msgid "/etc/sysctl.conf"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:66
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:66
 msgid ""
 "The above commands let the system remember new settings until the next "
 "system restart. If you want to make the change permanent you have to edit"
@@ -829,32 +829,32 @@ msgid ""
 "file:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:77
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:77
 msgid "It will be automatically loaded next time you start the server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:79
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:79
 msgid "Command:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:85
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:85
 msgid ""
 "Causes the ``/etc/systcl.conf`` to be reloaded which is useful when you "
 "have added more parameters to the file and don’t want to restart the "
 "server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:88
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:88
 msgid "nofile"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:90
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:90
 msgid ""
 "This is the property used by the system limits. For example running the "
 "command ``ulimit -a`` shows you all limits set for the current user:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:110
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:110
 msgid ""
 "To make it even more interesting and more complex, there are 2 types of "
 "system limits: **soft limit** which can be temporarily exceeded by the "
@@ -862,37 +862,37 @@ msgid ""
 "limit** execute command:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:130
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:130
 msgid ""
 "The hard limits are usually bigger then the soft limits or sometimes the "
 "same."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:132
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:132
 msgid ""
 "For us the most important parameter is: **open files**. You can change "
 "the property in file: ``/etc/security/limits.conf``. You have to append 2"
 " following lines to the end of the file:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:139
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:139
 msgid ""
 "Where the ``jabber`` is the user name of the account running you IM "
 "service. You can also set the limits for all users on the machine in a "
 "following way:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:146
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:146
 msgid ""
 "For those changes to make an effect you have to logout from the modified "
 "account and login again. New limits should be applied."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:150
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:150
 msgid "su and init script"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:152
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:152
 msgid ""
 "If one intends to use init scripts for startup purposes (or simply wants "
 "to be able to start the server utilizing su command) it’s necessary to "
@@ -900,15 +900,15 @@ msgid ""
 "following line:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.rst:158
+#: ../../Tigase_Admistration/Configuration/Settings_for_High_Load_Systems.inc:158
 msgid "Afterwards the init scripts will respect configured limits."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:2
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:2
 msgid "JVM settings and recommendations"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:4
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:4
 msgid ""
 "Tigase configuration file ``tigase.conf`` (described in more detail in "
 "`??? <#manualconfig>`__) mentioned a couple of environmental variables "
@@ -917,31 +917,31 @@ msgid ""
 "optimal settings."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:6
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:6
 msgid "Settings included in the ``etc/tigase.conf`` are as follows:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:18
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:18
 msgid ""
 "And while this file utilizes bash variables, JVM configuration options "
 "can be used in the same manner on all operating systems."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:20
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:20
 msgid ""
 "The guide will consists of two main parts - memory settings and Garbage "
 "Collector tweaks descriptions and hints."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:22
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:22
 msgid "We recommend using ``-server`` JVM parameter in all cases."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:25
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:25
 msgid "Heap Sizing"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:27
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:27
 msgid ""
 "For the non-production deployments (development or stating environments) "
 "we recommend using default memory settings of the JVM (which depends on "
@@ -950,7 +950,7 @@ msgid ""
 "environments."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:29
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:29
 #, python-format
 msgid ""
 "For the production environments we recommend a fixed size HEAP - both "
@@ -960,17 +960,17 @@ msgid ""
 "on the machine) to avoid allocation and deallocation."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:31
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:31
 msgid ""
 "For convenience it’s possible to uncomment line with "
 "``PRODUCTION_HEAP_SETTINGS`` and adjust parameters accordingly."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:34
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:34
 msgid "Memory consideration - total usage"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:36
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:36
 msgid ""
 "The HEAP size is not the only thing that affects JVM memory usage. When "
 "trying to size accordingly for your usage and machine specification you "
@@ -979,31 +979,31 @@ msgid ""
 "principle consider following equation:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:48
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:48
 msgid "In case of Tigase XMPP Server, apart from heap we limit remaining factors:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:50
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:50
 msgid "direct memory to **128** MB"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:52
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:52
 msgid "loaded classes to **128** MB"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:54
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:54
 msgid ""
 "single thread’s stack size to **228** KB (number of threads depends on "
 "number of CPU cores and may vary from 500 to couple of thousands)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:56
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:56
 msgid ""
 "In principle, in addition to HEAP’s maximum size defined by ``-Xmx`` you "
 "should add roughly **512** MB"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:58
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:58
 msgid ""
 "If you are interested in detailed tracking of memory take a look at "
 "[Memory footprint of the JVM](\\ https://spring.io/blog/2019/03/11"
@@ -1013,11 +1013,11 @@ msgid ""
 "/memory-leaks/why-does-my-java-process-consume-more-memory-than-xmx)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:62
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:62
 msgid "GC settings"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:64
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:64
 msgid ""
 "Let’s start with stating that there is no \"one to rule them all\" - each"
 " deployment and use-case is different, however we will try to give a "
@@ -1025,7 +1025,7 @@ msgid ""
 " GC itself."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:66
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:66
 msgid ""
 "XMPP is quite specific in terms of memory allocation - short-lived "
 "objects (various types of stanzas) usually exceed number of long-lived "
@@ -1035,21 +1035,21 @@ msgid ""
 "couple of regions:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:69
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:69
 msgid "Generations"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:71
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:71
 msgid "**Young Generation**, which is further divided in to:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:73
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:73
 msgid ""
 "**Eden** - the region when the objects are usually allocated when they "
 "are created;"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:75
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:75
 msgid ""
 "**Survivor Spaces** - (*to* and *from* - one of which is always empty) - "
 "responsible for storing all live object remaining after collecting "
@@ -1057,34 +1057,34 @@ msgid ""
 " finally considered *old enough*);"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:77
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:77
 msgid ""
 "**Old Generation** - (*Tenured Space*) - responsible for live objects "
 "remaining after running GC on **Survivor Spaces** - those would be *long-"
 "lived* objects (usually user connections and associated data);"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:80
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:80
 msgid "Minor, Major and Full GC - optimizing"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:82
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:82
 msgid "General thinking suggests that:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:84
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:84
 msgid "**Minor GC** cleans Young generation;"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:86
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:86
 msgid "**Major GC** cleans Tenured space;"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:88
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:88
 msgid "**Full GC** cleans all heap."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:90
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:90
 msgid ""
 "However, while we can certainly state that Minor GC cleans Young "
 "generation it’s a bit more difficult to differentiate Major and Full GC, "
@@ -1100,31 +1100,31 @@ msgid ""
 "using for example VisualVM (with VisualGC plugin) will also be helpful."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:93
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:93
 msgid "Settings for XMPP"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:95
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:95
 msgid ""
 "Ideally we should limit both number of GC pauses as well as their "
 "duration. After running rather tests following conclusions were made:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:97
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:97
 msgid ""
 "Garbage Collection is the faster the more dead objects occupies given "
 "space, therefore on high-traffic installation it’s better to have rather "
 "large YoungGen resulting in lower promotion of the objects to the OldGen;"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:99
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:99
 msgid ""
 "with JVM8 default sizing of Young / Old generation changed, even tho "
 "NewRatio is still defaulting to “2” - setting it explicitly to \"2\" "
 "brought back previous sizing;"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:101
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:101
 msgid ""
 "Concurrent Mark and Sweep (CMS) enabled (applies to Tenured space only) "
 "with explicit configuration of NewRatio set to default value of 2 (i.e. "
@@ -1132,13 +1132,13 @@ msgid ""
 "behaves best;"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:103
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:103
 msgid ""
 "For small installations (few core CPU, less memory) with low traffic "
 "default Parallel collector may be a better solution;"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:105
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:105
 msgid ""
 "Using Heap size adjusted to the actual usage is better as the larger the "
 "heap the larger are spaces over which collection needs to be performed "
@@ -1146,13 +1146,13 @@ msgid ""
 "be better solution to avoid longer pauses;"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:107
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:107
 msgid ""
 "Considering all of the above using following options should be a good "
 "starting point toward further optimizing of Garbage Collection:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:109
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:109
 msgid ""
 "``GC=\"-XX:+UseBiasedLocking -XX:+UseConcMarkSweepGC -XX:+UseParNewGC "
 "-XX:+CMSIncrementalMode -XX:-ReduceInitialCardMarks "
@@ -1160,17 +1160,17 @@ msgid ""
 "-XX:+UseCMSInitiatingOccupancyOnly\"``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:112
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:112
 msgid "GC settings worth considering"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:114
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:114
 msgid ""
 "In addition to the general recommendation to use CMS collector, following"
 " options (or changes to the options) may be worth considering:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:116
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:116
 msgid ""
 "``-XX:NewRatio=2`` - defines the ratio between the young and tenured "
 "generation is 1:2. In other words, the combined size of the eden and "
@@ -1180,21 +1180,21 @@ msgid ""
 "as setting -Xms and -Xmx to the same value fixes the total heap size."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:118
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:118
 msgid ""
 "``-XX:CMSInitiatingOccupancyFraction=percent`` - sets the percentage of "
 "the old generation occupancy (0 to 100) at which to start a CMS "
 "collection cycle."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:120
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:120
 msgid ""
 "``-XX:+UseCMSInitiatingOccupancyOnly`` - instructs the JVM not to base "
 "its decision when to start a CMS cycle on run time statistics but instead"
 " it uses the value of CMSInitiatingOccupancyFraction for every CMS cycle."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:122
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:122
 msgid ""
 "``-XX:ParallelGCThreads=x`` - sets the number of threads used for "
 "parallel garbage collection in the young and old generations. The default"
@@ -1203,7 +1203,7 @@ msgid ""
 "recommended."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:124
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:124
 msgid ""
 "``-XX:ConcGCThreads=x`` - sets the number of threads used for concurrent "
 "GC. The default value depends on the number of CPUs available to the JVM."
@@ -1211,7 +1211,7 @@ msgid ""
 "value is recommended."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:126
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:126
 msgid ""
 "``-XX:+UseBiasedLocking`` and ``-XX:+DoEscapeAnalysis`` - designed to "
 "eliminate locking overhead, however their effect on performance is "
@@ -1220,13 +1220,13 @@ msgid ""
 "throughput."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:128
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:128
 msgid ""
 "``-XX:+OptimizeStringConcat`` - enables the optimization of String "
 "concatenation operations. This option is enabled by default."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:130
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:130
 msgid ""
 "``-XX:+UseNUMA`` - enables performance optimization of an application on "
 "a machine with nonuniform memory architecture (NUMA - most modern "
@@ -1236,7 +1236,7 @@ msgid ""
 "parallel garbage collector is used (-XX:+UseParallelGC)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:132
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:132
 msgid ""
 "``-XX:-UseCompressedOops`` — disables the use of compressed pointers. By "
 "default, this option is enabled, and compressed pointers are used when "
@@ -1246,15 +1246,15 @@ msgid ""
 "Java heap sizes less than 32 GB. This option works only for 64-bit JVMs."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:136
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:136
 msgid "What to use with Machine x, y, z?"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:139
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:139
 msgid "Server class machine (non-VM), > 16GB, >= 8 core CPU"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:141
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:141
 msgid ""
 "For such setup enabling CMS garbage collector is recommended. Depending "
 "on the traffic usage and particular use-case adjusting NewRatio may be "
@@ -1262,17 +1262,17 @@ msgid ""
 " (or better yet, for the actual traffic!). Following should be used:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:153
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:153
 msgid ""
 "For installation with lot of available memory and intention to utilize it"
 " all, using G1GC collector may be a better idea :"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:167
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:167
 msgid "VM machine, 8GB of RAM, 4 core CPU equivalent"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:169
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:169
 msgid ""
 "For such setup enabling CMS garbage collector is also recommended. "
 "Depending on the traffic usage and particular use-case adjusting NewRatio"
@@ -1281,11 +1281,11 @@ msgid ""
 "actual traffic!). Following should be used:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:183
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:183
 msgid "VM machine with 4GB or less of RAM, and less than 4 core CPU equivalent"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:185
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:185
 msgid ""
 "Small installations with limited resources could operate better with "
 "default (for JVM versions up to 8, which is the most current at the "
@@ -1296,97 +1296,97 @@ msgid ""
 "be commented so the defaults will be used):"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:199
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:199
 msgid "Additional resources"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:201
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:201
 msgid ""
 "`Sizing the Generations "
 "<https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/sizing.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:203
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:203
 msgid ""
 "`About Java, parallel garbage collection and processor sets "
 "<http://www.c0t0d0s0.org/archives/6617-About-Java,-parallel-garbage-"
 "collection-and-processor-sets.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:205
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:205
 msgid ""
 "`GC Threads <http://hiroshiyamauchi.blogspot.cl/2009/12/gc-"
 "threads.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:207
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:207
 msgid "`GCViewer readme <https://github.com/chewiebug/GCViewer#readme>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:209
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:209
 msgid ""
 "`Java HotSpot™ Virtual Machine Performance Enhancements "
 "<http://docs.oracle.com/javase/7/docs/technotes/guides/vm/performance-"
 "enhancements-7.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:211
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:211
 msgid ""
 "`Java Garbage Collection handbook <https://plumbr.eu/java-garbage-"
 "collection-handbook>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:213
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:213
 msgid "Useful JVM Flags"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:215
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:215
 msgid ""
 "`Part 1 - JVM Types and Compiler Modes "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-1-jvm-"
 "types-and-compiler-modes/>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:217
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:217
 msgid ""
 "`Part 2 - Flag Categories and JIT Compiler Diagnostics) "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-2-flag-"
 "categories-and-jit-compiler-diagnostics/>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:219
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:219
 msgid ""
 "`Part 3 - Printing all XX Flags and their Values "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-3-printing-"
 "all-xx-flags-and-their-values/>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:221
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:221
 msgid ""
 "`Part 4 - Heap Tuning <https://blog.codecentric.de/en/2012/07/useful-jvm-"
 "flags-part-4-heap-tuning/>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:223
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:223
 msgid ""
 "`Part 5 - Young Generation Garbage Collection "
 "<https://blog.codecentric.de/en/2012/08/useful-jvm-flags-part-5-young-"
 "generation-garbage-collection/>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:225
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:225
 msgid ""
 "`Part 6 - Throughput Collector <https://blog.codecentric.de/en/2013/01"
 "/useful-jvm-flags-part-6-throughput-collector/>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:227
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:227
 msgid ""
 "`Part 7 - CMS Collector <https://blog.codecentric.de/en/2013/10/useful-"
 "jvm-flags-part-7-cms-collector/>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/JVM_settings.rst:229
+#: ../../Tigase_Admistration/Configuration/JVM_settings.inc:229
 msgid ""
 "`Part 8 - GC Logging <https://blog.codecentric.de/en/2014/01/useful-jvm-"
 "flags-part-8-gc-logging/>`__"
@@ -1565,11 +1565,11 @@ msgstr ""
 msgid "This replaces the old ``--sm-cluster-strategy-class`` setting from v7.1."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:2
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:2
 msgid "Virtual Hosts in Tigase Server"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:4
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:4
 msgid ""
 "Tigase server supports multiple virtual hosts in a single server "
 "installation. Virtual hosts can be added or removed, enabled or disabled "
@@ -1577,13 +1577,13 @@ msgid ""
 "operation."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:6
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:6
 msgid ""
 "This document describes how virtual hosts work in Tigase server and how "
 "to get the most out of this feature in your installation."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:8
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:8
 msgid ""
 "The `'default-virtual-host' <#virtHosts>`_ property allows to define name"
 " of the single vhost domain which will be considered a default vhost "
@@ -1592,7 +1592,7 @@ msgid ""
 "commands."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:10
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:10
 msgid ""
 "Virtual hosts should be managed using ad-hoc commands or admin ui, visit "
 "`Add and Manage Domains <#addManageDomain>` for description of vhosts "
@@ -1601,7 +1601,7 @@ msgid ""
 "hoc commands."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:12
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:12
 msgid ""
 "If you have components that may not be able to handle multiple vhosts or "
 "cluster mode, we have developed a virtual component solution as well, "
@@ -1609,18 +1609,18 @@ msgid ""
 "<#virtualComponents>`__ section."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:14
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:14
 msgid ""
 "You may also want to reference the Vhosts API for additional information:"
 " - `API Description for Virtual Domains Management in Tigase Server "
 "<#addManageDomain>`."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:22
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:22
 msgid "Default VHost configuration"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:24
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:24
 msgid ""
 "It’s possible to specify initial default configuration for all Virtual "
 "Host in TDSL configuration file (i.e. ``etc/config.tdsl``) for selected "
@@ -1628,7 +1628,7 @@ msgid ""
 "``defaults`` bean belonging to ``vhost-man`` bean:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:42
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:42
 msgid ""
 "After initial definition of default configuration or after first startup "
 "of Tigase XMPP Server it is possible to configure Virtual Host defaults "
@@ -1637,42 +1637,42 @@ msgid ""
 "Domains <#adhocCommands>`__."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:44
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:44
 msgid ""
 "Alternatively, you may edit default Virtual Host configuration "
 "(configuration for domain ``default``) using Admin UI which by default is"
 " available at ``http://localhost:8080/admin/``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:49
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:49
 msgid "Specification for ad-hoc Commands Used to Manage Virtual Domains"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:51
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:51
 msgid ""
 "There are 3 ad-hoc commands for virtual domains management in the Tigase "
 "server:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:53
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:53
 msgid ""
 "``VHOSTS_RELOAD`` used to reload virtual domains list from the repository"
 " (database)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:55
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:55
 msgid ""
 "``VHOSTS_UPDATE`` used to add a new virtual domain or update information "
 "for existing one."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:57
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:57
 msgid ""
 "``VHOSTS_REMOVE`` used to remove an existing virtual host from the "
 "running server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:59
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:59
 msgid ""
 "Syntax of the commands follows the specification described in `XEP-0050 "
 "<http://xmpp.org/extensions/xep-0050.html>`__. Extra information required"
@@ -1680,7 +1680,7 @@ msgid ""
 "<http://xmpp.org/extensions/xep-0004.html>`__."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:61
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:61
 msgid ""
 "All commands are accepted by the server only when send by the "
 "installation administrator. If the command is sent from any other account"
@@ -1689,7 +1689,7 @@ msgid ""
 "configuration file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:63
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:63
 msgid ""
 "Commands are sent to the 'vhost-man' server component and the 'to' "
 "attribute of the stanza must contain a full JID of the VHostManager on "
@@ -1700,45 +1700,45 @@ msgid ""
 "'vhost-man@existing.domain.com'."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:66
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:66
 msgid "Reloading the Domains List from the Database"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:68
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:68
 msgid ""
 "In order to reload virtual domains from the permanent repository other "
 "than configuration file, you have to send ``VHOSTS_RELOAD`` ad-hoc "
 "command to the VHostManager on the server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:70
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:70
 msgid "The reload command request is of the form:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:81
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:81
 msgid ""
 "The server sends a response upon successful completion of the command "
 "with current number of virtual domains server by the installation:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:100
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:100
 msgid ""
 "If the command is sent from an account other than admin, the server "
 "returns an error:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:119
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:119
 msgid ""
 "The response doesn’t have any special meaning other then end-user "
 "information. The client may ignore the response as it is sent after the "
 "command has been executed."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:122
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:122
 msgid "Adding a New Domain or Updating Existing One"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:124
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:124
 msgid ""
 "In order to add a new domain or update existing one you have to send an "
 "ad-hoc command ``VHOSTS_UPDATE`` with at least one domain name in the "
@@ -1750,43 +1750,43 @@ msgid ""
 "parameters not specified yet."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:126
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:126
 msgid "The domain add/update command request is of the form:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:148
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:148
 msgid ""
 "Please note: Character case in the command field variable names does "
 "matter."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:150
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:192
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:150
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:192
 msgid ""
 "Upon successful completion of the command the server sends a response "
 "back to the client with information of the existing number of virtual "
 "hosts on the server:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:170
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:170
 msgid "Removing a Virtual Domain From the Server"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:172
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:172
 msgid ""
 "In order to remove a virtual domain you have to send ``VHOSTS_REMOVE`` "
 "command to the server with the domain name."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:174
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:174
 msgid "The domain remove command is sent by the client:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:214
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:214
 msgid "Virtual Components for the Cluster Mode"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:216
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:216
 msgid ""
 "Let’s assume you have a cluster installation and you want to include a "
 "component in your installation which doesn’t support the cluster mode "
@@ -1796,7 +1796,7 @@ msgid ""
 "connected to this one node only."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:218
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:218
 msgid ""
 "Ideally you would like to have a mechanism to install it on one node and "
 "put some redirections on other nodes to forward all packets for this "
@@ -1806,7 +1806,7 @@ msgid ""
 "nodes."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:220
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:220
 msgid ""
 "This is where the virtual components are handy. They are visible to users"
 " as a local normal component, they seem to be a real local component but "
@@ -1814,7 +1814,7 @@ msgid ""
 "the real component is working."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:222
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:222
 msgid ""
 "Virtual component is a very lightweight ServerComponent implementation in"
 " Tigase server. It can pretend to be any kind of component and can "
@@ -1823,7 +1823,7 @@ msgid ""
 "component protocol (XEP-0114)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:224
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:224
 msgid ""
 "Configuration is very simple and straightforward, in fact it is very "
 "similar to configuration of any Tigase component. You set a real "
@@ -1833,146 +1833,146 @@ msgid ""
 " name of the component is: ``muc``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:230
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:230
 msgid ""
 "This is pretty much all you need to load a virtual component. A few other"
 " options are needed to point to correct destination addresses for packets"
 " forwarding and to set correct service discovery parameters:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Vhosts.rst:244
+#: ../../Tigase_Admistration/Configuration/Vhosts.inc:244
 msgid "That’s it."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:2
+#: ../../Tigase_Admistration/Configuration/Logging.inc:2
 msgid "Settings for Custom Logging in Tigase"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:4
+#: ../../Tigase_Admistration/Configuration/Logging.inc:4
 msgid ""
 "Logging can be an important tool to monitor your server’s health and "
 "performance. Logging may be controlled and customized on a per-component "
 "basis."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:6
+#: ../../Tigase_Admistration/Configuration/Logging.inc:6
 msgid ""
 "A ``logging`` bean has been implemented to allow more flexible "
 "configuration of logging in the Tigase XMPP Server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:9
+#: ../../Tigase_Admistration/Configuration/Logging.inc:9
 msgid "Configuring logging"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:12
+#: ../../Tigase_Admistration/Configuration/Logging.inc:12
 msgid "In the config file"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:14
+#: ../../Tigase_Admistration/Configuration/Logging.inc:14
 msgid ""
 "Default logging configuration for your installation is kept in the config"
 " file and it may be adjusted there."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:45
+#: ../../Tigase_Admistration/Configuration/Logging.inc:45
 msgid ""
 "You only need to specify the settings you wish to customize, otherwise "
 "they will be left as default."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:47
+#: ../../Tigase_Admistration/Configuration/Logging.inc:47
 msgid ""
 "``packet-debug-full`` - controls whether log entries should be obfuscated"
 " (all CData of all elements will be replaced by ``CData size: <length in "
 "bytes of the replaced string>``) or not; default: ``false``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:49
+#: ../../Tigase_Admistration/Configuration/Logging.inc:49
 msgid ""
 "``rootLevel`` - Defines the root level of logging for all components not "
 "otherwise defined. Default is CONFIG"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:51
+#: ../../Tigase_Admistration/Configuration/Logging.inc:51
 msgid ""
 "``loggers`` - Defines the level of logging for packages running in tigase"
 " server. This is similar to the --debug setting, however you must use "
 "``tigase.{package}`` format. Default is NONE."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:53
+#: ../../Tigase_Admistration/Configuration/Logging.inc:53
 msgid ""
 "``handlers`` - Defines the level of logging for File output and Console "
 "output."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:55
+#: ../../Tigase_Admistration/Configuration/Logging.inc:55
 msgid ""
 "``FileHandler`` - is the file output for log files, with the following "
 "options:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:57
+#: ../../Tigase_Admistration/Configuration/Logging.inc:57
 msgid "``level`` - specifies the level of logs to be written, default is ALL."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:59
+#: ../../Tigase_Admistration/Configuration/Logging.inc:59
 msgid ""
 "``append`` - whether to append to the log or replace it during restart. "
 "Default is true."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:61
+#: ../../Tigase_Admistration/Configuration/Logging.inc:61
 msgid ""
 "``count`` - number of individual log files to keep at set limit. Default "
 "is 5. (default settings will continue appending logs until 5 files at "
 "10MB are reached, then the oldest file will be overwritten.)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:63
-#: ../../Tigase_Admistration/Configuration/Logging.rst:73
+#: ../../Tigase_Admistration/Configuration/Logging.inc:63
+#: ../../Tigase_Admistration/Configuration/Logging.inc:73
 msgid ""
 "``formatter`` - specifies the package to format logging output. Default "
 "is tigase.util.LogFormatter."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:65
+#: ../../Tigase_Admistration/Configuration/Logging.inc:65
 msgid "``limit`` - Byte limit for each log file. Default is 10000000 or 10MB."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:67
+#: ../../Tigase_Admistration/Configuration/Logging.inc:67
 msgid ""
 "``pattern`` - Directory and filename of the log file with respect to the "
 "Tigase installation directory. Default is logs/tigase.log."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:69
+#: ../../Tigase_Admistration/Configuration/Logging.inc:69
 msgid ""
 "``ConsoleHandler`` - Determines the formatting for Tigase output to "
 "console."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:71
+#: ../../Tigase_Admistration/Configuration/Logging.inc:71
 msgid "``level`` - specifies the level of logs to be written, default is WARNING."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:77
+#: ../../Tigase_Admistration/Configuration/Logging.inc:77
 msgid "Disabling colored output"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:79
+#: ../../Tigase_Admistration/Configuration/Logging.inc:79
 msgid ""
 "If for some reason you don’t want colored output in the logs you can "
 "disable it by setting ``disable_logger_color`` to ``true``. For "
 "convenience, you can uncomment in ``etc/tigase.conf`` following line:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:86
+#: ../../Tigase_Admistration/Configuration/Logging.inc:86
 msgid "Ad-hoc changes to the logging configuration"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:88
+#: ../../Tigase_Admistration/Configuration/Logging.inc:88
 msgid ""
 "It is also possible to use ad-hoc command named **Set package logging** "
 "with id ``logging-set`` available at ``message-router@domain`` (where "
@@ -1980,20 +1980,20 @@ msgid ""
 "runtime without requirement of restarting the Tigase XMPP Server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:90
-#: ../../Tigase_Admistration/Configuration/Logging.rst:124
+#: ../../Tigase_Admistration/Configuration/Logging.inc:90
+#: ../../Tigase_Admistration/Configuration/Logging.inc:124
 msgid "**Note**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:92
+#: ../../Tigase_Admistration/Configuration/Logging.inc:92
 msgid "Those changes will be applied to this single cluster node."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:98
+#: ../../Tigase_Admistration/Configuration/Logging.inc:98
 msgid "Using Admin UI"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:100
+#: ../../Tigase_Admistration/Configuration/Logging.inc:100
 msgid ""
 "If your Tigase XMPP Server is running with HTTP server and with Admin UI "
 "enabled, then the easiest way to change logging configuration is by using"
@@ -2002,31 +2002,31 @@ msgid ""
 "you a form which you need to fill in with following fields:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:102
-#: ../../Tigase_Admistration/Configuration/Logging.rst:113
+#: ../../Tigase_Admistration/Configuration/Logging.inc:102
+#: ../../Tigase_Admistration/Configuration/Logging.inc:113
 msgid ""
 "``Package name`` - should contain Java package or class name for which "
 "you wish to change logging level"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:104
-#: ../../Tigase_Admistration/Configuration/Logging.rst:115
+#: ../../Tigase_Admistration/Configuration/Logging.inc:104
+#: ../../Tigase_Admistration/Configuration/Logging.inc:115
 msgid ""
 "``Level`` - select a logging level you wish to apply to entered package "
 "name *(``OFF`` means that logging will be disabled)*"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:106
+#: ../../Tigase_Admistration/Configuration/Logging.inc:106
 msgid ""
 "After pressing ``Submit`` your form will be passed to the server for "
 "validation and selected changes will be applied."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:109
+#: ../../Tigase_Admistration/Configuration/Logging.inc:109
 msgid "Using ad-hoc command"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:111
+#: ../../Tigase_Admistration/Configuration/Logging.inc:111
 msgid ""
 "If you have access to the XMPP admin account of Tigase XMPP Server and "
 "XMPP client which supports ad-hoc command execution, you may connect with"
@@ -2039,30 +2039,30 @@ msgid ""
 "fields:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:117
+#: ../../Tigase_Admistration/Configuration/Logging.inc:117
 msgid ""
 "After submitting the form, Tigase XMPP Server will validate your request "
 "and update logging configuration."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:120
+#: ../../Tigase_Admistration/Configuration/Logging.inc:120
 msgid "Using REST API"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:122
+#: ../../Tigase_Admistration/Configuration/Logging.inc:122
 msgid ""
 "If you have Tigase XMPP Server with REST API enabled, you can use it for "
 "configuring logging of Tigase XMPP Server as well."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:126
+#: ../../Tigase_Admistration/Configuration/Logging.inc:126
 msgid ""
 "As with all HTTP REST API requests you will require a valid API key and "
 "in this case a valid admin credentials to authenticate a HTTP request "
 "using Basic HTTP Authentication."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:128
+#: ../../Tigase_Admistration/Configuration/Logging.inc:128
 msgid ""
 "All you need to to is to send a HTTP POST request to ``/rest/adhoc"
 "/message-router@domain.com`` (where domain is your server name) with "
@@ -2070,18 +2070,18 @@ msgid ""
 "payload to set logging level of ``tigase.server`` package to ``ALL``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:151
+#: ../../Tigase_Admistration/Configuration/Logging.inc:151
 msgid "Alternate loggers in Tigase - Logback"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:153
+#: ../../Tigase_Admistration/Configuration/Logging.inc:153
 msgid ""
 "It’s possible to use Logback for logging purposes, which offers certain "
 "interesting features (async logging, better control over log rotation, on"
 " the fly changing logging configuration)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:155
+#: ../../Tigase_Admistration/Configuration/Logging.inc:155
 msgid ""
 "Requirements: \\* slf4j-api.jar (provided in ``-dist-max`` package) \\* "
 "jul-to-slf4j.jar (provided in ``-dist-max`` package) \\* desired logger "
@@ -2089,18 +2089,18 @@ msgid ""
 "core.jar`` (provided in -dist-max)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:157
+#: ../../Tigase_Admistration/Configuration/Logging.inc:157
 msgid ""
 "Configuration boils down to adding slf4j bridge handler to the list of "
 "build-in Java Logger handlers configuration, which in Tigase translates "
 "to adding following line to ``etc/config.tdsl``:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:165
+#: ../../Tigase_Admistration/Configuration/Logging.inc:165
 msgid "After that ``etc/logback.xml`` configuration file will be used."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:167
+#: ../../Tigase_Admistration/Configuration/Logging.inc:167
 msgid ""
 "As stated in [jul-to-slf4j bridge documentation](\\ "
 "http://www.slf4j.org/legacy.html#jul-to-slf4j) it’s essential to include "
@@ -2108,28 +2108,28 @@ msgid ""
 "log statements:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Logging.rst:176
+#: ../../Tigase_Admistration/Configuration/Logging.inc:176
 msgid ""
 "NOTE, that it may be prudent to remove configuration of all old JUL "
 "logger by appending following to ``etc/logback.xml`` configuration:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:2
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:2
 msgid "Tigase Advanced Options"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:4
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:4
 msgid ""
 "This section is designed to include a number of advanced configuration "
 "options available within Tigase, but may not have a relevant section yet "
 "to house them."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:7
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:7
 msgid "Using CAPTCHA for in-band registration"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:9
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:9
 msgid ""
 "To reduce false or spam registrations to Tigase XMPP Server, there is now"
 " the ability to add CAPTCHA forms as a part of the in-band registration. "
@@ -2138,27 +2138,27 @@ msgid ""
 "option of enabling registration in config.tdsl:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:23
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:23
 msgid ""
 "3 unsuccessful attempts will result in the captcha being invalidated and "
 "a client will receive an error message."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:27
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:27
 msgid "Enabling Empty Nicknames"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:29
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:29
 msgid ""
 "Tigase can now support users with empty nicknames. This can be enabled by"
 " adding the following code in config.tdsl."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:41
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:41
 msgid "Enable Silent Ignore on Packets Delivered to Unavailable Resources"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:43
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:43
 msgid ""
 "You can now have Tigase ignore packets delivered to unavailable resources"
 " to avoid having a packet bounce around and create unnecessary traffic. "
@@ -2166,23 +2166,23 @@ msgid ""
 "within the AMP component using the following settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:45
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:45
 msgid "Globally:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:53
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:53
 msgid "Message Processing Only:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:63
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:63
 msgid "AMP Component:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:73
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:73
 msgid "Mechanism to count errors within Tigase"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:75
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:75
 msgid ""
 "A new processor within statistics has been added to count the number of "
 "errors that Tigase returns. This processor, named ``error-counter``, will"
@@ -2193,35 +2193,35 @@ msgid ""
 "must ensure the processor is included in your ``sess-man`` configuration:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:84
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:84
 msgid "Including stream errors"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:86
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:86
 msgid ""
 "Stream ``ERROR`` packets are not included in the above counter by default"
 " as they are processed separately. To enable this to be added to the "
 "counter, the following line must be in your ``config.tdsl`` file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:97
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:97
 msgid "Stream resumption default & max-timeout"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:99
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:99
 msgid ""
 "``SteamManagementIOProcessor`` now has a setting that can be used to "
 "change the maximum timeout time it will wait for reconnection if a client"
 " does not send a time to wait. Two settings are now available:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:109
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:109
 msgid ""
 "The above setting in ``config.tdsl`` file will change the default timeout"
 " period to 90 seconds."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:119
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:119
 msgid ""
 "This setting will set the maximum time allowed for stream resumption to "
 "900 seconds. This can be handy if you expect a number of mobile phones to"
@@ -2229,11 +2229,11 @@ msgid ""
 "back and forth."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:122
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:122
 msgid "Automatic subscription approval"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:124
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:124
 msgid ""
 "You may setup a server to automatically approve presence subscriptions or"
 " roster authorizations for all users. Say you were hosting bots and "
@@ -2241,24 +2241,24 @@ msgid ""
 "settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:137
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:137
 msgid ""
 "Both of these settings are false by default, and you may use them "
 "together or separately."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:143
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:143
 msgid "The following behavior is followed when they are both activated:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:145
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:145
 msgid ""
 "Upon sending a subscription request - Both contacts will each others' "
 "subscription and be added to each others' roster. Presence information "
 "will immediately be exchanged between both parties."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:147
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:147
 msgid ""
 "Upon sending presence with type either unsubscribe or unsubscribed "
 "follows the rules defined in RFC regarding processing of these stanzas "
@@ -2268,18 +2268,18 @@ msgid ""
 "reflect changes to presence in user roster in a seamless manner."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:149
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:149
 msgid ""
 "Simply adding an item to the roster (i.e. with <iq/> stanza with correct "
 "semantics) will also cause an automatic subscription between the user and"
 " the contact in a matter explained above."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:152
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:152
 msgid "Abuse Contacts"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:154
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:154
 msgid ""
 "Tigase has support for `XEP-0128: Service Discovery Extensions "
 "<https://xmpp.org/extensions/xep-0128.html>`__ for providing additional "
@@ -2290,7 +2290,7 @@ msgid ""
 "server administrators or abuse response team."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:156
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:156
 msgid ""
 "To set abuse contact details you should set ``disco-extensions`` in "
 "property in ``etc/config.tdsl`` file with subproperty ``abuse-addresses``"
@@ -2298,11 +2298,11 @@ msgid ""
 "``mailto:`` and for XMPP address you need to prefix it with ``xmpp``):"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:165
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:165
 msgid "Push Notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:167
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:167
 msgid ""
 "Tigase XMPP Server comes with support for `XEP-0357: Push Notifications "
 "<https://xmpp.org/extensions/xep-0357.html>`__ allowing user to receive "
@@ -2310,43 +2310,43 @@ msgid ""
 "connected enabled by default."
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:170
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:170
 msgid "Disabling notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:172
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:172
 msgid "You can disable this feature with following settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:180
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:180
 msgid "Removing body and sender from notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:182
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:182
 msgid ""
 "If you wish Tigase XMPP Server not to forward body of the message or "
 "sender details in the push notification you can disable that with "
 "following settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:193
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:193
 msgid "Overriding body of notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:195
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:195
 msgid ""
 "If you wish Tigase XMPP Server to override forward body of the encrypted "
 "message in the push notification (for example to avoid indicating that "
 "there is an \"error\") you can do that with following settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:206
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:206
 msgid ""
 "Enabling push notifications for messages received when all resources are "
 "AWAY/XA/DND"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:208
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:208
 msgid ""
 "Push notifications may also be sent by Tigase XMPP Server when new "
 "message is received and all resources of recipient are in AWAY/XA/DND "
@@ -2354,7 +2354,7 @@ msgid ""
 " push delivery extension named ``away`` in default push processor:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:218
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:218
 msgid ""
 "As this behaviour may not be expected by users and users need a "
 "compatible XMPP client to properly handle this notifications (XMPP client"
@@ -2365,11 +2365,11 @@ msgid ""
 "server, as in following example:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:220
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:220
 msgid "**Enabling Push notifications for away/xa/dnd account.**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Configuration/Advanced_Options.rst:232
+#: ../../Tigase_Admistration/Configuration/Advanced_Options.inc:232
 msgid ""
 "If later on, user decides to disable notification for account in "
 "away/xa/dnd state, it may disable push notifications or once again send "

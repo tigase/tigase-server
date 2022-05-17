@@ -21,14 +21,14 @@ Appendix entries
 
 -  `Manual installtion for PostGRESQL <#Prepare-the-PostgreSQL-Database-for-the-Tigase-Server>`__
 
-.. include:: Database_Preparation/DbSchemaLoader.rst
+.. include:: Database_Preparation/DbSchemaLoader.inc
 
-.. include:: Database_Preparation/MySQL.rst
+.. include:: Database_Preparation/MySQL.inc
 
-.. include:: Database_Preparation/Derby.rst
+.. include:: Database_Preparation/Derby.inc
 
-.. include:: Database_Preparation/MSSQL.rst
+.. include:: Database_Preparation/MSSQL.inc
 
-.. include:: Database_Preparation/PostGRE.rst
+.. include:: Database_Preparation/PostGRE.inc
 
-.. include:: Database_Preparation/MongoDB.rst
+.. include:: Database_Preparation/MongoDB.inc
