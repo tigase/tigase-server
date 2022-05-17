@@ -17,6 +17,7 @@
  */
 package tigase.net;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
 import tigase.io.*;
@@ -152,7 +153,13 @@ public abstract class IOService<RefObject>
 		return tls_remote_hostname;
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.3.0", removeIn = "9.0.0", note = "Please use version with 'socketInputSize' parameter")
 	public void accept(final SocketChannel socketChannel) throws IOException {
+		accept(socketChannel, socketChannel.socket().getReceiveBufferSize());
+	}
+
+	public void accept(final SocketChannel socketChannel, Integer socketInputSize) throws IOException {
 		try {
 			if (socketChannel.isConnectionPending()) {
 				socketChannel.finishConnect();
@@ -178,7 +185,7 @@ public abstract class IOService<RefObject>
 
 			throw e;
 		}
-		socketInputSize = socketIO.getSocketChannel().socket().getReceiveBufferSize();
+		this.socketInputSize = socketInputSize;
 		socketInput = ByteBuffer.allocate(socketInputSize);
 		socketInput.order(byteOrder());
 
