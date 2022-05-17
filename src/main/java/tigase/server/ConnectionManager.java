@@ -147,6 +147,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	protected Kernel kernel;
 	@ConfigField(desc = "Default size of a network buffer", alias = "net-buffer")
 	protected int net_buffer = isHighThroughput() ? NET_BUFFER_HT_PROP_VAL : NET_BUFFER_ST_PROP_VAL;
+	@ConfigField(desc = "Size of TCP receive socket buffer for connection", alias = "socket-buffer-size")
+	private Integer socketBufferSize = null;
 	@Inject(nullAllowed = true)
 	protected XMPPIOProcessor[] processors = new XMPPIOProcessor[0];
 	@ConfigField(desc = "Traffic throttling")
@@ -1228,7 +1230,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			serv.setIOServiceListener(ConnectionManager.this);
 			serv.setSessionData(port_props);
 			try {
-				serv.accept(sc);
+				serv.accept(sc, net_buffer);
 				socketAccepted(serv, getSocketType());
 				if (getSocketType() == SocketType.ssl) {
 					serv.startSSL(false, false, false);
@@ -1301,6 +1303,9 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		@Override
 		public int getReceiveBufferSize() {
+			if (socketBufferSize != null) {
+				return socketBufferSize;
+			}
 			return net_buffer;
 		}
 
