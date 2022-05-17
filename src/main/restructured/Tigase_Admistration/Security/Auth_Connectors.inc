@@ -114,11 +114,11 @@ If you are interested in even further customizing your authentication connector 
 
 - :ref:`Tigase Custom Auth guide<custonAuthConnector>`
 
-.. include:: Auth_Connectors/Tigase_Auth_Connector.rst
-.. include:: Auth_Connectors/Custom_Auth_Connector.rst
-.. include:: Auth_Connectors/Drupal_Auth.rst
-.. include:: Auth_Connectors/LDAP_Auth.rst
-.. include:: Auth_Connectors/SASL_EXTERNAL.rst
+.. include:: Auth_Connectors/Tigase_Auth_Connector.inc
+.. include:: Auth_Connectors/Custom_Auth_Connector.inc
+.. include:: Auth_Connectors/Drupal_Auth.inc
+.. include:: Auth_Connectors/LDAP_Auth.inc
+.. include:: Auth_Connectors/SASL_EXTERNAL.inc
 
 .. |ss| raw:: html
 

@@ -1,10 +1,10 @@
 Appendix II - Properties Guide
 ===============================
 
-.. include:: _general.rst
-.. include:: _repository.rst
-.. include:: _cluster.rst
-.. include:: _user_connectivity.rst
-.. include:: _external.rst
-.. include:: _performance.rst
-.. include:: _vhost.rst
+.. include:: _general.inc
+.. include:: _repository.inc
+.. include:: _cluster.inc
+.. include:: _user_connectivity.inc
+.. include:: _external.inc
+.. include:: _performance.inc
+.. include:: _vhost.inc

@@ -35,13 +35,13 @@ This is a set of documents allowing you to quickly start with our software. Ever
 
 -  :ref:`Running Tigase XMPP Server as a service<tigaseScriptStart>`
 
-.. include:: Installation_Using_Web_Installer.rst 
-.. include:: Manual_Installation_in_Console_Mode.rst 
-.. include:: Windows_Installation.rst
-.. include:: Tigase_Server_Network_Instructions.rst
-.. include:: Script_Selection.rst
-.. include:: Shutting_Down.rst
-.. include:: Upgrading_from_Older_versions.rst
+.. include:: Installation_Using_Web_Installer.inc 
+.. include:: Manual_Installation_in_Console_Mode.inc 
+.. include:: Windows_Installation.inc
+.. include:: Tigase_Server_Network_Instructions.inc
+.. include:: Script_Selection.inc
+.. include:: Shutting_Down.inc
+.. include:: Upgrading_from_Older_versions.inc
 
 
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"POT-Creation-Date: 2022-05-16 23:42-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,55 +21,55 @@ msgstr ""
 msgid "Appendix II - Properties Guide"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:2
+#: ../../Tigase_Admistration/Properties/_general.inc:2
 msgid "General"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:5
+#: ../../Tigase_Admistration/Properties/_general.inc:5
 msgid "admins"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:7
+#: ../../Tigase_Admistration/Properties/_general.inc:7
 msgid "**Description:** Specifies a list of administrator accounts."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:9
+#: ../../Tigase_Admistration/Properties/_general.inc:9
 msgid ""
 "**Default value:** the administration account created when the server is "
 "setup. Typically it would be something like ``admins = "
 "['admin@server.com']``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:11
+#: ../../Tigase_Admistration/Properties/_general.inc:11
 msgid "**Example:** ``admins = [ 'admin@domain.com', 'user2@domain.com' ]``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:13
+#: ../../Tigase_Admistration/Properties/_general.inc:13
 msgid "**Possible values:** Comma seperated values of Bare JIDs."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:15
-#: ../../Tigase_Admistration/Properties/_general.rst:142
-#: ../../Tigase_Admistration/Properties/_general.rst:168
+#: ../../Tigase_Admistration/Properties/_general.inc:15
+#: ../../Tigase_Admistration/Properties/_general.inc:142
+#: ../../Tigase_Admistration/Properties/_general.inc:168
 msgid "**Available since:** 2.0.0"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:18
+#: ../../Tigase_Admistration/Properties/_general.inc:18
 msgid "Certificate Container"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:20
+#: ../../Tigase_Admistration/Properties/_general.inc:20
 msgid ""
 "The certificate container houses all configuration related to SSL "
 "certificate configuration. This container replaces a number of former — "
 "properties."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:23
+#: ../../Tigase_Admistration/Properties/_general.inc:23
 msgid "ssl-certs-location"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:25
+#: ../../Tigase_Admistration/Properties/_general.inc:25
 msgid ""
 "This option allows you to specify the location where SSL certificates are"
 " stored. The meaning of this property depends on the SSL container `class"
@@ -78,21 +78,21 @@ msgid ""
 "format."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:27
+#: ../../Tigase_Admistration/Properties/_general.inc:27
 msgid ""
 "Default location is ``/certs`` however it can be changed using the "
 "following setting:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:36
+#: ../../Tigase_Admistration/Properties/_general.inc:36
 msgid "This replaces the former ``--ssl-certs-location`` property."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:39
+#: ../../Tigase_Admistration/Properties/_general.inc:39
 msgid "ssl-def-cert-domain"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:41
+#: ../../Tigase_Admistration/Properties/_general.inc:41
 msgid ""
 "This property allows you to specify a default alias/domain name for "
 "certificate. It is mostly used to load certificates for unknown domain "
@@ -106,63 +106,63 @@ msgid ""
 "use a default one."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:43
+#: ../../Tigase_Admistration/Properties/_general.inc:43
 msgid "This may be configured as follows:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:52
+#: ../../Tigase_Admistration/Properties/_general.inc:52
 msgid "This replaces the former ``--ssl-def-cert-domain`` property."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:55
+#: ../../Tigase_Admistration/Properties/_general.inc:55
 msgid "Component"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:57
+#: ../../Tigase_Admistration/Properties/_general.inc:57
 msgid ""
 "**Description:** Container specifying component configuration. All "
 "components if they require configuration must be called in the conf.tdsl "
 "file in the following manner:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:65
+#: ../../Tigase_Admistration/Properties/_general.inc:65
 msgid ""
 "DSL allows for custom naming of the component, and specifying of the "
 "class in the same line. This method replaces the old ``comp-class`` and "
 "``comp-name`` style of configuration."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:67
+#: ../../Tigase_Admistration/Properties/_general.inc:67
 msgid "For example, what used to be"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:76
+#: ../../Tigase_Admistration/Properties/_general.inc:76
 msgid "is now"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:83
+#: ../../Tigase_Admistration/Properties/_general.inc:83
 msgid ""
 "In fact, if you are using the default class & name for a component, you "
 "don’t need to specify it either, so MUC in this is now called by"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:89
+#: ../../Tigase_Admistration/Properties/_general.inc:89
 msgid ""
 "**Default value:** By default, component configuration runs of default, "
 "and does not need to be specified."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:91
+#: ../../Tigase_Admistration/Properties/_general.inc:91
 msgid ""
 "There are many many configuration options under each component, which are"
 " specified in `component documentation <#loadComponent>`__."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:94
+#: ../../Tigase_Admistration/Properties/_general.inc:94
 msgid "Ports"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:96
+#: ../../Tigase_Admistration/Properties/_general.inc:96
 msgid ""
 "The ports property is a subclass of connections, which is used to set a "
 "ports list for a connection manager. 'list of ports' is a comma separated"
@@ -170,58 +170,58 @@ msgid ""
 "manager named s2s the property would like like the example below:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:106
+#: ../../Tigase_Admistration/Properties/_general.inc:106
 msgid "Each port many be individually configured underneath ports"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:119
+#: ../../Tigase_Admistration/Properties/_general.inc:119
 msgid "this replaces the ``--cmpname-ports`` property."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:34
-#: ../../Tigase_Admistration/Properties/_cluster.rst:47
-#: ../../Tigase_Admistration/Properties/_cluster.rst:66
-#: ../../Tigase_Admistration/Properties/_external.rst:28
-#: ../../Tigase_Admistration/Properties/_general.rst:121
-#: ../../Tigase_Admistration/Properties/_general.rst:199
-#: ../../Tigase_Admistration/Properties/_general.rst:276
-#: ../../Tigase_Admistration/Properties/_general.rst:552
-#: ../../Tigase_Admistration/Properties/_general.rst:604
-#: ../../Tigase_Admistration/Properties/_general.rst:623
-#: ../../Tigase_Admistration/Properties/_general.rst:644
-#: ../../Tigase_Admistration/Properties/_general.rst:657
-#: ../../Tigase_Admistration/Properties/_performance.rst:15
-#: ../../Tigase_Admistration/Properties/_repository.rst:80
-#: ../../Tigase_Admistration/Properties/_repository.rst:182
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:17
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:41
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:172
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:207
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:242
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:277
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:290
-#: ../../Tigase_Admistration/Properties/_vhost.rst:19
-#: ../../Tigase_Admistration/Properties/_vhost.rst:34
-#: ../../Tigase_Admistration/Properties/_vhost.rst:55
-#: ../../Tigase_Admistration/Properties/_vhost.rst:74
-#: ../../Tigase_Admistration/Properties/_vhost.rst:95
-#: ../../Tigase_Admistration/Properties/_vhost.rst:116
-#: ../../Tigase_Admistration/Properties/_vhost.rst:137
+#: ../../Tigase_Admistration/Properties/_cluster.inc:34
+#: ../../Tigase_Admistration/Properties/_cluster.inc:47
+#: ../../Tigase_Admistration/Properties/_cluster.inc:66
+#: ../../Tigase_Admistration/Properties/_external.inc:28
+#: ../../Tigase_Admistration/Properties/_general.inc:121
+#: ../../Tigase_Admistration/Properties/_general.inc:199
+#: ../../Tigase_Admistration/Properties/_general.inc:276
+#: ../../Tigase_Admistration/Properties/_general.inc:552
+#: ../../Tigase_Admistration/Properties/_general.inc:604
+#: ../../Tigase_Admistration/Properties/_general.inc:623
+#: ../../Tigase_Admistration/Properties/_general.inc:644
+#: ../../Tigase_Admistration/Properties/_general.inc:657
+#: ../../Tigase_Admistration/Properties/_performance.inc:15
+#: ../../Tigase_Admistration/Properties/_repository.inc:80
+#: ../../Tigase_Admistration/Properties/_repository.inc:182
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:17
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:41
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:172
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:207
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:242
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:277
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:290
+#: ../../Tigase_Admistration/Properties/_vhost.inc:19
+#: ../../Tigase_Admistration/Properties/_vhost.inc:34
+#: ../../Tigase_Admistration/Properties/_vhost.inc:55
+#: ../../Tigase_Admistration/Properties/_vhost.inc:74
+#: ../../Tigase_Admistration/Properties/_vhost.inc:95
+#: ../../Tigase_Admistration/Properties/_vhost.inc:116
+#: ../../Tigase_Admistration/Properties/_vhost.inc:137
 msgid "**Available since:** 8.0.0"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:124
+#: ../../Tigase_Admistration/Properties/_general.inc:124
 msgid "config-type"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:126
+#: ../../Tigase_Admistration/Properties/_general.inc:126
 msgid ""
 "**Description:** This property sets the server type and determines what "
 "components are started up without needing to declare and configure all "
 "components. Possible values are listed below:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:128
+#: ../../Tigase_Admistration/Properties/_general.inc:128
 msgid ""
 "``setup`` - This setting will setup a basic server that is prepared for "
 "initial setup after unpacking. This is set by default, and starts up http"
@@ -229,7 +229,7 @@ msgid ""
 "after the server is configured."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:130
+#: ../../Tigase_Admistration/Properties/_general.inc:130
 msgid ""
 "``default`` - creates default configuration file. That is configuration "
 "which is most likely needed for a typical installation. Components "
@@ -237,7 +237,7 @@ msgid ""
 "connection manager and server-to-server connection manager."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:132
+#: ../../Tigase_Admistration/Properties/_general.inc:132
 msgid ""
 "``session-manager`` - creates configuration for instance with session "
 "manager and external component only. This is useful for distributed "
@@ -247,7 +247,7 @@ msgid ""
 "ext2s."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:134
+#: ../../Tigase_Admistration/Properties/_general.inc:134
 msgid ""
 "``connection-managers`` - creates configuration for instance with "
 "components managing network connections. This is useful for distributed "
@@ -257,7 +257,7 @@ msgid ""
 "s2s, ext2s."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:136
+#: ../../Tigase_Admistration/Properties/_general.inc:136
 msgid ""
 "``component`` - generating a configuration with only one component - "
 "component managing external components connection, either XEP-0114 or "
@@ -268,56 +268,56 @@ msgid ""
 "domain name, password, port, etc…​"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:138
+#: ../../Tigase_Admistration/Properties/_general.inc:138
 msgid "**Default value:** ``'config-type' = 'setup'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:140
+#: ../../Tigase_Admistration/Properties/_general.inc:140
 msgid ""
 "**Possible values:** ``setup``\\ \\|\\ ``default``\\ \\|\\ ``connection-"
 "managers``\\ \\|\\ ``session-manager``\\ \\|\\ ``connection-managers``\\ "
 "\\|\\ ``component``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:145
+#: ../../Tigase_Admistration/Properties/_general.inc:145
 msgid "debug-packages"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:147
+#: ../../Tigase_Admistration/Properties/_general.inc:147
 msgid ""
 "**Default value:** No default as Tigase does not expect custom classes "
 "out of the box."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:149
+#: ../../Tigase_Admistration/Properties/_general.inc:149
 msgid ""
 "**Example:** ``'debug-packages' = [ 'com.company.CustomPlugin' , "
 "'com.company.custom' ]``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:151
+#: ../../Tigase_Admistration/Properties/_general.inc:151
 msgid "**Possible values:** comma separated list of Java packages or classes."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:153
+#: ../../Tigase_Admistration/Properties/_general.inc:153
 msgid ""
 "**Description:** This property is used to turn debugging on for any "
 "package not located within the default Tigase packages. Be sure class "
 "case is correct."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:17
-#: ../../Tigase_Admistration/Properties/_general.rst:155
-#: ../../Tigase_Admistration/Properties/_general.rst:363
-#: ../../Tigase_Admistration/Properties/_performance.rst:131
+#: ../../Tigase_Admistration/Properties/_external.inc:17
+#: ../../Tigase_Admistration/Properties/_general.inc:155
+#: ../../Tigase_Admistration/Properties/_general.inc:363
+#: ../../Tigase_Admistration/Properties/_performance.inc:131
 msgid "**Available since:** 5.0.0"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:158
+#: ../../Tigase_Admistration/Properties/_general.inc:158
 msgid "debug"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:160
+#: ../../Tigase_Admistration/Properties/_general.inc:160
 msgid ""
 "**Description:** The ``debug`` property is used to turn on the debug log "
 "for the specified Tigase package. For example if you want to turn debug "
@@ -332,24 +332,24 @@ msgid ""
 "`debug-packages <#debugPackages>`__ setting."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:162
-#: ../../Tigase_Admistration/Properties/_general.rst:232
+#: ../../Tigase_Admistration/Properties/_general.inc:162
+#: ../../Tigase_Admistration/Properties/_general.inc:232
 msgid "**Default value:** 'none'"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:164
+#: ../../Tigase_Admistration/Properties/_general.inc:164
 msgid "**Example:** ``debug = [ 'server', 'xmpp.impl' ]``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:166
+#: ../../Tigase_Admistration/Properties/_general.inc:166
 msgid "**Possible values:** Comma separated list of Tigase’s package names."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:171
+#: ../../Tigase_Admistration/Properties/_general.inc:171
 msgid "monitoring"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:173
+#: ../../Tigase_Admistration/Properties/_general.inc:173
 msgid ""
 "**Description:** This property activates monitoring interfaces through "
 "selected protocols on selected TCP/IP port numbers. For more details "
@@ -359,35 +359,35 @@ msgid ""
 "monitoring under that will not be available."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:175
+#: ../../Tigase_Admistration/Properties/_general.inc:175
 msgid "**Default value:** By default monitoring is disabled."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:11
-#: ../../Tigase_Admistration/Properties/_general.rst:177
-#: ../../Tigase_Admistration/Properties/_general.rst:234
-#: ../../Tigase_Admistration/Properties/_general.rst:319
-#: ../../Tigase_Admistration/Properties/_general.rst:576
-#: ../../Tigase_Admistration/Properties/_repository.rst:16
-#: ../../Tigase_Admistration/Properties/_repository.rst:98
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:65
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:160
+#: ../../Tigase_Admistration/Properties/_cluster.inc:11
+#: ../../Tigase_Admistration/Properties/_general.inc:177
+#: ../../Tigase_Admistration/Properties/_general.inc:234
+#: ../../Tigase_Admistration/Properties/_general.inc:319
+#: ../../Tigase_Admistration/Properties/_general.inc:576
+#: ../../Tigase_Admistration/Properties/_repository.inc:16
+#: ../../Tigase_Admistration/Properties/_repository.inc:98
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:65
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:160
 msgid "**Example:**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:195
+#: ../../Tigase_Admistration/Properties/_general.inc:195
 msgid "DO NOT CONFUSE monitoring with monitor component."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:197
+#: ../../Tigase_Admistration/Properties/_general.inc:197
 msgid "**Possible values:** 'list of monitoring protocols with port numbers.'"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:202
+#: ../../Tigase_Admistration/Properties/_general.inc:202
 msgid "plugins"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:204
+#: ../../Tigase_Admistration/Properties/_general.inc:204
 msgid ""
 "**Description:** The former ``--sm-plugins`` property has been replaced "
 "by a new style of formatting with DSL. The former long unbroken string of"
@@ -397,14 +397,14 @@ msgid ""
 "protocol, the following may be used:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:212
+#: ../../Tigase_Admistration/Properties/_general.inc:212
 msgid ""
 "Should any plugin require configuration, those configurations will be "
 "under it’s own brackets. For example, this section not only turns on "
 "jabber:iq:auth but also sets the treads to 16."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:222
+#: ../../Tigase_Admistration/Properties/_general.inc:222
 msgid ""
 "As you may have noticed, beans or configuration options that require "
 "escape characters such as ``:`` or ``-`` will fall into single quotes to "
@@ -413,38 +413,38 @@ msgid ""
 "certain plugins, you can do so after declaring the bean."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:230
+#: ../../Tigase_Admistration/Properties/_general.inc:230
 msgid ""
 "Typically if a bean is called, it is automatically active. Session "
 "manager plugins will typically look like a list of plugins without "
 "configurations. The example section will show what one will look like."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:274
+#: ../../Tigase_Admistration/Properties/_general.inc:274
 msgid "**Possible values:** DSL format plugins list and configurations."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:279
+#: ../../Tigase_Admistration/Properties/_general.inc:279
 msgid "priority-queue-implementation"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:281
+#: ../../Tigase_Admistration/Properties/_general.inc:281
 msgid "**Default value:** ``tigase.util.PriorityQueueRelaxed``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:283
+#: ../../Tigase_Admistration/Properties/_general.inc:283
 msgid ""
 "**Example:** ``'priority-queue-implementation' = "
 "'tigase.util.PriorityQueueStrict``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:285
+#: ../../Tigase_Admistration/Properties/_general.inc:285
 msgid ""
 "**Possible values:** class name extending "
 "``tigase.util.PriorityQueueAbstract``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:287
+#: ../../Tigase_Admistration/Properties/_general.inc:287
 msgid ""
 "**Description:** The ``priority-queue-implementation`` property sets "
 "Tigase’s internal queue implementation. You can choose between already "
@@ -453,7 +453,7 @@ msgid ""
 " implementations are available:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:289
+#: ../../Tigase_Admistration/Properties/_general.inc:289
 msgid ""
 "**tigase.util.workqueue.PriorityQueueRelaxed** - specialized priority "
 "queue designed to efficiently handle very high load and prevent packets "
@@ -463,7 +463,7 @@ msgid ""
 "lowest priority packets (presences) under a very high load."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:291
+#: ../../Tigase_Admistration/Properties/_general.inc:291
 msgid ""
 "**tigase.util.workqueue.PriorityQueueStrict** - specialized priority "
 "queue designed to efficiently handle very high load but prefers packet "
@@ -475,7 +475,7 @@ msgid ""
 "depending which priority queue is overloaded."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:293
+#: ../../Tigase_Admistration/Properties/_general.inc:293
 msgid ""
 "**tigase.util.workqueue.NonpriorityQueue** - specialized non-priority "
 "queue. All packets are stored in a single physical collection, hence they"
@@ -487,7 +487,7 @@ msgid ""
 " for all packets which do not fit into the single queue."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:297
+#: ../../Tigase_Admistration/Properties/_general.inc:297
 msgid ""
 "*Since the packets are processed by plugins in the SessionManager "
 "component and each plugin has own thread-pool with own queues packet "
@@ -497,31 +497,31 @@ msgid ""
 "'presence' packet and so on…​ This is unpredictable.*"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:299
-#: ../../Tigase_Admistration/Properties/_performance.rst:90
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:120
+#: ../../Tigase_Admistration/Properties/_general.inc:299
+#: ../../Tigase_Admistration/Properties/_performance.inc:90
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:120
 msgid "**Available since:** 5.1.0"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:302
+#: ../../Tigase_Admistration/Properties/_general.inc:302
 msgid "roster-implementation"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:304
+#: ../../Tigase_Admistration/Properties/_general.inc:304
 msgid "**Default value:** ``RosterFlat.class.getCanonicalName()``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:306
+#: ../../Tigase_Admistration/Properties/_general.inc:306
 msgid "**Example:** ``'roster-implementation' = 'my.pack.CustomRosterImpl'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:308
+#: ../../Tigase_Admistration/Properties/_general.inc:308
 msgid ""
 "**Possible values:** Class extending "
 "tigase.xmpp.impl.roster.RosterAbstract."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:310
+#: ../../Tigase_Admistration/Properties/_general.inc:310
 msgid ""
 "**Description:** The ``roster-implementation`` property allows you to "
 "specify a different RosterAbstract implementation. This might be useful "
@@ -529,29 +529,29 @@ msgid ""
 "cases for some custom logic for certain roster elements."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:312
-#: ../../Tigase_Admistration/Properties/_general.rst:337
-#: ../../Tigase_Admistration/Properties/_performance.rst:62
-#: ../../Tigase_Admistration/Properties/_performance.rst:77
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:56
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:151
+#: ../../Tigase_Admistration/Properties/_general.inc:312
+#: ../../Tigase_Admistration/Properties/_general.inc:337
+#: ../../Tigase_Admistration/Properties/_performance.inc:62
+#: ../../Tigase_Admistration/Properties/_performance.inc:77
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:56
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:151
 msgid "**Available since:** 5.2.0"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:315
+#: ../../Tigase_Admistration/Properties/_general.inc:315
 msgid "s2s-secret"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:317
-#: ../../Tigase_Admistration/Properties/_general.rst:649
+#: ../../Tigase_Admistration/Properties/_general.inc:317
+#: ../../Tigase_Admistration/Properties/_general.inc:649
 msgid "**Default value:** ``none``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:329
+#: ../../Tigase_Admistration/Properties/_general.inc:329
 msgid "**Possible values:** 'ascii string.'"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:331
+#: ../../Tigase_Admistration/Properties/_general.inc:331
 msgid ""
 "**Description:** This property is a global setting for s2s secrets to "
 "generate dialback keys on the Tigase installation. By default it is null,"
@@ -559,13 +559,13 @@ msgid ""
 "connection and handshake."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:333
+#: ../../Tigase_Admistration/Properties/_general.inc:333
 msgid ""
 "This is a global property which is overridden by settings for each VHost "
 "(see `??? <#addManageDomain>`__)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:335
+#: ../../Tigase_Admistration/Properties/_general.inc:335
 msgid ""
 "As in the example provided, 'defaults' settings for all virtual hosts for"
 " which the configuration is not defined. This settings is useful mostly "
@@ -575,56 +575,56 @@ msgid ""
 "individual configuration for each vhost."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:340
+#: ../../Tigase_Admistration/Properties/_general.inc:340
 msgid "scripts-dir"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:342
+#: ../../Tigase_Admistration/Properties/_general.inc:342
 msgid "**Default value:** ``scripts/admin``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:344
+#: ../../Tigase_Admistration/Properties/_general.inc:344
 msgid "**Example:** ``'scripts-dir' = ''/opt/admin-scripts'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:346
+#: ../../Tigase_Admistration/Properties/_general.inc:346
 msgid "**Possible values:** path to a directory on the file system."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:348
+#: ../../Tigase_Admistration/Properties/_general.inc:348
 msgid ""
 "**Description:** This property sets the directory where all administrator"
 " scripts for ad-hoc commands are stored."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:47
-#: ../../Tigase_Admistration/Properties/_general.rst:350
-#: ../../Tigase_Admistration/Properties/_performance.rst:103
-#: ../../Tigase_Admistration/Properties/_performance.rst:116
+#: ../../Tigase_Admistration/Properties/_external.inc:47
+#: ../../Tigase_Admistration/Properties/_general.inc:350
+#: ../../Tigase_Admistration/Properties/_performance.inc:103
+#: ../../Tigase_Admistration/Properties/_performance.inc:116
 msgid "**Available since:** 4.3.0"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:353
+#: ../../Tigase_Admistration/Properties/_general.inc:353
 msgid "ssl-container-class"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:355
+#: ../../Tigase_Admistration/Properties/_general.inc:355
 msgid "*Default value:** ``tigase.io.SSLContextContainer``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:357
+#: ../../Tigase_Admistration/Properties/_general.inc:357
 msgid ""
 "**Example:** ``rootSslContextContainer (class: "
 "class.implementing.SSLContextContainerIFC) {}``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:359
+#: ../../Tigase_Admistration/Properties/_general.inc:359
 msgid ""
 "**Possible values:** a class implementing "
 "tigase.io.SSLContectContainerIfc."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:361
+#: ../../Tigase_Admistration/Properties/_general.inc:361
 msgid ""
 "**Description:** The ``rootSslContextContainer`` property allows you to "
 "specify a class implementing storage for SSL/TLS certificates. The class "
@@ -633,27 +633,27 @@ msgid ""
 "systems."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:366
+#: ../../Tigase_Admistration/Properties/_general.inc:366
 msgid "stats"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:368
+#: ../../Tigase_Admistration/Properties/_general.inc:368
 msgid ""
 "The stats block contains settings for statistics collection. To begin the"
 " stats block, use the following:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:374
+#: ../../Tigase_Admistration/Properties/_general.inc:374
 msgid ""
 "**Default value:** 'By default, stats is not listed in the "
 "``config.tdsl`` file'"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:376
+#: ../../Tigase_Admistration/Properties/_general.inc:376
 msgid "**Description**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:378
+#: ../../Tigase_Admistration/Properties/_general.inc:378
 msgid ""
 "Tigase XMPP Server can store server statistics internally for a given "
 "period of time. This allows you to connect to a running system and "
@@ -666,47 +666,47 @@ msgid ""
 "memory.**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:381
+#: ../../Tigase_Admistration/Properties/_general.inc:381
 msgid "stats-history-size"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:383
+#: ../../Tigase_Admistration/Properties/_general.inc:383
 msgid ""
 "Stats-history defines the size of the history buffer. That is how many "
 "complete sets of historic metrics to store in memory."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:392
+#: ../../Tigase_Admistration/Properties/_general.inc:392
 msgid "stats-history-interval"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:394
+#: ../../Tigase_Admistration/Properties/_general.inc:394
 msgid "Sets the interval for which statistics will be gathered from the server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:404
+#: ../../Tigase_Admistration/Properties/_general.inc:404
 msgid "stats-logger"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:406
+#: ../../Tigase_Admistration/Properties/_general.inc:406
 msgid ""
 "Allow enabling and configuring components responsible for storing "
 "statistic information. Note that this controls the logging system for "
 "retrieving using JMX, clients, or ad-hoc commands."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:416
+#: ../../Tigase_Admistration/Properties/_general.inc:416
 msgid "Currently following classes are available:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:418
+#: ../../Tigase_Admistration/Properties/_general.inc:418
 msgid ""
 "``tigase.stats.CounterDataArchivizer`` - every execution put current "
 "basic server metrics (CPU usage, memory usage, number of user "
 "connections, uptime) into database (overwrites previous entry)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:420
+#: ../../Tigase_Admistration/Properties/_general.inc:420
 msgid ""
 "``tigase.stats.CounterDataLogger`` - every execution insert new row with "
 "new set of number of server statistics (CPU usage, memory usage, number "
@@ -714,85 +714,85 @@ msgid ""
 "different types, uptime, etc) into the database"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:422
+#: ../../Tigase_Admistration/Properties/_general.inc:422
 msgid ""
 "``tigase.stats.CounterDataFileLogger`` - every execution store all server"
 " statistics into separate file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:424
-#: ../../Tigase_Admistration/Properties/_general.rst:457
+#: ../../Tigase_Admistration/Properties/_general.inc:424
+#: ../../Tigase_Admistration/Properties/_general.inc:457
 msgid "frequency"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:426
+#: ../../Tigase_Admistration/Properties/_general.inc:426
 msgid ""
 "stats-logger may also be controlled using frequency, which is the time "
 "interval between executions of the archiver ``.execute()`` method in "
 "seconds."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:443
+#: ../../Tigase_Admistration/Properties/_general.inc:443
 msgid "stats-file-logger"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:445
+#: ../../Tigase_Admistration/Properties/_general.inc:445
 msgid ""
 "This allows configuring of statistics gathering to an external file. This"
 " only has one class, and may be controlled independently from the "
 "internal statistics."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:459
+#: ../../Tigase_Admistration/Properties/_general.inc:459
 msgid ""
 "stats-file-logger may also be controlled using frequency, which is the "
 "time interval between executions of the archiver ``.execute()`` method in"
 " seconds."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:470
+#: ../../Tigase_Admistration/Properties/_general.inc:470
 msgid "file configuration"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:472
+#: ../../Tigase_Admistration/Properties/_general.inc:472
 msgid ""
 "You can customize the file output for stats-file-logger using the "
 "following setting options, these are all optional."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:488
+#: ../../Tigase_Admistration/Properties/_general.inc:488
 msgid "**'stats-datetime'** - Whether to include date & time timestamp."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:490
+#: ../../Tigase_Admistration/Properties/_general.inc:490
 msgid ""
 "**'stats-datetime-format'** - Specifies the formatting of datetime "
 "timestamp."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:492
+#: ../../Tigase_Admistration/Properties/_general.inc:492
 msgid ""
 "**'stats-directory'** - The directory to which the statistics file should"
 " be saved."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:494
+#: ../../Tigase_Admistration/Properties/_general.inc:494
 msgid ""
 "**'stats-filename'** - The filename prefix to name the output statistics "
 "file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:496
+#: ../../Tigase_Admistration/Properties/_general.inc:496
 msgid "**'stats-level'** - Sets the level of statistics to be gathered."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:498
+#: ../../Tigase_Admistration/Properties/_general.inc:498
 msgid ""
 "**'stats-unixtime'** - Control the format of the timestamp to use java "
 "DateFormat pattern."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:500
+#: ../../Tigase_Admistration/Properties/_general.inc:500
 msgid ""
 "which configures accordingly: directory to which files should be saved, "
 "filename prefix, whether to include or not unix timestamp in filename, "
@@ -801,11 +801,11 @@ msgid ""
 "want to save (using java Logger.Level)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:503
+#: ../../Tigase_Admistration/Properties/_general.inc:503
 msgid "Database logger"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:505
+#: ../../Tigase_Admistration/Properties/_general.inc:505
 msgid ""
 "This allows configuring of statistics gathering to a database. Without "
 "additional configuration ``default`` data source will be used but it’s "
@@ -813,27 +813,27 @@ msgid ""
 "source and configure logger with it’s name."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:507
-#: ../../Tigase_Admistration/Properties/_repository.rst:44
+#: ../../Tigase_Admistration/Properties/_general.inc:507
+#: ../../Tigase_Admistration/Properties/_repository.inc:44
 msgid "**Note**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:509
+#: ../../Tigase_Admistration/Properties/_general.inc:509
 msgid ""
 "After enabling the component it’s database schema should be loaded by "
 "executing ``./scripts/tigase.sh upgrade-schema etc/tigase.conf`` from the"
 " main Tigase directory"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:526
+#: ../../Tigase_Admistration/Properties/_general.inc:526
 msgid "Example configuration block"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:555
+#: ../../Tigase_Admistration/Properties/_general.inc:555
 msgid "stream-error-counter"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:557
+#: ../../Tigase_Admistration/Properties/_general.inc:557
 msgid ""
 "**Description:** Add stream-error-counter to comma separated processors "
 "of components for which you wish to count the number of stream errors "
@@ -841,28 +841,28 @@ msgid ""
 " on stream-error-counter for both c2s and ws2s:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:572
+#: ../../Tigase_Admistration/Properties/_general.inc:572
 msgid ""
 "You may if you wish turn off stream error counters by setting ``active = "
 "false``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:574
+#: ../../Tigase_Admistration/Properties/_general.inc:574
 msgid ""
 "**Default value:** Stream error counters are not turned on by default, "
 "thus no default value is set."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:585
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:97
+#: ../../Tigase_Admistration/Properties/_general.inc:585
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:97
 msgid "**Available since:** 7.1.0"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:588
+#: ../../Tigase_Admistration/Properties/_general.inc:588
 msgid "stringprep-processor"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:590
+#: ../../Tigase_Admistration/Properties/_general.inc:590
 msgid ""
 "**Description:** The ``'stringprep-processor'`` property sets the "
 "stringprep processor for all JIDs handled by Tigase. The default 'simple'"
@@ -872,18 +872,18 @@ msgid ""
 "very low."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:592
+#: ../../Tigase_Admistration/Properties/_general.inc:592
 msgid "Other possible values are:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:594
+#: ../../Tigase_Admistration/Properties/_general.inc:594
 msgid ""
 "``'libidn'`` - provides full stringprep processing exactly as described "
 "in the RFC-3920. It requires lots of CPU power and significantly impacts "
 "performance."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:596
+#: ../../Tigase_Admistration/Properties/_general.inc:596
 msgid ""
 "``'empty'`` - doesn’t do anything to JIDs. JIDs are accepted in the form "
 "they are received. No impact on the performance and doesn’t use any CPU. "
@@ -892,81 +892,81 @@ msgid ""
 "system."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:598
+#: ../../Tigase_Admistration/Properties/_general.inc:598
 msgid "**Default value:** ``simple``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:600
+#: ../../Tigase_Admistration/Properties/_general.inc:600
 msgid "**Example:** ``'stringprep-processor' = 'libidn'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:602
+#: ../../Tigase_Admistration/Properties/_general.inc:602
 msgid "**Possible values:** ``simple|libidn|empty``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:607
+#: ../../Tigase_Admistration/Properties/_general.inc:607
 msgid "test"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:609
+#: ../../Tigase_Admistration/Properties/_general.inc:609
 msgid "*Default value:** By default test mode is disabled."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:611
+#: ../../Tigase_Admistration/Properties/_general.inc:611
 msgid ""
 "**Description:** This property sets the server for test mode, which means"
 " that all logging is turned off, offline message storage is off, and "
 "possibly some other changes to the system configuration are being made."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:613
+#: ../../Tigase_Admistration/Properties/_general.inc:613
 msgid ""
 "The idea behind this mode is to test Tigase XMPP Server with minimal "
 "performance impact from environment such as hard drive, database and "
 "others…​"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:615
+#: ../../Tigase_Admistration/Properties/_general.inc:615
 msgid "Test function has been replaced by the following setting:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:626
+#: ../../Tigase_Admistration/Properties/_general.inc:626
 msgid "tls-jdk-nss-bug-workaround-active"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:628
-#: ../../Tigase_Admistration/Properties/_performance.rst:121
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:7
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:282
-#: ../../Tigase_Admistration/Properties/_vhost.rst:24
-#: ../../Tigase_Admistration/Properties/_vhost.rst:121
+#: ../../Tigase_Admistration/Properties/_general.inc:628
+#: ../../Tigase_Admistration/Properties/_performance.inc:121
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:7
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:282
+#: ../../Tigase_Admistration/Properties/_vhost.inc:24
+#: ../../Tigase_Admistration/Properties/_vhost.inc:121
 msgid "**Default value:** ``false``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:630
+#: ../../Tigase_Admistration/Properties/_general.inc:630
 msgid "**Example:** ``'tls-jdk-nss-bug-workaround-active' = true``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:45
-#: ../../Tigase_Admistration/Properties/_general.rst:632
-#: ../../Tigase_Admistration/Properties/_performance.rst:125
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:11
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:286
-#: ../../Tigase_Admistration/Properties/_vhost.rst:11
-#: ../../Tigase_Admistration/Properties/_vhost.rst:28
-#: ../../Tigase_Admistration/Properties/_vhost.rst:104
-#: ../../Tigase_Admistration/Properties/_vhost.rst:125
+#: ../../Tigase_Admistration/Properties/_cluster.inc:45
+#: ../../Tigase_Admistration/Properties/_general.inc:632
+#: ../../Tigase_Admistration/Properties/_performance.inc:125
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:11
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:286
+#: ../../Tigase_Admistration/Properties/_vhost.inc:11
+#: ../../Tigase_Admistration/Properties/_vhost.inc:28
+#: ../../Tigase_Admistration/Properties/_vhost.inc:104
+#: ../../Tigase_Admistration/Properties/_vhost.inc:125
 msgid "**Possible values:** ``true|false``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:634
+#: ../../Tigase_Admistration/Properties/_general.inc:634
 msgid ""
 "**Description:** This is a workaround for TLS/SSL bug in new JDK7 using "
 "the native library for keys generation and connection encryption used "
 "with new version of nss library."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:636
+#: ../../Tigase_Admistration/Properties/_general.inc:636
 msgid ""
 "This caused a number of problems with Tigase installed on systems with "
 "JDK7 and the new library installed, such as hanging connections, or "
@@ -975,33 +975,33 @@ msgid ""
 " allows you to run Tigase with JDK7."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:638
+#: ../../Tigase_Admistration/Properties/_general.inc:638
 msgid "http://stackoverflow.com/q/10687200/427545"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:640
+#: ../../Tigase_Admistration/Properties/_general.inc:640
 msgid "http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:642
+#: ../../Tigase_Admistration/Properties/_general.inc:642
 msgid ""
 "Note, while this setting is still supported, the issues mentioned above "
 "are fixed in v8 JDK."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:647
+#: ../../Tigase_Admistration/Properties/_general.inc:647
 msgid "trusted"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:651
+#: ../../Tigase_Admistration/Properties/_general.inc:651
 msgid "**Example:** ``trusted = [ 'user@domain.com' , 'user-2@domain2.com' ]``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:653
+#: ../../Tigase_Admistration/Properties/_general.inc:653
 msgid "**Possible values:** comma separated list of user bare JIDs."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_general.rst:655
+#: ../../Tigase_Admistration/Properties/_general.inc:655
 msgid ""
 "**Description:** The ``trusted`` property allows users to specify a list "
 "of accounts which are considered as trusted, thus whom can perform some "
@@ -1010,49 +1010,49 @@ msgid ""
 "```admins`` <#admins>`__ setting."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:2
+#: ../../Tigase_Admistration/Properties/_repository.inc:2
 msgid "Repository"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:4
+#: ../../Tigase_Admistration/Properties/_repository.inc:4
 msgid ""
 "**Description:** Container specifying authentication repository. This "
 "container replaces the old ``auth-db`` property types, and may contain "
 "some other configuration values."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:6
-#: ../../Tigase_Admistration/Properties/_repository.rst:87
+#: ../../Tigase_Admistration/Properties/_repository.inc:6
+#: ../../Tigase_Admistration/Properties/_repository.inc:87
 msgid "**Default value:**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:14
+#: ../../Tigase_Admistration/Properties/_repository.inc:14
 msgid ""
 "This is the basic setup for authRepository, where <configuration> "
 "settings are global for all authentication databases. However, you may "
 "configure multiple databases individually."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:35
+#: ../../Tigase_Admistration/Properties/_repository.inc:35
 msgid "**Configuration Values:**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:37
+#: ../../Tigase_Admistration/Properties/_repository.inc:37
 msgid "Container has the following options"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:40
-#: ../../Tigase_Admistration/Properties/_repository.rst:165
+#: ../../Tigase_Admistration/Properties/_repository.inc:40
+#: ../../Tigase_Admistration/Properties/_repository.inc:165
 msgid "pool-size"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:42
+#: ../../Tigase_Admistration/Properties/_repository.inc:42
 msgid ""
 "This property sets the database connections pool size for the associated "
 "``UserRepository``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:46
+#: ../../Tigase_Admistration/Properties/_repository.inc:46
 msgid ""
 "in some cases instead of default for this property setting for ```data-"
 "repo-pool-size`` <#dataRepoPoolSize>`__ is used if pool-size is not "
@@ -1060,83 +1060,83 @@ msgid ""
 "implementation and the way it is initialized."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:55
+#: ../../Tigase_Admistration/Properties/_repository.inc:55
 msgid ""
 "This is a global property that may be overridden by individual repository"
 " settings:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:70
+#: ../../Tigase_Admistration/Properties/_repository.inc:70
 msgid "**cls**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:72
+#: ../../Tigase_Admistration/Properties/_repository.inc:72
 msgid ""
 "Defines the class used for repository connection. You can use this to "
 "specify specific drivers for different DB types."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:74
+#: ../../Tigase_Admistration/Properties/_repository.inc:74
 msgid ""
 "Unless specified, the pool class will use the one included with Tigase. "
 "You may configure individual repositories in the same way. This replaces "
 "the former ``--auth-repo-pool`` property."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:78
+#: ../../Tigase_Admistration/Properties/_repository.inc:78
 msgid ""
 "File conversion will not remove and convert this property, it **MUST BE "
 "DONE MANUALLY**."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:83
+#: ../../Tigase_Admistration/Properties/_repository.inc:83
 msgid "authRepository"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:85
+#: ../../Tigase_Admistration/Properties/_repository.inc:85
 msgid ""
 "**Description:** Container specifying repository URIs. This container "
 "replaces the old ``auth-db-uri`` and ``user-db-uri`` property types."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:96
+#: ../../Tigase_Admistration/Properties/_repository.inc:96
 msgid ""
 "Once your configuration is setup, you will see the uri of your user "
 "database here. If other databases need to be defined, they will be listed"
 " in the same dataSource bean."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:111
+#: ../../Tigase_Admistration/Properties/_repository.inc:111
 msgid ""
 "**Possible values:** Broken down list of customized names for DB URIs. "
 "Each name must have a defined uri property. DB name can be customized by "
 "the bean name."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:115
+#: ../../Tigase_Admistration/Properties/_repository.inc:115
 msgid ""
 "URI name may be used as shorthand to define DB location URI in other "
 "containers, so be sure to name them uniquely."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:119
+#: ../../Tigase_Admistration/Properties/_repository.inc:119
 msgid ""
 "default () URI setting replaces the ``user-db-uri`` as well as the "
 "``auth-repo-uri`` property."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:122
+#: ../../Tigase_Admistration/Properties/_repository.inc:122
 msgid "MSSQL"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:124
+#: ../../Tigase_Admistration/Properties/_repository.inc:124
 msgid ""
 "MSSql support works out of the box, however Tigase provides an open "
 "source driver for the database. We recommend using Microsoft’s own driver"
 " for better functionality."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:134
+#: ../../Tigase_Admistration/Properties/_repository.inc:134
 msgid ""
 "Where the uri is divided as follows: jdbc:<driver>:sqlserver://<server "
 "address>;databaseName=<database name>;user=<username for "
@@ -1146,21 +1146,21 @@ msgid ""
 "your changes."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:137
+#: ../../Tigase_Admistration/Properties/_repository.inc:137
 msgid "MongoDb"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:139
+#: ../../Tigase_Admistration/Properties/_repository.inc:139
 msgid ""
 "For using mongoDB as the repository, the setting will look slightly "
 "different:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:150
+#: ../../Tigase_Admistration/Properties/_repository.inc:150
 msgid "MySQL"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:152
+#: ../../Tigase_Admistration/Properties/_repository.inc:152
 msgid ""
 "MySQL support works out of the box, however Tigase uses prepared calls "
 "for calling procedures accessing data stored in database. While this "
@@ -1174,7 +1174,7 @@ msgid ""
 "you need to set ``useCallableMysqlWorkaround`` to ``true``."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:167
+#: ../../Tigase_Admistration/Properties/_repository.inc:167
 msgid ""
 "``DataSource`` is an abstraction layer between any higher level data "
 "access repositories such as ``userRepository`` or ``authRepository`` and "
@@ -1185,39 +1185,39 @@ msgid ""
 "level to an avoid excessive number of connections to the database."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:169
+#: ../../Tigase_Admistration/Properties/_repository.inc:169
 msgid ""
 "To do so, specify the number of number of database connection as an "
 "integer:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_repository.rst:180
+#: ../../Tigase_Admistration/Properties/_repository.inc:180
 msgid "By default, the number of connections is 10."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:2
+#: ../../Tigase_Admistration/Properties/_cluster.inc:2
 msgid "Cluster"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:5
+#: ../../Tigase_Admistration/Properties/_cluster.inc:5
 msgid "cl-comp"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:7
+#: ../../Tigase_Admistration/Properties/_cluster.inc:7
 msgid "**Description:** Container specifying cluster component configuration."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:9
+#: ../../Tigase_Admistration/Properties/_cluster.inc:9
 msgid ""
 "**Default value:** By default, the cl-comp container is not listed in the"
 " ``config.tdsl`` file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:20
+#: ../../Tigase_Admistration/Properties/_cluster.inc:20
 msgid "connect-all"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:22
+#: ../../Tigase_Admistration/Properties/_cluster.inc:22
 msgid ""
 "The ``cluster-connect-all`` property is used to open active connections "
 "to all nodes listed in the `cluster-nodes <#clusterNodes>`__ "
@@ -1230,19 +1230,19 @@ msgid ""
 "which it is by default."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:24
+#: ../../Tigase_Admistration/Properties/_cluster.inc:24
 msgid "**Example**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:32
+#: ../../Tigase_Admistration/Properties/_cluster.inc:32
 msgid "This replaces the ``--cluster-connect-all`` property."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:37
+#: ../../Tigase_Admistration/Properties/_cluster.inc:37
 msgid "cluster-mode"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:39
+#: ../../Tigase_Admistration/Properties/_cluster.inc:39
 msgid ""
 "**Description:** The property is used to switch cluster mode on. The "
 "default value is ``false`` so you can normally skip the parameter if you "
@@ -1252,36 +1252,36 @@ msgid ""
 " cluster nodes at any time without restarting the server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:41
+#: ../../Tigase_Admistration/Properties/_cluster.inc:41
 msgid ""
 "**Default value:** ``false`` Tigase by default does not run in clustered "
 "mode."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:43
+#: ../../Tigase_Admistration/Properties/_cluster.inc:43
 msgid "**Example:** ``'cluster-mode' = 'true'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:50
+#: ../../Tigase_Admistration/Properties/_cluster.inc:50
 msgid "cluster-nodes"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:52
-#: ../../Tigase_Admistration/Properties/_external.rst:7
+#: ../../Tigase_Admistration/Properties/_cluster.inc:52
+#: ../../Tigase_Admistration/Properties/_external.inc:7
 msgid "**Default value:** none"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:54
+#: ../../Tigase_Admistration/Properties/_cluster.inc:54
 msgid ""
 "**Example:** ``'cluster-nodes' = [ 'node1.domain:pass:port' , "
 "'node2.domain:pass:port' , 'node3.domain:pass:port' ]``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:56
+#: ../../Tigase_Admistration/Properties/_cluster.inc:56
 msgid "**Possible values:** a comma separated list of hostnames."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:58
+#: ../../Tigase_Admistration/Properties/_cluster.inc:58
 msgid ""
 "**Description:** The property is used to specify a list of cluster nodes "
 "running on your installation. The node is the full DNS name of the "
@@ -1292,7 +1292,7 @@ msgid ""
 "critical element for an effective cluster performance."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:60
+#: ../../Tigase_Admistration/Properties/_cluster.inc:60
 msgid ""
 "All cluster nodes must be connected with each other to maintain user "
 "session synchronization and exchange packets between users connected to "
@@ -1309,26 +1309,26 @@ msgid ""
 " used."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_cluster.rst:64
+#: ../../Tigase_Admistration/Properties/_cluster.inc:64
 msgid ""
 "Cluster nodes are not required to be configured, as they can "
 "automatically find/add/remove cluster nodes. This is for installations "
 "where nodes will be limited and static!"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:2
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:2
 msgid "User connectivity"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:5
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:5
 msgid "bosh-close-connection"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:9
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:9
 msgid "**Example:** ``'bosh-close-connection' = true``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:13
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:13
 msgid ""
 "**Description:** This property globally disables Bosh keep-alive support "
 "for Tigase server. It causes the Bosh connection manager to force close "
@@ -1336,30 +1336,30 @@ msgid ""
 "continue communication the client must open a new HTTP connection."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:15
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:15
 msgid ""
 "This setting is rarely required but on installations where the client "
 "cannot control/disable keep-alive Bosh connections and keep-alive does "
 "not work correctly for some reason."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:20
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:20
 msgid "bosh-extra-headers-file"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:22
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:22
 msgid "*Default value:** ``'etc/bosh-extra-headers.txt'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:24
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:24
 msgid "**Example:** ``'bosh-extra-headers-file' = ''/path/to/file.txt'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:26
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:26
 msgid "**Possible values:** 'path to a file on the filesystem.'"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:28
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:28
 msgid ""
 "**Description:** This property allows you to specify a path to a text "
 "file with additional HTTP headers which will be sent to a Bosh client "
@@ -1368,37 +1368,37 @@ msgid ""
 "and some additional settings."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:30
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:30
 msgid ""
 "By default a file distributed with the installation contains following "
 "content:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:39
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:39
 msgid ""
 "This can be modified, removed or replaced with a different content on "
 "your installation."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:44
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:44
 msgid "client-access-policy-file"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:46
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:46
 msgid "**Default value:** ``etc/client-access-policy.xml``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:48
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:48
 msgid ""
 "**Example:** ``'client-access-policy-file' = ''/path/to/access-policy-"
 "file.xml'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:50
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:50
 msgid "**Possible values:** path to a file on the filesystem."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:52
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:52
 msgid ""
 "**Description:** The ``client-access-policy-file`` property allows "
 "control of the cross domain access policy for Silverlight based web "
@@ -1406,7 +1406,7 @@ msgid ""
 "contains the policy and rules."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:54
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:54
 msgid ""
 "By default Tigase is distributed with an example policy file which allows"
 " for full access from all sources to the whole installation. This is "
@@ -1415,28 +1415,28 @@ msgid ""
 "modification of the policy on any installation."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:59
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:59
 msgid "client-port-delay-listening"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:61
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:61
 msgid ""
 "**Description:** The property allows to enabled or disable delaying of "
 "listening for client connections **in cluster mode** until the cluster is"
 " correctly connected."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:63
-#: ../../Tigase_Admistration/Properties/_vhost.rst:7
-#: ../../Tigase_Admistration/Properties/_vhost.rst:100
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:63
+#: ../../Tigase_Admistration/Properties/_vhost.inc:7
+#: ../../Tigase_Admistration/Properties/_vhost.inc:100
 msgid "**Default value:** ``true``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:73
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:73
 msgid "**Possible values:** ``true``, ``false``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:75
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:75
 msgid ""
 "In cluster mode, in order to ensure correct user status broadcast, we are"
 " delaying opening client ports (components: ``c2s``, ``ws2s``, ``bosh``) "
@@ -1445,81 +1445,81 @@ msgid ""
 "nodes connected correctly)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:77
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:77
 msgid ""
 "It’s possible to enable/disable this on per-component basis with the "
 "following configuration:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:91
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:91
 msgid ""
 "Maximum delay time depends on the component and it’s multiplication of "
 "``ConnectionManager`` default connection delay times ``30s`` - in case of"
 " client connection manager this delay equals 60s."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:95
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:95
 msgid "Only applicable if **Cluster Mode** is active!"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:100
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:100
 msgid "cross-domain-policy-file"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:102
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:102
 msgid "**Default value:** ``etc/cross-domain-policy.xml``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:104
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:104
 msgid ""
 "**Example:** ``'cross-domain-policy-file' = ''/path/to/cross-domain-"
 "policy.xml'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:106
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:106
 msgid "**Possible values:** path to a file on the file system."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:108
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:108
 msgid ""
 "**Description:** This property allows you to set a path to a file with "
 "cross domain access policy for flash based clients. This is a standard "
 "XML file which is sent to the flash client upon request."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:110
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:110
 msgid ""
 "A default file distributed with Tigase installations allows for full "
 "access for all. This is good enough for most use cases but it can be "
 "changed by simply editing the file."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:112
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:112
 msgid ""
 "This is a global property that can also be overridden by configuring "
 "connection managers [ c2s, s2s, ws2s, bosh, ext, etc] and they may all "
 "have their own policies."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:123
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:123
 msgid "domain-filter-policy"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:125
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:125
 msgid "**Default value:** ``ALL``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:127
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:127
 msgid "**Example:** ``domain-filter-policy' = 'LOCAL``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:129
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:129
 msgid ""
 "**Possible values:** "
 "``ALL|LOCAL|OWN|BLOCK|LIST=domain1;domain2|BLACKLIST=domain1;domain2``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:131
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:131
 msgid ""
 "**Description:** The ``domain-filter-policy`` property is a global "
 "setting for setting communication filtering for vhosts. This function is "
@@ -1534,52 +1534,52 @@ msgid ""
 "possible values are:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:133
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:133
 msgid ""
 "``ALL`` a default value allowing users to communicate with anybody on any"
 " other domain, including external servers."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:135
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:135
 msgid ""
 "``LOCAL`` allows users to communicate with all users on the same "
 "installation on any domain. It only blocks communication with external "
 "servers."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:137
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:137
 msgid ""
 "``OWN`` allows users to communicate with all other users on the same "
 "domain. Plus it allows users to communicate with subdomains such as "
 "**muc.domain**, **pubsub.domain**, etc…"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:139
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:139
 msgid ""
 "``BLOCK`` value completely blocks communication for the domain or for the"
 " user with anybody else. This could be used as a means to temporarily "
 "disable account or domain."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:141
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:141
 msgid ""
 "``LIST`` property allows to set a list of domains (users' JIDs) with "
 "which users on the domain can communicate (i.e. *whitelist*)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:143
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:143
 msgid ""
 "``BLACKLIST`` - user can communicate with everybody (like ``ALL``), "
 "except contacts on listed domains."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:145
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:145
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "VHosts (see `??? <#addManageDomain>`__)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:147
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:147
 msgid ""
 "A default settings for all virtual hosts for which the configuration is "
 "not defined. This settings is useful mostly for installations with many "
@@ -1589,31 +1589,31 @@ msgid ""
 "vhost."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:149
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:149
 msgid ""
 "``ALL`` is also applied as a default value for all new vhosts added at "
 "run-time."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:154
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:154
 msgid "see-other-host"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:156
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:156
 msgid ""
 "--cmSeeOtherHost has been replaced with using ``seeOtherHost`` setting, "
 "and can be configured for each connection manager (c2s, s2s, etc..)"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:158
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:158
 msgid "**Default value:** ``tigase.server.xmppclient.SeeOtherHostHashed``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:168
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:168
 msgid "**Possible values:** 'none' 'or class implementing SeeOtherHostIfc.'"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:170
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:170
 msgid ""
 "**Description:** Allows you to specify a load balancing mechanism by "
 "specifying SeeOtherHostIfc implementation. More details about "
@@ -1621,25 +1621,25 @@ msgid ""
 "Balancing documentation."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:175
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:205
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:275
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:175
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:205
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:275
 msgid "watchdog_timeout"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:177
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:177
 msgid "**Default value:** ``1740000``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:179
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:179
 msgid "**Example:** ``watchdog_timeout=60000``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:181
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:181
 msgid "**Possible values:** ``any integer.``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:183
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:183
 msgid ""
 "**Description:** The ``watchdog_timeout`` property allows for fine-tuning"
 " ConnectionManager Watchdog (service responsible for detecting broken "
@@ -1650,43 +1650,43 @@ msgid ""
 "configuration is possible:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:191
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:191
 msgid "for example (for C2SConnectionManager):"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:199
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:234
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:269
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:199
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:234
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:269
 msgid "All related configuration options:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:201
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:236
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:201
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:236
 msgid "`watchdog_Ping_Type <#watchdogPingType>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:203
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:203
 msgid "`watchdog_delay <#watchdogDelay>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:210
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:238
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:210
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:238
 msgid "watchdog_delay"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:212
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:212
 msgid "**Default value:** ``600000``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:214
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:214
 msgid "**Example:** ``watchdog_delay = '30000'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:216
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:216
 msgid "**Possible values:** 'any integer.'"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:218
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:218
 msgid ""
 "**Description:** ``watchdog_delay`` configuration property allows "
 "configuring delay (in milliseconds) between subsequent checks that "
@@ -1696,34 +1696,34 @@ msgid ""
 "configuration is possible:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:55
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:226
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:261
+#: ../../Tigase_Admistration/Properties/_performance.inc:55
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:226
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:261
 msgid "for example (for ClusterConnectionManager):"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:240
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:240
 msgid "`watchdog_timeout <#watchdogTimeout>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:245
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:271
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:245
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:271
 msgid "watchdog_ping_type"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:247
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:247
 msgid "**Default value:** ``whitespace``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:249
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:249
 msgid "**Example:** ``watchdog_ping_type = 'XMPP'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:251
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:251
 msgid "**Possible values:** ``WHITESPACE``,\\ ``XMPP``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:253
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:253
 msgid ""
 "**Description:** ``watchdog_ping_type`` configuration property allows "
 "configuring of the type of ping that ConnectionManager Watchdog (service "
@@ -1732,19 +1732,19 @@ msgid ""
 "above a per component configuration is possible:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:273
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:273
 msgid "`watchdog_Delay <#watchdogDelay>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:280
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:280
 msgid "ws-allow-unmasked-frames"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:284
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:284
 msgid "**Example:** ``'ws-allow-unmasked-frames' = true``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_user_connectivity.rst:288
+#: ../../Tigase_Admistration/Properties/_user_connectivity.inc:288
 msgid ""
 "**Description:** RFC 6455 specifies that all clients must mask frames "
 "that it sends to the server over Websocket connections. If unmasked "
@@ -1756,23 +1756,23 @@ msgid ""
 "connection."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:2
+#: ../../Tigase_Admistration/Properties/_external.inc:2
 msgid "External"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:5
+#: ../../Tigase_Admistration/Properties/_external.inc:5
 msgid "bind-ext-hostnames"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:9
+#: ../../Tigase_Admistration/Properties/_external.inc:9
 msgid "**Example:** ``'bind-ext-hostnames' = [ 'pubsub.host.domain' ]``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:11
+#: ../../Tigase_Admistration/Properties/_external.inc:11
 msgid "**Possible values:** comma separated list of domains."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:13
+#: ../../Tigase_Admistration/Properties/_external.inc:13
 msgid ""
 "**Description:** This property enables setting a list of domains to be "
 "bound to the external component connection. Let’s say we have a Tigase "
@@ -1784,7 +1784,7 @@ msgid ""
 "(MUC) visible on the remote server."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:15
+#: ../../Tigase_Admistration/Properties/_external.inc:15
 msgid ""
 "To make the second component (PubSub) visible we would need to open "
 "another connection with the domain name (pubsub.devel.tigase.org) for the"
@@ -1796,11 +1796,11 @@ msgid ""
 "has been authenticated during protocol handshaking."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:22
+#: ../../Tigase_Admistration/Properties/_external.inc:22
 msgid "default-virtual-host"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:24
+#: ../../Tigase_Admistration/Properties/_external.inc:24
 msgid ""
 "**Description:** The ``default-virtual-host`` property allows setting of "
 "the name of default virtual host that is served by the installation. It "
@@ -1808,7 +1808,7 @@ msgid ""
 "**It may only contain single domain name!**"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:26
+#: ../../Tigase_Admistration/Properties/_external.inc:26
 msgid ""
 "Any additional configuration options or additional virtual hosts domains "
 "should be added and configured using ad-hoc commands such as ``Add new "
@@ -1817,23 +1817,23 @@ msgid ""
 "man@your-server-domain``)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:31
+#: ../../Tigase_Admistration/Properties/_external.inc:31
 msgid "ext"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:33
+#: ../../Tigase_Admistration/Properties/_external.inc:33
 msgid ""
 "**Description:** This property defines parameters for external component "
 "connections."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:35
+#: ../../Tigase_Admistration/Properties/_external.inc:35
 msgid ""
 "The component is loaded the same way as all other Tigase components. In "
 "your ``config.tdsl`` file you need to add the external class:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:41
+#: ../../Tigase_Admistration/Properties/_external.inc:41
 msgid ""
 "This will load the component with an empty configuration and is "
 "practically useless. You have to tell the component on what port to "
@@ -1841,7 +1841,7 @@ msgid ""
 "passwords."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:43
+#: ../../Tigase_Admistration/Properties/_external.inc:43
 msgid ""
 "Those values need to be configured while the Tigase XMPP Server is "
 "running using XMPP ad-hoc commands such as ``Add new item``, ``Update "
@@ -1850,38 +1850,38 @@ msgid ""
 "domain``)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:45
+#: ../../Tigase_Admistration/Properties/_external.inc:45
 msgid "**Possible values:** external domains parameters list."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_external.rst:49
+#: ../../Tigase_Admistration/Properties/_external.inc:49
 msgid "**Removed in:** 8.0.0"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:2
+#: ../../Tigase_Admistration/Properties/_performance.inc:2
 msgid "Performance"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:5
+#: ../../Tigase_Admistration/Properties/_performance.inc:5
 msgid "cm-ht-traffic-throttling"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:7
+#: ../../Tigase_Admistration/Properties/_performance.inc:7
 msgid "**Default value:** ``xmpp:25k:0:disc,bin:200m:0:disc``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:9
+#: ../../Tigase_Admistration/Properties/_performance.inc:9
 msgid ""
 "**Example:** ``'cm-ht-traffic-throttling' = "
 "'xmpp:25k:0:disc,bin:200m:0:disc'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:11
-#: ../../Tigase_Admistration/Properties/_performance.rst:24
+#: ../../Tigase_Admistration/Properties/_performance.inc:11
+#: ../../Tigase_Admistration/Properties/_performance.inc:24
 msgid "**Possible values:** comma separated list of traffic limits settings."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:13
+#: ../../Tigase_Admistration/Properties/_performance.inc:13
 msgid ""
 "**Description:** This property is used to specify traffic limit of non-"
 "user connections, that is s2s, external components and other high traffic"
@@ -1890,28 +1890,28 @@ msgid ""
 "<#cmTrafficThrottling>`__."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:18
+#: ../../Tigase_Admistration/Properties/_performance.inc:18
 msgid "cm-traffic-throttling"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:20
+#: ../../Tigase_Admistration/Properties/_performance.inc:20
 msgid "**Default value:** ``xmpp:2500:0:disc,bin:20m:0:disc``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:22
+#: ../../Tigase_Admistration/Properties/_performance.inc:22
 msgid ""
 "**Example:** ``'cm-traffic-throttling' = "
 "'xmpp:2500:0:disc,bin:20m:0:disc'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:26
+#: ../../Tigase_Admistration/Properties/_performance.inc:26
 msgid ""
 "**Description:** The ``cm-traffic-throttling`` property allows you to "
 "limit traffic on user connections. These limits are applied to each user "
 "connection and if a limit is exceeded then a specified action is applied."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:28
+#: ../../Tigase_Admistration/Properties/_performance.inc:28
 msgid ""
 "The property value is a comma separated list of traffic limits settings. "
 "For example the first part: ``xmpp:2500:0:disc`` specifies traffic limits"
@@ -1921,48 +1921,48 @@ msgid ""
 " the user."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:30
+#: ../../Tigase_Admistration/Properties/_performance.inc:30
 msgid ""
 "**[xmpp|bin]** traffic type, xmpp - XMPP traffic, that is limits refer to"
 " a number of XMPP packets transmitted, bin - binary traffic, that is "
 "limits refer to a number of bytes transmitted."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:32
+#: ../../Tigase_Admistration/Properties/_performance.inc:32
 msgid ""
 "**2500** maximum traffic allowed within 1 minute. 0 means unlimited, or "
 "no limits."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:34
+#: ../../Tigase_Admistration/Properties/_performance.inc:34
 msgid ""
 "**0** maximum traffic allowed for the life span of the connection. 0 "
 "means unlimited or no limits."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:36
+#: ../../Tigase_Admistration/Properties/_performance.inc:36
 msgid ""
 "**[disc|drop]** action performed on the connection if limits are "
 "exceeded. disc - means disconnect, drop - means drop data."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:38
+#: ../../Tigase_Admistration/Properties/_performance.inc:38
 msgid "**Available since:** 5.1.3"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:41
+#: ../../Tigase_Admistration/Properties/_performance.inc:41
 msgid "elements-number-limit"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:43
+#: ../../Tigase_Admistration/Properties/_performance.inc:43
 msgid "**Default value:** ``1000``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:45
+#: ../../Tigase_Admistration/Properties/_performance.inc:45
 msgid "**Possible values:** any integer."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:47
+#: ../../Tigase_Admistration/Properties/_performance.inc:47
 msgid ""
 "**Description:** ``elements-number-limit`` configuration property allows "
 "configuring a Denial of Service protection mechanism which limits number "
@@ -1970,23 +1970,23 @@ msgid ""
 "ConnectionManager basis:"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:65
+#: ../../Tigase_Admistration/Properties/_performance.inc:65
 msgid "hardened-mode"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:67
+#: ../../Tigase_Admistration/Properties/_performance.inc:67
 msgid "**Default value:** ``secure``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:69
+#: ../../Tigase_Admistration/Properties/_performance.inc:69
 msgid "**Example:** ``'hardened-mode' = secure``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:71
+#: ../../Tigase_Admistration/Properties/_performance.inc:71
 msgid "**Possible values:** ``relaxed|secure|strict``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:73
+#: ../../Tigase_Admistration/Properties/_performance.inc:73
 msgid ""
 "**Description:** Adjusting hardened mode affects handling of security "
 "aspects within Tigase. The higher the level the more strict are the "
@@ -1997,7 +1997,7 @@ msgid ""
 "support Forward secrecy."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:75
+#: ../../Tigase_Admistration/Properties/_performance.inc:75
 msgid ""
 "On older JVM versions it required `UnlimitedJCEPolicyJDK "
 "<http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html>`__"
@@ -2005,24 +2005,24 @@ msgid ""
 " newer."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:80
+#: ../../Tigase_Admistration/Properties/_performance.inc:80
 msgid "max-queue-size"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:82
+#: ../../Tigase_Admistration/Properties/_performance.inc:82
 msgid "**Default value:** default queue size is variable depending on RAM size."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:84
+#: ../../Tigase_Admistration/Properties/_performance.inc:84
 msgid "**Example:** ``'max-queue-size' = 10000``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:86
-#: ../../Tigase_Admistration/Properties/_vhost.rst:43
+#: ../../Tigase_Admistration/Properties/_performance.inc:86
+#: ../../Tigase_Admistration/Properties/_vhost.inc:43
 msgid "**Possible values:** integer number."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:88
+#: ../../Tigase_Admistration/Properties/_performance.inc:88
 msgid ""
 "**Description:** The ``max-queue-size`` property sets internal queues "
 "maximum size to a specified value. By default Tigase sets the queue size "
@@ -2035,24 +2035,24 @@ msgid ""
 "may drop packets that it is unable to process."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:93
+#: ../../Tigase_Admistration/Properties/_performance.inc:93
 msgid "net-buff-high-throughput"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:95
+#: ../../Tigase_Admistration/Properties/_performance.inc:95
 msgid "**Default value:** ``64k``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:97
+#: ../../Tigase_Admistration/Properties/_performance.inc:97
 msgid "**Example:** ``'net-buff-high-throughput' = '256k'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:99
-#: ../../Tigase_Admistration/Properties/_performance.rst:112
+#: ../../Tigase_Admistration/Properties/_performance.inc:99
+#: ../../Tigase_Admistration/Properties/_performance.inc:112
 msgid "**Possible values:** network buffer size as integer."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:101
+#: ../../Tigase_Admistration/Properties/_performance.inc:101
 msgid ""
 "**Description:** The ``net-buff-high-throughput`` property sets the "
 "network buffer for high traffic connections like s2s or connections "
@@ -2061,34 +2061,34 @@ msgid ""
 "between nodes try to increase this number."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:106
+#: ../../Tigase_Admistration/Properties/_performance.inc:106
 msgid "net-buff-standard"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:108
+#: ../../Tigase_Admistration/Properties/_performance.inc:108
 msgid "**Default value:** ``2k``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:110
+#: ../../Tigase_Admistration/Properties/_performance.inc:110
 msgid "**Example:** ``'net-buff-standard' = '16k'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:114
+#: ../../Tigase_Admistration/Properties/_performance.inc:114
 msgid ""
 "**Description:** This property sets the network buffer for standard "
 "(usually c2s) connections, default value is 2k and is optimal for most "
 "installations."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:119
+#: ../../Tigase_Admistration/Properties/_performance.inc:119
 msgid "nonpriority-queue"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:123
+#: ../../Tigase_Admistration/Properties/_performance.inc:123
 msgid "**Example:** ``'nonpriority-queue' =  true``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:127
+#: ../../Tigase_Admistration/Properties/_performance.inc:127
 msgid ""
 "**Description:** The ``nonpriority`` property can be used to switch to "
 "non-priority queues usage in Tigase server (value set to 'true'). Using "
@@ -2098,7 +2098,7 @@ msgid ""
 "packets arriving out of order."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_performance.rst:129
+#: ../../Tigase_Admistration/Properties/_performance.inc:129
 msgid ""
 "This may happen however only for packets of different types. That is, "
 "messages may take over presence packets. However, one message never takes"
@@ -2106,32 +2106,32 @@ msgid ""
 "delivery is not an issue for the most part."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:2
+#: ../../Tigase_Admistration/Properties/_vhost.inc:2
 msgid "VHost / domain"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:5
+#: ../../Tigase_Admistration/Properties/_vhost.inc:5
 msgid "vhost-anonymous-enabled"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:9
+#: ../../Tigase_Admistration/Properties/_vhost.inc:9
 msgid "**Example:** ``'vhost-anonymous-enabled' = 'false'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:13
+#: ../../Tigase_Admistration/Properties/_vhost.inc:13
 msgid ""
 "**Description:** The ``vhost-anonymous-enabled`` property specifies "
 "whether anonymous user logins are allowed for the installation for all "
 "vhosts."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:15
+#: ../../Tigase_Admistration/Properties/_vhost.inc:15
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "VHost (see ` Add and Manage Domains (VHosts)`__)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:17
+#: ../../Tigase_Admistration/Properties/_vhost.inc:17
 msgid ""
 "Default settings for all virtual hosts are used when this property is not"
 " defined. This settings is useful mostly for installations with many "
@@ -2141,15 +2141,15 @@ msgid ""
 "configuration for each VHost."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:22
+#: ../../Tigase_Admistration/Properties/_vhost.inc:22
 msgid "vhost-disable-dns-check"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:26
+#: ../../Tigase_Admistration/Properties/_vhost.inc:26
 msgid "**Example:** ``'vhost-disable-dns-check' = 'true'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:30
+#: ../../Tigase_Admistration/Properties/_vhost.inc:30
 msgid ""
 "**Description:** This property disables DNS validation when adding or "
 "editing vhosts in Tigase server. This also exempts administrative "
@@ -2158,48 +2158,48 @@ msgid ""
 "connect to specific vhosts from outside your network."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:32
-#: ../../Tigase_Admistration/Properties/_vhost.rst:53
-#: ../../Tigase_Admistration/Properties/_vhost.rst:72
+#: ../../Tigase_Admistration/Properties/_vhost.inc:32
+#: ../../Tigase_Admistration/Properties/_vhost.inc:53
+#: ../../Tigase_Admistration/Properties/_vhost.inc:72
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "VHost (see `??? <#addManageDomain>`__)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:37
+#: ../../Tigase_Admistration/Properties/_vhost.inc:37
 msgid "vhost-max-users"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:39
+#: ../../Tigase_Admistration/Properties/_vhost.inc:39
 msgid "**Default value:** ``0``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:41
+#: ../../Tigase_Admistration/Properties/_vhost.inc:41
 msgid "**Example:** ``'vhost-max-users' = '1000'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:45
+#: ../../Tigase_Admistration/Properties/_vhost.inc:45
 msgid ""
 "**Description:** The ``vhost-max-users`` property specifies how many user"
 " accounts can be registered on the installations for all vhosts."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:47
+#: ../../Tigase_Admistration/Properties/_vhost.inc:47
 msgid ""
 "**0 - zero** means unlimited and this is a default. Otherwise greater "
 "than zero value specifies accounts number limit."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:49
-#: ../../Tigase_Admistration/Properties/_vhost.rst:87
-#: ../../Tigase_Admistration/Properties/_vhost.rst:108
-#: ../../Tigase_Admistration/Properties/_vhost.rst:129
+#: ../../Tigase_Admistration/Properties/_vhost.inc:49
+#: ../../Tigase_Admistration/Properties/_vhost.inc:87
+#: ../../Tigase_Admistration/Properties/_vhost.inc:108
+#: ../../Tigase_Admistration/Properties/_vhost.inc:129
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "vhost."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:51
+#: ../../Tigase_Admistration/Properties/_vhost.inc:51
 msgid ""
 "The default setting is used for all virtual hosts for which the "
 "configuration is not defined. This settings is most useful for "
@@ -2209,23 +2209,23 @@ msgid ""
 "provide individual configuration for each vhost."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:58
+#: ../../Tigase_Admistration/Properties/_vhost.inc:58
 msgid "vhost-message-forward-jid"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:60
+#: ../../Tigase_Admistration/Properties/_vhost.inc:60
 msgid "**Default value:** <null>"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:62
+#: ../../Tigase_Admistration/Properties/_vhost.inc:62
 msgid "**Example:** ``'vhost-message-forward-jid' = 'archive@domain.com'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:64
+#: ../../Tigase_Admistration/Properties/_vhost.inc:64
 msgid "**Possible values:** 'valid JID'"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:66
+#: ../../Tigase_Admistration/Properties/_vhost.inc:66
 msgid ""
 "**Description:** This is a global property for message forwarding for the"
 " installation. This property is normally specified on the vhost "
@@ -2237,7 +2237,7 @@ msgid ""
 "work."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:68
+#: ../../Tigase_Admistration/Properties/_vhost.inc:68
 msgid ""
 "The null value is used as a default when no configuration is set. This "
 "setting is mostly useful for installations with many virtual hosts listed"
@@ -2247,34 +2247,34 @@ msgid ""
 "vhost."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:70
-#: ../../Tigase_Admistration/Properties/_vhost.rst:91
-#: ../../Tigase_Admistration/Properties/_vhost.rst:112
-#: ../../Tigase_Admistration/Properties/_vhost.rst:133
+#: ../../Tigase_Admistration/Properties/_vhost.inc:70
+#: ../../Tigase_Admistration/Properties/_vhost.inc:91
+#: ../../Tigase_Admistration/Properties/_vhost.inc:112
+#: ../../Tigase_Admistration/Properties/_vhost.inc:133
 msgid ""
 "It is also applied as a default value for all new vhosts added at run-"
 "time."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:77
+#: ../../Tigase_Admistration/Properties/_vhost.inc:77
 msgid "vhost-presence-forward-jid"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:79
+#: ../../Tigase_Admistration/Properties/_vhost.inc:79
 msgid "**Default value:** ``<null>``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:81
+#: ../../Tigase_Admistration/Properties/_vhost.inc:81
 msgid ""
 "**Example:** ``'vhost-presence-forward-jid' = 'presence-"
 "collector@domain.com'``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:83
+#: ../../Tigase_Admistration/Properties/_vhost.inc:83
 msgid "**Possible values:** valid JID."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:85
+#: ../../Tigase_Admistration/Properties/_vhost.inc:85
 msgid ""
 "**Description:** This is a global property for presence forwarding "
 "function for the installation. All user status presences will be "
@@ -2285,7 +2285,7 @@ msgid ""
 "presences from users who are not in the contact list."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:89
+#: ../../Tigase_Admistration/Properties/_vhost.inc:89
 msgid ""
 "The null value is used as a default when no configuration is set. This "
 "settings is useful for installations with many virtual hosts listed in "
@@ -2295,21 +2295,21 @@ msgid ""
 "vhost."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:93
-#: ../../Tigase_Admistration/Properties/_vhost.rst:114
-#: ../../Tigase_Admistration/Properties/_vhost.rst:135
+#: ../../Tigase_Admistration/Properties/_vhost.inc:93
+#: ../../Tigase_Admistration/Properties/_vhost.inc:114
+#: ../../Tigase_Admistration/Properties/_vhost.inc:135
 msgid "This may be used on a per-VHost (see `??? <#addManageDomain>`__)."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:98
+#: ../../Tigase_Admistration/Properties/_vhost.inc:98
 msgid "vhost-register-enabled"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:102
+#: ../../Tigase_Admistration/Properties/_vhost.inc:102
 msgid "**Example:** ``'vhost-register-enabled' = false``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:106
+#: ../../Tigase_Admistration/Properties/_vhost.inc:106
 msgid ""
 "**Description:** ``vhost-register-enabled`` is a global property which "
 "allows you to switch on/off user registration on the installation. "
@@ -2318,7 +2318,7 @@ msgid ""
 " the domain configuration settings."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:110
+#: ../../Tigase_Admistration/Properties/_vhost.inc:110
 msgid ""
 "The ``true`` value is used as a default when no configuration is set. "
 "This settings is useful for installations with many virtual hosts listed "
@@ -2327,15 +2327,15 @@ msgid ""
 "instead of having to provide individual configuration for each vhost."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:119
+#: ../../Tigase_Admistration/Properties/_vhost.inc:119
 msgid "vhost-tls-required"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:123
+#: ../../Tigase_Admistration/Properties/_vhost.inc:123
 msgid "**Example:** ``'vhost-tls-required' = true``"
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:127
+#: ../../Tigase_Admistration/Properties/_vhost.inc:127
 msgid ""
 "**Description:** This property is a global settings to switch on/off TLS "
 "required mode on the Tigase installation. Setting this property to "
@@ -2346,7 +2346,7 @@ msgid ""
 " is completed."
 msgstr ""
 
-#: ../../Tigase_Admistration/Properties/_vhost.rst:131
+#: ../../Tigase_Admistration/Properties/_vhost.inc:131
 msgid ""
 "The ``false`` value is used as a default when no configuration is set. "
 "This settings is useful for installations with many virtual hosts listed "

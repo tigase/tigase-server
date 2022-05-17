@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-13 12:04-0700\n"
+"POT-Creation-Date: 2022-05-16 23:42-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -247,1904 +247,1904 @@ msgid ""
 "implement a web user interface for server monitoring and configuring."
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:2
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:2
 msgid "XMPP Supported Extensions"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:4
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:4
 msgid ""
 "Based on `XEP-0387: XMPP Compliance Suites 2018 "
 "<https://xmpp.org/extensions/xep-0387.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:8
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:8
 msgid "Core Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:10
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:10
 msgid "Table 1.Core Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:10
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:58
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:14
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:39
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:54
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:89
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:106
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:301
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:10
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:58
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:14
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:39
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:54
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:89
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:106
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:301
 msgid "Support"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:14
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:39
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:54
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:89
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:106
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:301
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:14
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:39
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:54
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:89
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:106
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:301
 msgid "Specification"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:10
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:58
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:14
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:39
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:54
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:89
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:106
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:301
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:10
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:58
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:14
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:39
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:54
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:89
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:106
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:301
 msgid "Name"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:10
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:58
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:14
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:39
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:54
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:89
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:106
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:301
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:10
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:58
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:14
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:39
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:54
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:89
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:106
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:301
 msgid "Comment"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:14
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:16
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:18
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:20
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:22
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:24
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:26
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:28
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:30
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:32
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:34
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:36
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:38
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:40
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:42
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:44
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:46
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:48
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:60
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:62
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:64
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:66
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:68
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:70
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:72
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:74
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:76
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:16
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:20
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:22
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:24
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:26
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:28
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:30
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:41
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:43
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:45
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:56
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:58
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:60
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:62
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:64
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:66
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:68
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:70
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:72
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:74
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:76
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:78
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:80
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:91
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:93
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:95
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:97
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:108
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:110
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:112
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:114
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:116
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:118
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:120
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:122
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:124
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:126
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:128
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:130
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:132
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:134
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:136
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:138
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:140
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:142
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:144
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:146
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:148
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:150
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:152
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:154
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:156
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:158
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:160
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:162
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:164
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:166
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:168
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:170
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:172
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:174
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:176
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:178
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:180
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:182
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:186
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:188
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:190
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:192
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:194
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:196
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:198
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:200
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:202
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:204
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:206
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:208
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:210
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:212
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:214
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:216
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:218
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:220
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:222
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:224
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:226
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:228
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:230
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:232
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:234
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:236
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:238
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:240
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:242
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:244
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:246
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:248
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:250
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:252
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:254
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:256
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:258
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:260
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:262
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:264
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:266
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:268
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:270
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:272
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:274
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:276
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:278
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:280
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:282
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:284
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:286
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:288
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:290
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:292
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:294
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:303
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:305
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:309
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:311
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:313
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:315
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:317
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:319
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:321
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:323
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:325
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:327
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:329
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:331
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:333
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:335
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:337
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:339
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:341
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:343
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:345
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:347
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:349
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:351
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:353
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:355
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:357
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:359
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:361
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:363
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:365
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:367
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:369
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:371
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:373
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:375
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:377
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:379
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:381
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:383
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:385
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:387
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:389
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:391
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:393
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:395
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:397
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:399
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:401
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:403
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:405
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:407
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:409
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:411
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:413
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:415
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:417
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:419
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:421
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:423
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:425
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:427
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:429
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:431
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:433
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:435
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:437
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:439
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:441
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:443
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:445
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:447
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:449
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:451
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:453
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:455
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:457
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:459
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:461
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:463
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:465
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:467
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:469
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:471
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:473
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:475
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:477
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:479
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:481
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:483
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:485
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:487
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:489
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:491
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:493
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:495
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:497
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:499
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:501
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:503
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:505
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:507
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:509
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:511
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:513
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:515
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:517
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:519
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:521
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:523
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:525
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:527
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:529
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:531
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:533
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:535
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:537
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:539
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:541
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:543
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:14
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:16
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:18
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:20
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:22
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:24
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:26
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:28
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:30
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:32
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:34
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:36
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:38
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:40
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:42
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:44
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:46
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:48
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:60
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:62
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:64
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:66
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:68
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:70
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:72
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:74
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:76
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:16
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:20
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:22
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:24
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:26
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:28
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:30
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:41
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:43
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:45
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:56
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:58
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:60
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:62
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:64
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:66
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:68
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:70
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:72
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:74
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:76
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:78
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:80
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:91
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:93
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:95
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:97
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:108
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:110
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:112
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:114
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:116
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:118
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:120
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:122
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:124
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:126
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:128
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:130
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:132
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:134
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:136
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:138
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:140
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:142
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:144
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:146
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:148
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:150
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:152
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:154
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:156
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:158
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:160
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:162
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:164
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:166
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:168
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:170
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:172
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:174
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:176
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:178
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:180
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:182
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:186
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:188
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:190
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:192
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:194
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:196
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:198
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:200
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:202
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:204
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:206
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:208
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:210
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:212
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:214
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:216
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:218
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:220
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:222
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:224
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:226
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:228
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:230
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:232
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:234
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:236
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:238
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:240
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:242
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:244
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:246
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:248
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:250
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:252
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:254
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:256
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:258
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:260
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:262
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:264
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:266
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:268
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:270
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:272
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:274
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:276
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:278
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:280
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:282
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:284
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:286
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:288
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:290
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:292
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:294
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:303
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:305
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:309
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:311
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:313
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:315
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:317
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:319
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:321
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:323
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:325
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:327
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:329
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:331
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:333
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:335
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:337
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:339
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:341
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:343
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:345
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:347
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:349
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:351
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:353
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:355
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:357
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:359
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:361
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:363
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:365
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:367
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:369
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:371
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:373
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:375
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:377
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:379
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:381
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:383
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:385
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:387
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:389
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:391
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:393
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:395
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:397
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:399
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:401
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:403
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:405
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:407
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:409
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:411
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:413
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:415
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:417
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:419
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:421
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:423
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:425
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:427
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:429
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:431
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:433
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:435
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:437
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:439
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:441
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:443
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:445
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:447
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:449
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:451
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:453
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:455
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:457
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:459
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:461
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:463
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:465
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:467
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:469
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:471
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:473
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:475
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:477
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:479
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:481
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:483
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:485
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:487
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:489
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:491
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:493
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:495
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:497
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:499
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:501
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:503
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:505
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:507
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:509
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:511
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:513
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:515
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:517
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:519
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:521
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:523
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:525
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:527
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:529
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:531
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:533
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:535
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:537
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:539
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:541
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:543
 msgid "✓"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:16
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:56
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:303
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:305
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:16
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:56
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:303
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:305
 msgid "`RFC6120 <https://tools.ietf.org/html/rfc6120>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:16
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:303
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:16
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:303
 msgid "Extensible Messaging and Presence Protocol (XMPP): Core"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:18
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:307
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:18
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:307
 msgid "⍻"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:18
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:307
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:18
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:307
 msgid "`RFC7622 <https://tools.ietf.org/html/rfc7622>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:18
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:307
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:18
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:307
 msgid "Extensible Messaging and Presence Protocol (XMPP): Address Format"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:18
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:307
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:18
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:307
 msgid "We support previous version of the specification: RFC6122"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:20
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:313
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:20
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:313
 msgid "`RFC7590 <https://tools.ietf.org/html/rfc7590>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:20
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:313
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:20
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:313
 msgid ""
 "Use of Transport Layer Security (TLS) in the Extensible Messaging and "
 "Presence Protocol (XMPP)"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:22
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:541
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:22
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:541
 msgid "`XEP-0368 <https://xmpp.org/extensions/xep-0368.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:22
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:541
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:22
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:541
 msgid "SRV records for XMPP over TLS"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:22
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:541
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:22
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:541
 msgid "Requires adding DNS entries pointing to port 5223"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:24
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:329
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:24
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:329
 msgid "`XEP-0030 <https://xmpp.org/extensions/xep-0030.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:24
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:329
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:24
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:329
 msgid "Service Discovery"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:26
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:391
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:26
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:391
 msgid "`XEP-0115 <https://xmpp.org/extensions/xep-0115.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:26
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:391
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:26
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:391
 msgid "Entity Capabilities"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:28
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:389
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:28
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:389
 msgid "`XEP-0114 <https://xmpp.org/extensions/xep-0114.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:28
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:389
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:28
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:389
 msgid "Jabber Component Protocol"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:30
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:429
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:30
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:429
 msgid "`XEP-0163 <https://xmpp.org/extensions/xep-0163.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:30
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:429
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:30
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:429
 msgid "Personal Eventing Protocol"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:34
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:34
 msgid "Web Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:36
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:36
 msgid "Table 2.Web Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:41
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:91
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:309
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:311
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:41
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:91
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:309
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:311
 msgid "`RFC7395 <https://tools.ietf.org/html/rfc7395>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:41
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:91
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:309
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:311
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:41
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:91
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:309
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:311
 msgid ""
 "An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for "
 "WebSocket"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:43
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:477
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:43
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:477
 msgid "`XEP-0206 <https://xmpp.org/extensions/xep-0206.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:43
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:477
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:43
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:477
 msgid "XMPP Over BOSH"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:45
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:395
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:45
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:395
 msgid "`XEP-0124 <https://xmpp.org/extensions/xep-0124.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:45
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:395
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:45
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:395
 msgid "Bidirectional-streams Over Synchronous HTTP (BOSH)"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:49
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:49
 msgid "IM Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:51
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:51
 msgid "Table 3.Web Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:56
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:305
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:56
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:305
 msgid ""
 "Extensible Messaging and Presence Protocol (XMPP): Instant Messaging and "
 "Presence"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:58
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:369
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:58
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:369
 msgid "`XEP-0084 <https://xmpp.org/extensions/xep-0084.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:58
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:369
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:58
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:369
 msgid "User Avatar"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:60
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:419
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:60
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:419
 msgid "`XEP-0153 <https://xmpp.org/extensions/xep-0153.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:60
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:419
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:60
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:419
 msgid "vCard-Based Avatars"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:62
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:341
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:62
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:341
 msgid "`XEP-0054 <https://xmpp.org/extensions/xep-0054.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:62
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:341
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:62
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:341
 msgid "vcard-temp"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:64
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:515
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:64
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:515
 msgid "`XEP-0280 <https://xmpp.org/extensions/xep-0280.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:64
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:515
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:64
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:515
 msgid "Message Carbons"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:66
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:463
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:66
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:463
 msgid "`XEP-0191 <https://xmpp.org/extensions/xep-0191.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:66
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:463
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:66
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:463
 msgid "Blocking Command"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:68
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:331
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:68
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:331
 msgid "`XEP-0045 <https://xmpp.org/extensions/xep-0045.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:68
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:331
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:68
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:331
 msgid "Multi-User Chat"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:70
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:501
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:70
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:501
 msgid "`XEP-0249 <https://xmpp.org/extensions/xep-0249.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:70
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:501
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:70
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:501
 msgid "Direct MUC Invitations"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:72
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:335
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:72
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:335
 msgid "`XEP-0048 <https://xmpp.org/extensions/xep-0048.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:72
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:335
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:72
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:335
 msgid "Bookmarks"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:74
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:483
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:74
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:483
 msgid "`XEP-0223 <https://xmpp.org/extensions/xep-0223.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:74
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:483
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:74
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:483
 msgid "Persistent Storage of Private Data via PubSub"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:76
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:337
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:76
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:337
 msgid "`XEP-0049 <https://xmpp.org/extensions/xep-0049.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:76
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:337
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:76
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:337
 msgid "Private XML Storage"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:78
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:93
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:465
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:78
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:93
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:465
 msgid "`XEP-0198 <https://xmpp.org/extensions/xep-0198.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:78
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:93
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:465
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:78
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:93
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:465
 msgid "Stream Management"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:78
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:93
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:465
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:78
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:93
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:465
 msgid "Both ``Session Resumption`` and ``Stanza Acknowledgements``"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:80
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:523
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:80
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:523
 msgid "`XEP-0313 <https://xmpp.org/extensions/xep-0313.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:80
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:523
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:80
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:523
 msgid "Message Archive Management"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:84
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:84
 msgid "Mobile Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:86
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:86
 msgid "Table 4.Web Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:95
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:535
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:95
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:535
 msgid "`XEP-0352 <https://xmpp.org/extensions/xep-0352.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:95
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:535
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:95
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:535
 msgid "Client State Indication"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:97
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:537
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:97
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:537
 msgid "`XEP-0357 <https://xmpp.org/extensions/xep-0357.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:97
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:537
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:97
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:537
 msgid "Push Notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:101
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:101
 msgid "Non-Compliance Suite Extensions"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:103
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:103
 msgid "Table 5.Core Compliance Suite"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:108
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:315
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:108
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:315
 msgid "`XEP-0004 <https://xmpp.org/extensions/xep-0004.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:108
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:315
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:108
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:315
 msgid "Data Forms"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:110
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:317
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:110
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:317
 msgid "`XEP-0008 <https://xmpp.org/extensions/xep-0004.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:110
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:317
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:110
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:317
 msgid "IQ-Based Avatars"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:112
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:319
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:112
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:319
 msgid "`XEP-0012 <https://xmpp.org/extensions/xep-0012.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:112
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:319
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:112
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:319
 msgid "Last Activity"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:114
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:321
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:114
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:321
 msgid "`XEP-0013 <https://xmpp.org/extensions/xep-0013.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:114
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:321
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:114
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:321
 msgid "Flexible Offline Message Retrieval"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:116
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:323
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:116
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:323
 msgid "`XEP-0016 <https://xmpp.org/extensions/xep-0016.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:116
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:323
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:116
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:323
 msgid "Privacy Lists"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:118
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:325
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:118
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:325
 msgid "`XEP-0020 <https://xmpp.org/extensions/xep-0020.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:118
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:325
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:118
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:325
 msgid "Feature Negotiation"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:120
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:327
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:120
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:327
 msgid "`XEP-0022 <https://xmpp.org/extensions/xep-0022.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:120
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:327
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:120
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:327
 msgid "Message Events"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:122
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:333
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:122
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:333
 msgid "`XEP-0047 <https://xmpp.org/extensions/xep-0047.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:122
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:333
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:122
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:333
 msgid "In-Band Bytestreams"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:124
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:339
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:124
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:339
 msgid "`XEP-0050 <https://xmpp.org/extensions/xep-0050.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:124
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:339
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:124
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:339
 msgid "Ad-Hoc Commands"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:126
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:343
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:126
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:343
 msgid "`XEP-0059 <https://xmpp.org/extensions/xep-0059.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:126
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:343
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:126
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:343
 msgid "Result Set Management"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:128
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:345
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:128
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:345
 msgid "`XEP-0060 <https://xmpp.org/extensions/xep-0060.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:128
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:345
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:128
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:345
 msgid "Publish-Subscribe"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:130
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:347
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:130
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:347
 msgid "`XEP-0065 <https://xmpp.org/extensions/xep-0065.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:130
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:347
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:130
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:347
 msgid "SOCKS5 Bytestreams"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:132
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:349
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:132
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:349
 msgid "`XEP-0066 <https://xmpp.org/extensions/xep-0066.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:132
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:349
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:132
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:349
 msgid "Out of Band Data"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:134
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:351
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:134
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:351
 msgid "`XEP-0068 <https://xmpp.org/extensions/xep-0068.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:134
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:351
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:134
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:351
 msgid "Field Standardization for Data Forms"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:136
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:353
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:136
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:353
 msgid "`XEP-0071 <https://xmpp.org/extensions/xep-0071.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:136
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:353
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:136
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:353
 msgid "XHTML-IM"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:138
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:355
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:138
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:355
 msgid "`XEP-0072 <https://xmpp.org/extensions/xep-0072.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:138
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:355
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:138
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:355
 msgid "SOAP Over XMPP"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:140
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:357
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:140
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:357
 msgid "`XEP-0077 <https://xmpp.org/extensions/xep-0077.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:140
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:357
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:140
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:357
 msgid "In-Band Registration"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:142
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:359
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:142
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:359
 msgid "`XEP-0078 <https://xmpp.org/extensions/xep-0078.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:142
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:359
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:142
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:359
 msgid "Non-SASL Authentication"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:144
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:361
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:144
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:361
 msgid "`XEP-0079 <https://xmpp.org/extensions/xep-0079.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:144
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:361
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:144
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:361
 msgid "Advanced Message Processing"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:146
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:363
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:146
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:363
 msgid "`XEP-0080 <https://xmpp.org/extensions/xep-0080.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:146
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:363
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:146
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:363
 msgid "User Location"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:148
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:365
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:148
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:365
 msgid "`XEP-0082 <https://xmpp.org/extensions/xep-0082.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:148
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:365
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:148
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:365
 msgid "XMPP Date and Time Profiles"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:150
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:367
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:150
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:367
 msgid "`XEP-0083 <https://xmpp.org/extensions/xep-0083.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:150
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:367
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:150
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:367
 msgid "Nested Roster Groups"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:152
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:371
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:152
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:371
 msgid "`XEP-0085 <https://xmpp.org/extensions/xep-0085.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:152
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:371
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:152
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:371
 msgid "Chat State Notifications"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:154
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:373
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:154
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:373
 msgid "`XEP-0086 <https://xmpp.org/extensions/xep-0086.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:154
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:373
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:154
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:373
 msgid "Error Condition Mappings"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:156
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:375
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:156
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:375
 msgid "`XEP-0091 <https://xmpp.org/extensions/xep-0091.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:156
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:375
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:156
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:375
 msgid "Legacy Delayed Delivery"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:158
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:377
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:158
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:377
 msgid "`XEP-0092 <https://xmpp.org/extensions/xep-0092.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:158
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:377
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:158
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:377
 msgid "Software Version"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:160
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:379
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:160
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:379
 msgid "`XEP-0096 <https://xmpp.org/extensions/xep-0096.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:160
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:379
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:160
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:379
 msgid "File Transfer"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:162
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:381
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:162
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:381
 msgid "`XEP-0100 <https://xmpp.org/extensions/xep-0100.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:162
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:381
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:162
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:381
 msgid "Gateway Interaction"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:164
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:383
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:164
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:383
 msgid "`XEP-0106 <https://xmpp.org/extensions/xep-0106.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:164
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:383
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:164
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:383
 msgid "JID Escaping"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:166
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:385
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:166
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:385
 msgid "`XEP-0107 <https://xmpp.org/extensions/xep-0107.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:166
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:385
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:166
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:385
 msgid "User Mood"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:166
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:168
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:170
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:385
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:387
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:393
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:166
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:168
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:170
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:385
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:387
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:393
 msgid "Server support via ``Personal Eventing Protocol (XEP-0163)``"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:168
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:387
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:168
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:387
 msgid "`XEP-0108 <https://xmpp.org/extensions/xep-0108.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:168
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:387
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:168
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:387
 msgid "User Activity"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:170
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:393
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:170
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:393
 msgid "`XEP-0118 <https://xmpp.org/extensions/xep-0118.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:170
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:393
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:170
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:393
 msgid "User Tune"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:172
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:399
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:172
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:399
 msgid "`XEP-0127 <https://xmpp.org/extensions/xep-0127.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:172
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:399
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:172
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:399
 msgid "Common Alerting Protocol (CAP) Over XMPP"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:174
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:397
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:174
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:397
 msgid "`XEP-0128 <https://xmpp.org/extensions/xep-0128.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:174
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:397
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:174
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:397
 msgid "Service Discovery Extensions"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:176
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:401
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:176
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:401
 msgid "`XEP-0131 <https://xmpp.org/extensions/xep-0131.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:176
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:401
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:176
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:401
 msgid "Stanza Headers and Internet Metadata (SHIM)"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:178
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:403
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:178
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:403
 msgid "`XEP-0133 <https://xmpp.org/extensions/xep-0133.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:178
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:403
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:178
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:403
 msgid "Service Administration"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:180
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:405
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:180
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:405
 msgid "`XEP-0136 <https://xmpp.org/extensions/xep-0136.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:180
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:405
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:180
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:405
 msgid "Message Archiving"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:182
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:407
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:182
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:407
 msgid "`XEP-0141 <https://xmpp.org/extensions/xep-0141.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:182
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:407
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:182
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:407
 msgid "Data Forms Layout"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:12
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:184
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:12
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:184
 msgid "✓ [1]_"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:184
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:409
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:184
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:409
 msgid "`XEP-0142 <https://xmpp.org/extensions/xep-0142.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:184
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:409
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:184
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:409
 msgid "Workgroup Queues"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:186
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:411
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:186
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:411
 msgid "`XEP-0144 <https://xmpp.org/extensions/xep-0144.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:186
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:411
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:186
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:411
 msgid "Roster Item Exchange"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:188
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:413
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:188
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:413
 msgid "`XEP-0145 <https://xmpp.org/extensions/xep-0145.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:188
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:413
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:188
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:413
 msgid "Annotations"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:190
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:415
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:190
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:415
 msgid "`XEP-0146 <https://xmpp.org/extensions/xep-0146.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:190
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:415
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:190
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:415
 msgid "Remote Controlling Clients"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:192
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:417
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:192
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:417
 msgid "`XEP-0152 <https://xmpp.org/extensions/xep-0152.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:192
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:417
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:192
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:417
 msgid "Reachability Addresses"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:194
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:421
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:194
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:421
 msgid "`XEP-0155 <https://xmpp.org/extensions/xep-0155.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:194
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:421
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:194
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:421
 msgid "Stanza Session Negotiation"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:196
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:423
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:196
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:423
 msgid "`XEP-0156 <https://xmpp.org/extensions/xep-0156.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:196
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:423
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:196
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:423
 msgid "Discovering Alternative XMPP Connection Methods"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:196
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:423
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:196
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:423
 msgid "Uses DNS records, so will work with Tigase XMPP Server"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:198
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:425
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:198
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:425
 msgid "`XEP-0157 <https://xmpp.org/extensions/xep-0157.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:198
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:425
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:198
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:425
 msgid "Contact Addresses for XMPP Services"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:200
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:427
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:200
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:427
 msgid "`XEP-0160 <https://xmpp.org/extensions/xep-0160.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:200
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:427
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:200
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:427
 msgid "Best Practices for Handling Offline Messages"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:202
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:431
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:202
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:431
 msgid "`XEP-0166 <https://xmpp.org/extensions/xep-0166.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:202
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:431
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:202
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:431
 msgid "Jingle"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:204
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:433
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:204
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:433
 msgid "`XEP-0167 <https://xmpp.org/extensions/xep-0167.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:204
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:433
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:204
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:433
 msgid "Jingle RTP Sessions"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:206
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:435
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:206
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:435
 msgid "`XEP-0170 <https://xmpp.org/extensions/xep-0170.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:206
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:435
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:206
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:435
 msgid "Recommended Order of Stream Feature Negotiation"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:208
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:437
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:208
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:437
 msgid "`XEP-0171 <https://xmpp.org/extensions/xep-0171.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:208
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:437
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:208
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:437
 msgid "Language Translation"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:210
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:439
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:210
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:439
 msgid "`XEP-0172 <https://xmpp.org/extensions/xep-0172.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:210
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:439
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:210
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:439
 msgid "User Nickname"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:212
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:441
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:212
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:441
 msgid "`XEP-0174 <https://xmpp.org/extensions/xep-0174.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:212
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:441
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:212
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:441
 msgid "Serverless Messaging"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:214
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:443
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:214
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:443
 msgid "`XEP-0175 <https://xmpp.org/extensions/xep-0175.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:214
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:443
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:214
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:443
 msgid "Best Practices for Use of SASL ANONYMOUS"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:216
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:445
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:216
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:445
 msgid "`XEP-0176 <https://xmpp.org/extensions/xep-0176.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:216
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:445
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:216
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:445
 msgid "Jingle ICE-UDP Transport Method"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:218
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:447
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:218
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:447
 msgid "`XEP-0177 <https://xmpp.org/extensions/xep-0177.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:218
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:447
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:218
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:447
 msgid "Jingle Raw UDP Transport Method"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:220
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:449
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:220
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:449
 msgid "`XEP-0178 <https://xmpp.org/extensions/xep-0178.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:220
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:449
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:220
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:449
 msgid "Best Practices for Use of SASL EXTERNAL with Certificates"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:222
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:451
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:222
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:451
 msgid "`XEP-0179 <https://xmpp.org/extensions/xep-0179.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:222
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:451
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:222
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:451
 msgid "Jingle IAX Transport Method"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:224
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:453
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:224
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:453
 msgid "`XEP-0180 <https://xmpp.org/extensions/xep-0180.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:224
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:453
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:224
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:453
 msgid "Jingle Video via RTP"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:226
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:455
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:226
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:455
 msgid "`XEP-0181 <https://xmpp.org/extensions/xep-0181.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:226
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:455
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:226
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:455
 msgid "Jingle DTMF"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:228
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:457
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:228
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:457
 msgid "`XEP-0184 <https://xmpp.org/extensions/xep-0184.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:228
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:457
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:228
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:457
 msgid "Message Receipts"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:230
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:459
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:230
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:459
 msgid "`XEP-0185 <https://xmpp.org/extensions/xep-0185.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:230
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:459
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:230
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:459
 msgid "Dialback Key Generation and Validation"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:232
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:461
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:232
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:461
 msgid "`XEP-0190 <https://xmpp.org/extensions/xep-0190.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:232
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:461
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:232
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:461
 msgid "Best Practice for Closing Idle Streams"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:234
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:467
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:234
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:467
 msgid "`XEP-0199 <https://xmpp.org/extensions/xep-0199.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:234
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:467
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:234
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:467
 msgid "XMPP Ping"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:236
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:469
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:236
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:469
 msgid "`XEP-0201 <https://xmpp.org/extensions/xep-0201.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:236
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:469
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:236
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:469
 msgid "Best Practices for Message Threads"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:238
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:471
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:238
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:471
 msgid "`XEP-0202 <https://xmpp.org/extensions/xep-0202.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:238
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:471
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:238
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:471
 msgid "Entity Time"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:240
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:473
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:240
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:473
 msgid "`XEP-0203 <https://xmpp.org/extensions/xep-0203.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:240
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:473
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:240
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:473
 msgid "Delayed Delivery"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:242
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:475
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:242
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:475
 msgid "`XEP-0205 <https://xmpp.org/extensions/xep-0205.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:242
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:475
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:242
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:475
 msgid "Best Practices to Discourage Denial of Service Attacks"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:244
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:479
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:244
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:479
 msgid "`XEP-0209 <https://xmpp.org/extensions/xep-0209.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:244
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:479
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:244
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:479
 msgid "Metacontacts"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:246
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:481
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:246
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:481
 msgid "`XEP-0220 <https://xmpp.org/extensions/xep-0220.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:246
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:481
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:246
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:481
 msgid "Server Dialback"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:248
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:485
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:248
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:485
 msgid "`XEP-0224 <https://xmpp.org/extensions/xep-0224.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:248
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:485
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:248
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:485
 msgid "Attention"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:250
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:487
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:250
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:487
 msgid "`XEP-0225 <https://xmpp.org/extensions/xep-0225.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:250
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:487
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:250
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:487
 msgid "Component Connections"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:252
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:489
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:252
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:489
 msgid "`XEP-0226 <https://xmpp.org/extensions/xep-0226.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:252
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:489
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:252
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:489
 msgid "Message Stanza Profiles"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:254
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:491
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:254
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:491
 msgid "`XEP-0231 <https://xmpp.org/extensions/xep-0231.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:254
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:491
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:254
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:491
 msgid "Bits of Binary"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:256
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:493
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:256
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:493
 msgid "`XEP-0234 <https://xmpp.org/extensions/xep-0234.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:256
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:493
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:256
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:493
 msgid "Jingle File Transfer"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:258
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:495
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:258
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:495
 msgid "`XEP-0245 <https://xmpp.org/extensions/xep-0245.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:258
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:495
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:258
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:495
 msgid "The /me Command"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:260
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:497
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:260
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:497
 msgid "`XEP-0246 <https://xmpp.org/extensions/xep-0246.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:260
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:497
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:260
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:497
 msgid "End-to-End XML Streams"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:262
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:499
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:262
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:499
 msgid "`XEP-0247 <https://xmpp.org/extensions/xep-0247.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:262
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:499
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:262
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:499
 msgid "Jingle XML Streams"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:264
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:503
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:264
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:503
 msgid "`XEP-0250 <https://xmpp.org/extensions/xep-0250.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:264
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:503
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:264
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:503
 msgid "C2C Authentication Using TLS"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:266
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:505
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:266
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:505
 msgid "`XEP-0251 <https://xmpp.org/extensions/xep-0251.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:266
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:505
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:266
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:505
 msgid "Jingle Session Transfer"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:268
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:507
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:268
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:507
 msgid "`XEP-0260 <https://xmpp.org/extensions/xep-0260.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:268
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:507
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:268
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:507
 msgid "Jingle SOCKS5 Bytestreams Transport Method"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:270
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:509
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:270
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:509
 msgid "`XEP-0261 <https://xmpp.org/extensions/xep-0261.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:270
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:509
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:270
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:509
 msgid "Jingle In-Band Bytestreams Transport"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:272
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:511
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:272
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:511
 msgid "`XEP-0262 <https://xmpp.org/extensions/xep-0262.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:272
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:511
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:272
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:511
 msgid "Use of ZRTP in Jingle RTP Sessions"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:274
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:513
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:274
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:513
 msgid "`XEP-0277 <https://xmpp.org/extensions/xep-0277.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:274
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:513
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:274
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:513
 msgid "Microblogging over XMPP"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:276
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:517
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:276
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:517
 msgid "`XEP-0292 <https://xmpp.org/extensions/xep-0292.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:276
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:517
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:276
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:517
 msgid "vCard4 Over XMPP"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:278
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:519
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:278
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:519
 msgid "`XEP-0301 <https://xmpp.org/extensions/xep-0301.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:278
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:519
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:278
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:519
 msgid "In-Band Real Time Text"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:280
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:521
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:280
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:521
 msgid "`XEP-0305 <https://xmpp.org/extensions/xep-0305.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:280
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:521
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:280
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:521
 msgid "XMPP Quickstart"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:282
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:525
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:282
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:525
 msgid "`XEP-0323 <https://xmpp.org/extensions/xep-0323.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:282
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:525
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:282
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:525
 msgid "Internet of Things - Sensor Data"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:284
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:527
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:284
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:527
 msgid "`XEP-0324 <https://xmpp.org/extensions/xep-0324.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:284
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:527
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:284
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:527
 msgid "Internet of Things - Provisioning"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:286
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:529
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:286
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:529
 msgid "`XEP-0325 <https://xmpp.org/extensions/xep-0325.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:286
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:529
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:286
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:529
 msgid "Internet of Things - Control"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:288
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:531
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:288
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:531
 msgid "`XEP-0326 <https://xmpp.org/extensions/xep-0326.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:288
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:531
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:288
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:531
 msgid "Internet of Things - Concentrators"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:290
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:533
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:290
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:533
 msgid "`XEP-0333 <https://xmpp.org/extensions/xep-0333.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:290
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:533
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:290
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:533
 msgid "Chat Markers"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:292
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:539
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:292
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:539
 msgid "`XEP-0363 <https://xmpp.org/extensions/xep-0363.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:292
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:539
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:292
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:539
 msgid "HTTP File Upload"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:294
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:543
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:294
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:543
 msgid "`XEP-0387 <https://xmpp.org/extensions/xep-0387.html>`__"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:294
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:543
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:294
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:543
 msgid "XMPP Compliance Suites 2018"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:298
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:298
 msgid "Full, ordered list of supported RFCs and XEPs:"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:80
-#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.rst:547
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:80
+#: ../../Tigase_Admistration/XMPP_Server/Supported_Extension.inc:547
 msgid "Requires commercial license"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:2
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:2
 msgid "Tigase Custom Extensions"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:5
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:5
 msgid "General features"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:7
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:7
 msgid "tabel 6.Monitoring"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:12
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:12
 msgid "AuditLog"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:12
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:12
 msgid ""
 "Ability functionality to log important events in a system (loggins, "
 "message exchanges, calls)"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:14
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:14
 msgid "Anti Abuse"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:14
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:14
 msgid "Fight stanza SPAM, DoS, brute-force attacks and other threats"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:16
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:16
 msgid "Virtual domains"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:16
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:16
 msgid ""
 "Ability to create and manage multiple virtual domains from a single "
 "instance and restart-less management"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:18
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:18
 msgid "MUC subscribe for offline push"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:18
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:18
 msgid ""
 "Option to register permanently to the room to receive push notifications "
 "about new messages."
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:20
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:20
 msgid "Scripting API"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:20
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:20
 msgid "Supports the Java Scripting API JSR-223"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:22
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:22
 msgid "JMX monitoring"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:22
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:22
 msgid ""
 "Advanced monitoring the server via JMX protocol with an API for "
 "connecting custom monitors and TCP/IP end-point for connecting general "
 "purpose JMX tools"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:24
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:24
 msgid "HTTP monitoring"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:24
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:24
 msgid "Basic monitoring via HTTP protocol"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:26
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:26
 msgid "XMPP Monitoring"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:26
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:26
 msgid ""
 "Pluggable, active monitoring via XMPP, retrieving detailed server "
 "statistics, receiving automatic notifications about possible problems "
 "discovered by the self-monitor mechanisms"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:28
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:28
 msgid "SNMP Monitoring"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:28
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:28
 msgid "Advanced server monitoring via SNMP."
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:30
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:30
 msgid "Bosh Cache"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:30
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:30
 msgid ""
 "Bosh Session Cache - a feature to quickly reload user data - roster, "
 "presences and messages history by the web client (for example after web "
 "page reload)"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:32
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:32
 msgid "Clustering"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:32
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:32
 msgid ""
 "Full clustering support for HA and LB with pluggabble clustering "
 "strategies for perfect optimising the cluster to the client’s system"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:34
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:34
 msgid "Advanced Clustering Strategy"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:34
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:34
 msgid "Dedicated, specialised clustering strategy for best possible performance"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:36
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:36
 msgid "MUC Clustered"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:36
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:36
 msgid "Support for clustering group chatrooms with various, pluggable strategies"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:38
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:38
 msgid "PubSub Clustered"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:38
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:38
 msgid "Support for clustering PubSub component with various, pluggable strategies"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:40
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:40
 msgid "Mobile optimisations"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:40
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:40
 msgid "Optimizations designed for Mobile Devices"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:42
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:42
 msgid "OSGi"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:42
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:42
 msgid ""
 "Support for running in OSGi environment, i.e. as embedded XMPP server in "
 "advanced application server"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:44
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:44
 msgid "Dynamic rosters"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:44
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:44
 msgid ""
 "Ability to create users' rosters entries on the fly based on data "
 "retrieved from any sources"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:46
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:46
 msgid "Command line admin tools"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:46
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:46
 msgid "Commandline utility to manage server"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:48
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:48
 msgid "Unified Archive"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:48
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:48
 msgid ""
 "An extension to XEP-0313 Message Archive Management, with greatly "
 "improved flexibility in terms of what can be archived."
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:53
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:53
 msgid "Repositories/Databases"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:55
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:55
 msgid "Table 7.Repositories/Databases"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:60
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:60
 msgid "DB per domain"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:60
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:60
 msgid "Ability to have multiple databases for specific domains."
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:62
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:62
 msgid "PostgreSQL"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:62
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:62
 msgid ""
 "Full support for PostgreSQL database with database schemas excluding "
 "dedicated DB schema for PubSub component"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:64
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:64
 msgid "MySQL"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:64
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:64
 msgid ""
 "Full support for MySQL database with database schemas, dedicated DB "
 "schema for PubSub component"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:66
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:66
 msgid "SQL Server"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:66
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:66
 msgid ""
 "Full support for MS SQL Server database with database schemas excluding "
 "dedicated DB schema for PubSub component, only in Tigase server version "
 "3.x"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:68
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:68
 msgid "Derby DB"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:68
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:68
 msgid ""
 "Full support for built-in Derby database with database schemas excluding "
 "dedicated DB schema for PubSub component"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:70
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:70
 msgid "JDBC"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:70
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:70
 msgid ""
 "Support for all JDBC enabled databases, although the database schemas are"
 " available for some databases"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:72
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:74
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:72
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:74
 msgid "Drupal Auth"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:72
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:72
 msgid ""
 "Drupal authentication - the Tigase server can share user authentication "
 "database with Drupal CMS and authenticate users agains Drupal user "
 "database"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:74
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:74
 msgid ""
 "Close integration with Drupal CMS, the Tigase can send notifications to "
 "subscribed users about new posts, comments and can also publish short "
 "news information via XMPP"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:76
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:76
 msgid "LDAP-Auth"
 msgstr ""
 
-#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.rst:76
+#: ../../Tigase_Admistration/XMPP_Server/Custom_Extensions.inc:76
 msgid "LDAP Authentication Connector Supported"
 msgstr ""
 

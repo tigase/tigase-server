@@ -355,9 +355,9 @@ Each repository will have a table ``tig_schema_versions`` with the information a
 
 It will be stored and maintained in the file named ``<RDBMS_name>-common-schema-<version>.sql``
 
-.. include:: Database_Preparation.rst
-.. include:: Hashed_User_Passwords_in_Database.rst
-.. include:: Multiple_Databases.rst
-.. include:: Importing_User_Data.rst
-.. include:: Existing_Databases.rst
-.. include:: Schema_Updates.rst
+.. include:: Database_Preparation.inc
+.. include:: Hashed_User_Passwords_in_Database.inc
+.. include:: Multiple_Databases.inc
+.. include:: Importing_User_Data.inc
+.. include:: Existing_Databases.inc
+.. include:: Schema_Updates.inc

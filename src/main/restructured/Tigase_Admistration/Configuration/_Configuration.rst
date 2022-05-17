@@ -8,14 +8,14 @@ When the user tries to setup the client for the first time he comes across 2 con
 2. `tigase.conf <#manualconfig>`__ is the Tigase server startup configuration. It is actually not used by the server itself. It rather contains operating system settings and environment parameters to correctly run the `Java Virtual Machine <http://java.sun.com/>`__. It is only useful on the unix-like systems with Bash shell. If you run the server on MS Windows systems ``tigase.bat`` and ``wrapper.conf`` files are used instead. The ``tigase.conf`` file is read and loaded by the ``scripts/tigase.sh`` shell script which also scans the operating system environment for Java VM and other tools needed.
 
  
-.. include:: DSL_configuration.rst
-.. include:: Startup_Files.rst
-.. include:: Settings_for_High_Load_Systems.rst
-.. include:: JVM_settings.rst
+.. include:: DSL_configuration.inc
+.. include:: Startup_Files.inc
+.. include:: Settings_for_High_Load_Systems.inc
+.. include:: JVM_settings.inc
 .. include:: Session_Manager.inc  
-.. include:: Vhosts.rst
-.. include:: Logging.rst
-.. include:: Advanced_Options.rst
+.. include:: Vhosts.inc
+.. include:: Logging.inc
+.. include:: Advanced_Options.inc
 
 
 

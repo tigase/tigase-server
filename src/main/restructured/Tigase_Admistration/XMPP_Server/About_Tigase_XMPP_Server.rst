@@ -73,5 +73,5 @@ Tigase server is designed and implemented to allow dynamic reconfiguration durin
 
 There are also interfaces and handlers available to make it easy to implement a web user interface for server monitoring and configuring.
 
-.. include:: Supported_Extension.rst
-.. include:: Custom_Extensions.rst
+.. include:: Supported_Extension.inc
+.. include:: Custom_Extensions.inc
