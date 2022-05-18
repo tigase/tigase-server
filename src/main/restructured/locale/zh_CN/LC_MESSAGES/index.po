@@ -19,13 +19,12 @@ msgstr ""
 
 #: ../../index.rst:6
 msgid "Tigase XMPP Server Distribution Administration Guide -Version 8.3.0"
-msgstr ""
+msgstr "Tigase XMPP 服务器分发管理指南 - 版本 8.3.0"
 
 #: ../../index.rst:13
 msgid "Tigase Development Guide -Version 8.3.0"
-msgstr ""
+msgstr "Tigase 开发指南 - 版本 8.3.0"
 
 #: ../../index.rst:4
 msgid "Tigase Documentation"
-msgstr ""
-
+msgstr "Tigase 文档"
