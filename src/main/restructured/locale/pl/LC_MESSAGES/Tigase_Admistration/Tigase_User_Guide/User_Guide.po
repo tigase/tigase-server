@@ -3,27 +3,31 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-16 23:42-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-05-18 16:44+0000\n"
+"Last-Translator: Wojciech Kapcia <wojtek@tigase.net>\n"
+"Language-Team: Polish <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/tigase_user_guide/pl/>\n"
+"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: ../../Tigase_Admistration/Tigase_User_Guide/User_Guide.rst:3
 msgid "Tigase User Guide"
-msgstr ""
+msgstr "Podręcznik użytkownika Tigase"
 
 #: ../../Tigase_Admistration/Tigase_User_Guide/Introduction.inc:2
 msgid "Jabber/XMPP introduction"
-msgstr ""
+msgstr "Wstęp do Jabber/XMPP"
 
 #: ../../Tigase_Admistration/Tigase_User_Guide/Introduction.inc:5
 msgid "Jabber/XMPP is Instant Messaging Technology"
@@ -571,4 +575,3 @@ msgstr ""
 #: ../../Tigase_Admistration/Tigase_User_Guide/Configuration_Instructions.inc:107
 msgid "Welcome to the Tigase Administration Guide."
 msgstr ""
-
