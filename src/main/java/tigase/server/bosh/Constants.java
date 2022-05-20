@@ -93,7 +93,7 @@ public abstract class Constants {
 
 	protected static final int MAX_PACKETS = 15;
 
-	protected static final String MAX_PAUSE_PROP_KEY = "max-inactivity";
+	protected static final String MAX_PAUSE_PROP_KEY = "max-pause";
 
 	protected static final long MAX_PAUSE_PROP_VAL = 10;
 
