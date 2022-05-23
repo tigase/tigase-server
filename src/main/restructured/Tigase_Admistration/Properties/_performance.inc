@@ -115,6 +115,32 @@ net-buff-standard
 
 **Available since:** 4.3.0
 
+net-buffer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Default value:** ``2k``
+
+**Example:** ``'net-buffer' = 16 * 1024``
+
+**Possible values:** internal network buffer size as integer.
+
+**Description:** Sets default size of a internal network buffer used by ``ConnectionManager`` within the context in which it is set.
+
+**Available since:** 8.0.0
+
+socket-buffer-size
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Default value:** ``4k`` (for client-to-server connections) and ``64k`` (for server-to-server connections)
+
+**Example:** ``'socket-buffer-size' = 16 * 1024``
+
+**Possible values:** socket network buffer size as integer.
+
+**Description:** Sets default size of a socket network buffer used by ``ConnectionManager`` for each connection within the context in which it is set.
+
+**Available since:** 8.3.0 (previously value of ``net-buffer`` was used)
+
 nonpriority-queue
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

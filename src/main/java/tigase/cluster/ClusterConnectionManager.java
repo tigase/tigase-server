@@ -173,7 +173,7 @@ public class ClusterConnectionManager
 	private long totalNodeDisconnects = 0;
 
 	public ClusterConnectionManager() {
-		super();
+		super(SOCKET_BUFFER_CL_PROP_VAL);
 		serviceConnectedTimeout = 10;
 		elements_number_limit = ELEMENTS_NUMBER_LIMIT_CLUSTER_PROP_VAL;
 		if (getDefHostName().toString().equalsIgnoreCase("localhost")) {

@@ -100,6 +100,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public static final String PORT_SOCKET_PROP_KEY = "socket";
 	public static final String PORT_TYPE_PROP_KEY = "type";
 	public static final String PROP_KEY = "connections/";
+
+	public static final int SOCKET_BUFFER_CL_PROP_VAL = 128 * 1024;
+
+	public static final int SOCKET_BUFFER_ST_PROP_VAL  = 4 * 1024;
+
+	public static final int SOCKET_BUFFER_HT_PROP_VAL = NET_BUFFER_HT_PROP_VAL;
+
 	public static final long TOTAL_BIN_LIMIT_PROP_VAL = 0L;
 	public static final long TOTAL_PACKETS_LIMIT_PROP_VAL = 0L;
 	public static final String WHITE_CHAR_ACK_PROP_KEY = "white-char-ack";
@@ -148,7 +155,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	@ConfigField(desc = "Default size of a network buffer", alias = "net-buffer")
 	protected int net_buffer = isHighThroughput() ? NET_BUFFER_HT_PROP_VAL : NET_BUFFER_ST_PROP_VAL;
 	@ConfigField(desc = "Size of TCP receive socket buffer for connection", alias = "socket-buffer-size")
-	private Integer socketBufferSize = null;
+	private int socketBufferSize = isHighThroughput() ? SOCKET_BUFFER_HT_PROP_VAL : SOCKET_BUFFER_ST_PROP_VAL;
 	@Inject(nullAllowed = true)
 	protected XMPPIOProcessor[] processors = new XMPPIOProcessor[0];
 	@ConfigField(desc = "Traffic throttling")
@@ -202,6 +209,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	@ConfigField(desc = "Service connection timeout", alias = "service-connected-timeout")
 	protected int serviceConnectedTimeout = 60;
+
+	public ConnectionManager() {
+	}
+
+	protected ConnectionManager(int socketBufferSize) {
+		this.socketBufferSize = socketBufferSize;
+	}
 
 	protected boolean enableServiceConnectedTimeout(IO service) {
 		return service != null && service.connectionType() == ConnectionType.accept;
@@ -1303,10 +1317,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		@Override
 		public int getReceiveBufferSize() {
-			if (socketBufferSize != null) {
-				return socketBufferSize;
-			}
-			return net_buffer;
+			return socketBufferSize;
 		}
 
 		@Override
