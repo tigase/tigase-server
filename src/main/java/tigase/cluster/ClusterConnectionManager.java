@@ -86,6 +86,8 @@ public class ClusterConnectionManager
 		extends ConnectionManager<XMPPIOService<Object>>
 		implements ClusteredComponentIfc, RepositoryChangeListenerIfc<ClusterRepoItem>, ClusterConnectionHandler {
 
+	public static final int SOCKET_BUFFER_CL_PROP_VAL = 128 * 1024;
+
 	public static final String CLUSTER_CONNECTIONS_PER_NODE_PROP_KEY = "cluster-connections-per-node";
 
 	public static final int CLUSTER_CONNECTIONS_PER_NODE_VAL = 5;
