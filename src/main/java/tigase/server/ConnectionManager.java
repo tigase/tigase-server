@@ -101,8 +101,6 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public static final String PORT_TYPE_PROP_KEY = "type";
 	public static final String PROP_KEY = "connections/";
 
-	public static final int SOCKET_BUFFER_CL_PROP_VAL = 128 * 1024;
-
 	public static final int SOCKET_BUFFER_ST_PROP_VAL  = 4 * 1024;
 
 	public static final int SOCKET_BUFFER_HT_PROP_VAL = NET_BUFFER_HT_PROP_VAL;
