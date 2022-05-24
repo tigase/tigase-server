@@ -6,6 +6,7 @@ Tigase Administration Guide -Version 8.3.0
    :titlesonly:
    :numbered:
 
+   Release_Notes/Tigase_Release_Notes
    Tigase_User_Guide/User_Guide
    XMPP_Server/About_Tigase_XMPP_Server
    Licensing_Open_Source
