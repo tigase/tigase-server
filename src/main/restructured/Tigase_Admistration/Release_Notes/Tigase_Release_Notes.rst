@@ -1,6 +1,6 @@
 
 Tigase 8.3.0 Release Notes
-===================
+----------------------------------
 
 .. include:: tigase-server-current.inc
 .. include:: Tigase_v8.2.0.inc

@@ -1,4 +1,5 @@
 Tigase XMPP Server 8.1.0 Change notes and announcement
+------------------------------------------------------
 
 .. _`_major_changes`:
 
