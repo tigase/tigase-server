@@ -1,15 +1,11 @@
 Tigase XMPP Server 8.1.0 Change notes and announcement
 ------------------------------------------------------
 
-.. _`_major_changes`:
-
 Major Changes
-=============
-
-.. _`_more_xmpp_extensions`:
+^^^^^^^^^^^^^
 
 More XMPP extensions
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 Following XMPP guidelines specified in *Compliance Suites* a number of extensions was included in this release:
 
@@ -30,14 +26,14 @@ Following XMPP guidelines specified in *Compliance Suites* a number of extension
 .. _`_improved_connectivity_with_other_servers`:
 
 Improved connectivity with other servers
-----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``SASL-EXTERNAL`` mechanism was added for server-to-server (federated, s2s) connections greatly improving compliance with XMPP network. It’s possible to use both SASL-EXTERNAL and Diallback depending on support in other servers.
 
 .. _`_better_security_privacy`:
 
 Better security & privacy
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When it comes to connectivity, Tigase XMPP Server sported **Hardened Mode** that adjusted networking security settings (supported protocols, cipher suites and keys' length where applicable). We decided include 3-level configuration option for **Hardened Mode** (roughly following *Mozilla’s SSL Configuration Generator*): ``relaxed``, ``secure`` (default) and ``strict`` and to further eliminate cipher suites that are currently considered insecure.
 
@@ -46,7 +42,7 @@ We also enabled by default our anti-spam plugin and because we like all-things-e
 .. _`_multiple_domains_vhosts_support_is_even_better`:
 
 Multiple domains (VHosts) support is even better
-------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It was always quite easy to configure and serve multiple domains in Tigase XMPP Server. In this release we made it even better! First of all - we included ``Default`` VHost item, which allows configuring global defaults for the installation on the fly without having to change configuration files and restart the instance.
 
@@ -57,7 +53,7 @@ On top of that we reworked how SSL certificates are handled (especially wildcard
 .. _`_mobile_first`:
 
 Mobile First
-------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 Notifications send to mobile applications via Apple’s and Google’s push servers using **Tigase’s PUSH component** are now encrypted (`#push-25 <https://projects.tigase.net/issue/push-25>`__), requires compatible clients)
 
@@ -66,7 +62,7 @@ MUC component now allows users to register permanent nickname, which makes it po
 .. _`_installation_management`:
 
 Installation & management
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The (web) installer was simplified making setting up and configuring Tigase even easier (`#http-78 <https://projects.tigase.net/issue/http-78>`__) - now it’s only needed to select desired database, provide it’s details and eventually adjust which components and plugins should be enabled or disabled, but we believe that provided defaults should work well in most of the cases.
 
@@ -75,7 +71,7 @@ After the installation and startup, it’s possible to see basic instance state 
 .. _`_noteworthy`:
 
 Noteworthy
-----------
+~~~~~~~~~~~~~~
 
 -  Startup time was significantly reduced due to improvements of creating repository pools (`#server-1149 <https://projects.tigase.net/issue/server-1149>`__)
 
@@ -87,10 +83,8 @@ Noteworthy
 
 -  `Publishing Options <https://xmpp.org/extensions/xep-0060.html#publisher-publish-options>`__ were added to PubSub (`#pubsub-75 <https://projects.tigase.net/issue/pubsub-75>`__)
 
-.. _`_new_minor_features_behavior_changes`:
-
 New Minor Features & Behavior Changes
-=====================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  `server-918 <https://projects.tigase.net/issue/server-918>`__: AWS obtain public IP and/or DNS address of the EC2 instance
 

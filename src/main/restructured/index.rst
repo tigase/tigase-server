@@ -4,14 +4,14 @@ Tigase Documentation
 ===================================
 
 .. toctree::
-   :caption: Tigase XMPP Server Distribution Administration Guide -Version 8.3.0
+   :caption: Tigase XMPP Server Distribution Administration Guide
    :maxdepth: 3
 
    Tigase_Admistration/index.rst
 
 
 .. toctree::
-   :caption: Tigase Development Guide -Version 8.3.0
+   :caption: Tigase Development Guide
    :maxdepth: 3
 
    Tigase_Development/index.rst

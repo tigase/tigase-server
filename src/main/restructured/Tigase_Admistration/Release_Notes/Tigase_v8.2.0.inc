@@ -1,10 +1,8 @@
 Tigase XMPP Server 8.2.0 Change notes
-------------------------------------------------------
-
-.. _`_major_changes`:
+-------------------------------------
 
 Major Changes
-=============
+^^^^^^^^^^^^^
 
 -  **Improvements to s2s connection**: Version 8.2.0 brings a lot of improvements related to s2s connectivity: support for TLS1.3, improved logic during authentication and stream negotiation solving connectivity issues with various deployments
 
@@ -14,10 +12,8 @@ Major Changes
 
 -  Improved performance: reduced memory usage and decrease startup time
 
-.. _`_all_minor_features_behavior_changes`:
-
 All Minor Features & Behavior Changes
-=====================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  `#server-1050 <https://projects.tigase.net/issue/server-1050>`__: Database installation without root credentials
 
