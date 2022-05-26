@@ -5,13 +5,13 @@ The only step is to tell the server what components to load, how to name them an
 
 Let’s say you want to just add PubSub for now. All you need to do is add the following to the properties file:
 
-.. code:: dsl
+.. code::
 
    pubsub (class: tigase.pubsub.PubSubComponent) {}
 
 Normally, this is not necessary since pubsub is loaded by default, however this is just an example of loading a class with the DSL format.
 
-.. code:: dsl
+.. code::
 
    'pubsub-priv' (class: tigase.pubsub.PubSubComponent) {}
 
@@ -21,7 +21,7 @@ Although this may be rare, it allows for wide compatibility and platform stabili
 
 Normally, however we want to load few different components like PubSub, MUC, MSN Transport and so on…​. Therefore instead of the above second PubSub we can load the MUC component:
 
-.. code:: dsl
+.. code::
 
    muc (class: tigase.muc.MUCComponent) {}
    pubsub (class: tigase.pubsub.PubSubComponent) {}

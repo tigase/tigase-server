@@ -14,13 +14,13 @@ By default, Tigase has the old ``debug = ['server']`` setting is turned on and d
 
 However, people want to see what is going on the network level. That is what has been sent and what has been received by the server - the actual character data. The class which would print all received and sent character data is: ``tigase.xmpp.XMPPIOService``. To enable all debugging info for this class you have to modify the debug line:
 
-.. code:: dsl
+.. code::
 
    debug = [ 'xmpp.XMPPIOService' ]
 
 You can also have debugging switched on for many packages/classes at the same time:
 
-.. code:: dsl
+.. code::
 
    debug = [ 'cluster' , 'xmpp.XMPPIOService' ]
 

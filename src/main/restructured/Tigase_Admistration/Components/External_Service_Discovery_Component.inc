@@ -10,7 +10,7 @@ Component (which is implemented in class ``tigase.server.extdisco.ExternalServic
 
 -  in DSL format:
 
-   .. code:: DSL
+   .. code::
 
       ext-disco () { }
 
@@ -18,7 +18,7 @@ Additionally you need to activate ``urn:xmpp:extdisco:2`` XMPP processor in ``Se
 
 -  in DSL - enable subbean of ``sess-man``:
 
-   .. code:: DSL
+   .. code::
 
       sess-man {
           'urn:xmpp:extdisco:2'() {}

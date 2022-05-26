@@ -21,7 +21,7 @@ At the moment Tigase offers following authentication connectors:
 
 As always the simplest way to configure the server is through the ``config.tdsl`` file. In the article describing this file you can find long list with all available options and all details how to handle it. For the authentication connector setup however we only need 2 options:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        'default-auth' () {
@@ -37,7 +37,7 @@ As always the simplest way to configure the server is through the ``config.tdsl`
 
 For example if you store authentication data in a ``drupal`` database on ``localhost`` your settings would be:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        'default-auth' () {
@@ -54,7 +54,7 @@ You have to use a class name if you want to attach your own authentication conne
 
 Default is:
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default {
@@ -66,7 +66,7 @@ In the same exact way you can setup connector for any different database type.
 
 For example, drupal configuration is below
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default {
@@ -76,7 +76,7 @@ For example, drupal configuration is below
 
 Or tigase-custom authentication connector.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default {
@@ -100,7 +100,7 @@ One more important thing to know is that you will have to modify ``authRepositor
 
 For example:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {

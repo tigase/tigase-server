@@ -57,7 +57,7 @@ We want to make it possible to connect the MUC component to all nodes. To do so,
 
 This can be simply done by adding following line to the server configuration file:
 
-.. code:: dsl
+.. code::
 
    ext () {}
 

@@ -271,7 +271,7 @@ There is another part of the plugin configuration though. If you looked at the `
 
 Again **config.tdsl** is the place to put the stuff. These kind of properties start under your **plugin ID** and each key and value will be a child underneath:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        pluginID {
@@ -399,7 +399,7 @@ It can also be done by specifying the class directly for bean ``customSaslFactor
 
 **Example of the registration of a SASL mechanism factory with TDSL setting id of the factory to ``customSaslFactory``.**
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'sasl-provider' () {
@@ -420,7 +420,7 @@ To register a new callback handler you need to create a new class extending ``ti
 
 Next you need to register new implementation of ``CallbackHandlerFactoryIfc``. The ``config.tdsl`` file should include:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'sasl-provider' () {
@@ -443,7 +443,7 @@ The default selector returns mechanisms from all mechanism factories registered 
 
 It is possible to use a custom selector by specifying it’s class int the ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'sasl-provider' () {

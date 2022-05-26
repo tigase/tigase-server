@@ -37,7 +37,7 @@ This will create Derby database named DerbyDB in the main Tigase directory and l
 
 You will need to repeat this process again in for following order:
 
-.. code:: list
+.. code::
 
    derby-common-0.0.1.sql
    derby-common-0.0.2.sql
@@ -52,7 +52,7 @@ You will need to repeat this process again in for following order:
 
 Other components may require installation such as:
 
-.. code:: list
+.. code::
 
    derby-socks5-2.0.0.sql
    derby-push-1.0.0.sql
@@ -63,7 +63,7 @@ Connecting Tigase to database
 
 Once the database is setup, configure the ``config.tdsl`` file in Tigase and add the following configuration:
 
-.. code:: properties
+.. code::
 
    dataSource {
        default () {

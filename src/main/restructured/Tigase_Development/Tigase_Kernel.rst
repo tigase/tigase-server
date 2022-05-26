@@ -195,7 +195,7 @@ In this case it means that ``bean1`` is registered in the root/main kernel insta
 
 To configure value of ``field1`` in instance of ``bean1`` and ``field2`` in instance of ``bean2`` in DSL (for more information about DSL format please check section ``DSL file format`` of the ``Admin Guide``) you would need to use following entry in the config file:
 
-.. code:: dsl
+.. code::
 
    bean1 {
        field1 = 1
@@ -326,7 +326,7 @@ There is also an interface named ``RegistrarBeanWithDefaultBeanClass``. This int
 
 As an example of such use case is ``dataSource`` bean, which allows administrator to easily configure many data sources without passing their class names, ie.
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () { .... }
@@ -471,7 +471,7 @@ Following classes will produce following structure of beans:
 
 As mentioned DSL file structure depends on structure of beans, a file to set a config field in each bean to bean name should look like that:
 
-.. code:: dsl
+.. code::
 
    'bean1' () {
        'v1' = 'bean1'

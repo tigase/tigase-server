@@ -12,7 +12,7 @@ By default, Tigase employs XEP-0352 Client State Indication which allows for a m
 
 However, this can be fine tuned by using mobile plugins from Tigase which can be used at the same time by adding the following line to the ``config.tdsl`` file:
 
-.. code:: properties
+.. code::
 
    }
    'sess-man' {
@@ -58,7 +58,7 @@ Disabling CSI
 
 If you wish to not use the ``ClientStateIndication`` processor, set the following in your ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'urn:xmpp:csi:0' (active: false) {}
@@ -82,7 +82,7 @@ The ``threadsNo`` property allows you to fine-tune the SM plugin’s (processors
 
 We can even fine tune this packet processing. Let’s say you want most of the plugins to be executed within a single thread pool to preserve packet ordering for them, but for some selected plugins that should execute within separate thread pools to improve performance. Let’s say, authentication packets and user registration can be actually executed in a separate thread pools as we do not worry about an order for them. Users cannot send or receive anything else before they authenticates anyway. The solution is to specify a number of threads for the selected plugin. For example, setting a common thread pool for all plugins but registration and authentication can be done with following configuration:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'amp' () {
@@ -101,7 +101,7 @@ Thread Pool factor
 
 Session manager can control the number of available thread pools for each processor. By adding the following line to the ``config.tdsl`` file, the global thread pool can be increased by a specified factor:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'sm-threads-factor' = 3
@@ -119,7 +119,7 @@ Any class implementing ``tigase.cluster.strategy.ClusteringStrategyIfc`` interfa
 
 Example:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        strategy (class: tigase.cluster.strategy.SMCachingAllNodes)

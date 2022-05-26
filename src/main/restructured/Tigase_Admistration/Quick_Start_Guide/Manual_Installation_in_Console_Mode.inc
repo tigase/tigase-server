@@ -101,7 +101,7 @@ Configure config.tdsl
 
 You need also to edit the ``config.tdsl`` file. It contains initial parameters normally set by the configuration program. As this is a manual installation, you will have to edit this document yourself. It contains already a few lines:
 
-.. code:: dsl
+.. code::
 
    'config-type' = 'setup'
 
@@ -126,13 +126,13 @@ Step 2: Set virtual host
 
 Without a virtual host, your XMPP server has no domain with which to operate. To set a virtual host use the following configuration:
 
-.. code:: dsl
+.. code::
 
    'default-virtual-host' = 'hostname'
 
 You have to replace ``hostname`` with a domain name used for your XMPP installation. Let’s say this is **jabber.your-great.net**. Your setting should look like this:
 
-.. code:: dsl
+.. code::
 
    'default-virtual-host' = 'jabber.your-great.net'
 
@@ -144,7 +144,7 @@ Step 3: Set Administrators
 
 At least one administrator is required, and once the database is setup will have the default password of ``tigase``. Be sure to change this once you have finished setting up your server. To add admins, use the following line in the ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    admins = [ 'admin@jabber.your-great.net', 'user2jabber.your-great.net' ]
 
@@ -152,7 +152,7 @@ Step 4: Set databases
 
 You will also need to configure connection to the database. First you have to decide what database you want to use: ``Derby``, ``MySQL``, ``PostgreSQL``, ``MSSQL``, or ``MondoDB``. Each database will have slightly different configurations. If we are using derby, in a directory called ``tigasedb``, your configuration would look like this:
 
-.. code:: dsl
+.. code::
 
    dataSource () {
        default () {
@@ -170,7 +170,7 @@ Install Database
 
 Creating the database is the next step. Previously, we had scripts to handle this process, but we now have the advantage of functions in the ``tigase.sh`` script that can be used. Setting up the database can now be done using a single command.
 
-.. code:: dsl
+.. code::
 
    ./scripts/tigase.sh install-schema etc/tigase.conf -T derby -D tigasedb -H localhost -U tigase_user -P tigase_pass -R root -A rootpass -J admin@jabber.your-great.net -N pass
 
@@ -178,7 +178,7 @@ This command will install tigase using a Derby database on one named ``tigasedb`
 
 On a windows system, you need to call the program directly:
 
-.. code:: windows
+.. code::
 
    C:\tigase>java -cp "jars/*" tigase.db.util.SchemaManager "install-schema" -T derby -D tigasedb -H localhost -U tigase_user -P tigase_pass -R root -A rootpass -J admin@jabber.your-great.net -N pass
 

@@ -65,7 +65,7 @@ Connect new database
 
 Edit your new ``config.tdsl`` file to connect to the new database you created during the import step.
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {

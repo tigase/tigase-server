@@ -27,7 +27,7 @@ Activation
 
 You can either run the Tigase installer and use the configuration wizard to activate the monitoring or edit etc/config.tdsl file and add following lines:
 
-.. code:: dsl
+.. code::
 
    monitoring() {
      jmx() {

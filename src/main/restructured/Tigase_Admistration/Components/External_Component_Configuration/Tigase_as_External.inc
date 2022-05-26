@@ -12,7 +12,7 @@ Usage with shared database (since version 8.0.0)
 
 When you are using Tigase server 8.0.0 or newer in the "external component mode" while using shared default "user repository" and you have main server also running Tigase XMPP Server 8.0.0 or newer, then you can benefit from the remote management of the component connections from the main server. To use that, you need to enable external component and external component manager on the main server by adding following line to the config file:
 
-.. code:: dsl
+.. code::
 
    'ext' () {}
    'ext-man' () {}
@@ -36,13 +36,13 @@ A few assumptions:
 
 There is a special configuration type for this case which simplifies setting needed to run Tigase as an external component:
 
-.. code:: dsl
+.. code::
 
    'config-type' = 'component'
 
 Knowing that we can now create simple configuration file for Tigase XMPP Server:
 
-.. code:: dsl
+.. code::
 
    admins = [ 'admin@devel.tigase.org' ]
    'config-type' = 'component'
@@ -97,7 +97,7 @@ Suppose you want to run more than one component as an external components within
 
 The most straightforward way is just to add another component to the server running in the component mode for the component domain
 
-.. code:: dsl
+.. code::
 
    admins = [ 'admin@devel.tigase.org' ]
    'config-type' = 'component'
@@ -128,7 +128,7 @@ There is one catch however. Since you are reusing connections (hostname binding 
 
 Here is an example configuration with a single connection over the `XEP-0225 <http://xmpp.org/extensions/xep-0225.html>`__ protocol used by both external domains:
 
-.. code:: dsl
+.. code::
 
    admins = [ 'admin@devel.tigase.org' ]
    'bind-ext-hostnames' = [ 'pubsub.devel.tigase.org' ]
@@ -168,13 +168,13 @@ A few assumptions:
 
 There is a special configuration type for this case which simplifies setting needed to run Tigase as an external component:
 
-.. code:: dsl
+.. code::
 
    'config-type' = 'component'
 
 This generates a configuration for Tigase with only one component loaded by default - the component used for external component connection. If you use this configuration type, your ``config.tdsl`` file may look like this:
 
-.. code:: dsl
+.. code::
 
    admins = [ 'admin@devel.tigase.org' ]
    'config-type' = 'component'
@@ -214,7 +214,7 @@ The most straightforward way is just to add another external component connectio
 
 Then we can use following configuration on the server running in the ``component`` mode:
 
-.. code:: dsl
+.. code::
 
    admins = [ 'admin@devel.tigase.org' ]
    'config-type' = 'component'
@@ -251,7 +251,7 @@ There is one catch however. Since you are reusing connections (hostname binding 
 
 Here is an example configuration with a single connection over the `XEP-0225 <http://xmpp.org/extensions/xep-0225.html>`__ protocol used by both external domains:
 
-.. code:: dsl
+.. code::
 
    admins = [ 'admin@devel.tigase.org' ]
    'bind-ext-hostnames' = [ 'pubsub.devel.tigase.org' ]

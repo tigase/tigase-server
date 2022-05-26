@@ -11,7 +11,7 @@ The functionality itself is split in two plugins:
 
 In order to enable functionality you should add both plugins to your configuration file
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        'jabber:iq:last-marker' (active: true) {
@@ -24,7 +24,7 @@ What updates last activity
 
 By default marker plugin will only update last activity information on presence stanza. It’s possible to control whether ``<presence/>`` and/or ``<message/>`` should update with respective options:
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        'jabber:iq:last-marker' (active: true) {
@@ -40,7 +40,7 @@ Persist everything to repository
 
 To lower impact on performance, by default last activity information is persisted to repository less frequently. This can yield slightly less accurate results on installations with multiple cluster nodes with users having multiple resources connected. To get more accurate results you should set ``persistAllToRepository`` to ``true``, which will cause all update times to be persisted (please bear in mind that this could cause higher impact on the repository).
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        'jabber:iq:last-marker' (active: true) {

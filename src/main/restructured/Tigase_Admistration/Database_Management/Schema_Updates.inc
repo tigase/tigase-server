@@ -34,7 +34,7 @@ In previous versions, Tigase used stored procedures ``TigUserLoginPlainPw`` and 
 
 It is still possible to use this procedures for authentication, but to do that you need add:
 
-.. code:: tdsl
+.. code::
 
    'user-login-query' = '{ call TigUserLoginPlainPw(?, ?) }'
 
@@ -42,7 +42,7 @@ to configuration block of **every** authentication repository.
 
 To enable this for default repository, the ``authRepository`` configuration block will look like this:
 
-.. code:: tdsl
+.. code::
 
    authRepository () {
        default () {
@@ -67,7 +67,7 @@ If you have changed ``password-encoding`` database property in previous versions
 
 **Usage of MD5 decoder.**
 
-.. code:: tdsl
+.. code::
 
    authRepository () {
        default () {
@@ -81,7 +81,7 @@ If you wish to store passwords in MD5 form then use following entries in your co
 
 **Usage of MD5 encoder.**
 
-.. code:: tdsl
+.. code::
 
    authRepository () {
        default () {
@@ -98,7 +98,7 @@ You may enable which encoders and decoders used on your installation. By enablin
 
 **Enabling PLAIN decoder.**
 
-.. code:: tdsl
+.. code::
 
    authRepository () {
        default () {
@@ -110,7 +110,7 @@ You may enable which encoders and decoders used on your installation. By enablin
 
 **Disabling SCRAM-SHA-1 encoder.**
 
-.. code:: tdsl
+.. code::
 
    authRepository () {
        default () {

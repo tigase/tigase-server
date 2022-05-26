@@ -23,7 +23,7 @@ Configuration Options
 
 The most basic configuration is related to the choice of actual redirection implementation by declaring class for each connector:
 
-.. code:: dsl
+.. code::
 
    bosh {
        seeOtherHost (class: <value>) {}
@@ -49,7 +49,7 @@ Possible values are:
 
 All options are configured on a per-connection-manager basis, thus all options need to be prefixed with the corresponding connection manager ID, i.e. c2s, bosh or ws; we will use c2s in the examples:
 
-.. code:: dsl
+.. code::
 
    c2s {
        'cm-see-other-host' {
@@ -73,7 +73,7 @@ SeeOtherHostDB
 
 For ``SeeOtherHostDB`` implementation there are additional options:
 
-.. code:: dsl
+.. code::
 
    c2s {
        'cm-see-other-host' {
@@ -97,7 +97,7 @@ This mechanisms matches internal Tigase cluster nodes against the lookup table t
 
 To enable this redirection mechanism following configuration / class should be used. Note that for global use, all connection managers must have the same class defined. You can define each connection manager individually.
 
-.. code:: dsl
+.. code::
 
    bosh {
        seeOtherHost (class: tigase.server.xmppclient.SeeOtherHostDualIP) {}
@@ -123,7 +123,7 @@ It offers following configuration options:
 
 All options are configured or on per-component basis:
 
-.. code:: dsl
+.. code::
 
    <connector> {
        'cm-see-other-host' {
@@ -139,7 +139,7 @@ EventBus as a source of information
 
 It’s possible to utilize EventBus and internal Tigase events as a source of redirection data. In order to do that ``eventbus-repository-notifications`` needs to be enabled in ClusterConnectionManager:
 
-.. code:: dsl
+.. code::
 
    'cl-comp' {
        'eventbus-repository-notifications' = true
@@ -154,7 +154,7 @@ Enforcing redirection
 
 It’s possible to enforce redirection of connections on the particular port of connection manager with ``force-redirect-to`` set to Integer with the following general setting option:
 
-.. code:: dsl
+.. code::
 
    <connection_manager> {
        connections {
@@ -166,7 +166,7 @@ It’s possible to enforce redirection of connections on the particular port of 
 
 for example, enable additional port ``5322`` for ``c2s`` connection manager and enforce all connections to be redirected to port ``5222`` (it will utilize hostname retrieved from ``SeeOtherHost`` implementation and will be only used when such value is returned):
 
-.. code:: dsl
+.. code::
 
    c2s {
        connections {
@@ -194,7 +194,7 @@ To fully utilize ``SeeOtherHostDualIP`` setup in automated fashion it’s now po
 
 or in the ``etc/config.tdsl`` (they will be converted to JVM properties):
 
-.. code:: dsl
+.. code::
 
    'dns-resolver' {
        'tigase-resolver-class' = 'tigase.util.DNSResolverDefault'

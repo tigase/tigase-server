@@ -12,7 +12,7 @@ This guide describes MySQL database connection parameters.
 
 This guide is actually very short as there are example configuration files which can be used and customized for your environment.
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {
@@ -50,7 +50,7 @@ If you look in ``etc/`` directory of your Tigase installation you should find a 
 
 All you need to connect to Drupal database is set the following:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        'default-auth' () {
@@ -66,7 +66,7 @@ All you need to connect to Drupal database is set the following:
 
 Typically, you will need to have drupal for authentication, and another for user repository. In this case, we will use SQL for user DB.
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {
@@ -139,7 +139,7 @@ Server Configuration
 
 Server configuration is almost identical to MySQL database setup. The only difference is the connection string which usually looks like:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {

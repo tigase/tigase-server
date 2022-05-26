@@ -134,7 +134,7 @@ Configuration
 
 DynamicRoster implementation class should be configured in the **config.tdsl** file:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'dynamic-rosters' () {
@@ -205,7 +205,7 @@ Configuration
 
 Mobile plugins are not activated by default thus additional entry in the ``config.tdsl`` is required:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        mobile_v1 () {}

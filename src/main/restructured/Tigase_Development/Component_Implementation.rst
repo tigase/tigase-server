@@ -128,7 +128,7 @@ Before we go any further with the implementation let’s configure the component
 
 We can see that it already is configured to load two other components: **MUC** and **PubSub**. Let’s add a third - our new component to the configuration file by appending the following line in the properties file:
 
-.. code:: java
+.. code::
 
    test(class: TestComponent) {}
 
@@ -213,7 +213,7 @@ And this is it. Tigase Kernel will take care of this fields and will update them
 
 The syntax in ``config.tdsl`` file is very simple and is described in details in the *Admin Guide*. To set the configuration for your component in ``config.tdsl`` file you have to append following lines to the file inside test component configuration block:
 
-.. code:: dsl
+.. code::
 
    test-module {
      log-prepend = 'My packet: '
@@ -1462,7 +1462,7 @@ Our class ``TestRepositoryMDBean`` is annotated with ``@Bean`` which sets its na
 
 **Example.**
 
-.. code:: dsl
+.. code::
 
    test(class: TestComponent) {
        repository () {
@@ -1475,7 +1475,7 @@ Defaults
 
 As mentioned above, if we use ``MDRepositoryBeanWithStatistics`` as our base class for ``TestRepositoryMDBean``, then we may have different data sources used for different domains. By default, if we will not configure it otherwise, ``MDRepositoryBeanWithStatistics`` will create only single repository instance named ``default``. It will be used for all domains and it will, by default, use data source named the same as repository instance - it will use data source named ``default``. This defaults are equal to following configuration entered in the config file:
 
-.. code:: dsl
+.. code::
 
    test(class: TestComponent) {
        repository () {
@@ -1492,7 +1492,7 @@ It is possible to make any repository use different data source than data source
 
 **Example setting repository ``default`` to use data source named ``test``.**
 
-.. code:: dsl
+.. code::
 
    test(class: TestComponent) {
        repository () {
@@ -1509,7 +1509,7 @@ To configure repository instance to be used for particular domain, you need to d
 
 **Separate repository for ``example.com`` using data source named ``example.com``.**
 
-.. code:: dsl
+.. code::
 
    dataSource () {
        // configuration of data sources here is not complete
@@ -1532,7 +1532,7 @@ To configure repository instance to be used for particular domain, you need to d
 
 **Separate repository for ``example.com`` using data source named ``test``.**
 
-.. code:: dsl
+.. code::
 
    dataSource () {
        // configuration of data sources here is not complete
@@ -1575,7 +1575,6 @@ First of all, repository implementation should implement ``tigase.db.util.Reposi
    @Repository.SchemaId(id = "test-component", name = "Test Component")
    public static class TestRepositoryMDBean extends MDRepositoryBeanWithStatistics<TestRepositoryIfc>
        implements TestRepositoryIfc {
-   …
    }
 
 This action alone will result in performing the check during Tigase XMPP Server startup and initialisation of repository whether tables, indexes, stored procedures and other elements are present in the configured data source in the required version. By default, required version matches the implementation version (obtained via call to ``java.lang.Package.getImplementationVersion()``), however it’s possible to specify required version manually, either:

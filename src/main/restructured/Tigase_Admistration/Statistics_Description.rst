@@ -95,7 +95,7 @@ Statistics common to components
 
 These statistics may be found in multiple components and may be seen multiple times. For example both s2s and c2s will have Bytes received statistic, so each can be found the following way:
 
-.. code:: properties
+.. code::
 
    s2s/Bytes received
    c2s/Bytes received

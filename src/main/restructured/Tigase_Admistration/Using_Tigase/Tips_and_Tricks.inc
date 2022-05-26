@@ -75,7 +75,7 @@ There is also a way to use BOSH without load balancer enabled. In this case the 
 
 Tigase XMPP Server by default provides server side solution for this issue by sending additional ``host`` attribute in ``body`` element of BOSH response. As value of this attribute Tigase XMPP Server sends domain name of server cluster node to which client connected and to which next connections of this session should be opened. It is possible to disable this custom feature by addition of of following line to ``etc/config.tdsl`` config file:
 
-.. code:: dsl
+.. code::
 
    bosh {
        'send-node-hostname' = false
@@ -95,7 +95,7 @@ Tip #1 - Encrypted WebSocket Connection
 
 It is possible to enable encrypted WebSocket connection in Tigase XMPP Server. To do this you need to add following lines to ``etc/config.tdsl`` config file:
 
-.. code:: dsl
+.. code::
 
    ws2s {
        connections {

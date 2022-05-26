@@ -39,7 +39,7 @@ Database Watchdog
 
 It is possible to have Tigase test availability and existence of database periodically only when db connections are idle. By default this ping is sent once every 60 minutes to each connected repository. However this can be overridden as a part of the dataSource property:
 
-.. code:: properties
+.. code::
 
    dataSource {
        default () {
@@ -53,7 +53,7 @@ It is possible to have Tigase test availability and existence of database period
 
 This setting changes frequency to 30 minutes.
 
-.. code:: properties
+.. code::
 
    dataSource {
        default () {
@@ -75,7 +75,7 @@ If you are using Tigase XMPP Server with modified schema (changed procedures or 
 
 **Disabling ``schema-management`` for ``default`` data source**
 
-.. code:: tdsl
+.. code::
 
    dataSource {
        default () {

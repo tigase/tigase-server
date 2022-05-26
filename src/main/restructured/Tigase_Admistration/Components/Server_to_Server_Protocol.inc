@@ -28,7 +28,7 @@ Tigase server offers 2 different parameters to tweak the number of concurrent, s
 
    To adjust the limit you have to add following to the ``config.tdsl`` file:
 
-   .. code:: dsl
+   .. code::
 
       s2s {
           'max-out-total-conns' = 2
@@ -38,7 +38,7 @@ Tigase server offers 2 different parameters to tweak the number of concurrent, s
 
    To adjust the limit you have to add following line to the ``config.tdsl`` file:
 
-   .. code:: dsl
+   .. code::
 
       s2s {
           'max-out-per-ip-conns' = 2
@@ -61,7 +61,7 @@ There are 2 timeouts you can set for the component controlling s2s communication
 
 -  ``max-packet-waiting-time`` - this sets the maximum time for the packets waiting for sending to some remote server. Sometimes, due to networking problems or DNS problems it might be impossible to send message to remote server right away. Establishing a new connection may take time or there might be communication problems between servers or perhaps the remote server is restarted. Tigase will try a few times to connect to the remote server before giving up. This parameter specifies how long the packet is waiting for sending before it is returned to the sender with an error. The timeout is specified in seconds:
 
-   .. code:: dsl
+   .. code::
 
       s2s {
           'max-packet-waiting-time' = 420L
@@ -69,7 +69,7 @@ There are 2 timeouts you can set for the component controlling s2s communication
 
 -  ``max-inactivity-time`` - this parameters specifies the maximum s2s connection inactivity time before it is closed. If a connection is not in use for a long time, it doesn’t make sense to keep it open and tie resources up. Tigase closes s2s connection after specified period of time and reconnects when it is necessary. The timeout is specified in seconds:
 
-   .. code:: dsl
+   .. code::
 
       s2s {
           'max-inactivity-time' = 900L
@@ -82,7 +82,7 @@ Sometimes for very large installations you may want to set larger number of s2s 
 
 This piece of code is pluggable and you can write your own connection selector. It is enough to implement ``S2SConnectionSelector`` interface and set your class name in the configuration using following parameter in ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    s2s {
        's2s-conn-selector' = 'YourSelectorImplementation'
@@ -95,7 +95,7 @@ skip-tls-hostnames
 
 The ``s2s-skip-tls-hostnames`` property disables TLS handshaking for s2s connections to selected remote domains. Unfortunately some servers (certain versions of Openfire - [`1 <http://community.igniterealtime.org/thread/36206>`__] or [`2 <http://community.igniterealtime.org/thread/30578>`__]) have problems with TLS handshaking over s2s which prevents establishing a usable connection. This completely blocks any communication to these servers. As a workaround you can disable TLS for these domains to get communication back. Enabling this can be done on any vhost, but must be configured under the s2s component.
 
-.. code:: dsl
+.. code::
 
    s2s {
        'skip-tls-hostnames' = [ 'domain1', 'domain2' ]
@@ -106,7 +106,7 @@ ejabberd-bug-workaround
 
 This property activates a workaround for a bug in EJabberd in it’s s2s implementation. EJabberd does not send dialback in stream features after TLS handshaking even if the dialback is expected/needed. This results in unusable connection as EJabberd does not accept any packets on this connection either. The workaround is enabled by default right now until the EJabberd version without the bug is popular enough. A disadvantage of the workaround is that dialback is always performed even if the SSL certificate is fully trusted and in theory this dialback could be avoided. By default, this is not enabled.
 
-.. code:: dsl
+.. code::
 
    s2s {
        dialback () {

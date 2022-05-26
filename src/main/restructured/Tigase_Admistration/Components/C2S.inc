@@ -8,7 +8,7 @@ Configuration
 
 To disable C2S, use the following line in ``config.tdsl`` folder.
 
-.. code:: dsl
+.. code::
 
    c2s (active: false) {}
 
@@ -19,7 +19,7 @@ Connections
 
 The connections container houses all configuration related to connections with the component. Each port may be configured individually.
 
-.. code:: dsl
+.. code::
 
    c2s {
        connections {
@@ -37,7 +37,7 @@ new-connections-throttling
 
 The property allows you to limit how many new users' connection per second the server accepts on a particular port. Connections established within the limit are processed normally, all others are simply disconnected. This allows you to avoid server overload in case there is a huge number of users trying to connect at the same time. Mostly this happens after a server restart.
 
-.. code:: dsl
+.. code::
 
    c2s {
        connections {
@@ -56,7 +56,7 @@ Resumption timeout
 
 It is now possible to set a default stream resumption timeout that the server uses. This allows control of how long a server will wait for a reconnection from a client. This can be particularly helpful to manage mobile clients connecting to your server as they may not have complete coverage, and you do not want to close the stream right away. By default, Tigase sets this value to 60 seconds.
 
-.. code:: dsl
+.. code::
 
    c2s {
        'urn:xmpp:sm:3' {
@@ -66,7 +66,7 @@ It is now possible to set a default stream resumption timeout that the server us
 
 This sets the default timeout to 90 seconds. You may, if you choose, specify a maximum timeout time, which will allow the server to wait between the default and maximum before a connection is closed.
 
-.. code:: dsl
+.. code::
 
    c2s {
        'urn:xmpp:sm:3' {
@@ -85,7 +85,7 @@ Packet Redelivery
 
 Normally packets are handled by C2S and are typically processed in the first run, however if that fails to send, a retry of sending that packet will occur after 60 seconds. If that second try fails, the delay will increase by a factor of 1.5. This means that the next retry will occur at 90, 135, and so on until the retry count is reached. By default this count is 15, however it can be changed by using the following setting:
 
-.. code:: dsl
+.. code::
 
    c2s {
        'packet-deliver-retry-count' = '20'

@@ -51,7 +51,7 @@ Import Schema
 
 From the File menu Select Open → File (or use Ctrl+O) and then open following files:
 
-.. code:: list
+.. code::
 
    sqlserver-common-0.0.1.sql
    sqlserver-common-0.0.2.sql
@@ -70,7 +70,7 @@ From the File menu Select Open → File (or use Ctrl+O) and then open following 
 
 Other components may require installation such as:
 
-.. code:: list
+.. code::
 
    sqlserver-socks5-2.0.0.sql
    sqlserver-push-1.0.0.sql
@@ -138,7 +138,7 @@ where any number of additional parameters can (and should) consist of:
 
 Example:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {
@@ -155,7 +155,7 @@ Depending on the driver used ``uri`` needs to be configured accordingly.
 
 -  Microsoft driver:
 
-   .. code:: dsl
+   .. code::
 
       dataSource {
           default () {

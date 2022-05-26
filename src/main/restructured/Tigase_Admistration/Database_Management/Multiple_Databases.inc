@@ -9,7 +9,7 @@ How can we do that then?
 
 This is very easy to do through the Tigase’s configuration file.
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {
@@ -35,7 +35,7 @@ Here is, how it works:
 
 First, let’s define our default database for all VHosts
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {
@@ -57,7 +57,7 @@ First, let’s define our default database for all VHosts
 
 Now, we have VHost: domain1.com User authentication data for this VHost is stored in Drupal database
 
-.. code:: dsl
+.. code::
 
    dataSource {
      'domain1.com-auth' () {
@@ -73,7 +73,7 @@ Now, we have VHost: domain1.com User authentication data for this VHost is store
 
 All other user data is stored in Tigase’s standard database in MySQL
 
-.. code:: dsl
+.. code::
 
    dataSource {
      'domain1.com' () {
@@ -86,7 +86,7 @@ All other user data is stored in Tigase’s standard database in MySQL
 
 Next VHost: domain2.com User authentication is in LDAP server but all other user data is stored in Tigase’s standard database
 
-.. code:: dsl
+.. code::
 
    authRepository {
        domain2.com () {
@@ -98,7 +98,7 @@ Next VHost: domain2.com User authentication is in LDAP server but all other user
 
 Now is something new, we have a custom authentication repository and separate user settings for a single domain. Please note how we define the VHost for which we set custom parameters
 
-.. code:: dsl
+.. code::
 
    authRepository {
        domain2.com {
@@ -108,7 +108,7 @@ Now is something new, we have a custom authentication repository and separate us
 
 All other user data is stored in the same as default repository
 
-.. code:: dsl
+.. code::
 
    userRepository {
        domain2.com () {}
@@ -121,7 +121,7 @@ All other user data is stored in the same as default repository
 
 When combined, the DSL output should look like this:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        domain2.com () {
@@ -141,7 +141,7 @@ When combined, the DSL output should look like this:
 
 Next VHost: domain3.com Again user authentication is in LDAP server but pointing to a different LDAP server with different access credentials and parameters. User information is stored in a postgreSQL database.
 
-.. code:: dsl
+.. code::
 
    dataSource {
        domain3.com () {
@@ -161,7 +161,7 @@ Next VHost: domain3.com Again user authentication is in LDAP server but pointing
 
 For VHost: domain4.com all the data, both authentication and user XMPP data are stored on a separate MySQL server with custom stored procedures for both user login and user logout processing.
 
-.. code:: dsl
+.. code::
 
    dataSource {
        domain4.com () {

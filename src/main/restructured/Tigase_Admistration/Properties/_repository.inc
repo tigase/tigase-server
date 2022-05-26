@@ -5,7 +5,7 @@ Repository
 
 **Default value:**
 
-.. code:: dsl
+.. code::
 
    authRepository {
      <configuration>
@@ -15,7 +15,7 @@ This is the basic setup for authRepository, where <configuration> settings are g
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    authRepository {
        'auth-repo-pool-size' = 50
@@ -45,7 +45,7 @@ This property sets the database connections pool size for the associated ``UserR
 
    in some cases instead of default for this property setting for ```data-repo-pool-size`` <#dataRepoPoolSize>`__ is used if pool-size is not defined in ``userRepository``. This depends on the repository implementation and the way it is initialized.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default ()
@@ -54,7 +54,7 @@ This property sets the database connections pool size for the associated ``UserR
 
 This is a global property that may be overridden by individual repository settings:
 
-.. code:: dsl
+.. code::
 
    userRepository {
        default () {
@@ -86,7 +86,7 @@ authRepository
 
 **Default value:**
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {
@@ -97,7 +97,7 @@ Once your configuration is setup, you will see the uri of your user database her
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {
@@ -123,7 +123,7 @@ MSSQL
 
 MSSql support works out of the box, however Tigase provides an open source driver for the database. We recommend using Microsoft’s own driver for better functionality.
 
-.. code:: dsl
+.. code::
 
    dataSource () {
        default () {
@@ -138,7 +138,7 @@ MongoDb
 
 For using mongoDB as the repository, the setting will look slightly different:
 
-.. code:: dsl
+.. code::
 
    dataSource () {
        default () {
@@ -151,7 +151,7 @@ MySQL
 
 MySQL support works out of the box, however Tigase uses prepared calls for calling procedures accessing data stored in database. While this works very fast, it takes time during Tigase XMPP Server startup to prepare those prepared calls. Since version 8.2.0, it is possible to enable workaround which will force Tigase XMPP Server to use prepared statements instead of prepared calls, that will improve startup time but may have slight impact on performance during execution of queries and disables startup verification checking if stored procedures and function in database exist and have correct parameter types. To enable this mode you need to set ``useCallableMysqlWorkaround`` to ``true``.
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {
@@ -168,7 +168,7 @@ pool-size
 
 To do so, specify the number of number of database connection as an integer:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        default () {

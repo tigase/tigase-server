@@ -12,7 +12,7 @@ Operation
 
 Operating the schema utility is quite easy! To use it run this command from the installation directory:
 
-.. code:: command
+.. code:: bash
 
    ./scripts/tigase.sh [task] [params_file.conf] [options]
 
@@ -47,13 +47,13 @@ This task will locate any schema versions above your current one, and will insta
 
    To use this utility, you must have Tigase XMPP server fully setup with a configured configuration file.
 
-.. code:: command
+.. code:: bash
 
    ./scripts/tigase.sh upgrade-schema etc/tigase.conf
 
 Windows users will need to run the command using the following command:
 
-.. code:: windows
+.. code::
 
    java -cp "jars/*" tigase.db.util.SchemaManager "upgrade-schema" --config-file=etc/config.tdsl
 
@@ -63,7 +63,7 @@ This task will install a schema using the parameters provided.
 
 **If you are setting up a server manually, we HIGHLY recommend using this method**
 
-.. code:: command
+.. code:: bash
 
    ./scripts/tigase.sh install-schema [Options]
 
@@ -71,7 +71,7 @@ This command will install tigase using a Derby database on one named ``tigasedb`
 
 If you are using a windows system, you need to call the program directly:
 
-.. code:: windows
+.. code::
 
    java -cp "jars/*" tigase.db.util.SchemaManager "install-schema" [options]
 
@@ -120,7 +120,7 @@ Query function
 
 Should you decide to customize your own functions, or have specific information you want to put into the database, you can use the -query function to perform a single query step.
 
-.. code:: cmd
+.. code::
 
    ./scripts/tigase.sh install-schema -T mysql -D tigasedb -R root -A root -Q "CREATE TABLE tigasedb.EXTRA_TABLE (id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(10) NOT NULL)"
 
@@ -141,7 +141,7 @@ This will destroy the database specified in the configuration file.
 
     **THIS ACTION IS NOT REVERSIBLE**
 
-.. code:: cmd
+.. code::
 
    ./scripts/tigase.sh destroy-schema etc/config.tdsl
 
@@ -149,7 +149,7 @@ Only use this if you wish to destroy a database and not have the information rec
 
 Windows users will need to call the method directly:
 
-.. code:: cmd
+.. code::
 
    java -cp "jars/*" tigase.db.util.SchemaManager "destroy-schema" etc/config.tdsl
 

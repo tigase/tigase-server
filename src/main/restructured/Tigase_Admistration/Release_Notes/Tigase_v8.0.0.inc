@@ -53,7 +53,7 @@ BouncyCastle being used for StartTLS
 
 `BouncyCastle <https://www.bouncycastle.org/java.html>`__ Crypto API has now been employed to handle StartTLS negotiation. By doing this, Tigase now supports ``tls-unique`` within the SCRAM PLUS authentication implementation. This API is may be employed by calling the class in your configuration file:
 
-.. code:: dsl
+.. code::
 
    c2s () {
        sslContextContainer(class: tigase.extras.bcstarttls.BCSSLContextContainer) {}
@@ -138,7 +138,7 @@ Shrinkable Statistics History
 
 Statistics history can now be automatically made smaller if a systems memory resources are above a certain amount. By default this is enabled and will trigger when over 95% of memory is in use. Half of all existing entries will be removed at this time. The same pattern will continue to halve the available records every time the threshold is met. A hard-set minimum of 5 entries is set, so you will always have the last 5 entries. This setting may be adjusted by adding the following setting to your ``config.tdsl`` file and adjusting the integer value:
 
-.. code:: dsl
+.. code::
 
    stats() {
      'stats-high-memory-level' = 95
@@ -151,7 +151,7 @@ Statistics now available for all modules
 
 For any bean, you may enable statistics by using the following
 
-.. code:: dsl
+.. code::
 
    bean (class) {
      statistics = true
@@ -178,7 +178,7 @@ Accounts created using in-band registration now will use confirmation E-mail
 
 In an effort to create a more secure method for implementing ``JabberIqRegister`` Tigase XMPP Server will now require the use of a confirmation E-mail by default in the process. The E-mail must be valid, and accounts will be made into pending status until a user clicks the generated URI in the E-mail and activates the account. This is a plugin and must be enabled in the ``config.tdsl`` file by using the following code:
 
-.. code:: properties
+.. code::
 
    'account-registration-email-validator'() {}
 
@@ -214,7 +214,7 @@ XEP-305 Quickstart now supported
 
 It’s now possible to establish connection faster due to implementation of `XEP-0305: XMPP Quickstart <https://xmpp.org/extensions/xep-0305.html>`__ (`#1936 <https://projects.tigase.net/issues?q=Redmine%20ID:%201936>`__). Feature is only available for ``c2s`` Connection Manager (i.e. connections on port 5222) and needs to be enabled in ``config.tdsl``
 
-.. code:: dsl
+.. code::
 
    c2s () {
        'pipelining' = true
@@ -252,7 +252,7 @@ Packet statistics expanded
 
 Packet statistics both retrieved VIA XMPP and during graceful shutdown have now been separated to a per-XMLNS basis. This may be disabled by adding the following line to ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    'detailed-other-statistics' = false
 
@@ -263,7 +263,7 @@ XEP-0016 Behavior changes
 
 XEP states that Privacy lists should be used when no user session exists in addition to when there is. Previously, Tigase would only filter results when retrieving messages, allowing blocked users to store offline messages. This has now been changed to reflect the XEP properly, and messages will be filtered while there is no user session. If however, you wish to use the previous version, where offline messages are cached first and then filtered, you may use the following configuration:
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        'jabber:iq:privacy' () {
@@ -289,7 +289,7 @@ Option to ignore schema-version check added
 
 You can now skip the schema check phase for individual databases. To do this, add the following do the datasource configuration block:
 
-.. code:: dsl
+.. code::
 
    DataSource () {
      default () {

@@ -24,7 +24,7 @@ The connector loads correctly and starts working using predefined, default list 
 
 This query is used to check connection to the database, whether it is still alive or not
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -34,7 +34,7 @@ This query is used to check connection to the database, whether it is still aliv
 
 This is database initialization query, normally we do not use it, especially in clustered environment
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -48,7 +48,7 @@ This is database initialization query, normally we do not use it, especially in 
 
 Below query performs user authentication on the database level. The Tigase server does not need to know authentication algorithm or password encoding type, it simply passes user id (BareJID) and password in form which was received from the client, to the stored procedure. If the authentication was successful the procedure returns user bare JID or null otherwise. Tigase checks whether the JID returned from the query matches JID passed as a parameter. If they match, the authentication is successful.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -63,7 +63,7 @@ Below query performs user authentication on the database level. The Tigase serve
 
 Below query returns number of user accounts in the database, this is mainly used for the server metrics and monitoring components.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -73,7 +73,7 @@ Below query returns number of user accounts in the database, this is mainly used
 
 The Below query is used to add a new user account to the database.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -83,7 +83,7 @@ The Below query is used to add a new user account to the database.
 
 Below query is used to remove existing account with all user’s data from the database.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -93,7 +93,7 @@ Below query is used to remove existing account with all user’s data from the d
 
 This query is used for the user authentication if ``user-login-query`` is not defined, that is if there is no database level user authentication algorithm available. In such a case the Tigase server loads user’s password from the database and compares it with data received from the client.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -103,7 +103,7 @@ This query is used for the user authentication if ``user-login-query`` is not de
 
 Below query is used for user password update in case user decides to change his password.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -113,7 +113,7 @@ Below query is used for user password update in case user decides to change his 
 
 This query is called on user logout event. Usually we use a stored procedure which records user logout time and marks user as offline in the database.
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -128,7 +128,7 @@ This query is called on user logout event. Usually we use a stored procedure whi
 
 This configuration specifies what non-sasl authentication mechanisms to expose to the client
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -138,7 +138,7 @@ This configuration specifies what non-sasl authentication mechanisms to expose t
 
 This setting to specify what sasl authentication mechanisms expose to the client
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -154,7 +154,7 @@ Some queries can take arguments. Arguments are marked by question marks ``?`` in
 
 This example shows how to use a stored procedure to add a user as a query with 2 required parameters (username, and password).
 
-.. code:: dsl
+.. code::
 
    authRepository {
        default () {
@@ -164,7 +164,7 @@ This example shows how to use a stored procedure to add a user as a query with 2
 
 The same query with plain SQL parameters instead:
 
-.. code:: dsl
+.. code::
 
    'add-user-query' = 'insert into users (user_id, password) values (?, ?)'
 

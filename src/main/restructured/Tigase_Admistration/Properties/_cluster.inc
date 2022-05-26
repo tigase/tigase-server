@@ -10,7 +10,7 @@ cl-comp
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    'cl-comp' {
        <configuration>
@@ -23,7 +23,7 @@ The ``cluster-connect-all`` property is used to open active connections to all n
 
 **Example**
 
-.. code:: dsl
+.. code::
 
    'cl-comp' {
        'connect-all' = true

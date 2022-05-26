@@ -32,19 +32,19 @@ Schema Installation
 
 Load database schema to initialize the Tigase server from the file that corresponds to the version of Tigase you want to use. First you need to switch to ``tigasedb``.
 
-.. code:: sql
+.. code::
 
-   psql=# \connect tigasedb
+   psql=# \c tigasedb
 
 Begin by applying the basic Schema
 
-.. code:: sql
+.. code::
 
    psql=# \i database/postgresql-common-0.0.1.sql
 
 Continue by adding the schema files listed below:
 
-.. code:: list
+.. code::
 
    postgresql-common-0.0.1.sql
    postgresql-common-0.0.2.sql
@@ -59,7 +59,7 @@ Continue by adding the schema files listed below:
 
 Other components may require installation such as:
 
-.. code:: list
+.. code::
 
    postgresql-socks5-2.0.0.sql
    postgresql-push-1.0.0.sql
@@ -97,7 +97,7 @@ Load database schema to initialize the Tigase server
 
 Continue by adding the schema files listed below:
 
-.. code:: list
+.. code::
 
    postgresql-common-0.0.1.sql
    postgresql-common-0.0.2.sql
@@ -112,7 +112,7 @@ Continue by adding the schema files listed below:
 
 Other components may require installation such as:
 
-.. code:: list
+.. code::
 
    postgresql-socks5-2.0.0.sql
    postgresql-push-1.0.0.sql

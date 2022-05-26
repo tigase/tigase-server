@@ -79,7 +79,7 @@ Next install the schema files:
 
 You will need to repeat this process for the following files:
 
-.. code:: list
+.. code::
 
    mysql-common-0.0.1.sql
    mysql-common-0.0.2.sql
@@ -94,7 +94,7 @@ You will need to repeat this process for the following files:
 
 Other components may require installation such as:
 
-.. code:: list
+.. code::
 
    mysql-socks5-2.0.0.sql
    mysql-push-1.0.0.sql
@@ -168,7 +168,7 @@ Load the proper mysql schemas into the database.
 
 You will need to repeat this process for the following files:
 
-.. code:: list
+.. code::
 
    mysql-common-0.0.1.sql
    mysql-common-0.0.2.sql
@@ -183,7 +183,7 @@ You will need to repeat this process for the following files:
 
 Other components may require installation such as:
 
-.. code:: list
+.. code::
 
    mysql-socks5-2.0.0.sql
    mysql-push-1.0.0.sql
@@ -304,7 +304,7 @@ Support for emoji and other icons
 
 Tigase Database Schema can support emojis and other icons, however by using UTF-8 in ``mysqld`` settings will not allow this. To employ settings to support emojis and other icons, we recommend you use the following in your MySQL configuration file:
 
-.. code:: properties
+.. code::
 
    [mysqld]
    character-set-server = utf8mb4

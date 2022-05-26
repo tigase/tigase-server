@@ -34,7 +34,7 @@ ext
 
 The component is loaded the same way as all other Tigase components. In your ``config.tdsl`` file you need to add the external class:
 
-.. code:: dsl
+.. code::
 
    ext (class: tigase.server.ext.ComponentProtocol) {}
 

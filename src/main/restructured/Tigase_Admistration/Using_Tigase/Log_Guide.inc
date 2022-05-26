@@ -51,7 +51,7 @@ The process ID may sometimes come in a different format such as ``[in_14-muc]`` 
 
 By default, Tigase has a limit of 10000000 bytes or 10MB with a file rotation of 10 files. You can edit these values by editing the ``config.tdsl`` file and adding the following lines.
 
-.. code:: dsl
+.. code::
 
    logging {
        java.util.logging.FileHandler {
@@ -106,7 +106,7 @@ Log File Location
 
 You can also change the location of log files if you have a specific directory you wish to use. The configuration may be made by the following lines in your ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    logging {
        java.util.logging.FileHandler {

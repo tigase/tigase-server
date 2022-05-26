@@ -35,7 +35,7 @@ Please note, the ACL lists work on the command framework level. Access is verifi
 
 The ACL list is set for a specific Tigase component and a specific command. Therefore the configuration property must specify all the details. So the general format for configuring ACL for a command is this:
 
-.. code:: dsl
+.. code::
 
    comp-id () {
        commands {
@@ -55,7 +55,7 @@ Here are a few examples:
 
 *Allowing local users to create and manage their own domains*
 
-.. code:: dsl
+.. code::
 
    'vhost-man' () {
        commands {
@@ -70,7 +70,7 @@ In fact all the commands except item-add can be executed by the domain owner or 
 
 *Allowing local users to execute user management commands:*
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'commands' {
@@ -88,7 +88,7 @@ As in the previous example, the commands will by executed only by local users wh
 
 *Allowing users from a specific domain to execute query-dns command and some other users for given JIDs from other domains:*
 
-.. code:: dsl
+.. code::
 
    'vhost-man' () {
        'commands' {

@@ -29,7 +29,7 @@ If you want to enable or disable one of password-based authentication mechanism 
 **Enabling SCRAM-SHA-512 encoder**
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: tdsl
+.. code::
 
    authRepository () {
        default () {
@@ -41,7 +41,7 @@ If you want to enable or disable one of password-based authentication mechanism 
 
 **Disabling SCRAM-SHA-1 decoder**
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. code:: tdsl
+.. code::
 
    authRepository () {
        default () {

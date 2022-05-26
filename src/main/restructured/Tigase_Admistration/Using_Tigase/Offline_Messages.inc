@@ -7,7 +7,7 @@ By default, Tigase ``MessageAmp`` processor is responsible for storing offline m
 
 Many of the features listed here require the use of the Advanced Message Processor Plugin which is turned on by default. To ensure AMP is turned on your system, view your ``config.tdsl`` file and be sure the following is there in your plugins line:
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {}
@@ -20,7 +20,7 @@ Offline Message Limits
 
 Support for limiting number of stored offline messages on a per-user basis has now been added to Tigase as of v7.1.0. By default, Tigase comes with a limit of stored offline messages which is set for every user. This limit by default is 100 offline messages for barejid-barejid pair. This value can be changed by the ``store-limit`` property. To change to 200 messages on barejid-barejid paid, add the following entries to the ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    amp {
        'store-limit' = 200L
@@ -38,7 +38,7 @@ User Limit
 
 Each user is able to configure the number of offline messages which should be stored for him. To enable this feature, the following lines need to be entered into the ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    amp {
        'user-store-limit-enable' = true
@@ -58,7 +58,7 @@ There are two possible ways to handle offline messages that exceed the limitatio
 
 By default, Tigase sends a message back to the original sender with an error type of ``service-unavailable`` with a proper description of error according to `XEP-0160 <http://www.xmpp.org/extensions/xep-0160.html>`__. However, it is possible to change this behavior to better suit your needs. This is done by adding the following line to your ``config.tdsl`` file.
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {
@@ -136,7 +136,7 @@ This can include message receipts, and messages with specific ``do-not-store`` t
 
 Support has been added to set a list of paths and xmlns to trigger and place storage of offline messages using the following settings in ``config.tdsl``:
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {
@@ -157,7 +157,7 @@ Filtering of offline storage
 
 It is possible to set storage of other types to save:
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {
@@ -175,7 +175,7 @@ Any of these can be adjusted for your installation, remember that a '-' will sto
 
 For example, if you wanted to store messages with <received> element, but not ones with <plain> element, your filter will look like this:
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {
@@ -191,7 +191,7 @@ However…​.
 
 The below statement will properly filter your results.
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {
@@ -206,7 +206,7 @@ Disabling Offline Messages
 
 If you wish to disable the storing of offline messages, use the following line in your ``config.tdsl`` file. This will not disable other features of the AMP plugin.
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {

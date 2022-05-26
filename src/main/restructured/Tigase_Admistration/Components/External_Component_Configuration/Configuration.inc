@@ -7,7 +7,7 @@ First thing to do is to specify the component class and the component name which
 
 The following line in the ``config.tdsl`` will load the component during the server startup time:
 
-.. code:: dsl
+.. code::
 
    ext (class: tigase.server.ext.ComponentProtocol) {}
 

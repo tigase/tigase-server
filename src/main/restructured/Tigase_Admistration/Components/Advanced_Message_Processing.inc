@@ -9,7 +9,7 @@ Configuration of AMP is not very complex, but as it is implemented as a componen
 
 Here is a first, brief overview of the AMP configuration and later detailed explanation of each parameter.
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {
@@ -25,7 +25,7 @@ First of all: plugins
 
 Even though the whole functionality is implemented inside the component you need a way to forward messages with ``AMP`` payload to that component. This is what the ``amp`` plugin does. The ``amp`` plugin intercepts all ``<message/>`` packets even without AMP payload, redirecting some of the to the ``AMP`` component and others processing in a standard way. Therefore you no longer need ``message`` plugin or ``msgoffline`` plugin. Those are all functions are offered by the ``amp`` plugin now. Hence you have to switch ``message`` and ``msgoffline`` plugins off (the ``amp`` plugin is loaded by default):
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {}
@@ -35,7 +35,7 @@ Even though the whole functionality is implemented inside the component you need
 
 The ``amp`` plugin needs to know where to forward all the ``AMP`` packets. By default plugin uses hostname of the given machine as this is true to the most installations. However, this is configured by the last line of the example configuration, which forwards all packets to the address ``amp@your-domain.tld``:
 
-.. code:: dsl
+.. code::
 
    'sess-man' {
        amp () {
@@ -55,7 +55,7 @@ There is also one parameter shared between the component and the plugin. Connect
 
 By default the same physical database as for ``UserRepository`` is used but you can change it and store messages in a completely separate location to reduce performance degradation of rest of the system. You can set a database connection string using following property:
 
-.. code:: dsl
+.. code::
 
    dataSource {
        'default-amp' () {
@@ -67,7 +67,7 @@ The `XEP-0079 <http://xmpp.org/extensions/xep-0079.html>`__ specification has a 
 
 Tigase’s implementation offers 3 modes to handle ``AMP`` requests to prevent revealing user’s status to non-authorized users:
 
-.. code:: dsl
+.. code::
 
    'amp-security-level' = 'STRICT'
 
@@ -77,7 +77,7 @@ In the XEP this mode is described in the following way:
 
 *Accept the relevant condition only if the sender is authorized to receive the receiver’s presence, as a result of which the server MUST reply with a <not-acceptable/> error condition if the sender is not so authorized; this is the RECOMMENDED behavior. This is also the default in Tigase.*
 
-.. code:: dsl
+.. code::
 
    'amp-security-level' = 'PERFORMANCE'
 
@@ -89,6 +89,6 @@ In the XEP this mode is described in the following way:
 
 It does not do any checking. It acts like all users are authorized to receive notifications, even if it may reveal user status to unauthorized users. It does not impact the server performance and it offers full AMP compliance.
 
-.. code:: dsl
+.. code::
 
    'amp-security-level' = 'NONE'

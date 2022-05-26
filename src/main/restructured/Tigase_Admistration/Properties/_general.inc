@@ -28,7 +28,7 @@ This option allows you to specify the location where SSL certificates are stored
 
 Default location is ``/certs`` however it can be changed using the following setting:
 
-.. code:: dsl
+.. code::
 
    }
    'certificate-container' {
@@ -44,7 +44,7 @@ This property allows you to specify a default alias/domain name for certificate.
 
 This may be configured as follows:
 
-.. code:: dsl
+.. code::
 
    }
    'certificate-container' {
@@ -58,7 +58,7 @@ Component
 
 **Description:** Container specifying component configuration. All components if they require configuration must be called in the conf.tdsl file in the following manner:
 
-.. code:: dsl
+.. code::
 
    componentName (class: value) {
        <configuration>
@@ -68,7 +68,7 @@ DSL allows for custom naming of the component, and specifying of the class in th
 
 For example, what used to be
 
-.. code:: properties
+.. code::
 
    --comp-name-1 = socks5
    --comp-class-1 = tigase.socks5.Socks5Component
@@ -77,14 +77,14 @@ For example, what used to be
 
 is now
 
-.. code:: dsl
+.. code::
 
    socks5 (class: tigase.socks5.Socks5Component) {}
    stun (class: tigase.stun.StunComponent) {}
 
 In fact, if you are using the default class & name for a component, you don’t need to specify it either, so MUC in this is now called by
 
-.. code:: dsl
+.. code::
 
    socks5 () {}
 
@@ -97,7 +97,7 @@ Ports
 
 The ports property is a subclass of connections, which is used to set a ports list for a connection manager. 'list of ports' is a comma separated list of ports numbers. For example for the server to server connection manager named s2s the property would like like the example below:
 
-.. code:: dsl
+.. code::
 
    s2s {
        connections {
@@ -107,7 +107,7 @@ The ports property is a subclass of connections, which is used to set a ports li
 
 Each port many be individually configured underneath ports
 
-.. code:: dsl
+.. code::
 
    s2s {
        connections {
@@ -178,7 +178,7 @@ monitoring
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    monitoring () {
        http () {
@@ -205,7 +205,7 @@ plugins
 
 **Description:** The former ``--sm-plugins`` property has been replaced by a new style of formatting with DSL. The former long unbroken string of plusses and minuses have been replaced by a compartmentalized style. Plugins controlled under session manager will now be children of the ``'sess-man'`` bean. For example, to turn on the personal eventing protocol, the following may be used:
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        pep ()
@@ -213,7 +213,7 @@ plugins
 
 Should any plugin require configuration, those configurations will be under it’s own brackets. For example, this section not only turns on jabber:iq:auth but also sets the treads to 16.
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'jabber:iq:auth' () {
@@ -223,7 +223,7 @@ Should any plugin require configuration, those configurations will be under it�
 
 As you may have noticed, beans or configuration options that require escape characters such as ``:`` or ``-`` will fall into single quotes to contain any special characters. If no special characters are in the bean name, then no single quotes are not required. If you need to disable certain plugins, you can do so after declaring the bean.
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        pep (active: false) {}
@@ -235,7 +235,7 @@ Typically if a bean is called, it is automatically active. Session manager plugi
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    'sess-man' () {
        'version' () {}
@@ -320,7 +320,7 @@ s2s-secret
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    'vhost-man' {
        defaults {
@@ -369,7 +369,7 @@ stats
 
 The stats block contains settings for statistics collection. To begin the stats block, use the following:
 
-.. code:: dsl
+.. code::
 
    stats {}
 
@@ -384,7 +384,7 @@ stats-history-size
 
 Stats-history defines the size of the history buffer. That is how many complete sets of historic metrics to store in memory.
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-history-size' = '2160'
@@ -395,7 +395,7 @@ stats-history-interval
 
 Sets the interval for which statistics will be gathered from the server.
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-history-interval' = '10'
@@ -407,7 +407,7 @@ stats-logger
 
 Allow enabling and configuring components responsible for storing statistic information. Note that this controls the logging system for retrieving using JMX, clients, or ad-hoc commands.
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-logger' (class: value) {
@@ -427,7 +427,7 @@ frequency
 
 stats-logger may also be controlled using frequency, which is the time interval between executions of the archiver ``.execute()`` method in seconds.
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-logger' (class: tigase.stats.CounterDataLogger) {
@@ -446,7 +446,7 @@ stats-file-logger
 
 This allows configuring of statistics gathering to an external file. This only has one class, and may be controlled independently from the internal statistics.
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-file-logger' (class: tigase.stats.CounterDataFileLogger) {
@@ -460,7 +460,7 @@ frequency
 
 stats-file-logger may also be controlled using frequency, which is the time interval between executions of the archiver ``.execute()`` method in seconds.
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-file-logger' (class: tigase.stats.CounterDataFileLogger) {
@@ -473,7 +473,7 @@ file configuration
 
 You can customize the file output for stats-file-logger using the following setting options, these are all optional.
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-history-size' = '2160'
@@ -510,7 +510,7 @@ This allows configuring of statistics gathering to a database. Without additiona
 
    After enabling the component it’s database schema should be loaded by executing ``./scripts/tigase.sh upgrade-schema etc/tigase.conf`` from the main Tigase directory
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-logger' (class: tigase.stats.CounterDataLogger) {
@@ -527,7 +527,7 @@ This allows configuring of statistics gathering to a database. Without additiona
 Example configuration block
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: dsl
+.. code::
 
    stats {
        'stats-history-size' = '2160'
@@ -558,7 +558,7 @@ stream-error-counter
 
 **Description:** Add stream-error-counter to comma separated processors of components for which you wish to count the number of stream errors made. Without enabling this, statistics will return 0. This setting turns on stream-error-counter for both c2s and ws2s:
 
-.. code:: dsl
+.. code::
 
    c2s {
        'stream-error-counter' () {
@@ -577,7 +577,7 @@ You may if you wish turn off stream error counters by setting ``active = false``
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    <component> {
        'stream-error-counter' () {
@@ -616,7 +616,7 @@ The idea behind this mode is to test Tigase XMPP Server with minimal performance
 
 Test function has been replaced by the following setting:
 
-.. code:: dsl
+.. code::
 
    logging {
        rootLevel = 'WARNING'

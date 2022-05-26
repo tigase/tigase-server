@@ -223,13 +223,13 @@ Virtual component is a very lightweight ServerComponent implementation in Tigase
 
 Configuration is very simple and straightforward, in fact it is very similar to configuration of any Tigase component. You set a real component name as a name of the component and a virtual component class name to load. Let’s say we want to deploy MUC component this way. The MUC component is visible as ``muc.domain.oug`` in the installation. Thus the name of the component is: ``muc``
 
-.. code:: dsl
+.. code::
 
    muc (class: tigase.cluster.VirtualComponent) {}
 
 This is pretty much all you need to load a virtual component. A few other options are needed to point to correct destination addresses for packets forwarding and to set correct service discovery parameters:
 
-.. code:: dsl
+.. code::
 
    }
    muc (class: tigase.cluster.VirtualComponent) {

@@ -54,7 +54,7 @@ The next page will provide you with an installation ID like the following:
 
 Edit your ``config.tdsl`` file and add your installation-id
 
-.. code:: dsl
+.. code::
 
    'installation-id' = '1TCICGG7K8AS2JSSEVMDA9QOLR4NVLJSR'
 

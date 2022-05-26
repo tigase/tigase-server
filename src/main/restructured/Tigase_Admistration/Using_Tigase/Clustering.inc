@@ -26,7 +26,7 @@ Configuration
 
 To enable Clustering on Tigase servers, use the following line in your ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    'cluster-mode' = true
 
@@ -37,7 +37,7 @@ Custom Ports
 
 You can customize ports for the cluster component, just be sure that each clustered server also has the same settings so they can communicate.
 
-.. code:: dsl
+.. code::
 
    cl-comp {
        connections {
@@ -53,7 +53,7 @@ Custom Port Configuration
 
 Each port has it’s own details that can be manipulated via the following ports. Again **THIS IS OPTIONAL**
 
-.. code:: dsl
+.. code::
 
    'cl-comp' {
        connections {
@@ -86,7 +86,7 @@ cm-ht-traffic-throttling
 
 This setting will control the number of bytes sent over non-user connections. Namely, Server to Server or S2S connections.
 
-.. code:: dsl
+.. code::
 
    'cm-ht-traffic-throttling' = 'xmpp:25k:0:disc,bin:200m:0:disc'
 
@@ -119,13 +119,13 @@ Specifying Specific nodes
 
 You can still use the old method of specifying every node on each server. Server 3 needs the following set
 
-.. code:: dsl
+.. code::
 
    'cluster-nodes' = [ 'serv1.xmpp-test.org' , 'serv2.xmpp-test.org' ]
 
 Server 2 needs
 
-.. code:: dsl
+.. code::
 
    'cluster-nodes' = [ 'serv1.xmpp-test.org' , 'serv3.xmpp-test.org' ]
 
@@ -137,7 +137,7 @@ Password and Port configuration
 
 You may specify a password and port to specific cluster servers if that is required. To do so, you will need to add {password}:{port} to the domain, like this example:
 
-.. code:: properties
+.. code::
 
    'cluster-nodes' = [ 'serv1.xmpp-test.org:domainpass:5600' ]
 

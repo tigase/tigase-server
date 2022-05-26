@@ -38,7 +38,7 @@ To aid with troubleshooting purposes, the full stacktrace will be dumped to a se
 
 This feature is enabled by default, however you may disable this by adding the following to your ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    'shutdown-thread-dump' = false
 

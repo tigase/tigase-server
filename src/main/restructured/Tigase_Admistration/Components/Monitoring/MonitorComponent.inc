@@ -108,7 +108,7 @@ Tasks can be configured in the ``config.tdsl`` file. See `available tasks <#avai
 
 To enable a specific monitor task, use the following line:
 
-.. code:: dsl
+.. code::
 
    monitor {
        '$TASKNAME' {
@@ -120,7 +120,7 @@ Where monitor is the component name for ``MonitorComponent``, and ``$TASKNAME`` 
 
 This format will be the same for other settings for tasks, and it’s best to group settings under one heading. For example:
 
-.. code:: dsl
+.. code::
 
    monitor {
        'connections-task' {
@@ -140,7 +140,7 @@ Subscription Limitations
 
 To define list of JIDs allowed to subscribe for events:
 
-.. code:: dsl
+.. code::
 
    eventbus {
        affiliations {
@@ -305,7 +305,7 @@ Configuration
 
 Tigase Mailer Extension may be configured via the ``config.tdsl`` file in the following manner:
 
-.. code:: dsl
+.. code::
 
    monitor {
        'mailer-from-address' = 'sender@<VHost>'

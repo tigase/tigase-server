@@ -13,7 +13,7 @@ Watchdog Configuration
 
 To configure watchdog, the following lines need to be present or edited in ``config.tdsl`` file:
 
-.. code:: dsl
+.. code::
 
    'watchdog-timeout' = 70000
    'watchdog-delay' = 60000
@@ -29,7 +29,7 @@ The three settings are as follows:
 
 You may, if you choose, to specify individual watchdog settings for specific components by adding them to the component settings, for example if we wanted to change the Client2Server settings to include watchdog, use the following lines in config.tdsl:
 
-.. code:: dsl
+.. code::
 
    c2s {
        watchdog-delay = '1500'
@@ -73,7 +73,7 @@ For example, lets draw this out and get a visual representation
 
 -  The following line represents the watchdog logic, with timeout at 120 seconds and max inactivity timeout at 180 seconds:
 
-   .. code:: dsl
+   .. code::
 
       'watchdog-timeout' = 120000
       c2s {
@@ -103,7 +103,7 @@ How the check is performed:
 
    Global settings may not be ideal for every setup. Since each component has its own settings for ``max-inactivity-time`` you may find it necessary to design custom watchdog settings, or edit the inactivity times to better suit your needs. Below is a short list of components with thier default settings:
 
-   .. code:: dsl
+   .. code::
 
       bosh {
           'max-inactivity-time' = 600L

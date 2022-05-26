@@ -194,7 +194,7 @@ Customizing Tigase Test Suite
 
 You may run the tests from a command line like above, however you may create and edit the /scripts/tests-runner-settings.sh file to fit your Tigase installation and avoid having to have long complex commands as this template shows:
 
-.. code:: script
+.. code::
 
    #!/bin/bash
 
@@ -231,7 +231,7 @@ The test suite contains scripting language which allows you to combine test case
 
 Let’s look at the example test description.
 
-.. code:: java
+.. code::
 
    Short name@test-id-1;test-id-2: Short description for the test case
    {

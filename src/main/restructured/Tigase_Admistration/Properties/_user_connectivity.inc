@@ -64,7 +64,7 @@ client-port-delay-listening
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    <component> {
        'port-delay-listening' = false
@@ -76,7 +76,7 @@ In cluster mode, in order to ensure correct user status broadcast, we are delayi
 
 It’s possible to enable/disable this on per-component basis with the following configuration:
 
-.. code:: dsl
+.. code::
 
    bosh {
        'port-delay-listening' = true
@@ -111,7 +111,7 @@ A default file distributed with Tigase installations allows for full access for 
 
 This is a global property that can also be overridden by configuring connection managers [ c2s, s2s, ws2s, bosh, ext, etc] and they may all have their own policies.
 
-.. code:: dsl
+.. code::
 
    c2s {
        'cross-domain-policy-file' = '/path/to/cross-domain-policy.xml'
@@ -159,7 +159,7 @@ see-other-host
 
 **Example:**
 
-.. code:: dsl
+.. code::
 
    <connectionManager> {
      seeOtherHost (class: value) { }
@@ -182,7 +182,7 @@ watchdog_timeout
 
 **Description:** The ``watchdog_timeout`` property allows for fine-tuning ConnectionManager Watchdog (service responsible for detecting broken connections and closing them). Timeout property relates to the amount of time (in miliseconds) after which lack of response/activity on a given connection will considered such connection as broken an close it. In addition to global configuration presented above a per component configuration is possible:
 
-.. code:: dsl
+.. code::
 
    <ConnectionManager> {
        watchdog_timeout = 60000L
@@ -190,7 +190,7 @@ watchdog_timeout
 
 for example (for C2SConnectionManager):
 
-.. code:: dsl
+.. code::
 
    c2s {
        watchdog_timeout = 150000L
@@ -217,7 +217,7 @@ watchdog_delay
 
 **Description:** ``watchdog_delay`` configuration property allows configuring delay (in milliseconds) between subsequent checks that ConnectionManager Watchdog (service responsible for detecting broken connections and closing them) will use to verify the connection. In addition to global configuration presented above a per component configuration is possible:
 
-.. code:: dsl
+.. code::
 
    <ConnectionManager> {
      watchdog_delay = 60000L
@@ -225,7 +225,7 @@ watchdog_delay
 
 for example (for ClusterConnectionManager):
 
-.. code:: dsl
+.. code::
 
    'cl-comp' {
        watchdog_delay = 150000L
@@ -252,7 +252,7 @@ watchdog_ping_type
 
 **Description:** ``watchdog_ping_type`` configuration property allows configuring of the type of ping that ConnectionManager Watchdog (service responsible for detecting broken connections and closing them) will use to check the connection. In addition to global configuration presented above a per component configuration is possible:
 
-.. code:: dsl
+.. code::
 
    <ConnectionManager> {
      watchdog_ping_type = 'XMPP'
@@ -260,7 +260,7 @@ watchdog_ping_type
 
 for example (for ClusterConnectionManager):
 
-.. code:: dsl
+.. code::
 
    cl-comp {
        watchdog_ping_type = 'WHITESPACE'

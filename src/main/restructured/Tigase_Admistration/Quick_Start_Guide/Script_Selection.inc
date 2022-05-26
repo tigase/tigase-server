@@ -91,7 +91,7 @@ Gentoo
 
 The conf.d script must contain the following parameters:
 
-.. code:: conf
+.. code::
 
    TIGASE_HOME="/home/tigase/tigase-server"
    TIGASE_USER=tigase

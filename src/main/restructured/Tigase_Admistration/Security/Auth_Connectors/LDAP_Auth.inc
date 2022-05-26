@@ -5,7 +5,7 @@ Tigase XMPP Server offers support for authenticating users against an LDAP serve
 
 Configuration for the LDAP support is really simple you just have to add a few lines to your ``config.tdsl`` file.
 
-.. code:: tdsl
+.. code::
 
    authRepository {
        default () {

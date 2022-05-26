@@ -14,7 +14,7 @@ It is possible to enable and configure automatic storage of statistics informati
 
 As an example to configure ``tigase.stats.CounterDataFileLogger`` to archive statistics data with level ``FINE`` every 60 seconds to file prefixed with ``stat`` and located in ``logs/server_statistics`` following entry is needed:
 
-.. code:: dsl
+.. code::
 
    stats() {
        'stats-file-logger' (class: tigase.stats.CounterDataFileLogger) {

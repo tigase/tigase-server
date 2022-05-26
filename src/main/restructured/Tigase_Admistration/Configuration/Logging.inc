@@ -13,7 +13,7 @@ In the config file
 
 Default logging configuration for your installation is kept in the config file and it may be adjusted there.
 
-.. code:: config
+.. code::
 
    logging () {
        rootLevel = CONFIG

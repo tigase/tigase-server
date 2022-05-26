@@ -214,7 +214,7 @@ If you moved all certs to a single directory, you may combine them using the fol
 
 Your certificate should look something like this:
 
-.. code:: certificate
+.. code::rtificate
 
    -----BEGIN PRIVATE KEY-----
    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDAUAqqKu7Z4odo
