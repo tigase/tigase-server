@@ -35,6 +35,6 @@ As in previous version only users with administrator permissions can execute com
 
 Server components don’t show up on the service discovery, the user can’t see administrator commands nor he can execute them. This hasn’t been implemented to improve the server security but to reduce confusion for general users who would otherwise see a lot of stuff which can’t be used by them anyway.
 
-.. |new service disco admin| image:: /../asciidoc/admin/images/admin/new-service-disco-admin.png
-.. |new command list| image:: /../asciidoc/admin/images/admin/new-command-list.png
-.. |new add command| image:: /../asciidoc/admin/images/admin/new-add-command.png
+.. |new service disco admin| image:: /images/admin/new-service-disco-admin.png
+.. |new command list| image:: /images/admin/new-command-list.png
+.. |new add command| image:: /images/admin/new-add-command.png

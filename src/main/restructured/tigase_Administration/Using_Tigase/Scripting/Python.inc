@@ -64,5 +64,5 @@ Except this minor difference, the rest part of scripting in Python for the Tigas
 
 In article *"Component Implementation - Lesson 6 - Scripting Support"* in Developer guide, I am going to present the Tigase server API available for scripting framework. My main language is Groovy as it offers the best integration with JVM and Tigase API, however I will try to include Python example code as well.
 
-.. |lang list no python small| image:: /../asciidoc/admin/images/admin/lang-list-no-python-small.png
-.. |lang list with python small| image:: /../asciidoc/admin/images/admin/lang-list-with-python-small.png
+.. |lang list no python small| image:: /images/admin/lang-list-no-python-small.png
+.. |lang list with python small| image:: /images/admin/lang-list-with-python-small.png

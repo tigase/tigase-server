@@ -7,6 +7,6 @@ Tigase server supports scripting languages in versions 4.3.1 and higher. These p
 
    Tigase server is known for it very low memory consumption and successfully runs with less then 10MB of RAM memory. However adding scripting support for any non-standard (default) language to Tigase server significantly increases memory requirements for the installation. You cannot expect Tigase server to run on 10MB RAM system if you enabled Python, Scala or any other non-standard language.
 
-.. include:: /Tigase_Admistration/Using_Tigase/Scripting/Introduction.inc
-.. include:: /Tigase_Admistration/Using_Tigase/Scripting/v4.4.x_Update.inc
-.. include:: /Tigase_Admistration/Using_Tigase/Scripting/Python.inc
+.. include:: /tigase_Administration/Using_Tigase/Scripting/Introduction.inc
+.. include:: /tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc
+.. include:: /tigase_Administration/Using_Tigase/Scripting/Python.inc

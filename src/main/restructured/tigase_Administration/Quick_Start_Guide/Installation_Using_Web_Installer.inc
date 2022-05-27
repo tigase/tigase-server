@@ -176,5 +176,5 @@ From here, you have a few options how to run Tigase; ``run.bat`` will operate Ti
 
 Once this setup is finished, web installer will continue the same from `here <#connecttoWebInstall>`__.
 
-.. |web install 01| image:: ../../../asciidoc/admin/images/admin/web-install-01.png
+.. |web install 01| image:: /images/admin/web-install-01.png
 
