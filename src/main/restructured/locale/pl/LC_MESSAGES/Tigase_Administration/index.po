@@ -17,21 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: ../../index.rst:6
-msgid "Tigase XMPP Server Distribution Administration Guide"
+#: ../../Tigase_Administration/index.rst:3
+msgid "Tigase Administration Guide"
 msgstr ""
-
-#: ../../index.rst:13
-msgid "Tigase Development Guide"
-msgstr ""
-
-#: ../../index.rst:4
-msgid "Tigase Documentation"
-msgstr ""
-
-#~ msgid "Tigase XMPP Server Distribution Administration Guide -Version 8.3.0"
-#~ msgstr ""
-
-#~ msgid "Tigase Development Guide -Version 8.3.0"
-#~ msgstr ""
 
