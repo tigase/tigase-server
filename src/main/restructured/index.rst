@@ -7,7 +7,7 @@ Tigase Documentation
    :caption: Tigase XMPP Server Distribution Administration Guide
    :maxdepth: 3
 
-   tigase_Administration/index.rst
+   Tigase_Administration/index.rst
 
 
 .. toctree::
