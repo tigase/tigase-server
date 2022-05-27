@@ -53,8 +53,8 @@ logs
 etc/acs.licence
 etc/config-dump.properties
 etc/installation-id
-src/main/restructured/locale/pl/LC_MESSAGES/Tigase_Admistration/*.mo
+src/main/restructured/locale/pl/LC_MESSAGES/Tigase_Administration/*.mo
 src/main/restructured/locale/pl/LC_MESSAGES/Tigase_Development/*.mo
-src/main/restructured/locale/pl/LC_MESSAGES/Tigase_Admistration/*/*.mo
+src/main/restructured/locale/pl/LC_MESSAGES/TTigase_Administration/*/*.mo
 src/main/restructured/locale/pl/LC_MESSAGES/Tigase_Development/*/*.mo
 src/main/restructured/_build/
