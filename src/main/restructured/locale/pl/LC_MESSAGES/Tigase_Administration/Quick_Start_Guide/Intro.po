@@ -1,0 +1,2038 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-27 12:11-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:2
+msgid "Quick Start Guide"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:5
+msgid "Minimum Requirements"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:7
+msgid ""
+"Before you begin installing Tigase server onto your system, please make "
+"sure the minimum requirements are met first:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:9
+msgid "**Java Development Kit (JDK) 11 (LTS)** - We recommend OpenJDK"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:11
+msgid ""
+"**Administrator access** - We recommend that you install Tigase Server "
+"from a user login with administrator access."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:17
+msgid ""
+"You should always run the latest point/bugfix release of the recommended "
+"JDK."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:21
+msgid ""
+"While it should be possible to use newer versions of the JDK, we don’t "
+"guarantee it and we recommend using the one mentioned above."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:24
+msgid "Contents"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:26
+msgid ""
+"This is a set of documents allowing you to quickly start with our "
+"software. Every document provides an introduction to a single topic "
+"allowing you to start using/developing or just working on the subject. "
+"Please have a look at the documents list below to find a topic you are "
+"looking for. If you don’t find a document for the topic you need please "
+"`let us know <http://www.tigase.net/contact>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:28
+msgid ":ref:`Installation Using Web Installer<webinstall>`"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:30
+msgid ":ref:`Manual installation in console mode<manualinstall>`"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:32
+msgid ":ref:`Installing Tigase on Windows <windowsInstallation>`"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:34
+msgid ":ref:`Network settings for Tigase<setupTigaseServer>`"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:36
+msgid ":ref:`Running Tigase XMPP Server as a service<tigaseScriptStart>`"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:4
+msgid "Installation Using Web Installer"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:6
+msgid ""
+"When Tigase XMPP Server starts up, it looks for the default configuration"
+" file: ``etc/config.tdsl``. If this file has not been modified you can "
+"run the web installer. Which will step you through the process of "
+"configuring Tigase. If you are installing Tigase in a Windows "
+"environment, please see the `Windows Installation <#winWebInstall>`__ "
+"section."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:10
+msgid "Download and Extract"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:12
+msgid ""
+"First download Tigase XMPP Server and extract it. You can download the "
+"`official binaries <https://tigase.net/downloads>`__, or the latest and "
+"greatest `nightly builds <https://build.tigase.net/nightlies/dists/>`__. "
+"Once you have the distribution binary extract it and navigate to the "
+"directory:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:22
+msgid "Do not run as root user!"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:26
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:283
+msgid "Start the Server"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:30
+msgid "Please make sure ``JAVA_HOME`` is set and points to your JVM installation"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:38
+msgid "Verify Tigase is ready to start installation"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:40
+msgid ""
+"Tigase should start listening on port 8080 - you can check it using "
+"``lsof`` command:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:48
+msgid ""
+"You can also check console log under ``logs/tigase-console.log``, which "
+"should point you directly to the installer."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:52
+msgid "Connect to the Web Installer"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:54
+msgid "Some points before you can connect:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:56
+msgid ""
+"This setup page is restricted access, however for first setup there is a "
+"default account set to setup Tigase: Username: ``admin`` Password: "
+"``tigase``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:58
+msgid ""
+"This combination will only be valid once as it will be removed from "
+"``config.tdsl`` file on completion of setup process. After this point the"
+" setup page will only be accessible using the following:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:60
+msgid ""
+"JID accounts listed as administrators in admins line in ``config.tdsl`` "
+"file."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:62
+msgid ""
+"Username and password combinations added to ``config.tdsl`` file "
+"manually, or at the last page in this process."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:64
+msgid ""
+"Point your browser to http://localhost:8080/setup/ unless you are working"
+" remotely. You can also use the domain name, or IP address."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:66
+msgid "Enter the username and password above to gain access."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:70
+msgid "Step Through the Installation Process"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:72
+msgid "You will be greeted by the following \"About software\" page."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:74
+msgid "|web install 01|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:179
+msgid "web install 01"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:76
+msgid "Read it and then click \"Next\""
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:78
+msgid ""
+"The setup consists of several steps that help you configure your "
+"installation: selecting features and providing database configuration."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:82
+msgid ""
+"Order and design of the steps may slightly differ thus we only provide a "
+"broad overview of how to proceed:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:84
+msgid "**Advanced Clustering Strategy information**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:86
+msgid ""
+"You will see some information about our commercial products and "
+"licensing. Please read though the agreement, and as a confirmation of "
+"agreement type in your name or company and click \"Next\" to go to the "
+"next page."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:88
+msgid "**Basic Tigase server configuration**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:90
+msgid ""
+"This page will look over your basic configuration settings, those include"
+" the server type, domain you wish to use, and gives you a chance to "
+"specify an administrator for the domain. Also, you will be selecting what"
+" type of database Tigase server will be using (configuration comes "
+"later)."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:92
+msgid ""
+"If you do not specify an administrator and password, one is made for you,"
+" which will be admin@yourdomain and password is tigase."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:94
+msgid "**Connectivity**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:96
+msgid ""
+"At this page you will be presented with a list of possible connectivity "
+"options supported by Tigase XMPP Server and a way to enable/disable each "
+"of them (desktop, mobile, http, websocket, federation, etc.). After "
+"making this decisions, click \"Next\"."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:98
+msgid "**Features**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:100
+msgid ""
+"Now you will be able to select which features of Tigase XMPP Server (such"
+" as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or "
+"disabled."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:102
+msgid "At this step will also be able to enable clustering on your installation"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:104
+msgid "When you will be ready, click \"Next\"."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:106
+msgid "**Database configuration**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:108
+msgid ""
+"This is where the database is configured. The type of database selected "
+"in step 3 will influence available options. **BE SURE TO SPECIFY DATABASE"
+" ROOT USER ACCOUNT AND PASSWORD**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:110
+msgid "**Database connectivity check**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:112
+msgid ""
+"After database setup, you should see a page with executed actions and "
+"their results. All presented items should be \"green\", meaning that "
+"everything went well. If anything is presented in \"red\" or \"yellow\", "
+"please read description presented below this header to learn more about "
+"this issue. If setup is completed, click \"Next\"."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:114
+msgid "**Setup security**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:116
+msgid ""
+"The Setup Access Page will be locked from the admin/tigase user as "
+"specified above. This is your chance to have the setup pages add a "
+"specific user in addition to admin accounts to re-access this setup "
+"process later. If left blank, only JIDs listed in admin will be allowed "
+"to access."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:118
+msgid "**Saving configuration**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:120
+msgid ""
+"The installation is almost complete and you will be presented with a page"
+" showing what the resulting configuration (stored in ``config.tdsl`` "
+"file) will look like."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:122
+msgid ""
+"If you have a custom setup, or would like to put your own settings in, "
+"you may copy and past the contents here to edit the current "
+"``config.tdsl`` file."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:124
+msgid "Click \"Save\" to write the file to disk."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:126
+msgid "**Finished**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:128
+msgid ""
+"You have now finished the installation, proceed to the next step to "
+"restart the server."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:131
+msgid "Restart the Server"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:133
+msgid ""
+"It is recommended at this point to stop the server manually and restart "
+"it using the proper script for your OS. From the Tigase base directory "
+"enter"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:144
+msgid ""
+"In order to make Tigase XMPP Server start automatically during system "
+"startup you should setup startup scripts as described in `??? "
+"<#tigaseScriptStart>`__"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:146
+msgid ""
+"To further fine tune the server you should edit ``etc/tigase.conf``. "
+"Ensure ``JAVA_HOME`` path is correct, and increase memory if needed using"
+" ``JAVA_OPTIONS`` -Xmx (max), and -Xms (initial). You will need to direct"
+" Tigase to read settings from this file on startup as follows."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:148
+msgid ""
+"Everything should be running smooth at this point. Check the logfiles in "
+"``logs/`` if you experience any problems."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:151
+msgid "Verify Tigase is Running"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:153
+msgid "You should see a list of listening ports."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:169
+msgid "Windows Instructions for using Web Installer"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:171
+msgid ""
+"There are a few steps involved with setting up Tigase with the web "
+"installer in a Windows environment. Please follow this guide."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:173
+msgid ""
+"First step is to extract the distribution archive in it’s entirety to the"
+" intended running directory. Once there, run the ``Setup.bat`` file "
+"inside the ``win-stuff`` folder. This will move the necessary files to "
+"the correct folders before Tigase begins operation."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:175
+msgid ""
+"From here, you have a few options how to run Tigase; ``run.bat`` will "
+"operate Tigase using a java command, or ``tigase.bat`` which will start "
+"Tigase using the wrapper. You may also install Tigase and run it as a "
+"service."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:177
+msgid ""
+"Once this setup is finished, web installer will continue the same from "
+"`here <#connecttoWebInstall>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:4
+msgid "Manual Installation in Console Mode"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:6
+msgid ""
+"Our preferred way to install the Tigase server is using `Web installer "
+"<#webinstall>`__ and configuration program which comes with one of the "
+"binary packages. Please pick up the latest version of the distribution "
+"archive in our `download section <https://tigase.net/downloads>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:8
+msgid ""
+"In many cases however it is not always possible to use the web installer."
+" In many cases you have just an ssh access or even a direct access in "
+"console mode only. We are going to provide a text-only installer in one "
+"of the next releases but for the time being you can use our binary "
+"packages to install the server manually. Please continue reading to learn"
+" how to install and setup the server in a few easy steps…​"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:10
+msgid ""
+"If you have an old version of the Tigase server running and working and "
+"you intend to upgrade it please always backup the old version first."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:14
+msgid ""
+"Please note that these instructions are for \\*nix operating systems, and"
+" some modifications may be required for other Operating Systems!"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:18
+msgid "Get the Binary Package"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:20
+msgid ""
+"Have a look at our `download area <https://tigase.net/downloads>`__. "
+"Always pick the latest version of the package available. For manual "
+"installation either ``zip`` or ``tar.gz`` file is available. Pick one of "
+"files with filename looking like: ``tigase-"
+"server-<version>-b<build>-<type>.<archive>``, where ``<version>`` is in "
+"the form of ``major.minor.bugfix``, ``<type>`` can be either ``dist`` "
+"(basic package) or ``dist-max`` (extended set of components) and archive "
+"type can be eitehr ``tar.gz`` or ``zip``."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:24
+msgid "Unpack the Package"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:26
+msgid "Unpack the file using command for the tar.gz file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:32
+msgid "or for the zip file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:38
+msgid "A new directory will be created: **tigase-server-x.y.z-bv/**."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:40
+msgid ""
+"Sometimes after unpacking package on unix system startup script doesn’t "
+"have execution permissions. To fix the problem you have to run following "
+"command:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:48
+msgid "Prepare Configuration"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:50
+msgid "If you look inside the new directory, it should like this output:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:70
+msgid "At the moment the most important is the etc/ directory with these files:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:88
+msgid "Configure tigase.conf"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:90
+msgid ""
+"Tigase.conf is a file that contains general program operating parameters,"
+" and java settings for Tigase to run. For now, the only setting we need "
+"to set is the **JAVA_HOME** directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:96
+msgid ""
+"Replace **${JDKPath}** with a path to Java JDK installation on your "
+"system."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:100
+msgid "Configure config.tdsl"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:102
+msgid ""
+"You need also to edit the ``config.tdsl`` file. It contains initial "
+"parameters normally set by the configuration program. As this is a manual"
+" installation, you will have to edit this document yourself. It contains "
+"already a few lines:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:115
+msgid "You will need to set a few things in order to get Tigase up and running."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:119
+msgid "Step 1: Change config-type"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:122
+msgid ""
+"Refer to `config-type <#configType>`__ property description for details, "
+"but for most operations, change ``setup`` to ``default``."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:125
+msgid "Step 2: Set virtual host"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:127
+msgid ""
+"Without a virtual host, your XMPP server has no domain with which to "
+"operate. To set a virtual host use the following configuration:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:133
+msgid ""
+"You have to replace ``hostname`` with a domain name used for your XMPP "
+"installation. Let’s say this is **jabber.your-great.net**. Your setting "
+"should look like this:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:139
+msgid ""
+"There are many other settings that can be configured `visit this section "
+"for details <#tigase41virtualHosts>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:142
+msgid "Step 3: Set Administrators"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:145
+msgid ""
+"At least one administrator is required, and once the database is setup "
+"will have the default password of ``tigase``. Be sure to change this once"
+" you have finished setting up your server. To add admins, use the "
+"following line in the ``config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:151
+msgid "Step 4: Set databases"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:153
+msgid ""
+"You will also need to configure connection to the database. First you "
+"have to decide what database you want to use: ``Derby``, ``MySQL``, "
+"``PostgreSQL``, ``MSSQL``, or ``MondoDB``. Each database will have "
+"slightly different configurations. If we are using derby, in a directory "
+"called ``tigasedb``, your configuration would look like this:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:163
+msgid "Consult `dataSource <#dataSource>`__ property for more configuration info."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:165
+msgid ""
+"This is enough basic configuration to have your Tigase server "
+"installation running."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:169
+msgid "Install Database"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:171
+msgid ""
+"Creating the database is the next step. Previously, we had scripts to "
+"handle this process, but we now have the advantage of functions in the "
+"``tigase.sh`` script that can be used. Setting up the database can now be"
+" done using a single command."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:177
+msgid ""
+"This command will install tigase using a Derby database on one named "
+"``tigasedb`` hosted on ``localhost``. The username and password editing "
+"the database is ``tigase_pass`` and ``root``. Note that ``-J`` explicitly"
+" adds the administrator, this is highly recommended with the ``-N`` "
+"passing the password. You may customize this command as needed, refer to "
+"the `install-schema <#install-schema>`__ section of the documentation for"
+" more information."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:179
+msgid "On a windows system, you need to call the program directly:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:185
+msgid "If this successfully passes, you should see some information printed out"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:279
+msgid ""
+"Note at the end, the script will output a recommended example file. You "
+"may use this in conjunction with your written config file, but some "
+"settings may not be set using this configuration. Again, it is only an "
+"**EXAMPLE**."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:285
+msgid ""
+"You can start the server using the tigase file found in the scripts sub-"
+"directory of Tigase server base directory. There, select the type of "
+"linux you have, debian, gentoo, mendriva or redhat. In the root server "
+"directory type the following command:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:291
+msgid "Where {OS} is your \\*nix operating system."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:293
+msgid "and you should get the output like this:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:302
+msgid "Check if it is Working"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:304
+msgid ""
+"The server is started already but how do you know if it is really working"
+" and there were no problems. Have a look in the ``logs/`` directory. "
+"There should be a few files in there:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:315
+msgid ""
+"The first 2 files are the most interesting for us: **tigase-console.log**"
+" and **tigase.log.0**. The first one contains very limited information "
+"and only the most important entries. Have a look inside and check if "
+"there are any **WARNING** or **SEVERE** entries. If not everything should"
+" be fine."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:317
+msgid ""
+"Now you can connect with an XMPP client of your choice with the "
+"administrator account you setup earlier."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:4
+msgid "Windows Installation"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:6
+msgid ""
+"Tigase XMPP Server can also work on Microsoft Windows systems and "
+"servers, although some slight modifications may be necessary to get "
+"things ready to run."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:8
+msgid ""
+"Although you may wish to use command line, take note that commands "
+"entered in shell may require quotations in some cases."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:10
+msgid ""
+"Make sure that you have Java JDK v8 installed on your system prior to "
+"installing Tigase. It will also help to fully setup whatever database "
+"software you will be using as well."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:13
+msgid "Step 1: Initial Setup"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:15
+msgid ""
+"Download the Tigase XMPP Server archive from `our repository "
+"<https://tigase.net/downloads>`__ and extract it to a directory of your "
+"choice."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:17
+msgid ""
+"Once that is completed, enter the directory ``win-stuff`` and run the "
+"setup.bat program. This program when run, will extract the necessary "
+"files to appropriate places on your computer. The bat file should look "
+"like the following:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:30
+msgid "Step 2: Starting Server"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:32
+msgid ""
+"To start the server you may use a command prompt from the installation "
+"directory"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:66
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:10
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:40
+msgid "**Note**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:42
+msgid ""
+"this may freeze the command window, and will only display output from "
+"Tigase."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:44
+msgid "Or you may run wrapper.exe or tigase.bat from the GUI."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:47
+msgid "2A: Installing as a service"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:49
+msgid ""
+"The cleanest way to operate Tigase in a Windows environment is to install"
+" Tigase as a Service by running the InstallTigaseService.bat program. "
+"This will install Tigase as a system service, and now the server can be "
+"controlled from the services.msc panel. This allows for stopping, "
+"starting, and pausing of Tigase XMPP Server and allowing for graceful "
+"shutdowns."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:51
+msgid ""
+"For a basic installation, MySQL is recommended over Derby DB. For that "
+"purpose, we have included a basic installation guide for MySQL on Windows"
+" systems here:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:54
+msgid "MySQL Database Installation"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:56
+msgid ""
+"The section describes installation and configuration of the MySQL "
+"database to work with Tigase server."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:58
+msgid ""
+"Download the binary package from MySQL download area at `mysql.com "
+"<http://dev.mysql.com/downloads/mysql/5.0.html#win32>`__. Make sure you "
+"select executable proper for your operating system."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:60
+msgid ""
+"Run the installation program and follow default installation steps. When "
+"the installation is complete find the MySQL elements in the Windows Start"
+" menu and run the MySQL Configuration Wizard. Follow the wizard and make "
+"sure to check settings against the screenshots in the guide below."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:62
+msgid "In Welcome window just press 'Next'.(pic.1)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:64
+msgid "|sql1|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:134
+msgid "sql1"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:66
+msgid ""
+"In the next window select option: 'Detailed Configuration' and press "
+"'Next' (pic. 2)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:68
+msgid "|sql2|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:135
+msgid "sql2"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:70
+msgid ""
+"On the next screen select option: 'Server Machine' and press 'Next' (pic."
+" 3)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:72
+msgid "|sql3|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:136
+msgid "sql3"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:74
+msgid ""
+"On the forth windows leave the default\" 'Multi-functional Database' and "
+"press 'Next' (pic. 4)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:76
+msgid "|sql4|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:137
+msgid "sql4"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:78
+msgid "On the step number five just press 'Next' using defaults. (pic. 5)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:80
+msgid "|sql5|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:138
+msgid "sql5"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:82
+msgid ""
+"Again, on window 6 select the default - 'Decision Support (DSS)/OLAP' and"
+" press 'Next' (pic.6)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:84
+msgid "|sql6|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:139
+msgid "sql6"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:86
+msgid "Make sure you switch OFF the 'Strict mode' and and press 'Next' (pic. 7)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:88
+msgid "|sql7|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:140
+msgid "sql7"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:90
+msgid ""
+"On the character encoding page select: 'Manual Selected Default Character"
+" set/ Collation' and 'utf8', press 'Next' (pic.8)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:92
+msgid "|sql8|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:141
+msgid "sql8"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:94
+msgid ""
+"On next window select 'Include Bin Directory in Windows PATH' and press "
+"'Next' (pic.9)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:96
+msgid "|sql9|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:142
+msgid "sql9"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:98
+msgid ""
+"On this window just enter the database super user password and make sure "
+"you remember it. When ready press 'Next' (pic. 10)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:100
+msgid "|sql10|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:143
+msgid "sql10"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:102
+msgid ""
+"This is the last screen. Press 'Execute' to save the configuration "
+"parameters. (pic. 11)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:104
+msgid "|sql11|"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:144
+msgid "sql11"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:106
+msgid ""
+"When the configuration is saved you can repeat all the steps and change "
+"settings at any time by running: **START ⇒ Programs ⇒ MYSQL⇒ MYSQL serwer"
+" machine⇒ MySQL Server Instance Config Wizard**"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:108
+msgid ""
+"Now we have to setup Tigase database. From the Start menu run the MySQL "
+"console and enter all commands below finishing them with **<ENTER>**:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:110
+msgid "Create the database:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:116
+msgid "Add database user:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:125
+msgid "Load Tigase database schema:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:132
+msgid ""
+"When the system is up and running you can connect with any XMPP client "
+"(Psi for example) to your server to see if it is working."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:4
+msgid "Tigase Server Network Instructions"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:6
+msgid ""
+"One you have installed Tigase XMPP Server on a machine, you’re going to "
+"want to use it. If you are just using for local communications on a "
+"network behind a router, you’re all set. Enjoy and use!"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:8
+msgid ""
+"However, if you want to have people from other computers outside your "
+"network connect to your server, you’re going to have to go through a few "
+"more steps to show your server out to the public."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:12
+msgid ""
+"This guide is merely a recommendation of how to get a local server to be "
+"open to incoming communications. Any time you open ports, or take other "
+"security measures you risk compromising your network security. These are "
+"only recommendations, and may not be appropriate for all installations. "
+"Please consult your IT Security expert for securing your own "
+"installation."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:14
+msgid ""
+"XMPP, being a decentralized communication method, relies on proper DNS "
+"records to figure out where and how an XMPP server is setup. Operating an"
+" XMPP Server will require you to properly setup DNS routing so not only "
+"can clients connect to you, but if you decide to run a federated server "
+"and enable server to server communication, you will need to do the same. "
+"If you already have a DNS server already, you should have little issue "
+"adding these records. If you do not have a DNS setup pointing to your "
+"server, you may use a free dynamic name service such as dynu.com."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:17
+msgid "A Records"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:19
+msgid ""
+"You will not be able to use an IP Address or a CNAME record to setup an "
+"XMPP Server. While it’s not required, an A record can provide some other "
+"benefits such serving as a backup in case the SRV record is not "
+"configured right."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:22
+msgid "SRV Records"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:24
+msgid ""
+"You will need to set SRV records both for client-to-server (c2s) "
+"communication and, if you plan to use it, server to server (s2s) "
+"communication. We recommend both records are entered for every server as "
+"some resources or clients will check for both records. For this example "
+"we will use tigase.org is our domain, and xmpp as the xmpp server "
+"subdomain."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:26
+msgid "SRV records have the following form:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:32
+msgid "The key is as follows:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:34
+msgid ""
+"``service``: is the symbolic name of the desired service, in this case it"
+" would be *xmpp-client* or *xmpp-server*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:36
+msgid ""
+"``protocol``: is the transport protocol, either TCP or UDP, XMPP traffic "
+"will take place over *TCP*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:38
+msgid ""
+"``name``: the domain name where the server resides, in this case "
+"*tigase.org*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:40
+msgid ""
+"``TTL``: a numeric value for DNS time to live in milliseconds, by default"
+" use *86400*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:42
+msgid "``class``: DNS class field, this is always *IN*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:44
+msgid ""
+"``priority``: the priority of the target host with lower numbers being "
+"higher priority. Since we are not setting up multiple SRV records, we can"
+" use *0*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:46
+msgid ""
+"``weight``: the relative weight for records with the same priority. We "
+"can use *5*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:48
+msgid ""
+"``port``: the specific TCP or UDP port where the service can be found. In"
+" this case it will be *5222* or *5269*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:50
+msgid ""
+"``target``: the hostname of the machine providing the service, here we "
+"will use *xmpp.tigase.org*."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:52
+msgid "For our example server, the SRV records will then look like this:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:60
+msgid "Tigase and Vhosts"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:62
+msgid ""
+"If you are running multiple vhosts or subdomains that you wish to "
+"separate, you will need another record. In this case an A record will be "
+"all you need if you are using default ports. If you are using custom "
+"ports, you will need to have a new SRV record for each subdomain."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:65
+msgid "Hosting via Tigase.me"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:67
+msgid ""
+"If you don’t want to do all the hosting yourself, you can still have an "
+"XMPP service running in your own domain. The only condition right now is "
+"proper DNS service record (SRV) configuration that point to the following"
+" DNS address: ``tigase.me``."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:69
+msgid ""
+"We highly encourage using SRV records. If you want to register: **your-"
+"domain.tld** on our XMPP service make sure that it resolves correctly:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:72
+msgid "Service"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:72
+msgid "DNS Type"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:72
+msgid "DNS record"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:72
+msgid "Comment"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:74
+msgid "``_xmpp-client._tcp.your-domain.tld``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:74
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:76
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:78
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:80
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:82
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:84
+msgid "SRV"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:74
+msgid "``10 0 5222 tigase.me.``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:74
+msgid "Basic XMPP"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:76
+msgid "``_xmpps-client._tcp.your-domain.tld``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:76
+msgid "``10 0 5223 tigase.me.``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:76
+msgid "DirectTLS"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:78
+msgid "``_xmpp-server._tcp.your-domain.tld``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:78
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:80
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:82
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:84
+msgid "``10 0 5269 tigase.me.``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:78
+msgid "Federation / s2s connection"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:80
+msgid "``_xmpp-server._tcp.muc.your-domain.tld``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:80
+msgid "Federation / s2s connection (MUC)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:82
+msgid "``_xmpp-server._tcp.mix.your-domain.tld``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:82
+msgid "Federation / s2s connection (MIX)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:84
+msgid "``_xmpp-server._tcp.pubsub.your-domain.tld``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:84
+msgid "Federation / s2s connection (PubSub)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:91
+msgid ""
+"You can check if the configuration is correct by issuing following "
+"commands:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:101
+msgid "Now, how do you register your domain with our service?"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:103
+msgid ""
+"There are a few ways. We recommend checking with the `Add and Manage "
+"Domains <#addManageDomain>`__ section of the documentation on setting "
+"that up. If you cannot or don’t want to do it on your own, the way "
+"described in the guide please send us a message, either via XMPP to "
+"admin@tigase.im or the contact form requesting new domain. User "
+"registration is available via in-band registration protocol. You can also"
+" specify whether you want to allow anonymous authentication to be "
+"available for your domain and you can specify maximum number of users for"
+" your domain."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:107
+msgid "Providing certificate"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:109
+msgid ""
+"It’s also encouraged to provide dedicated SSL certificate - there are "
+"various ways to do it and they are described in `??? "
+"<#InstallingSSLCertificate>`__. You may want to take advantage of free "
+"Let’s Encrypt certificates and automate whole upload and renewal process "
+"as described in `??? <#LetsEncryptCertificate>`__"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:113
+msgid "Checking setup"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:115
+msgid ""
+"If you have a cell phone on a separate network with an XMPP client, you "
+"can now try to login to test the server. If that is not handy, you can "
+"use an online tool to check proper DNS records such as kingant’s: "
+"https://kingant.net/check_xmpp_dns/ and it will tell you if anything is "
+"missing."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:119
+msgid "Ports description"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:122
+msgid ""
+"Once your server is setup, you may need to open at least two ports. By "
+"default XMPP communication happens on ports 5222/5269, to which point SRV"
+" records. Other ports used by the server are:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:124
+msgid "``3478`` - TURN or STUN, plain socket, TCP and UDP"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:126
+msgid "``5349`` - TURN or STUN, over TLS, TCP and UDP"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:128
+msgid "``5222`` - incoming client to server XMPP connections"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:130
+msgid ""
+"``5223`` - incoming client to server XMPP connections over TLS/SSL, "
+"including DirectTLS"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:132
+msgid "``5269`` - default s2s port, i.e.: federation support"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:134
+msgid "``5277`` - inter-cluster communication"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:136
+msgid "``5280`` - default BOSH connections"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:138
+msgid "``5290`` - default WebSocket connections"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:140
+msgid "``5291`` - default WebSocket connections over TLS/SSL"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:142
+msgid ""
+"``8080`` - for HTTP server (web-based setup, REST API, file upload "
+"extension, etc.)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:144
+msgid "``9050`` - JMX Monitoring"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:146
+msgid ""
+"If for any reason you can’t use default ports and have to change them "
+"it’s possible to point SRV records those ports. Please keep in mind, that"
+" you have to open those ports for incoming connections in your firewall. "
+"In case you are using ``iptables`` you can use following command to "
+"include those ports in your rules:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:159
+msgid ""
+"Both ports should be setup to use TCP only. If for any reason you want to"
+" make service available for different ports you can:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:161
+msgid "change ports in Tigase configuration and update DNS SRV records;"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:163
+msgid ""
+"forward those ports to default Tigase ports (this is especially useful "
+"under \\*nix operating system if you want to utilize ports lower than "
+"``1024`` while running, as recommended, Tigase service from user account "
+"- there is a limitation and user accounts can bind to ports lower than "
+"``1024``), for example using ``iptables`` rules (in following example we "
+"are making available Tigase SSL websocket port available under port "
+"``443``, which is usually opened in corporate firewalls):"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:4
+msgid "Tigase Script Selection"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:6
+msgid ""
+"As mentioned in each of the quick start sections, each distribution of "
+"Tigase XMPP server comes with a number of scripts that are customized for"
+" different versions of Linux."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:8
+msgid "init.d chart"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:11
+msgid "Operating system"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:11
+msgid "init.d file path"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:11
+msgid "Types of Operating Systems"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:13
+msgid "Systemd"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:13
+msgid "``tigase-server/scripts/systemd/*``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:13
+msgid "Systemd-based distributions"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:15
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:197
+msgid "Debian"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:15
+msgid "``tigase-server/scripts/debian/tigase.init.d``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:15
+msgid "Knoppix, Ubuntu (before v15.04), Raspbian or Duvian"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:17
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:90
+msgid "Gentoo"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:17
+msgid "``tigase-server/scripts/gentoo/init.d/tigase``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:17
+msgid "CoreOS (before v94.0.0), Tin Hat Linux or other \\*too based systems"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:19
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:110
+msgid "Mandriva"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:19
+msgid "``tigase-server/scripts/mandriva/init.d/tigase``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:19
+msgid "Specific init.d file for Mandriva Linux"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:21
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:138
+msgid "Redhat"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:21
+msgid "``tigase-server/scripts/redhat/init.d/tigase``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:21
+msgid ""
+"RedHat (before v7.0) and other RPM based linux derivatives like CentOS "
+"(before v.7.14), openSUSE (before v12.2)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:28
+msgid ""
+"If your operating system is a systemd-based linux distribution, we "
+"recommend to use systemd service scripts. It may be possible to use (in "
+"this case legacy) ``init.d`` startup files as before, but usage of "
+"systemd startup scripts will allow better control of the startup process "
+"and will even allow for automatic restart of the Tigase XMPP Server in "
+"the case of JVM crash."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:32
+msgid "Configuration: For Linux Distributions using systemd"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:34
+msgid ""
+"To set up Tigase XMPP Server as a system service it is required to copy "
+"``tigase-server.service`` file to ``/etc/systemd/system/`` directory"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:40
+msgid "This file contains following parameters which may need to be adjusted:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:42
+msgid ""
+"``User`` - Specifies the user that will run the program. This should be a"
+" user with SU permissions."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:44
+msgid ""
+"``WorkingDirectory`` - Specifies installation directory *(default: "
+"``/home/tigase/tigase-server``)*"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:46
+msgid ""
+"``ExecStart`` - Specifies startup command *(default: runs "
+"``scripts/tigase.sh start etc/tigase.conf`` in the Tigase installation "
+"directory)*"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:48
+msgid ""
+"``ExecStop`` - Specifies shutdown command *(default: runs "
+"``scripts/tigase.sh stop etc/tigase.conf`` in the Tigase installation "
+"directory)*"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:50
+msgid ""
+"``PIDFile`` - Specifies location of the PID file *(default: "
+"``logs/tigase.pid`` file in the Tigase installation directory)*"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:52
+msgid ""
+"It is also required to copy options file ``tigase-server`` to "
+"``/etc/default/`` directory"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:58
+msgid "With those files in place you need to reload ``systemctl`` daemon"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:68
+msgid ""
+"If you are upgrading from the previous version of the Tigase XMPP Server "
+"which was not running as the systemd system service it is required to "
+"uninstall old service and remove old service files."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:72
+msgid "Configuration: For All Linux Distributions"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:74
+msgid ""
+"Once you’ve located the appropriate distribution scripts (please take a "
+"look at the table above), copy it to your system’s init.d folder (usually"
+" it’s ``/etc/init.d/``):"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:80
+msgid "You may also need to make it executable:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:86
+msgid ""
+"It is recommended that you open the script files or configuration files "
+"as some have some parameters that you will need to specify."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:92
+msgid "The conf.d script must contain the following parameters:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:100
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:124
+msgid "The following should be configured:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:102
+msgid "``TIGASE_HOME`` - Specifies the Tigase Server installation directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:104
+msgid ""
+"``TIGASE_USER`` - Specifies the user that will run the program. This "
+"should be a user with SU permissions."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:106
+msgid ""
+"``TIGASE_CONF`` - The location of tigase.conf file, relative to the "
+"``TIGASE_HOME`` directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:112
+msgid "Mandriva has a single init.d file, however it should be configured:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:126
+msgid "``JAVA_HOME`` - The location of your JDK Installation."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:128
+msgid "``TIGASE_DIR`` - Tigase Server installation directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:130
+msgid ""
+"``tigase`` - The location of your tigase.sh script. This should not need "
+"adjusting if you maintain the default file structure."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:132
+msgid ""
+"``config`` - The location of your tigase.conf file. This should not need "
+"adjusting if you maintain the default file structure."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:134
+msgid "``pid`` file will be stored in ``/var/run/ser.pid``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:140
+msgid "Similar to Mandriva, you will need to configure the init.d file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:162
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:218
+msgid "``USERNAME`` - Username running Tigase, should have su permissions."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:164
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:220
+msgid "``USERGROUP`` - The usergroup of the username."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:166
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:222
+msgid "``NAME`` - OS name for Tigase program."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:168
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:224
+msgid "``DESC`` - Optional description."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:170
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:226
+msgid ""
+"``TIGASE_HOME`` - The location of your Tigase Server installation "
+"directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:172
+msgid ""
+"``TIGASE_LIB`` - The location of your Tigase Jars folder, you should not "
+"need to adjust this if you set ``TIGASE_HOME`` properly, and maintain the"
+" default file structure."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:174
+msgid ""
+"``TIGASE_CONFIG`` - The location of your tigase.conf file relative to "
+"``TIGASE_HOME``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:176
+msgid ""
+"``TIGASE_OPTIONS`` - Legacy options for Tigase, most are now handled in "
+"``config.tdsl`` or tigase.conf."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:178
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:232
+msgid ""
+"``TIGASE_PARAMS`` - Parameters passed to command line when launching "
+"Tigase."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:180
+msgid ""
+"``PIDFILE`` - Location of Tigase PID file if you wish to use custom "
+"directory. Default will be located in /logs or /var/temp directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:182
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:236
+msgid ""
+"``TIGASE_CONSOLE_LOG`` - Location of Tigase Server console log file if "
+"you wish to use a custom directory. Default will be located in /logs "
+"directory, failing that /dev/null."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:184
+msgid ""
+"After you’ve copied the script, in order to install sysinit script you "
+"have to add it to the configuration:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:190
+msgid "Service can be enabled or disabled service with:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:199
+msgid ""
+"As with other distributions you should copy init.d script to the correct "
+"location. Afterwards it should be edited and correct values for variables"
+" need to be set:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:228
+msgid ""
+"``TIGASE_CONFIG`` - The location of your tigase-server.xml file relative "
+"(old configuration format)"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:230
+msgid ""
+"``TIGASE_OPTIONS`` - command line arguments passed to Tigase server "
+"(which may include path to ``init.properies`` (if correct ``tigase.conf``"
+" configuration will be found then it will translate to "
+"``TIGASE_OPTIONS=\" --property-file etc/config.tdsl \"``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:234
+msgid ""
+"``PIDFILE`` - Location of Tigase PID file if you wish to use custom "
+"directory. Default will be located in ``/var/run/tigase/tigase.pid`` or "
+"under (in this case relative to tigase home directory)\\ "
+"``logs/tigase.pid``."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:238
+msgid ""
+"Afterwards we need to install service in the system with following "
+"command:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:246
+msgid "Running Tigase as a system service"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:248
+msgid ""
+"There are a number of benefits to running Tigase as a service, one of "
+"which is to ensure that the program will run even in the event of a power"
+" outage or accidental server restart, Tigase will always be up and "
+"running."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:252
+msgid "For systemd-based linux distributions"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:254
+msgid ""
+"Once installation is complete you may start Tigase as a typical systemd "
+"service using following command:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:260
+msgid "To stop it, you may run following command:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:266
+msgid ""
+"It is also possible to enable service, to make it start during startup of"
+" the operating system:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:274
+msgid "For other linux distributions"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:276
+msgid ""
+"Once installation is complete, you should be able to start Tigase using "
+"the following command:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:282
+msgid ""
+"Tigase should begin running in the background. Since Tigase is now "
+"installed as a service, it can be controlled with any of the service "
+"commands, such as:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:284
+msgid "``service tigase stop``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:286
+msgid "``service tigase restart``"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:2
+msgid "Shutting Down Tigase"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:4
+msgid ""
+"Although Tigase XMPP Server can be terminated by ending the process, it "
+"is preferred and recommended to use it’s own shutdown scripts instead. "
+"Not only does this allow for a proper purge of Tigase form the system, "
+"but allows for all shutdown functions to operate, such as amending logs "
+"and completing statistics. To trigger a shutdown of Tigase server, the "
+"following command can be used from the tigase directory:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:10
+msgid ""
+"You may specify the config file if you want, but it will make no "
+"differences"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:12
+msgid "This will:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:14
+msgid "Begin shutdown thread"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:16
+msgid "Stop accepting new connections"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:18
+msgid "Close all current connections"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:20
+msgid "Collect runtime statistics"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:22
+msgid "Write statistics to log"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:24
+msgid "Dump full stacktrace to a file"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:26
+msgid "Run GC and clear from memory"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:30
+msgid "Shutdown statistics"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:32
+msgid ""
+"Upon shutdown, statistics for the server’s runtime will be appended to "
+"the log file. For a description of the statistics and what they mean, "
+"refer to the :ref:`Statistics Description<statsticsDescription>` portion "
+"of the documentation."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:35
+msgid "Shutdown StackTrace Dump"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:37
+msgid ""
+"To aid with troubleshooting purposes, the full stacktrace will be dumped "
+"to a seperate file located at $serverdir/logs/threads-dump.log.# "
+"Stacktrace logs will follow the same log file numbering scheme described "
+"in :ref:`Log file description<logs>`."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:39
+msgid ""
+"This feature is enabled by default, however you may disable this by "
+"adding the following to your ``config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:46
+msgid "Shutting Down Cluster Nodes"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:48
+msgid ""
+"Starting with v8.0.0 you can now shut down individual cluster nodes "
+"without shutting down the whole server. This command will use the "
+"*SeeOtherHost* strategy to direct traffic to other nodes and update the "
+"cluster map to gracefully shut down the single node"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:50
+msgid ""
+"Shutting down individual nodes can be done VIA Ad-hoc command and fill "
+"out the response forms. The command is available from message-router as "
+"http://jabber.org/protocol/admin#shutdown."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:2
+msgid "Upgrading to v8.0.0 from v7.1.0"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:4
+msgid ""
+"There have been a number of changes to the user and auth databases since "
+"v7.1.0. As a result, if you are upgrading from older versions, you will "
+"need to follow this guide."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:8
+msgid "We recommend installing Tigase XMPP Server 8.0.0 in a separate directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:11
+msgid "Backup your data"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:13
+msgid ""
+"As with any migration it is highly recommended that you backup your "
+"repository before conducting any upgrade operations."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:15
+msgid "For MySQL databases:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:23
+msgid "Setup Tigase XMPP Server 8.0.0"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:25
+msgid ""
+"After downloading Tigase XMPP Server 8.0.0 from our website, or using "
+"wget, extract the files to a separate directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:27
+msgid ""
+"Copy the ``tigase.conf`` and ``init.properties`` files from the old "
+"directory to v8.0.0 directory."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:35
+msgid "Import the database."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:45
+msgid "Upgrade configuration file"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:47
+msgid ""
+"Tigase XMPP Server has a utility that can be called using ``upgrade-"
+"config`` that will update your old ``init.properties`` file and create a "
+"new file using DSL."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:53
+msgid "When everything is ready it will printout following information"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:64
+msgid "Connect new database"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:66
+msgid ""
+"Edit your new ``config.tdsl`` file to connect to the new database you "
+"created during the import step."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:83
+msgid "Upgrade Database schema"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:85
+msgid ""
+"Upgrading database schemas is now possible using the ``upgrade-schema`` "
+"option. Do this now."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:94
+msgid "Your database schema MUST be v8 or conversion will not occur properly!"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:96
+msgid "You will be asked the following prompts:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:104
+msgid "Upon success, you should see the following:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:125
+msgid "Start Tigase!"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:129
+msgid "Help?"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:131
+msgid ""
+"Both ``upgrade`` commands also have a build in help function, they can be"
+" called if needed from the command line. You can also run these commands "
+"for help."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:140
+msgid "Upgrade/Restore with a script [experimental!]"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:142
+msgid ""
+"To make upgrade process easier it’s possible to utilize `tigase-"
+"upgrade.sh <files/tigase-upgrade.sh>`__ \\*nix shell script. It permits "
+"upgrading to new version (supports downloading version from provided "
+"URL)."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:144
+msgid "It’s usage is as follows:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:150
+msgid ""
+"Where: \\* ``{upgrade|rollback}`` - defines whether to perform upgrade or"
+" rollback to previous version \\* ``install_package`` - package to which "
+"perform upgrade (can be URL) in case of upgrade or backed-up installation"
+" (from which we want to restore) in case of rollback \\* "
+"``install_directory`` - destination directory (both in upgrade and "
+"rollback); can be symlink in which case it will be preserved with "
+"upgraded/restored path as target \\* ``[tar|dir]`` - (optional) type of "
+"backup (either simply copy directory or also archive it using ``tar`` "
+"command); by default ``dir`` is used."
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:152
+msgid ""
+"To upgrade installation to version ``tigase-server-8.0.0-SNAPSHOT-b5285"
+"-dist-max.tar.gz`` execute the script as follows:"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:158
+msgid ""
+"To rollback from ``tigase-server-8.0.0-SNAPSHOT-"
+"b5264_backup-18-11-05_1712`` backup execute script as follows:"
+msgstr ""
+
