@@ -3,7 +3,7 @@
 Installation Using Web Installer
 -----------------------------------
 
-When Tigase XMPP Server starts up, it looks for the default configuration file: ``etc/config.tdsl``. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase. If you are installing Tigase in a Windows environment, please see the `Windows Installation <#winWebInstall>`__ section.
+When Tigase XMPP Server starts up, it looks for the default configuration file: ``etc/config.tdsl``. If this file has not been modified you can run the web installer. Which will step you through the process of configuring Tigase. If you are installing Tigase in a Windows environment, please see the :ref:`Windows Installation<winWebInstall>` section.
 
 
 Download and Extract
@@ -47,6 +47,7 @@ Tigase should start listening on port 8080 - you can check it using ``lsof`` com
 
 You can also check console log under ``logs/tigase-console.log``, which should point you directly to the installer.
 
+.. _connecttoWebInstall:
 
 Connect to the Web Installer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -141,7 +142,7 @@ It is recommended at this point to stop the server manually and restart it using
 
 .. Note::
 
-   In order to make Tigase XMPP Server start automatically during system startup you should setup startup scripts as described in `??? <#tigaseScriptStart>`__
+   In order to make Tigase XMPP Server start automatically during system startup you should setup startup scripts as described in :ref:`Tigase Script Selection<tigaseScriptStart>`__
 
 To further fine tune the server you should edit ``etc/tigase.conf``. Ensure ``JAVA_HOME`` path is correct, and increase memory if needed using ``JAVA_OPTIONS`` -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
 
@@ -174,7 +175,7 @@ First step is to extract the distribution archive in it’s entirety to the inte
 
 From here, you have a few options how to run Tigase; ``run.bat`` will operate Tigase using a java command, or ``tigase.bat`` which will start Tigase using the wrapper. You may also install Tigase and run it as a service.
 
-Once this setup is finished, web installer will continue the same from `here <#connecttoWebInstall>`__.
+Once this setup is finished, web installer will continue the same from :ref:`here<connecttoWebInstall>`.
 
 .. |web install 01| image:: /images/admin/web-install-01.png
 
