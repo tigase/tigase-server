@@ -4,7 +4,7 @@ Tigase Administration Guide
 
 .. toctree::
    :titlesonly:
-   :numbered:
+   :numbered: 3
 
    Release_Notes/Tigase_Release_Notes
    Tigase_User_Guide/User_Guide
