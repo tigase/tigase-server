@@ -1,0 +1,117 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:2
+msgid "Licensing and Open Source"
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:4
+msgid ""
+"As mentioned previously, Tigase is open source under AGPLv3. If you are "
+"not familiar with open source software, or the environment, here are some"
+" frequently asked questions that might provide some answers."
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:6
+msgid "**What does open source mean?**"
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:7
+msgid ""
+"This means that Tigase’s source code is available to the public to see "
+"how Tigase works. There are no 'black boxes' for packets where things "
+"just happen, everything is out in the open, whereas other companies may "
+"consider this propitiatory information. In addition, we have the benefit "
+"of many talented people working with Tigase to constantly improve Tigase "
+"server and related projects. These people not only include the Tigase "
+"development team, but other members of the community who submit code "
+"improvements, patches, enhancements, or other changes to Tigase."
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:9
+msgid "**Does this mean that the binaries are open to malicious code?**"
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:10
+msgid ""
+"Although we accept patches from contributors, our repository does not "
+"accept them directly. Code may be submitted through our `tigase.tech "
+"<http://tigase.tech>`__ page and our developers will review the code "
+"before it is added. All builds are tested for functionality and security "
+"when they are built."
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:12
+msgid "**Does this mean it is less secure?**"
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:13
+msgid ""
+"Not at all. Although anybody can see the source code, and know how Tigase"
+" works; your installation, connections, and settings are uniquely yours. "
+"Tigase is regularly tested and written to be as secure as possible using "
+"the latest encryption and secure connection protocols."
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:15
+msgid "**Is Tigase free?**"
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:16
+msgid ""
+"Tigase is free for download and use in it’s unmodified state. Our "
+"commercial grade products such as Advanced Clustering Strategy is "
+"available for free use for testing & development."
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:18
+msgid ""
+"**Does this mean I cannot use it in my product or commercial "
+"environment?**"
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:19
+msgid ""
+"Not necessarily, consult the Affero General Public License Agreement v3 "
+"to see if your use qualifies. Tigase is offered under commercial license "
+"if your use is not covered by AGPLv3."
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:21
+msgid "**Are there options for closed code or extensions?**"
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:22
+msgid ""
+"Yes! Commercial licenses can be custom made for each client, and software"
+" written for your company may be made private or part of our open source "
+"distributions at your discretion."
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:24
+msgid "**Can I contribute code?**"
+msgstr ""
+
+#: ../../Tigase_Administration/Licensing_Open_Source.rst:25
+msgid ""
+"Sure! We accept code through GitHub pull-requests - submit them to one of"
+" our projects listed in our `GitHub organisation "
+"<https://github.com/tigase/>`__"
+msgstr ""
+
