@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:11-0700\n"
+"POT-Creation-Date: 2022-05-27 12:30-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,7 +97,7 @@ msgid ""
 " file: ``etc/config.tdsl``. If this file has not been modified you can "
 "run the web installer. Which will step you through the process of "
 "configuring Tigase. If you are installing Tigase in a Windows "
-"environment, please see the `Windows Installation <#winWebInstall>`__ "
+"environment, please see the :ref:`Windows Installation<winWebInstall>` "
 "section."
 msgstr ""
 
@@ -143,87 +143,87 @@ msgid ""
 "should point you directly to the installer."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:52
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:53
 msgid "Connect to the Web Installer"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:54
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:55
 msgid "Some points before you can connect:"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:56
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:57
 msgid ""
 "This setup page is restricted access, however for first setup there is a "
 "default account set to setup Tigase: Username: ``admin`` Password: "
 "``tigase``"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:58
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:59
 msgid ""
 "This combination will only be valid once as it will be removed from "
 "``config.tdsl`` file on completion of setup process. After this point the"
 " setup page will only be accessible using the following:"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:60
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:61
 msgid ""
 "JID accounts listed as administrators in admins line in ``config.tdsl`` "
 "file."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:62
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:63
 msgid ""
 "Username and password combinations added to ``config.tdsl`` file "
 "manually, or at the last page in this process."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:64
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:65
 msgid ""
 "Point your browser to http://localhost:8080/setup/ unless you are working"
 " remotely. You can also use the domain name, or IP address."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:66
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:67
 msgid "Enter the username and password above to gain access."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:70
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:71
 msgid "Step Through the Installation Process"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:72
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:73
 msgid "You will be greeted by the following \"About software\" page."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:74
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:75
 msgid "|web install 01|"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:179
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:180
 msgid "web install 01"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:76
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:77
 msgid "Read it and then click \"Next\""
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:78
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:79
 msgid ""
 "The setup consists of several steps that help you configure your "
 "installation: selecting features and providing database configuration."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:82
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:83
 msgid ""
 "Order and design of the steps may slightly differ thus we only provide a "
 "broad overview of how to proceed:"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:84
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:85
 msgid "**Advanced Clustering Strategy information**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:86
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:87
 msgid ""
 "You will see some information about our commercial products and "
 "licensing. Please read though the agreement, and as a confirmation of "
@@ -231,11 +231,11 @@ msgid ""
 "next page."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:88
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:89
 msgid "**Basic Tigase server configuration**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:90
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:91
 msgid ""
 "This page will look over your basic configuration settings, those include"
 " the server type, domain you wish to use, and gives you a chance to "
@@ -244,17 +244,17 @@ msgid ""
 "later)."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:92
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:93
 msgid ""
 "If you do not specify an administrator and password, one is made for you,"
 " which will be admin@yourdomain and password is tigase."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:94
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:95
 msgid "**Connectivity**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:96
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:97
 msgid ""
 "At this page you will be presented with a list of possible connectivity "
 "options supported by Tigase XMPP Server and a way to enable/disable each "
@@ -262,41 +262,41 @@ msgid ""
 "making this decisions, click \"Next\"."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:98
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:99
 msgid "**Features**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:100
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:101
 msgid ""
 "Now you will be able to select which features of Tigase XMPP Server (such"
 " as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or "
 "disabled."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:102
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:103
 msgid "At this step will also be able to enable clustering on your installation"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:104
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:105
 msgid "When you will be ready, click \"Next\"."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:106
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:107
 msgid "**Database configuration**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:108
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:109
 msgid ""
 "This is where the database is configured. The type of database selected "
 "in step 3 will influence available options. **BE SURE TO SPECIFY DATABASE"
 " ROOT USER ACCOUNT AND PASSWORD**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:110
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:111
 msgid "**Database connectivity check**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:112
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:113
 msgid ""
 "After database setup, you should see a page with executed actions and "
 "their results. All presented items should be \"green\", meaning that "
@@ -305,11 +305,11 @@ msgid ""
 "this issue. If setup is completed, click \"Next\"."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:114
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:115
 msgid "**Setup security**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:116
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:117
 msgid ""
 "The Setup Access Page will be locked from the admin/tigase user as "
 "specified above. This is your chance to have the setup pages add a "
@@ -318,57 +318,57 @@ msgid ""
 "to access."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:118
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:119
 msgid "**Saving configuration**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:120
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:121
 msgid ""
 "The installation is almost complete and you will be presented with a page"
 " showing what the resulting configuration (stored in ``config.tdsl`` "
 "file) will look like."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:122
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:123
 msgid ""
 "If you have a custom setup, or would like to put your own settings in, "
 "you may copy and past the contents here to edit the current "
 "``config.tdsl`` file."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:124
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:125
 msgid "Click \"Save\" to write the file to disk."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:126
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:127
 msgid "**Finished**"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:128
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:129
 msgid ""
 "You have now finished the installation, proceed to the next step to "
 "restart the server."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:131
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:132
 msgid "Restart the Server"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:133
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:134
 msgid ""
 "It is recommended at this point to stop the server manually and restart "
 "it using the proper script for your OS. From the Tigase base directory "
 "enter"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:144
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:145
 msgid ""
 "In order to make Tigase XMPP Server start automatically during system "
-"startup you should setup startup scripts as described in `??? "
-"<#tigaseScriptStart>`__"
+"startup you should setup startup scripts as described in :ref:`Tigase "
+"Script Selection<tigaseScriptStart>`"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:146
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:147
 msgid ""
 "To further fine tune the server you should edit ``etc/tigase.conf``. "
 "Ensure ``JAVA_HOME`` path is correct, and increase memory if needed using"
@@ -376,31 +376,31 @@ msgid ""
 " Tigase to read settings from this file on startup as follows."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:148
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:149
 msgid ""
 "Everything should be running smooth at this point. Check the logfiles in "
 "``logs/`` if you experience any problems."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:151
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:152
 msgid "Verify Tigase is Running"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:153
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:154
 msgid "You should see a list of listening ports."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:169
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:170
 msgid "Windows Instructions for using Web Installer"
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:171
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:172
 msgid ""
 "There are a few steps involved with setting up Tigase with the web "
 "installer in a Windows environment. Please follow this guide."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:173
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:174
 msgid ""
 "First step is to extract the distribution archive in it’s entirety to the"
 " intended running directory. Once there, run the ``Setup.bat`` file "
@@ -408,7 +408,7 @@ msgid ""
 "the correct folders before Tigase begins operation."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:175
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:176
 msgid ""
 "From here, you have a few options how to run Tigase; ``run.bat`` will "
 "operate Tigase using a java command, or ``tigase.bat`` which will start "
@@ -416,10 +416,10 @@ msgid ""
 "service."
 msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:177
+#: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:178
 msgid ""
 "Once this setup is finished, web installer will continue the same from "
-"`here <#connecttoWebInstall>`__."
+":ref:`here<connecttoWebInstall>`."
 msgstr ""
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:4
@@ -2035,4 +2035,31 @@ msgid ""
 "To rollback from ``tigase-server-8.0.0-SNAPSHOT-"
 "b5264_backup-18-11-05_1712`` backup execute script as follows:"
 msgstr ""
+
+#~ msgid ""
+#~ "When Tigase XMPP Server starts up, "
+#~ "it looks for the default configuration"
+#~ " file: ``etc/config.tdsl``. If this file"
+#~ " has not been modified you can "
+#~ "run the web installer. Which will "
+#~ "step you through the process of "
+#~ "configuring Tigase. If you are "
+#~ "installing Tigase in a Windows "
+#~ "environment, please see the `Windows "
+#~ "Installation <#winWebInstall>`__ section."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In order to make Tigase XMPP "
+#~ "Server start automatically during system "
+#~ "startup you should setup startup scripts"
+#~ " as described in `??? "
+#~ "<#tigaseScriptStart>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Once this setup is finished, web "
+#~ "installer will continue the same from"
+#~ " `here <#connecttoWebInstall>`__."
+#~ msgstr ""
 
