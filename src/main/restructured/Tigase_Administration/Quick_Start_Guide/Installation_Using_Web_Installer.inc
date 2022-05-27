@@ -142,7 +142,7 @@ It is recommended at this point to stop the server manually and restart it using
 
 .. Note::
 
-   In order to make Tigase XMPP Server start automatically during system startup you should setup startup scripts as described in :ref:`Tigase Script Selection<tigaseScriptStart>`__
+   In order to make Tigase XMPP Server start automatically during system startup you should setup startup scripts as described in :ref:`Tigase Script Selection<tigaseScriptStart>`
 
 To further fine tune the server you should edit ``etc/tigase.conf``. Ensure ``JAVA_HOME`` path is correct, and increase memory if needed using ``JAVA_OPTIONS`` -Xmx (max), and -Xms (initial). You will need to direct Tigase to read settings from this file on startup as follows.
 
