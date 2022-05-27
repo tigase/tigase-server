@@ -181,11 +181,11 @@ The script description and command id needs a little bit more work. You have to 
 
 Please note, there must be at least a single space after the ``AS:Description:`` or ``AS:CommandId:`` string. Everything rest after that, until the end of the line, is treated as either the script description or command id. Put these in your script file and the loader will detect them and set correctly for your script.
 
-.. |service disco| image:: /../asciidoc/admin/images/admin/service-disco.png
-.. |hello1 new script| image:: /../asciidoc/admin/images/admin/hello1-new-script.png
-.. |loaded ok small| image:: /../asciidoc/admin/images/admin/loaded-ok-small.png
-.. |service disco with new hello| image:: /../asciidoc/admin/images/admin/service-disco-with-new-hello.png
-.. |hello1 result small| image:: /../asciidoc/admin/images/admin/hello1-result-small.png
-.. |hello2 asking for name small| image:: /../asciidoc/admin/images/admin/hello2-asking-for-name-small.png
-.. |hello2 result small| image:: /../asciidoc/admin/images/admin/hello2-result-small.png
-.. |hello2 new script| image:: /../asciidoc/admin/images/admin/hello2-new-script.png
+.. |service disco| image:: /images/admin/service-disco.png
+.. |hello1 new script| image:: /images/admin/hello1-new-script.png
+.. |loaded ok small| image:: /images/admin/loaded-ok-small.png
+.. |service disco with new hello| image:: /images/admin/service-disco-with-new-hello.png
+.. |hello1 result small| image:: /images/admin/hello1-result-small.png
+.. |hello2 asking for name small| image:: /images/admin/hello2-asking-for-name-small.png
+.. |hello2 result small| image:: /images/admin/hello2-result-small.png
+.. |hello2 new script| image:: /images/admin/hello2-new-script.png

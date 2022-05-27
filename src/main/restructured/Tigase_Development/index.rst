@@ -4,7 +4,7 @@ Tigase Development Guide -Version 8.3.0
 
 .. toctree::
    :titlesonly:
-   :numbered:
+   :numbered: 3
 
    Basic_Information
    CodeStyleGuide

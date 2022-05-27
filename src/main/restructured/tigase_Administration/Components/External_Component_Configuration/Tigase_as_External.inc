@@ -280,5 +280,5 @@ and example of the external connections configuration file:
 
    muc.devel.tigase.org:muc-pass:connect:5270:devel.tigase.org:client
 
-.. |adminui extman add item form| image:: /../asciidoc/admin/images/admin/adminui_extman_add_item_form.png
-.. |adminui extman add item form external muc| image:: /../asciidoc/admin/images/admin/adminui_extman_add_item_form_external_muc.png
+.. |adminui extman add item form| image:: /images/admin/adminui_extman_add_item_form.png
+.. |adminui extman add item form external muc| image:: /images/admin/adminui_extman_add_item_form_external_muc.png

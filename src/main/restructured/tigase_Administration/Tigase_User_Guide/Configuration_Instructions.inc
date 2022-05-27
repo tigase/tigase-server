@@ -106,20 +106,20 @@ Where to go next? For detailed Psi documentation refer to the program Wiki page:
 
 Welcome to the Tigase Administration Guide.
 
-.. |Psi First Run| image:: ../../../asciidoc/admin/images/user/psi-first-run.png
-.. |Psi Add Account| image:: ../../../asciidoc/admin/images/user/psi-add-account.png
-.. |Psi Empty Account| image:: ../../../asciidoc/admin/images/user/psi-register-account-empty.png
-.. |Psi Register Account| image:: ../../../asciidoc/admin/images/user/psi-register-account-nossl.png
-.. |Register Account Success| image:: ../../../asciidoc/admin/images/user/psi-register-account-success.png
-.. |PSI After Registration| image:: ../../../asciidoc/admin/images/user/psi-after-registration.png
-.. |PSI Connected| image:: ../../../asciidoc/admin/images/user/psi-connected.png
-.. |PSI Menu| image:: ../../../asciidoc/admin/images/user/psi-menu.png
-.. |PSI Menu add Contact| image:: ../../../asciidoc/admin/images/user/psi-menu-add-contact.png
-.. |PSI Add User Empty| image:: ../../../asciidoc/admin/images/user/psi-add-user-empty.png
-.. |PSI Add User Filled| image:: ../../../asciidoc/admin/images/user/psi-add-user-filled.png
-.. |PSI Kobit Added| image:: ../../../asciidoc/admin/images/user/psi-kobit-added.png
-.. |PSI Kobit Auth Received| image:: ../../../asciidoc/admin/images/user/psi-kobit-auth-received.png
-.. |PSI Authorized Window| image:: ../../../asciidoc/admin/images/user/psi-authorized-window.png
-.. |PSI Authorized Window 2| image:: ../../../asciidoc/admin/images/user/psi-authorized-window-2.png
-.. |PSI Authorized Window 3| image:: ../../../asciidoc/admin/images/user/psi-authorized-window-3.png
-.. |PSI Kobit Added Authorized| image:: ../../../asciidoc/admin/images/user/psi-kobit-added-authorized.png
+.. |Psi First Run| image:: /images/user/psi-first-run.png
+.. |Psi Add Account| image:: /images/user/psi-add-account.png
+.. |Psi Empty Account| image:: /images/user/psi-register-account-empty.png
+.. |Psi Register Account| image:: /images/user/psi-register-account-nossl.png
+.. |Register Account Success| image:: /images/user/psi-register-account-success.png
+.. |PSI After Registration| image:: /images/user/psi-after-registration.png
+.. |PSI Connected| image:: /images/user/psi-connected.png
+.. |PSI Menu| image:: /images/user/psi-menu.png
+.. |PSI Menu add Contact| image:: /images/user/psi-menu-add-contact.png
+.. |PSI Add User Empty| image:: /images/user/psi-add-user-empty.png
+.. |PSI Add User Filled| image:: /images/user/psi-add-user-filled.png
+.. |PSI Kobit Added| image:: /images/user/psi-kobit-added.png
+.. |PSI Kobit Auth Received| image:: /images/user/psi-kobit-auth-received.png
+.. |PSI Authorized Window| image:: /images/user/psi-authorized-window.png
+.. |PSI Authorized Window 2| image:: /images/user/psi-authorized-window-2.png
+.. |PSI Authorized Window 3| image:: /images/user/psi-authorized-window-3.png
+.. |PSI Kobit Added Authorized| image:: /images/user/psi-kobit-added-authorized.png

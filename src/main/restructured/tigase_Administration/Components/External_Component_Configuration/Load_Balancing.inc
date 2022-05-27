@@ -77,6 +77,6 @@ As you can see remote host name is not a simple domain but a character string wi
 
 Of course it is possible to connect multiple external component to all cluster nodes, this way the whole installation would be really working in the cluster and also load balanced.
 
-.. |ExternalCompClustering002| image:: /../asciidoc/admin/images/admin/ExternalCompClustering002.png
-.. |adminui ext add item form_1| image:: /../asciidoc/admin/images/admin/adminui_ext_add_item_form.png
-.. |ExternalCompClustering003 0| image:: /../asciidoc/admin/images/admin/ExternalCompClustering003_0.png
+.. |ExternalCompClustering002| image:: /images/admin/ExternalCompClustering002.png
+.. |adminui ext add item form_1| image:: /images/admin/adminui_ext_add_item_form.png
+.. |ExternalCompClustering003 0| image:: /images/admin/ExternalCompClustering003_0.png

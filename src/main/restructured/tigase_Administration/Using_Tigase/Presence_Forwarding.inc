@@ -57,4 +57,4 @@ You should be able to find a few more code examples on the wiki page.
    Thread.sleep( 10 * 60 * 1000 )
    disconnect()
 
-.. |vhost presence forward| image:: ../../../asciidoc/admin/images/admin/vhost-presence-forward.png
+.. |vhost presence forward| image:: /images/admin/vhost-presence-forward.png

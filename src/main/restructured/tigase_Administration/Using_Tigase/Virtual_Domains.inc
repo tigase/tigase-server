@@ -133,17 +133,17 @@ SSL Certificate Management
 
 SSL Certificate Management has been implemented, and certificates can be manipulated when in a .pem form. For more details, see `Creating and Loading the Server Certificate in pem Files <#certspem>`__ section of documentation for more information.
 
-.. |adminui vhost add item button| image:: ../../../asciidoc/admin/images/admin/adminui_vhost_add_item_button.png
-.. |adminui vhost add item form| image:: ../../../asciidoc/admin/images/admin/adminui_vhost_add_item_form.png
-.. |adminui vhost update item button| image:: ../../../asciidoc/admin/images/admin/adminui_vhost_update_item_button.png
-.. |adminui vhost update item domains list| image:: ../../../asciidoc/admin/images/admin/adminui_vhost_update_item_domains_list.png
-.. |adminui vhost update item form| image:: ../../../asciidoc/admin/images/admin/adminui_vhost_update_item_form.png
-.. |adminui vhost remove item button| image:: ../../../asciidoc/admin/images/admin/adminui_vhost_remove_item_button.png
-.. |adminui vhost remove item domains list| image:: ../../../asciidoc/admin/images/admin/adminui_vhost_remove_item_domains_list.png
-.. |service disco menu| image:: ../../../asciidoc/admin/images/admin/service_disco_menu.png
-.. |service disco window vhost| image:: ../../../asciidoc/admin/images/admin/service_disco_window_vhost.png
-.. |command menu add vhost| image:: ../../../asciidoc/admin/images/admin/command_menu_add_vhost.png
-.. |add vhost window| image:: ../../../asciidoc/admin/images/admin/add_vhost_window.png
-.. |service disco window sm| image:: ../../../asciidoc/admin/images/admin/service_disco_window_sm.png
-.. |command menu add user| image:: ../../../asciidoc/admin/images/admin/command_menu_add_user.png
-.. |add user window| image:: ../../../asciidoc/admin/images/admin/add_user_window.png
+.. |adminui vhost add item button| image:: /images/admin/adminui_vhost_add_item_button.png
+.. |adminui vhost add item form| image:: /images/admin/adminui_vhost_add_item_form.png
+.. |adminui vhost update item button| image:: /images/admin/adminui_vhost_update_item_button.png
+.. |adminui vhost update item domains list| image:: /images/admin/adminui_vhost_update_item_domains_list.png
+.. |adminui vhost update item form| image:: /images/admin/adminui_vhost_update_item_form.png
+.. |adminui vhost remove item button| image:: /images/admin/adminui_vhost_remove_item_button.png
+.. |adminui vhost remove item domains list| image:: /images/admin/adminui_vhost_remove_item_domains_list.png
+.. |service disco menu| image:: /images/admin/service_disco_menu.png
+.. |service disco window vhost| image:: /images/admin/service_disco_window_vhost.png
+.. |command menu add vhost| image:: /images/admin/command_menu_add_vhost.png
+.. |add vhost window| image:: /images/admin/add_vhost_window.png
+.. |service disco window sm| image:: /images/admin/service_disco_window_sm.png
+.. |command menu add user| image:: /images/admin/command_menu_add_user.png
+.. |add user window| image:: /images/admin/add_user_window.png

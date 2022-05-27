@@ -131,14 +131,14 @@ Now we have to setup Tigase database. From the Start menu run the MySQL console 
 
 When the system is up and running you can connect with any XMPP client (Psi for example) to your server to see if it is working.
 
-.. |sql1| image:: ../../../asciidoc/admin/images/admin/sql1.JPG
-.. |sql2| image:: ../../../asciidoc/admin/images/admin/sql2.JPG
-.. |sql3| image:: ../../../asciidoc/admin/images/admin/sql3.JPG
-.. |sql4| image:: ../../../asciidoc/admin/images/admin/sql4.JPG
-.. |sql5| image:: ../../../asciidoc/admin/images/admin/sql5.JPG
-.. |sql6| image:: ../../../asciidoc/admin/images/admin/sql6.JPG
-.. |sql7| image:: ../../../asciidoc/admin/images/admin/sql7.JPG
-.. |sql8| image:: ../../../asciidoc/admin/images/admin/sql8.JPG
-.. |sql9| image:: ../../../asciidoc/admin/images/admin/sql9.JPG
-.. |sql10| image:: ../../../asciidoc/admin/images/admin/sql10.JPG
-.. |sql11| image:: ../../../asciidoc/admin/images/admin/sql11.JPG
+.. |sql1| image:: /images/admin/sql1.JPG
+.. |sql2| image:: /images/admin/sql2.JPG
+.. |sql3| image:: /images/admin/sql3.JPG
+.. |sql4| image:: /images/admin/sql4.JPG
+.. |sql5| image:: /images/admin/sql5.JPG
+.. |sql6| image:: /images/admin/sql6.JPG
+.. |sql7| image:: /images/admin/sql7.JPG
+.. |sql8| image:: /images/admin/sql8.JPG
+.. |sql9| image:: /images/admin/sql9.JPG
+.. |sql10| image:: /images/admin/sql10.JPG
+.. |sql11| image:: /images/admin/sql11.JPG

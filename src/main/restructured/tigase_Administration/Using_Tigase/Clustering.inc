@@ -179,5 +179,5 @@ In the *Service Discovery* window we need to find *Cluster Connection Manager* c
 
 |discovery-nodes|
 
-.. |roster-discovery| image:: ../../../asciidoc/admin/images/admin/monitoring_xmpp_1.png
-.. |discovery-nodes| image:: ../../../asciidoc/admin/images/admin/monitoring_clustering.png
+.. |roster-discovery| image:: /images/admin/monitoring_xmpp_1.png
+.. |discovery-nodes| image:: /images/admin/monitoring_clustering.png
