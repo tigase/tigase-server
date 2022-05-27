@@ -1,0 +1,122 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:2
+msgid "Tigase Server Binary Updates"
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:4
+msgid ""
+"Most open source projects try to make sure that the nightly builds "
+"compile correctly so that these builds can be used. However, we at Tigase"
+" believe that these builds should be separated until they are thoroughly "
+"tested and released. Although lots of installations out there we know of "
+"just run from our nightly builds, this puts an extra responsibility to "
+"make sure all code is functional and will constantly work. Therefore, our"
+" general approach is to run all basic functionality tests before each "
+"code commit to make sure it works correctly. This does not guarantee that"
+" there will never be a problem, but it is a precaution from preventing "
+"bad builds from arriving in the hands of our customers."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:6
+msgid ""
+"Some users on the other hand, like to be on the bleeding edge and "
+"regularly use our nightly builds exploring new code changes and playing "
+"with new features before they are put to a full release. Others prefer to"
+" stick to stable and fully tested public releases. Others however, want "
+"something from the middle, the most recent features, but bug fixes, "
+"something like a beta or a release-candidate state."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:8
+msgid ""
+"Should you choose to use the nightly builds, a few things you should "
+"consider:"
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:10
+msgid "Changes may be made to the code that can negatively affect performance."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:12
+msgid "Changes may be made to the code that can negatively affect security."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:14
+msgid ""
+"We **highly** recommend testing these builds in your environments before "
+"upgrading."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:16
+msgid ""
+"With these considerations in mind, we provide nightly builds at `this "
+"link <https://build.tigase.net/nightlies/dists/>`__ which provides "
+"directories by date."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:18
+msgid ""
+"Standard naming format is ``tigase-"
+"server-<version>-SNAPSHOT-b<build>-<type>`` where ``<version>`` is in the"
+" form of ``major.minor.bugfix``"
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:22
+msgid ""
+"individual days may have the same builds as noted by the byyyy section of"
+" the file.\\*"
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:24
+msgid ""
+"Just like the standard distributions, the builds are available with the "
+"following extensions (``<type>``):"
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:26
+msgid "``javadoc.jar`` - Java installer for javadoc only"
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:28
+msgid "``dist.zip`` - Compressed binaries with no dependencies."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:30
+msgid "``dist.tar.gz`` - tarball compressed binaries with no dependencies."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:32
+msgid "``dist-max.zip`` - Compressed binaries with all dependencies."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:34
+msgid "``dist-max.tar.gz`` - tarball compressed binaries with all dependencies."
+msgstr ""
+
+#: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:36
+msgid ""
+"We also provide automated testing of each of our nightly builds for each "
+"supported databases. Tests are done with both functional and low memory "
+"parameters in mind, and are available `at this link "
+"<https://build.tigase.net/nightlies/tests/>`__. These tests can provide a"
+" quick examination of function before upgrading your current build."
+msgstr ""
+

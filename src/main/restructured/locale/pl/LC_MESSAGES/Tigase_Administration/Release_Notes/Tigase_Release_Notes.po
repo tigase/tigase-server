@@ -1,0 +1,3035 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_Release_Notes.rst:2
+msgid "Tigase 8.3.0 Release Notes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:2
+msgid "Tigase XMPP Server 8.3.0 Change notes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:5
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:5
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:5
+#: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:5
+msgid "Major Changes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:16
+#: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:8
+msgid "All Minor Features & Behavior Changes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:10
+msgid ""
+"Increased network socket buffer from 2K to 4K to improve performance when"
+" reading data from socket. It can increase somewhat memory usage "
+"proportionally to number of concurrent user connections. It's possible to"
+" configure size of this buffer using `socket-buffer-size` property - "
+"please see documentation."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:2
+msgid "Tigase XMPP Server 8.2.0 Change notes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:7
+msgid ""
+"**Improvements to s2s connection**: Version 8.2.0 brings a lot of "
+"improvements related to s2s connectivity: support for TLS1.3, improved "
+"logic during authentication and stream negotiation solving connectivity "
+"issues with various deployments"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:9
+msgid ""
+"**Better handling of certificates**: It’s now possible to store "
+"certificates in the database making it easier to manage them in clustered"
+" environment."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:11
+msgid "Deprecation of ``Element`` based events in favour of Object based events"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:13
+msgid "Improved performance: reduced memory usage and decrease startup time"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:18
+msgid ""
+"`#server-1050 <https://projects.tigase.net/issue/server-1050>`__: "
+"Database installation without root credentials"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:20
+msgid ""
+"`#server-1062 <https://projects.tigase.net/issue/server-1062>`__: "
+"Deprecate Element based Event-bus"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:22
+msgid ""
+"`#server-1097 <https://projects.tigase.net/issue/server-1097>`__: It’s "
+"not possible to configure additional PacketFilters"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:24
+msgid ""
+"`#server-1101 <https://projects.tigase.net/issue/server-1101>`__: "
+"Enabling TLS1.3 causes s2s connections to fail"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:26
+msgid ""
+"`#server-1102 <https://projects.tigase.net/issue/server-1102>`__: Add "
+"possibility to extend MAM to MAM:2"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:28
+msgid ""
+"`#server-1105 <https://projects.tigase.net/issue/server-1105>`__: Enhance"
+" Add SSL Certificate ad-hoc with option to set default"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:30
+msgid ""
+"`#server-1119 <https://projects.tigase.net/issue/server-1119>`__: Use "
+"database for certificate storage instead of filesystem"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:32
+msgid ""
+"`#server-1120 <https://projects.tigase.net/issue/server-1120>`__: "
+"JabberIqRegister should allow enforcing both CAPTCHA and e-mail"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:34
+msgid ""
+"`#server-1132 <https://projects.tigase.net/issue/server-1132>`__: Don’t "
+"use s2s socket if only one-direction works"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:36
+msgid ""
+"`#server-1142 <https://projects.tigase.net/issue/server-1142>`__: After "
+"registration inform the client that the account activation (email) is "
+"required"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:38
+msgid ""
+"`#server-1158 <https://projects.tigase.net/issue/server-1158>`__: "
+"Establishing JMX connection to the server causes excessive memory "
+"allocation"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:40
+msgid ""
+"`#server-1162 <https://projects.tigase.net/issue/server-1162>`__: Allow "
+"interfaces in @ConfigField"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:42
+msgid ""
+"`#server-1170 <https://projects.tigase.net/issue/server-1170>`__: TLS "
+"infinity loop impacts Tigase XMPP Server performance"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:44
+msgid ""
+"`#server-1175 <https://projects.tigase.net/issue/server-1175>`__: "
+"Connection with diebesban.de stopped with invalid-namespace error"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:46
+msgid ""
+"`#server-1177 <https://projects.tigase.net/issue/server-1177>`__: Ability"
+" to change log level during runtime"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:48
+msgid ""
+"`#server-1178 <https://projects.tigase.net/issue/server-1178>`__: Remove "
+"``online_status`` from the repository"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:50
+msgid ""
+"`#server-1179 <https://projects.tigase.net/issue/server-1179>`__: Add "
+"support for {clusterNode} in XEP-0215 host field"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:52
+msgid ""
+"`#server-1181 <https://projects.tigase.net/issue/server-1181>`__: "
+"NoSuchElementException in MaxDailyCounterQueue"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:54
+msgid ""
+"`#server-1182 <https://projects.tigase.net/issue/server-1182>`__: NPE "
+"while processing <iq type=\"result\"/> without existing session"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:56
+msgid ""
+"`#server-1187 <https://projects.tigase.net/issue/server-1187>`__: "
+"SchemaLoader should not print passwords in the logs (URL logs)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:58
+msgid ""
+"`#server-1192 <https://projects.tigase.net/issue/server-1192>`__: "
+"Obfuscate repository passwords"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:60
+msgid ""
+"`#server-1190 <https://projects.tigase.net/issue/server-1190>`__: "
+"Executing EditUser on non-existen’t user causes creation of the user"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:62
+msgid ""
+"`#server-1193 <https://projects.tigase.net/issue/server-1193>`__: Push "
+"notifications are sent for groupchat messages without <body/>"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:64
+msgid ""
+"`#server-1197 <https://projects.tigase.net/issue/server-1197>`__: "
+"Infinite loop while cutting body of encrypted push notification to fit "
+"the push notifications limit"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:66
+msgid ""
+"`#server-1199 <https://projects.tigase.net/issue/server-1199>`__: Don’t "
+"send any packets until s2s stream negotiation is finished"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:68
+msgid ""
+"`#server-1200 <https://projects.tigase.net/issue/server-1200>`__: Use "
+"proper size of network buffers for high-throughput connections"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:70
+msgid ""
+"`#server-1203 <https://projects.tigase.net/issue/server-1203>`__: Handing"
+" error packets in CIDConnections.sendPacketsBack"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:72
+msgid ""
+"`#server-1217 <https://projects.tigase.net/issue/server-1217>`__: Prevent"
+" performing schema upgrade concurrently"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:74
+msgid ""
+"`#server-1219 <https://projects.tigase.net/issue/server-1219>`__: Use all"
+" JDBC URI parameters from config.tdsl when performing database upgrade."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:76
+msgid ""
+"`#server-1222 <https://projects.tigase.net/issue/server-1222>`__: Add "
+"support for XEP-0377: Spam Reporting"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:78
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:80
+msgid ""
+"`#server-1229 <https://projects.tigase.net/issue/server-1229>`__: "
+"Enabling CAPTCHA or e-mail for JabberIqRegister breaks password changing "
+"functionality."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:82
+msgid ""
+"`#server-1233 <https://projects.tigase.net/issue/server-1233>`__: Add "
+"option to CertificateRepository to load certificates from the filesystem"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:84
+msgid ""
+"`#server-1234 <https://projects.tigase.net/issue/server-1234>`__: Roster "
+"API improvements"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:86
+msgid ""
+"`#server-1237 <https://projects.tigase.net/issue/server-1237>`__: Rework "
+"CertificateRepository so items are stored individually"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:88
+msgid ""
+"`#server-1238 <https://projects.tigase.net/issue/server-1238>`__: Can’t "
+"set MOTD via ad-hoc."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:90
+msgid ""
+"`#server-1243 <https://projects.tigase.net/issue/server-1243>`__: Include"
+" wait-for-it.sh script in base distribution"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:92
+msgid ""
+"`#server-1245 <https://projects.tigase.net/issue/server-1245>`__: "
+"MethodStatistics doesn’t work well for interfaces with overloaded methods"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:94
+msgid ""
+"`#server-1251 <https://projects.tigase.net/issue/server-1251>`__: Can’t "
+"initialise MAM processor with default installation"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:96
+msgid ""
+"`#server-1252 <https://projects.tigase.net/issue/server-1252>`__: Remove "
+"select row_count() from Tig_OfflineMessages_DeleteMessage"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:98
+msgid ""
+"`#server-1253 <https://projects.tigase.net/issue/server-1253>`__: It "
+"seems that 'expired-processor' doesn’t remove periodically expired "
+"messages"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:100
+msgid ""
+"`#server-1254 <https://projects.tigase.net/issue/server-1254>`__: Fix "
+"slow startup and shutdown"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:102
+msgid ""
+"`#server-1258 <https://projects.tigase.net/issue/server-1258>`__: Allow "
+"beans to be instantiated without the requirement to reference/inject them"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:104
+msgid ""
+"`#server-1260 <https://projects.tigase.net/issue/server-1260>`__: "
+"UserConnectedEvent should be a cluster event"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:106
+msgid ""
+"`#server-1261 <https://projects.tigase.net/issue/server-1261>`__: Revise "
+"and improve EventBus developer guide"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:108
+msgid ""
+"`#server-1269 <https://projects.tigase.net/issue/server-1269>`__: SSL "
+"issues are hidden by default making it difficult to identify"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:110
+msgid ""
+"`#server-1273 <https://projects.tigase.net/issue/server-1273>`__: Add "
+"option to limit number of concurrently connected resources"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:112
+msgid ""
+"`#server-1277 <https://projects.tigase.net/issue/server-1277>`__: Fix "
+"HUGE out queue in StreamManagementIOProcessor"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:114
+msgid ""
+"`#server-1278 <https://projects.tigase.net/issue/server-1278>`__: NPE in "
+"StreamManagementIOProcessor.serviceStopped"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:116
+msgid ""
+"`#server-1282 <https://projects.tigase.net/issue/server-1282>`__: "
+"XMPPProcessorAbstract.processToUserPacket() responds to IQ result with "
+"error"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:118
+msgid ""
+"`#server-1284 <https://projects.tigase.net/issue/server-1284>`__: Add "
+"validation to JabberIqAuth"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:120
+msgid ""
+"`#server-1285 <https://projects.tigase.net/issue/server-1285>`__: Wrong "
+"field type for XEP-0157 entries"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:122
+msgid ""
+"`#server-1290 <https://projects.tigase.net/issue/server-1290>`__: Improve"
+" StringPrep to actually forbid space in localpart/domain as per rfc7622"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:124
+msgid ""
+"`#server-1292 <https://projects.tigase.net/issue/server-1292>`__: TLS "
+"connectivity issue with search.jabber.network"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:126
+msgid ""
+"`#server-1297 <https://projects.tigase.net/issue/server-1297>`__: Add "
+"option to push plugin that would allow to overwrite unencrypted part in "
+"(OMEMO) encrypted messages"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:128
+msgid ""
+"`#server-1303 <https://projects.tigase.net/issue/server-1303>`__: Better "
+"handling of \"The target is unavailable at this time.\" / "
+"PacketInvalidTypeException"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:130
+msgid ""
+"`#server-1305 <https://projects.tigase.net/issue/server-1305>`__: Allow "
+"creation of admin user (if not exist) during ``upgrade-schema`` task"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:132
+msgid ""
+"`#server-1306 <https://projects.tigase.net/issue/server-1306>`__: Fix "
+"farge amount of direct memory being used."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:134
+msgid ""
+"`#server-1307 <https://projects.tigase.net/issue/server-1307>`__: Fix "
+"disconnection on MAM sync"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:136
+msgid ""
+"`#extras-3 <https://projects.tigase.net/issue/extras-3>`__: Add AWS "
+"logback and documentation how to use it"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:138
+msgid ""
+"`#extras-4 <https://projects.tigase.net/issue/extras-4>`__: Unescape and "
+"normalise logs in mail notifications before sending them"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:140
+msgid ""
+"`#extras-7 <https://projects.tigase.net/issue/extras-7>`__: Add email "
+"validation during in-band-registration; better handling of mail sending "
+"exceptions regarding to non-existent addresses"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:142
+msgid ""
+"`#extras-9 <https://projects.tigase.net/issue/extras-9>`__: Deprecate "
+"mDNS implementation"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:144
+msgid ""
+"`#serverdist-8 <https://projects.tigase.net/issue/serverdist-8>`__: "
+"Remove DNS resolution part from XEP-0156 implementation"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:2
+msgid "Tigase XMPP Server 8.1.0 Change notes and announcement"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:8
+msgid "More XMPP extensions"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:10
+msgid ""
+"Following XMPP guidelines specified in *Compliance Suites* a number of "
+"extensions was included in this release:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:12
+msgid ""
+"**XEP-0157**: Contact Addresses for XMPP Services (`server-995 "
+"<https://projects.tigase.net/issue/server-995>`__) that can be configured"
+" on per VHost basis (`server-1015 "
+"<https://projects.tigase.net/issue/server-1015>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:14
+msgid ""
+"**XEP-0398**: User Avatar to vCard-Based Avatars Conversion (`server-1017"
+" <https://projects.tigase.net/issue/server-1017>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:16
+msgid ""
+"**XEP-0156**: Discovering Alternative XMPP Connection Methods - Tigase "
+"already supported handling DNS queries and standardised our "
+"``webservice`` to XEP-0156 (`http-76 "
+"<https://projects.tigase.net/issue/http-76>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:18
+msgid ""
+"**XEP-0410**: MUC Self-Ping (Schrödinger’s Chat) (`muc-122 "
+"<https://projects.tigase.net/issue/http-76>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:20
+msgid ""
+"**XEP-0153**: vCard-Based Avatars - added support for setting **vCard "
+"avatar for MUC rooms** (`muc-112 "
+"<https://projects.tigase.net/issue/http-76>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:22
+msgid ""
+"**XEP-0411**: Bookmarks Conversion (`pubsub-79 "
+"<https://projects.tigase.net/issue/http-76>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:24
+msgid ""
+"**XEP-0157**: Contact Addresses for XMPP Services (`server-995 "
+"<https://projects.tigase.net/issue/server-995>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:29
+msgid "Improved connectivity with other servers"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:31
+msgid ""
+"``SASL-EXTERNAL`` mechanism was added for server-to-server (federated, "
+"s2s) connections greatly improving compliance with XMPP network. It’s "
+"possible to use both SASL-EXTERNAL and Diallback depending on support in "
+"other servers."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:36
+msgid "Better security & privacy"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:38
+msgid ""
+"When it comes to connectivity, Tigase XMPP Server sported **Hardened "
+"Mode** that adjusted networking security settings (supported protocols, "
+"cipher suites and keys' length where applicable). We decided include "
+"3-level configuration option for **Hardened Mode** (roughly following "
+"*Mozilla’s SSL Configuration Generator*): ``relaxed``, ``secure`` "
+"(default) and ``strict`` and to further eliminate cipher suites that are "
+"currently considered insecure."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:40
+msgid ""
+"We also enabled by default our anti-spam plugin and because we like all-"
+"things-extensible we created a guide how to create your own pluggable "
+"filters for anti-spam-plugin."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:45
+msgid "Multiple domains (VHosts) support is even better"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:47
+msgid ""
+"It was always quite easy to configure and serve multiple domains in "
+"Tigase XMPP Server. In this release we made it even better! First of all "
+"- we included ``Default`` VHost item, which allows configuring global "
+"defaults for the installation on the fly without having to change "
+"configuration files and restart the instance."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:49
+msgid ""
+"Internally, we introduced *VHost Extensions* - a mechanism that allows "
+"easy addition of configurable options that can be set on per-domain "
+"basis."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:51
+msgid ""
+"On top of that we reworked how SSL certificates are handled (especially "
+"wildcard ones) and now they are loaded and assigned to correct domain "
+"automatically - no need to configure *star*-certificates manually "
+"anymore."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:56
+msgid "Mobile First"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:58
+msgid ""
+"Notifications send to mobile applications via Apple’s and Google’s push "
+"servers using **Tigase’s PUSH component** are now encrypted (`#push-25 "
+"<https://projects.tigase.net/issue/push-25>`__), requires compatible "
+"clients)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:60
+msgid ""
+"MUC component now allows users to register permanent nickname, which "
+"makes it possible to receive PUSH notifications even if our client "
+"disconnects and is offline (`#muc-115 "
+"<https://projects.tigase.net/issue/muc-115>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:65
+msgid "Installation & management"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:67
+msgid ""
+"The (web) installer was simplified making setting up and configuring "
+"Tigase even easier (`#http-78 "
+"<https://projects.tigase.net/issue/http-78>`__) - now it’s only needed to"
+" select desired database, provide it’s details and eventually adjust "
+"which components and plugins should be enabled or disabled, but we "
+"believe that provided defaults should work well in most of the cases."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:69
+msgid ""
+"After the installation and startup, it’s possible to see basic instance "
+"state via web browser either opening ``/server/`` endpoint (`#server-1164"
+" <https://projects.tigase.net/issue/server-1164>`__), or local file from "
+"``logs/server-info.html``) and manage the installation using Admin WebUI,"
+" that received slight visual face-lift (`#http-90 "
+"<https://projects.tigase.net/issue/http-90>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:74
+msgid "Noteworthy"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:76
+msgid ""
+"Startup time was significantly reduced due to improvements of creating "
+"repository pools (`#server-1149 "
+"<https://projects.tigase.net/issue/server-1149>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:78
+msgid ""
+"Multi-thread, highly concurrent script execution was improved "
+"(`#server-1154 <https://projects.tigase.net/issue/server-1154>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:80
+msgid ""
+"StreamManagement was available, but in this version we decided to enabled"
+" it by default."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:82
+msgid ""
+"More places offers support for `XEP-0059: Result Set Management "
+"<https://xmpp.org/extensions/xep-0059.html>`__ - namely PubSub nodes "
+"discovery and ``jabber:iq:serach``"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:84
+msgid ""
+"`Publishing Options <https://xmpp.org/extensions/xep-0060.html#publisher-"
+"publish-options>`__ were added to PubSub (`#pubsub-75 "
+"<https://projects.tigase.net/issue/pubsub-75>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:304
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:87
+msgid "New Minor Features & Behavior Changes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:89
+msgid ""
+"`server-918 <https://projects.tigase.net/issue/server-918>`__: AWS obtain"
+" public IP and/or DNS address of the EC2 instance"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:91
+msgid ""
+"`server-985 <https://projects.tigase.net/issue/server-985>`__: Add "
+"support for SCRAM-SHA-512(-PLUS)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:93
+msgid ""
+"`spam-8 <https://projects.tigase.net/issue/spam-8>`__: Enable spam "
+"processor by default"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:95
+msgid ""
+"`server-1012 <https://projects.tigase.net/issue/server-1012>`__: "
+"UserDomainFilter.groovy fails to load"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:97
+msgid ""
+"`server-1014 <https://projects.tigase.net/issue/server-1014>`__: Can’t "
+"upgrade from 8.0.0GA to 8.1.0-SNAPSHOT"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:99
+msgid ""
+"`server-798 <https://projects.tigase.net/issue/server-798>`__: Limit "
+"number of messages that are stored in DB per user within a period of time"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:101
+msgid ""
+"`server-827 <https://projects.tigase.net/issue/server-827>`__: Seperate "
+"Component-based statistics"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:103
+msgid ""
+"`server-1026 <https://projects.tigase.net/issue/server-1026>`__: NPE: in "
+"JabberIqRegister/EmailConfirmationSender"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:105
+msgid ""
+"`pubsub-82 <https://projects.tigase.net/issue/pubsub-82>`__: NPE in "
+"RetrieveItemsModule"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:107
+msgid ""
+"`tigaseim-78 <https://projects.tigase.net/issue/tigaseim-78>`__: IPv6 "
+"connectivity issue"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:109
+msgid ""
+"`server-239 <https://projects.tigase.net/issue/server-239>`__: OSGi mode "
+"- exceptions in logs"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:111
+msgid ""
+"`server-1020 <https://projects.tigase.net/issue/server-1020>`__: Enable "
+"stream management by default"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:113
+msgid ""
+"`pubsub-83 <https://projects.tigase.net/issue/pubsub-83>`__: NPE in "
+"PublishItemModule"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:115
+msgid ""
+"`pubsub-81 <https://projects.tigase.net/issue/pubsub-81>`__: Exception "
+"during execution of event: "
+"tigase.pubsub.modules.PresenceCollectorModule.PresenceChangeEvent"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:117
+msgid ""
+"`server-1021 <https://projects.tigase.net/issue/server-1021>`__: NPE: "
+"Cannot update BruteForceLocker"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:119
+msgid ""
+"`server-826 <https://projects.tigase.net/issue/server-826>`__: "
+"UserRepository caches force synchronization even if caching is disabled"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:121
+msgid ""
+"`server-958 <https://projects.tigase.net/issue/server-958>`__: Add "
+"timeout for opened TCP connections"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:123
+msgid ""
+"`server-1029 <https://projects.tigase.net/issue/server-1029>`__: Read "
+"receipients are not copied via carbons"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:125
+msgid ""
+"`server-1015 <https://projects.tigase.net/issue/server-1015>`__: Allow "
+"configuring XEP-0157: Contact Addresses on per VHost basis"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:127
+msgid ""
+"`pubsub-65 <https://projects.tigase.net/issue/pubsub-65>`__: RSM and "
+"jabber:search for pubsub discovery"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:129
+msgid ""
+"`server-1030 <https://projects.tigase.net/issue/server-1030>`__: NPE in "
+"VCardTemp when processing initial presence"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:131
+msgid ""
+"`http-72 <https://projects.tigase.net/issue/http-72>`__: Change Content-"
+"Disposition from attachment to inline"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:133
+msgid ""
+"`server-1045 <https://projects.tigase.net/issue/server-1045>`__: NPE in "
+"DiscoExtensionsForm"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:135
+msgid ""
+"`server-1048 <https://projects.tigase.net/issue/server-1048>`__: Update "
+"parent pom and information about suggested JDK"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:137
+msgid ""
+"`push-23 <https://projects.tigase.net/issue/push-23>`__: [JDK12] Can’t "
+"establish encrypted connection with Push/FCM"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:139
+msgid ""
+"`server-978 <https://projects.tigase.net/issue/server-978>`__: Improve "
+"VHost configuration / extending"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:141
+msgid ""
+"`server-1068 <https://projects.tigase.net/issue/server-1068>`__: Improve "
+"LogFormat readability (and maybe performance)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:143
+msgid ""
+"`server-1070 <https://projects.tigase.net/issue/server-1070>`__: Improve "
+"privacy list loggging"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:145
+msgid ""
+"`server-1071 <https://projects.tigase.net/issue/server-1071>`__: NPE in "
+"IOService.accept"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:147
+msgid ""
+"`server-710 <https://projects.tigase.net/issue/server-710>`__: "
+"Registration improvements"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:149
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:249
+msgid ""
+"`pubsub-79 <https://projects.tigase.net/issue/pubsub-79>`__: XEP-0411: "
+"Bookmarks Conversion"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:151
+msgid ""
+"`pubsub-75 <https://projects.tigase.net/issue/pubsub-75>`__: Add support "
+"for Publishing Options"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:153
+msgid ""
+"`server-1017 <https://projects.tigase.net/issue/server-1017>`__: "
+"XEP-0398: User Avatar to vCard-Based Avatars Conversion"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:155
+msgid ""
+"`server-994 <https://projects.tigase.net/issue/server-994>`__: Add server"
+" support for Entity Capabilities: Stream Feature"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:157
+msgid ""
+"`server-995 <https://projects.tigase.net/issue/server-995>`__: XEP-0157: "
+"Contact Addresses for XMPP Services"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:159
+msgid ""
+"`http-76 <https://projects.tigase.net/issue/http-76>`__: Standardise DNS "
+"webservice to XEP-0156"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:161
+msgid ""
+"`server-1109 <https://projects.tigase.net/issue/server-1109>`__: Add "
+"recommended JDK version to documentation"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:163
+msgid ""
+"`push-28 <https://projects.tigase.net/issue/push-28>`__: Non-tigase "
+"notifications should use high priority (APNS)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:165
+msgid ""
+"`server-1114 <https://projects.tigase.net/issue/server-1114>`__: Can’t "
+"register on sure.im with StorkIM"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:167
+msgid ""
+"`server-1005 <https://projects.tigase.net/issue/server-1005>`__: Flatten "
+"schema to match versioning document"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:169
+msgid ""
+"`server-1116 <https://projects.tigase.net/issue/server-1116>`__: "
+"account_status is not checked"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:171
+msgid ""
+"`server-1074 <https://projects.tigase.net/issue/server-1074>`__: Hardened"
+" Mode improvements"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:173
+msgid ""
+"`server-1125 <https://projects.tigase.net/issue/server-1125>`__: "
+"StatsDumper.groovy doesn’t work in documentation in 8.x"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:175
+msgid ""
+"`http-85 <https://projects.tigase.net/issue/http-85>`__: Pasword resset "
+"doesn’t work"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:177
+msgid ""
+"`server-1128 <https://projects.tigase.net/issue/server-1128>`__: Possible"
+" vulnerability in XML parser"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:179
+msgid ""
+"`server-1130 <https://projects.tigase.net/issue/server-1130>`__: NPE i "
+"JabberIqAuth"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:181
+msgid ""
+"`http-84 <https://projects.tigase.net/issue/http-84>`__: Configurable "
+"``resetPassword`` endpoint hostname"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:183
+msgid ""
+"`server-1129 <https://projects.tigase.net/issue/server-1129>`__: BOSH "
+"timeouts on GET requests"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:185
+msgid ""
+"`prv-436 <https://projects.tigase.net/issue/prv-436>`__: Conversations "
+"compliance - contact developers"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:187
+msgid ""
+"`server-1100 <https://projects.tigase.net/issue/server-1100>`__: CAAS and"
+" WS testers fail to connect to wss://tigase.im:5291"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:189
+msgid ""
+"`server-1047 <https://projects.tigase.net/issue/server-1047>`__: Add "
+"SASL-EXTERNAL on s2s conections"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:191
+msgid ""
+"`server-1103 <https://projects.tigase.net/issue/server-1103>`__: High "
+"priority PUSH notifications are sent for all messages"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:193
+msgid ""
+"`pubsub-93 <https://projects.tigase.net/issue/pubsub-93>`__: NPE in "
+"CapsChangeEvent"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:195
+msgid ""
+"`server-1137 <https://projects.tigase.net/issue/server-1137>`__: Don’t "
+"require setting JAVA_HOME to start server"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:197
+msgid ""
+"`server-1136 <https://projects.tigase.net/issue/server-1136>`__: upgrade-"
+"schema --help not available"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:199
+msgid ""
+"`utils-19 <https://projects.tigase.net/issue/utils-19>`__: tigase-utils "
+"doesn’t compile with JDK12"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:201
+msgid ""
+"`server-1138 <https://projects.tigase.net/issue/server-1138>`__: Schema "
+"files are not sorted correctly during loading"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:203
+msgid ""
+"`pubsub-98 <https://projects.tigase.net/issue/pubsub-98>`__: Resources "
+"with emoji chars are causing issues with MySQL backend"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:205
+msgid ""
+"`server-1110 <https://projects.tigase.net/issue/server-1110>`__: "
+"Disabling TLS in VHost configuration doesn’t work"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:207
+msgid ""
+"`server-1078 <https://projects.tigase.net/issue/server-1078>`__: Don’t "
+"send root CA certificate in chain"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:209
+msgid ""
+"`server-1113 <https://projects.tigase.net/issue/server-1113>`__: Don’t "
+"advertise SASL-EXTERNAL if own certificate is not valid"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:211
+msgid ""
+"`http-78 <https://projects.tigase.net/issue/http-78>`__: Simplify "
+"installer"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:213
+msgid ""
+"`server-1133 <https://projects.tigase.net/issue/server-1133>`__: Not able"
+" to connect via S2S to server with incorrect SSL certificate"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:215
+msgid ""
+"`serverdistribution-2 "
+"<https://projects.tigase.net/issue/serverdistribution-2>`__: MUC upgrade "
+"not linked correctly in global tigase guide"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:217
+msgid ""
+"`server-1149 <https://projects.tigase.net/issue/server-1149>`__: Reduce "
+"startup time with a lot of database connections"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:219
+msgid ""
+"`server-1148 <https://projects.tigase.net/issue/server-1148>`__: \"ERROR!"
+" Component <x> schema version is not loaded in the database or it is "
+"old!\" during shutdown"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:221
+msgid ""
+"`server-1153 <https://projects.tigase.net/issue/server-1153>`__: Refactor"
+" Credentials related ``username`` to ``credentialId`` to avoid confussion"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:223
+msgid ""
+"`servers-312 <https://projects.tigase.net/issue/servers-312>`__: No "
+"cluster connection to send a packet"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:225
+msgid ""
+"`server-1154 <https://projects.tigase.net/issue/server-1154>`__: Multi-"
+"thread script execution yields wrong results"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:227
+msgid ""
+"`servers-294 <https://projects.tigase.net/issue/servers-294>`__: Can’t "
+"connect from tigase.im to rsocks.net"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:229
+msgid ""
+"`server-1111 <https://projects.tigase.net/issue/server-1111>`__: Can’t "
+"establish s2s to upload.pouet.ovh"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:231
+msgid ""
+"`server-1143 <https://projects.tigase.net/issue/server-1143>`__: S2S "
+"connectivity issue with OpenFire when SASL external is used"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:233
+msgid ""
+"`servers-309 <https://projects.tigase.net/issue/servers-309>`__: Issue "
+"when connecting to xabber.org: not-authorized: self signed certificate"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:235
+msgid ""
+"`tigaseim-80 <https://projects.tigase.net/issue/tigaseim-80>`__: Siskin "
+"IM push server is not accessible"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:237
+msgid ""
+"`server-1080 <https://projects.tigase.net/issue/server-1080>`__: After "
+"updating certificate via ad-hoc/rest only main certificate is updated"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:239
+msgid ""
+"`http-88 <https://projects.tigase.net/issue/http-88>`__: Improve REST "
+"documentation"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:241
+msgid ""
+"`http-87 <https://projects.tigase.net/issue/http-87>`__: \"request accept"
+" time exceeded\" for every request when using "
+"``JavaStandaloneHttpServer``"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:243
+msgid ""
+"`server-1151 <https://projects.tigase.net/issue/server-1151>`__: "
+"BruteForceLockerExtension (and possibly others) settings are not "
+"correctly retrieved"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:245
+msgid ""
+"`http-89 <https://projects.tigase.net/issue/http-89>`__: Drop "
+"result/error packages received by HTTP-API if no connection present to "
+"write response to"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:247
+msgid ""
+"`pubsub-99 <https://projects.tigase.net/issue/pubsub-99>`__: "
+"Notifications are not sent for +notify from nodes with whitelist access "
+"mode"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:251
+msgid ""
+"`server-1157 <https://projects.tigase.net/issue/server-1157>`__: SCRAM-"
+"SHA512 not working"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:253
+msgid ""
+"`server-1159 <https://projects.tigase.net/issue/server-1159>`__: Improve "
+"handling establishing and terminating of the session"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:255
+msgid ""
+"`server-1152 <https://projects.tigase.net/issue/server-1152>`__: Cleanup "
+"warnings from JDBCMsgRepository"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:257
+msgid ""
+"`server-1112 <https://projects.tigase.net/issue/server-1112>`__: Fallback"
+" to diallback if SASL-EXTERNAL fails"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:259
+msgid ""
+"`servers-292 <https://projects.tigase.net/issue/servers-292>`__: S2S "
+"connectivity issues"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:261
+msgid ""
+"`acspubsub-19 <https://projects.tigase.net/issue/acspubsub-19>`__: REST "
+"execution fails on other nodes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:263
+msgid ""
+"`server-1145 <https://projects.tigase.net/issue/server-1145>`__: Race "
+"condition during storing/loading of offline messages"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:265
+msgid ""
+"`http-90 <https://projects.tigase.net/issue/http-90>`__: Add direct links"
+" to most useful task in AdminUI main page"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:267
+msgid ""
+"`spam-10 <https://projects.tigase.net/issue/spam-10>`__: Add "
+"documentation for creation of a custom filter"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:269
+msgid ""
+"`server-1163 <https://projects.tigase.net/issue/server-1163>`__: Review "
+"and update ``SASL Custom Mechanisms and Configuration`` documentation"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:271
+msgid ""
+"`server-1164 <https://projects.tigase.net/issue/server-1164>`__: After-"
+"installation report - installation status"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:273
+msgid ""
+"`systems-76 <https://projects.tigase.net/issue/systems-76>`__: Fix issue "
+"with StackOverflow due to recursive call in TLSIO; improve debug log"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:275
+msgid ""
+"`server-1082 <https://projects.tigase.net/issue/server-1082>`__: Sec-"
+"WebSocket-Accept not calculated correctly"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:277
+msgid ""
+"`server-1083 <https://projects.tigase.net/issue/server-1083>`__: Messages"
+" sent to full jid are returned with error"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:279
+msgid ""
+"`push-25 <https://projects.tigase.net/issue/push-25>`__: Add support for "
+"sending encrypted PUSHes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:281
+msgid ""
+"`server-1085 <https://projects.tigase.net/issue/server-1085>`__: Improve "
+"retrieval of values for all keys in a node in UserRepository"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:283
+msgid ""
+"`muc-115 <https://projects.tigase.net/issue/muc-115>`__: Add support for "
+"MUC and offline message delivery"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:285
+msgid ""
+"`muc-122 <https://projects.tigase.net/issue/muc-122>`__: XEP-0410: MUC "
+"Self-Ping (Schrödinger’s Chat)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:287
+msgid ""
+"`muc-112 <https://projects.tigase.net/issue/muc-112>`__: Support for "
+"setting vCard avatar for room"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:289
+msgid ""
+"`http-83 <https://projects.tigase.net/issue/http-83>`__: Issue with "
+"multithreading access to HttpExchange instance"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:291
+msgid ""
+"`httpapijetty-3 <https://projects.tigase.net/issue/httpapijetty-3>`__: "
+"Support for HTTP/2"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:293
+msgid ""
+"`httpapijetty-6 <https://projects.tigase.net/issue/httpapijetty-6>`__: "
+"Update Jetty version"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:2
+msgid "Tigase XMPP Server 8.0.0 Change notes and announcement"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:8
+msgid "Kernel and beans configuration"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:10
+msgid ""
+"Tigase now operates using a Kernel and Beans style of programming. What "
+"does this mean for Tigase and You? Good news, really. Tigase XMPP Server "
+"is now working as a Kernel program, which will operate on it’s own and "
+"handle all the core functionality of the server. Component, and non-"
+"essential functionality will now be loaded as Beans. As a user, your "
+"experience will not change all that much. However, beans can be loaded "
+"and unloaded without having to restart Tigase, meaning that the program "
+"will behave more dynamically. This means a smaller footprint on memory on"
+" resources when components are not needed, and longer uptimes without "
+"having to rest art the program! This also allows for greater flexibility "
+"for Tigase XMPP Server to be better customized for unique solutions."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:14
+msgid "New Configuration File Format"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:16
+msgid ""
+"With the change of Tigase to a Kernel and Beans style of programming, we "
+"have also changed how the configuration file is managed. Although you "
+"will still edit the ``config.tdsl`` file like a plaintext file, a new "
+"style of formatting will be used known as DSL. Domain Specific Language "
+"may add more lines, but is a cleaner format, and provides a more secure "
+"configuration design since validation of the configuration is done at the"
+" domain level. For more information on this format and how to configure "
+"Tigase, visit `DSL Configuration Guide <#dslConfig>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:20
+msgid "Cluster Node Shutdown Changes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:22
+msgid ""
+"Starting with Tigase XMPP Server 8.0.0, users connected on clustered "
+"nodes will be able use a ``see-other-host`` strategy when a node is being"
+" shutdown. **Note: This may not be compatible with all clients.** The Ad-"
+"hoc command is designed for a graceful shutdown of cluster nodes as a "
+"groovy script ``Shutdown.groovy``. This script also allows for the "
+"-timeout setting which will delay shutdown of the node, and alert all "
+"users (via a headline message) that the server will be shutdown after a "
+"time. User clients that are compatible with the command will then detect "
+"other connected clusters and maintain their connections."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:24
+msgid ""
+"If the command is being sent to shut down the whole cluster, no ``see-"
+"other-host`` implementation will be sent, however timeout settings may "
+"still be used."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:26
+msgid ""
+"The script may be activated by an ad-hoc command, or sent using REST from"
+" remote or Tigase Admin UI."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:31
+msgid "Significant cleanup of code and repositories"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:33
+msgid ""
+"Multiple changes have been made to the structure and coding for v8, many "
+"related to trimming size of repositories and old calls. Some of these "
+"improvements are listed here:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:35
+msgid "Empty JavaDocs that do not convey values have been removed."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:37
+msgid ""
+"All code is reformatted to be compliant with out `codestyle guidelines "
+"<#tigaseCodeStyle>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:39
+msgid ""
+"Calls to ``System.out.print*()`` and ``printStackTrace()`` have been "
+"removed from code."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:41
+msgid "Depreciated and unused classes have been removed."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:46
+msgid "BouncyCastle being used for StartTLS"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:48
+msgid ""
+"`BouncyCastle <https://www.bouncycastle.org/java.html>`__ Crypto API has "
+"now been employed to handle StartTLS negotiation. By doing this, Tigase "
+"now supports ``tls-unique`` within the SCRAM PLUS authentication "
+"implementation. This API is may be employed by calling the class in your "
+"configuration file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:56
+msgid "The BouncyCastle classes are included in the dist-max archives."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:61
+msgid "default-virtual-host property changes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:63
+msgid ""
+"Default virtual hosts property is now able to be configured only as a "
+"domain name instead of the list of virtual host domains with options. "
+"Additional virtual host domains and their options need to be configured "
+"using ad-hoc commands or web AdminUI. Reference `Virtual-Hosts "
+"Configuration <#virtHosts>`__ for more details."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:68
+msgid "All artifacts are signed"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:70
+msgid ""
+"Since work began on v8.0.0 Tigase has required that all changes to Tigase"
+" XMPP Server and dependencies be signed with known certificates. This "
+"version marks the first to be totally signed."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:75
+msgid "Scaled Down Installation Methods"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:77
+msgid ""
+"We have cleaned up installation methods for Tigase and now recommend the "
+"use of web-installer method. IzPack installer (files ``tigase-"
+"server-<version>-b<build>.jar`` installation methods have been removed "
+"and will no longer be produced for v8.0.0 and later. Manual installation "
+"is still available for those unable to use HTTP or browser access. Visit "
+"our `Quick Start <#quickstart>`__ guide for instructions on these other "
+"methods."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:82
+msgid "Emojis now supported on Tigase XMPP Servers"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:84
+msgid ""
+"Emojis are now supported on MySQL databases, however some settings may be"
+" need to be changed, although they won’t affect existing databases. "
+"`Visit this section <#emojisupportSQL>`__ for details."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:89
+msgid "XEP-0215 External Service Discovery now supported"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:91
+msgid ""
+"Tigase now supports `XEP-0215 - External Service Discovery "
+"<https://xmpp.org/extensions/xep-0215.html>`__ allowing Tigase to "
+"discover services that are not available VIA the XMPP Protocol. For setup"
+" and configuration information visit `External Service Discovery "
+"Component <#_tigase_external_service_discovery>`__ documentation."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:96
+msgid "XEP-0313 Message Archive Management now supported"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:98
+msgid ""
+"`XEP-0313 - Message Archive Management "
+"<https://xmpp.org/extensions/xep-0313.html>`__ is now supported by Tigase"
+" featuring custom enhancements like full-text search and searching by "
+"tags. MAM requires Tigase’s message archive to be enabled in the "
+"``config.tdsl`` file, and the schema (XEP-0136 or XEP-0313) must be "
+"configured in session manager settings. To turn on MAM, see configuration"
+" guide `located here <#_support_for_mam>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:103
+msgid "XEP-0363 HTTP File Upload now supported"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:105
+msgid ""
+"`XEP-0363 - HTTP File Upload "
+"<https://xmpp.org/extensions/xep-0363.html>`__ is now supported using "
+"Tigase HTTP API component now allowing for a more robust one-to-many file"
+" uploading option. Configuration details are available at the `HTTP File "
+"Upload Component <#XEP0363>`__ section of documentation."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:110
+msgid "Startup now uses bootstrapping"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:112
+msgid ""
+"Tigase now uses bootstrapping to startup, which will load configuration "
+"from ``config.tdsl`` file like before. Then Tigase will begin it’s normal"
+" operations with the configuration options. All startup functions for "
+"Tigase will now run under the ``bootstrap`` bean."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:117
+msgid "CAPTCHA system now available for in-band registration"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:119
+msgid ""
+"`XEP-0077 In band registration "
+"<https://xmpp.org/extensions/xep-0077.html>`__ can use Data Forms as an "
+"option to process new registrations. Now you can secure these "
+"registrations by employing a CAPTCHA solution. By enabling this option "
+"you can reduce the number of potential spammers and bots on your server."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:124
+msgid "Schema changes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:126
+msgid ""
+"Now each component has it’s own schema for databases, they are no longer "
+"tied into Tigase XMPP server versions making changes and updates to "
+"individual components easier, and may not disrupt all users not using "
+"certain components. See the `schema update section <#schemaChangev800>`__"
+" for more details."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:131
+msgid "Shrinkable Statistics History"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:133
+#, python-format
+msgid ""
+"Statistics history can now be automatically made smaller if a systems "
+"memory resources are above a certain amount. By default this is enabled "
+"and will trigger when over 95% of memory is in use. Half of all existing "
+"entries will be removed at this time. The same pattern will continue to "
+"halve the available records every time the threshold is met. A hard-set "
+"minimum of 5 entries is set, so you will always have the last 5 entries. "
+"This setting may be adjusted by adding the following setting to your "
+"``config.tdsl`` file and adjusting the integer value:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:144
+msgid "Statistics now available for all modules"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:146
+msgid "For any bean, you may enable statistics by using the following"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:157
+msgid "Spam Protection"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:159
+msgid ""
+"Tigase XMPP Server v8.0.0 now includes some efforts to prevent spam bot "
+"accounts from running on servers."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:162
+msgid "Account Registration Limits Expanded"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:164
+msgid ""
+"Account registration limits have been expanded and now you can set "
+"separate counters, or configure components individually for their own "
+"limits. Visit `this section <#accountRegLimit>`__ for configuration "
+"details."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:167
+msgid ""
+"Accounts created using in-band registration now will use confirmation "
+"E-mail"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:169
+msgid ""
+"In an effort to create a more secure method for implementing "
+"``JabberIqRegister`` Tigase XMPP Server will now require the use of a "
+"confirmation E-mail by default in the process. The E-mail must be valid, "
+"and accounts will be made into pending status until a user clicks the "
+"generated URI in the E-mail and activates the account. This is a plugin "
+"and must be enabled in the ``config.tdsl`` file by using the following "
+"code:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:176
+msgid "Further Spam prevention"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:178
+msgid ""
+"Tigase-spam component is now in ``dist-max`` distribution package, and "
+"has a number of features described here `in this section "
+"<#tigase_spam_filter>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:183
+msgid "Changes in password storage"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:185
+msgid ""
+"Before version 8.0.0, user passwords were stored in plaintext in the "
+"``user_pw`` database field within ``tig_users`` table, but in plaintext. "
+"It was possible to enable storage of the MD5 hash of the password "
+"instead, however this limited authentication mechanism SASL PLAIN only. "
+"However an MD5 hash of a password is not really a secure method as it is "
+"possible to revert this mechanism using rainbow tables."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:187
+msgid ""
+"Therefore, we decided to change this and store only encrypted versions of"
+" a password in ``PBKDF2`` form which can be easily used for ``SCRAM-"
+"SHA-1`` authentication mechanism or ``SCRAM-SHA-256``. ``SASL PLAIN`` "
+"mechanism can also use these encrypted passwords."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:189
+msgid ""
+"The storage of encrypted passwords is now enabled **by default** in "
+"v8.0.0 of Tigase."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:194
+msgid "Dynamic TLS Buffer"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:196
+msgid ""
+"Memory Buffer for TLS no longer remains at highest buffer size needed for"
+" the server session. Buffer will now free memory during idle connections."
+" Thus drastically improving program footprint."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:201
+msgid "XEP-305 Quickstart now supported"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:203
+msgid ""
+"It’s now possible to establish connection faster due to implementation of"
+" `XEP-0305: XMPP Quickstart "
+"<https://xmpp.org/extensions/xep-0305.html>`__ (`#1936 "
+"<https://projects.tigase.net/issues?q=Redmine%20ID:%201936>`__). Feature "
+"is only available for ``c2s`` Connection Manager (i.e. connections on "
+"port 5222) and needs to be enabled in ``config.tdsl``"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:214
+msgid "Database Timestamps"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:216
+msgid "Timestamps in database will be stored using UTC time."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:221
+msgid "Config-type properties have changed"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:223
+msgid ""
+"Config-type is now configured using DSL format. Visit `this section "
+"<#configType>`__ for more information. The names of different config-type"
+" properties have changed: ``default`` replaces ``--gen-config-def``, "
+"``--gen=config-all``, and ``--gen-config-default`` configuration types. "
+"``session-manager`` replaces ``--gen-config-sm``. ``connection-managers``"
+" replaces ``--gen-config-cs``. ``component`` replaces ``--gen-config-"
+"comp``. ``setup`` - is a new type of config created for initial "
+"configuration of Tigase XMPP Server."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:227
+msgid ""
+"Old versions are no longer supported, you HAVE to replace old versions "
+"with the new ones manually when upgrading to v8.0.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:232
+msgid "Database Watchdog implemented"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:234
+msgid ""
+"It is now possible to set connection testing to databases when "
+"connections are idle and customize the frequency with which this is done."
+" Visit `this section <#databaseWatchdog>`__ for more details."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:239
+msgid "Packet statistics expanded"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:241
+msgid ""
+"Packet statistics both retrieved VIA XMPP and during graceful shutdown "
+"have now been separated to a per-XMLNS basis. This may be disabled by "
+"adding the following line to ``config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:250
+msgid "XEP-0016 Behavior changes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:252
+msgid ""
+"XEP states that Privacy lists should be used when no user session exists "
+"in addition to when there is. Previously, Tigase would only filter "
+"results when retrieving messages, allowing blocked users to store offline"
+" messages. This has now been changed to reflect the XEP properly, and "
+"messages will be filtered while there is no user session. If however, you"
+" wish to use the previous version, where offline messages are cached "
+"first and then filtered, you may use the following configuration:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:264
+msgid ""
+"By default, the cache has a limit of 10000 entries, that may be set by "
+"using size bean as seen above."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:269
+msgid "Access Control List has new ACL modifiers"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:271
+msgid ""
+"New permissions have been added to ACL including ``DOMAIN_OWNER`` and "
+"``DOMAIN_ADMIN`` to reduce permissions checking, and add another level of"
+" fine-grained permissions. For more details, please see `Tigase ACL "
+"<#accessControlList>`__ configuration for more details."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:276
+msgid "Option to ignore schema-version check added"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:278
+msgid ""
+"You can now skip the schema check phase for individual databases. To do "
+"this, add the following do the datasource configuration block:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:288
+msgid "This will do the following:"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:290
+msgid "Print a warning during repository startup."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:292
+msgid "Skip schema upgrades for the source."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:294
+msgid "Skip schema destruction for the source."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:299
+msgid "Protection against brute-force attacks"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:301
+msgid ""
+"Version 8.0.0 improves security by preventing brute-force attacks. "
+"Feature needs to be explicitly enabled and configured (on per VHost "
+"basis). Detailed configuration is described in `??? "
+"<#bruteForcePrevention>`__ (`#8160 "
+"<https://projects.tigase.net/issues?q=Redmine%20ID:%208160>`__)"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:306
+msgid ""
+"`#611 <https://projects.tigase.net/issues?q=Redmine%20ID:%20611>`__ "
+"Support for Message of the Day is now enabled in Tigase XMPP Server and "
+"can be administered using `XEP-0133 Service Administration "
+"<http://xmpp.org/extensions/xep-0133.html#set-motd>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:308
+msgid ""
+"`#1569 <https://projects.tigase.net/issues?q=Redmine%20ID:%201569>`__ Re-"
+"implemented XEP-0133 Service Administration Scripts ``4.3 Disable User`` "
+"and ``4.4 Re-enable User``."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:310
+msgid ""
+"`#1449 <https://projects.tigase.net/issues?q=Redmine%20ID:%201449>`__ "
+"Monitoring modules now works in OSGi mode."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:312
+msgid ""
+"`#1706 <https://projects.tigase.net/issues?q=Redmine%20ID:%201706>`__ "
+"``auto-authorize`` of presence subscriptions can now be set for "
+"individual vhosts."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:314
+msgid ""
+"`#1968 <https://projects.tigase.net/issues?q=Redmine%20ID:%201968>`__ "
+"Added a Proxy Wrapper to handle reconnections to database connection pool"
+" to help prevent deadlocking threads."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:316
+msgid ""
+"`#3511 <https://projects.tigase.net/issues?q=Redmine%20ID:%203511>`__ "
+"Mechanism responsible for closing XMPP in SessionManager has been changed"
+" to process all packets from TCP connection before closing connection."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:318
+msgid ""
+"`#3802 <https://projects.tigase.net/issues?q=Redmine%20ID:%203802>`__ "
+"Implementation and API of LocalEventBus and ClusteredEventBus has been "
+"unified and is now available as EventBus."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:320
+msgid ""
+"`#3918 <https://projects.tigase.net/issues?q=Redmine%20ID:%203918>`__ "
+"Session Establishment Advertisement is now optional, bringing session "
+"establishment in line with `RFC 6121 "
+"<https://tools.ietf.org/html/rfc6121>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:322
+msgid ""
+"`#4111 <https://projects.tigase.net/issues?q=Redmine%20ID:%204111>`__ "
+"Changed input buffer sizing to use a ratio of 2 to 1 based on input "
+"capacity. No longer using a constant value."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:324
+msgid ""
+"`#4212 <https://projects.tigase.net/issues?q=Redmine%20ID:%204212>`__ "
+"Database schema files have been flattened and made for better "
+"organization."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:326
+#, python-format
+msgid ""
+"`#4501 <https://projects.tigase.net/issues?q=Redmine%20ID:%204501>`__ "
+"``CounterDataFileLogger`` now has an upper limit and will be default be "
+"shrunk to 75% if available disk space is 5% or less than 100MB."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:328
+msgid ""
+"`#4654 <https://projects.tigase.net/issues?q=Redmine%20ID:%204654>`__ "
+"PubSub component has been updated and new schema uses UTF-8 encoding when"
+" hashing database lookup."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:330
+msgid ""
+"`#4776 <https://projects.tigase.net/issues?q=Redmine%20ID:%204776>`__ "
+"Tigase ``DbSchemaLoader`` now prompts for password if one is missing from"
+" command line."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:332
+msgid ""
+"`#4788 <https://projects.tigase.net/issues?q=Redmine%20ID:%204788>`__ "
+"Push component added to dist-max archive."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:334
+msgid ""
+"`#4814 <https://projects.tigase.net/issues?q=Redmine%20ID:%204814>`__ "
+"SASL-SCRAM will now be automatically disabled if auth database uses "
+"encoded passwords."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:336
+msgid ""
+"`#4844 <https://projects.tigase.net/issues?q=Redmine%20ID:%204844>`__ "
+"External components can now have SSL socket connections assigned to them."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:338
+msgid ""
+"`#4859 <https://projects.tigase.net/issues?q=Redmine%20ID:%204859>`__ "
+"Tigase ``DbSchemaLoader`` now can support using SSL when connecting to "
+"databases."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:340
+msgid ""
+"`#4874 <https://projects.tigase.net/issues?q=Redmine%20ID:%204874>`__ "
+"Tigase Test Suite has been updated to correspond to all changes for "
+"v8.0.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:342
+msgid ""
+"`#4877 <https://projects.tigase.net/issues?q=Redmine%20ID:%204877>`__ In-"
+"memory repository implemented for **testing ONLY**."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:344
+msgid ""
+"`#4880 <https://projects.tigase.net/issues?q=Redmine%20ID:%204880>`__ "
+"Tigase config-type settings have been reduced and changed. See `this "
+"section <#configType>`__ for more details."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:346
+msgid ""
+"`#4908 <https://projects.tigase.net/issues?q=Redmine%20ID:%204908>`__ "
+"Limited Ad-hoc execution to admin only within monitor component."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:348
+msgid ""
+"`#5005 <https://projects.tigase.net/issues?q=Redmine%20ID:%205005>`__ "
+"Detailed logging configuration is now available in DSL format. See "
+"xref:[customLogging] for more details."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:350
+msgid ""
+"`#5069 <https://projects.tigase.net/issues?q=Redmine%20ID:%205069>`__ "
+"Packet processed statistics now separates results based on XML "
+"Namespaces."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:352
+msgid ""
+"`#5079 <https://projects.tigase.net/issues?q=Redmine%20ID:%205079>`__ "
+"Tigase ``DbSchemaLoader`` can now process multiple .sql files in one "
+"command by using a comma separated list when calling."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:354
+msgid ""
+"`#5086 <https://projects.tigase.net/issues?q=Redmine%20ID:%205086>`__ "
+"Tigase server monitor is loaded after delay to prevent NPE during "
+"startup."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:356
+msgid ""
+"`#5149 <https://projects.tigase.net/issues?q=Redmine%20ID:%205149>`__ "
+"``StanzaReceiver`` and ``StanzaSender`` Components have been deprecated "
+"and are no longer part of Tigase XMPP Server. Related SQL tables "
+"``xmpp_stanza`` and ``short_news`` have also been removed from schemas."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:358
+msgid ""
+"`#5150 <https://projects.tigase.net/issues?q=Redmine%20ID:%205150>`__ All"
+" TigaseDB tables now use the ``tig_`` prefix."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:360
+msgid ""
+"`#5214 <https://projects.tigase.net/issues?q=Redmine%20ID:%205214>`__ "
+"Check has been added if recipient exists before storing offline messages "
+"for local jid."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:362
+msgid ""
+"`#5293 <https://projects.tigase.net/issues?q=Redmine%20ID:%205293>`__ "
+"``DbSchemaLoader`` now will fail execution instead of skipping when "
+"encountering missing files."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:364
+msgid ""
+"`#5379 <https://projects.tigase.net/issues?q=Redmine%20ID:%205379>`__ "
+"Server ready detection has been improved in testrunner.sh."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:366
+msgid ""
+"`#5397 <https://projects.tigase.net/issues?q=Redmine%20ID:%205397>`__ "
+"Webhelp Documentation will no longer be built."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:368
+msgid ""
+"`#5422 <https://projects.tigase.net/issues?q=Redmine%20ID:%205422>`__ "
+"Errors with Beans will now result in compact and more readable StackTrace"
+" print in console log."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:370
+msgid ""
+"`#5423 <https://projects.tigase.net/issues?q=Redmine%20ID:%205423>`__ "
+"System configuration will now be printed to log file as "
+"``ConfigHolder.loadConfiguration`` output."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:372
+msgid ""
+"`#5425 <https://projects.tigase.net/issues?q=Redmine%20ID:%205425>`__ "
+"``GetAnyFile`` and ``GetConfigFile`` scripts moved to message-router "
+"instead of basic-conf."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:374
+msgid ""
+"`#5429 <https://projects.tigase.net/issues?q=Redmine%20ID:%205429>`__ "
+"Adjusted settings for Dynamic Rostering now can use separate beans for "
+"multiple implementations."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:376
+msgid ""
+"`#5430 <https://projects.tigase.net/issues?q=Redmine%20ID:%205430>`__ "
+"``BindResource`` is now set to FINER log level to reduce console output "
+"verbosity."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:378
+msgid ""
+"`#5475 <https://projects.tigase.net/issues?q=Redmine%20ID:%205475>`__ "
+"Setting default environment variables is now possible in ``config.tdsl`` "
+"file using ``env('env-1', 'def-value')`` lines. Details available `in DSL"
+" Configuration <#dslEnv>`__ section."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:380
+msgid ""
+"`#5496 <https://projects.tigase.net/issues?q=Redmine%20ID:%205496>`__ "
+"``Destroy Schema`` task now added to schema manager."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:382
+msgid ""
+"`#5583 <https://projects.tigase.net/issues?q=Redmine%20ID:%205583>`__ "
+"Error messages now properly sent when offline message storage is full."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:384
+msgid ""
+"`#5674 <https://projects.tigase.net/issues?q=Redmine%20ID:%205674>`__ All"
+" components now use UTC timestamp when interacting with databases."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:386
+msgid ""
+"`#5800 <https://projects.tigase.net/issues?q=Redmine%20ID:%205800>`__ "
+"Better annotation of deprecated code, cleanup and removal code previously"
+" marked as deprecated."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:388
+msgid ""
+"`#5964 <https://projects.tigase.net/issues?q=Redmine%20ID:%205964>`__ "
+"Server version is now added to JMX statistics."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:390
+msgid ""
+"`#5982 <https://projects.tigase.net/issues?q=Redmine%20ID:%205982>`__ "
+"Remote JVM debugging configuration added to tigase.conf file, commented "
+"by default."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:392
+msgid ""
+"`#6038 <https://projects.tigase.net/issues?q=Redmine%20ID:%206038>`__ "
+"Data Source pool connections are now initialized concurrently instead of "
+"one at a time, dropping initializing time."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:394
+msgid ""
+"`#6103 <https://projects.tigase.net/issues?q=Redmine%20ID:%206103>`__ "
+":literal:`RosterElement`no longer keeps `XMPPResourceConnection` instance"
+" as it is cached elsewhere. Removal results in net improvement in memory "
+"footprint."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:396
+msgid ""
+"`#6133 <https://projects.tigase.net/issues?q=Redmine%20ID:%206133>`__ "
+"Tigase now checks components against server version to ensure "
+"compatibility."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:398
+msgid ""
+"`#6163 <https://projects.tigase.net/issues?q=Redmine%20ID:%206163>`__ "
+"Groovy plugin updated to v2.4.12."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:400
+msgid ""
+"`#6206 <https://projects.tigase.net/issues?q=Redmine%20ID:%206206>`__ "
+"Separated TigaseXMLTools and TigaseUtil packages for better compatibility"
+" with JDK v9."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:402
+msgid ""
+"`#6216 <https://projects.tigase.net/issues?q=Redmine%20ID:%206216>`__ "
+"MongoDB Driver now updated to v3.5.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:404
+msgid ""
+"`#6560 <https://projects.tigase.net/issues?q=Redmine%20ID:%206560>`__ "
+"tigase anti-spam component now included in tigase dist-max archive."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:406
+msgid ""
+"`#6821 <https://projects.tigase.net/issues?q=Redmine%20ID:%206821>`__ "
+"Improved error reporting when errors from ``ConfigReader``."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:408
+msgid ""
+"`#6842 <https://projects.tigase.net/issues?q=Redmine%20ID:%206842>`__ "
+"``DefaultTypesConverter`` no longer requires case sensitive enums."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:410
+msgid ""
+"`#7082 <https://projects.tigase.net/issues?q=Redmine%20ID:%207082>`__ "
+"``ClassUtilBean`` now handles packet filtering for packets part of Tigase"
+" Server but not containing beans, other improvements to mDNS."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:412
+msgid ""
+"`#7433 <https://projects.tigase.net/issues?q=Redmine%20ID:%207433>`__ "
+"``SeeOtherHost`` no longer uses ``PropertiesBeanConfigurator`` to parse "
+"configuration."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:414
+msgid ""
+"`#7446 <https://projects.tigase.net/issues?q=Redmine%20ID:%207446>`__ "
+"User credentials can now be managed with Ad-hoc commands."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:416
+msgid ""
+"`#7743 <https://projects.tigase.net/issues?q=Redmine%20ID:%207743>`__ "
+"Improved error message when repository is not found."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:418
+msgid ""
+"`#7773 <https://projects.tigase.net/issues?q=Redmine%20ID:%207773>`__ Ad-"
+"hoc commands can now by executed asynchronously."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:420
+msgid ""
+"`#2341 <https://projects.tigase.net/issues?q=Redmine%20ID:%202341>`__ "
+"allow specifying SubscriptionType when adding buddy to avoid calling "
+"separately .setBuddySubscription() thus eliminating saving roster twice "
+"to database if not needed"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:425
+msgid "Fixes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:427
+msgid ""
+"`#2750 <https://projects.tigase.net/issues?q=Redmine%20ID:%202750>`__ "
+"Multiple artifact and depreciated file cleanup. Massive code cleanup and "
+"javadoc cleaning."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:429
+msgid ""
+"`#3582 <https://projects.tigase.net/issues?q=Redmine%20ID:%203582>`__ "
+"Schema files streamlined, and no longer embedded in code."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:431
+msgid ""
+"`#3611 <https://projects.tigase.net/issues?q=Redmine%20ID:%203611>`__ "
+"Fixed TheadExceptionHandler caused by ACS unable to read PubSub schema "
+"changes."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:433
+msgid ""
+"`#3686 <https://projects.tigase.net/issues?q=Redmine%20ID:%203686>`__ "
+"Issues with processing XHTML-IM have been fixed, and now render correctly"
+" messages with multiple CData items."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:435
+msgid ""
+"`#3689 <https://projects.tigase.net/issues?q=Redmine%20ID:%203689>`__ "
+"Packets returned from CM no longer bear the original senders' jid."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:437
+msgid ""
+"`#3803 <https://projects.tigase.net/issues?q=Redmine%20ID:%203803>`__ New"
+" call ``RouteEvent`` has been added to check to list and check events and"
+" determine which should be forwarded to other nodes."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:439
+msgid ""
+"`#3822 <https://projects.tigase.net/issues?q=Redmine%20ID:%203822>`__ "
+"Error is now thrown if listener is registered for an event that is not "
+"found in EventBus."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:441
+msgid ""
+"`#3910 <https://projects.tigase.net/issues?q=Redmine%20ID:%203910>`__ "
+"Fixed NPE in SessionManager when session is closed during execution of "
+"everyMinute method."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:443
+msgid ""
+"`#3911 <https://projects.tigase.net/issues?q=Redmine%20ID:%203911>`__ "
+"Fixed issue of dropping connections during thread load distribution."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:445
+msgid ""
+"`#4185 <https://projects.tigase.net/issues?q=Redmine%20ID:%204185>`__ "
+"Fixed an error where messages would be duplicated on stream resumption "
+"due to a counter being reset upon reconnection."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:447
+msgid ""
+"`#4447 <https://projects.tigase.net/issues?q=Redmine%20ID:%204447>`__ "
+"Fixed condition where expired messages in offline store would cause "
+"locks."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:449
+msgid ""
+"`#4547 <https://projects.tigase.net/issues?q=Redmine%20ID:%204547>`__ "
+"config.dump file now is fully compatible with init.tdsl file and DSL file"
+" formatting."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:451
+msgid ""
+"`#4672 <https://projects.tigase.net/issues?q=Redmine%20ID:%204672>`__ "
+"Fixed ``UnsupportedOperationException`` occurring during configuration of"
+" ``WebSocketConnectionClustered``."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:453
+msgid ""
+"`#4776 <https://projects.tigase.net/issues?q=Redmine%20ID:%204776>`__ "
+"``DBSchemaLoader`` now asks for user credentials if parameter is missing."
+" Exceptions are no longer thrown if file specified is not found."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:455
+msgid ""
+"`#4885 <https://projects.tigase.net/issues?q=Redmine%20ID:%204885>`__ "
+"``client-port-delay-listening`` no longer causes exception when called."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:457
+msgid ""
+"`#4973 <https://projects.tigase.net/issues?q=Redmine%20ID:%204973>`__ "
+"Changed Message History query to now include a limit when selecting "
+"items, preventing an SQLTimeoutException."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:459
+msgid ""
+"`#5005 <https://projects.tigase.net/issues?q=Redmine%20ID:%205005>`__ "
+"Fixed an issue where disabling components would result in server "
+"shutdown."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:461
+msgid ""
+"`#5042 <https://projects.tigase.net/issues?q=Redmine%20ID:%205042>`__ "
+"Fixed issue when implementing custom SASL providers, mechanisms and "
+"callback handler factories."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:463
+msgid ""
+"`#5066 <https://projects.tigase.net/issues?q=Redmine%20ID:%205066>`__ "
+"Fixed issue initializing databases using MongoDB."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:465
+msgid ""
+"`#5076 <https://projects.tigase.net/issues?q=Redmine%20ID:%205076>`__ "
+"last_login and last_logout values are now properly updated while using "
+"SASL SCRAM authentication."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:467
+msgid ""
+"`#5084 <https://projects.tigase.net/issues?q=Redmine%20ID:%205084>`__ "
+"SCRAM now checks to see if account is disabled before retrieving "
+"password."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:469
+msgid ""
+"`#5085 <https://projects.tigase.net/issues?q=Redmine%20ID:%205085>`__ "
+"Fixed ``too many beans implemented`` error in Monitor Component."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:471
+msgid ""
+"`#5088 <https://projects.tigase.net/issues?q=Redmine%20ID:%205088>`__ "
+"Removed unnecessary SASL request processing after session is closed."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:473
+msgid ""
+"`#5118 <https://projects.tigase.net/issues?q=Redmine%20ID:%205118>`__ "
+"Fixed NPE during query of privacy lists then ``type`` is missing."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:475
+msgid ""
+"`#5303 <https://projects.tigase.net/issues?q=Redmine%20ID:%205303>`__ "
+"Fixed beans not being overridden by configuration if they were registered"
+" in ``RegistrarBean`` or ``AbstractKernelBasedComponent``."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:477
+msgid ""
+"`#5311 <https://projects.tigase.net/issues?q=Redmine%20ID:%205311>`__ "
+"Offline messages are no longer dumped from MongoDB when restarting "
+"server."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:479
+msgid ""
+"`#5394 <https://projects.tigase.net/issues?q=Redmine%20ID:%205394>`__ "
+"Loading main Derby schema no longer throws exceptions."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:481
+msgid ""
+"`#5428 <https://projects.tigase.net/issues?q=Redmine%20ID:%205428>`__ "
+"Fixed parsing of v-host per domain limit property."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:483
+msgid ""
+"`#5450 <https://projects.tigase.net/issues?q=Redmine%20ID:%205450>`__ "
+"Server no longer automatically shuts down when default or other db can "
+"not be found or accessed."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:485
+msgid ""
+"`#5458 <https://projects.tigase.net/issues?q=Redmine%20ID:%205458>`__ "
+"Fixed potential timeout arising from "
+"``XMPPIOService::xmppStreamOpened()`` method."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:487
+msgid ""
+"`#5480 <https://projects.tigase.net/issues?q=Redmine%20ID:%205480>`__ "
+"Fixed issue in Derby DB where obtaining offline messages results in "
+"SQLException."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:489
+msgid ""
+"`#5525 <https://projects.tigase.net/issues?q=Redmine%20ID:%205525>`__ "
+"Fixed S2S ``invalid-namespace`` error being returned during connection "
+"establishment."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:491
+msgid ""
+"`#5587 <https://projects.tigase.net/issues?q=Redmine%20ID:%205587>`__ "
+"Fixed unclosed ``ResultSet`` when storing a message to AMP-offline "
+"database in Derby causing deadlock."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:493
+msgid ""
+"`#5645 <https://projects.tigase.net/issues?q=Redmine%20ID:%205645>`__ "
+"Added fix for possible NPE when failing to retrieve beans."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:495
+msgid ""
+"`#5670 <https://projects.tigase.net/issues?q=Redmine%20ID:%205670>`__ "
+"config-dump now prints configuration for inactive components and beans to"
+" log."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:497
+msgid ""
+"`#5692 <https://projects.tigase.net/issues?q=Redmine%20ID:%205692>`__ "
+"Messages sent with negative priority were being occasionally dropped and "
+"not processed to ``OfflineMessageHandler``."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:499
+msgid ""
+"`#5727 <https://projects.tigase.net/issues?q=Redmine%20ID:%205727>`__ "
+"Fixed potential issue with MySQL procedures not being killed properly."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:501
+msgid ""
+"`#5750 <https://projects.tigase.net/issues?q=Redmine%20ID:%205750>`__ "
+"Statistics now filter out zero-value results unless FINEST level is "
+"requested."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:503
+msgid ""
+"`#5831 <https://projects.tigase.net/issues?q=Redmine%20ID:%205831>`__ "
+"Fixed occurrence of ``OutOfMemory`` error."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:505
+msgid ""
+"`#5864 <https://projects.tigase.net/issues?q=Redmine%20ID:%205864>`__ "
+"Fixed NPE when executing BOSH pre-bind script."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:507
+msgid ""
+"`#5867 <https://projects.tigase.net/issues?q=Redmine%20ID:%205867>`__ "
+"Fixed NPE occurring during configuration dump."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:509
+msgid ""
+"`#6000 <https://projects.tigase.net/issues?q=Redmine%20ID:%206000>`__ "
+"Fixed a few issues with dynamic rosters properly handling presence "
+"subscription requests."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:511
+msgid ""
+"`#6006 <https://projects.tigase.net/issues?q=Redmine%20ID:%206006>`__ "
+"Improved configuration file and DB Schema handling."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:513
+msgid ""
+"`#6041 <https://projects.tigase.net/issues?q=Redmine%20ID:%206041>`__ "
+"Fixed potential issue where vhosts DB could be overwritten by vhosts "
+"configuration in ``init.config``."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:515
+msgid ""
+"`#6078 <https://projects.tigase.net/issues?q=Redmine%20ID:%206078>`__ "
+"Fixed ``ClusterConnectionManager`` to use custom_elements_limit instead "
+"of a fixed value."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:517
+msgid ""
+"`#6080 <https://projects.tigase.net/issues?q=Redmine%20ID:%206080>`__ "
+"Fixed Packet Filtering to not filter cluster node information requests."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:519
+msgid ""
+"`#6083 <https://projects.tigase.net/issues?q=Redmine%20ID:%206083>`__ "
+"Fixed clustered mode shutting down server when certain components are "
+"disabled."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:521
+msgid ""
+"`#6135 <https://projects.tigase.net/issues?q=Redmine%20ID:%206135>`__ "
+"Tigase now properly enabled selective TLS if not enabled globally."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:523
+msgid ""
+"`#6140 <https://projects.tigase.net/issues?q=Redmine%20ID:%206140>`__ "
+"Fixed issue while sending server welcome message."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:525
+msgid ""
+"`#6141 <https://projects.tigase.net/issues?q=Redmine%20ID:%206141>`__ "
+"Fixed NPE at startup."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:527
+msgid ""
+"`#6234 <https://projects.tigase.net/issues?q=Redmine%20ID:%206234>`__ "
+"Fixed an error where an error message would repeat unnecessarily."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:529
+msgid ""
+"`#6284 <https://projects.tigase.net/issues?q=Redmine%20ID:%206284>`__ Ad-"
+"hoc commands now refresh SSL Certificate, and restart is no longer "
+"required."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:531
+msgid ""
+"`#6293 <https://projects.tigase.net/issues?q=Redmine%20ID:%206293>`__ "
+"Server no longer sends no response upon setting empty photo in vCard."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:533
+msgid ""
+"`#6263 <https://projects.tigase.net/issues?q=Redmine%20ID:%206263>`__ "
+"Fixed missing namespaces in responses from adhoc commands."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:535
+msgid ""
+"`#6400 <https://projects.tigase.net/issues?q=Redmine%20ID:%206400>`__ "
+"Added a proper error when max-queue-size is too small and server cannot "
+"start."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:537
+msgid ""
+"`#6408 <https://projects.tigase.net/issues?q=Redmine%20ID:%206408>`__ "
+"Fixed an issue where single WebSocket frames contained multiple XML "
+"stanzas instead of one per frame."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:539
+msgid ""
+"`#6411 <https://projects.tigase.net/issues?q=Redmine%20ID:%206411>`__ "
+"Main kernel is now called to smooth shutdown. Further, timeout periods "
+"are opened up for large instances."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:541
+msgid ""
+"`#6574 <https://projects.tigase.net/issues?q=Redmine%20ID:%206574>`__ SSL"
+" certificate upload handling is now fixed within cluster mode."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:543
+msgid ""
+"`#6598 <https://projects.tigase.net/issues?q=Redmine%20ID:%206598>`__ "
+"Fixed EventBus Registration connection issues between cluster nodes."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:545
+msgid ""
+"`#6658 <https://projects.tigase.net/issues?q=Redmine%20ID:%206658>`__ "
+"Cluster connections no longer potentially keep open connection after "
+"cluster is no longer connected or available."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:547
+msgid ""
+"`#6749 <https://projects.tigase.net/issues?q=Redmine%20ID:%206749>`__ "
+"Fixed schema parsing for DerbyDB."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:549
+msgid ""
+"`#6776 <https://projects.tigase.net/issues?q=Redmine%20ID:%206776>`__ "
+"Fixed failing Websocket connections if header contains more than one "
+"value."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:551
+msgid ""
+"`#6875 <https://projects.tigase.net/issues?q=Redmine%20ID:%206875>`__ "
+"Fixed an issue where C2S connections could be accepted before "
+"SessionManager was initialized."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:553
+msgid ""
+"`#7037 <https://projects.tigase.net/issues?q=Redmine%20ID:%207037>`__ "
+"Fixed error while parsing negative values from ``config.tdsl`` file."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:555
+msgid ""
+"`#7055 <https://projects.tigase.net/issues?q=Redmine%20ID:%207055>`__ "
+"Improvements to metaspace use and other memory use tweaks."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:557
+msgid ""
+"`#7304 <https://projects.tigase.net/issues?q=Redmine%20ID:%207304>`__ "
+"Virtual host logs now properly follow log size limits."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:559
+msgid ""
+"`#7431 <https://projects.tigase.net/issues?q=Redmine%20ID:%207431>`__ "
+"AdHoc requests between the same user with different resources are no "
+"longer dropped with \\`NoConnectionIdExecption`error."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:561
+msgid ""
+"`#7434 <https://projects.tigase.net/issues?q=Redmine%20ID:%207434>`__ "
+"Adjusted ``SeeOtherHotDualIP`` to use new table name in cluster nodes "
+"database."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:563
+msgid ""
+"`#7491 <https://projects.tigase.net/issues?q=Redmine%20ID:%207491>`__ "
+"Stacktraces from ``CertificateContainer`` are no longer printed to "
+"tigase-console.log, but will be printed to tigase.log."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:565
+msgid ""
+"`#7687 <https://projects.tigase.net/issues?q=Redmine%20ID:%207687>`__ "
+"Fixed an error where connections failed after authentication timeout were"
+" marked as active after cleanup."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:567
+msgid ""
+"`#7747 <https://projects.tigase.net/issues?q=Redmine%20ID:%207747>`__ "
+"Fixed ``ClusterRepoItemEvent`` serialization issues causing unsupported "
+"conversion error in cluster mode."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:569
+msgid ""
+"`#7495 <https://projects.tigase.net/issues?q=Redmine%20ID:%207495>`__ fix"
+" issue with not all logs being obfuscated, added testcase, documentation"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:571
+msgid ""
+"`#8305 <https://projects.tigase.net/issues?q=Redmine%20ID:%208305>`__ fix"
+" issue with SeeOtherHostDualIP when using MongoDB"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:576
+msgid "Component Changes"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:579
+msgid "AMP"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:581
+msgid ""
+"`#7301 <https://projects.tigase.net/issues?q=Redmine%20ID:%207301>`__ "
+"Tigase AMP component now uses multiple processing threads."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:586
+msgid "PubSub"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:588
+msgid ""
+"`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ "
+"PubSub now compatible with using emojis in pubsub items."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:590
+msgid ""
+"`#5693 <https://projects.tigase.net/issues?q=Redmine%20ID:%205693>`__ "
+"Fixed parsing configuration of SessionManager processors."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:592
+msgid ""
+"`#5766 <https://projects.tigase.net/issues?q=Redmine%20ID:%205766>`__ "
+"PubSub now writes to all databases with UTC timestamp."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:594
+msgid ""
+"`#5953 <https://projects.tigase.net/issues?q=Redmine%20ID:%205953>`__ "
+"Fixed presences not being removed from ``presenceByService`` collection "
+"if client disconnects without ``<unavailable/>`` presence being sent."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:596
+msgid ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"version changed to PubSub v4.0.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:598
+msgid ""
+"`#7707 <https://projects.tigase.net/issues?q=Redmine%20ID:%207707>`__ "
+"Fixed potential NPE in PubSub."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:603
+msgid "http-api"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:605
+msgid ""
+"`#4873 <https://projects.tigase.net/issues?q=Redmine%20ID:%204873>`__ "
+"Support added to display timestamp fields as data, time, and timezone "
+"fields."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:607
+msgid ""
+"`#4876 <https://projects.tigase.net/issues?q=Redmine%20ID:%204876>`__ "
+"Implemented using XML repository for new setups, and updated default "
+"config to use this."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:609
+msgid ""
+"`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ "
+"``http-api`` now is enabled by default."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:611
+msgid ""
+"`#5209 <https://projects.tigase.net/issues?q=Redmine%20ID:%205209>`__ "
+"Updated visual styling of pages hosted by component."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:613
+msgid ""
+"`#5290 <https://projects.tigase.net/issues?q=Redmine%20ID:%205290>`__ "
+"Fixed invalid property name."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:615
+msgid ""
+"`#5316 <https://projects.tigase.net/issues?q=Redmine%20ID:%205316>`__ "
+"Account Registration now can now require and send confirmation E-mails."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:617
+msgid ""
+"`#5415 <https://projects.tigase.net/issues?q=Redmine%20ID:%205415>`__ Web"
+" Setup now checks configuration for message archive conflicts."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:619
+msgid ""
+"`#5460 <https://projects.tigase.net/issues?q=Redmine%20ID:%205460>`__ "
+"MongoDB now supported through web-setup."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:621
+msgid ""
+"`#5717 <https://projects.tigase.net/issues?q=Redmine%20ID:%205717>`__ "
+"Fixed default values of check-boxes in admin UI not being shown."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:623
+msgid ""
+"`#5950 <https://projects.tigase.net/issues?q=Redmine%20ID:%205950>`__ "
+"Supported added for `XEP-0363: HTTP File Upload "
+"<https://xmpp.org/extensions/xep-0363.html>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:625
+msgid ""
+"`#6159 <https://projects.tigase.net/issues?q=Redmine%20ID:%206159>`__ "
+"Fixed NPE thrown if scripts directory is not present."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:627
+msgid ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"version changed to tigase-http-api v2.0.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:629
+msgid ""
+"`#6212 <https://projects.tigase.net/issues?q=Redmine%20ID:%206212>`__ "
+"Added mechanism for password changing through HTTP API."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:631
+msgid ""
+"`#7307 <https://projects.tigase.net/issues?q=Redmine%20ID:%207307>`__ "
+"Fixed scripts returning 404 while handling rest/user/ requests even "
+"though user exists."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:633
+msgid ""
+"`#7178 <https://projects.tigase.net/issues?q=Redmine%20ID:%207178>`__ Ad-"
+"hoc commands are now categorized in groups for better organization."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:635
+msgid ""
+"`#7568 <https://projects.tigase.net/issues?q=Redmine%20ID:%207568>`__ "
+"Added timeout reading for HTTP request headers, added configurable "
+"``accept-timeout``."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:640
+msgid "message-archive"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:642
+msgid ""
+"`#4867 <https://projects.tigase.net/issues?q=Redmine%20ID:%204867>`__ "
+"fixed issue when changing MA jid."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:644
+msgid ""
+"`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ "
+"``message-archive`` is enabled by default."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:646
+msgid ""
+"`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ "
+"Update message archive to be compatible with emojis."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:648
+msgid ""
+"`#5391 <https://projects.tigase.net/issues?q=Redmine%20ID:%205391>`__ "
+"Added missing query statement block starts and ends to be compatible with"
+" SQL Server."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:650
+msgid ""
+"`#5604 <https://projects.tigase.net/issues?q=Redmine%20ID:%205604>`__ "
+"Modified access to static fields and functions."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:652
+msgid ""
+"`#5681 <https://projects.tigase.net/issues?q=Redmine%20ID:%205681>`__ "
+"Fixed duplication of groupchat messages with different ids by modifying "
+"hash algorithm."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:654
+msgid ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"version changed to message-archive v2.0.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:656
+msgid ""
+"`#7615 <https://projects.tigase.net/issues?q=Redmine%20ID:%207615>`__ "
+"``feature-not-implemented`` response no longer occurs when removing "
+"stored messages."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:661
+msgid "MUC"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:663
+msgid ""
+"`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ "
+"``muc`` now is enabled by default."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:665
+msgid ""
+"`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ MUC"
+" component is now compatible with emojis."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:667
+msgid ""
+"`#5066 <https://projects.tigase.net/issues?q=Redmine%20ID:%205066>`__ "
+"Fixed issues working with MongoDB repository."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:669
+msgid ""
+"`#5085 <https://projects.tigase.net/issues?q=Redmine%20ID:%205085>`__ "
+"Removed invalid annotation parameter values."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:671
+msgid ""
+"`#5559 <https://projects.tigase.net/issues?q=Redmine%20ID:%205559>`__ "
+"Fixed NPE while changing default room configuration."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:673
+msgid ""
+"`#5666 <https://projects.tigase.net/issues?q=Redmine%20ID:%205666>`__ "
+"User may add more than one ``<item/>`` elements to query when querying "
+"room members."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:675
+msgid ""
+"`#5715 <https://projects.tigase.net/issues?q=Redmine%20ID:%205715>`__ "
+"Welcome messages may now be disabled globally, or in individual room "
+"configurations."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:677
+msgid ""
+"`#5736 <https://projects.tigase.net/issues?q=Redmine%20ID:%205736>`__ "
+"Rooms with no subject now return empty ``<subject/>`` element, as per "
+"`XEP-0048 7.2.16 <https://xmpp.org/extensions/xep-0045.html#enter-"
+"subject>`__."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:679
+msgid ""
+"`#5813 <https://projects.tigase.net/issues?q=Redmine%20ID:%205813>`__ "
+"Fixed NPE during room creation."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:681
+msgid ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"version changed to tigase-muc v3.0.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:683
+msgid ""
+"`#6395 <https://projects.tigase.net/issues?q=Redmine%20ID:%206395>`__ "
+"Fixed ``tigase.db.UserNotFoundException`` during retrieval of MUC user."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:685
+msgid ""
+"`#6734 <https://projects.tigase.net/issues?q=Redmine%20ID:%206734>`__ "
+"Introduced ``muc#roomconfig_maxresources`` to allow configuration of max "
+"number of resources for a single occupant."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:687
+msgid ""
+"`#7443 <https://projects.tigase.net/issues?q=Redmine%20ID:%207443>`__ "
+"Disabled XEP-0091 by default, added history attribute validation."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:692
+msgid "socks5 Proxy"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:694
+msgid ""
+"`#2750 <https://projects.tigase.net/issues?q=Redmine%20ID:%202750>`__ "
+"Cleanup of code and removal of empty javadocs."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:696
+msgid ""
+"`#5867 <https://projects.tigase.net/issues?q=Redmine%20ID:%205867>`__ "
+"Fixed NPE during configuration dump when component is disabled."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:698
+msgid ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"version changed to tigase-socks5 v2.0.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:703
+msgid "stats"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:705
+msgid ""
+"`#5206 <https://projects.tigase.net/issues?q=Redmine%20ID:%205206>`__ "
+"Fixed exception causing duplicate error entry."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:707
+msgid ""
+"`#5728 <https://projects.tigase.net/issues?q=Redmine%20ID:%205728>`__ "
+"Fixed ``MySQLIntegrityConstraintViolationException`` in upload handler."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:709
+msgid ""
+"`#6161 <https://projects.tigase.net/issues?q=Redmine%20ID:%206161>`__ "
+"Removed usage of classes from javax.xml.ws package for JDKv9 "
+"compatibility."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:714
+msgid "STUN Server"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:716
+msgid ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"version changed to tigase-stun v2.0.0."
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:721
+msgid "WebSocket"
+msgstr ""
+
+#: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:723
+msgid ""
+"`#6481 <https://projects.tigase.net/issues?q=Redmine%20ID:%206481>`__ "
+"Websocket component has been improved to be more compliant with `rfc6455 "
+"<https://tools.ietf.org/html/rfc6455>`__"
+msgstr ""
+
