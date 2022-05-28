@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-05-27 19:27-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -437,11 +437,11 @@ msgid ""
 "automatically sort certificates in PEM file while loading it.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:121
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:123
 msgid "Installing/Loading Certificate To the Tigase Server"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:123
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:125
 msgid ""
 "Installing and loading certificates is very easy. The server can load all"
 " certificates directly from **pem** files. You just need to create a "
@@ -451,7 +451,7 @@ msgid ""
 "things easy, we recommend the ``Tigase/certs`` directory."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:125
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:127
 msgid ""
 "It’s also possible to use: \\* Admin ad-hoc command via XMPP client - you"
 " should navigate to Service Discovery of your server and in the list of "
@@ -464,11 +464,11 @@ msgid ""
 "required form fields make ``GET`` request to the same endpoint"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:130
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:132
 msgid "Certificate From Other Providers"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:132
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:134
 msgid ""
 "There is number of certificate providers offering certificates either for"
 " free or for money. You can use any of them, however you have to be aware"
@@ -477,19 +477,19 @@ msgid ""
 "providers:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:134
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:136
 msgid ""
 "LetsEncrypt - please see `Installing LetsEncrypt Certificates in Your "
 "Linux System<LetsEncryptCertificate>` for details"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:136
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:138
 msgid ""
 "`CAcert <https://www.cacert.org/>`__ - free certificates with Web GUI. "
 "(WARNING: it’s not widely accepted)"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:138
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:140
 msgid ""
 "`Verisign <https://www.verisign.com/>`__ - very expensive certificates "
 "comparing to above provides but the provider is recognized by everybody. "
@@ -497,14 +497,14 @@ msgid ""
 "as a valid certificate."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:140
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:142
 msgid ""
 "`Comodo Certificate Authority <http://www.comodo.com/business-security"
 "/digital-certificates/ssl-certificates.php>`__ offers different kind of "
 "commercial certificates"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:142
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:144
 msgid ""
 "To obtain certificate from a third party authority you have to go to its "
 "website and request the certificate using certificate request generated "
@@ -512,18 +512,18 @@ msgid ""
 "providers listed have different requirements and interfaces."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:144
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:146
 msgid ""
 "We **highly** recommend using LetsEncrypt keys to self-sign and secure "
 "your domain. Instructions are in the :ref:`next "
 "section<LetsEncryptCertificate>`."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:147
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:149
 msgid "Using one certificate for multiple domains"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:151
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:153
 msgid ""
 "Tigase tries to be *smart* and automatically detects wildcard domain and "
 "alternative domains so it’s not needed to duplicate same certificate in "
@@ -531,18 +531,18 @@ msgid ""
 "available for all domains (CNames) available in the certificate."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:156
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:158
 msgid "Installing LetsEncrypt Certificates in Your Linux System"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:158
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:160
 msgid ""
 "LetsEncrypt is a trusted CA that provides free security certificates. "
 "Unlike previously self-signed certificates, we can use LetsEncrypt "
 "Certificates to certify your domains from a trusted source."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:160
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:162
 msgid ""
 "Please refer to official `certbot User Guide "
 "<https://certbot.eff.org/docs/using.html>`__ for details how to install "
@@ -551,39 +551,39 @@ msgid ""
 "related files will be stored under ``/etc/letsencrypt/live/$domain``"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:167
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:169
 msgid "In that directory, you will find four files:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:169
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:171
 msgid "``privkey.pem`` - private key for the certificate"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:171
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:173
 msgid "``cert.pem`` - contains the server certificate by itself"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:173
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:175
 msgid ""
 "``chain.pem`` - contains the additional intermediate certificate or "
 "certificates"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:175
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:177
 msgid ""
 "``fullchain.pem`` - all certificates, including server certificate (aka "
 "leaf certificate or end-entity certificate). The server certificate is "
 "the first one in this file, followed by any intermediates."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:177
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:179
 msgid ""
 "For Tigase XMPP Server, we are only concerned with ``privkey.pem`` and "
 "``fullchain.pem`` (or ``chain.pem`` - please consider actual issuers and "
 "certification chain!)."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:179
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:181
 msgid ""
 "At this point we will need to obtain the root and intermediate "
 "certificates, this can be done by downloading these certificates from the"
@@ -591,13 +591,13 @@ msgid ""
 "<https://letsencrypt.org/certificates/>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:183
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:185
 msgid ""
 "Please pay utmost attention to the actual certificate issuers and make "
 "sure that the certification chain is maintained!"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:185
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:187
 msgid ""
 "On the time of the writing, LetsEncrypt was providing domain certificates"
 " issued by ``R3`` CertificateAuthorigy (CA). In order to provide complete"
@@ -614,30 +614,30 @@ msgid ""
 "https://letsencrypt.org/certs/trustid-x3-root.pem.txt"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:187
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:189
 msgid "Considering first (recommended) option, you may obtain them using wget:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:194
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:196
 msgid ""
 "These are the root certificate, and the intermediate certificate signed "
 "by root certificate."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:198
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:200
 msgid ""
 "IdenTrust cross-signed certificate will not function properly in the "
 "future!"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:200
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:202
 msgid ""
 "Take the contents of your ``privkey.pem``, certificate, and combine them "
 "with the contents of ``isrgrootx1.pem`` and ``lets-encrypt-r3.pem`` into "
 "a single pem certificate."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:202
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:204
 msgid ""
 "Depending on your configuration you either need to name the file after "
 "your domain such as ``mydomain.com.pem`` and place it under ``certs/`` "
@@ -645,13 +645,13 @@ msgid ""
 "ad-hoc (see :ref:`Storing and managing certificates<certificateStorage>`)"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:204
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:206
 msgid ""
 "If you moved all certs to a single directory, you may combine them using "
 "the following command under \\*nix operating systems:."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:213
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:215
 msgid ""
 "If you are using ``isrgrootx1`` root make sure you use ``cert.pem`` file "
 "instead of ``fullchain.pem``, which uses different intermediate "
@@ -661,64 +661,64 @@ msgid ""
 "<https://letsencrypt.org/certs/trustid-x3-root.pem.txt>`__ certificate!"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:215
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:217
 msgid "Your certificate should look something like this:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:237
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:239
 msgid ""
 "LetsEncrypt certificates expire 90 days from issue and need to be renewed"
 " in order for them to remain valid!"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:239
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:241
 msgid "You can check your certificate with utility class:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:246
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:248
 msgid "Let’s encrypt and DNS verification"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:248
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:250
 msgid ""
 "The only way to obtain wildcard (``*.domain.com``) certificate is via DNS"
 " verification. Certbot support a number of DNS operators - you can check "
 "if your DNS provider is listed by executing ``$ certbot plugins``"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:250
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:252
 msgid "AWS Route53"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:252
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:254
 msgid "If you want to use it with Amazon Cloud you should install plugin for AWS:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:260
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:262
 msgid ""
 "If you are using certbot under macOS and you installed it via brew then "
 "you should use: ``$( brew --prefix certbot )/libexec/bin/pip install "
 "certbot-dns-route53``"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:262
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:264
 msgid ""
 "You should store your credentials in ``~/.aws/credentials`` (you may want"
 " to create dedicated policy for updating DNS as described in `plugin’s "
 "documentation <https://certbot-dns-route53.readthedocs.io/en/stable/>`__:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:270
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:272
 msgid ""
 "And afterward you should execute ``certbot`` with ``--dns-route53`` "
 "parameter"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:273
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:275
 msgid "Certbot update hook and Tigase API"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:275
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:277
 msgid ""
 "For greater automation it’s possible to automate updating certificate "
 "obtained with ``certbot`` in Tigase XMPP Server. You should use following"
@@ -729,7 +729,7 @@ msgid ""
 "UPDATE_DOMAINS)."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:279
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:281
 msgid ""
 "Please adjust account credentials used for deployment (``USER``, "
 "``PASS``, ``DOMAIN``) as well as paths to Let’s Encrypt certificates "
@@ -737,22 +737,22 @@ msgid ""
 " named ``letsencryptauthorityx3.pem``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:362
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:364
 msgid ""
 "If you are not using wildcard certificate when you have to provide "
 "certificate for main domain as well as certificates for subdomains that "
 "mach all components that you want to expose (muc, pubsub, push, etc…)"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:367
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:369
 msgid "Storing and managing certificates"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:370
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:372
 msgid "Filesystem"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:372
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:374
 msgid ""
 "By default Tigase loads and stores certificates in ``certs/`` "
 "subdirectory. Each *domain* certificate should be stored in a file which "
@@ -761,18 +761,18 @@ msgid ""
 "``certs/tigase.net.pem``."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:376
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:378
 msgid ""
 "Tigase tries to be *smart* and automatically detects wildcard domain and "
 "alternative domains so it’s not needed to duplicate same certificate in "
 "multiple files to match domains."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:379
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:381
 msgid "Database repository"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:381
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:383
 msgid ""
 "Alternatively it’s possible to use database as a storage for the "
 "certificates. Upon enabling it certificates won’t be read nor stored to "
@@ -780,7 +780,7 @@ msgid ""
 "``'certificate-container' () {}`` in your TDSL configuration file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Server_Certificates.inc:389
+#: ../../Tigase_Administration/Security/Server_Certificates.inc:391
 msgid ""
 "If you are using database repository then you manage/update certificates "
 "using either ad-hoc command ``Add SSL certificate`` from *VHost Manager* "
@@ -2184,10 +2184,11 @@ msgid ""
 "establishing TLS connections - set of protocols and ciphers that will be "
 "used during negotiation of the connection. The single most important is "
 "``hardened-mode`` - it’s the most general configuration and offers three-"
-"step adjustment of the settings - please see `??? <#hardenedMode>`__ for "
-"details. ``hardened-mode`` can be configured both via TDSL configuration "
-"file (either on ``root`` level or for ``sslContextContainer`` for "
-"particular connection managers) or on VHost level."
+"step adjustment of the settings - please see :ref:`hardened-"
+"mode<hardenedMode>` for details. ``hardened-mode`` can be configured both"
+" via TDSL configuration file (either on ``root`` level or for "
+"``sslContextContainer`` for particular connection managers) or on VHost "
+"level."
 msgstr ""
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:6
@@ -2273,4 +2274,22 @@ msgid ""
 "disabled by default. It can be enabled by setting property ``tls-disable-"
 "tls13`` of ``sslContextContainer`` bean to ``false``:"
 msgstr ""
+
+#~ msgid ""
+#~ "Tigase allows adjusting the most "
+#~ "important parameters used when establishing"
+#~ " TLS connections - set of protocols"
+#~ " and ciphers that will be used "
+#~ "during negotiation of the connection. "
+#~ "The single most important is "
+#~ "``hardened-mode`` - it’s the most "
+#~ "general configuration and offers three-"
+#~ "step adjustment of the settings - "
+#~ "please see `??? <#hardenedMode>`__ for "
+#~ "details. ``hardened-mode`` can be "
+#~ "configured both via TDSL configuration "
+#~ "file (either on ``root`` level or "
+#~ "for ``sslContextContainer`` for particular "
+#~ "connection managers) or on VHost level."
+#~ msgstr ""
 

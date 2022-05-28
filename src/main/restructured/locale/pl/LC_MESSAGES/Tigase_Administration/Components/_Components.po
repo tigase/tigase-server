@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-05-27 19:27-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -223,29 +223,29 @@ msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:6
 msgid ""
-"`Setting up Remote Monitoring in the Server <#Setting-Up-Remote-"
-"Monitoring-in-the-Server>`__"
+":ref:`Setting up Remote Monitoring in the Server<Setting-Up-Remote-"
+"Monitoring-in-the-Server>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:8
-msgid "`Statistics Logger Configuration <#Configuration-of-statistics-loggers>`__"
+msgid "ref:`Statistics Logger Configuration<Configuration-of-statistics-loggers>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:10
 msgid ""
-"`Retrieving Statistics from the Server <#Retrieving-statistics-from-the-"
-"server>`__"
+"ref:`Retrieving Statistics from the Server<Retrieving-statistics-from-"
+"the-server>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:12
-msgid "`Monitor Component <#Monitor-Component>`__"
-msgstr ""
-
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:2
-msgid "Setting Up Remote Monitoring in the Server"
+msgid "ref:`Monitor Component<Monitor-Component>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:4
+msgid "Setting Up Remote Monitoring in the Server"
+msgstr ""
+
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:6
 msgid ""
 "Tigase server can be remotely monitored over following protocols: "
 "``JMX/RMI``, ``SNMP`` and ``HTTP``. Even though ``JMX`` offers the "
@@ -253,53 +253,53 @@ msgid ""
 "monitoring services give the same basic set of the server statistics:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:6
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:8
 msgid "Number of network connections for s2s, c2s and Bosh"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:8
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:10
 msgid ""
 "Last second, last minute and last hour load for all main components: SM, "
 "MR, c2s, s2s, Bosh, MUC and PubSub"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:10
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:12
 msgid ""
 "System statistics - memory usage (heap and non heap) and the server "
 "uptime in milliseconds and human readable text."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:12
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:14
 msgid ""
 "Users statistics - number of registered users and number of online user "
 "session."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:14
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:16
 msgid ""
 "JMX/RMI and SNMP servers offer basic security and can restrict access "
 "while the HTTP server doesn’t offer any access restriction mechanisms. "
 "Therefore HTTP monitoring is recommended to operate behind a firewall."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:16
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:18
 msgid ""
 "The monitoring itself causes very low overhead in terms of the resources "
 "and CPU consumption on top of the normal Tigase processing requirements "
 "so it can be left on without worrying about performance degradation."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:18
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:20
 msgid ""
 "NOTE This works with the Tigase server from version **4.2.0** or build "
 "**1418**."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:21
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:23
 msgid "What You Need"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:23
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:25
 msgid ""
 "Statistics binaries are built-in ``-dist-max`` and no extra files are "
 "needed. If you have downloaded ``-dist`` file, you will need tigase-"
@@ -307,18 +307,18 @@ msgid ""
 " ``jars/`` directory."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:26
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:28
 msgid "Activation"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:28
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:30
 msgid ""
 "You can either run the Tigase installer and use the configuration wizard "
 "to activate the monitoring or edit etc/config.tdsl file and add following"
 " lines:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:44
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:46
 msgid ""
 "As you see there is a separate block for each monitoring server you want "
 "to activate. Each server is responsible for activation of a different "
@@ -326,45 +326,45 @@ msgid ""
 "protocols supported right now:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:46
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:48
 msgid "``jmx`` - activating monitoring via JMX/RMI"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:48
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:50
 msgid "``http`` - activating monitoring over HTTP protocol"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:50
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:52
 msgid "``snmp`` - activating monitoring over SNMP protocol"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:52
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:54
 msgid ""
 "You can have all protocols active at the same time or any combination of "
 "them or none."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:55
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:57
 msgid "Security"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:57
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:59
 msgid ""
 "Both JMX and SNMP offer security protection to limit access to monitoring"
 " data. The security configuration is a bit different for both."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:60
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:62
 msgid "JMX"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:62
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:64
 msgid ""
 "After the server installation or in the SVN repository you can find 2 "
 "files in the ``etc/`` directory: ``jmx.access`` and ``jmx.password``."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:64
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:66
 msgid ""
 "``jmx.access`` is a user permission file. You can use it to specify "
 "whether the user can access the monitoring data for reading only "
@@ -372,7 +372,7 @@ msgid ""
 "entries in the file already and the content may simply look like:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:71
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:73
 msgid ""
 "``jmx.password`` is a user password file. You can set user passwords here"
 " and the format again is very simple and the same as for jmx.access. "
@@ -380,17 +380,17 @@ msgid ""
 "of the file may look like the example below:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:78
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:80
 msgid ""
 "Using above to files you can control who and how can access the JMX "
 "monitoring services."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:80
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:82
 msgid "SNMP"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:82
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:84
 msgid ""
 "Access to SNMP monitoring is controlled using ACL (access control lists) "
 "which can be configured in the file ``snmp.acl`` located in ``etc/`` "
@@ -399,7 +399,7 @@ msgid ""
 "simplest possible configuration may look like this:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:99
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:101
 msgid ""
 "You might also need Tigase MIB definition: `TIGASE-MANAGEMENT-MIB.mib "
 "<https://github.com/tigase/tigase-"
@@ -408,31 +408,31 @@ msgid ""
 "server statistics exposed via SNMP."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:101
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:103
 msgid "HTTP"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:103
+#: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:105
 msgid ""
 "Access the server at example.com:9080 and you will be presented with an "
 "Agent View."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:2
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:4
 msgid "Retrieving statistics from the server"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:4
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:6
 msgid ""
 "By default we can retrieve server statistics using XMPP, no additional "
 "setup is necessary."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:7
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:9
 msgid "Retrieving statistics using XMPP"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:9
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:11
 msgid ""
 "Accessing statistics over XMPP protocol requires any XMPP client capable "
 "of executing `XEP-0050: Ad-Hoc Commands "
@@ -441,11 +441,11 @@ msgid ""
 "administrative) can access the statistics."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:12
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:14
 msgid "Psi XMPP Client"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:14
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:16
 msgid ""
 "For the purpose of this guide `Psi <http://psi-im.org/>`__ client will be"
 " used. After successfully configuring and connecting to account with "
@@ -454,29 +454,29 @@ msgid ""
 "account:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:16
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:18
 msgid "|roster-discovery|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:72
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:74
 msgid "roster-discovery"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:18
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:20
 msgid ""
 "In the *Service Discovery* window we need to find *Server Statistics* "
 "component:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:20
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:22
 msgid "|discovery-stats|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:73
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:75
 msgid "discovery-stats"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:22
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:24
 msgid ""
 "We can either access statistics for all components or select particular "
 "component after expanding the tree. To execute ad-hoc command simply "
@@ -484,26 +484,26 @@ msgid ""
 "statistics:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:24
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:26
 msgid "|server-stats|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:74
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:76
 msgid "server-stats"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:26
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:28
 msgid ""
 "In this window, in addition to see the statistics, we can adjust *Stats "
 "level* by selecting desired level from the list and confirm by clicking "
 "*Finish*."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:29
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:31
 msgid "Retrieving statistics using JMX"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:31
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:33
 msgid ""
 "In order to access statistics over JMX we need to enable support for it "
 "in Tigase - `Monitoring Activation <#monitoring_activation>`__. "
@@ -511,26 +511,26 @@ msgid ""
 "example the following:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:34
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:36
 msgid "JConsole"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:36
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:38
 msgid ""
 "After opening JConsole we either select local process or provide details "
 "of the remote process, including IP, port and credentials from "
 "**etc/jmx.**\\ \\* files:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:38
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:40
 msgid "|jconsole|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:75
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:77
 msgid "jconsole"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:40
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:42
 msgid ""
 "Afterwards we navigate to the MBeans tab from where we can access the "
 "``tigase.stats`` MBean. It offers similar options to XMPP - either "
@@ -538,19 +538,19 @@ msgid ""
 "as well as adjusting level for which we want to obtain statistics:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:42
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:44
 msgid "|jconsole-1|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:76
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:78
 msgid "jconsole-1"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:46
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:48
 msgid "StatsDumper.groovy"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:48
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:50
 msgid ""
 "In order to collect statistics over period of time following groovy "
 "script can be used: `StatsDumper.groovy <files/StatsDumper.groovy>`__. "
@@ -558,51 +558,51 @@ msgid ""
 "all statistics to files."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:50
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:52
 msgid "It takes following parameters:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:56
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:58
 msgid "``hostname`` - address of the instance"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:58
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:60
 msgid "``username`` - JMX username"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:60
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:62
 msgid "``password`` - JMX username"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:62
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:64
 msgid "``dir`` - directory to which save the files with statistics"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:64
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:66
 msgid "``port`` - port on which to make the connection"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:66
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:68
 msgid ""
 "``delay``\\ (ms) - initial delay in milliseconds after which statistics "
 "should be saved"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:68
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:70
 msgid "``interval``\\ (ms) - interval between each retrieval/saving of statistics"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:70
+#: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:72
 msgid ""
 "``loadhistory``\\ (bool) - indicates whether or not load statistics "
 "history from server (if such is enabled in Tigase)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:2
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:4
 msgid "Monitor Component"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:4
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:6
 msgid ""
 "Tigase includes an **Monitor Component** to help with monitoring has been"
 " implemented. This allows you to set thresholds for certain predefined "
@@ -612,7 +612,7 @@ msgid ""
 "Lets begin with setup and requirements."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:6
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:8
 msgid ""
 "Monitor Component is based on eventbus which in turn is based on a "
 "limited `PubSub <http://www.xmpp.org/extensions/xep-0060.html>`__ "
@@ -620,37 +620,37 @@ msgid ""
 "notification."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:8
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:10
 msgid ""
 "Each component or client may subscribe for specific types of events. Only"
 " components on cluster nodes are allowed to publish events."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:11
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:13
 msgid "Setup"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:13
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:15
 msgid ""
 "Monitor Component is enabled by default on v7.1.0 b4001 and later, so no "
 "setup needed!"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:16
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:18
 msgid "How it Works"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:18
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:20
 msgid ""
 "Events in Eventbus are identified by two elements: name of event and its "
 "namespace:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:26
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:28
 msgid "Where event name is ``EventName`` and namespace is ``tigase:demo``."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:28
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:30
 msgid ""
 "Listeners may subscribe for a specific event or for all events with "
 "specific a namespace. Because in pubsub, only one node name exists, so we"
@@ -658,7 +658,7 @@ msgid ""
 "name:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:34
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:36
 msgid ""
 "So for example, to subscribe to ``<EventName xmlns=\"tigase:demo\">``, "
 "node must be: ``EventName|tigase:demo``. If you wish to subscribe to all "
@@ -666,22 +666,22 @@ msgid ""
 "event name: ``*|tigase:demo``."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:36
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:38
 msgid "**Note**"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:38
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:40
 msgid ""
 "If client is subscribed to ``*|tigase:demo node``, then events will not "
 "be sent from node ``*|tigase:demo``, but from the **real** node (in this "
 "case: ``EventName|tigase:demo``)."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:41
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:43
 msgid "Available Tasks"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:43
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:45
 msgid ""
 "Monitor Component has several pre-defined tasks that can be monitored and"
 " set to trigger. What follows is the list of tasks with the options "
@@ -696,23 +696,23 @@ msgstr ""
 msgid "Available Options"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:48
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:57
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:66
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:75
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:85
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:92
-msgid "``enabled`` - Enable or disable task, Boolean value."
-msgstr ""
-
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:50
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:59
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:68
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:77
-msgid "``period`` - Period of running check, Integer value."
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:87
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:94
+msgid "``enabled`` - Enable or disable task, Boolean value."
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:52
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:61
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:70
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:79
+msgid "``period`` - Period of running check, Integer value."
+msgstr ""
+
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:54
 msgid "``threshold`` - Percentage of used space on disk, Float value."
 msgstr ""
 
@@ -720,7 +720,7 @@ msgstr ""
 msgid "**cpu-temp-task** - Used to check CPU temperature."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:61
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:63
 msgid "``cpuTempThreshold`` - Temperature threshold of CPU in °C."
 msgstr ""
 
@@ -728,7 +728,7 @@ msgstr ""
 msgid "**load-checker-task** - Used to check system load."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:70
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:72
 msgid "``averageLoadThreshold`` - Average percent load threshold, Long value."
 msgstr ""
 
@@ -736,13 +736,13 @@ msgstr ""
 msgid "**memory-checker-task** - Used to check memory usage."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:79
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:81
 msgid ""
 "``maxHeapMemUsagePercentThreshold`` - Alarm when percent of used Heap "
 "memory is larger than, Integer value."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:81
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:83
 msgid ""
 "``maxNonHeapMemUsagePercentThreshold`` - Alarm when percent of used Non "
 "Heap memory is larger than, Integer value."
@@ -752,7 +752,7 @@ msgstr ""
 msgid "**logger-task** - Used to transmit log entries depending on level entered."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:87
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:89
 msgid ""
 "``levelThreshold`` - Minimal log level that will be the threshold. "
 "Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, "
@@ -769,29 +769,29 @@ msgid ""
 "percentage) will be fulfilled.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:94
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:96
 msgid "``period`` - Period of running check in ms, Integer value."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:96
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:98
 msgid ""
 "``thresholdMinimal`` - Minimal amount of disconnected users required to "
 "generate alarm."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:98
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:100
 msgid ""
 "``threshold`` - Minimal percent of disconnected users required to "
 "generate alarm."
 msgstr ""
 
 #: ../../Tigase_Administration/Components/C2S.inc:7
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:101
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:304
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:103
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:306
 msgid "Configuration"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:103
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:105
 msgid ""
 "Configuration of the monitor can be done one of two ways; either by lines"
 " in ``config.tdsl`` file, or by sending XMPP stanzas to the server. You "
@@ -800,61 +800,61 @@ msgid ""
 "restarts."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:105
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:107
 msgid "config.tdsl"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:107
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:109
 msgid ""
 "Tasks can be configured in the ``config.tdsl`` file. See `available tasks"
 " <#availableTasks>`__ for the tasks that can be setup."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:109
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:111
 msgid "To enable a specific monitor task, use the following line:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:119
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:121
 msgid ""
 "Where monitor is the component name for ``MonitorComponent``, and "
 "``$TASKNAME`` is one of the `available task names <#availableTasks>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:121
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:123
 msgid ""
 "This format will be the same for other settings for tasks, and it’s best "
 "to group settings under one heading. For example:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:132
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:134
 msgid ""
 "sets the check period to 1000 milliseconds and enables ``connections-"
 "task``."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:136
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:138
 msgid ""
 "Once triggers have been activated, they will become dormant. Think of "
 "these as one-shot settings."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:139
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:141
 msgid "Subscription Limitations"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:141
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:143
 msgid "To define list of JIDs allowed to subscribe for events:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:151
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:153
 msgid "If this is not specified, all users can subscribe."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:153
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:155
 msgid "Configuration via XMPP"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:155
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:157
 msgid ""
 "We can also configure the eventbus monitor component using XMPP stanzas. "
 "This allows us to set and change configurations during server runtime. "
@@ -862,45 +862,45 @@ msgid ""
 "component."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:157
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:159
 msgid ""
 "We can query each component for its current settings using the following "
 "stanza."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:165
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:167
 msgid ""
 "The server will return the component current settings which will make "
 "things easier if you wish to edit them. In this case, the server has "
 "returned the following to us"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:188
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:190
 msgid ""
 "This tells us that the disk-task setting is not active, has a period of "
 "60000ms, and will trigger when disk usage is over 80%."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:190
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:192
 msgid ""
 "To send new settings to the monitor component, we can send a similar "
 "stanza back to the monitor component."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:211
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:213
 msgid ""
 "To which a successful update will give you an XMPP success stanza to let "
 "you know everything is set correctly."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:213
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:215
 msgid ""
 "Alternatively, you can update specific settings by editing a single field"
 " without adding anything else. For example, if we just wanted to turn the"
 " disk-task on we could send the following stanza:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:227
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:229
 msgid ""
 "To set any other values, do not forget that certain parts may need to be "
 "changed, specifically the ``<field type=\"boolean\" "
@@ -913,35 +913,35 @@ msgid ""
 "`Available Tasks <#availableTasks>`__ section."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:231
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:233
 msgid ""
 "``var=x task#`` will be followed by the property value taken directly "
 "from the `Available Tasks <#availableTasks>`__ section."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:234
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:236
 msgid "Getting the Message"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:236
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:238
 msgid ""
 "Without a place to send messages to, monitor will just trigger and shut "
 "down. There are two different methods that monitor can deliver alarm "
 "messages and relevant data; XMPP messages and using the mailer extension."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:238
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:240
 msgid "XMPP notification"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:240
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:242
 msgid ""
 "In order to retrieve notifications, a subscription to the "
 "``eventbus@<VHost>`` user must be made. Keep in mind that subscriptions "
 "are not persistent across server restarts, or triggers."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:241
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:243
 msgid ""
 "The monitor schema is very similar to most XMPP subscription requests but"
 " with a few tweaks to differentiate it if you wanted to subscribe to a "
@@ -954,140 +954,140 @@ msgid ""
 "something like this:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:253
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:255
 msgid ""
 "Don’t forget to replace ``$USER_JID`` with the bare JID of the user you "
 "want to receive those messages. You can even have them sent to a MUC or "
 "any component with a JID."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:255
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:257
 msgid "Available events are as follows:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:257
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:259
 msgid "DiskUsageMonitorEvent for ``disk-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:259
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:261
 msgid "LoggerMonitorEvent for ``logger-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:261
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:263
 msgid "HeapMemoryMonitorEvent for ``memory-checker-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:263
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:265
 msgid "LoadAverageMonitorEvent for ``load-checker-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:265
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:267
 msgid "CPUTempMonitorEvent for ``cpu-temp-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:267
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:269
 msgid "UsersDisconnected for ``connections-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:269
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:271
 msgid ""
 "Alternatively, you can also subscribe to all events within the eventbus "
 "by using a wildcard \\* in place of the event XMLNS like this example:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:281
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:283
 msgid "Sample notification from Monitor"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:298
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:300
 msgid "Mailer Extension"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:300
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:302
 msgid ""
 "*Tigase Server Monitor Mailer Extension* (TSMME) can send messages from "
 "the monitor component to a specified E-mail address so system "
 "administrators who are not logged into the XMPP server."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:302
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:304
 msgid ""
 "For v7.1.0 versions and later, TSMME is already included in your "
 "distribution package and no extra installation is needed."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:306
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:308
 msgid ""
 "Tigase Mailer Extension may be configured via the ``config.tdsl`` file in"
 " the following manner:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:319
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:321
 msgid "Here is an explanation of those variables."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:321
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:323
 msgid "``mailer-smtp-host`` - SMTP Server hostname."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:323
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:325
 msgid "``mailer-smtp-port`` - SMTP Server port."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:325
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:327
 msgid "``mailer-smtp-usernam`` - name of sender account."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:327
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:329
 msgid "``mailer-smtp-password`` - password of sender account."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:329
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:331
 msgid ""
 "``mailer-from-address`` - sender email address. It will be set in field "
 "from in email."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:331
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:333
 msgid ""
 "``mailer-to-addresses`` - comma separated notification receivers email "
 "addresses."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:333
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:335
 msgid ""
 "It is recommended to create a specific e-mail address in your mail server"
 " for this purpose only, as the account settings are stored in plaintext "
 "without encryption."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:2
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:4
 msgid "Configuration of statistics loggers"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:4
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:6
 msgid ""
 "It is possible to enable and configure automatic storage of statistics "
 "information. To do that you need to configure any of following statistics"
 " loggers as a ``StatisticsCollector`` component sub-beans:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:7
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:9
 msgid "``tigase.stats.CounterDataArchivizer``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:7
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:9
 msgid ""
 "every execution put current basic server metrics (CPU usage, memory "
 "usage, number of user connections, uptime) into database (overwrites "
 "previous entry)."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:10
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:12
 msgid "``tigase.stats.CounterDataLogger``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:10
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:12
 msgid ""
 "every execution insert new row with new set of number of server "
 "statistics (CPU usage, memory usage, number of user connections per "
@@ -1095,15 +1095,15 @@ msgid ""
 "into the database."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:13
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:15
 msgid "``tigase.stats.CounterDataFileLogger``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:13
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:15
 msgid "every execution store all server statistics into separate file."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:15
+#: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:17
 msgid ""
 "As an example to configure ``tigase.stats.CounterDataFileLogger`` to "
 "archive statistics data with level ``FINE`` every 60 seconds to file "
@@ -2484,4 +2484,23 @@ msgid ""
 "easiest and flexible way to add, modify or remove entries for services "
 "which will be returned by discovery."
 msgstr ""
+
+#~ msgid ""
+#~ "`Setting up Remote Monitoring in the "
+#~ "Server <#Setting-Up-Remote-Monitoring-"
+#~ "in-the-Server>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Statistics Logger Configuration <#Configuration-"
+#~ "of-statistics-loggers>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Retrieving Statistics from the Server "
+#~ "<#Retrieving-statistics-from-the-server>`__"
+#~ msgstr ""
+
+#~ msgid "`Monitor Component <#Monitor-Component>`__"
+#~ msgstr ""
 

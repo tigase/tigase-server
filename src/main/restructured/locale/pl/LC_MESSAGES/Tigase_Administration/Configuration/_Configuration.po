@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-05-27 19:27-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,7 +32,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:6
 msgid ""
-"`config.tdsl <#dslConfig>`__ file is a simple text file with server "
+":ref:`config.tdsl<dslConfig>` file is a simple text file with server "
 "parameters in form: **key** = **value**. When the XML configuration file "
 "is missing the Tigase server reads ``config.tdsl`` file and uses "
 "parameters found there as defaults for generation of the XML file. "
@@ -46,22 +46,23 @@ msgstr ""
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:8
 msgid ""
-"`tigase.conf <#manualconfig>`__ is the Tigase server startup "
+":ref:`tigase.conf<manualconfig>` is the Tigase server startup "
 "configuration. It is actually not used by the server itself. It rather "
 "contains operating system settings and environment parameters to "
-"correctly run the `Java Virtual Machine <http://java.sun.com/>`__. It is "
-"only useful on the unix-like systems with Bash shell. If you run the "
-"server on MS Windows systems ``tigase.bat`` and ``wrapper.conf`` files "
-"are used instead. The ``tigase.conf`` file is read and loaded by the "
-"``scripts/tigase.sh`` shell script which also scans the operating system "
-"environment for Java VM and other tools needed."
-msgstr ""
-
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:2
-msgid "DSL file format"
+"correctly run the `Java Virtual Machine "
+"<https://www.oracle.com/java/technologies/>`__. It is only useful on the "
+"unix-like systems with Bash shell. If you run the server on MS Windows "
+"systems ``tigase.bat`` and ``wrapper.conf`` files are used instead. The "
+"``tigase.conf`` file is read and loaded by the ``scripts/tigase.sh`` "
+"shell script which also scans the operating system environment for Java "
+"VM and other tools needed."
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:4
+msgid "DSL file format"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:6
 msgid ""
 "In previous Tigase XMPP Server releases configuration was stored in "
 "properties based configuration file. From Tigase XMPP Server 8.0.0 "
@@ -70,24 +71,24 @@ msgid ""
 "core feature of Tigase XMPP Server - Tigase Kernel Framework."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:7
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:9
 msgid "why new format?"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:9
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:11
 msgid ""
 "In properties configuration format each line contained key and value with"
 " optional definition of type of stored value:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:15
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:17
 msgid ""
 "where ``c2s/ports`` was name of property, ``[i]`` defined that type of "
 "value is array of integers, and ``5222,5223`` was comma separated list of"
 " values."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:17
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:19
 msgid ""
 "This format worked but in fact ``c2s/ports`` was not name of property you"
 " configured but key which was later split on ``/`` char to parts which "
@@ -95,7 +96,7 @@ msgid ""
 "you can see that it was domain based setting of properties."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:19
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:21
 msgid ""
 "Except from this multi-part keys we also used properties starting with "
 "``--`` which were global properties accessible for every part of "
@@ -103,21 +104,21 @@ msgid ""
 "needed to write:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:28
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:30
 msgid ""
 "This lead to mistakes like duplicated definition of name and class for "
 "same number of component or redefined property value in other place of a "
 "configuration file - especially in cases where configuration was big."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:30
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:32
 msgid ""
 "In this configuration structure it was hard to tell where is "
 "configuration for particular component or what databases this "
 "installation uses. This could be defined all over the file."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:32
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:34
 msgid ""
 "In this release we are introducing Tigase Kernel Framework, which allows "
 "to configure beans in configuration file and even define usage of new "
@@ -126,35 +127,35 @@ msgid ""
 "difficult and less readable."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:35
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:37
 msgid "What is DSL?"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:37
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:39
 msgid ""
 "DSL stands for domain-specific language - in this case language created "
 "for storage of configuration."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:39
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:41
 msgid ""
 "Now we use domain based configuration which means that our configuration "
 "file is not a flat key=value storage but it defines objects, it's "
 "properties and assigned values."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:41
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:43
 msgid ""
 "To illustrate it better let's start with a simple example. In properties "
 "file in order to configure PubSub component named ``pubsub`` you would "
 "use following properties:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:49
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:51
 msgid "In DSL based configuration this would be replaced by following block"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:58
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:60
 msgid ""
 "in which we define bean with name `pubsub` and set it's class inside "
 "``()`` block to ``tigase.pubsub.PubSubComponent``. We also use block "
@@ -165,17 +166,17 @@ msgid ""
 "wrap whole part containing it in ``''``, ie. ``'test#242'``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:64
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:66
 msgid ""
 "If a string value assigned to a property contains any char from a "
 "following list ``=:,[]#+-*/`` it needs to be wrapped in a ``''``."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:67
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:69
 msgid "Why DSL?"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:69
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:71
 msgid ""
 "DSL configuration format provides a number of advantages over the old "
 "system of configuration. All configurations for components are related in"
@@ -190,7 +191,7 @@ msgid ""
 "able to be in multiple lines."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:71
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:73
 msgid ""
 "Although the format may seem more complex, looking like a section of java"
 " code, the formatting is consistent and can be far more readable. After "
@@ -200,29 +201,29 @@ msgid ""
 " the DSL format using the following command:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:78
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:80
 msgid "Setting property"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:80
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:82
 msgid ""
 "To set property you just write property name followed by `=` and value to"
 " set. This is always done in context of bean which configuration property"
 " you want to set."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:86
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:88
 msgid ""
 "It is also possible to set property in main context by placing property "
 "outside of any context. This sets property which value is available to "
 "access by any bean."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:90
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:92
 msgid "Setting global property"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:92
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:94
 msgid ""
 "Like in properties file it is still possible to use property names "
 "starting with ``--`` without any context or any other properties at "
@@ -231,26 +232,26 @@ msgid ""
 "and accessible by any bean but also set as system property in JVM."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:95
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:97
 msgid "Defining bean"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:97
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:99
 msgid "You can configure bean by using following format:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:105
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:107
 msgid ""
 "where ``beanName`` is name under which you want to configure bean. "
 "`beanName` must be wrapped in ``''``, if ``beanName`` contains characters"
 " like ``=:,[]#+-*/`` and is recommended, if ``beanName`` is numeric only."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:108
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:110
 msgid "Inside block between ``(` and `)`` you can define:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:110
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:112
 msgid ""
 "``class`` which will be used as a bean, in example above we set class as "
 "``className``. *_(default: if you try to configure bean under name which "
@@ -259,13 +260,13 @@ msgid ""
 "as a bean)_*"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:111
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:113
 msgid ""
 "``active`` (boolean) whether you want the bean to be active or not (beans"
 " with ``active`` set to ``false`` are not loaded). *_(default: true)_*"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:112
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:114
 msgid ""
 "``exportable`` (boolean) defines if this bean should be exported and "
 "available for use for beans in inner scopes. This is advanced option in "
@@ -273,7 +274,7 @@ msgid ""
 "*_(default: false)_*"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:114
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:116
 msgid ""
 "Spaces between ``beanName`` and block between ``()`` is optional as well "
 "as space between block ``()`` and block ``{}``. It is recommended that "
@@ -281,7 +282,7 @@ msgid ""
 " first property will be placed in new line."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:119
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:121
 msgid ""
 "Usage of ``()`` block is very important. When this block is used in "
 "configuration it automatically sets ``active`` property of bean "
@@ -289,140 +290,140 @@ msgid ""
 "to fact that default value of ``active`` is ``true``."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:121
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:123
 msgid ""
 "If you omit it in configuration, you will set bean configuration but it "
 "may remain ``inactive``. In this state bean will not be loaded and as a "
 "result will not be used by Tigase XMPP Server."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:124
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:126
 msgid "Configuring bean"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:126
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:128
 msgid ""
 "If you know that bean is defined and you do not want to change it's "
 "activity or class then you can just pass properties to configure bean in "
 "following way:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:136
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:138
 msgid ""
 "where ``beanName`` is name of bean to configure and `test` is name of "
 "property to set to ``true`` in this bean."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:139
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:146
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:141
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:148
 msgid "Format of values"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:141
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:143
 msgid ""
 "In properties based configuration file every property was defined as a "
 "string and only by defining expected format it was properly converted to "
 "expected value. In DSL it is possible to set values in two ways:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:144
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:146
 msgid "as an object"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:144
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:146
 msgid "Using this format you set list as a list and integer is set as an integer."
-msgstr ""
-
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:149
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:203
-msgid "Type"
-msgstr ""
-
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:149
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:203
-msgid "Description"
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:151
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:205
-msgid "**string**"
+msgid "Type"
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:151
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:205
+msgid "Description"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:153
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:207
+msgid "**string**"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:153
 msgid "Wrap it in ``''``, ie. to set ``test`` as string you use ``'test'``"
-msgstr ""
-
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:153
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:207
-msgid "**integer**"
-msgstr ""
-
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:153
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:207
-msgid "Just put value, ie. to set ``543`` use ``543``"
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:155
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:209
-msgid "**long**"
+msgid "**integer**"
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:155
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:209
+msgid "Just put value, ie. to set ``543`` use ``543``"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:157
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:211
+msgid "**long**"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:157
 msgid ""
 "Put value and follow it with ``L``, ie. to set ``23645434`` as long use "
 "``23645434L``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:157
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:211
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:159
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:213
 msgid "**float**"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:157
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:159
 msgid ""
 "Put value and follow it with ``f``, ie. to set ``231.342`` use "
 "``231.342f``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:159
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:213
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:161
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:215
 msgid "**boolean**"
-msgstr ""
-
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:159
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:213
-msgid "To set value just use ``true`` or ``false``"
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:161
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:215
+msgid "To set value just use ``true`` or ``false``"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:163
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:217
 msgid "**list**"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:161
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:163
 msgid ""
 "Lists can be of many types and to make it simple we decided to use as a "
 "comma separated list of values in proper format wrapped in ``[]``."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:163
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:165
 msgid "of strings - ``[ 'alfa', 'beta', 'gamma' ]``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:165
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:167
 msgid "of integers - ``[ 1, 2, 3, 4]``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:167
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:169
 msgid "You can write it in multiple lines if you want:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:177
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:217
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:179
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:219
 msgid "**map**"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:177
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:179
 msgid ""
 "Maps can be written as a block of properties wrapped in ``{}``. This "
 "format of map is the same as used for passing configuration to bean "
@@ -430,52 +431,52 @@ msgid ""
 "*(recommended)*:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:190
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:192
 msgid "or in single line *(separation with spaces is not required)*:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:198
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:200
 msgid "as a plain string"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:198
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:200
 msgid ""
 "Very similar to properties based configuration, in fact values are passed"
 " in same format and later are converted to correct type by checking type "
 "expected by bean. *(Not recommended)*"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:200
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:202
 msgid "Types"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:205
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:207
 msgid "Just put value, ie. to set ``test`` use ``test``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:209
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:211
 msgid "Put value, ie. to set ``23645434`` as long use ``23645434``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:211
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:213
 msgid "Put value, ie. to set ``231.342`` use ``231.342``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:215
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:217
 msgid ""
 "List needs to be written as comma separated list of values, ie. "
 "``test,abc,efg`` or ``1,2,3``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:217
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:219
 msgid "Not possible"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:222
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:224
 msgid "Using values from System Properties and Environment Variables"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:224
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:226
 msgid ""
 "Now it is possible to use values of `system properties "
 "<https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html>`__"
@@ -485,29 +486,29 @@ msgid ""
 "which can be used in DSL and which will return values of:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:227
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:229
 msgid "system property"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:227
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:229
 msgid "``prop('property-name')`` or ``prop('property-name','default value')``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:230
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:232
 msgid "environment variable"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:230
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:232
 msgid "``env('variable-name')``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:232
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:234
 msgid ""
 "**Example of setting value of system property and environment variable to"
 " bean ``user``.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:245
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:247
 msgid ""
 "For properties which accepts lists it is not allowed to set value using "
 "variable/property with comma separated values like ``value1,value2`` "
@@ -515,11 +516,11 @@ msgid ""
 "to be set in following way ``property = env('some-variable')``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:248
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:250
 msgid "Computed values"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:250
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:252
 msgid ""
 "With DSL configuration format we introduce support for computable values "
 "for properties. It is now possible to set value which is result of a "
@@ -527,29 +528,29 @@ msgid ""
 "expression. We currently support only following mathematical operations:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:252
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:254
 msgid "add"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:254
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:256
 msgid "subtract"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:256
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:258
 msgid "multiply"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:258
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:260
 msgid "divide"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:260
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:262
 msgid ""
 "**Example of setting environment variable related path and computed "
 "timeout.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:276
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:278
 msgid ""
 "For properties which accepts lists it is not allowed to set value using "
 "computed values with comma separated values like ``value1,value2`` "
@@ -558,11 +559,11 @@ msgid ""
 "variable') + ',other-value'``."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:279
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:281
 msgid "Period / Duration values"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:281
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:283
 msgid ""
 "Some configuration options allow control of execution of tasks with "
 "particular period or within certain duration. DSL file format accepts "
@@ -574,78 +575,78 @@ msgid ""
 "java.lang.CharSequence->`__ for detailed explanation)."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:283
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:285
 msgid ""
 "``Duration`` formats accepted are based on the ISO-8601 duration format "
 "``PnDTnHnMn.nS`` with days considered to be exactly 24 hours, for "
 "example:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:285
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:287
 msgid "``PT20.345S`` - 20.345 seconds"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:287
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:289
 msgid "``PT15M`` - 15 minutes (where a minute is 60 seconds)"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:289
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:291
 msgid "``PT10H`` - 10 hours (where an hour is 3600 seconds)"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:291
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:293
 msgid "``P2D`` - 2 days (where a day is 24 hours or 86400 seconds)"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:293
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:295
 msgid "``P2DT3H4M`` - 2 days, 3 hours and 4 minutes"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:295
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:297
 msgid ""
 "``Period`` format is based on the ISO-8601 period formats PnYnMnD and "
 "PnW, for example, the following are valid inputs:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:297
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:299
 msgid "``P2Y`` - 2 years"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:299
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:301
 msgid "``P3M`` - 3 months"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:301
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:303
 msgid "``P4W`` - 4 weeks"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:303
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:305
 msgid "``P5D`` - 5 days"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:305
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:307
 msgid "``P1Y2M3D`` - 1 year, 2 months, 3 days"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:307
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:309
 msgid "``P1Y2M3W4D`` - 1 year, 2 months, 3 weeks, 4 days"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:311
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:313
 msgid "Example configuration file in DSL"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:389
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:391
 msgid "Default configuration"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:391
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:393
 msgid ""
 "Tigase XMPP Server is packaged with a basic ``config.tdsl`` file that "
 "tells the server to start up in setup mode."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:404
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:406
 msgid ""
 "This tells Tigase to operate in a setup mode, and tells the http "
 "component to allow login with the username and password admin/tigase. "
@@ -653,45 +654,45 @@ msgid ""
 "section <#webinstall>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:406
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:408
 msgid ""
 "There are other options for config-type: ``default``, ``session-"
 "manager``, ``connection-managers``, and ``component``. For more "
 "information, visit `Config Type <#configType>`__ property description."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:2
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:4
 msgid "Startup File for tigase.sh - tigase.conf"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:4
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:6
 msgid ""
 "Property file names for ``tigase.sh`` startup script is a second "
 "parameter for the startup script. It can be skipped if environmental "
 "variables are set in different location or in different way."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:6
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:8
 msgid ""
 "Config file for startup script simply sets number of environment "
 "variables with the location of required components. Possible variables to"
 " set in this file are:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:8
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:10
 msgid ""
 "``JAVA_HOME`` - location of Java installation home directory. **Must be "
 "set**."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:10
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:12
 msgid ""
 "``TIGASE_HOME`` - location of Tigase installation home directory. *By "
 "default script try to find this location by searching directories from "
 "the location where the script has been run.*"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:12
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:14
 msgid ""
 "``TIGASE_CONSOLE_LOG`` - file to which all console messages will be "
 "redirected if server is run in background. By default it will be: "
@@ -700,19 +701,19 @@ msgid ""
 "/dev/null**"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:14
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:16
 msgid ""
 "``TIGASE_PID`` location of the file with server PID number. By default it"
 " will be ``TIGASE_HOME/logs/tigase.pid``."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:16
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:18
 msgid ""
 "``JAVA_OPTIONS`` - options for JVM like size of RAM allocated for the "
 "JVM, properties and so on."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:18
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:20
 msgid ""
 "``TIGASE_OPTIONS`` - (optional) additional options for Tigase server "
 "program. You can tweak initial parameters for your environment here. If "
@@ -720,11 +721,11 @@ msgid ""
 " use ``--config-file <path/to/config.tdsl>`` configuration"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:20
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:22
 msgid "Sample file to run **Tigase** with **PostgreSQL** database may look like:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:31
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:33
 msgid ""
 "Please note encoding settings. JVM by default uses encoding set in "
 "operating system environment. XMPP protocol, however uses ``UTF-8`` for "
@@ -732,7 +733,7 @@ msgid ""
 "all operations."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Startup_Files.inc:33
+#: ../../Tigase_Administration/Configuration/Startup_Files.inc:35
 msgid ""
 "Another significant setting is \\\\'**CLASSPATH**'. It is intentionally "
 "set to an empty string. The **tigase.sh** startup script builds the "
@@ -1570,11 +1571,11 @@ msgstr ""
 msgid "This replaces the old ``--sm-cluster-strategy-class`` setting from v7.1."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:2
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:4
 msgid "Virtual Hosts in Tigase Server"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:4
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:6
 msgid ""
 "Tigase server supports multiple virtual hosts in a single server "
 "installation. Virtual hosts can be added or removed, enabled or disabled "
@@ -1582,13 +1583,13 @@ msgid ""
 "operation."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:6
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:8
 msgid ""
 "This document describes how virtual hosts work in Tigase server and how "
 "to get the most out of this feature in your installation."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:8
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:10
 msgid ""
 "The `'default-virtual-host' <#virtHosts>`_ property allows to define name"
 " of the single vhost domain which will be considered a default vhost "
@@ -1597,7 +1598,7 @@ msgid ""
 "commands."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:10
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:12
 msgid ""
 "Virtual hosts should be managed using ad-hoc commands or admin ui, visit "
 "`Add and Manage Domains <#addManageDomain>` for description of vhosts "
@@ -1606,7 +1607,7 @@ msgid ""
 "hoc commands."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:12
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:14
 msgid ""
 "If you have components that may not be able to handle multiple vhosts or "
 "cluster mode, we have developed a virtual component solution as well, "
@@ -1614,18 +1615,18 @@ msgid ""
 "<#virtualComponents>`__ section."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:14
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:16
 msgid ""
 "You may also want to reference the Vhosts API for additional information:"
 " - `API Description for Virtual Domains Management in Tigase Server "
 "<#addManageDomain>`."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:22
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:24
 msgid "Default VHost configuration"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:24
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:26
 msgid ""
 "It’s possible to specify initial default configuration for all Virtual "
 "Host in TDSL configuration file (i.e. ``etc/config.tdsl``) for selected "
@@ -1633,7 +1634,7 @@ msgid ""
 "``defaults`` bean belonging to ``vhost-man`` bean:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:42
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:44
 msgid ""
 "After initial definition of default configuration or after first startup "
 "of Tigase XMPP Server it is possible to configure Virtual Host defaults "
@@ -1642,42 +1643,42 @@ msgid ""
 "Domains <#adhocCommands>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:44
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:46
 msgid ""
 "Alternatively, you may edit default Virtual Host configuration "
 "(configuration for domain ``default``) using Admin UI which by default is"
 " available at ``http://localhost:8080/admin/``."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:49
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:51
 msgid "Specification for ad-hoc Commands Used to Manage Virtual Domains"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:51
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:53
 msgid ""
 "There are 3 ad-hoc commands for virtual domains management in the Tigase "
 "server:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:53
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:55
 msgid ""
 "``VHOSTS_RELOAD`` used to reload virtual domains list from the repository"
 " (database)."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:55
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:57
 msgid ""
 "``VHOSTS_UPDATE`` used to add a new virtual domain or update information "
 "for existing one."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:57
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:59
 msgid ""
 "``VHOSTS_REMOVE`` used to remove an existing virtual host from the "
 "running server."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:59
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:61
 msgid ""
 "Syntax of the commands follows the specification described in `XEP-0050 "
 "<http://xmpp.org/extensions/xep-0050.html>`__. Extra information required"
@@ -1685,7 +1686,7 @@ msgid ""
 "<http://xmpp.org/extensions/xep-0004.html>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:61
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:63
 msgid ""
 "All commands are accepted by the server only when send by the "
 "installation administrator. If the command is sent from any other account"
@@ -1694,7 +1695,7 @@ msgid ""
 "configuration file."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:63
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:65
 msgid ""
 "Commands are sent to the 'vhost-man' server component and the 'to' "
 "attribute of the stanza must contain a full JID of the VHostManager on "
@@ -1705,45 +1706,45 @@ msgid ""
 "'vhost-man@existing.domain.com'."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:66
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:68
 msgid "Reloading the Domains List from the Database"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:68
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:70
 msgid ""
 "In order to reload virtual domains from the permanent repository other "
 "than configuration file, you have to send ``VHOSTS_RELOAD`` ad-hoc "
 "command to the VHostManager on the server."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:70
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:72
 msgid "The reload command request is of the form:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:81
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:83
 msgid ""
 "The server sends a response upon successful completion of the command "
 "with current number of virtual domains server by the installation:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:100
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:102
 msgid ""
 "If the command is sent from an account other than admin, the server "
 "returns an error:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:119
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:121
 msgid ""
 "The response doesn’t have any special meaning other then end-user "
 "information. The client may ignore the response as it is sent after the "
 "command has been executed."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:122
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:124
 msgid "Adding a New Domain or Updating Existing One"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:124
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:126
 msgid ""
 "In order to add a new domain or update existing one you have to send an "
 "ad-hoc command ``VHOSTS_UPDATE`` with at least one domain name in the "
@@ -1755,43 +1756,43 @@ msgid ""
 "parameters not specified yet."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:126
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:128
 msgid "The domain add/update command request is of the form:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:148
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:150
 msgid ""
 "Please note: Character case in the command field variable names does "
 "matter."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:150
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:192
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:152
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:194
 msgid ""
 "Upon successful completion of the command the server sends a response "
 "back to the client with information of the existing number of virtual "
 "hosts on the server:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:170
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:172
 msgid "Removing a Virtual Domain From the Server"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:172
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:174
 msgid ""
 "In order to remove a virtual domain you have to send ``VHOSTS_REMOVE`` "
 "command to the server with the domain name."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:174
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:176
 msgid "The domain remove command is sent by the client:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:214
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:216
 msgid "Virtual Components for the Cluster Mode"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:216
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:218
 msgid ""
 "Let’s assume you have a cluster installation and you want to include a "
 "component in your installation which doesn’t support the cluster mode "
@@ -1801,7 +1802,7 @@ msgid ""
 "connected to this one node only."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:218
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:220
 msgid ""
 "Ideally you would like to have a mechanism to install it on one node and "
 "put some redirections on other nodes to forward all packets for this "
@@ -1811,7 +1812,7 @@ msgid ""
 "nodes."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:220
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:222
 msgid ""
 "This is where the virtual components are handy. They are visible to users"
 " as a local normal component, they seem to be a real local component but "
@@ -1819,7 +1820,7 @@ msgid ""
 "the real component is working."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:222
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:224
 msgid ""
 "Virtual component is a very lightweight ServerComponent implementation in"
 " Tigase server. It can pretend to be any kind of component and can "
@@ -1828,7 +1829,7 @@ msgid ""
 "component protocol (XEP-0114)."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:224
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:226
 msgid ""
 "Configuration is very simple and straightforward, in fact it is very "
 "similar to configuration of any Tigase component. You set a real "
@@ -1838,14 +1839,14 @@ msgid ""
 " name of the component is: ``muc``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:230
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:232
 msgid ""
 "This is pretty much all you need to load a virtual component. A few other"
 " options are needed to point to correct destination addresses for packets"
 " forwarding and to set correct service discovery parameters:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Vhosts.inc:244
+#: ../../Tigase_Administration/Configuration/Vhosts.inc:246
 msgid "That’s it."
 msgstr ""
 
@@ -2381,4 +2382,45 @@ msgid ""
 "stanza to enable push notification but without ``away`` attribute being "
 "set:"
 msgstr ""
+
+#~ msgid ""
+#~ "`config.tdsl <#dslConfig>`__ file is a "
+#~ "simple text file with server parameters"
+#~ " in form: **key** = **value**. When"
+#~ " the XML configuration file is "
+#~ "missing the Tigase server reads "
+#~ "``config.tdsl`` file and uses parameters "
+#~ "found there as defaults for generation"
+#~ " of the XML file. Therefore if "
+#~ "you change the ``config.tdsl`` file you"
+#~ " normally have to stop the server,"
+#~ " remove the XML file and start "
+#~ "the server again. All the settings "
+#~ "from the ``config.tdsl`` are read and"
+#~ " applied to the XML configuration. "
+#~ "The properties file is easy to "
+#~ "read and very safe to modify. At"
+#~ " the moment this is the recommended"
+#~ " way change the server configuration."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`tigase.conf <#manualconfig>`__ is the Tigase"
+#~ " server startup configuration. It is "
+#~ "actually not used by the server "
+#~ "itself. It rather contains operating "
+#~ "system settings and environment parameters "
+#~ "to correctly run the `Java Virtual "
+#~ "Machine <http://java.sun.com/>`__. It is only"
+#~ " useful on the unix-like systems "
+#~ "with Bash shell. If you run the"
+#~ " server on MS Windows systems "
+#~ "``tigase.bat`` and ``wrapper.conf`` files are"
+#~ " used instead. The ``tigase.conf`` file "
+#~ "is read and loaded by the "
+#~ "``scripts/tigase.sh`` shell script which also"
+#~ " scans the operating system environment "
+#~ "for Java VM and other tools "
+#~ "needed."
+#~ msgstr ""
 
