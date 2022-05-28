@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-05-27 19:27-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,66 +29,65 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:6
-msgid "`Tigase Log Guide <#Tigase-Log-Guide>`__"
+msgid ":ref:`Tigase Log Guide<Tigase-Log-Guide>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:8
-msgid "`Debugging Tigase <#Debuging-Tigase>`__"
+msgid "ref:`Debugging Tigase<Debuging-Tigase>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:10
-msgid "`Basic System Checks <#Basic-System-Checks>`__"
+msgid "ref:`Basic System Checks<Basic-System-Checks>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:12
-msgid "`Add and Manage Domains <#Add-and-Manage-Domains-(VHosts)>`__"
+msgid "ref:`Add and Manage Domains<addManageDomain>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:14
-msgid "`Presence Forwarding <#Presence-Forwarding>`__"
+msgid "ref:`Presence Forwarding<Presence-Forwarding>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:16
-msgid "`Watchdog <#Watchdog>`__"
+msgid "ref:`Watchdog<Watchdog>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:18
-msgid "`Runtime Environment Tip <#Tigase-Tip-Checking-the-Runtime-Environment>`__"
+msgid "ref:`Runtime Environment Tip<Tigase-Tip-Checking-the-Runtime-Environment>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:20
-msgid "`Checking Cluster Connections <#Checking-Cluster-Connections>`__"
+msgid "ref:`Checking Cluster Connections<Checking-Cluster-Connections>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:22
 msgid ""
-"`Best Practices for Connecting to Tigase XMPP server From Web Browser "
-"<#Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-"
-"Browser>`__"
+"ref:`Best Practices for Connecting to Tigase XMPP server From Web Browser"
+"<Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-Browser>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:24
-msgid "`Scripting Support in Tigase <#Scripting-support-in-Tigase>`__"
+msgid "`Scripting Support in Tigase<Scripting-support-in-Tigase>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:26
 msgid ""
-"`Scripting Introduction - Hello World! <#Scripting-Introduction - Hello-"
-"World!>`__"
+"ref:`Scripting Introduction - Hello World!<Scripting-Introduction - "
+"Hello-World!>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:28
 msgid ""
-"`Tigase Scripting Version 4.4.x Update for Administrators <#Tigase-"
-"Scripting-Version-4.4.x-Update-for-Administrators>`__"
+"ref:`Tigase Scripting Version 4.4.x Update for Administrators<Tigase-"
+"Scripting-Version-4.4.x-Update-for-Administrators>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:30
-msgid "`Tigase and Python Scripting <#Tigase-and-Python>`__"
+msgid "ref:`Tigase and Python Scripting<Tigase-and-Python>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:32
-msgid "`Configuration Wizards <#tigase3xconfiguration>`__"
+msgid "ref:`Configuration Wizards<tigase3xconfiguration>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:2
@@ -640,24 +639,24 @@ msgid ""
 "log files will be made. Files in the original location will be left."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:4
 msgid "Debuging Tigase"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:6
 msgid ""
 "If something goes wrong and you can’t find out why it is not working as "
 "expected, you might want more detailed debugging options switched on."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:6
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:8
 msgid ""
 "Tigase is a Java application and it uses Java logging library, this gives"
 " you the flexibility to switch logging on for selected Java packages or "
 "even for a single Java class."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:8
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:10
 msgid ""
 "Logs files are stored in ``logs/`` directory. ``tigase-console.log`` "
 "stores basic log data, but is the main log file. ``tigase.log.N`` files "
@@ -666,17 +665,17 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:25
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:11
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:13
 msgid "Configuration"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:13
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:15
 msgid ""
 "By default, Tigase has the old ``debug = ['server']`` setting is turned "
 "on and does not need to be added."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:15
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:17
 msgid ""
 "However, people want to see what is going on the network level. That is "
 "what has been sent and what has been received by the server - the actual "
@@ -685,49 +684,49 @@ msgid ""
 " info for this class you have to modify the debug line:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:21
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:23
 msgid ""
 "You can also have debugging switched on for many packages/classes at the "
 "same time:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:27
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:29
 msgid "Other packages you might be interested in are:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:29
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:31
 msgid ""
 "``io`` can print out what is going on a very low level network level "
 "including TLS/SSL stuff."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:31
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:33
 msgid "``xml`` would print the XML parser debugging data."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:33
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:35
 msgid "``cluster`` would print all the clustering related stuff."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:35
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:37
 msgid "``xmpp.impl`` would print logs from all plugins loaded to Tigase server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:38
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:40
 msgid "Non-Tigase packages"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:40
+#: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:42
 msgid ""
 "To enable logging for your own packages from those different than Tigase,"
 " you have to use another option which has been made available for this:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:4
 msgid "Basic System Checks"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:6
 msgid ""
 "Previously, a configuration article is available about `Linux settings "
 "for high load systems <#linuxhighload>`__. This has a description of "
@@ -735,7 +734,7 @@ msgid ""
 "hundreds or thousands of online users."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:6
+#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:8
 msgid ""
 "Of course, high load and high traffic systems require much more tuning "
 "and adjustments. If you use selinux you have to be careful as it can "
@@ -745,7 +744,7 @@ msgid ""
 "the traffic."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:8
+#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:10
 msgid ""
 "In any case, there are some basic checks to do every time you deploy XMPP"
 " service to make sure it will function properly. I am trying to keep the "
@@ -755,21 +754,21 @@ msgid ""
 "add, please let me know.*"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:10
+#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:12
 msgid ""
 "If you want to run a service on a few cluster nodes (5 or even 10), then "
 "manually checking every machine and adjusting these settings is time "
 "consuming and it is very easy to forget about."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:12
+#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:14
 msgid ""
 "To overcome this problem I started to work on a shell script which would "
 "run all the basic checks and report problems found. Ideally it should be "
 "also able to adjust some parameters for you."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:14
+#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:16
 msgid ""
 "Inside the Tigase server `scripts/ <https://github.com/tigase/tigase-"
 "server/blob/master/scripts/>`__ repository find a script called "
@@ -779,7 +778,7 @@ msgid ""
 "check.sh>`__ and run for yourself."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:16
+#: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:18
 msgid "Any comments or suggestions, as usual, are very much appreciated."
 msgstr ""
 
@@ -798,7 +797,7 @@ msgid "There are two ways of managing domains you host on your server:"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:10
-msgid "using web-based admin management console - `Admin UI <#usingAdminUI>`__"
+msgid "using web-based admin management console - :ref:`Admin UI<usingAdminUI>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:12
@@ -811,15 +810,15 @@ msgstr ""
 msgid ""
 "To use any of those ways, you need to be an administrator of the server, "
 "which means that you have a XMPP account created on this XMPP server and "
-"your account JID is added to `the list of the administrators <#admins>`__"
-" in the Tigase XMPP Server configuration file."
-msgstr ""
-
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:19
-msgid "Using Admin UI"
+"your account JID is added to :ref:`the list of the "
+"administrators<admins>` in the Tigase XMPP Server configuration file."
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:21
+msgid "Using Admin UI"
+msgstr ""
+
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:23
 msgid ""
 "First, you need to open Admin UI web page. By default Admin UI is enabled"
 " and available at the port ``8080`` at path ``/admin/`` on the XMPP "
@@ -827,7 +826,7 @@ msgid ""
 "Tigase XMPP Server, it will be available at http://localhost:8080/admin/."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:23
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:25
 msgid ""
 "When you will be prompted for username and password to login to the Admin"
 " UI please fill username with full JID of your XMPP admin account and "
@@ -836,47 +835,47 @@ msgid ""
 "Server configuration and management web-based interface."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:26
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:28
 msgid "Adding a new domain"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:28
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:30
 msgid ""
 "To add a new domain you need to open ``Configuration`` section of the "
 "Admin UI (by clicking on ``Configuration`` label and then selecting ``Add"
 " new item`` position which mentions ``vhost-man``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:30
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:32
 msgid "|adminui vhost add item button|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:136
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:138
 msgid "adminui vhost add item button"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:32
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:34
 msgid ""
 "After doing that, you will be presented with a form which you need to "
 "fill in. This form allows you to pass ``Domain name`` to add and other "
 "options (some of the are advanced options)."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:34
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:36
 msgid "|adminui vhost add item form|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:137
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:139
 msgid "adminui vhost add item form"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:38
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:40
 msgid ""
 "All options with exception of ``Domain name`` may be changed later on by "
 "modifying vhost settings."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:40
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:42
 msgid ""
 "When you will be ready, please submit the form using button below the "
 "form. As a result you will be presented with a result of this operation. "
@@ -885,62 +884,62 @@ msgid ""
 " which you encountered."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:43
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:45
 msgid "Modifying domain settings"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:45
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:47
 msgid ""
 "Modifying a domain settings is very similar to adding a new domain. You "
 "need to open ``Configuration`` section of the Admin UI and then select "
 "``Update item configuration`` position which mentions ``vhost-man``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:47
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:49
 msgid "|adminui vhost update item button|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:138
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:140
 msgid "adminui vhost update item button"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:49
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:51
 msgid ""
 "You will be presented with a list of domains hosted on this Tigase XMPP "
 "Server installation. From them you should choose the one for which you "
 "wish to modify settings."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:51
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:53
 msgid "|adminui vhost update item domains list|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:139
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:141
 msgid "adminui vhost update item domains list"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:53
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:55
 msgid ""
 "After submitting this selection, you will be presented with a the same "
 "form as the one used during adding a new domain. It presents "
 "configuration options for this domain and currently used values."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:55
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:57
 msgid "|adminui vhost update item form|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:140
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:142
 msgid "adminui vhost update item form"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:57
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:59
 msgid ""
 "Now you should adjust them as you wish and submit this form using the "
 "button below the form."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:59
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:61
 msgid ""
 "As a result you will be presented with a result of this operation. If it "
 "was successful it show ``Operation successful`` message and if something "
@@ -948,11 +947,11 @@ msgid ""
 " encountered."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:62
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:64
 msgid "Removing a domain"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:64
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:66
 msgid ""
 "Removing a hosted domain from the Tigase XMPP Server installation is "
 "quite simple as well. You need to open ``Configuration`` section of the "
@@ -960,30 +959,30 @@ msgid ""
 "``vhost-man``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:66
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:68
 msgid "|adminui vhost remove item button|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:141
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:143
 msgid "adminui vhost remove item button"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:68
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:70
 msgid ""
 "You will be presented with a list of domains hosted on this Tigase XMPP "
 "Server installation. From them you should select the one which should be "
 "removed."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:70
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:72
 msgid "|adminui vhost remove item domains list|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:142
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:144
 msgid "adminui vhost remove item domains list"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:72
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:74
 msgid ""
 "After submitting your selection, Tigase XMPP Server will try to remove "
 "this domain from the list of hosted domains and will present you with the"
@@ -992,11 +991,11 @@ msgid ""
 "this issue which you encountered."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:75
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:77
 msgid "Using ad-hoc commands"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:77
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:79
 msgid ""
 "For everybody interested in using our service to host their own XMPP "
 "domain we have good news! You do not have to ask an administrator to add "
@@ -1004,19 +1003,19 @@ msgid ""
 "own."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:79
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:81
 msgid ""
 "Please note, this is very new stuff. Something may go wrong or may not be"
 " polished. Please report any problems, notices or suggestions."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:81
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:83
 msgid ""
 "This is the guide to walk you through the new functions and describes how"
 " to add a new domain and new users within your domain."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:83
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:85
 msgid ""
 "You can do everything from your XMPP client or you can use our web "
 "application that allows you to connect to the service and execute admin "
@@ -1026,7 +1025,7 @@ msgid ""
 "can only offer support and help if you use Psi client."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:85
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:87
 msgid ""
 "Secondly, you need an account on the server. This is because all the "
 "commands and features described here are available to local users only. "
@@ -1035,32 +1034,32 @@ msgid ""
 "<http://www.tigase.im/>`__ or `Jabber.Today <http://jabber.today/>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:88
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:90
 msgid "Adding a New Domain"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:90
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:92
 msgid ""
 "Once you register an account on one of the websites, connect to the XMPP "
 "server using the account on the Psi client. We will be using the "
 "following account: green@tigase.im which is this guide."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:92
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:94
 msgid ""
 "When you are ready right click on the account name in Psi roster window "
 "to bring up context menu. Select **Service Discovery** element."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:94
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:96
 msgid "|service disco menu|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:143
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:145
 msgid "service disco menu"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:96
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:98
 msgid ""
 "A new windows pops up as in the example on the right. The service "
 "discovery window is where all the stuff installed on XMPP service should "
@@ -1069,15 +1068,15 @@ msgid ""
 " are 2 elements: **VHost Manager** and **Session Manager**."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:98
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:100
 msgid "|service disco window vhost|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:144
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:146
 msgid "service disco window vhost"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:100
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:102
 msgid ""
 "**VHost Manager** component in Tigase is responsible for managing and "
 "controlling virtual hosts on the installation. It provides virtual hosts "
@@ -1085,14 +1084,14 @@ msgid ""
 "new hosts and remove/update existing virtual hosts."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:102
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:104
 msgid ""
 "**Session Manager** component in Tigase is responsible for managing "
 "users. In most cases online users but it can also perform some actions on"
 " user repository where all user data is stored."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:104
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:106
 msgid ""
 "Select **VHost Manager** and double click on it. A new windows shows up "
 "(might be hidden behind the service discovery window). The window "
@@ -1101,15 +1100,15 @@ msgid ""
 "information. For now, just select the first element **Add…​.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:106
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:108
 msgid "|command menu add vhost|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:145
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:147
 msgid "command menu add vhost"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:108
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:110
 msgid ""
 "Click **Execute** and you get a new window where you can enter all of "
 "your VHost configuration details. All fields should be self explanatory. "
@@ -1122,15 +1121,15 @@ msgid ""
 "manage users for the domain."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:110
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:112
 msgid "|add vhost window|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:146
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:148
 msgid "add vhost window"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:112
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:114
 msgid ""
 "When you are ready click the **Finish** button. All done, hopefully. You "
 "can get either a window confirming everything went well or a window "
@@ -1143,26 +1142,26 @@ msgid ""
 " Please refer to these instructions if you need more details."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:115
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:117
 msgid "Adding a New User"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:117
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:119
 msgid ""
 "Adding a new user process is quite similar, almost identical to adding a "
 "new domain. This time, however we have to select **Session Manager** in "
 "the service discovery window."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:119
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:121
 msgid "|service disco window sm|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:147
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:149
 msgid "service disco window sm"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:121
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:123
 msgid ""
 "Double click on the **Session Manager** and a window with SM’s commands "
 "list shows up. Right now, there is only one command available to domain "
@@ -1170,29 +1169,29 @@ msgid ""
 " in the future and I am waiting for your suggestions."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:123
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:125
 msgid "|command menu add user|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:148
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:150
 msgid "command menu add user"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:125
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:127
 msgid ""
 "If you click **Execute** a window presented on the left shows up. Fill "
 "all fields accordingly and press **Finish**."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:127
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:129
 msgid "|add user window|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:149
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:151
 msgid "add user window"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:129
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:131
 msgid ""
 "If everything went well you have just added a new user and you should get"
 " a window confirming successful operation. If something went wrong, a "
@@ -1202,11 +1201,11 @@ msgid ""
 "existen domain."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:132
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:134
 msgid "SSL Certificate Management"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:134
+#: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:136
 msgid ""
 "SSL Certificate Management has been implemented, and certificates can be "
 "manipulated when in a .pem form. For more details, see `Creating and "
@@ -1214,36 +1213,36 @@ msgid ""
 "documentation for more information."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:4
 msgid "Presence Forwarding"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:6
 msgid ""
 "Have you ever thought of displaying your users presence status on the "
 "website? Or, maybe, you wanted to integrate XMPP service with your own "
 "system and share not only users' accounts but also presence status?"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:6
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:8
 msgid ""
 "Not only is it possible but also very simple. You have a new option in "
 "the domain control form."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:8
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:10
 msgid "Actually there are 2 new options:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:10
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:12
 msgid "Presence forward address"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:12
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:14
 msgid "Message forward address - not fully implemented yet"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:14
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:16
 msgid ""
 "Presence forward address can be any XMPP address. Usually you want it to "
 "be a bot address which can collect your users' presence information. Once"
@@ -1257,15 +1256,15 @@ msgid ""
 "won’t be delivered to the bot."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:16
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:18
 msgid "|vhost presence forward|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:60
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:62
 msgid "vhost presence forward"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:18
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:20
 msgid ""
 "As the screenshot shows, there are new input lines with option for "
 "presence forwarding address and message forwarding address. As you can "
@@ -1273,7 +1272,7 @@ msgid ""
 "have a different forward address for each domain."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:20
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:22
 msgid ""
 "If you have your own Tigase installation, the forwarding address can be "
 "also set globally and can be the same for all domains. However, for this "
@@ -1281,7 +1280,7 @@ msgid ""
 "this can be set on per-domain basis."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:22
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:24
 msgid ""
 "Now, the big question. How this can be used? I am attaching below an "
 "example code. With just a few lines of code you can connect a command "
@@ -1292,21 +1291,21 @@ msgid ""
 "it from a web application."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:24
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:26
 msgid ""
 "The bot/client uses our `JaXMPP2 <https://github.com/tigase/jaxmpp>`__ "
 "library which is included in current builds of Tigase XMPP Server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:26
+#: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:28
 msgid "You should be able to find a few more code examples on the wiki page."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:4
 msgid "Watchdog"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:6
 msgid ""
 "Tigase’s Watchdog was implemented to help Tigase close connections that "
 "have become stale or inactive. Sometimes the connection is delayed, maybe"
@@ -1324,51 +1323,51 @@ msgid ""
 "problem."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:7
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:9
 msgid "Setup"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:9
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:11
 msgid ""
 "No extra setup is necessary, Watchdog is already included with your build"
 " of Tigase (as long as it’s 7.1.0 or newer). Follow the steps in the "
 "configuration section."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:12
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:14
 msgid "Watchdog Configuration"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:14
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:16
 msgid ""
 "To configure watchdog, the following lines need to be present or edited "
 "in ``config.tdsl`` file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:22
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:24
 msgid "The three settings are as follows:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:24
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:26
 msgid ""
 "``'watchdog-timeout'= 70000`` This setting sets the amount of time that "
 "watchdog will consider before it determines a connection may be stale. "
 "This setting sets the timeout at 70000ms or 70 seconds."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:26
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:28
 msgid ""
 "``'watchdog-delay' = 60000`` This setting sets how often the watchdog "
 "should conduct the check, the default delay at 60000ms or 60 seconds."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:28
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:30
 msgid ""
 "``'watchdog-ping-type'`` This setting determines the type of ping sent to"
 " components when watchdog is testing for activity."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:30
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:32
 msgid ""
 "You may, if you choose, to specify individual watchdog settings for "
 "specific components by adding them to the component settings, for example"
@@ -1376,18 +1375,18 @@ msgid ""
 "use the following lines in config.tdsl:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:39
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:41
 msgid ""
 "If any settings are not set, the global or settings will be used. "
 "``watchdog-delay`` default is set to 10 min ``watchdog-ping-type`` "
 "default is set to XMPP"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:42
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:44
 msgid "Logic"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:44
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:46
 msgid ""
 "Watchdog compares it’s own pings, and records the time it takes for a "
 "round trip to different components, clustered connections, and if one "
@@ -1395,23 +1394,23 @@ msgid ""
 "stale connection. Here is a breakdown:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:46
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:48
 msgid ""
 "A check is performed of a connection(s) on every ``watchdog-delay`` "
 "interval."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:48
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:50
 msgid "During this check two things occur"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:50
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:52
 msgid ""
 "If the last transfer time exceeds ``max-inactivity-time`` a stop service "
 "command is given to terminate and broadcast unavailable presence."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:52
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:54
 msgid ""
 "If the last transfer time is lower than ``max-inactivity-time`` but "
 "exceeds ``watchdog-timeout`` watchdog will try to send a ping (of "
@@ -1419,88 +1418,88 @@ msgid ""
 "config.tdsl)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:54
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:56
 msgid ""
 "``WHITESPACE`` ping which will yield the time of the last data transfer "
 "in any direction."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:56
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:58
 msgid "``XMPP`` ping which will yield the time of the last received xmpp stanza."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:58
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:60
 msgid ""
 "If the 2nd option is true, the connection will remain open, and another "
 "check will begin after the ``watchdog-delay`` time has expired."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:60
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:62
 msgid "For example, lets draw this out and get a visual representation"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:70
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:72
 msgid ""
 "This line represents how often the check is performed. Each ``-`` (dash) "
 "is 10 seconds, so the check is done every 60 seconds (``'watchdog-delay' "
 "= 60000``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:72
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:74
 msgid ""
 "This line is client activity, here the client sent a message at 40 "
 "seconds (marked by ``+``) and has gone idle."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:74
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:76
 msgid ""
 "The following line represents the watchdog logic, with timeout at 120 "
 "seconds and max inactivity timeout at 180 seconds:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:84
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:86
 msgid "How the check is performed:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:86
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:88
 msgid ""
 "30 seconds - at this point *last transfer* or *last received* time is "
 "updated."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:88
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:90
 msgid ""
 "60 seconds - watchdog runs - it check the connection and says: \\_ok, "
 "last client transfer was 20s ago - but it’s lower than both inactivity "
 "(so don’t disconnect) and timeout (so don’t send ping)."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:90
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:92
 msgid ""
 "120 seconds - 2nd check - last transfer was 100s ago - still lower than "
 "both values - do nothing."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:92
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:94
 msgid ""
 "180 seconds - 3rd check - last transfer was 160s ago - lower than "
 "inactivity but greater than delay - ping it sent."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:94
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:96
 msgid ""
 "240 seconds - 4th check - last transfer was 220s ago - client still "
 "hasn’t responded, watchdog compares idle time to ``max-inactivity-"
 "timeout`` and finds out that it is greater, connection is terminated."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:96
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:98
 msgid ""
 "300 seconds - watchdog is run again but given the connection was "
 "terminatet there is no XMPP session to check for that particular client."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:100
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:102
 msgid ""
 "It is possible that the connection is broken, and could be detected "
 "during the sending of a ping and the connection would be severed at step "
@@ -1508,7 +1507,7 @@ msgid ""
 "exception."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:104
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:106
 msgid ""
 "Global settings may not be ideal for every setup. Since each component "
 "has its own settings for ``max-inactivity-time`` you may find it "
@@ -1517,71 +1516,71 @@ msgid ""
 " thier default settings:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:126
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:128
 msgid ""
 "Again remember, for Watchdog to properly work, the ``max-inactivity-"
 "time`` MUST be longer than the ``watchdog-timeout`` setting"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:129
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:131
 msgid "Testing"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:131
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:133
 msgid ""
 "The tigase.log.0 file can reveal some information about watchdog and how "
 "it is working (or how it might be fighting your settings). To do so, "
 "enter the following line into your ``config.tdsl`` file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:137
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:139
 msgid ""
 "This will set debug mode for your log, and enable some more information "
 "about what Tigase is doing. These logs are truncated for simplicity. Lets"
 " look at the above scenario in terms of the logs:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:139
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:141
 msgid "**Stage Two.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:145
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:147
 msgid "**Stage Three.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:151
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:153
 msgid "**Stage Four.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:158
+#: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:160
 msgid "**Stage Five.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:4
 msgid "Tips and Tricks"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:6
 msgid ""
 "The section contains some short tricks and tips helping in different "
 "kinds of issues related to the server administration and maintenance."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:6
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:8
 msgid "`Runtime Environment Tip <#tigaseTip_RuntimeEnvironment>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:8
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:10
 msgid ""
 "`Best Practices for Connecting to Tigase XMPP server From Web Browser "
 "<#bestWebPrax>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:11
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:13
 msgid "Tigase Tip: Checking the Runtime Environment"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:13
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:15
 msgid ""
 "It has happened recently that we have tried very hard to fix a few "
 "annoying problems on one of the Tigase installations. Whatever we did, "
@@ -1590,7 +1589,7 @@ msgid ""
 "didn’t on the target system."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:15
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:17
 msgid ""
 "It turned out that due to specific environment settings on the target "
 "system, an old version of Tigase server was always started regardless of "
@@ -1599,48 +1598,48 @@ msgid ""
 " finding the issue: improper environment settings."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:17
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:19
 msgid ""
 "The best way to check all the environment settings used to start the "
 "Tigase server is to use… ``check`` command line parameter:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:49
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:51
 msgid ""
 "In our case ``TIGASE_HOME`` was set to a fixed location pointing to an "
 "old version of the server files. The quick ``check`` command may be a "
 "real time saver."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:52
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:56
 msgid "Best Practices for Connecting to Tigase XMPP server From Web Browser"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:54
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:58
 msgid ""
 "Currently we have 2 ways to connect to Tigase XMPP Server from web "
 "browsers:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:56
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:60
 msgid "BOSH (Bidirectional-streams Over Synchronous HTTP)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:58
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:62
 msgid "WebSocket (XMPP over WebSocket)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:60
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:64
 msgid ""
 "You will find more information about these ways for connecting to Tigase "
 "XMPP Server with some useful tips below."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:63
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:67
 msgid "BOSH"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:65
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:69
 msgid ""
 "BOSH protocol specified in `XEP-0124 "
 "<http://xmpp.org/extensions/xep-0124.html>`__ is one of first protocols "
@@ -1650,7 +1649,7 @@ msgid ""
 "XMPP Server and available at port 5280."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:67
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:71
 msgid ""
 "In clustered mode we can deploy it with load balancer deployed with "
 "guarantees that each BOSH connection from web browser will be forwarded "
@@ -1662,11 +1661,11 @@ msgid ""
 "be forwarded always to node ``t1``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:70
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:74
 msgid "Tip #1 - BOSH in Cluster Mode Without Load Balancer"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:72
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:76
 msgid ""
 "There is also a way to use BOSH without load balancer enabled. In this "
 "case the XMPP client needs to have more logic and knowledge about all "
@@ -1678,11 +1677,11 @@ msgid ""
 " randomly pick other node from list of rest of available nodes."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:74
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:78
 msgid "*Solution:*"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:76
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:80
 msgid ""
 "Tigase XMPP Server by default provides server side solution for this "
 "issue by sending additional ``host`` attribute in ``body`` element of "
@@ -1693,12 +1692,12 @@ msgid ""
 "``etc/config.tdsl`` config file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:84
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:124
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:88
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:128
 msgid "*Example:*"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:86
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:90
 msgid ""
 "We have servers ``t1.example.com`` and ``t2.example.com`` which are nodes"
 " of a cluster hosting domain ``example.com``. Web client retrieves list "
@@ -1710,11 +1709,11 @@ msgid ""
 " attribute of XMPP stream)."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:89
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:93
 msgid "WebSocket"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:91
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:95
 msgid ""
 "WebSocket protocol is newly standardized protocol which is supported by "
 "many of current versions of browsers. Currently there is a draft of "
@@ -1727,18 +1726,18 @@ msgid ""
 "you need to use library which supports XMPP-over-WebSocket protocol."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:94
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:98
 msgid "Tip #1 - Encrypted WebSocket Connection"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:96
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:100
 msgid ""
 "It is possible to enable encrypted WebSocket connection in Tigase XMPP "
 "Server. To do this you need to add following lines to ``etc/config.tdsl``"
 " config file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:114
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:118
 msgid ""
 "In this example we enabled WebSocket endpoint on port 5290 allowing "
 "unencrypted connections, and encrypted WebSocket endpoint on port 5291. "
@@ -1747,17 +1746,17 @@ msgid ""
 "``certs/default.pem``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:118
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:122
 msgid ""
 "There is no default configuration for non-default ports. All ports "
 "outside 443 MUST be configured."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:120
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:124
 msgid "Tip #2 - Encrypted WebSocket Connection - Dealing With Multiple VHosts"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:122
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:126
 msgid ""
 "As mentioned in Tip #1 WebSocket endpoint is plain TLS/SSL port, so it "
 "always serves default certificate for Tigase XMPP Server instance. That "
@@ -1776,7 +1775,7 @@ msgid ""
 "which it can be identified from internet."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:126
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:130
 msgid ""
 "We have servers ``t1.example1.com`` and ``t2.example1.com`` which are "
 "nodes of a cluster in hosting domain ``example2.com``. Each of our nodes "
@@ -1837,11 +1836,11 @@ msgid ""
 " connectivity."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:22
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:24
 msgid "Automatic Registration (recommended)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:24
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:26
 msgid ""
 "Once a commercial component is activated on Tigase XMPP Server, the "
 "program will then retrieve an *Installation ID* from our servers, and "
@@ -1855,18 +1854,17 @@ msgid ""
 "license file automatically."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:27
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:29
 msgid "Manual"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:31
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:33
 msgid ""
-"This method should be used only in extreme cases when `Automatic "
-"Registration (recommended) <#AutomaticLicenceRegistration>`__ can’t be "
-"used."
+"This method should be used only in extreme cases when :ref:`Automatic "
+"Registration (recommended)<AutomaticLicenceRegistration>` can’t be used."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:33
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:35
 msgid ""
 "If you do not wish to use the automatic method, you may decide to "
 "generate a license file using our web portal. Offline installation may "
@@ -1874,64 +1872,64 @@ msgid ""
 "registration, generating hash, and obtaining license file."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:35
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:37
 msgid "Generating Installation ID"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:37
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:39
 msgid ""
 "For offline installations, you may obtain an *Installation ID* from this "
 "address: https://license.tigase.software/register."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:39
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:41
 msgid "Data Fields:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:41
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:43
 msgid ""
 "``Customer name``: Company or user name used to identify machines. "
 "Multiple clusters or servers can have the same customer name."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:43
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:45
 msgid ""
 "``VHosts``: Comma separated list of VHosts you will be using on this "
 "node. NOTE: these fields are case sensitive!"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:45
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:47
 msgid ""
 "``Legacy license hashes``: Copy the digest hash generated for all legacy "
 "licenses - it’s available in the ``etc/tigase-console.log`` after startup"
 " (if such licenses are present)."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:47
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:49
 msgid ""
 "``Captcha question``: Enter the basic math answer for this form to prove "
 "you are not a robot."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:49
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:51
 msgid "The next page will provide you with an installation ID like the following:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:55
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:57
 msgid "Edit your ``config.tdsl`` file and add your installation-id"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:61
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:63
 msgid ""
 "Note that the ``installation-id`` file will be made automatically once "
 "the license file is installed and verified by the server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:63
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:65
 msgid "Obtaining a Server Code"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:65
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:67
 msgid ""
 "Once you have the *Installation ID*, you will need to generate a server "
 "code. This can be done by accessing the admin UI page and navigating to "
@@ -1942,11 +1940,11 @@ msgid ""
 " and proceed to the next section."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:67
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:69
 msgid "Obtaining license file"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:69
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:71
 msgid ""
 "Open a new browser and navigate to this address: "
 "https://license.tigase.software/retrieve once there, paste the generated "
@@ -1956,18 +1954,18 @@ msgid ""
 "installed on your server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:71
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:73
 msgid ""
 "**If you are provided a manually produced license, you will need to place"
 " it in the same ``etc/`` directory with the name "
 "``<component_name>.license`` (e.g.: ``etc/acs.license``)**"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:74
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:76
 msgid "What happens if I do not use a license file or it is expired?"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:76
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:78
 msgid ""
 "Tigase permits commercial products to be used without a license, but a "
 "validation process must complete otherwise the server will shutdown. "
@@ -1977,17 +1975,17 @@ msgid ""
 "obtain a valid one."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:78
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:80
 msgid ""
 "Communications will be made to license.tigase.software over https (port "
 "443) to verify the license or download a new one."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:81
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:83
 msgid "Demo mode"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:83
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:85
 msgid ""
 "If no valid license can be found, Tigase will revert to a demonstration "
 "mode. Most functions will be available and usable, but with a caveat. "
@@ -1997,84 +1995,84 @@ msgid ""
 "and will shut down."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:86
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:88
 msgid "Statistics Sent"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:88
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:90
 msgid ""
 "Statistics of your server may be sent to Tigase server’s if the all of "
 "following happens:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:90
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:92
 msgid "You are using commercial Tigase components."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:92
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:94
 msgid "You have registered an ``installation-id``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:94
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:96
 msgid "You do not have a current license to run Tigase commercial components."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:96
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:98
 msgid ""
 "If these conditions exist, statistics will be sent to our servers and a "
 "warning will be posted in your logs. The following is an example of what "
 "information will be sent."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:100
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:102
 msgid ""
 "The text below has been better formatted for readability, but does not "
 "reflect the actual text being sent to Tigase."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:249
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:251
 msgid "Unauthorized use"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:251
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:253
 msgid ""
 "Tigase will consider itself unauthorized if the following conditions are "
 "met:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:253
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:255
 msgid "if Tigase XMPP Server does not have a valid license file and"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:255
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:257
 msgid ""
 "cannot contact the licensing server to obtain installation id and "
 "attached licenses."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:257
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:259
 msgid "Then the program will then attempt to send statistics."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:259
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:261
 msgid "if unable to sent statistics the server after a random number of retries."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:261
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:263
 msgid ""
 "if these retries are not successful within 10 attempts, the server will "
 "then shutdown."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:263
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:265
 msgid "If you are experiencing this condition, please contact Tigase."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:266
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:268
 msgid "Manual mode"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:268
+#: ../../Tigase_Administration/Using_Tigase/Licensing.inc:270
 msgid ""
 "If you cannot open communication to ``stats.tigase.software`` or "
 "``license.tigase.software`` over the required ports (https over port "
@@ -2290,11 +2288,11 @@ msgid ""
 "domain, like this example:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:145
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:147
 msgid "Checking Cluster Connections"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:147
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:149
 msgid ""
 "After setting up clustering you may want to verify that the clusters are "
 "operational. Right now it can be done in two manners - first by checking "
@@ -2302,29 +2300,29 @@ msgid ""
 "nodes. The other is to check internal status of the server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:150
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:152
 msgid "Established connections"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:152
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:154
 msgid ""
 "There are number of ways to check for opened connections, simplest one "
 "use command line. (Tigase uses port *5277* for cluster connections)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:154
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:156
 msgid "Linux"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:160
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:162
 msgid "Windows"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:168
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:170
 msgid "Cluster nodes connected (using XMPP)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:170
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:172
 msgid ""
 "Verifying clustering connectivity over XMPP protocol requires any XMPP "
 "client capable of `XEP-0030: Service Discovery "
@@ -2333,11 +2331,11 @@ msgid ""
 "administrative) has access."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:172
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:174
 msgid "Psi XMPP Client"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:174
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:176
 msgid ""
 "For the purpose of this guide a `Psi <http://psi-im.org/>`__ client will "
 "be used. After successfully configuring and connecting to account with "
@@ -2346,15 +2344,15 @@ msgid ""
 "account:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:176
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:178
 msgid "|roster-discovery|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:182
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:184
 msgid "roster-discovery"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:178
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:180
 msgid ""
 "In the *Service Discovery* window we need to find *Cluster Connection "
 "Manager* component. After expanding the tree node for the component a "
@@ -2363,11 +2361,11 @@ msgid ""
 "hostname of the cluster node:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:180
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:182
 msgid "|discovery-nodes|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:183
+#: ../../Tigase_Administration/Using_Tigase/Clustering.inc:185
 msgid "discovery-nodes"
 msgstr ""
 
@@ -2455,11 +2453,11 @@ msgid ""
 "reconnection."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:4
 msgid "Scripting support in Tigase"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:6
 msgid ""
 "Tigase server supports scripting languages in versions 4.3.1 and higher. "
 "These pages describe this feature in details how to create new scripts, "
@@ -2467,7 +2465,7 @@ msgid ""
 "description with code examples."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:8
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:10
 msgid ""
 "Tigase server is known for it very low memory consumption and "
 "successfully runs with less then 10MB of RAM memory. However adding "
@@ -2477,11 +2475,11 @@ msgid ""
 "Python, Scala or any other non-standard language."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:4
 msgid "Scripting Introduction - Hello World!"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:6
 msgid ""
 "This document is the first in a series describing scripting support in "
 "the Tigase server showing how to load, install, update and call a script."
@@ -2489,13 +2487,13 @@ msgid ""
 "*Hello world!* example."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:6
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:8
 msgid ""
 "Since Tigase version 4.3.1 the server supports scripting for "
 "administrator commands as well as standard commands."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:8
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:10
 msgid ""
 "In theory many different languages can be used to write scripts and the "
 "only requirement is that support `JSR-223 "
@@ -2504,7 +2502,7 @@ msgid ""
 "<https://docs.oracle.com/javase/8/docs/technotes/guides/scripting/prog_guide/api.html>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:10
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:12
 msgid ""
 "In practice some languages are better supported than others, at the "
 "moment we recommend `Groovy <http://groovy-lang.org/>`__. However the "
@@ -2515,14 +2513,14 @@ msgid ""
 "contains a few examples for these languages."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:14
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:16
 msgid ""
 "the default Tigase installation contains only libraries for Groovy. "
 "Adding support for a different language is as simple as copying a few JAR"
 " files to the Tigase ``libs/`` directory."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:16
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:18
 msgid ""
 "All the examples presented in this guide are also available as ready to "
 "use scripts in the Tigase SVN repository in directory: "
@@ -2530,7 +2528,7 @@ msgid ""
 "server/blob/master/src/main/groovy/tigase/admin>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:18
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:20
 msgid ""
 "The scripting utilizes only standard XMPP extensions and is by no means "
 "specific to any particular solution. We use and prefer Psi client. The "
@@ -2540,39 +2538,39 @@ msgid ""
 "commands you need a XMPP client with a good support for both features."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:20
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:22
 msgid ""
 "To follow the guide and run all the examples you need will need to have "
 "installed Tigase server version 4.3.1 or newer and you have to connect to"
 " the server as administrator."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:23
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:25
 msgid "Loading Script at Run Time"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:25
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:27
 msgid ""
 "All the scripting stuff is usually based on the service discovery and ad-"
 "hoc commands in the Tigase server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:27
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:29
 msgid "|service disco|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:184
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:186
 msgid "service disco"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:29
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:31
 msgid ""
 "The first thing to do, therefore, is to browse service discovery on the "
 "running server. The result you receive will depend on your installation "
 "and installed components."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:31
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:33
 msgid ""
 "The most interesting things right now are all items with "
 "\"http://jabber.org/protocol/admin\" in their node part. You may have a "
@@ -2581,59 +2579,59 @@ msgid ""
 "and ``Remove command script``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:33
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:35
 msgid ""
 "The first is for adding a new script or updating existing and the second "
 "is for removing script from the server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:35
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:37
 msgid ""
 "To add a new script you have just to execute ``New command script``. In "
 "Psi this is done by double clicking on the element in service discovery "
 "list."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:37
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:39
 msgid "|hello1 new script|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:185
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:187
 msgid "hello1 new script"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:39
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:41
 msgid ""
 "The screenshot above shows a couple of options to set for the loaded "
 "script:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:42
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:44
 msgid "Description"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:42
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:44
 msgid ""
 "is what shows as the script name in the service discovery window. There "
 "are no special restrictions on what to put there."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:45
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:47
 msgid "Command id"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:45
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:47
 msgid ""
 "is a unique ID of the script (admin command). This is what shows after "
 "the \"http://jabber.org/protocol/admin\" in node part. This needs to be "
 "unique or existing script is overwritten."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:48
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:50
 msgid "Language"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:48
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:50
 msgid ""
 "a drop down list of all supported scripting languages for your "
 "installation. Tigase automatically detects all libraries for scripting "
@@ -2641,92 +2639,92 @@ msgid ""
 "language for your script."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:51
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:53
 msgid "Script text"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:51
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:53
 msgid "is just your script content."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:53
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:55
 msgid ""
 "When your script is ready and all fields are correctly set, simply press "
 "\"**Finish**\" button and you should receive a message confirming that "
 "the script has been loaded successfully."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:55
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:57
 msgid "|loaded ok small|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:186
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:188
 msgid "loaded ok small"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:57
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:59
 msgid ""
 "In this guide we are creating a simple \"Hello world\" script written in "
 "Groovy. What it does is displays a window (ad-hoc command result) with a "
 "message: \"*Hello admin, how are you?*\"."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:59
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:61
 msgid "It uses a basic scripting API which is described line by line below:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:61
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:63
 msgid "It imports basic Tigase classes."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:63
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:65
 msgid ""
 "Sets a local variable ``p`` which points to a ``packet`` variable with "
 "data received from the client."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:65
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:67
 msgid ""
 "Creates a ``res`` variable which is response sent back to the client "
 "(administrator). The response to the client is of type ``result``. Other "
 "possible types will be introduced later."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:67
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:69
 msgid ""
 "We operate on ad-hoc commands here so the script uses Tigase utility "
 "class to set/retrieve command parameters. It sets the window title and a "
 "simple message displayed to the user (administrator)."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:69
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:71
 msgid "The last line returns new packet as a script execution result."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:71
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:73
 msgid "The first, very simple version looks like this:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:83
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:85
 msgid "Executing Script"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:85
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:87
 msgid ""
 "Once the script is successfully loaded you will have to reload/refresh "
 "the service discovery window which now should display one more element on"
 " the list."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:87
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:89
 msgid "|service disco with new hello|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:187
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:189
 msgid "service disco with new hello"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:89
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:91
 msgid ""
 "As you can see script name is set to what you have entered as "
 "\"Description\" in script loading window - \"*Hello world script*\". The "
@@ -2734,38 +2732,38 @@ msgid ""
 "\"**hello**\" is what is set as the script ID."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:91
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:93
 msgid ""
 "To execute the script you just have to double click on the script name "
 "(or click execute command if you use any other client)."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:93
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:95
 msgid ""
 "As a result you should see a simple window similar to the screenshot "
 "below displaying our message."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:95
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:97
 msgid "|hello1 result small|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:188
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:190
 msgid "hello1 result small"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:98
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:100
 msgid "Interaction in Scripts"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:100
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:102
 msgid ""
 "Displaying just a message is very nice but is not very useful in most "
 "cases. Normally you need to ask the user for some more data or parameters"
 " before you can perform any real processing."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:102
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:104
 msgid ""
 "Therefore in most cases the administrator script has to display a new "
 "window with input fields asking the user for some more data. In this "
@@ -2773,21 +2771,21 @@ msgid ""
 "ask about the administrator name before displaying a greeting."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:104
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:106
 msgid "|hello2 asking for name small|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:189
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:191
 msgid "hello2 asking for name small"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:106
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:108
 msgid ""
 "To ask the user for some more information we have to extend example above"
 " with some more code:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:131
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:133
 msgid ""
 "If you compare both scripts you see that they are quite similar. Before "
 "displaying greeting, however, the script tries to retrieve data from the "
@@ -2795,15 +2793,15 @@ msgid ""
 "displayed, otherwise the script asks for the user name."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:133
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:135
 msgid "|hello2 result small|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:190
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:192
 msgid "hello2 result small"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:135
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:137
 msgid ""
 "Please note, in this case the packet sent back to the user is of type "
 "form instead of ``result``. The practical difference is that the type "
@@ -2813,78 +2811,78 @@ msgid ""
 "the server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:137
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:139
 msgid ""
 "This script demonstrates use of two new methods from the utility class "
 "\"Command\": getFieldValue and addFieldValue."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:139
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:141
 msgid ""
 "The first argument to all Command methods is the packet with ad-hoc "
 "command."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:141
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:143
 msgid "The second argument is usually the input field name"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:143
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:145
 msgid ""
 "These two method parameters are actually enough to read the ad-hoc "
 "command data. Methods creating input fields in the ad-hoc command need a "
 "few arguments more:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:145
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:147
 msgid ""
 "Next arguments sets a default value displayed to the user. The way to it "
 "is set in the example above is specific to Groovy language and is quite "
 "useful what will be apparent in later examples."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:147
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:149
 msgid ""
 "After that we have to specify the field type. All field types are defined"
 " in the `XEP-0004 <http://xmpp.org/extensions/xep-0004.html#protocol-"
 "fieldtypes>`__ article."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:149
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:151
 msgid ""
 "The last argument specifies the field label which is displayed to the "
 "user."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:151
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:153
 msgid "|hello2 new script|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:191
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:193
 msgid "hello2 new script"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:153
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:155
 msgid ""
 "There are a few other different utility methods in the Command class to "
 "set different types of input fields and they will be described in details"
 " later on."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:155
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:157
 msgid ""
 "To reload the script simply call \"New command script\" again, enter the "
 "script text and make sure you entered exactly the same command ID to "
 "replace the old script with the new one."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:157
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:159
 msgid ""
 "Or of course, you can enter a new command id to create a new command and "
 "make it available on your server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:159
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:161
 msgid ""
 "When the script is loaded on the server, try to execute it. You should "
 "get a new dialog window asking for your name as in the screenshot at the "
@@ -2893,11 +2891,11 @@ msgid ""
 " along with your name."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:162
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:164
 msgid "Automatic Scripts Loading at Startup Time"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:164
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:166
 msgid ""
 "The last thing described in this guide is how to automatically load your "
 "scripts when the Tigase server starts. The ability to load scripts at run"
@@ -2906,13 +2904,13 @@ msgid ""
 "without affecting the service."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:166
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:168
 msgid ""
 "If you, however have a few dozens scripts you don’t want to manually load"
 " them every time the server restarts."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:168
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:170
 msgid ""
 "Tigase server automatically loads all scripts at the startup time which "
 "are located in the admin scripts directory. Unless you set it differently"
@@ -2922,26 +2920,26 @@ msgid ""
 " the server starts."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:170
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:172
 msgid ""
 "But hold on. What about the script parameters: language, description, "
 "command id? How are you supposed to set them?"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:172
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:174
 msgid ""
 "Language is simple. It is detected automatically by the script file "
 "extension. So just make sure file extensions are correct and the language"
 " is sorted."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:174
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:176
 msgid ""
 "The script description and command id needs a little bit more work. You "
 "have to include in your script following lines:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:182
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:184
 msgid ""
 "Please note, there must be at least a single space after the "
 "``AS:Description:`` or ``AS:CommandId:`` string. Everything rest after "
@@ -2950,11 +2948,11 @@ msgid ""
 "will detect them and set correctly for your script."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:4
 msgid "Tigase Scripting Version 4.4.x Update for Administrators"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:6
 msgid ""
 "Scripting functionality is quite useful in Tigase server for all sorts of"
 " administrator tasks. The possibility to load new scripts or replace old "
@@ -2962,7 +2960,7 @@ msgid ""
 "maintenance."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:6
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:8
 msgid ""
 "In earlier versions of the Tigase server scripting capabilities was "
 "available only in the session manager component while it might be very "
@@ -2973,7 +2971,7 @@ msgid ""
 " each component separately."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:8
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:10
 msgid ""
 "Therefore the scripting capabilities has been implemented in the core of "
 "the Tigase server. It is now part of the API and is automatically "
@@ -2981,14 +2979,14 @@ msgid ""
 "developer guide will be published separately."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:10
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:12
 msgid ""
 "This document describes changes from the user/administrator perspective "
 "because there are some usability changes related to the new "
 "implementation."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:12
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:14
 msgid ""
 "Please note. The description and screenshots are taken from the Psi "
 "client and most likely interface for ad-hoc commands and service "
@@ -2997,28 +2995,28 @@ msgid ""
 "preferred application for your day-to-day use."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:14
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:16
 msgid ""
 "As it always was in the Tigase you can access all the functions via XMPP "
 "service discovery on the server. However, as soon as you connect to the "
 "server you can see some changes there."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:16
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:18
 msgid "|new service disco admin|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:38
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:40
 msgid "new service disco admin"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:18
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:20
 msgid ""
 "There are no command on the list. They are hidden from the main service "
 "discovery list. You can see on the list only the server main components."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:20
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:22
 msgid ""
 "This had to be done for many reasons. One of them is, obviously, the "
 "cleaner access to the main server stuff. Another, probably more "
@@ -3033,7 +3031,7 @@ msgid ""
 "selected."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:22
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:24
 msgid ""
 "A new window should show up with drop-down list of available commands. "
 "All the commands are related to the selected component and are executed "
@@ -3042,30 +3040,30 @@ msgid ""
 "showing on the list."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:24
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:26
 msgid "|new command list|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:39
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:41
 msgid "new command list"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:26
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:28
 msgid ""
 "As a reminder, in the window title you can see the component ID and you "
 "should check it before running any command to make sure you accidentally "
 "don’t break your system."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:28
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:30
 msgid "|new add command|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:40
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:42
 msgid "new add command"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:30
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:32
 msgid ""
 "There has been also a small change made to the script adding window. As "
 "you can see on the screenshot there is one additional option added - "
@@ -3074,7 +3072,7 @@ msgid ""
 "at next startup time."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:32
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:34
 msgid ""
 "This option is enabled by default as this seems to be a logical choice "
 "that the administrator wants to save his new script for later reuse. "
@@ -3084,7 +3082,7 @@ msgid ""
 "drive."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:34
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:36
 msgid ""
 "As in previous version only users with administrator permissions can "
 "execute commands and access all the critical elements on the server. "
@@ -3093,7 +3091,7 @@ msgid ""
 "hidden for the rest of users."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:36
+#: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:38
 msgid ""
 "Server components don’t show up on the service discovery, the user can’t "
 "see administrator commands nor he can execute them. This hasn’t been "
@@ -3102,11 +3100,11 @@ msgid ""
 "by them anyway."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:2
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:4
 msgid "Tigase and Python"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:4
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:6
 msgid ""
 "This article describes how to get Python working as a scripting language "
 "for ad-hoc commands in Tigase server. The first part is installation, and"
@@ -3114,7 +3112,7 @@ msgid ""
 " between Python usage and some other languages."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:6
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:8
 msgid ""
 "*Please note, we are not a Python developer, and by no means this is "
 "Python development guide. All the code examples are used only to present "
@@ -3123,11 +3121,11 @@ msgid ""
 "examples I am happy to include them in the guide.*"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:9
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:11
 msgid "Installation"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:11
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:13
 msgid ""
 "In short, installation is extremely simple: just copy the file attached "
 "to this article to your Tigase installation, to the ``libs/`` directory. "
@@ -3135,7 +3133,7 @@ msgid ""
 "Python."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:13
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:15
 msgid ""
 "In theory the Tigase offers scripting support defined in `JSR-223 "
 "<http://www.jcp.org/en/jsr/detail?id=223>`__. You can use any language "
@@ -3147,15 +3145,15 @@ msgid ""
 "application (Tigase server) and the script."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:15
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:17
 msgid "|lang list no python small|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:67
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:69
 msgid "lang list no python small"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:17
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:19
 msgid ""
 "The best way to go is to use Jython implementation. It works very well "
 "within JVM and more importantly, perfectly integrates with Tigase server."
@@ -3167,7 +3165,7 @@ msgid ""
 "<http://wiki.python.org/jython/DownloadInstructions>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:19
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:21
 msgid ""
 "**Version 2.5.1** is a bit simpler to install. When you download and run "
 "the Jython installer, find ``jython.jar`` file in the directory where you"
@@ -3176,7 +3174,7 @@ msgid ""
 "attached to this article for your convenience."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:21
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:23
 msgid ""
 "**Version 2.2.1** needs a little bit more work. The first part is the "
 "same. It is not, however enough to copy the ``jython.jar`` file. One more"
@@ -3186,7 +3184,7 @@ msgid ""
 "``libs/`` directory."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:23
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:25
 msgid ""
 "The best way to check if the Jython is installed correctly and support "
 "for Python is enabled, is by trying to submit a new script to the Tigase "
@@ -3199,19 +3197,19 @@ msgid ""
 " means everything is ok and support for Python is enabled."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:25
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:27
 msgid "|lang list with python small|"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:68
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:70
 msgid "lang list with python small"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:28
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:30
 msgid "Writing Python Scripts"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:30
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:32
 msgid ""
 "Python scripts work in a similar way to Groovy or other languages "
 "scripts, except one significant difference. You cannot call \"*return*\" "
@@ -3219,7 +3217,7 @@ msgid ""
 "calling \"*return*\" statement directly from the script."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:32
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:34
 msgid ""
 "To overcome the problem, Tigase offers another way to pass script "
 "execution results. It checks the value of a special variables on the "
@@ -3228,27 +3226,27 @@ msgid ""
 "results back to the Tigase server."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:34
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:36
 msgid ""
 "``result`` allows to return simple text (or characters String) from the "
 "script."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:36
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:38
 msgid ""
 "``packet`` allows to return Packet instance which is send back to the "
 "user."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:38
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:40
 msgid "The simplest possible Python script may look like this one:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:40
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:42
 msgid "``result = \"Hello world!\"``"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:42
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:44
 msgid ""
 "For instructions how to load and execute the script, please refer to the "
 "`introductory article <#scriptingintro>`__ for scripting in Tigase "
@@ -3257,13 +3255,13 @@ msgid ""
 "elements as well."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:44
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:46
 msgid ""
 "An example of a more advanced script asks the user for providing required"
 " parameters for the actual script execution:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:63
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:65
 msgid ""
 "Except this minor difference, the rest part of scripting in Python for "
 "the Tigase administrator commands is the same as all other languages. As "
@@ -3271,7 +3269,7 @@ msgid ""
 "it could be argued there is no difference at all."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:65
+#: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:67
 msgid ""
 "In article *\"Component Implementation - Lesson 6 - Scripting Support\"* "
 "in Developer guide, I am going to present the Tigase server API available"
@@ -3279,4 +3277,78 @@ msgid ""
 "best integration with JVM and Tigase API, however I will try to include "
 "Python example code as well."
 msgstr ""
+
+#~ msgid "`Tigase Log Guide <#Tigase-Log-Guide>`__"
+#~ msgstr ""
+
+#~ msgid "`Debugging Tigase <#Debuging-Tigase>`__"
+#~ msgstr ""
+
+#~ msgid "`Basic System Checks <#Basic-System-Checks>`__"
+#~ msgstr ""
+
+#~ msgid "`Add and Manage Domains <#Add-and-Manage-Domains-(VHosts)>`__"
+#~ msgstr ""
+
+#~ msgid "`Presence Forwarding <#Presence-Forwarding>`__"
+#~ msgstr ""
+
+#~ msgid "`Watchdog <#Watchdog>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Runtime Environment Tip <#Tigase-Tip-"
+#~ "Checking-the-Runtime-Environment>`__"
+#~ msgstr ""
+
+#~ msgid "`Checking Cluster Connections <#Checking-Cluster-Connections>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Best Practices for Connecting to Tigase"
+#~ " XMPP server From Web Browser "
+#~ "<#Best-Practices-for-Connecting-to-"
+#~ "Tigase-XMPP-server-From-Web-Browser>`__"
+#~ msgstr ""
+
+#~ msgid "`Scripting Support in Tigase <#Scripting-support-in-Tigase>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Scripting Introduction - Hello World! "
+#~ "<#Scripting-Introduction - Hello-World!>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Tigase Scripting Version 4.4.x Update "
+#~ "for Administrators <#Tigase-Scripting-"
+#~ "Version-4.4.x-Update-for-Administrators>`__"
+#~ msgstr ""
+
+#~ msgid "`Tigase and Python Scripting <#Tigase-and-Python>`__"
+#~ msgstr ""
+
+#~ msgid "`Configuration Wizards <#tigase3xconfiguration>`__"
+#~ msgstr ""
+
+#~ msgid "using web-based admin management console - `Admin UI <#usingAdminUI>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To use any of those ways, you "
+#~ "need to be an administrator of the"
+#~ " server, which means that you have"
+#~ " a XMPP account created on this "
+#~ "XMPP server and your account JID "
+#~ "is added to `the list of the "
+#~ "administrators <#admins>`__ in the Tigase "
+#~ "XMPP Server configuration file."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method should be used only in"
+#~ " extreme cases when `Automatic Registration"
+#~ " (recommended) <#AutomaticLicenceRegistration>`__ can’t"
+#~ " be used."
+#~ msgstr ""
 
