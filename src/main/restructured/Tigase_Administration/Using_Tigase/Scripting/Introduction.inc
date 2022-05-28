@@ -1,3 +1,5 @@
+.. _Scripting-Introduction - Hello-World!:
+
 Scripting Introduction - Hello World!
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

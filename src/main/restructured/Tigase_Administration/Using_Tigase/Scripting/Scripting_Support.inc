@@ -1,3 +1,5 @@
+.. _Scripting-support-in-Tigase:
+
 Scripting support in Tigase
 --------------------------------
 

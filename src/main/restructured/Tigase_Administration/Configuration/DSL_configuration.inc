@@ -1,3 +1,5 @@
+.. _dslConfig:
+
 DSL file format
 -------------------
 

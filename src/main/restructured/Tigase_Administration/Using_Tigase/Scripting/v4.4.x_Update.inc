@@ -1,3 +1,5 @@
+.. _Tigase-Scripting-Version-4.4.x-Update-for-Administrators:
+
 Tigase Scripting Version 4.4.x Update for Administrators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

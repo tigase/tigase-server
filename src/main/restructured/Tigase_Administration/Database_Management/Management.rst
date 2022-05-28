@@ -88,6 +88,8 @@ If you are using Tigase XMPP Server with modified schema (changed procedures or 
 
     If ``schema-management`` is disabled, then it is administrator responsibility to maintain database schema and update it if needed (ie. if Tigase XMPP Server schema was changed).
 
+.. _Schemafilesmaintenance:
+
 Schema files maintenance
 --------------------------------
 

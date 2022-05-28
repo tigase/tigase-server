@@ -1,3 +1,5 @@
+.. _Tigase-Tip-Checking-the-Runtime-Environment:
+
 Tips and Tricks
 ----------------------
 
@@ -47,6 +49,8 @@ The best way to check all the environment settings used to start the Tigase serv
    TIGASE_CONSOLE_LOG = ./logs/tigase-console.log
 
 In our case ``TIGASE_HOME`` was set to a fixed location pointing to an old version of the server files. The quick ``check`` command may be a real time saver.
+
+.. _Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-Browser:
 
 Best Practices for Connecting to Tigase XMPP server From Web Browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

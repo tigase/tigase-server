@@ -1,3 +1,5 @@
+.. _Prepare-the-PostgreSQL-Database-for-the-Tigase-Server:
+
 Prepare the PostgreSQL Database for the Tigase Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

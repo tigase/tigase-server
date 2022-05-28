@@ -1,3 +1,5 @@
+.. _Basic-System-Checks:
+
 Basic System Checks
 ----------------------
 

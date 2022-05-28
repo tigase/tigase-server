@@ -136,7 +136,7 @@ You have to replace ``hostname`` with a domain name used for your XMPP installat
 
    'default-virtual-host' = 'jabber.your-great.net'
 
-There are many other settings that can be configured `visit this section for details <#tigase41virtualHosts>`__.
+There are many other settings that can be configured :ref:`visit this section for details<tigase41virtualHosts>`.
 
 
 Step 3: Set Administrators
@@ -160,7 +160,7 @@ You will also need to configure connection to the database. First you have to de
        }
    }
 
-Consult `dataSource <#dataSource>`__ property for more configuration info.
+Consult :ref:`dataSource<dataSource>` property for more configuration info.
 
 This is enough basic configuration to have your Tigase server installation running.
 
@@ -174,7 +174,7 @@ Creating the database is the next step. Previously, we had scripts to handle thi
 
    ./scripts/tigase.sh install-schema etc/tigase.conf -T derby -D tigasedb -H localhost -U tigase_user -P tigase_pass -R root -A rootpass -J admin@jabber.your-great.net -N pass
 
-This command will install tigase using a Derby database on one named ``tigasedb`` hosted on ``localhost``. The username and password editing the database is ``tigase_pass`` and ``root``. Note that ``-J`` explicitly adds the administrator, this is highly recommended with the ``-N`` passing the password. You may customize this command as needed, refer to the `install-schema <#install-schema>`__ section of the documentation for more information.
+This command will install tigase using a Derby database on one named ``tigasedb`` hosted on ``localhost``. The username and password editing the database is ``tigase_pass`` and ``root``. Note that ``-J`` explicitly adds the administrator, this is highly recommended with the ``-N`` passing the password. You may customize this command as needed, refer to the :ref:`install-schema<install-schema>` section of the documentation for more information.
 
 On a windows system, you need to call the program directly:
 

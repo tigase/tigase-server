@@ -1,3 +1,5 @@
+.. _Prepare-the-Derby-Database-for-the-Tigase-Server:
+
 Prepare the Derby Database for the Tigase Server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

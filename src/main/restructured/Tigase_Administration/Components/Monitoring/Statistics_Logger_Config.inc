@@ -1,3 +1,5 @@
+.. _Configuration-of-statistics-loggers:
+
 Configuration of statistics loggers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -1,3 +1,5 @@
+.. _Retrieving-statistics-from-the-server:
+
 Retrieving statistics from the server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

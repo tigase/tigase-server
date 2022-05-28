@@ -106,7 +106,7 @@ There are a few ways. We recommend checking with the `Add and Manage Domains <#a
 Providing certificate
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It’s also encouraged to provide dedicated SSL certificate - there are various ways to do it and they are described in `??? <#InstallingSSLCertificate>`__. You may want to take advantage of free Let’s Encrypt certificates and automate whole upload and renewal process as described in `??? <#LetsEncryptCertificate>`__
+It’s also encouraged to provide dedicated SSL certificate - there are various ways to do it and they are described in :ref:`Installing/Loading Certificate To the Tigase Server<InstallingSSLCertificate>`. You may want to take advantage of free Let’s Encrypt certificates and automate whole upload and renewal process as described in :ref:`Installing LetsEncrypt Certificates in Your Linux System<LetsEncryptCertificate>`
 
 
 Checking setup

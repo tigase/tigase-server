@@ -1,3 +1,5 @@
+.. _Presence-Forwarding:
+
 Presence Forwarding
 ------------------------
 

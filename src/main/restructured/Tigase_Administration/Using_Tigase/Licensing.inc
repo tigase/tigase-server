@@ -18,6 +18,8 @@ Registering for a License
 
 There are currently two ways for registering for a license with Tigase commercial products. **The easiest and recommended method is using the built in automatic registration function**. However, you may also register via a web portal if your installation has limitations on network connectivity.
 
+.. _AutomaticLicenceRegistration:
+
 Automatic Registration (recommended)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -28,7 +30,7 @@ Manual
 
 .. Caution::
 
-   This method should be used only in extreme cases when `Automatic Registration (recommended) <#AutomaticLicenceRegistration>`__ can’t be used.
+   This method should be used only in extreme cases when :ref:`Automatic Registration (recommended)<AutomaticLicenceRegistration>` can’t be used.
 
 If you do not wish to use the automatic method, you may decide to generate a license file using our web portal. Offline installation may obtain *Installation IDs* from our web portal in a three-step process: registration, generating hash, and obtaining license file.
 

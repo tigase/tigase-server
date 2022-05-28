@@ -1,4 +1,4 @@
-.. _logs:
+.. _Tigase-Log-Guide:
 
 Tigase Log Guide
 --------------------
