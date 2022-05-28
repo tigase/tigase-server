@@ -79,6 +79,8 @@ Unless specified, the pool class will use the one included with Tigase. You may 
 
 **Available since:** 8.0.0
 
+.. _dataSource:
+
 authRepository
 ^^^^^^^^^^^^^^^^^
 

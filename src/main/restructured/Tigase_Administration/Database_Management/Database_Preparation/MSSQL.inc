@@ -1,3 +1,5 @@
+.. _Prepare-the-MS-SQL-Server-Database-for-the-Tigase-Server:
+
 Prepare the MS SQL Server Database for the Tigase Server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -1,3 +1,5 @@
+.. _Monitor-Component:
+
 Monitor Component
 ^^^^^^^^^^^^^^^^^^^^^
 

@@ -1,3 +1,5 @@
+.. _HashedUserPasswordsinDatabase:
+
 Hashed User Passwords in Database
 --------------------------------------
 

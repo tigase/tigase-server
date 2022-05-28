@@ -141,6 +141,8 @@ You may specify a password and port to specific cluster servers if that is requi
 
    'cluster-nodes' = [ 'serv1.xmpp-test.org:domainpass:5600' ]
 
+.. _Checking-Cluster-Connections:
+
 Checking Cluster Connections
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

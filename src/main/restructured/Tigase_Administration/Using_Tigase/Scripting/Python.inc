@@ -1,3 +1,5 @@
+.. _Tigase-and-Python:
+
 Tigase and Python
 ^^^^^^^^^^^^^^^^^^^^
 

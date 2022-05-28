@@ -1,3 +1,5 @@
+.. _Setting-Up-Remote-Monitoring-in-the-Server:
+
 Setting Up Remote Monitoring in the Server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

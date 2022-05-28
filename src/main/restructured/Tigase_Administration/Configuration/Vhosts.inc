@@ -1,3 +1,5 @@
+.. _tigase41virtualHosts:
+
 Virtual Hosts in Tigase Server
 ----------------------------------
 

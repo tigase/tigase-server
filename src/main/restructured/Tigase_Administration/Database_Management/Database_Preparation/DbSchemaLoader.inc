@@ -1,3 +1,5 @@
+.. _SchemaUtility:
+
 Schema Utility
 ^^^^^^^^^^^^^^^
 
@@ -57,7 +59,10 @@ Windows users will need to run the command using the following command:
 
    java -cp "jars/*" tigase.db.util.SchemaManager "upgrade-schema" --config-file=etc/config.tdsl
 
+.. _install-schema:
+
 install-schema
+'''''''''''''''
 
 This task will install a schema using the parameters provided.
 
@@ -77,6 +82,7 @@ If you are using a windows system, you need to call the program directly:
 
 
 Options
+'''''''''
 
 Options for schema installation are as follows, required options are in bold
 

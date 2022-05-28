@@ -117,6 +117,8 @@ For Tigase server as well as many other servers (Apache 2.x), the order is follo
 
    Tigase requires full certificate chain in PEM file (described above)! Different applications may require pem file with certificates and private key in different order. So the same file may not be necessarily used by other services like Web server or e-mail server. Currently, Tigase can automatically sort certificates in PEM file while loading it.**
 
+.. _InstallingSSLCertificate:
+
 Installing/Loading Certificate To the Tigase Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,7 +1,7 @@
 TLS/SSL encryption features configuration
 ---------------------------------------------
 
-Tigase allows adjusting the most important parameters used when establishing TLS connections - set of protocols and ciphers that will be used during negotiation of the connection. The single most important is ``hardened-mode`` - it’s the most general configuration and offers three-step adjustment of the settings - please see `??? <#hardenedMode>`__ for details. ``hardened-mode`` can be configured both via TDSL configuration file (either on ``root`` level or for ``sslContextContainer`` for particular connection managers) or on VHost level.
+Tigase allows adjusting the most important parameters used when establishing TLS connections - set of protocols and ciphers that will be used during negotiation of the connection. The single most important is ``hardened-mode`` - it’s the most general configuration and offers three-step adjustment of the settings - please see :ref:`hardened-mode<hardenedMode>` for details. ``hardened-mode`` can be configured both via TDSL configuration file (either on ``root`` level or for ``sslContextContainer`` for particular connection managers) or on VHost level.
 
 If you want to disable certain protocols or ciphers you can use two options: ``tls-disabled-protocols`` and ``tls-disabled-ciphers`` respectively. They allow, as name suggests, disabling certain items from default sets. They both takes an array of strings, which ten be removed from the lists.
 

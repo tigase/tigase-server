@@ -1,3 +1,5 @@
+.. _manualconfig:
+
 Startup File for tigase.sh - tigase.conf
 --------------------------------------------
 

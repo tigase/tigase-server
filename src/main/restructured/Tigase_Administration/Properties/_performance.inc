@@ -61,6 +61,8 @@ for example (for ClusterConnectionManager):
 
 **Available since:** 5.2.0
 
+.. _hardenedMode:
+
 hardened-mode
 ^^^^^^^^^^^^^^^^^^
 

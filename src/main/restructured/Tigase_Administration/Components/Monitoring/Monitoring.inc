@@ -3,10 +3,10 @@ Server Monitoring
 
 All the documentation and resources related to the Tigase server monitoring.
 
--  `Setting up Remote Monitoring in the Server <#Setting-Up-Remote-Monitoring-in-the-Server>`__
+-  :ref:`Setting up Remote Monitoring in the Server<Setting-Up-Remote-Monitoring-in-the-Server>`
 
--  `Statistics Logger Configuration <#Configuration-of-statistics-loggers>`__
+-  ref:`Statistics Logger Configuration<Configuration-of-statistics-loggers>`
 
--  `Retrieving Statistics from the Server <#Retrieving-statistics-from-the-server>`__
+-  ref:`Retrieving Statistics from the Server<Retrieving-statistics-from-the-server>`
 
--  `Monitor Component <#Monitor-Component>`__
+-  ref:`Monitor Component<Monitor-Component>`

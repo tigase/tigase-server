@@ -1,3 +1,5 @@
+.. _PreparingTigaseforMongoDB:
+
 Preparing Tigase for MongoDB
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

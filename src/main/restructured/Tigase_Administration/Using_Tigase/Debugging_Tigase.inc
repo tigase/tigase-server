@@ -1,3 +1,5 @@
+.. _Debuging-Tigase:
+
 Debuging Tigase
 --------------------
 

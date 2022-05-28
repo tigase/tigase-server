@@ -1,3 +1,5 @@
+.. _Prepare-the-MySQL-Database-for-the-Tigase-Server:
+
 Prepare the MySQL Database for the Tigase Server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
