@@ -1,3 +1,5 @@
+.. _usingMaven:
+
 Using Maven
 ================
 
@@ -67,9 +69,9 @@ something like this should show up
 
 If you see this message, success! You have finished installation and are ready to use Maven! If not, go back on your settings and insure that JDK is installed, and the JAVA_HOME, M2_HOME, and MAVEN_HOME variables are set properly.
 
-.. |Environment Variables| image:: ../../asciidoc/devguide/images/Env-button.jpg
-.. |Env Panel| image:: ../../asciidoc/devguide/images/Env-Panel.jpg
-.. |Env New| image:: ../../asciidoc/devguide/images/Env-New.jpg
+.. |Environment Variables| image:: /images/devguide/images/Env-button.jpg
+.. |Env Panel| image:: /images/devguide/Env-Panel.jpg
+.. |Env New| image:: ./images/devguide/Env-New.jpg
 
 A Very Short Maven Guide
 ------------------------------

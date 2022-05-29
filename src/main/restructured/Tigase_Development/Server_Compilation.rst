@@ -1,7 +1,7 @@
 Server Compilation
 ====================
 
-Tigase XMPP Server Project uses Maven for compilation. For details on Maven and it’s use, please see the `Maven Guide. <#usingMaven>`__
+Tigase XMPP Server Project uses Maven for compilation. For details on Maven and it’s use, please see the :ref:`Maven Guide.<usingMaven>`
 
 Distribution Packages
 -----------------------

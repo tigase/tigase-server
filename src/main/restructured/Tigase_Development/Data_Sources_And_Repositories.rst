@@ -65,7 +65,7 @@ MDRepositoryBean
 
 It is required to create a class extending ``MDRepositoryBean`` implementing same custom interface as the custom repository. This class will be a multi domain pool, allowing you to have separate implementation of custom repository for each domain. Moreover, it will be responsible for creation and initialization of your custom repository instances.
 
-.. |Relations between DataSourceBean and DataSources| image:: ../../asciidoc/devguide/images/datasourcebean-datasources.png
-.. |Relations between AuthRepositories and DataSources| image:: ../../asciidoc/devguide/images/datasource-authrepository.png
-.. |Relations between UserRepositories and DataSources| image:: ../../asciidoc/devguide/images/datasource-userrepository.png
-.. |Relations between custom repositories and DataSources| image:: ../../asciidoc/devguide/images/datasource-customrepository.png
+.. |Relations between DataSourceBean and DataSources| image:: /images/devguide/datasourcebean-datasources.png
+.. |Relations between AuthRepositories and DataSources| image:: /images/devguide/datasource-authrepository.png
+.. |Relations between UserRepositories and DataSources| image:: /images/devguide/datasource-userrepository.png
+.. |Relations between custom repositories and DataSources| image:: /images/devguide/datasource-customrepository.png
