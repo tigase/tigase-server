@@ -35,7 +35,7 @@ Listeners may subscribe for a specific event or for all events with specific a n
 
 So for example, to subscribe to ``<EventName xmlns="tigase:demo">``, node must be: ``EventName|tigase:demo``. If you wish to subscribe to all events with a specific namespace, use an asterisk (``*``) instead of the event name: ``*|tigase:demo``.
 
-   **Note**
+.. **Note**::  
 
    If client is subscribed to ``*|tigase:demo node``, then events will not be sent from node ``*|tigase:demo``, but from the **real** node (in this case: ``EventName|tigase:demo``).
 
