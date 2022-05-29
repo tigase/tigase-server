@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-05-29 02:43-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,43 +46,39 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:10
-msgid "`Component implementation - Lesson 1 - Basics <#cil1>`__"
+msgid ":ref:`Component implementation - Lesson 1 - Basics<cil1>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:12
-msgid "`Component implementation - Lesson 2 - Configuration <#cil2>`__"
+msgid ":ref:`Component implementation - Lesson 2 - Configuration<cil2>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:14
-msgid "`Component implementation - Lesson 3 - Multi-Threading <#cil3>`__"
+msgid ":ref:`Component implementation - Lesson 3 - Multi-Threading<cil3>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:16
-msgid "`Component implementation - Lesson 4 - Service Discovery <#cil4>`__"
+msgid ":ref:`Component implementation - Lesson 4 - Service Discovery<cil4>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:18
-msgid "`Component implementation - Lesson 5 - Statistics <#cil5>`__"
+msgid ":ref:`Component implementation - Lesson 5 - Statistics<cil5>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:20
-msgid "`Component implementation - Lesson 6 - Scripting Support <#cil6>`__"
+msgid ":ref:`Component implementation - Lesson 6 - Scripting Support<cil6>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:22
-msgid "`Component implementation - Lesson 7 - Data Repository <#cil7>`__"
+msgid ":ref:`Component implementation - Lesson 7 - Data Repository<cil7>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:24
-msgid "`Component implementation - Lesson 8 - Startup Time <#cil8>`__"
+msgid ":ref:`Component implementation - Lesson 8 - Startup Time<cil8>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:26
-msgid "`Packet Filtering in Component <#packetfiltering>`__"
-msgstr ""
-
-#: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ cil1"
+msgid ":ref:`Packet Filtering in Component<packetfiltering>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:31
@@ -325,10 +321,6 @@ msgid ""
 "useful code."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:182
-msgid ": _cil2:"
-msgstr ""
-
 #: ../../Tigase_Development/Component_Implementation.rst:185
 msgid "Component Implementation - Lesson 2 - Configuration"
 msgstr ""
@@ -418,10 +410,6 @@ msgid ""
 " value to different type and update other field - in our case we updated "
 "**CRITERIA** field which will result in change of packet types which for "
 "which method **void process(…​)** will be called."
-msgstr ""
-
-#: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ cil3"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:273
@@ -573,10 +561,6 @@ msgstr ""
 #: ../../Tigase_Development/Component_Implementation.rst:912
 #: ../../Tigase_Development/Component_Implementation.rst:1209
 msgid "**Example module code.**"
-msgstr ""
-
-#: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ cil4"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:514
@@ -806,10 +790,6 @@ msgid ""
 " component:"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst
-msgid "_ cil5"
-msgstr ""
-
 #: ../../Tigase_Development/Component_Implementation.rst:794
 msgid "Component Implementation - Lesson 5 - Statistics"
 msgstr ""
@@ -915,11 +895,6 @@ msgid ""
 "statistics is very simple and straightforward. Just one method to "
 "overwrite and a simple way to pass your own counters. Below is the whole "
 "code of the example component:"
-msgstr ""
-
-#: ../../Tigase_Development/Component_Implementation.rst:1017
-#: ../../Tigase_Development/Component_Implementation.rst:1315
-msgid ": _cil6:"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1020
@@ -1753,4 +1728,49 @@ msgid ""
 " ``RegistrarBean`` called to give component a way to unregister beans (if"
 " needed)."
 msgstr ""
+
+#~ msgid "`Component implementation - Lesson 1 - Basics <#cil1>`__"
+#~ msgstr ""
+
+#~ msgid "`Component implementation - Lesson 2 - Configuration <#cil2>`__"
+#~ msgstr ""
+
+#~ msgid "`Component implementation - Lesson 3 - Multi-Threading <#cil3>`__"
+#~ msgstr ""
+
+#~ msgid "`Component implementation - Lesson 4 - Service Discovery <#cil4>`__"
+#~ msgstr ""
+
+#~ msgid "`Component implementation - Lesson 5 - Statistics <#cil5>`__"
+#~ msgstr ""
+
+#~ msgid "`Component implementation - Lesson 6 - Scripting Support <#cil6>`__"
+#~ msgstr ""
+
+#~ msgid "`Component implementation - Lesson 7 - Data Repository <#cil7>`__"
+#~ msgstr ""
+
+#~ msgid "`Component implementation - Lesson 8 - Startup Time <#cil8>`__"
+#~ msgstr ""
+
+#~ msgid "`Packet Filtering in Component <#packetfiltering>`__"
+#~ msgstr ""
+
+#~ msgid "_ cil1"
+#~ msgstr ""
+
+#~ msgid ": _cil2:"
+#~ msgstr ""
+
+#~ msgid "_ cil3"
+#~ msgstr ""
+
+#~ msgid "_ cil4"
+#~ msgstr ""
+
+#~ msgid "_ cil5"
+#~ msgstr ""
+
+#~ msgid ": _cil6:"
+#~ msgstr ""
 

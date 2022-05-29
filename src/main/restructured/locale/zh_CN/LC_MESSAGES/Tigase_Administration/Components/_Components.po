@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-29 01:40-0700\n"
+"POT-Creation-Date: 2022-05-29 02:43-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -228,17 +228,19 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:8
-msgid "ref:`Statistics Logger Configuration<Configuration-of-statistics-loggers>`"
+msgid ""
+":ref:`Statistics Logger Configuration<Configuration-of-statistics-"
+"loggers>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:10
 msgid ""
-"ref:`Retrieving Statistics from the Server<Retrieving-statistics-from-"
+":ref:`Retrieving Statistics from the Server<Retrieving-statistics-from-"
 "the-server>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:12
-msgid "ref:`Monitor Component<Monitor-Component>`"
+msgid ":ref:`Monitor Component<Monitor-Component>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:4
@@ -666,17 +668,6 @@ msgid ""
 "node must be: ``EventName|tigase:demo``. If you wish to subscribe to all "
 "events with a specific namespace, use an asterisk (``*``) instead of the "
 "event name: ``*|tigase:demo``."
-msgstr ""
-
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:38
-msgid "**Note**"
-msgstr ""
-
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:40
-msgid ""
-"If client is subscribed to ``*|tigase:demo node``, then events will not "
-"be sent from node ``*|tigase:demo``, but from the **real** node (in this "
-"case: ``EventName|tigase:demo``)."
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:43
@@ -2514,5 +2505,29 @@ msgstr ""
 #~ "JMX client that connects to Tigase "
 #~ "and periodically saves all statistics to"
 #~ " files."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "ref:`Statistics Logger Configuration<Configuration-"
+#~ "of-statistics-loggers>`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "ref:`Retrieving Statistics from the Server"
+#~ "<Retrieving-statistics-from-the-server>`"
+#~ msgstr ""
+
+#~ msgid "ref:`Monitor Component<Monitor-Component>`"
+#~ msgstr ""
+
+#~ msgid "**Note**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If client is subscribed to "
+#~ "``*|tigase:demo node``, then events will "
+#~ "not be sent from node ``*|tigase:demo``,"
+#~ " but from the **real** node (in "
+#~ "this case: ``EventName|tigase:demo``)."
 #~ msgstr ""
 
