@@ -1,4 +1,4 @@
-:_ #packetfiltering::
+.. _packetfiltering:
 
 Packet Filtering in Components
 ================================

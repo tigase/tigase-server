@@ -87,4 +87,4 @@ Each stanza is stored in the ``tigase.xml.Element`` object. Every Element can co
 
 To simplify some, most common operations Element is wrapped in ``tigase.server.Packet`` class which offers another level of API for the most common operations like preparation of response stanza based on the element it contains (swap to/from values, put type=result attribute and others).
 
-.. |Tigase architecture| image:: ../../asciidoc/devguide/images/tigase-architecture.svg
+.. |Tigase architecture| image:: /images/devguide/tigase-architecture.svg

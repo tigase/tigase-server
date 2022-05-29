@@ -353,11 +353,11 @@ The packet has to be processed twice by the session manager. The first time it i
 
 This is to make sure the User A has permission to send a packet out and all processing is applied to the packet and also to make sure that User B has permission to receive the packet and all processing is applied. If, for example, the User B is offline there is an offline message processor which should send the packet to a database instead of User B.
 
-.. |Consumer| image:: ../../asciidoc/devguide/images/sm-consumer.png
-.. |User Send to Comp| image:: ../../asciidoc/devguide/images/user-sends-to-comp.png
-.. |Comp Sends to User| image:: ../../asciidoc/devguide/images/comp-sends-to-user.png
-.. |User Request Response| image:: ../../asciidoc/devguide/images/user-request-response.png
-.. |User Sends to User| image:: ../../asciidoc/devguide/images/user-sends-to-user.png
+.. |Consumer| image:: /images/devguide/sm-consumer.png
+.. |User Send to Comp| image:: /images/devguide/user-sends-to-comp.png
+.. |Comp Sends to User| image:: /images/devguide/comp-sends-to-user.png
+.. |User Request Response| image:: /images/devguide/user-request-response.png
+.. |User Sends to User| image:: /images/devguide/user-sends-to-user.png
 
 .. _saslcmac:
 

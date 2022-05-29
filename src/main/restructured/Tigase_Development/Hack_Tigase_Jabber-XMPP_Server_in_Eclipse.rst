@@ -84,12 +84,12 @@ Now click Next and point the root directory to where you cloned the git reposito
 
 Once the import is finished, you are able to now begin working with Tigase’s code inside Eclipse! Happy coding!
 
-.. |win git1| image:: ../../asciidoc/devguide/images/win-git1.jpg
-.. |win git2| image:: ../../asciidoc/devguide/images/win-git2.jpg
-.. |win git3| image:: ../../asciidoc/devguide/images/win-git3.jpg
-.. |win git4| image:: ../../asciidoc/devguide/images/win-git4.jpg
-.. |win git5| image:: ../../asciidoc/devguide/images/win-git5.jpg
-.. |Eclipse help| image:: ../../asciidoc/devguide/images/Eclipse-help.jpg
-.. |Eclipse m2Einstall| image:: ../../asciidoc/devguide/images/Eclipse-m2Einstall.jpg
-.. |Eclipse importMaven| image:: ../../asciidoc/devguide/images/Eclipse-importMaven.jpg
-.. |Eclipse importMaven2| image:: ../../asciidoc/devguide/images/Eclipse-importMaven2.jpg
+.. |win git1| image:: /images/devguide/win-git1.jpg
+.. |win git2| image:: /images/devguide/win-git2.jpg
+.. |win git3| image:: /images/devguide/win-git3.jpg
+.. |win git4| image:: /images/devguide/win-git4.jpg
+.. |win git5| image:: /images/devguide/win-git5.jpg
+.. |Eclipse help| image:: /images/devguide/Eclipse-help.jpg
+.. |Eclipse m2Einstall| image:: /images/devguide/Eclipse-m2Einstall.jpg
+.. |Eclipse importMaven| image:: /images/devguide/Eclipse-importMaven.jpg
+.. |Eclipse importMaven2| image:: /images/devguide/Eclipse-importMaven2.jpg

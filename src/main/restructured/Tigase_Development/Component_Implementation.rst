@@ -7,25 +7,25 @@ An example of the best known components is MUC or PubSub. In Tigase however, alm
 
 Creating components for Tigase server is an essential part of the server development hence there is a lot of useful API and ready to use code available. This guide should help you to get familiar with the API and how to quickly and efficiently create your own component implementations.
 
-1. `Component implementation - Lesson 1 - Basics <#cil1>`__
+1. :ref:`Component implementation - Lesson 1 - Basics<cil1>`
 
-2. `Component implementation - Lesson 2 - Configuration <#cil2>`__
+2. :ref:`Component implementation - Lesson 2 - Configuration<cil2>`
 
-3. `Component implementation - Lesson 3 - Multi-Threading <#cil3>`__
+3. :ref:`Component implementation - Lesson 3 - Multi-Threading<cil3>`
 
-4. `Component implementation - Lesson 4 - Service Discovery <#cil4>`__
+4. :ref:`Component implementation - Lesson 4 - Service Discovery<cil4>`
 
-5. `Component implementation - Lesson 5 - Statistics <#cil5>`__
+5. :ref:`Component implementation - Lesson 5 - Statistics<cil5>`
 
-6. `Component implementation - Lesson 6 - Scripting Support <#cil6>`__
+6. :ref:`Component implementation - Lesson 6 - Scripting Support<cil6>`
 
-7. `Component implementation - Lesson 7 - Data Repository <#cil7>`__
+7. :ref:`Component implementation - Lesson 7 - Data Repository<cil7>`
 
-8. `Component implementation - Lesson 8 - Startup Time <#cil8>`__
+8. :ref:`Component implementation - Lesson 8 - Startup Time<cil8>`
 
-9. `Packet Filtering in Component <#packetfiltering>`__
+9. :ref:`Packet Filtering in Component<packetfiltering>`
 
-:_ cil1:
+.. _cil1:
 
 Component Implementation - Lesson 1 - Basics
 ------------------------------------------------
@@ -175,11 +175,11 @@ Let’s try it out. Using you favorite client send a message to JID: **test@deve
 
 If this is a case we can be sure that everything works as expected and all we now have to do is to fill the **process(…​)** method with some useful code.
 
-.. |service disco test comp admin 300| image:: ../../asciidoc/devguide/images/service-disco-test-comp-admin-300.png
-.. |commands list test 200| image:: ../../asciidoc/devguide/images/commands-list-test-200.png
-.. |service disco stats 200| image:: ../../asciidoc/devguide/images/service-disco-stats-200.png
+.. |service disco test comp admin 300| image:: /images/devguide/service-disco-test-comp-admin-300.png
+.. |commands list test 200| image:: /images/devguide/commands-list-test-200.png
+.. |service disco stats 200| image:: /images/devguide/service-disco-stats-200.png
 
-: _cil2:
+.. _cil2:
 
 Component Implementation - Lesson 2 - Configuration
 ----------------------------------------------------------------
@@ -267,7 +267,7 @@ Of course we can do much more useful packet processing in the ``process(…​)`
 
    Here we used a setter **setPacketType(String[] packetTypes)** which is a setter for field **packetTypes**. Tigase Kernel will use it instead of assigning value directly to a field which gives up opportunity to convert value to different type and update other field - in our case we updated **CRITERIA** field which will result in change of packet types which for which method **void process(…​)** will be called.
 
-:_ cil3:
+.. _cil3:
 
 Component Implementation - Lesson 3 - Multi-Threading
 -------------------------------------------------------------
@@ -508,7 +508,7 @@ Here is a code of an example component and module which uses all the API discuss
      }
    }
 
-:_ cil4:
+.. _cil4:
 
 Component Implementation - Lesson 4 - Service Discovery
 ----------------------------------------------------------
@@ -785,10 +785,10 @@ Of course all these setting can be applied to any service discovery create or up
      }
    }
 
-.. |spam filtering disco small| image:: ../../asciidoc/devguide/images/spam-filtering-disco-small.png
-.. |spam filter counter small| image:: ../../asciidoc/devguide/images/spam-filter-counter-small.png
+.. |spam filtering disco small| image:: /images/devguide/spam-filtering-disco-small.png
+.. |spam filter counter small| image:: /images/devguide/spam-filter-counter-small.png
 
-:_ cil5:
+.. _cil5:
 
 Component Implementation - Lesson 5 - Statistics
 ------------------------------------------------------
@@ -1012,9 +1012,9 @@ As you can see, the API for generating and presenting component statistics is ve
      }
    }
 
-.. |spam statitics small| image:: ../../asciidoc/devguide/images/spam-statitics-small.png
+.. |spam statitics small| image:: /images/devguide/spam-statitics-small.png
 
-: _cil6:
+.. _cil6:
 
 Component Implementation - Lesson 6 - Scripting Support
 ---------------------------------------------------------
@@ -1309,10 +1309,10 @@ Here is a complete code of the test component with the new method described at t
      }
    }
 
-.. |test comp newscript| image:: ../../asciidoc/devguide/images/test-comp-newscript.png
-.. |badwords list script| image:: ../../asciidoc/devguide/images/badwords-list-script.png
+.. |test comp newscript| image:: /images/devguide/test-comp-newscript.png
+.. |badwords list script| image:: /images/devguide/badwords-list-script.png
 
-: _cil6:
+.. _cil7:
 
 Component Implementation - Lesson 7 - Data Repository
 ---------------------------------------------------------------
