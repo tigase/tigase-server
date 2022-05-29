@@ -47,7 +47,7 @@ Afterwards we navigate to the MBeans tab from where we can access the ``tigase.s
 StatsDumper.groovy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to collect statistics over period of time following groovy script can be used: `StatsDumper.groovy <files/StatsDumper.groovy>`__. It’s a Simple JMX client that connects to Tigase and periodically saves all statistics to files.
+In order to collect statistics over period of time following groovy script can be used: `StatsDumper.groovy <https://raw.githubusercontent.com/tigase/tigase-server/master/src/main/restructured/files/StatsDumper.groovy>`__. It’s a Simple JMX client that connects to Tigase and periodically saves all statistics to files.
 
 It takes following parameters:
 
