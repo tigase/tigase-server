@@ -139,7 +139,7 @@ Both ``upgrade`` commands also have a build in help function, they can be called
 Upgrade/Restore with a script [experimental!]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To make upgrade process easier it’s possible to utilize `tigase-upgrade.sh </../master/files/tigase-upgrade.sh>`__ \*nix shell script. It permits upgrading to new version (supports downloading version from provided URL).
+To make upgrade process easier it’s possible to utilize `tigase-upgrade.sh </../files/tigase-upgrade.sh>`__ \*nix shell script. It permits upgrading to new version (supports downloading version from provided URL).
 
 It’s usage is as follows:
 
