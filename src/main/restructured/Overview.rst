@@ -1,5 +1,3 @@
-**Tigase MIX Component**
-
 Welcome to Tigase Mediated Information eXchange (MIX) component guide. The MIX component allows you to have multi user group chats (channels), which are better suited for multi device usage.
 
 Overview
