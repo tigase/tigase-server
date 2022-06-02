@@ -42,6 +42,7 @@ import tigase.pubsub.utils.Cache;
 import tigase.pubsub.utils.LRUCacheWithFuture;
 import tigase.server.DataForm;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
@@ -297,17 +298,53 @@ public class MixRepository<T> implements IMixRepository, IPubSubRepository.IList
 	public boolean validateItem(BareJID serviceJID, String node, String id, String publisher, Element item)
 			throws PubSubException {
 		if (Mix.Nodes.CONFIG.equals(node)) {
-			// this line is required as it validates it configuration is correct!
-			ChannelConfiguration config = new ChannelConfiguration(item);
-			ChannelConfiguration.updateLastChangeMadeBy(item, JID.jidInstanceNS(publisher));
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "validated channel " + serviceJID + " configuration as valid: " + config.toElement("UNSET"));
+			try {
+				ChannelConfiguration config = getChannelConfiguration(serviceJID);
+				if (config == null) {
+					config = new ChannelConfiguration();
+				}
+				config = config.apply(item.getChild("x", "jabber:x:data"));
+				config.setLastChangeMadeBy(BareJID.bareJIDInstanceNS(publisher));
+				Element validatedConfigForm = config.toFormElement();
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST,
+							"validated channel " + serviceJID + " configuration as valid: " + validatedConfigForm);
+				}
+				item.setChildren(Arrays.asList(validatedConfigForm));
+				return config != null && config.isValid();
+			} catch (RepositoryException ex) {
+				throw new PubSubException(Authorization.INTERNAL_SERVER_ERROR, "Could not load previous configuration form", ex);
 			}
-			return config != null && config.isValid();
 		}
 		if (Mix.Nodes.INFO.equals(node)) {
-			// we need to handle this properly..
-
+			Element form = item.getChild("x", "jabber:x:data");
+			if (form == null) {
+				throw new PubSubException(Authorization.NOT_ACCEPTABLE, "This is not a valid information form!");
+			}
+			form.setAttribute("type", "form");
+			try {
+				IItems items = pubSubRepository.getNodeItems(serviceJID, Mix.Nodes.INFO);
+				IItems.IItem prev = items.getLastItem(CollectionItemsOrdering.byUpdateDate);
+				if (prev != null) {
+					Set<String> currFields = DataForm.getFields(item);
+					Element prevForm = prev.getItem().getChild("x", "jabber:x:data");
+					if (prevForm != null) {
+						List<Element> prevFields = prevForm.findChildren(el -> el.getName() == "field");
+						if (prevFields != null) {
+							for (Element field : prevFields) {
+								if (currFields == null || !currFields.contains(field.getAttributeStaticStr("var"))) {
+									form.addChild(field);
+								}
+							}
+						}
+					}
+				}
+			} catch (RepositoryException ex) {
+				throw new PubSubException(Authorization.INTERNAL_SERVER_ERROR, "Could not load previous information form", ex);
+			}
+			if (!Mix.CORE1_XMLNS.equals(DataForm.getFieldValue(form, "FORM_TYPE"))) {
+				throw new PubSubException(Authorization.NOT_ACCEPTABLE, "Invalid FORM_TYPE!");
+			}
 		}
 		return true;
 	}
