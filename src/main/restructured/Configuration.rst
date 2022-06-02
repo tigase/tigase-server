@@ -37,7 +37,7 @@ By default we allow only local domain owners or admins to create publicly browsa
 
 **Allowing domain users to create public channels.**
 
-.. code:: dsl
+.. code:: text
 
    mix () {
        logic () {
@@ -55,7 +55,7 @@ Setting ACL for creation of ad-hoc (private) channels
 
 **Allowing all local users to create public channels.**
 
-.. code:: dsl
+.. code:: text
 
    mix () {
        logic () {
@@ -70,7 +70,7 @@ MIX component by default exposes MUC compatibility layer for clients that doesnâ
 
 **Disabling support for MUC.**
 
-.. code:: dsl
+.. code:: text
 
    mix () {
        roomPresenceModule (active: false) {}
@@ -90,7 +90,7 @@ You can increase this value by setting ``maxCacheSize`` property in the ``config
 
 **Setting limit of cached channels.**
 
-.. code:: dsl
+.. code:: text
 
    mix () {
        config () {
