@@ -1,0 +1,180 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2022, Tigase, Inc
+# This file is distributed under the same license as the TigaseDoc package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: TigaseDoc \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-04-19 13:47-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: ../../Configuration.rst:2
+msgid "Configuration"
+msgstr ""
+
+#: ../../Configuration.rst:4
+msgid ""
+"Configuration of MIX component is extended version of PubSub component "
+"configuration. We will not describe here configuration of PubSub "
+"component as it already available in PubSub component documentation."
+msgstr ""
+
+#: ../../Configuration.rst:7
+msgid "Setting ACL"
+msgstr ""
+
+#: ../../Configuration.rst:9
+msgid ""
+"With ACL you can control who can create publicly visible channels and "
+"also ad-hoc channels. ACL properties accept following values:"
+msgstr ""
+
+#: ../../Configuration.rst:12
+msgid "**ALL**"
+msgstr ""
+
+#: ../../Configuration.rst:12
+msgid "Anyone can create channel"
+msgstr ""
+
+#: ../../Configuration.rst:15
+msgid "**LOCAL**"
+msgstr ""
+
+#: ../../Configuration.rst:15
+msgid ""
+"Only local users can create channels (from all local domains on all local"
+" domains)"
+msgstr ""
+
+#: ../../Configuration.rst:18
+msgid "**ADMIN**"
+msgstr ""
+
+#: ../../Configuration.rst:18
+msgid "Only installation administrator can create channels"
+msgstr ""
+
+#: ../../Configuration.rst:21
+msgid "**DOMAIN_OWNER**"
+msgstr ""
+
+#: ../../Configuration.rst:21
+msgid ""
+"Only domain owner of the domain as the domain under which MIX component "
+"is running can create channels"
+msgstr ""
+
+#: ../../Configuration.rst:24
+msgid "**DOMAIN_ADMIN**"
+msgstr ""
+
+#: ../../Configuration.rst:24
+msgid ""
+"Only domain administrator of the domain as the domain under which MIX "
+"component is running can create channels"
+msgstr ""
+
+#: ../../Configuration.rst:27
+msgid "**DOMAIN**"
+msgstr ""
+
+#: ../../Configuration.rst:27
+msgid ""
+"Only users from the same domain as the domain under which MIX component "
+"is running can create channels"
+msgstr ""
+
+#: ../../Configuration.rst:30
+msgid "Setting ACL for creation of public channels"
+msgstr ""
+
+#: ../../Configuration.rst:32
+msgid "**Property name: ``publicChannelCreationAcl``**"
+msgstr ""
+
+#: ../../Configuration.rst:34
+msgid "**Default value: ``DOMAIN_ADMIN``**"
+msgstr ""
+
+#: ../../Configuration.rst:36
+msgid ""
+"By default we allow only local domain owners or admins to create publicly"
+" browsable channels."
+msgstr ""
+
+#: ../../Configuration.rst:38
+msgid "**Allowing domain users to create public channels.**"
+msgstr ""
+
+#: ../../Configuration.rst:50
+msgid "Setting ACL for creation of ad-hoc (private) channels"
+msgstr ""
+
+#: ../../Configuration.rst:52
+msgid "**Property nmae: ``adhocChannelCreationAcl``**"
+msgstr ""
+
+#: ../../Configuration.rst:54
+msgid "**Default value: ``DOMAIN``**"
+msgstr ""
+
+#: ../../Configuration.rst:56
+msgid "**Allowing all local users to create public channels.**"
+msgstr ""
+
+#: ../../Configuration.rst:67
+msgid "Disabling support for MUC"
+msgstr ""
+
+#: ../../Configuration.rst:69
+msgid ""
+"MIX component by default exposes MUC compatibility layer for clients that"
+" doesn’t support MIX yet, so they would still be able to participate in "
+"the MIX channel conversation. It’s possible to disable it with the "
+"following option."
+msgstr ""
+
+#: ../../Configuration.rst:71
+msgid "**Disabling support for MUC.**"
+msgstr ""
+
+#: ../../Configuration.rst:81
+msgid "Setting limit of cached channels"
+msgstr ""
+
+#: ../../Configuration.rst:83
+msgid "**Property name: ``maxCacheSize``**"
+msgstr ""
+
+#: ../../Configuration.rst:85
+msgid "**Default value: ``2000``**"
+msgstr ""
+
+#: ../../Configuration.rst:87
+msgid ""
+"MIX component is caching channels configuration and affiliation in memory"
+" while it is processing request for the particular channel. To make that "
+"more efficient it is using cache to keep the most often used channels "
+"configuration in memory instead of loading it every time."
+msgstr ""
+
+#: ../../Configuration.rst:89
+msgid ""
+"You can increase this value by setting ``maxCacheSize`` property in the "
+"``config`` scope of the MIX component:"
+msgstr ""
+
+#: ../../Configuration.rst:91
+msgid "**Setting limit of cached channels.**"
+msgstr ""
+
