@@ -3,39 +3,42 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-06-11 23:14+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/release_notes/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_Release_Notes.rst:2
 msgid "Tigase 8.3.0 Release Notes"
-msgstr ""
+msgstr "Tigase 8.3.0 发行说明"
 
 #: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:2
 msgid "Tigase XMPP Server 8.3.0 Change notes"
-msgstr ""
+msgstr "Tigase XMPP 服务器 8.3.0 变更说明"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:5
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:5
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:5
 #: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:5
 msgid "Major Changes"
-msgstr ""
+msgstr "主要变化"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:16
 #: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:8
 msgid "All Minor Features & Behavior Changes"
-msgstr ""
+msgstr "所有次要功能和行为变化"
 
 #: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:10
 msgid ""
@@ -45,10 +48,14 @@ msgid ""
 " configure size of this buffer using `socket-buffer-size` property - "
 "please see documentation."
 msgstr ""
+"网络套接字缓冲区从 2K 增加到 "
+"4K，从而以提高从套接字读取数据时的性能。当并发用户连接的数量增加时， "
+"它可以成比例地增加内存使用量。也可以使用 `socket-buffer-size` "
+"属性配置此缓冲区的大小 - 请参阅文档。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:2
 msgid "Tigase XMPP Server 8.2.0 Change notes"
-msgstr ""
+msgstr "Tigase XMPP Server 8.2.0 变更说明"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:7
 msgid ""
@@ -57,75 +64,96 @@ msgid ""
 "logic during authentication and stream negotiation solving connectivity "
 "issues with various deployments"
 msgstr ""
+"**对 s2s 连接的改进**：版本 8.2.0 带来了许多与 s2s 连接相关的改进：支持 TLS1."
+"3，改进了身份验证和流协商期间的逻辑，解决了各种部署的连接问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:9
 msgid ""
 "**Better handling of certificates**: It’s now possible to store "
 "certificates in the database making it easier to manage them in clustered"
 " environment."
-msgstr ""
+msgstr "**更好地处理证书**：现在可以将证书存储在数据库中，从而更容易在集群环境中管理"
+"它们。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:11
 msgid "Deprecation of ``Element`` based events in favour of Object based events"
-msgstr ""
+msgstr "弃用基于``Element`` 的事件，支持基于对象的事件"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:13
 msgid "Improved performance: reduced memory usage and decrease startup time"
-msgstr ""
+msgstr "提高性能：减少内存使用并缩短启动时间"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:18
 msgid ""
 "`#server-1050 <https://projects.tigase.net/issue/server-1050>`__: "
 "Database installation without root credentials"
 msgstr ""
+"`#server-1050 <https://projects.tigase.net/issue/server-1050>`__:没有 "
+"根凭证的数据库安装"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:20
 msgid ""
 "`#server-1062 <https://projects.tigase.net/issue/server-1062>`__: "
 "Deprecate Element based Event-bus"
 msgstr ""
+"`#server-1062 <https://projects.tigase.net/issue/"
+"server-1062>`__:弃用基于事件总线的元素"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:22
 msgid ""
 "`#server-1097 <https://projects.tigase.net/issue/server-1097>`__: It’s "
 "not possible to configure additional PacketFilters"
 msgstr ""
+"`#server-1097 <https://projects.tigase.net/issue/server-1097>`__: "
+"无法配置额外的包过滤器"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:24
 msgid ""
 "`#server-1101 <https://projects.tigase.net/issue/server-1101>`__: "
 "Enabling TLS1.3 causes s2s connections to fail"
 msgstr ""
+"`#server-1101 <https://projects.tigase.net/issue/server-1101>`__: 启用 "
+"TLS1.3 会导致 s2s 连接失败"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:26
 msgid ""
 "`#server-1102 <https://projects.tigase.net/issue/server-1102>`__: Add "
 "possibility to extend MAM to MAM:2"
 msgstr ""
+"`#server-1102 <https://projects.tigase.net/issue/server-1102>`__:增加将 MAM "
+"扩展到 MAM:2 的可能性"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:28
 msgid ""
 "`#server-1105 <https://projects.tigase.net/issue/server-1105>`__: Enhance"
 " Add SSL Certificate ad-hoc with option to set default"
 msgstr ""
+"`#server-1105 <https://projects.tigase.net/issue/server-1105>`__: 增强添加 "
+"SSL 证书临时选项以设置默认值"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:30
 msgid ""
 "`#server-1119 <https://projects.tigase.net/issue/server-1119>`__: Use "
 "database for certificate storage instead of filesystem"
 msgstr ""
+"`#server-1119 <https://projects.tigase.net/issue/server-1119>`__: "
+"用数据库替代文件系统来存储证书"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:32
 msgid ""
 "`#server-1120 <https://projects.tigase.net/issue/server-1120>`__: "
 "JabberIqRegister should allow enforcing both CAPTCHA and e-mail"
 msgstr ""
+"`#server-1120 <https://projects.tigase.net/issue/server-1120>`__: "
+"JabberIqRegister 应该允许同时执行 CAPTCHA 和电子邮件"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:34
 msgid ""
 "`#server-1132 <https://projects.tigase.net/issue/server-1132>`__: Don’t "
 "use s2s socket if only one-direction works"
 msgstr ""
+"`#server-1132 <https://projects.tigase.net/issue/"
+"server-1132>`__:如果只有一个方向有效，请不要使用 s2s 套接字"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:36
 msgid ""
@@ -133,6 +161,8 @@ msgid ""
 "registration inform the client that the account activation (email) is "
 "required"
 msgstr ""
+"`#server-1142 <https://projects.tigase.net/issue/server-1142>`__: "
+"注册后要求通过电子邮件通知客户激活帐户"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:38
 msgid ""
@@ -140,78 +170,104 @@ msgid ""
 "Establishing JMX connection to the server causes excessive memory "
 "allocation"
 msgstr ""
+"`#server-1158 <https://projects.tigase.net/issue/server-1158>`__: "
+"与服务器建立 JMX 连接会导致内存分配过多"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:40
 msgid ""
 "`#server-1162 <https://projects.tigase.net/issue/server-1162>`__: Allow "
 "interfaces in @ConfigField"
 msgstr ""
+"`#server-1162 <https://projects.tigase.net/issue/server-1162>`__: 在@"
+"ConfigField 中允许接口"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:42
 msgid ""
 "`#server-1170 <https://projects.tigase.net/issue/server-1170>`__: TLS "
 "infinity loop impacts Tigase XMPP Server performance"
 msgstr ""
+"`#server-1170 <https://projects.tigase.net/issue/server-1170>`__: TLS "
+"无限循环影响 Tigase XMPP 服务器性能"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:44
 msgid ""
 "`#server-1175 <https://projects.tigase.net/issue/server-1175>`__: "
 "Connection with diebesban.de stopped with invalid-namespace error"
 msgstr ""
+"`#server-1175 <https://projects.tigase.net/issue/server-1175>`__: 与 "
+"diebesban.de 的连接因无效命名空间错误而停止"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:46
 msgid ""
 "`#server-1177 <https://projects.tigase.net/issue/server-1177>`__: Ability"
 " to change log level during runtime"
 msgstr ""
+"`#server-1177 <https://projects.tigase.net/issue/server-1177>`__: "
+"能够在运行时更改日志级别"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:48
 msgid ""
 "`#server-1178 <https://projects.tigase.net/issue/server-1178>`__: Remove "
 "``online_status`` from the repository"
 msgstr ""
+"`#server-1178 <https://projects.tigase.net/issue/server-1178>`__: "
+"从存储库中删除 ``online_status``（在线状态）"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:50
 msgid ""
 "`#server-1179 <https://projects.tigase.net/issue/server-1179>`__: Add "
 "support for {clusterNode} in XEP-0215 host field"
 msgstr ""
+"`#server-1179 <https://projects.tigase.net/issue/server-1179>`__: 在 XEP-"
+"0215 主机字段中添加对 {clusterNode（集群节点）} 的支持"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:52
 msgid ""
 "`#server-1181 <https://projects.tigase.net/issue/server-1181>`__: "
 "NoSuchElementException in MaxDailyCounterQueue"
 msgstr ""
+"`#server-1181 <https://projects.tigase.net/issue/server-1181>`"
+"__MaxDailyCounterQueue 中的 NoSuchElementException"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:54
 msgid ""
 "`#server-1182 <https://projects.tigase.net/issue/server-1182>`__: NPE "
 "while processing <iq type=\"result\"/> without existing session"
 msgstr ""
+"`#server-1182 <https://projects.tigase.net/issue/server-1182>`__: "
+"在没有现有会话的情况下处理 <iq type=\"result\"/> 时的 NPE"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:56
 msgid ""
 "`#server-1187 <https://projects.tigase.net/issue/server-1187>`__: "
 "SchemaLoader should not print passwords in the logs (URL logs)"
 msgstr ""
+"`#server-1187 <https://projects.tigase.net/issue/server-1187>`__: "
+"SchemaLoader 不应在日志（URL 日志）中打印密码"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:58
 msgid ""
 "`#server-1192 <https://projects.tigase.net/issue/server-1192>`__: "
 "Obfuscate repository passwords"
 msgstr ""
+"`#server-1192 <https://projects.tigase.net/issue/server-1192>`__: "
+"混淆存储库密码"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:60
 msgid ""
 "`#server-1190 <https://projects.tigase.net/issue/server-1190>`__: "
 "Executing EditUser on non-existen’t user causes creation of the user"
 msgstr ""
+"`#server-1190 <https://projects.tigase.net/issue/server-1190>`__: "
+"对不存在的用户执行 EditUser 会导致创建新用户"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:62
 msgid ""
 "`#server-1193 <https://projects.tigase.net/issue/server-1193>`__: Push "
 "notifications are sent for groupchat messages without <body/>"
 msgstr ""
+"`#server-1193 <https://projects.tigase.net/issue/server-1193>`__: 对没有<"
+"body/> 的群聊消息发送推送通知"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:64
 msgid ""
@@ -219,98 +275,141 @@ msgid ""
 "Infinite loop while cutting body of encrypted push notification to fit "
 "the push notifications limit"
 msgstr ""
+"`#server-1197 <https://projects.tigase.net/issue/server-1197>`__: "
+"无限循环，同时删减加密推送通知的主体以适应推送通知限制"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:66
+#, fuzzy
 msgid ""
 "`#server-1199 <https://projects.tigase.net/issue/server-1199>`__: Don’t "
 "send any packets until s2s stream negotiation is finished"
 msgstr ""
+"`#server-1199 <https://projects.tigase.net/issue/server-1199>`__: 在 s2s "
+"流协商完成之前不要发送任何数据包"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:68
 msgid ""
 "`#server-1200 <https://projects.tigase.net/issue/server-1200>`__: Use "
 "proper size of network buffers for high-throughput connections"
 msgstr ""
+"`#server-1200 <https://projects.tigase.net/issue/server-1200>`__: "
+"对高通量的连接使用适当大小的网络缓冲区"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:70
+#, fuzzy
 msgid ""
 "`#server-1203 <https://projects.tigase.net/issue/server-1203>`__: Handing"
 " error packets in CIDConnections.sendPacketsBack"
 msgstr ""
+"`#server-1203 <https://projects.tigase.net/issue/server-1203>`__: 在 "
+"CIDConnections.sendPacketsBack 中处理错误数据包"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:72
+#, fuzzy
 msgid ""
 "`#server-1217 <https://projects.tigase.net/issue/server-1217>`__: Prevent"
 " performing schema upgrade concurrently"
 msgstr ""
+"`#server-1217 <https://projects.tigase.net/issue/server-1217>`__: "
+"防止同时执行架构升级"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:74
+#, fuzzy
 msgid ""
 "`#server-1219 <https://projects.tigase.net/issue/server-1219>`__: Use all"
 " JDBC URI parameters from config.tdsl when performing database upgrade."
 msgstr ""
+"`#server-1219 <https://projects.tigase.net/issue/server-1219>`__: "
+"执行数据库升级时，使用 config.tdsl 中的所有 JDBC URI 参数。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:76
 msgid ""
 "`#server-1222 <https://projects.tigase.net/issue/server-1222>`__: Add "
 "support for XEP-0377: Spam Reporting"
 msgstr ""
+"`#server-1222 <https://projects.tigase.net/issue/server-1222>`__: 添加对 "
+"XEP-0377：垃圾邮件报告的支持"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:78
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:80
+#, fuzzy
 msgid ""
 "`#server-1229 <https://projects.tigase.net/issue/server-1229>`__: "
 "Enabling CAPTCHA or e-mail for JabberIqRegister breaks password changing "
 "functionality."
 msgstr ""
+"`#server-1229 <https://projects.tigase.net/issue/server-1229>`__: 为 "
+"JabberIqRegister 启用 CAPTCHA 或电子邮件会损害密码更改功能。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:82
+#, fuzzy
 msgid ""
 "`#server-1233 <https://projects.tigase.net/issue/server-1233>`__: Add "
 "option to CertificateRepository to load certificates from the filesystem"
 msgstr ""
+"`#server-1233 <https://projects.tigase.net/issue/server-1233>`__: 向 "
+"CertificateRepository 添加选项以从文件系统加载证书"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:84
+#, fuzzy
 msgid ""
 "`#server-1234 <https://projects.tigase.net/issue/server-1234>`__: Roster "
 "API improvements"
 msgstr ""
+"`#server-1234 <https://projects.tigase.net/issue/server-1234>`__: 名册 API "
+"改进"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:86
+#, fuzzy
 msgid ""
 "`#server-1237 <https://projects.tigase.net/issue/server-1237>`__: Rework "
 "CertificateRepository so items are stored individually"
 msgstr ""
+"`#server-1237 <https://projects.tigase.net/issue/server-1237>`__: 修改 "
+"CertificateRepository，以便单独存储项目"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:88
+#, fuzzy
 msgid ""
 "`#server-1238 <https://projects.tigase.net/issue/server-1238>`__: Can’t "
 "set MOTD via ad-hoc."
 msgstr ""
+"`#server-1238 <https://projects.tigase.net/issue/server-1238>`__: 无法通过 "
+"ad-hoc 设置 MOTD。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:90
+#, fuzzy
 msgid ""
 "`#server-1243 <https://projects.tigase.net/issue/server-1243>`__: Include"
 " wait-for-it.sh script in base distribution"
 msgstr ""
+"`#server-1243 <https://projects.tigase.net/issue/server-1243>`__: "
+"在基本发行版中包含 wait-for-it.sh 脚本"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:92
+#, fuzzy
 msgid ""
 "`#server-1245 <https://projects.tigase.net/issue/server-1245>`__: "
 "MethodStatistics doesn’t work well for interfaces with overloaded methods"
 msgstr ""
+"`#server-1245 <https://projects.tigase.net/issue/server-1245>`__: "
+"MethodStatistics 不适用于有重载方法的接口"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:94
 msgid ""
 "`#server-1251 <https://projects.tigase.net/issue/server-1251>`__: Can’t "
 "initialise MAM processor with default installation"
 msgstr ""
+"`#server-1251 <https://projects.tigase.net/issue/server-1251>`__: "
+"无法使用默认安装初始化 MAM 处理器"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:96
 msgid ""
 "`#server-1252 <https://projects.tigase.net/issue/server-1252>`__: Remove "
 "select row_count() from Tig_OfflineMessages_DeleteMessage"
 msgstr ""
+"`#server-1252 <https://projects.tigase.net/issue/server-1252>`__: 从 "
+"Tig_OfflineMessages_DeleteMessage 中删除选择的 row_count()"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:98
 msgid ""
@@ -318,54 +417,77 @@ msgid ""
 "seems that 'expired-processor' doesn’t remove periodically expired "
 "messages"
 msgstr ""
+"`#server-1253 <https://projects.tigase.net/issue/server-1253>`__: 'expired-"
+"processor' 疑似不会定期删除过期的消息"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:100
+#, fuzzy
 msgid ""
 "`#server-1254 <https://projects.tigase.net/issue/server-1254>`__: Fix "
 "slow startup and shutdown"
 msgstr ""
+"`#server-1254 <https://projects.tigase.net/issue/server-1254>`__: "
+"修复启动和关闭缓慢的问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:102
+#, fuzzy
 msgid ""
 "`#server-1258 <https://projects.tigase.net/issue/server-1258>`__: Allow "
 "beans to be instantiated without the requirement to reference/inject them"
 msgstr ""
+"`#server-1258 <https://projects.tigase.net/issue/server-1258>`__: "
+"无需引用/注入bean,但是允许实例化它们"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:104
+#, fuzzy
 msgid ""
 "`#server-1260 <https://projects.tigase.net/issue/server-1260>`__: "
 "UserConnectedEvent should be a cluster event"
 msgstr ""
+"`#server-1260 <https://projects.tigase.net/issue/server-1260>`__: "
+"UserConnectedEvent 应该是一个集群事件"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:106
+#, fuzzy
 msgid ""
 "`#server-1261 <https://projects.tigase.net/issue/server-1261>`__: Revise "
 "and improve EventBus developer guide"
 msgstr ""
+"`#server-1261 <https://projects.tigase.net/issue/server-1261>`__: 修订和改进 "
+"EventBus 开发者指南"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:108
 msgid ""
 "`#server-1269 <https://projects.tigase.net/issue/server-1269>`__: SSL "
 "issues are hidden by default making it difficult to identify"
 msgstr ""
+"`#server-1269 <https://projects.tigase.net/issue/server-1269>`__: SSL "
+"问题被默认隐藏，难以识别"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:110
 msgid ""
 "`#server-1273 <https://projects.tigase.net/issue/server-1273>`__: Add "
 "option to limit number of concurrently connected resources"
 msgstr ""
+"`#server-1273 <https://projects.tigase.net/issue/server-1273>`__: "
+"添加选项以限制并发连接的资源数量"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:112
+#, fuzzy
 msgid ""
 "`#server-1277 <https://projects.tigase.net/issue/server-1277>`__: Fix "
 "HUGE out queue in StreamManagementIOProcessor"
 msgstr ""
+"`#server-1277 <https://projects.tigase.net/issue/server-1277>`__: 修复 "
+"StreamManagementIOProcessor 中的 HUGE out queue"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:114
 msgid ""
 "`#server-1278 <https://projects.tigase.net/issue/server-1278>`__: NPE in "
 "StreamManagementIOProcessor.serviceStopped"
 msgstr ""
+"`#server-1278 <https://projects.tigase.net/issue/server-1278>`__: "
+"在StreamManagementIOProcessor.serviceStopped 中的 NPE"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:116
 msgid ""
@@ -373,74 +495,105 @@ msgid ""
 "XMPPProcessorAbstract.processToUserPacket() responds to IQ result with "
 "error"
 msgstr ""
+"`#server-1282 <https://projects.tigase.net/issue/server-1282>`__: "
+"XMPPProcessorAbstract.processToUserPacket() 以错误结果响应 IQ"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:118
+#, fuzzy
 msgid ""
 "`#server-1284 <https://projects.tigase.net/issue/server-1284>`__: Add "
 "validation to JabberIqAuth"
 msgstr ""
+"`#server-1284 <https://projects.tigase.net/issue/server-1284>`__: 向 "
+"JabberIqAuth 添加验证"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:120
 msgid ""
 "`#server-1285 <https://projects.tigase.net/issue/server-1285>`__: Wrong "
 "field type for XEP-0157 entries"
 msgstr ""
+"`#server-1285 <https://projects.tigase.net/issue/server-1285>`__: XEP-0157 "
+"条目中的错误字段类型"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:122
 msgid ""
 "`#server-1290 <https://projects.tigase.net/issue/server-1290>`__: Improve"
 " StringPrep to actually forbid space in localpart/domain as per rfc7622"
 msgstr ""
+"`#server-1290 <https://projects.tigase.net/issue/server-1290>`__: 根据 "
+"rfc7622 改进 StringPrep 以禁止 localpart/domain 中的空间"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:124
+#, fuzzy
 msgid ""
 "`#server-1292 <https://projects.tigase.net/issue/server-1292>`__: TLS "
 "connectivity issue with search.jabber.network"
 msgstr ""
+"`#server-1292 <https://projects.tigase.net/issue/server-1292>`__: "
+"search.jabber.network 的 TLS 连接问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:126
+#, fuzzy
 msgid ""
 "`#server-1297 <https://projects.tigase.net/issue/server-1297>`__: Add "
 "option to push plugin that would allow to overwrite unencrypted part in "
 "(OMEMO) encrypted messages"
 msgstr ""
+"`#server-1297 <https://projects.tigase.net/issue/server-1297>`__: "
+"添加选项以推送插件，从而允许覆盖（OMEMO）加密消息中的未加密部分"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:128
+#, fuzzy
 msgid ""
 "`#server-1303 <https://projects.tigase.net/issue/server-1303>`__: Better "
 "handling of \"The target is unavailable at this time.\" / "
 "PacketInvalidTypeException"
 msgstr ""
+"`#server-1303 <https://projects.tigase.net/issue/server-1303>`__: "
+"更好地处理“此时目标不可用。” / PacketInvalidTypeException"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:130
 msgid ""
 "`#server-1305 <https://projects.tigase.net/issue/server-1305>`__: Allow "
 "creation of admin user (if not exist) during ``upgrade-schema`` task"
 msgstr ""
+"`#server-1305 <https://projects.tigase.net/issue/server-1305>`__: 允许在"
+"``upgrade-schema``任务期间创建管理员（如果不存在）用户"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:132
 msgid ""
 "`#server-1306 <https://projects.tigase.net/issue/server-1306>`__: Fix "
 "farge amount of direct memory being used."
 msgstr ""
+"`#server-1306 <https://projects.tigase.net/issue/server-1306>`__: "
+"修复正在使用的大量直接内存。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:134
+#, fuzzy
 msgid ""
 "`#server-1307 <https://projects.tigase.net/issue/server-1307>`__: Fix "
 "disconnection on MAM sync"
 msgstr ""
+"`#server-1307 <https://projects.tigase.net/issue/server-1307>`__: 修复 MAM "
+"同步断开连接问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:136
+#, fuzzy
 msgid ""
 "`#extras-3 <https://projects.tigase.net/issue/extras-3>`__: Add AWS "
 "logback and documentation how to use it"
 msgstr ""
+"`#extras-3 <https://projects.tigase.net/issue/extras-3>`__: 添加 AWS logback "
+"和如何使用它的文档"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:138
+#, fuzzy
 msgid ""
 "`#extras-4 <https://projects.tigase.net/issue/extras-4>`__: Unescape and "
 "normalise logs in mail notifications before sending them"
 msgstr ""
+"`#extras-4 <https://projects.tigase.net/issue/extras-4>`__: "
+"在发送邮件通知之前取消转义和规范化日志"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:140
 msgid ""
@@ -448,32 +601,37 @@ msgid ""
 "validation during in-band-registration; better handling of mail sending "
 "exceptions regarding to non-existent addresses"
 msgstr ""
+"`#extras-7 <https://projects.tigase.net/issue/extras-7>`__: 在带内注册期间添"
+"加电子邮件验证；更好地处理给不存在的邮件地址发送邮件所产生的异常问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:142
 msgid ""
 "`#extras-9 <https://projects.tigase.net/issue/extras-9>`__: Deprecate "
 "mDNS implementation"
-msgstr ""
+msgstr "`#extras-9 <https://projects.tigase.net/issue/extras-9>`__: 弃用 mDNS 实施"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:144
+#, fuzzy
 msgid ""
 "`#serverdist-8 <https://projects.tigase.net/issue/serverdist-8>`__: "
 "Remove DNS resolution part from XEP-0156 implementation"
 msgstr ""
+"`#serverdist-8 <https://projects.tigase.net/issue/serverdist-8>`__:从 XEP-"
+"0156 实现中删除 DNS 解析部分"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:2
 msgid "Tigase XMPP Server 8.1.0 Change notes and announcement"
-msgstr ""
+msgstr "Tigase XMPP Server 8.1.0 变更说明和公告"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:8
 msgid "More XMPP extensions"
-msgstr ""
+msgstr "XMPP更多 扩展"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:10
 msgid ""
 "Following XMPP guidelines specified in *Compliance Suites* a number of "
 "extensions was included in this release:"
-msgstr ""
+msgstr "遵循 *Compliance Suites* 中指定的 XMPP 指南，此版本中包含了许多扩展："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:12
 msgid ""
@@ -482,12 +640,17 @@ msgid ""
 " on per VHost basis (`server-1015 "
 "<https://projects.tigase.net/issue/server-1015>`__)"
 msgstr ""
+"**XEP-0157**: XMPP 服务的联系地址 (`server-995 <https://projects.tigase.net/"
+"issue/server-995>`__)可以在每个 VHost 基础上进行配置(`server-1015 "
+"<https://projects.tigase.net/issue/server-1015>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:14
 msgid ""
 "**XEP-0398**: User Avatar to vCard-Based Avatars Conversion (`server-1017"
 " <https://projects.tigase.net/issue/server-1017>`__)"
 msgstr ""
+"**XEP-0398**: 用户头像到基于 vCard 的头像转换 (`server-1017 <https://projects"
+".tigase.net/issue/server-1017>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:16
 msgid ""
@@ -496,12 +659,17 @@ msgid ""
 "``webservice`` to XEP-0156 (`http-76 "
 "<https://projects.tigase.net/issue/http-76>`__)"
 msgstr ""
+"**XEP-0156**:发现另外一种 XMPP 连接方法 - Tigase 已经支持处理 DNS "
+"查询并将我们的``webservice``标准化为 XEP-0156 (`http-76 <https://projects."
+"tigase.net/issue/http-76>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:18
 msgid ""
 "**XEP-0410**: MUC Self-Ping (Schrödinger’s Chat) (`muc-122 "
 "<https://projects.tigase.net/issue/http-76>`__)"
 msgstr ""
+"**XEP-0410**: MUC Self-Ping (薛定谔的聊天) (`muc-122 <https://projects.tigase"
+".net/issue/http-76>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:20
 msgid ""
@@ -509,22 +677,28 @@ msgid ""
 "avatar for MUC rooms** (`muc-112 "
 "<https://projects.tigase.net/issue/http-76>`__)"
 msgstr ""
+"**XEP-0153**: 基于 vCard 的头像 - 添加了对设置 **MUC 房间的 vCard 头像** "
+"的支持 (`muc-112 <https://projects.tigase.net/issue/http-76>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:22
 msgid ""
 "**XEP-0411**: Bookmarks Conversion (`pubsub-79 "
 "<https://projects.tigase.net/issue/http-76>`__)"
 msgstr ""
+"**XEP-0411**: 书签转换 (`pubsub-79 <https://projects.tigase.net/issue/"
+"http-76>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:24
 msgid ""
 "**XEP-0157**: Contact Addresses for XMPP Services (`server-995 "
 "<https://projects.tigase.net/issue/server-995>`__)"
 msgstr ""
+"**XEP-0157**:XMPP 服务的联系地址 (`server-995 <https://projects.tigase.net/"
+"issue/server-995>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:29
 msgid "Improved connectivity with other servers"
-msgstr ""
+msgstr "改进了与其他服务器的连接"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:31
 msgid ""
@@ -533,10 +707,13 @@ msgid ""
 "possible to use both SASL-EXTERNAL and Diallback depending on support in "
 "other servers."
 msgstr ""
+"为服务器到服务器（联合，s2s）连接添加了“SASL-EXTERNAL”机制，极大地提高了对 "
+"XMPP 网络的适应性。可能可以同时使用 SASL-EXTERNAL "
+"和回拨，这取决于其他服务器是否支持。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:36
 msgid "Better security & privacy"
-msgstr ""
+msgstr "更好的安全性和隐私性"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:38
 msgid ""
@@ -548,17 +725,23 @@ msgid ""
 "(default) and ``strict`` and to further eliminate cipher suites that are "
 "currently considered insecure."
 msgstr ""
+"在连接方面，Tigase XMPP服务器 "
+"采用**强化模式**来调整网络安全设置（支持的协议，密码套件和适用的密钥长度）。"
+"我们决定让 **强化模式** 包含 3 级配置选项（基本遵循 *Mozilla 的 SSL "
+"配置生成器*）：``relaxed``, ``secure``（默认）和 "
+"``strict``，并进一步消除当前被认为不安全的密码套件。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:40
 msgid ""
 "We also enabled by default our anti-spam plugin and because we like all-"
 "things-extensible we created a guide how to create your own pluggable "
 "filters for anti-spam-plugin."
-msgstr ""
+msgstr "我们还默认启用了我们的反垃圾邮件插件，因为我们喜欢万物可扩展，所以我们创建了"
+"一个指南，指导用户如何为反垃圾邮件插件创建自己的可插入过滤器。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:45
 msgid "Multiple domains (VHosts) support is even better"
-msgstr ""
+msgstr "多域（VHosts）支持更好"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:47
 msgid ""
@@ -568,13 +751,18 @@ msgid ""
 "defaults for the installation on the fly without having to change "
 "configuration files and restart the instance."
 msgstr ""
+"在 Tigase XMPP Server "
+"中配置和服务多个域总是很容易的。在这个新发布的版本中，我们做得更好！首先 - "
+"我们包括了``Default`` VHost "
+"项，它可以为即时安装配置全局默认值，而无需更改配置文件并重启实例。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:49
 msgid ""
 "Internally, we introduced *VHost Extensions* - a mechanism that allows "
 "easy addition of configurable options that can be set on per-domain "
 "basis."
-msgstr ""
+msgstr "在内部，我们引入了*VHost Extensions* - "
+"一种允许轻松添加并可在每个域基础上设置的可配置选项的机制。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:51
 msgid ""
@@ -583,10 +771,12 @@ msgid ""
 "automatically - no need to configure *star*-certificates manually "
 "anymore."
 msgstr ""
+"最重要的是，我们重新设计了 SSL 证书的处理方式（尤其是通配符证书），"
+"现在它们会自动加载并分配给正确的域 - 不再需要手动配置 *star*-certificates。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:56
 msgid "Mobile First"
-msgstr ""
+msgstr "移动优先"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:58
 msgid ""
@@ -595,6 +785,9 @@ msgid ""
 "<https://projects.tigase.net/issue/push-25>`__), requires compatible "
 "clients)"
 msgstr ""
+"使用 **Tigase 的 PUSH 组件**并 通过 Apple 和 Google "
+"的推送服务器发送到移动应用程序的通知现在已加密（`#push-25 <https://projects."
+"tigase.net/issue/push-25>`__），需要兼容的客户端）"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:60
 msgid ""
@@ -603,10 +796,12 @@ msgid ""
 "disconnects and is offline (`#muc-115 "
 "<https://projects.tigase.net/issue/muc-115>`__)"
 msgstr ""
+"MUC 组件现在允许用户注册永久昵称，这使得即使我们的客户端断开连接和离线也可以"
+"接收推送通知（`#muc-115 <https://projects.tigase.net/issue/muc-115>` __)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:65
 msgid "Installation & management"
-msgstr ""
+msgstr "安装与管理"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:67
 msgid ""
@@ -617,6 +812,10 @@ msgid ""
 "which components and plugins should be enabled or disabled, but we "
 "believe that provided defaults should work well in most of the cases."
 msgstr ""
+"(web) 安装程序已简化，使得设置和配置 Tigase 更加容易（`#http-78 "
+"<https://projects.tigase.net/issue/http-78>`__） - 现在只需要选择所需的数据库"
+"，提供详细信息并最后调整启用或禁用的组件和插件即可，但我们相信在提供的默认值"
+"下程序在大多数情况下可以正常工作。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:69
 msgid ""
@@ -627,10 +826,15 @@ msgid ""
 " that received slight visual face-lift (`#http-90 "
 "<https://projects.tigase.net/issue/http-90>`__)"
 msgstr ""
+"安装和启动后，可以通过 Web 浏览器查看基本实例状态，或者打开 ``/server/`` "
+"端点（`#server-1164 <https://projects.tigase.net/issue/server-1164>` __)，"
+"或来自 ``logs/server-info.html`` 的本地文件，并使用 Admin WebUI "
+"管理安装，该安装得到了轻微的视觉提升（`#http-90 <https://projects.tigase.net "
+"/issue/http-90>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:74
 msgid "Noteworthy"
-msgstr ""
+msgstr "显著不同点"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:76
 msgid ""
@@ -638,18 +842,22 @@ msgid ""
 "repository pools (`#server-1149 "
 "<https://projects.tigase.net/issue/server-1149>`__)"
 msgstr ""
+"由于创建存储库池的改进（`#server-1149 <https://projects.tigase.net/issue/"
+"server-1149>`__），启动时间显著减少"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:78
 msgid ""
 "Multi-thread, highly concurrent script execution was improved "
 "(`#server-1154 <https://projects.tigase.net/issue/server-1154>`__)"
 msgstr ""
+"改进了多线程，高并发脚本执行（`#server-1154 <https://projects.tigase.net/"
+"issue/server-1154>`__）"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:80
 msgid ""
 "StreamManagement was available, but in this version we decided to enabled"
 " it by default."
-msgstr ""
+msgstr "StreamManagement 还是可用的，但在这个版本中，我们决定默认启用它。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:82
 msgid ""
@@ -657,6 +865,8 @@ msgid ""
 "<https://xmpp.org/extensions/xep-0059.html>`__ - namely PubSub nodes "
 "discovery and ``jabber:iq:serach``"
 msgstr ""
+"更多地方提供了对`XEP-0059: Result Set Management <https://xmpp.org/"
+"extensions/xep-0059.html>`__的支持 - 即PubSub节点发现和 ``jabber:iq:serach``"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:84
 msgid ""
@@ -664,89 +874,114 @@ msgid ""
 "publish-options>`__ were added to PubSub (`#pubsub-75 "
 "<https://projects.tigase.net/issue/pubsub-75>`__)"
 msgstr ""
+"`发布选项 <https://xmpp.org/extensions/xep-0060.html#publisher-publish-"
+"options>`__ 已被添加到 PubSub (`#pubsub-75 <https://projects.tigase.net/"
+"issue/pubsub-75>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:304
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:87
 msgid "New Minor Features & Behavior Changes"
-msgstr ""
+msgstr "新的次要功能和行为变化"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:89
 msgid ""
 "`server-918 <https://projects.tigase.net/issue/server-918>`__: AWS obtain"
 " public IP and/or DNS address of the EC2 instance"
 msgstr ""
+"`server-918 <https://projects.tigase.net/issue/server-918>`__:AWS 获取 EC2 "
+"实例的公共 IP 和/或 DNS 地址"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:91
 msgid ""
 "`server-985 <https://projects.tigase.net/issue/server-985>`__: Add "
 "support for SCRAM-SHA-512(-PLUS)"
 msgstr ""
+"`server-985 <https://projects.tigase.net/issue/server-985>`__:添加对 SCRAM-"
+"SHA-512(-PLUS) 的支持"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:93
 msgid ""
 "`spam-8 <https://projects.tigase.net/issue/spam-8>`__: Enable spam "
 "processor by default"
-msgstr ""
+msgstr "`spam-8 <https://projects.tigase.net/issue/spam-8>`__: 默认启用垃圾邮件处理器"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:95
 msgid ""
 "`server-1012 <https://projects.tigase.net/issue/server-1012>`__: "
 "UserDomainFilter.groovy fails to load"
 msgstr ""
+"`server-1012 <https://projects.tigase.net/issue/server-1012>`__:"
+"UserDomainFilter.groovy 加载失败"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:97
 msgid ""
 "`server-1014 <https://projects.tigase.net/issue/server-1014>`__: Can’t "
 "upgrade from 8.0.0GA to 8.1.0-SNAPSHOT"
 msgstr ""
+"`server-1014 <https://projects.tigase.net/issue/server-1014>`__:无法从 "
+"8.0.0GA 升级到 8.1.0-SNAPSHOT"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:99
 msgid ""
 "`server-798 <https://projects.tigase.net/issue/server-798>`__: Limit "
 "number of messages that are stored in DB per user within a period of time"
 msgstr ""
+"`server-798 <https://projects.tigase.net/issue/"
+"server-798>`__:限制每个用户在一定时间段内存储在数据库中的消息数"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:101
 msgid ""
 "`server-827 <https://projects.tigase.net/issue/server-827>`__: Seperate "
 "Component-based statistics"
 msgstr ""
+"`server-827 <https://projects.tigase.net/issue/server-827>`__: "
+"单独基于组件的统计信息"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:103
 msgid ""
 "`server-1026 <https://projects.tigase.net/issue/server-1026>`__: NPE: in "
 "JabberIqRegister/EmailConfirmationSender"
 msgstr ""
+"`server-1026 <https://projects.tigase.net/issue/server-1026>`__:NPE：在 "
+"JabberIqRegister/EmailConfirmationSender 中"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:105
 msgid ""
 "`pubsub-82 <https://projects.tigase.net/issue/pubsub-82>`__: NPE in "
 "RetrieveItemsModule"
 msgstr ""
+"`pubsub-82 <https://projects.tigase.net/issue/pubsub-82>`__: "
+"RetrieveItemsModule 中的 NPE"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:107
 msgid ""
 "`tigaseim-78 <https://projects.tigase.net/issue/tigaseim-78>`__: IPv6 "
 "connectivity issue"
 msgstr ""
+"`tigaseim-78 <https://projects.tigase.net/issue/tigaseim-78>`__:IPv6 连接问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:109
 msgid ""
 "`server-239 <https://projects.tigase.net/issue/server-239>`__: OSGi mode "
 "- exceptions in logs"
 msgstr ""
+"`server-239 <https://projects.tigase.net/issue/server-239>`__:OSGi 模式 - "
+"日志中的异常"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:111
 msgid ""
 "`server-1020 <https://projects.tigase.net/issue/server-1020>`__: Enable "
 "stream management by default"
-msgstr ""
+msgstr "`server-1020 <https://projects.tigase.net/issue/"
+"server-1020>`__:默认启用流管理"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:113
 msgid ""
 "`pubsub-83 <https://projects.tigase.net/issue/pubsub-83>`__: NPE in "
 "PublishItemModule"
 msgstr ""
+"`pubsub-83 <https://projects.tigase.net/issue/pubsub-83>`__:"
+"PublishItemModule 中的 NPE"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:115
 msgid ""
@@ -754,102 +989,135 @@ msgid ""
 "during execution of event: "
 "tigase.pubsub.modules.PresenceCollectorModule.PresenceChangeEvent"
 msgstr ""
+"`pubsub-81 <https://projects.tigase.net/issue/"
+"pubsub-81>`__:事件执行期间的异常: tigase.pubsub.modules."
+"PresenceCollectorModule.PresenceChangeEvent"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:117
 msgid ""
 "`server-1021 <https://projects.tigase.net/issue/server-1021>`__: NPE: "
 "Cannot update BruteForceLocker"
 msgstr ""
+"`server-1021 <https://projects.tigase.net/issue/server-1021>`__:NPE："
+"无法更新 BruteForceLocker"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:119
 msgid ""
 "`server-826 <https://projects.tigase.net/issue/server-826>`__: "
 "UserRepository caches force synchronization even if caching is disabled"
 msgstr ""
+"`server-826 <https://projects.tigase.net/issue/"
+"server-826>`__:即使缓存被禁用，UserRepository 缓存也会强制同步"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:121
 msgid ""
 "`server-958 <https://projects.tigase.net/issue/server-958>`__: Add "
 "timeout for opened TCP connections"
 msgstr ""
+"`server-958 <https://projects.tigase.net/issue/server-958>`__:打开的 TCP "
+"连接添加超时"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:123
 msgid ""
 "`server-1029 <https://projects.tigase.net/issue/server-1029>`__: Read "
 "receipients are not copied via carbons"
 msgstr ""
+"`server-1029 <https://projects.tigase.net/issue/"
+"server-1029>`__:阅读收件人不通过碳复制"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:125
 msgid ""
 "`server-1015 <https://projects.tigase.net/issue/server-1015>`__: Allow "
 "configuring XEP-0157: Contact Addresses on per VHost basis"
 msgstr ""
+"`server-1015 <https://projects.tigase.net/issue/server-1015>`__:允许配置 "
+"XEP-0157：基于每个 VHost 的联系地址"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:127
 msgid ""
 "`pubsub-65 <https://projects.tigase.net/issue/pubsub-65>`__: RSM and "
 "jabber:search for pubsub discovery"
 msgstr ""
+"`pubsub-65 <https://projects.tigase.net/issue/pubsub-65>`__: RSM 和 jabber："
+"搜索 pubsub 发现"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:129
 msgid ""
 "`server-1030 <https://projects.tigase.net/issue/server-1030>`__: NPE in "
 "VCardTemp when processing initial presence"
 msgstr ""
+"`server-1030 <https://projects.tigase.net/issue/server-1030>`__:"
+"处理初始存在时 VCardTemp 中的 NPE"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:131
 msgid ""
 "`http-72 <https://projects.tigase.net/issue/http-72>`__: Change Content-"
 "Disposition from attachment to inline"
 msgstr ""
+"`http-72 <https://projects.tigase.net/issue/http-72>`__:将 Content-"
+"Disposition 从附件更改为内联"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:133
 msgid ""
 "`server-1045 <https://projects.tigase.net/issue/server-1045>`__: NPE in "
 "DiscoExtensionsForm"
 msgstr ""
+"`server-1045 <https://projects.tigase.net/issue/server-1045>`__:"
+"DiscoExtensionsForm 中的 NPE"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:135
 msgid ""
 "`server-1048 <https://projects.tigase.net/issue/server-1048>`__: Update "
 "parent pom and information about suggested JDK"
 msgstr ""
+"`server-1048 <https://projects.tigase.net/issue/server-1048>`__:"
+"更新相关建议的JDK 的父 pom 和信息"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:137
 msgid ""
 "`push-23 <https://projects.tigase.net/issue/push-23>`__: [JDK12] Can’t "
 "establish encrypted connection with Push/FCM"
 msgstr ""
+"`push-23 <https://projects.tigase.net/issue/push-23>`__: [JDK12] 无法与 Push/"
+"FCM 建立加密连接"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:139
 msgid ""
 "`server-978 <https://projects.tigase.net/issue/server-978>`__: Improve "
 "VHost configuration / extending"
 msgstr ""
+"`server-978 <https://projects.tigase.net/issue/server-978>`__:改进 VHost "
+"配置/扩展"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:141
 msgid ""
 "`server-1068 <https://projects.tigase.net/issue/server-1068>`__: Improve "
 "LogFormat readability (and maybe performance)"
 msgstr ""
+"`server-1068 <https://projects.tigase.net/issue/server-1068>`__: 提高 "
+"LogFormat 的可读性（也许还有表现性能）"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:143
 msgid ""
 "`server-1070 <https://projects.tigase.net/issue/server-1070>`__: Improve "
 "privacy list loggging"
 msgstr ""
+"`server-1070 <https://projects.tigase.net/issue/"
+"server-1070>`__:改进隐私列表记录"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:145
 msgid ""
 "`server-1071 <https://projects.tigase.net/issue/server-1071>`__: NPE in "
 "IOService.accept"
 msgstr ""
+"`server-1071 <https://projects.tigase.net/issue/server-1071>`__: "
+"IOService.accept 中的 NPE"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:147
 msgid ""
 "`server-710 <https://projects.tigase.net/issue/server-710>`__: "
 "Registration improvements"
-msgstr ""
+msgstr "`server-710 <https://projects.tigase.net/issue/server-710>`__:注册的改进"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:149
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:249
@@ -857,198 +1125,260 @@ msgid ""
 "`pubsub-79 <https://projects.tigase.net/issue/pubsub-79>`__: XEP-0411: "
 "Bookmarks Conversion"
 msgstr ""
+"`pubsub-79 <https://projects.tigase.net/issue/pubsub-79>`__: "
+"XEP-0411:书签转换"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:151
 msgid ""
 "`pubsub-75 <https://projects.tigase.net/issue/pubsub-75>`__: Add support "
 "for Publishing Options"
-msgstr ""
+msgstr "`pubsub-75 <https://projects.tigase.net/issue/pubsub-75>`__: "
+"添加对发布选项的支持"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:153
 msgid ""
 "`server-1017 <https://projects.tigase.net/issue/server-1017>`__: "
 "XEP-0398: User Avatar to vCard-Based Avatars Conversion"
 msgstr ""
+"`server-1017 <https://projects.tigase.net/issue/server-1017>`__: XEP-0398: "
+"用户头像到基于 vCard 的头像转换"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:155
 msgid ""
 "`server-994 <https://projects.tigase.net/issue/server-994>`__: Add server"
 " support for Entity Capabilities: Stream Feature"
 msgstr ""
+"`server-994 <https://projects.tigase.net/issue/server-994>`__: "
+"添加对实体功能的服务器支持：流功能"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:157
 msgid ""
 "`server-995 <https://projects.tigase.net/issue/server-995>`__: XEP-0157: "
 "Contact Addresses for XMPP Services"
 msgstr ""
+"`server-995 <https://projects.tigase.net/issue/server-995>`__: XEP-0157: "
+"XMPP 服务的联系地址"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:159
 msgid ""
 "`http-76 <https://projects.tigase.net/issue/http-76>`__: Standardise DNS "
 "webservice to XEP-0156"
 msgstr ""
+"`http-76 <https://projects.tigase.net/issue/http-76>`__:将 DNS "
+"网络服务标准化为 XEP-0156"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:161
 msgid ""
 "`server-1109 <https://projects.tigase.net/issue/server-1109>`__: Add "
 "recommended JDK version to documentation"
 msgstr ""
+"`server-1109 <https://projects.tigase.net/issue/server-1109>`__:将推荐的 JDK "
+"版本添加到文档中"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:163
 msgid ""
 "`push-28 <https://projects.tigase.net/issue/push-28>`__: Non-tigase "
 "notifications should use high priority (APNS)"
 msgstr ""
+"`push-28 <https://projects.tigase.net/issue/push-28>`__:非 tigase "
+"通知应该使用高优先级 (APNS)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:165
 msgid ""
 "`server-1114 <https://projects.tigase.net/issue/server-1114>`__: Can’t "
 "register on sure.im with StorkIM"
 msgstr ""
+"`server-1114 <https://projects.tigase.net/issue/server-1114>`__:无法使用 "
+"StorkIM 在sure.im 上注册"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:167
 msgid ""
 "`server-1005 <https://projects.tigase.net/issue/server-1005>`__: Flatten "
 "schema to match versioning document"
 msgstr ""
+"`server-1005 <https://projects.tigase.net/issue/"
+"server-1005>`__:拼合模式以匹配版本控制文档"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:169
 msgid ""
 "`server-1116 <https://projects.tigase.net/issue/server-1116>`__: "
 "account_status is not checked"
 msgstr ""
+"`server-1116 <https://projects.tigase.net/issue/"
+"server-1116>`__:未检查account_status"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:171
 msgid ""
 "`server-1074 <https://projects.tigase.net/issue/server-1074>`__: Hardened"
 " Mode improvements"
 msgstr ""
+"`server-1074 <https://projects.tigase.net/issue/server-1074>`__: "
+"强化模式的改进"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:173
 msgid ""
 "`server-1125 <https://projects.tigase.net/issue/server-1125>`__: "
 "StatsDumper.groovy doesn’t work in documentation in 8.x"
 msgstr ""
+"`server-1125 <https://projects.tigase.net/issue/server-1125>`__: "
+"StatsDumper.groovy 在 8.x 版本的文档中不起作用"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:175
 msgid ""
 "`http-85 <https://projects.tigase.net/issue/http-85>`__: Pasword resset "
 "doesn’t work"
-msgstr ""
+msgstr "`http-85 <https://projects.tigase.net/issue/http-85>`__:密码重置不工作"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:177
 msgid ""
 "`server-1128 <https://projects.tigase.net/issue/server-1128>`__: Possible"
 " vulnerability in XML parser"
 msgstr ""
+"`server-1128 <https://projects.tigase.net/issue/server-1128>`__:在XML "
+"解析器中可能存在的漏洞"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:179
+#, fuzzy
 msgid ""
 "`server-1130 <https://projects.tigase.net/issue/server-1130>`__: NPE i "
 "JabberIqAuth"
 msgstr ""
+"`server-1130 <https://projects.tigase.net/issue/server-1130>`__: NPE i "
+"JabberIqAuth"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:181
 msgid ""
 "`http-84 <https://projects.tigase.net/issue/http-84>`__: Configurable "
 "``resetPassword`` endpoint hostname"
 msgstr ""
+"`http-84 <https://projects.tigase.net/issue/http-84>`__: 可配置的 "
+"``resetPassword`` 端点主机名"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:183
 msgid ""
 "`server-1129 <https://projects.tigase.net/issue/server-1129>`__: BOSH "
 "timeouts on GET requests"
 msgstr ""
+"`server-1129 <https://projects.tigase.net/issue/server-1129>`__: GET 请求的 "
+"BOSH 超时"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:185
 msgid ""
 "`prv-436 <https://projects.tigase.net/issue/prv-436>`__: Conversations "
 "compliance - contact developers"
 msgstr ""
+"`prv-436 <https://projects.tigase.net/issue/prv-436>`__: 对话的合规性 - "
+"联系开发人员"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:187
 msgid ""
 "`server-1100 <https://projects.tigase.net/issue/server-1100>`__: CAAS and"
 " WS testers fail to connect to wss://tigase.im:5291"
 msgstr ""
+"`server-1100 <https://projects.tigase.net/issue/server-1100>`__:CAAS 和 WS "
+"测试人员无法连接到 wss://tigase.im:5291"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:189
 msgid ""
 "`server-1047 <https://projects.tigase.net/issue/server-1047>`__: Add "
 "SASL-EXTERNAL on s2s conections"
 msgstr ""
+"`server-1047 <https://projects.tigase.net/issue/server-1047>`__:在 s2s "
+"连接上添加 SASL-EXTERNAL"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:191
 msgid ""
 "`server-1103 <https://projects.tigase.net/issue/server-1103>`__: High "
 "priority PUSH notifications are sent for all messages"
 msgstr ""
+"`server-1103 <https://projects.tigase.net/issue/server-1103>`__:"
+"为所有消息发送高优先级 PUSH 通知"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:193
 msgid ""
 "`pubsub-93 <https://projects.tigase.net/issue/pubsub-93>`__: NPE in "
 "CapsChangeEvent"
 msgstr ""
+"`pubsub-93 <https://projects.tigase.net/issue/pubsub-93>`__:CapsChangeEvent "
+"中的 NPE"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:195
 msgid ""
 "`server-1137 <https://projects.tigase.net/issue/server-1137>`__: Don’t "
 "require setting JAVA_HOME to start server"
 msgstr ""
+"`server-1137 <https://projects.tigase.net/issue/server-1137>`__:不需要设置 "
+"JAVA_HOME 来启动服务器"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:197
 msgid ""
 "`server-1136 <https://projects.tigase.net/issue/server-1136>`__: upgrade-"
 "schema --help not available"
 msgstr ""
+"`server-1136 <https://projects.tigase.net/issue/server-1136>`__:升级模式 --"
+"help 不可用"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:199
 msgid ""
 "`utils-19 <https://projects.tigase.net/issue/utils-19>`__: tigase-utils "
 "doesn’t compile with JDK12"
 msgstr ""
+"`utils-19 <https://projects.tigase.net/issue/utils-19>`__:tigase-utils "
+"不能与 JDK12 一起编译"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:201
 msgid ""
 "`server-1138 <https://projects.tigase.net/issue/server-1138>`__: Schema "
 "files are not sorted correctly during loading"
 msgstr ""
+"`server-1138 <https://projects.tigase.net/issue/server-1138>`__: "
+"加载过程中模式文件未被正确排序"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:203
 msgid ""
 "`pubsub-98 <https://projects.tigase.net/issue/pubsub-98>`__: Resources "
 "with emoji chars are causing issues with MySQL backend"
 msgstr ""
+"`pubsub-98 <https://projects.tigase.net/issue/pubsub-98>`__: "
+"带有表情符号字符的资源导致 MySQL 后端出现问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:205
 msgid ""
 "`server-1110 <https://projects.tigase.net/issue/server-1110>`__: "
 "Disabling TLS in VHost configuration doesn’t work"
 msgstr ""
+"`server-1110 <https://projects.tigase.net/issue/server-1110>`__:在 VHost "
+"配置中禁用 TLS 不起作用"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:207
 msgid ""
 "`server-1078 <https://projects.tigase.net/issue/server-1078>`__: Don’t "
 "send root CA certificate in chain"
 msgstr ""
+"`server-1078 <https://projects.tigase.net/issue/server-1078>`__: "
+"不要在链中发送根 CA 证书"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:209
 msgid ""
 "`server-1113 <https://projects.tigase.net/issue/server-1113>`__: Don’t "
 "advertise SASL-EXTERNAL if own certificate is not valid"
 msgstr ""
+"`server-1113 <https://projects.tigase.net/issue/server-1113>`__: "
+"如果自己的证书无效，请勿宣传 SASL-EXTERNAL"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:211
 msgid ""
 "`http-78 <https://projects.tigase.net/issue/http-78>`__: Simplify "
 "installer"
-msgstr ""
+msgstr "`http-78 <https://projects.tigase.net/issue/http-78>`__:简化安装程序"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:213
 msgid ""
 "`server-1133 <https://projects.tigase.net/issue/server-1133>`__: Not able"
 " to connect via S2S to server with incorrect SSL certificate"
 msgstr ""
+"`server-1133 <https://projects.tigase.net/issue/server-1133>`__: 无法通过 "
+"S2S 连接到 不正确的SSL服务器"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:215
 msgid ""
@@ -1056,12 +1386,16 @@ msgid ""
 "<https://projects.tigase.net/issue/serverdistribution-2>`__: MUC upgrade "
 "not linked correctly in global tigase guide"
 msgstr ""
+"`serverdistribution-2 <https://projects.tigase.net/issue/"
+"serverdistribution-2>`__:全球 tigase 指南中未正确链接 MUC 升级"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:217
 msgid ""
 "`server-1149 <https://projects.tigase.net/issue/server-1149>`__: Reduce "
 "startup time with a lot of database connections"
 msgstr ""
+"`server-1149 <https://projects.tigase.net/issue/"
+"server-1149>`__:通过大量数据库连接减少启动时间"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:219
 msgid ""
@@ -1069,66 +1403,86 @@ msgid ""
 " Component <x> schema version is not loaded in the database or it is "
 "old!\" during shutdown"
 msgstr ""
+"`server-1148 <https://projects.tigase.net/issue/server-1148>`__: 在关机期间 "
+"“错误！组件 <x> 架构版本未被加载到数据库中，或者它是旧版本！”"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:221
 msgid ""
 "`server-1153 <https://projects.tigase.net/issue/server-1153>`__: Refactor"
 " Credentials related ``username`` to ``credentialId`` to avoid confussion"
 msgstr ""
+"`server-1153 <https://projects.tigase.net/issue/server-1153>`__: 将与 "
+"``username`` 相关的凭据重构为 ``credentialId`` 以避免混淆"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:223
 msgid ""
 "`servers-312 <https://projects.tigase.net/issue/servers-312>`__: No "
 "cluster connection to send a packet"
 msgstr ""
+"`servers-312 <https://projects.tigase.net/issue/servers-312>`__: "
+"没有集群连接发送数据包"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:225
 msgid ""
 "`server-1154 <https://projects.tigase.net/issue/server-1154>`__: Multi-"
 "thread script execution yields wrong results"
 msgstr ""
+"`server-1154 <https://projects.tigase.net/issue/server-1154>`__: "
+"多线程脚本执行产生错误结果"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:227
 msgid ""
 "`servers-294 <https://projects.tigase.net/issue/servers-294>`__: Can’t "
 "connect from tigase.im to rsocks.net"
 msgstr ""
+"`servers-294 <https://projects.tigase.net/issue/servers-294>`__:无法从 "
+"tigase.im 连接到 rsocks.net"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:229
 msgid ""
 "`server-1111 <https://projects.tigase.net/issue/server-1111>`__: Can’t "
 "establish s2s to upload.pouet.ovh"
 msgstr ""
+"`server-1111 <https://projects.tigase.net/issue/server-1111>`__:无法建立 s2s "
+"到 upload.pouet.ovh"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:231
 msgid ""
 "`server-1143 <https://projects.tigase.net/issue/server-1143>`__: S2S "
 "connectivity issue with OpenFire when SASL external is used"
 msgstr ""
+"`server-1143 <https://projects.tigase.net/issue/server-1143>`__: SASL "
+"外部被使用时和OpenFire 的 S2S 连接问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:233
 msgid ""
 "`servers-309 <https://projects.tigase.net/issue/servers-309>`__: Issue "
 "when connecting to xabber.org: not-authorized: self signed certificate"
 msgstr ""
+"`servers-309 <https://projects.tigase.net/issue/servers-309>`__: 连接到 "
+"xabber.org 时出现问题：未授权：自签名证书"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:235
 msgid ""
 "`tigaseim-80 <https://projects.tigase.net/issue/tigaseim-80>`__: Siskin "
 "IM push server is not accessible"
 msgstr ""
+"`tigaseim-80 <https://projects.tigase.net/issue/tigaseim-80>`__: Siskin IM "
+"推送服务器无法访问"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:237
 msgid ""
 "`server-1080 <https://projects.tigase.net/issue/server-1080>`__: After "
 "updating certificate via ad-hoc/rest only main certificate is updated"
 msgstr ""
+"`server-1080 <https://projects.tigase.net/issue/server-1080>`__: 通过 ad-hoc/"
+"rest 更新证书后，仅更新主证书"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:239
 msgid ""
 "`http-88 <https://projects.tigase.net/issue/http-88>`__: Improve REST "
 "documentation"
-msgstr ""
+msgstr "`http-88 <https://projects.tigase.net/issue/http-88>`__:改进 REST 文档"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:241
 msgid ""
@@ -1136,6 +1490,8 @@ msgid ""
 " time exceeded\" for every request when using "
 "``JavaStandaloneHttpServer``"
 msgstr ""
+"`http-87 <https://projects.tigase.net/issue/http-87>`__: "
+"对每个请求使用``JavaStandaloneHttpServer``时的“超过请求接受时间”"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:243
 msgid ""
@@ -1143,6 +1499,8 @@ msgid ""
 "BruteForceLockerExtension (and possibly others) settings are not "
 "correctly retrieved"
 msgstr ""
+"`server-1151 <https://projects.tigase.net/issue/server-1151>`__: "
+"BruteForceLockerExtension（可能还有其他）设置未正确检索"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:245
 msgid ""
@@ -1150,6 +1508,8 @@ msgid ""
 "result/error packages received by HTTP-API if no connection present to "
 "write response to"
 msgstr ""
+"`http-89 <https://projects.tigase.net/issue/"
+"http-89>`__:如果要写入响应的连接不存在，则可丢弃 HTTP-API 收到的结果/错误包"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:247
 msgid ""
@@ -1157,146 +1517,189 @@ msgid ""
 "Notifications are not sent for +notify from nodes with whitelist access "
 "mode"
 msgstr ""
+"`pubsub-99 <https://projects.tigase.net/issue/pubsub-99>`__:"
+"不会从具有白名单访问模式的节点发送 +notify 通知"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:251
 msgid ""
 "`server-1157 <https://projects.tigase.net/issue/server-1157>`__: SCRAM-"
 "SHA512 not working"
 msgstr ""
+"`server-1157 <https://projects.tigase.net/issue/server-1157>`__: SCRAM-"
+"SHA512 不工作"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:253
 msgid ""
 "`server-1159 <https://projects.tigase.net/issue/server-1159>`__: Improve "
 "handling establishing and terminating of the session"
 msgstr ""
+"`server-1159 <https://projects.tigase.net/issue/"
+"server-1159>`__:改进会话的建立和终止的处理"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:255
 msgid ""
 "`server-1152 <https://projects.tigase.net/issue/server-1152>`__: Cleanup "
 "warnings from JDBCMsgRepository"
 msgstr ""
+"`server-1152 <https://projects.tigase.net/issue/server-1152>`__: 来自 "
+"JDBCMsgRepository 的清理警告"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:257
 msgid ""
 "`server-1112 <https://projects.tigase.net/issue/server-1112>`__: Fallback"
 " to diallback if SASL-EXTERNAL fails"
 msgstr ""
+"`server-1112 <https://projects.tigase.net/issue/server-1112>`__:如果 SASL-"
+"EXTERNAL 失败，则回退到回拨"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:259
 msgid ""
 "`servers-292 <https://projects.tigase.net/issue/servers-292>`__: S2S "
 "connectivity issues"
 msgstr ""
+"`servers-292 <https://projects.tigase.net/issue/servers-292>`__: S2S "
+"的连接问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:261
 msgid ""
 "`acspubsub-19 <https://projects.tigase.net/issue/acspubsub-19>`__: REST "
 "execution fails on other nodes"
 msgstr ""
+"`acspubsub-19 <https://projects.tigase.net/issue/acspubsub-19>`__: REST "
+"执行在其他节点上失败"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:263
 msgid ""
 "`server-1145 <https://projects.tigase.net/issue/server-1145>`__: Race "
 "condition during storing/loading of offline messages"
 msgstr ""
+"`server-1145 <https://projects.tigase.net/issue/server-1145>`__: "
+"存储/加载离线消息期间的竞争条件"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:265
 msgid ""
 "`http-90 <https://projects.tigase.net/issue/http-90>`__: Add direct links"
 " to most useful task in AdminUI main page"
 msgstr ""
+"`http-90 <https://projects.tigase.net/issue/http-90>`__: 在 AdminUI "
+"主页中添加直接链接并指向最有用任务。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:267
 msgid ""
 "`spam-10 <https://projects.tigase.net/issue/spam-10>`__: Add "
 "documentation for creation of a custom filter"
-msgstr ""
+msgstr "`spam-10 <https://projects.tigase.net/issue/"
+"spam-10>`__:添加用于创建自定义过滤器的文档"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:269
 msgid ""
 "`server-1163 <https://projects.tigase.net/issue/server-1163>`__: Review "
 "and update ``SASL Custom Mechanisms and Configuration`` documentation"
 msgstr ""
+"`server-1163 <https://projects.tigase.net/issue/server-1163>`__: 审核和更新 "
+"``SASL Custom Mechanisms and Configuration`` 文档"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:271
 msgid ""
 "`server-1164 <https://projects.tigase.net/issue/server-1164>`__: After-"
 "installation report - installation status"
 msgstr ""
+"`server-1164 <https://projects.tigase.net/issue/server-1164>`__: "
+"安装后报告-安装状态"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:273
 msgid ""
 "`systems-76 <https://projects.tigase.net/issue/systems-76>`__: Fix issue "
 "with StackOverflow due to recursive call in TLSIO; improve debug log"
 msgstr ""
+"`systems-76 <https://projects.tigase.net/issue/systems-76>`__:修复由于 TLSIO "
+"中递归调用导致 StackOverflow 的问题；改进调试日志"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:275
 msgid ""
 "`server-1082 <https://projects.tigase.net/issue/server-1082>`__: Sec-"
 "WebSocket-Accept not calculated correctly"
 msgstr ""
+"`server-1082 <https://projects.tigase.net/issue/server-1082>`__: Sec-"
+"WebSocket-Accept 计算不正确"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:277
 msgid ""
 "`server-1083 <https://projects.tigase.net/issue/server-1083>`__: Messages"
 " sent to full jid are returned with error"
 msgstr ""
+"`server-1083 <https://projects.tigase.net/issue/server-1083>`__: 发送到完整 "
+"jid 的消息返回错误"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:279
 msgid ""
 "`push-25 <https://projects.tigase.net/issue/push-25>`__: Add support for "
 "sending encrypted PUSHes"
-msgstr ""
+msgstr "`push-25 <https://projects.tigase.net/issue/push-25>`__: 添加对加密推送的支持"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:281
 msgid ""
 "`server-1085 <https://projects.tigase.net/issue/server-1085>`__: Improve "
 "retrieval of values for all keys in a node in UserRepository"
 msgstr ""
+"`server-1085 <https://projects.tigase.net/issue/server-1085>`__: 改进对 "
+"UserRepository 节点中所有键值的检索"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:283
 msgid ""
 "`muc-115 <https://projects.tigase.net/issue/muc-115>`__: Add support for "
 "MUC and offline message delivery"
 msgstr ""
+"`muc-115 <https://projects.tigase.net/issue/muc-115>`__: 添加对 MUC "
+"和离线消息传递的支持"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:285
 msgid ""
 "`muc-122 <https://projects.tigase.net/issue/muc-122>`__: XEP-0410: MUC "
 "Self-Ping (Schrödinger’s Chat)"
 msgstr ""
+"`muc-122 <https://projects.tigase.net/issue/muc-122>`__: XEP-0410: MUC Self-"
+"Ping (薛定谔聊天)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:287
 msgid ""
 "`muc-112 <https://projects.tigase.net/issue/muc-112>`__: Support for "
 "setting vCard avatar for room"
 msgstr ""
+"`muc-112 <https://projects.tigase.net/issue/muc-112>`__: 支持为房间设置 "
+"vCard 头像"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:289
 msgid ""
 "`http-83 <https://projects.tigase.net/issue/http-83>`__: Issue with "
 "multithreading access to HttpExchange instance"
 msgstr ""
+"`http-83 <https://projects.tigase.net/issue/http-83>`__:多线程访问 "
+"HttpExchange 实例的问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:291
 msgid ""
 "`httpapijetty-3 <https://projects.tigase.net/issue/httpapijetty-3>`__: "
 "Support for HTTP/2"
 msgstr ""
+"`httpapijetty-3 <https://projects.tigase.net/issue/httpapijetty-3>`__: 支持 "
+"HTTP/2"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:293
 msgid ""
 "`httpapijetty-6 <https://projects.tigase.net/issue/httpapijetty-6>`__: "
 "Update Jetty version"
 msgstr ""
+"`httpapijetty-6 <https://projects.tigase.net/issue/httpapijetty-6>`__: "
+"更新Jetty 版本"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:2
 msgid "Tigase XMPP Server 8.0.0 Change notes and announcement"
-msgstr ""
+msgstr "Tigase XMPP Server 8.0.0 变更说明和公告"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:8
 msgid "Kernel and beans configuration"
-msgstr ""
+msgstr "内核和 bean 配置"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:10
 msgid ""
@@ -1312,10 +1715,18 @@ msgid ""
 "having to rest art the program! This also allows for greater flexibility "
 "for Tigase XMPP Server to be better customized for unique solutions."
 msgstr ""
+"Tigase 现在使用内核和 Beans 编程风格进行操作。这对 Tigase "
+"和你意味着什么呢？这真的是一个好消息。 Tigase XMPP "
+"服务器现在作为一个内核程序运行，它将独立运行并处理服务器的所有核心功能。"
+"而组件和非必要功能现在将作为 Bean "
+"加载。作为用户，您的体验不会发生太大变化。但是，无需重新启动 Tigase "
+"即可加载和卸载 bean，这意味着程序将更加动态化。这意味着当不需要组件时，无需重"
+"新启动程序，内存占用的资源更少，正常运行时间更长！这也为 Tigase XMPP "
+"服务器提供了更大的灵活性，从而可以更好的定制独特的解决方案。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:14
 msgid "New Configuration File Format"
-msgstr ""
+msgstr "新的配置文件格式"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:16
 msgid ""
@@ -1328,10 +1739,15 @@ msgid ""
 " domain level. For more information on this format and how to configure "
 "Tigase, visit `DSL Configuration Guide <#dslConfig>`__."
 msgstr ""
+"随着 Tigase 对内核和 Beans 编程风格的变化，我们也改变了配置文件的管理方式。"
+"尽管您仍将像编辑纯文本文件一样编辑 config.tdsl 文件，但一种称为 DSL 的新格式"
+"将被使用。域特定语言可能会添加更多行，但格式更简洁，并且提供了更安全的配置设"
+"计，因为配置验证是在域级别完成的。有关此格式以及如何配置 Tigase "
+"的更多信息，请访问`DSL 配置指南 <#dslConfig>`__。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:20
 msgid "Cluster Node Shutdown Changes"
-msgstr ""
+msgstr "集群节点关闭更改"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:22
 msgid ""
@@ -1345,54 +1761,62 @@ msgid ""
 "time. User clients that are compatible with the command will then detect "
 "other connected clusters and maintain their connections."
 msgstr ""
+"从 Tigase XMPP Server 8.0.0 "
+"开始，连接到集群节点上的用户将能够在节点关闭时使用``see-other-host``。 "
+"**注意：这可能与所有客户端都不兼容。** Ad-hoc 命令旨在作为 groovy 脚本 "
+"``Shutdown.groovy``可以 顺利地关闭集群节点。该脚本还允许 -timeout 设置延迟节"
+"点关闭，并提醒所有用户（通过标题消息）服务器将在一段时间后关闭。与该命令兼容"
+"的用户客户端将检测其他连接的集群并保持它们的连接。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:24
 msgid ""
 "If the command is being sent to shut down the whole cluster, no ``see-"
 "other-host`` implementation will be sent, however timeout settings may "
 "still be used."
-msgstr ""
+msgstr "如果发送命令来关闭整个集群，则``see-other-"
+"host``实现不会被发送，但超时设置仍可以被使用。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:26
 msgid ""
 "The script may be activated by an ad-hoc command, or sent using REST from"
 " remote or Tigase Admin UI."
-msgstr ""
+msgstr "该脚本可以通过临时命令激活，或者使用 REST 从远程或 Tigase Admin UI 发送。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:31
 msgid "Significant cleanup of code and repositories"
-msgstr ""
+msgstr "大量清理代码和存储库"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:33
 msgid ""
 "Multiple changes have been made to the structure and coding for v8, many "
 "related to trimming size of repositories and old calls. Some of these "
 "improvements are listed here:"
-msgstr ""
+msgstr "对 v8 的结构和编码进行了多项更改，其中许多改变都与存储库的大小和旧调用有关。"
+"此处列出了其中一些改进："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:35
 msgid "Empty JavaDocs that do not convey values have been removed."
-msgstr ""
+msgstr "不传递值的空 JavaDocs 已被删除。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:37
 msgid ""
 "All code is reformatted to be compliant with out `codestyle guidelines "
 "<#tigaseCodeStyle>`__."
-msgstr ""
+msgstr "所有代码都被重新格式化以符合`codestyle指南 <#tigaseCodeStyle>`__。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:39
 msgid ""
 "Calls to ``System.out.print*()`` and ``printStackTrace()`` have been "
 "removed from code."
-msgstr ""
+msgstr "对 ``System.out.print*()`` 和 ``printStackTrace()`` 的调用已从代码中删除。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:41
 msgid "Depreciated and unused classes have been removed."
-msgstr ""
+msgstr "删除已弃用和未使用的类。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:46
 msgid "BouncyCastle being used for StartTLS"
-msgstr ""
+msgstr "用于 StartTLS 的 BouncyCastle"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:48
 msgid ""
@@ -1402,14 +1826,17 @@ msgid ""
 "implementation. This API is may be employed by calling the class in your "
 "configuration file:"
 msgstr ""
+"`BouncyCastle <https://www.bouncycastle.org/java.html>`__ Crypto API "
+"现在已被用于处理 StartTLS 协商。通过这样做，Tigase 现在在 SCRAM PLUS "
+"身份验证实现中支持``tls-unique`` 。可以通过调用配置文件中的类来使用此 API："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:56
 msgid "The BouncyCastle classes are included in the dist-max archives."
-msgstr ""
+msgstr "BouncyCastle 类包含在 dist-max 档案中。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:61
 msgid "default-virtual-host property changes"
-msgstr ""
+msgstr "默认虚拟主机属性更改"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:63
 msgid ""
@@ -1419,10 +1846,13 @@ msgid ""
 "using ad-hoc commands or web AdminUI. Reference `Virtual-Hosts "
 "Configuration <#virtHosts>`__ for more details."
 msgstr ""
+"默认虚拟主机属性现在只能配置为域名，而不是带有选项的虚拟主机域列表。需要使用 "
+"ad-hoc 命令或 web AdminUI 配置其他虚拟主机域及其选项。参考 `Virtual-Hosts "
+"配置 <#virtHosts>`__ 了解更多详情。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:68
 msgid "All artifacts are signed"
-msgstr ""
+msgstr "所有生成物均已签名"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:70
 msgid ""
@@ -1430,10 +1860,12 @@ msgid ""
 " XMPP Server and dependencies be signed with known certificates. This "
 "version marks the first to be totally signed."
 msgstr ""
+"自从 v8.0.0 开始工作以来，Tigase 要求对 Tigase XMPP 服务器和依赖项的所有更改"
+"都使用已知证书进行签名。这个版本标志着第一个完全签名的版本。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:75
 msgid "Scaled Down Installation Methods"
-msgstr ""
+msgstr "按比例缩小的安装方法"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:77
 msgid ""
@@ -1445,10 +1877,15 @@ msgid ""
 "our `Quick Start <#quickstart>`__ guide for instructions on these other "
 "methods."
 msgstr ""
+"我们已经整理了 Tigase 的安装方法，现在推荐使用 web-installer 方法。 IzPack "
+"安装程序（文件 ``tigase-server-<version>-b<build>.jar`` 安装方法已被删除)"
+"将不再为 v8.0.0 及更高版本生成。无法使用HTTP "
+"或浏览器访问的人仍然可以手动安装。访问我们的`快速入门 <#quickstart>`__ "
+"指南以获取有关其他方法的说明。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:82
 msgid "Emojis now supported on Tigase XMPP Servers"
-msgstr ""
+msgstr "Tigase XMPP 服务器现在支持表情符号"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:84
 msgid ""
@@ -1456,10 +1893,13 @@ msgid ""
 " need to be changed, although they won’t affect existing databases. "
 "`Visit this section <#emojisupportSQL>`__ for details."
 msgstr ""
+"MySQL "
+"数据库现在支持表情符号，但可能需要更改某些设置，尽管它们不会影响现有数据库。 "
+"`访问此部分 <#emojisupportSQL>`__了解详细信息。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:89
 msgid "XEP-0215 External Service Discovery now supported"
-msgstr ""
+msgstr "现在支持 XEP-0215 外部服务发现"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:91
 msgid ""
@@ -1469,10 +1909,14 @@ msgid ""
 " and configuration information visit `External Service Discovery "
 "Component <#_tigase_external_service_discovery>`__ documentation."
 msgstr ""
+"Tigase 现在支持`XEP-0215 - External Service Discovery <https://xmpp.org/"
+"extensions/xep-0215.html>`__ 并允许 Tigase 发现通过 XMPP "
+"协议不可用的服务。有关设置和配置信息，请访问`外部服务发现组件 "
+"<#_tigase_external_service_discovery>`__ 文档。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:96
 msgid "XEP-0313 Message Archive Management now supported"
-msgstr ""
+msgstr "现在支持 XEP-0313 消息存档管理"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:98
 msgid ""
@@ -1484,10 +1928,15 @@ msgid ""
 "configured in session manager settings. To turn on MAM, see configuration"
 " guide `located here <#_support_for_mam>`__."
 msgstr ""
+"`XEP-0313 - 消息存档管理 <https://xmpp.org/extensions/xep-0313.html>`__ "
+"现在由 Tigase 支持，具有自定义增强功能，比如全文搜索和按标签搜索。 MAM "
+"要求在``config.tdsl``文件中启用 Tigase "
+"的消息存档，并且必须在会话管理器设置中配置模式（XEP-0136 或 XEP-0313）。"
+"要打开 MAM，请参阅`位于此处 <#_support_for_mam>`__的配置指南。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:103
 msgid "XEP-0363 HTTP File Upload now supported"
-msgstr ""
+msgstr "XEP-0363 现在支持 HTTP 文件上传"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:105
 msgid ""
@@ -1497,10 +1946,14 @@ msgid ""
 " uploading option. Configuration details are available at the `HTTP File "
 "Upload Component <#XEP0363>`__ section of documentation."
 msgstr ""
+"`XEP-0363 - HTTP 文件上传 <https://xmpp.org/extensions/xep-0363.html>`__ "
+"现在支持使用 Tigase HTTP API "
+"组件，现在允许更强大的一对多文件上传选项。配置详细信息可在文档的`HTTP "
+"文件上传组件 <#XEP0363>`__ 部分获得。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:110
 msgid "Startup now uses bootstrapping"
-msgstr ""
+msgstr "启动现在使用自助法"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:112
 msgid ""
@@ -1509,10 +1962,13 @@ msgid ""
 " operations with the configuration options. All startup functions for "
 "Tigase will now run under the ``bootstrap`` bean."
 msgstr ""
+"Tigase 现在使用自助法启动，这将像以前一样从``config.tdsl``文件加载配置。然后 "
+"Tigase 将使用配置选项开始正常操作。 Tigase 的所有启动功能现在都将在 "
+"``bootstrap`` bean 下运行。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:117
 msgid "CAPTCHA system now available for in-band registration"
-msgstr ""
+msgstr "CAPTCHA 系统现在可用于带内注册"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:119
 msgid ""
@@ -1522,10 +1978,14 @@ msgid ""
 "registrations by employing a CAPTCHA solution. By enabling this option "
 "you can reduce the number of potential spammers and bots on your server."
 msgstr ""
+"`XEP-0077 带内注册 <https://xmpp.org/extensions/xep-0077.html>`__ "
+"可以选择使用数据表单来处理新注册。现在，您可以通过使用 CAPTCHA 解决方案来保护"
+"这些注册。通过启用此选项，您可以减少服务器上潜在的垃圾邮件发送者和机器人的数"
+"量。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:124
 msgid "Schema changes"
-msgstr ""
+msgstr "架构更改"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:126
 msgid ""
@@ -1535,10 +1995,13 @@ msgid ""
 "certain components. See the `schema update section <#schemaChangev800>`__"
 " for more details."
 msgstr ""
+"现在每个组件都有自己的数据库架构，它们不再和 Tigase XMPP 服务器版本绑定，从而"
+"更容易更改和更新单个组件，并且可能不会扰乱不使用某些组件的所有用户。有关更多"
+"详细信息，请参阅`架构更新部分 <#schemaChangev800>`__。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:131
 msgid "Shrinkable Statistics History"
-msgstr ""
+msgstr "可收缩统计历史"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:133
 #, python-format
@@ -1552,28 +2015,34 @@ msgid ""
 "This setting may be adjusted by adding the following setting to your "
 "``config.tdsl`` file and adjusting the integer value:"
 msgstr ""
+"现在如果系统内存资源超过一定数量，可以自动缩小统计历史记录。默认情况下，这是"
+"启用的，并且会在超过 95% 的内存使用时触发。此时将删除所有现有条目的一半。每次"
+"达到阈值时，相同的模式将继续把可用记录减半。因为设置了最少 5 个条目的硬设置，"
+"所以您将始终拥有最后 5 个条目。此设置可以通过将以下设置添加到您的 "
+"config.tdsl 文件并调整整数值来加以调整："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:144
 msgid "Statistics now available for all modules"
-msgstr ""
+msgstr "统计信息现在可用于所有模块"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:146
 msgid "For any bean, you may enable statistics by using the following"
-msgstr ""
+msgstr "对于任何 bean，您可以使用以下命令启用统计信息"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:157
 msgid "Spam Protection"
-msgstr ""
+msgstr "垃圾邮件防护"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:159
 msgid ""
 "Tigase XMPP Server v8.0.0 now includes some efforts to prevent spam bot "
 "accounts from running on servers."
-msgstr ""
+msgstr "Tigase XMPP Server v8.0.0 "
+"现在包括一些措施可以防止垃圾邮件机器人帐户在服务器上运行。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:162
 msgid "Account Registration Limits Expanded"
-msgstr ""
+msgstr "扩大了帐户注册限制"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:164
 msgid ""
@@ -1582,12 +2051,14 @@ msgid ""
 "limits. Visit `this section <#accountRegLimit>`__ for configuration "
 "details."
 msgstr ""
+"已扩展了帐户注册限制，现在您可以设置单独的计数器，或单独配置组件以实现自己的"
+"限制。访问 `this section <#accountRegLimit>`__ 了解配置详情。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:167
 msgid ""
 "Accounts created using in-band registration now will use confirmation "
 "E-mail"
-msgstr ""
+msgstr "使用带内注册创建的帐户现在将使用电子邮件来确认"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:169
 msgid ""
@@ -1599,10 +2070,15 @@ msgid ""
 "and must be enabled in the ``config.tdsl`` file by using the following "
 "code:"
 msgstr ""
+"为了创建一种更安全的方法来实现``JabberIqRegister``，Tigase XMPP "
+"服务器现在需要在此过程中默认使用电子邮件来确认。 E-mail 必须是有效的，"
+"直到用户点击 E-mail 中生成的 URI "
+"并激活帐户后，帐户才会进入待处理状态。这是一个插件，必须通过以下代码在 "
+"config.tdsl 文件中启用："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:176
 msgid "Further Spam prevention"
-msgstr ""
+msgstr "进一步防止垃圾邮件"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:178
 msgid ""
@@ -1610,10 +2086,12 @@ msgid ""
 "has a number of features described here `in this section "
 "<#tigase_spam_filter>`__."
 msgstr ""
+"Tigase-spam 组件现在位于 ``dist-max`` 分发包中，并且具有此处描述的许多功能`"
+"in this section <#tigase_spam_filter>`__。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:183
 msgid "Changes in password storage"
-msgstr ""
+msgstr "密码存储的变化"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:185
 msgid ""
@@ -1624,6 +2102,10 @@ msgid ""
 "However an MD5 hash of a password is not really a secure method as it is "
 "possible to revert this mechanism using rainbow tables."
 msgstr ""
+"在 8.0.0 版之前，用户密码以明文形式存储在 ``tig_users`` 表中的 ``user_pw`` "
+"数据库字段中。可以启用存储密码的 MD5 哈希值，但是这种有限的身份验证机制仅限 "
+"SASL PLAIN。然而，密码的 "
+"MD5哈希并不是真正安全的方法，因为可以使用彩虹表恢复这种机制。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:187
 msgid ""
@@ -1632,27 +2114,31 @@ msgid ""
 "SHA-1`` authentication mechanism or ``SCRAM-SHA-256``. ``SASL PLAIN`` "
 "mechanism can also use these encrypted passwords."
 msgstr ""
+"因此，我们决定改变这一点，仅以 ``PBKDF2`` "
+"形式存储密码的加密版本，这可以很容易地用于``SCRAM-SHA-1`` 身份验证机制或"
+"``SCRAM-SHA-256``。 ``SASL PLAIN`` 机制也可以使用这些加密密码。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:189
 msgid ""
 "The storage of encrypted passwords is now enabled **by default** in "
 "v8.0.0 of Tigase."
-msgstr ""
+msgstr "现在在 Tigase v8.0.0 中**默认情况下**启用了加密密码的存储。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:194
 msgid "Dynamic TLS Buffer"
-msgstr ""
+msgstr "动态 TLS 缓冲区"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:196
 msgid ""
 "Memory Buffer for TLS no longer remains at highest buffer size needed for"
 " the server session. Buffer will now free memory during idle connections."
 " Thus drastically improving program footprint."
-msgstr ""
+msgstr "TLS 的内存缓冲区不再保持服务器会话所需的最高缓冲区大小。缓冲区现在将在空闲连"
+"接期间释放内存。从而大大改善了程序占用空间。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:201
 msgid "XEP-305 Quickstart now supported"
-msgstr ""
+msgstr "现在支持 XEP-305 快速入门"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:203
 msgid ""
@@ -1663,18 +2149,22 @@ msgid ""
 "is only available for ``c2s`` Connection Manager (i.e. connections on "
 "port 5222) and needs to be enabled in ``config.tdsl``"
 msgstr ""
+"由于实施了`XEP-0305: XMPP Quickstart <https://xmpp.org/extensions/xep-0305."
+"html>`__ (`#1936 <https://projects.tigase. net/"
+"issues?q=Redmine%20ID:%201936>`__)，建立连接会变快。该功能仅适用于``c2s`` "
+"连接管理器（即端口 5222 上的连接），并需要在``c2s`` 中启用"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:214
 msgid "Database Timestamps"
-msgstr ""
+msgstr "数据库时间戳"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:216
 msgid "Timestamps in database will be stored using UTC time."
-msgstr ""
+msgstr "数据库中的时间戳将使用 UTC 时间存储。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:221
 msgid "Config-type properties have changed"
-msgstr ""
+msgstr "配置类型属性已更改"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:223
 msgid ""
@@ -1687,16 +2177,22 @@ msgid ""
 "comp``. ``setup`` - is a new type of config created for initial "
 "configuration of Tigase XMPP Server."
 msgstr ""
+"Config-type 现在使用 DSL 格式进行配置。访问 `this section <#configType>`__ "
+"了解更多信息。不同配置类型属性的名称已更改：``default`` 替换 ``--gen-config-"
+"def``、``--gen=config-all`` 和 ``--gen-config-default``配置类型。 ``session-"
+"manager`` 替换 ``--gen-config-sm``。 ``connection-managers`` 替换 ``--gen-"
+"config-cs``。 ``component`` 替换 ``--gen-config-comp``。 ``setup`` - 是为 "
+"Tigase XMPP 服务器的初始配置创建的一种新型配置。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:227
 msgid ""
 "Old versions are no longer supported, you HAVE to replace old versions "
 "with the new ones manually when upgrading to v8.0.0."
-msgstr ""
+msgstr "不再支持旧版本，升级到 v8.0.0 时必须手动将旧版本替换为新版本。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:232
 msgid "Database Watchdog implemented"
-msgstr ""
+msgstr "数据库监视器实现"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:234
 msgid ""
@@ -1704,10 +2200,12 @@ msgid ""
 "connections are idle and customize the frequency with which this is done."
 " Visit `this section <#databaseWatchdog>`__ for more details."
 msgstr ""
+"现在在连接空闲时可以设置对数据库的连接测试，并自定义完成此操作的频率。访问 `"
+"this section <#databaseWatchdog>`__ 了解更多详情。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:239
 msgid "Packet statistics expanded"
-msgstr ""
+msgstr "数据包统计扩展"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:241
 msgid ""
@@ -1715,10 +2213,12 @@ msgid ""
 "have now been separated to a per-XMLNS basis. This may be disabled by "
 "adding the following line to ``config.tdsl`` file:"
 msgstr ""
+"通过 XMPP 和正常关闭期间检索到的数据包统计信息现在已被分散到每个 XMLNS "
+"的基础上。这些可以通过在``config.tdsl`` 文件中添加以下行来禁用："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:250
 msgid "XEP-0016 Behavior changes"
-msgstr ""
+msgstr "XEP-0016 行为变化"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:252
 msgid ""
@@ -1730,16 +2230,20 @@ msgid ""
 " wish to use the previous version, where offline messages are cached "
 "first and then filtered, you may use the following configuration:"
 msgstr ""
+"XEP 指出，除了用户会话存在的时候，用户会话不存在时隐私列表也应该可以被使用。"
+"之前，Tigase 只会在检索消息时过滤结果，允许被阻止的用户存储离线消息。"
+"现在为正确反映 XEP已作更改，并且在没有用户会话时消息将被过滤。但是，如果您希"
+"望使用以前的版本，在此版本中离线消息先缓存然后过滤，您可以使用以下配置："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:264
 msgid ""
 "By default, the cache has a limit of 10000 entries, that may be set by "
 "using size bean as seen above."
-msgstr ""
+msgstr "默认情况下，缓存有 10000 个条目的限制，可以通过 size bean 设置，如上所示。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:269
 msgid "Access Control List has new ACL modifiers"
-msgstr ""
+msgstr "访问控制列表有新的 ACL 修饰符"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:271
 msgid ""
@@ -1748,36 +2252,40 @@ msgid ""
 " fine-grained permissions. For more details, please see `Tigase ACL "
 "<#accessControlList>`__ configuration for more details."
 msgstr ""
+"ACL 中添加了新的权限，包括 了``DOMAIN_OWNER`` 和 "
+"``DOMAIN_ADMIN``以减少权限检查，并添加了另一个级别的细化权限。有关详细信息，"
+"请参阅 `Tigase ACL <#accessControlList>`__ 配置以获取更多详细信息。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:276
 msgid "Option to ignore schema-version check added"
-msgstr ""
+msgstr "添加了忽略模式版本检查的选项"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:278
 msgid ""
 "You can now skip the schema check phase for individual databases. To do "
 "this, add the following do the datasource configuration block:"
-msgstr ""
+msgstr "您现在可以跳过单个数据库的模式检查阶段。为此，请在数据源配置块中添加以下内容"
+"："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:288
 msgid "This will do the following:"
-msgstr ""
+msgstr "这将执行以下操作："
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:290
 msgid "Print a warning during repository startup."
-msgstr ""
+msgstr "在存储库启动期间打印警告。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:292
 msgid "Skip schema upgrades for the source."
-msgstr ""
+msgstr "跳过源的架构升级。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:294
 msgid "Skip schema destruction for the source."
-msgstr ""
+msgstr "跳过源的模式破坏。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:299
 msgid "Protection against brute-force attacks"
-msgstr ""
+msgstr "防止暴力攻击"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:301
 msgid ""
@@ -1787,6 +2295,9 @@ msgid ""
 "<#bruteForcePrevention>`__ (`#8160 "
 "<https://projects.tigase.net/issues?q=Redmine%20ID:%208160>`__)"
 msgstr ""
+"8.0.0 版通过防止暴力攻击提高了安全性。需要显式启用和配置功能（基于每个 "
+"VHost）。详细配置在`??? <#bruteForcePrevention>`__ (`#8160 <https://projects."
+"tigase.net/issues?q=Redmine%20ID:%208160>`__)"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:306
 msgid ""
@@ -1795,6 +2306,9 @@ msgid ""
 "can be administered using `XEP-0133 Service Administration "
 "<http://xmpp.org/extensions/xep-0133.html#set-motd>`__."
 msgstr ""
+"`#611 <https://projects.tigase.net/issues?q=Redmine%20ID:%20611>`__ 现在在 "
+"Tigase XMPP 服务器中启用了对每日消息的支持，并且可以使用 `XEP-0133 服务管理 "
+"<http://xmpp.org/extensions/xep-0133.html#set-motd>`__ 进行管理。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:308
 msgid ""
@@ -1802,12 +2316,17 @@ msgid ""
 "implemented XEP-0133 Service Administration Scripts ``4.3 Disable User`` "
 "and ``4.4 Re-enable User``."
 msgstr ""
+"`#1569 <https://projects.tigase.net/issues?q=Redmine%20ID:%201569>`__ "
+"重新实现 XEP-0133 服务管理脚本 ``4.3 Disable User`` 和``4.4 Re-enable "
+"User``。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:310
 msgid ""
 "`#1449 <https://projects.tigase.net/issues?q=Redmine%20ID:%201449>`__ "
 "Monitoring modules now works in OSGi mode."
 msgstr ""
+"`#1449 <https://projects.tigase.net/issues?q=Redmine%20ID:%201449>`__ "
+"监控模块现在在 OSGi 模式下工作。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:312
 msgid ""
@@ -1815,6 +2334,8 @@ msgid ""
 "``auto-authorize`` of presence subscriptions can now be set for "
 "individual vhosts."
 msgstr ""
+"`#1706 <https://projects.tigase.net/issues?q=Redmine%20ID:%201706>`__ "
+"现在可以为单个虚拟主机设置状态订阅``auto-authorize``。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:314
 msgid ""
@@ -1822,6 +2343,8 @@ msgid ""
 "Added a Proxy Wrapper to handle reconnections to database connection pool"
 " to help prevent deadlocking threads."
 msgstr ""
+"`#1968 <https://projects.tigase.net/issues?q=Redmine%20ID:%201968>`__ "
+"添加了代理包装器来处理与数据库连接池的重新连接，以帮助防止死锁线程。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:316
 msgid ""
@@ -1829,6 +2352,9 @@ msgid ""
 "Mechanism responsible for closing XMPP in SessionManager has been changed"
 " to process all packets from TCP connection before closing connection."
 msgstr ""
+"`#3511 <https://projects.tigase.net/issues?q=Redmine%20ID:%203511>`__ "
+"SessionManager 中负责关闭 XMPP 的机制已更改为在关闭连接之前处理来自 TCP "
+"连接的所有数据包。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:318
 msgid ""
@@ -1836,6 +2362,9 @@ msgid ""
 "Implementation and API of LocalEventBus and ClusteredEventBus has been "
 "unified and is now available as EventBus."
 msgstr ""
+"`#3802 <https://projects.tigase.net/issues?q=Redmine%20ID:%203802>`__ "
+"LocalEventBus 和 ClusteredEventBus 的实现已经和 API 统一，现在可以作为 "
+"EventBus 使用。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:320
 msgid ""
@@ -1844,6 +2373,9 @@ msgid ""
 "establishment in line with `RFC 6121 "
 "<https://tools.ietf.org/html/rfc6121>`__."
 msgstr ""
+"`#3918 <https://projects.tigase.net/issues?q=Redmine%20ID:%203918>`__ "
+"现在会话建立广告是可选的，使会话建立符合 `RFC 6121 <https://tools.ietf.org/"
+"html/rfc6121>`__。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:322
 msgid ""
@@ -1851,6 +2383,8 @@ msgid ""
 "Changed input buffer sizing to use a ratio of 2 to 1 based on input "
 "capacity. No longer using a constant value."
 msgstr ""
+"`#4111 <https://projects.tigase.net/issues?q=Redmine%20ID:%204111>`__ "
+"根据输入容量更改输入缓冲区大小以使用 2 比 1 的比率。不再使用常量值。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:324
 msgid ""
@@ -1858,6 +2392,8 @@ msgid ""
 "Database schema files have been flattened and made for better "
 "organization."
 msgstr ""
+"`#4212 <https://projects.tigase.net/issues?q=Redmine%20ID:%204212>`__ "
+"数据库模式文件已被平化并进行了更好的整理。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:326
 #, python-format
@@ -1866,6 +2402,9 @@ msgid ""
 "``CounterDataFileLogger`` now has an upper limit and will be default be "
 "shrunk to 75% if available disk space is 5% or less than 100MB."
 msgstr ""
+"`#4501 <https://projects.tigase.net/issues?q=Redmine%20ID:%204501>`__ "
+"``CounterDataFileLogger`` 现在有一个上限，如果可用磁盘空间还剩下5% 或小于 "
+"100MB，其默认会缩小到 75%。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:328
 msgid ""
@@ -1873,6 +2412,8 @@ msgid ""
 "PubSub component has been updated and new schema uses UTF-8 encoding when"
 " hashing database lookup."
 msgstr ""
+"`#4654 <https://projects.tigase.net/issues?q=Redmine%20ID:%204654>`__ PubSub "
+"组件已被更新，新架构在哈希数据库查找时使用 UTF-8 编码。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:330
 msgid ""
@@ -1880,12 +2421,16 @@ msgid ""
 "Tigase ``DbSchemaLoader`` now prompts for password if one is missing from"
 " command line."
 msgstr ""
+"`#4776 <https://projects.tigase.net/issues?q=Redmine%20ID:%204776>`__ 现在 "
+"``DbSchemaLoader`` 如果命令行中缺少密码会提示输入密码。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:332
 msgid ""
 "`#4788 <https://projects.tigase.net/issues?q=Redmine%20ID:%204788>`__ "
 "Push component added to dist-max archive."
 msgstr ""
+"`#4788 <https://projects.tigase.net/issues?q=Redmine%20ID:%204788>`__ "
+"推送组件添加到 dist-max 存档。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:334
 msgid ""
@@ -1893,12 +2438,16 @@ msgid ""
 "SASL-SCRAM will now be automatically disabled if auth database uses "
 "encoded passwords."
 msgstr ""
+"`#4814 <https://projects.tigase.net/issues?q=Redmine%20ID:%204814>`__ 如果 "
+"auth 数据库使用编码密码，现在将自动禁用 SASL-SCRAM。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:336
 msgid ""
 "`#4844 <https://projects.tigase.net/issues?q=Redmine%20ID:%204844>`__ "
 "External components can now have SSL socket connections assigned to them."
 msgstr ""
+"`#4844 <https://projects.tigase.net/issues?q=Redmine%20ID:%204844>`__ "
+"现在外部组件可以有分配给它们的 SSL 套接字连接。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:338
 msgid ""
@@ -1906,6 +2455,8 @@ msgid ""
 "Tigase ``DbSchemaLoader`` now can support using SSL when connecting to "
 "databases."
 msgstr ""
+"`#4859 <https://projects.tigase.net/issues?q=Redmine%20ID:%204859>`__ Tigase "
+"``DbSchemaLoader``现在可以在连接数据库时支持使用 SSL。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:340
 msgid ""
@@ -1913,12 +2464,16 @@ msgid ""
 "Tigase Test Suite has been updated to correspond to all changes for "
 "v8.0.0."
 msgstr ""
+"`#4874 <https://projects.tigase.net/issues?q=Redmine%20ID:%204874>`__ Tigase "
+"测试套件已更新相应的 v8.0.0 的所有变化。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:342
 msgid ""
 "`#4877 <https://projects.tigase.net/issues?q=Redmine%20ID:%204877>`__ In-"
 "memory repository implemented for **testing ONLY**."
 msgstr ""
+"`#4877 <https://projects.tigase.net/issues?q=Redmine%20ID:%204877>`__ "
+"为**测试用**而实现的内存存储库。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:344
 msgid ""
@@ -1926,12 +2481,16 @@ msgid ""
 "Tigase config-type settings have been reduced and changed. See `this "
 "section <#configType>`__ for more details."
 msgstr ""
+"`#4880 <https://projects.tigase.net/issues?q=Redmine%20ID:%204880>`__ Tigase "
+"配置类型设置已减少和更改。有关更多详细信息，请参阅`此节 <#configType>`__。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:346
 msgid ""
 "`#4908 <https://projects.tigase.net/issues?q=Redmine%20ID:%204908>`__ "
 "Limited Ad-hoc execution to admin only within monitor component."
 msgstr ""
+"`#4908 <https://projects.tigase.net/"
+"issues?q=Redmine%20ID:%204908>`__仅在监视器组件内限制管理员的临时执行。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:348
 msgid ""
@@ -1939,6 +2498,9 @@ msgid ""
 "Detailed logging configuration is now available in DSL format. See "
 "xref:[customLogging] for more details."
 msgstr ""
+"`#5005 <https://projects.tigase.net/issues?q=Redmine%20ID:%205005>`__ "
+"详细的日志记录配置现在以 DSL "
+"格式提供。有关详细信息，请参阅外部参照：[customLogging]。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:350
 msgid ""
@@ -1946,6 +2508,8 @@ msgid ""
 "Packet processed statistics now separates results based on XML "
 "Namespaces."
 msgstr ""
+"`#5069 <https://projects.tigase.net/issues?q=Redmine%20ID:%205069>`__ "
+"数据包处理统计信息现在根据 XML 命名空间划分结果。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:352
 msgid ""
@@ -1953,6 +2517,9 @@ msgid ""
 "Tigase ``DbSchemaLoader`` can now process multiple .sql files in one "
 "command by using a comma separated list when calling."
 msgstr ""
+"`#5079 <https://projects.tigase.net/issues?q=Redmine%20ID:%205079>`__ Tigase "
+"``DbSchemaLoader`` "
+"现在可以在调用时在一个命令中通过运用逗号分隔的列来处理多个 .sql 文件。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:354
 msgid ""
@@ -1960,6 +2527,8 @@ msgid ""
 "Tigase server monitor is loaded after delay to prevent NPE during "
 "startup."
 msgstr ""
+"`#5086 <https://projects.tigase.net/issues?q=Redmine%20ID:%205086>`__ Tigase "
+"服务监视器在延迟后加载，以防止启动期间出现 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:356
 msgid ""
@@ -1968,12 +2537,18 @@ msgid ""
 "and are no longer part of Tigase XMPP Server. Related SQL tables "
 "``xmpp_stanza`` and ``short_news`` have also been removed from schemas."
 msgstr ""
+"`#5149 <https://projects.tigase.net/issues?q=Redmine%20ID:%205149>`__ "
+"``StanzaReceiver`` 和 ``StanzaSender`` 组件已被弃用，其不再是 Tigase XMPP "
+"服务器的一部分。相关的 SQL 表 ``xmpp_stanza`` 和 ``short_news`` "
+"也已从模式中删除。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:358
 msgid ""
 "`#5150 <https://projects.tigase.net/issues?q=Redmine%20ID:%205150>`__ All"
 " TigaseDB tables now use the ``tig_`` prefix."
 msgstr ""
+"`#5150 <https://projects.tigase.net/issues?q=Redmine%20ID:%205150>`__ 所有 "
+"TigaseDB 表现在都使用 ``tig_`` 前缀。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:360
 msgid ""
@@ -1981,6 +2556,8 @@ msgid ""
 "Check has been added if recipient exists before storing offline messages "
 "for local jid."
 msgstr ""
+"`#5214 <https://projects.tigase.net/issues?q=Redmine%20ID:%205214>`__ "
+"在为本地 jid 存储离线消息之前，检查是否存在收件人。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:362
 msgid ""
@@ -1988,18 +2565,24 @@ msgid ""
 "``DbSchemaLoader`` now will fail execution instead of skipping when "
 "encountering missing files."
 msgstr ""
+"`#5293 <https://projects.tigase.net/issues?q=Redmine%20ID:%205293>`__ "
+"现在``DbSchemaLoader`` 遇到丢失的文件时将执行失败而不是跳过。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:364
 msgid ""
 "`#5379 <https://projects.tigase.net/issues?q=Redmine%20ID:%205379>`__ "
 "Server ready detection has been improved in testrunner.sh."
 msgstr ""
+"`#5379 <https://projects.tigase.net/issues?q=Redmine%20ID:%205379>`__ 在 "
+"testrunner.sh 中改进了服务器就绪检测。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:366
 msgid ""
 "`#5397 <https://projects.tigase.net/issues?q=Redmine%20ID:%205397>`__ "
 "Webhelp Documentation will no longer be built."
 msgstr ""
+"`#5397 <https://projects.tigase.net/issues?q=Redmine%20ID:%205397>`__ "
+"将不再创建 Webhelp 文档。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:368
 msgid ""
@@ -2007,6 +2590,8 @@ msgid ""
 "Errors with Beans will now result in compact and more readable StackTrace"
 " print in console log."
 msgstr ""
+"`#5422 <https://projects.tigase.net/issues?q=Redmine%20ID:%205422>`__ Beans "
+"的错误现在将导致控制台日志中的 StackTrace 打印紧凑且更具可读性。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:370
 msgid ""
@@ -2014,6 +2599,8 @@ msgid ""
 "System configuration will now be printed to log file as "
 "``ConfigHolder.loadConfiguration`` output."
 msgstr ""
+"`#5423 <https://projects.tigase.net/issues?q=Redmine%20ID:%205423>`__ "
+"系统配置现在将作为``ConfigHolder.loadConfiguration`` 输出打印到日志文件中。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:372
 msgid ""
@@ -2021,6 +2608,8 @@ msgid ""
 "``GetAnyFile`` and ``GetConfigFile`` scripts moved to message-router "
 "instead of basic-conf."
 msgstr ""
+"`#5425 <https://projects.tigase.net/issues?q=Redmine%20ID:%205425>`__ "
+"``GetAnyFile`` 和 ``GetConfigFile``脚本移至消息路由器而不是基本配置。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:374
 msgid ""
@@ -2028,6 +2617,8 @@ msgid ""
 "Adjusted settings for Dynamic Rostering now can use separate beans for "
 "multiple implementations."
 msgstr ""
+"`#5429 <https://projects.tigase.net/issues?q=Redmine%20ID:%205429>`__ "
+"现在调整后的动态排班设置使得单独的 bean可 用于多个实现。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:376
 msgid ""
@@ -2035,6 +2626,8 @@ msgid ""
 "``BindResource`` is now set to FINER log level to reduce console output "
 "verbosity."
 msgstr ""
+"`#5430 <https://projects.tigase.net/issues?q=Redmine%20ID:%205430>`__ "
+"现在``BindResource``设置为 FINER 日志级别以减少控制台输出的冗长度。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:378
 msgid ""
@@ -2043,24 +2636,33 @@ msgid ""
 "file using ``env('env-1', 'def-value')`` lines. Details available `in DSL"
 " Configuration <#dslEnv>`__ section."
 msgstr ""
+"`#5475 <https://projects.tigase.net/issues?q=Redmine%20ID:%205475>`__ "
+"现在可以在 ``config.tdsl``文件中使用``env('env-1', 'def-"
+"value')``行设置默认环境变量。 `DSL 配置 <#dslEnv>`__ 部分中提供了详细信息。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:380
 msgid ""
 "`#5496 <https://projects.tigase.net/issues?q=Redmine%20ID:%205496>`__ "
 "``Destroy Schema`` task now added to schema manager."
 msgstr ""
+"`#5496 <https://projects.tigase.net/issues?q=Redmine%20ID:%205496>`__ ``"
+"Destroy Schema``任务现在添加到模式管理器。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:382
 msgid ""
 "`#5583 <https://projects.tigase.net/issues?q=Redmine%20ID:%205583>`__ "
 "Error messages now properly sent when offline message storage is full."
 msgstr ""
+"`#5583 <https://projects.tigase.net/issues?q=Redmine%20ID:%205583>`__ "
+"现在，当离线消息存储已满时，错误消息会正常发送。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:384
 msgid ""
 "`#5674 <https://projects.tigase.net/issues?q=Redmine%20ID:%205674>`__ All"
 " components now use UTC timestamp when interacting with databases."
 msgstr ""
+"`#5674 <https://projects.tigase.net/issues?q=Redmine%20ID:%205674>`__ 现在，"
+"所有组件在与数据库交互时都使用 UTC 时间戳。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:386
 msgid ""
@@ -2068,12 +2670,16 @@ msgid ""
 "Better annotation of deprecated code, cleanup and removal code previously"
 " marked as deprecated."
 msgstr ""
+"`#5800 <https://projects.tigase.net/issues?q=Redmine%20ID:%205800>`__ "
+"更好地注释已弃用的代码，清理和删除以前标记为已弃用的代码。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:388
 msgid ""
 "`#5964 <https://projects.tigase.net/issues?q=Redmine%20ID:%205964>`__ "
 "Server version is now added to JMX statistics."
 msgstr ""
+"`#5964 <https://projects.tigase.net/issues?q=Redmine%20ID:%205964>`__ "
+"服务器版本现已添加到 JMX 统计信息中。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:390
 msgid ""
@@ -2081,6 +2687,8 @@ msgid ""
 "Remote JVM debugging configuration added to tigase.conf file, commented "
 "by default."
 msgstr ""
+"`#5982 <https://projects.tigase.net/issues?q=Redmine%20ID:%205982>`__ "
+"tigase.conf 文件中添加了远程 JVM 调试配置，默认注释。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:392
 msgid ""
@@ -2088,6 +2696,8 @@ msgid ""
 "Data Source pool connections are now initialized concurrently instead of "
 "one at a time, dropping initializing time."
 msgstr ""
+"`#6038 <https://projects.tigase.net/issues?q=Redmine%20ID:%206038>`__ "
+"数据源池连接现在是同时初始化的，而不是一次一个，从而减少了初始化时间。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:394
 msgid ""
@@ -2096,6 +2706,9 @@ msgid ""
 " as it is cached elsewhere. Removal results in net improvement in memory "
 "footprint."
 msgstr ""
+"`#6103 <https://projects.tigase.net/issues?q=Redmine%20ID:%206103>`__ :litera"
+"l:`RosterElement`不再保留`XMPPResourceConnection`实例，因为它缓存在其他地方。"
+"删除导致了所占内存量的净改善。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:396
 msgid ""
@@ -2103,12 +2716,16 @@ msgid ""
 "Tigase now checks components against server version to ensure "
 "compatibility."
 msgstr ""
+"`#6133 <https://projects.tigase.net/issues?q=Redmine%20ID:%206133>`__ Tigase "
+"现在根据服务器版本检查组件以确保兼容性。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:398
 msgid ""
 "`#6163 <https://projects.tigase.net/issues?q=Redmine%20ID:%206163>`__ "
 "Groovy plugin updated to v2.4.12."
 msgstr ""
+"`#6163 <https://projects.tigase.net/issues?q=Redmine%20ID:%206163>`__ Groovy "
+"插件更新到 v2.4.12。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:400
 msgid ""
@@ -2116,24 +2733,32 @@ msgid ""
 "Separated TigaseXMLTools and TigaseUtil packages for better compatibility"
 " with JDK v9."
 msgstr ""
+"`#6206 <https://projects.tigase.net/issues?q=Redmine%20ID:%206206>`__ 分开的 "
+"TigaseXMLTools 和 TigaseUtil 包以更好地与 JDK v9 兼容。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:402
 msgid ""
 "`#6216 <https://projects.tigase.net/issues?q=Redmine%20ID:%206216>`__ "
 "MongoDB Driver now updated to v3.5.0."
 msgstr ""
+"`#6216 <https://projects.tigase.net/issues?q=Redmine%20ID:%206216>`__ "
+"MongoDB 驱动程序现已更新到 v3.5.0。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:404
 msgid ""
 "`#6560 <https://projects.tigase.net/issues?q=Redmine%20ID:%206560>`__ "
 "tigase anti-spam component now included in tigase dist-max archive."
 msgstr ""
+"`#6560 <https://projects.tigase.net/issues?q=Redmine%20ID:%206560>`__ tigase "
+"反垃圾邮件组件现在包含在 tigase dist-max 存档中。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:406
 msgid ""
 "`#6821 <https://projects.tigase.net/issues?q=Redmine%20ID:%206821>`__ "
 "Improved error reporting when errors from ``ConfigReader``."
 msgstr ""
+"`#6821 <https://projects.tigase.net/issues?q=Redmine%20ID:%206821>`__ "
+"改进了来自 ``ConfigReader`` 错误的错误报告。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:408
 msgid ""
@@ -3032,4 +3657,3 @@ msgid ""
 "Websocket component has been improved to be more compliant with `rfc6455 "
 "<https://tools.ietf.org/html/rfc6455>`__"
 msgstr ""
-
