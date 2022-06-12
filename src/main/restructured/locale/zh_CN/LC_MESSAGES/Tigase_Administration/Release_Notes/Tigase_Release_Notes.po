@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-06-11 23:14+0000\n"
+"PO-Revision-Date: 2022-06-13 08:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/release_notes/zh_Hans/>\n"
@@ -2765,6 +2765,8 @@ msgid ""
 "`#6842 <https://projects.tigase.net/issues?q=Redmine%20ID:%206842>`__ "
 "``DefaultTypesConverter`` no longer requires case sensitive enums."
 msgstr ""
+"`#6842 <https://projects.tigase.net/issues?q=Redmine%20ID:%206842>`__ "
+"``DefaultTypesConverter`` 不再需要区分大小写的枚举。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:410
 msgid ""
@@ -2772,6 +2774,9 @@ msgid ""
 "``ClassUtilBean`` now handles packet filtering for packets part of Tigase"
 " Server but not containing beans, other improvements to mDNS."
 msgstr ""
+"`#7082 <https://projects.tigase.net/issues?q=Redmine%20ID:%207082>`__ "
+"现在``ClassUtilBean``处理 Tigase 服务器的数据包部分的数据包过滤，但不包含 "
+"beans，mDNS 的其他改进。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:412
 msgid ""
@@ -2779,24 +2784,32 @@ msgid ""
 "``SeeOtherHost`` no longer uses ``PropertiesBeanConfigurator`` to parse "
 "configuration."
 msgstr ""
+"`#7433 <https://projects.tigase.net/issues?q=Redmine%20ID:%207433>`__ "
+"``SeeOtherHost`` 不再使用 ``PropertiesBeanConfigurator`` 来解析配置。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:414
 msgid ""
 "`#7446 <https://projects.tigase.net/issues?q=Redmine%20ID:%207446>`__ "
 "User credentials can now be managed with Ad-hoc commands."
 msgstr ""
+"`#7446 <https://projects.tigase.net/issues?q=Redmine%20ID:%207446>`__ "
+"现在可以使用 Ad-hoc 命令管理用户凭证。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:416
 msgid ""
 "`#7743 <https://projects.tigase.net/issues?q=Redmine%20ID:%207743>`__ "
 "Improved error message when repository is not found."
 msgstr ""
+"`#7743 <https://projects.tigase.net/issues?q=Redmine%20ID:%207743>`__ "
+"当未找到存储库时改进的错误消息。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:418
 msgid ""
 "`#7773 <https://projects.tigase.net/issues?q=Redmine%20ID:%207773>`__ Ad-"
 "hoc commands can now by executed asynchronously."
 msgstr ""
+"`#7773 <https://projects.tigase.net/issues?q=Redmine%20ID:%207773>`__ Ad-hoc "
+"命令现在可以不同步执行。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:420
 msgid ""
@@ -2805,10 +2818,13 @@ msgid ""
 "separately .setBuddySubscription() thus eliminating saving roster twice "
 "to database if not needed"
 msgstr ""
+"`#2341 <https://projects.tigase.net/issues?q=Redmine%20ID:%202341>`__ "
+"允许在添加好友时指定 SubscriptionType 以避免单独调用 .setBuddySubscription() "
+"从而避免在不需要时将名册两次保存到数据库。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:425
 msgid "Fixes"
-msgstr ""
+msgstr "修复"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:427
 msgid ""
@@ -2816,12 +2832,17 @@ msgid ""
 "Multiple artifact and depreciated file cleanup. Massive code cleanup and "
 "javadoc cleaning."
 msgstr ""
+"`#2750 <https://projects.tigase.net/"
+"issues?q=Redmine%20ID:%202750>`__多个工件和折旧文件清理。大量代码清理和 "
+"javadoc 清理。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:429
 msgid ""
 "`#3582 <https://projects.tigase.net/issues?q=Redmine%20ID:%203582>`__ "
 "Schema files streamlined, and no longer embedded in code."
 msgstr ""
+"`#3582 <https://projects.tigase.net/issues?q=Redmine%20ID:%203582>`__ "
+"架构文件经过简化，不再嵌入代码中。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:431
 msgid ""
@@ -2829,6 +2850,8 @@ msgid ""
 "Fixed TheadExceptionHandler caused by ACS unable to read PubSub schema "
 "changes."
 msgstr ""
+"`#3611 <https://projects.tigase.net/issues?q=Redmine%20ID:%203611>`"
+"__修复了因为 ACS 无法读取 PubSub 架构更改而导致的 TheadExceptionHandler。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:433
 msgid ""
@@ -2836,12 +2859,16 @@ msgid ""
 "Issues with processing XHTML-IM have been fixed, and now render correctly"
 " messages with multiple CData items."
 msgstr ""
+"`#3686 <https://projects.tigase.net/issues?q=Redmine%20ID:%203686>`__处理 "
+"XHTML-IM 的问题已得到修复，现在可以正确呈现具有多个 CData 项的消息。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:435
 msgid ""
 "`#3689 <https://projects.tigase.net/issues?q=Redmine%20ID:%203689>`__ "
 "Packets returned from CM no longer bear the original senders' jid."
 msgstr ""
+"`#3689 <https://projects.tigase.net/issues?q=Redmine%20ID:%203689>`__ 从 CM "
+"返回的数据包不再带有原始发送者的 jid。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:437
 msgid ""
@@ -2849,6 +2876,8 @@ msgid ""
 " call ``RouteEvent`` has been added to check to list and check events and"
 " determine which should be forwarded to other nodes."
 msgstr ""
+"`#3803 <https://projects.tigase.net/issues?q=Redmine%20ID:%203803>`__ 添加了"
+"新调用``RouteEvent``来检查列表和检查事件，并确定哪些应该被转发到其他节点。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:439
 msgid ""
@@ -2856,6 +2885,8 @@ msgid ""
 "Error is now thrown if listener is registered for an event that is not "
 "found in EventBus."
 msgstr ""
+"`#3822 <https://projects.tigase.net/issues?q=Redmine%20ID:%203822>`__ 现在，"
+"如果为 EventBus 中未找到的事件注册了侦听器，则会引发错误。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:441
 msgid ""
@@ -2863,12 +2894,16 @@ msgid ""
 "Fixed NPE in SessionManager when session is closed during execution of "
 "everyMinute method."
 msgstr ""
+"`#3910 <https://projects.tigase.net/issues?q=Redmine%20ID:%203910>`__ "
+"修复了在执行 everyMinute 方法期间会话关闭时 SessionManager 中的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:443
 msgid ""
 "`#3911 <https://projects.tigase.net/issues?q=Redmine%20ID:%203911>`__ "
 "Fixed issue of dropping connections during thread load distribution."
 msgstr ""
+"`#3911 <https://projects.tigase.net/issues?q=Redmine%20ID:%203911>`__ "
+"修复了在线程负载分配期间连接断开的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:445
 msgid ""
@@ -2876,6 +2911,8 @@ msgid ""
 "Fixed an error where messages would be duplicated on stream resumption "
 "due to a counter being reset upon reconnection."
 msgstr ""
+"`#4185 <https://projects.tigase.net/issues?q=Redmine%20ID:%204185>`__ "
+"修复了由于重新连接时重置计数器而导致消息在流恢复时重复的错误。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:447
 msgid ""
@@ -2883,6 +2920,8 @@ msgid ""
 "Fixed condition where expired messages in offline store would cause "
 "locks."
 msgstr ""
+"`#4447 <https://projects.tigase.net/issues?q=Redmine%20ID:%204447>`__ "
+"修复了离线存储中过期消息会导致锁定的情况。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:449
 msgid ""
@@ -2890,6 +2929,8 @@ msgid ""
 "config.dump file now is fully compatible with init.tdsl file and DSL file"
 " formatting."
 msgstr ""
+"`#4547 <https://projects.tigase.net/issues?q=Redmine%20ID:%204547>`__ "
+"config.dump 文件现在与 init.tdsl 文件和 DSL 文件格式完全兼容。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:451
 msgid ""
@@ -2897,6 +2938,9 @@ msgid ""
 "Fixed ``UnsupportedOperationException`` occurring during configuration of"
 " ``WebSocketConnectionClustered``."
 msgstr ""
+"`#4672 <https://projects.tigase.net/issues?q=Redmine%20ID:%204672>`__ 修复了"
+"在配置``UnsupportedOperationException``期间出现的“UnsupportedOperationExcepti"
+"on”。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:453
 msgid ""
@@ -2904,12 +2948,17 @@ msgid ""
 "``DBSchemaLoader`` now asks for user credentials if parameter is missing."
 " Exceptions are no longer thrown if file specified is not found."
 msgstr ""
+"`#4776 <https://projects.tigase.net/issues?q=Redmine%20ID:%204776>`__ 如果参"
+"数丢失，``DBSchemaLoader``现在会询问用户凭据。如果找不到指定的文件，则不再引"
+"发异常。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:455
 msgid ""
 "`#4885 <https://projects.tigase.net/issues?q=Redmine%20ID:%204885>`__ "
 "``client-port-delay-listening`` no longer causes exception when called."
 msgstr ""
+"`#4885 <https://projects.tigase.net/issues?q=Redmine%20ID:%204885>`__ "
+"``client-port-delay-listening`` 调用时不再导致异常。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:457
 msgid ""
@@ -2917,6 +2966,9 @@ msgid ""
 "Changed Message History query to now include a limit when selecting "
 "items, preventing an SQLTimeoutException."
 msgstr ""
+"`#4973 <https://projects.tigase.net/issues?q=Redmine%20ID:%204973>`__ "
+"将消息历史查询更改为现在在选择项目时包含了限制，从而防止 "
+"SQLTimeoutException。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:459
 msgid ""
@@ -2924,6 +2976,8 @@ msgid ""
 "Fixed an issue where disabling components would result in server "
 "shutdown."
 msgstr ""
+"`#5005 <https://projects.tigase.net/"
+"issues?q=Redmine%20ID:%205005>`__修复了禁用组件会导致服务器关闭的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:461
 msgid ""
@@ -2931,12 +2985,16 @@ msgid ""
 "Fixed issue when implementing custom SASL providers, mechanisms and "
 "callback handler factories."
 msgstr ""
+"`#5042 <https://projects.tigase.net/issues?q=Redmine%20ID:%205042>`__ "
+"修复了实现自定义 SASL 提供程序，机制和回调处理程序工厂时的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:463
 msgid ""
 "`#5066 <https://projects.tigase.net/issues?q=Redmine%20ID:%205066>`__ "
 "Fixed issue initializing databases using MongoDB."
 msgstr ""
+"`#5066 <https://projects.tigase.net/issues?q=Redmine%20ID:%205066>`__ "
+"修复了使用 MongoDB 初始化数据库的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:465
 msgid ""
@@ -2944,6 +3002,8 @@ msgid ""
 "last_login and last_logout values are now properly updated while using "
 "SASL SCRAM authentication."
 msgstr ""
+"`#5076 <https://projects.tigase.net/issues?q=Redmine%20ID:%205076>`__ "
+"last_login 和 last_logout 值现在在使用 SASL SCRAM 身份验证时被正确更新。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:467
 msgid ""
@@ -2951,24 +3011,32 @@ msgid ""
 "SCRAM now checks to see if account is disabled before retrieving "
 "password."
 msgstr ""
+"`#5084 <https://projects.tigase.net/issues?q=Redmine%20ID:%205084>`__ SCRAM "
+"现在会在检索密码之前检查帐户是否被禁用。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:469
 msgid ""
 "`#5085 <https://projects.tigase.net/issues?q=Redmine%20ID:%205085>`__ "
 "Fixed ``too many beans implemented`` error in Monitor Component."
 msgstr ""
+"`#5085 <https://projects.tigase.net/issues?q=Redmine%20ID:%205085>`__ 修复了 "
+"Monitor Component 中的``too many beans implemented``错误。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:471
 msgid ""
 "`#5088 <https://projects.tigase.net/issues?q=Redmine%20ID:%205088>`__ "
 "Removed unnecessary SASL request processing after session is closed."
 msgstr ""
+"`#5088 <https://projects.tigase.net/issues?q=Redmine%20ID:%205088>`__ "
+"会话关闭后删除了不必要的 SASL 处理请求。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:473
 msgid ""
 "`#5118 <https://projects.tigase.net/issues?q=Redmine%20ID:%205118>`__ "
 "Fixed NPE during query of privacy lists then ``type`` is missing."
 msgstr ""
+"`#5118 <https://projects.tigase.net/issues?q=Redmine%20ID:%205118>`__ "
+"修复了查询隐私列表期间的 NPE，然后缺少``type``。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:475
 msgid ""
@@ -2976,6 +3044,9 @@ msgid ""
 "Fixed beans not being overridden by configuration if they were registered"
 " in ``RegistrarBean`` or ``AbstractKernelBasedComponent``."
 msgstr ""
+"`#5303 <https://projects.tigase.net/issues?q=Redmine%20ID:%205303>`__ "
+"修复了在 ``RegistrarBean`` "
+"或``AbstractKernelBasedComponent``中注册的bean不会被配置覆盖的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:477
 msgid ""
@@ -2983,18 +3054,24 @@ msgid ""
 "Offline messages are no longer dumped from MongoDB when restarting "
 "server."
 msgstr ""
+"`#5311 <https://projects.tigase.net/issues?q=Redmine%20ID:%205311>`__ "
+"重新启动服务器时，不再从 MongoDB 转储离线消息。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:479
 msgid ""
 "`#5394 <https://projects.tigase.net/issues?q=Redmine%20ID:%205394>`__ "
 "Loading main Derby schema no longer throws exceptions."
 msgstr ""
+"`#5394 <https://projects.tigase.net/issues?q=Redmine%20ID:%205394>`__加载主 "
+"Derby 模式不再引发异常。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:481
 msgid ""
 "`#5428 <https://projects.tigase.net/issues?q=Redmine%20ID:%205428>`__ "
 "Fixed parsing of v-host per domain limit property."
 msgstr ""
+"`#5428 <https://projects.tigase.net/issues?q=Redmine%20ID:%205428>`__ "
+"修复了每个域限制属性的 v-host 解析。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:483
 msgid ""
@@ -3002,6 +3079,8 @@ msgid ""
 "Server no longer automatically shuts down when default or other db can "
 "not be found or accessed."
 msgstr ""
+"`#5450 <https://projects.tigase.net/issues?q=Redmine%20ID:%205450>`__当无法找"
+"到或访问默认或其他数据库时，服务器不再自动关闭。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:485
 msgid ""
@@ -3009,6 +3088,8 @@ msgid ""
 "Fixed potential timeout arising from "
 "``XMPPIOService::xmppStreamOpened()`` method."
 msgstr ""
+"`#5458 <https://projects.tigase.net/issues?q=Redmine%20ID:%205458>`__ "
+"修复了由``XMPPIOService::xmppStreamOpened()``方法引起的潜在超时。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:487
 msgid ""
@@ -3016,6 +3097,8 @@ msgid ""
 "Fixed issue in Derby DB where obtaining offline messages results in "
 "SQLException."
 msgstr ""
+"`#5480 <https://projects.tigase.net/issues?q=Redmine%20ID:%205480>`__ 修复了 "
+"Derby DB 中获取离线消息而导致 SQLException 的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:489
 msgid ""
@@ -3023,6 +3106,8 @@ msgid ""
 "Fixed S2S ``invalid-namespace`` error being returned during connection "
 "establishment."
 msgstr ""
+"`#5525 <https://projects.tigase.net/issues?q=Redmine%20ID:%205525>`__ "
+"修复了连接建立期间返回的 S2S ``invalid-namespace`` 错误。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:491
 msgid ""
@@ -3030,12 +3115,17 @@ msgid ""
 "Fixed unclosed ``ResultSet`` when storing a message to AMP-offline "
 "database in Derby causing deadlock."
 msgstr ""
+"`#5587 <https://projects.tigase.net/issues?q=Redmine%20ID:%205587>`__ "
+"修复了在 Derby 中将消息存储到 AMP 离线数据库时由未关闭的 ``ResultSet`` "
+"导致死锁的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:493
 msgid ""
 "`#5645 <https://projects.tigase.net/issues?q=Redmine%20ID:%205645>`__ "
 "Added fix for possible NPE when failing to retrieve beans."
 msgstr ""
+"`#5645 <https://projects.tigase.net/issues?q=Redmine%20ID:%205645>`__ "
+"添加了在检索 bean 失败时对可能出现的 NPE 的修复。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:495
 msgid ""
@@ -3043,6 +3133,8 @@ msgid ""
 "config-dump now prints configuration for inactive components and beans to"
 " log."
 msgstr ""
+"`#5670 <https://projects.tigase.net/issues?q=Redmine%20ID:%205670>`__ config-"
+"dump 现在打印非活动组件和 bean 的配置来做记录。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:497
 msgid ""
@@ -3050,12 +3142,16 @@ msgid ""
 "Messages sent with negative priority were being occasionally dropped and "
 "not processed to ``OfflineMessageHandler``."
 msgstr ""
+"`#5692 <https://projects.tigase.net/issues?q=Redmine%20ID:%205692>`__ "
+"以负优先级发送的消息偶尔会被丢弃并且未处理到``OfflineMessageHandler``。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:499
 msgid ""
 "`#5727 <https://projects.tigase.net/issues?q=Redmine%20ID:%205727>`__ "
 "Fixed potential issue with MySQL procedures not being killed properly."
 msgstr ""
+"`#5727 <https://projects.tigase.net/issues?q=Redmine%20ID:%205727>`__ 修复了 "
+"MySQL 程序未正确终止的潜在问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:501
 msgid ""
@@ -3063,24 +3159,32 @@ msgid ""
 "Statistics now filter out zero-value results unless FINEST level is "
 "requested."
 msgstr ""
+"`#5750 <https://projects.tigase.net/issues?q=Redmine%20ID:%205750>`__ "
+"除非请求 FINEST 级别，否则统计信息现在会过滤掉零值结果。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:503
 msgid ""
 "`#5831 <https://projects.tigase.net/issues?q=Redmine%20ID:%205831>`__ "
 "Fixed occurrence of ``OutOfMemory`` error."
 msgstr ""
+"`#5831 <https://projects.tigase.net/issues?q=Redmine%20ID:%205831>`__ "
+"修复了``OutOfMemory``错误的发生。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:505
 msgid ""
 "`#5864 <https://projects.tigase.net/issues?q=Redmine%20ID:%205864>`__ "
 "Fixed NPE when executing BOSH pre-bind script."
 msgstr ""
+"`#5864 <https://projects.tigase.net/issues?q=Redmine%20ID:%205864>`__ "
+"修复了执行 BOSH 预绑定脚本时的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:507
 msgid ""
 "`#5867 <https://projects.tigase.net/issues?q=Redmine%20ID:%205867>`__ "
 "Fixed NPE occurring during configuration dump."
 msgstr ""
+"`#5867 <https://projects.tigase.net/issues?q=Redmine%20ID:%205867>`__ "
+"修复了配置转储期间发生的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:509
 msgid ""
@@ -3088,12 +3192,16 @@ msgid ""
 "Fixed a few issues with dynamic rosters properly handling presence "
 "subscription requests."
 msgstr ""
+"`#6000 <https://projects.tigase.net/issues?q=Redmine%20ID:%206000>`__ "
+"修复了动态名册正确处理订阅请求状态的一些问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:511
 msgid ""
 "`#6006 <https://projects.tigase.net/issues?q=Redmine%20ID:%206006>`__ "
 "Improved configuration file and DB Schema handling."
 msgstr ""
+"`#6006 <https://projects.tigase.net/issues?q=Redmine%20ID:%206006>`__ "
+"改进的配置文件和数据库模式处理。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:513
 msgid ""
@@ -3101,6 +3209,8 @@ msgid ""
 "Fixed potential issue where vhosts DB could be overwritten by vhosts "
 "configuration in ``init.config``."
 msgstr ""
+"`#6041 <https://projects.tigase.net/issues?q=Redmine%20ID:%206041>`__ 修复了 "
+"vhosts DB 可能被``init.config``中的 vhosts 配置覆盖的潜在问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:515
 msgid ""
@@ -3108,12 +3218,16 @@ msgid ""
 "Fixed ``ClusterConnectionManager`` to use custom_elements_limit instead "
 "of a fixed value."
 msgstr ""
+"`#6078 <https://projects.tigase.net/issues?q=Redmine%20ID:%206078>`__ 修复了 "
+"``ClusterConnectionManager`` 以使用 custom_elements_limit 而不是固定值。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:517
 msgid ""
 "`#6080 <https://projects.tigase.net/issues?q=Redmine%20ID:%206080>`__ "
 "Fixed Packet Filtering to not filter cluster node information requests."
 msgstr ""
+"`#6080 <https://projects.tigase.net/issues?q=Redmine%20ID:%206080>`__ "
+"修复了数据包过滤从而不过滤集群节点信息请求。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:519
 msgid ""
@@ -3121,30 +3235,40 @@ msgid ""
 "Fixed clustered mode shutting down server when certain components are "
 "disabled."
 msgstr ""
+"`#6083 <https://projects.tigase.net/issues?q=Redmine%20ID:%206083>`__ "
+"修复了禁用某些组件时集群模式关闭服务器的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:521
 msgid ""
 "`#6135 <https://projects.tigase.net/issues?q=Redmine%20ID:%206135>`__ "
 "Tigase now properly enabled selective TLS if not enabled globally."
 msgstr ""
+"`#6135 <https://projects.tigase.net/issues?q=Redmine%20ID:%206135>`__ "
+"如果未被全局启用，Tigase 现在可以正确选择性启用 TLS。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:523
 msgid ""
 "`#6140 <https://projects.tigase.net/issues?q=Redmine%20ID:%206140>`__ "
 "Fixed issue while sending server welcome message."
 msgstr ""
+"`#6140 <https://projects.tigase.net/issues?q=Redmine%20ID:%206140>`__ "
+"修复了发送服务器欢迎消息时的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:525
 msgid ""
 "`#6141 <https://projects.tigase.net/issues?q=Redmine%20ID:%206141>`__ "
 "Fixed NPE at startup."
 msgstr ""
+"`#6141 <https://projects.tigase.net/issues?q=Redmine%20ID:%206141>`__ "
+"修复了启动时的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:527
 msgid ""
 "`#6234 <https://projects.tigase.net/issues?q=Redmine%20ID:%206234>`__ "
 "Fixed an error where an error message would repeat unnecessarily."
 msgstr ""
+"`#6234 <https://projects.tigase.net/issues?q=Redmine%20ID:%206234>`__ "
+"修复了不必要地重复错误消息的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:529
 msgid ""
@@ -3152,18 +3276,24 @@ msgid ""
 "hoc commands now refresh SSL Certificate, and restart is no longer "
 "required."
 msgstr ""
+"`#6284 <https://projects.tigase.net/issues?q=Redmine%20ID:%206284>`__ 现在Ad-"
+"hoc 命令刷新 SSL 证书，并且不再需要重新启动。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:531
 msgid ""
 "`#6293 <https://projects.tigase.net/issues?q=Redmine%20ID:%206293>`__ "
 "Server no longer sends no response upon setting empty photo in vCard."
 msgstr ""
+"`#6293 <https://projects.tigase.net/issues?q=Redmine%20ID:%206293>`__ 在 "
+"vCard 中设置空照片时，服务器不再发送不响应。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:533
 msgid ""
 "`#6263 <https://projects.tigase.net/issues?q=Redmine%20ID:%206263>`__ "
 "Fixed missing namespaces in responses from adhoc commands."
 msgstr ""
+"`#6263 <https://projects.tigase.net/issues?q=Redmine%20ID:%206263>`__ "
+"修复了临时命令响应中缺少的命名空间。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:535
 msgid ""
@@ -3171,6 +3301,8 @@ msgid ""
 "Added a proper error when max-queue-size is too small and server cannot "
 "start."
 msgstr ""
+"`#6400 <https://projects.tigase.net/issues?q=Redmine%20ID:%206400>`__ 当 max-"
+"queue-size 太小并且服务器无法启动时添加了相应的错误。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:537
 msgid ""
@@ -3178,6 +3310,8 @@ msgid ""
 "Fixed an issue where single WebSocket frames contained multiple XML "
 "stanzas instead of one per frame."
 msgstr ""
+"`#6408 <https://projects.tigase.net/issues?q=Redmine%20ID:%206408>`__ "
+"修复了单个 WebSocket 帧包含多个 XML 节而不是每帧一个的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:539
 msgid ""
@@ -3185,12 +3319,16 @@ msgid ""
 "Main kernel is now called to smooth shutdown. Further, timeout periods "
 "are opened up for large instances."
 msgstr ""
+"`#6411 <https://projects.tigase.net/issues?q=Redmine%20ID:%206411>`__ "
+"现在调用主内核以顺利关闭。此外，为大型实例开放了超时期限。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:541
 msgid ""
 "`#6574 <https://projects.tigase.net/issues?q=Redmine%20ID:%206574>`__ SSL"
 " certificate upload handling is now fixed within cluster mode."
 msgstr ""
+"`#6574 <https://projects.tigase.net/issues?q=Redmine%20ID:%206574>`__ SSL "
+"证书上传处理现在已在集群模式中修复。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:543
 msgid ""
