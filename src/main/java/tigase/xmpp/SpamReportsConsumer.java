@@ -34,10 +34,11 @@ import java.util.stream.Stream;
 public interface SpamReportsConsumer {
 
 	static final String XMLNS_PREFIX = "urn:xmpp:reporting:";
+	static final String XMLNS1_PREFIX = "urn:xmpp:reporting:1";
 	static final String XMLNS = XMLNS_PREFIX + "0";
 
-	static final Element[] FEATURES = Stream.of("0", "abuse:0", "spam:0")
-			.map(suffix -> XMLNS_PREFIX + suffix)
+	static final Element[] FEATURES = Stream.concat(Stream.of("0", "abuse:0", "spam:0")
+			.map(suffix -> XMLNS_PREFIX + suffix), Stream.of(XMLNS1_PREFIX))
 			.map(var -> new Element("feature", new String[]{"var"}, new String[]{var}))
 			.toArray(Element[]::new);
 
@@ -56,6 +57,20 @@ public interface SpamReportsConsumer {
 				.collect(Collectors.toMap(it -> it.name(), Function.identity()));
 
 		public static ReportType fromReport(Element report) {
+			if (report.getXMLNS() == XMLNS1_PREFIX) {
+				String reason = report.getAttributeStaticStr("reason");
+				if (reason != null) {
+					switch (reason) {
+						case "urn:xmpp:reporting:spam":
+							return ReportType.spam;
+						case "urn:xmpp:reporting:abuse":
+							return ReportType.abuse;
+						default:
+							break;
+					}
+				}
+				return null;
+			}
 			List<Element> children = report.getChildren();
 			if (children == null) {
 				return null;

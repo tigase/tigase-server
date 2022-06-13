@@ -303,8 +303,9 @@ public class BlockingCommand
 
 		public Entry(Element element) {
 			jid = JID.jidInstanceNS(element.getAttributeStaticStr("jid"));
-			spamReportType = Optional.ofNullable(element.getChild("report", SpamReportsConsumer.XMLNS)).map(
-					SpamReportsConsumer.ReportType::fromReport);
+			spamReportType = Optional.ofNullable(element.getChild("report", SpamReportsConsumer.XMLNS))
+					.or(() -> Optional.ofNullable(element.getChild("report", SpamReportsConsumer.XMLNS1_PREFIX)))
+					.map(SpamReportsConsumer.ReportType::fromReport);
 		}
 
 		public JID getJid() {
