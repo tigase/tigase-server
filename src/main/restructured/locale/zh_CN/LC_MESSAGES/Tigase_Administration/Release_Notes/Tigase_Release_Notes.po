@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-06-13 08:14+0000\n"
+"PO-Revision-Date: 2022-06-13 22:23+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/release_notes/zh_Hans/>\n"
@@ -3335,6 +3335,8 @@ msgid ""
 "`#6598 <https://projects.tigase.net/issues?q=Redmine%20ID:%206598>`__ "
 "Fixed EventBus Registration connection issues between cluster nodes."
 msgstr ""
+"`#6598 <https://projects.tigase.net/issues?q=Redmine%20ID:%206598>`__ "
+"修复了集群节点之间的 EventBus 注册连接问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:545
 msgid ""
@@ -3342,12 +3344,16 @@ msgid ""
 "Cluster connections no longer potentially keep open connection after "
 "cluster is no longer connected or available."
 msgstr ""
+"`#6658 <https://projects.tigase.net/issues?q=Redmine%20ID:%206658>`__ "
+"在集群不再连接或可用后，集群连接不再可能保持打开连接。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:547
 msgid ""
 "`#6749 <https://projects.tigase.net/issues?q=Redmine%20ID:%206749>`__ "
 "Fixed schema parsing for DerbyDB."
 msgstr ""
+"`#6749 <https://projects.tigase.net/issues?q=Redmine%20ID:%206749>`__ 修复了 "
+"DerbyDB 的模式解析。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:549
 msgid ""
@@ -3355,6 +3361,8 @@ msgid ""
 "Fixed failing Websocket connections if header contains more than one "
 "value."
 msgstr ""
+"`#6776 <https://projects.tigase.net/issues?q=Redmine%20ID:%206776>`__ "
+"如果标头包含多个值，则修复失败的 Websocket 连接。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:551
 msgid ""
@@ -3362,24 +3370,32 @@ msgid ""
 "Fixed an issue where C2S connections could be accepted before "
 "SessionManager was initialized."
 msgstr ""
+"`#6875 <https://projects.tigase.net/issues?q=Redmine%20ID:%206875>`__ "
+"修复了在初始化 SessionManager 之前哪里可以接受 C2S 连接的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:553
 msgid ""
 "`#7037 <https://projects.tigase.net/issues?q=Redmine%20ID:%207037>`__ "
 "Fixed error while parsing negative values from ``config.tdsl`` file."
 msgstr ""
+"`#7037 <https://projects.tigase.net/issues?q=Redmine%20ID:%207037>`__ "
+"修复了从 ``config.tdsl``文件解析负值时的错误。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:555
 msgid ""
 "`#7055 <https://projects.tigase.net/issues?q=Redmine%20ID:%207055>`__ "
 "Improvements to metaspace use and other memory use tweaks."
 msgstr ""
+"`#7055 <https://projects.tigase.net/issues?q=Redmine%20ID:%207055>`__ "
+"改进元空间使用和其他内存使用调整。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:557
 msgid ""
 "`#7304 <https://projects.tigase.net/issues?q=Redmine%20ID:%207304>`__ "
 "Virtual host logs now properly follow log size limits."
 msgstr ""
+"`#7304 <https://projects.tigase.net/issues?q=Redmine%20ID:%207304>`__ "
+"现在虚拟主机日志正确遵循日志大小限制。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:559
 msgid ""
@@ -3387,6 +3403,9 @@ msgid ""
 "AdHoc requests between the same user with different resources are no "
 "longer dropped with \\`NoConnectionIdExecption`error."
 msgstr ""
+"`#7431 <https://projects.tigase.net/issues?q=Redmine%20ID:%207431>`__ "
+"具有不同资源的同一用户之间的 AdHoc 请求不再因 \\`NoConnectionIdExecption` "
+"错误而被丢弃。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:561
 msgid ""
@@ -3394,6 +3413,8 @@ msgid ""
 "Adjusted ``SeeOtherHotDualIP`` to use new table name in cluster nodes "
 "database."
 msgstr ""
+"`#7434 <https://projects.tigase.net/issues?q=Redmine%20ID:%207434>`__ 调整 "
+"``SeeOtherHotDualIP`` 以在集群节点数据库中使用新的表名。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:563
 msgid ""
@@ -3401,6 +3422,9 @@ msgid ""
 "Stacktraces from ``CertificateContainer`` are no longer printed to "
 "tigase-console.log, but will be printed to tigase.log."
 msgstr ""
+"`#7491 <https://projects.tigase.net/issues?q=Redmine%20ID:%207491>`__ 来自 "
+"``CertificateContainer`` 的堆栈跟踪不再打印到 tigase-console.log，但将打印到 "
+"tigase.log。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:565
 msgid ""
@@ -3408,6 +3432,8 @@ msgid ""
 "Fixed an error where connections failed after authentication timeout were"
 " marked as active after cleanup."
 msgstr ""
+"`#7687 <https://projects.tigase.net/issues?q=Redmine%20ID:%207687>`__ "
+"修复了身份验证超时后连接失败在清理后标记为活跃的错误。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:567
 msgid ""
@@ -3415,54 +3441,70 @@ msgid ""
 "Fixed ``ClusterRepoItemEvent`` serialization issues causing unsupported "
 "conversion error in cluster mode."
 msgstr ""
+"`#7747 <https://projects.tigase.net/issues?q=Redmine%20ID:%207747>`__ 修复了`"
+"`ClusterRepoItemEvent``序列化问题导致的在集群模式下产生的不支持转换错误。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:569
 msgid ""
 "`#7495 <https://projects.tigase.net/issues?q=Redmine%20ID:%207495>`__ fix"
 " issue with not all logs being obfuscated, added testcase, documentation"
 msgstr ""
+"`#7495 <https://projects.tigase.net/issues?q=Redmine%20ID:%207495>`__ "
+"修复部分日志都被混淆的问题，添加了测试用例，文档"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:571
 msgid ""
 "`#8305 <https://projects.tigase.net/issues?q=Redmine%20ID:%208305>`__ fix"
 " issue with SeeOtherHostDualIP when using MongoDB"
 msgstr ""
+"`#8305 <https://projects.tigase.net/issues?q=Redmine%20ID:%208305>`__ "
+"修复使用 MongoDB 时 SeeOtherHostDualIP 的问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:576
 msgid "Component Changes"
-msgstr ""
+msgstr "组件更改"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:579
+#, fuzzy
 msgid "AMP"
-msgstr ""
+msgstr "AMP"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:581
 msgid ""
 "`#7301 <https://projects.tigase.net/issues?q=Redmine%20ID:%207301>`__ "
 "Tigase AMP component now uses multiple processing threads."
 msgstr ""
+"`#7301 <https://projects.tigase.net/issues?q=Redmine%20ID:%207301>`__ Tigase "
+"AMP 组件现在使用多个处理线程。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:586
+#, fuzzy
 msgid "PubSub"
-msgstr ""
+msgstr "PubSub"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:588
 msgid ""
 "`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ "
 "PubSub now compatible with using emojis in pubsub items."
 msgstr ""
+"`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ "
+"现在PubSub 可以在 pubsub 项目中使用表情符号。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:590
 msgid ""
 "`#5693 <https://projects.tigase.net/issues?q=Redmine%20ID:%205693>`__ "
 "Fixed parsing configuration of SessionManager processors."
 msgstr ""
+"`#5693 <https://projects.tigase.net/issues?q=Redmine%20ID:%205693>`__ 修复了 "
+"SessionManager 处理器的解析配置。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:592
 msgid ""
 "`#5766 <https://projects.tigase.net/issues?q=Redmine%20ID:%205766>`__ "
 "PubSub now writes to all databases with UTC timestamp."
 msgstr ""
+"`#5766 <https://projects.tigase.net/issues?q=Redmine%20ID:%205766>`__ "
+"现在PubSub所有数据库使用 UTC 时间戳。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:594
 msgid ""
@@ -3470,22 +3512,30 @@ msgid ""
 "Fixed presences not being removed from ``presenceByService`` collection "
 "if client disconnects without ``<unavailable/>`` presence being sent."
 msgstr ""
+"`#5953 <https://projects.tigase.net/issues?q=Redmine%20ID:%205953>`__ "
+"如果客户端在没有发送 ``<unavailable/>`` "
+"存在的情况下断开连接，则固定存在不会从``presenceByService``集合中删除。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:596
 msgid ""
 "`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
 "version changed to PubSub v4.0.0."
 msgstr ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"版本更改为 PubSub v4.0.0。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:598
 msgid ""
 "`#7707 <https://projects.tigase.net/issues?q=Redmine%20ID:%207707>`__ "
 "Fixed potential NPE in PubSub."
 msgstr ""
+"`#7707 <https://projects.tigase.net/issues?q=Redmine%20ID:%207707>`__ 修复了 "
+"PubSub 中潜在的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:603
+#, fuzzy
 msgid "http-api"
-msgstr ""
+msgstr "http-api"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:605
 msgid ""
@@ -3493,6 +3543,8 @@ msgid ""
 "Support added to display timestamp fields as data, time, and timezone "
 "fields."
 msgstr ""
+"`#4873 <https://projects.tigase.net/issues?q=Redmine%20ID:%204873>`__ "
+"添加支持其可以将时间戳字段显示为数据，时间和时区字段。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:607
 msgid ""
@@ -3500,48 +3552,64 @@ msgid ""
 "Implemented using XML repository for new setups, and updated default "
 "config to use this."
 msgstr ""
+"`#4876 <https://projects.tigase.net/issues?q=Redmine%20ID:%204876>`__ 使用 "
+"XML 存储库实现新设置，并更新默认配置以使用它。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:609
 msgid ""
 "`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ "
 "``http-api`` now is enabled by default."
 msgstr ""
+"`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ 现在"
+"``http-api``默认启用。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:611
 msgid ""
 "`#5209 <https://projects.tigase.net/issues?q=Redmine%20ID:%205209>`__ "
 "Updated visual styling of pages hosted by component."
 msgstr ""
+"`#5209 <https://projects.tigase.net/issues?q=Redmine%20ID:%205209>`__ "
+"更新了由组件托管的页面的视觉样式。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:613
 msgid ""
 "`#5290 <https://projects.tigase.net/issues?q=Redmine%20ID:%205290>`__ "
 "Fixed invalid property name."
 msgstr ""
+"`#5290 <https://projects.tigase.net/issues?q=Redmine%20ID:%205290>`__ "
+"修复了无效的属性名称。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:615
 msgid ""
 "`#5316 <https://projects.tigase.net/issues?q=Redmine%20ID:%205316>`__ "
 "Account Registration now can now require and send confirmation E-mails."
 msgstr ""
+"`#5316 <https://projects.tigase.net/issues?q=Redmine%20ID:%205316>`__ "
+"帐户注册现在可以要求并发送确认电子邮件。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:617
 msgid ""
 "`#5415 <https://projects.tigase.net/issues?q=Redmine%20ID:%205415>`__ Web"
 " Setup now checks configuration for message archive conflicts."
 msgstr ""
+"`#5415 <https://projects.tigase.net/issues?q=Redmine%20ID:%205415>`__ Web "
+"安装程序现在检查配置中的消息存档冲突。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:619
 msgid ""
 "`#5460 <https://projects.tigase.net/issues?q=Redmine%20ID:%205460>`__ "
 "MongoDB now supported through web-setup."
 msgstr ""
+"`#5460 <https://projects.tigase.net/issues?q=Redmine%20ID:%205460>`__ "
+"现在通过网络设置支持 MongoDB。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:621
 msgid ""
 "`#5717 <https://projects.tigase.net/issues?q=Redmine%20ID:%205717>`__ "
 "Fixed default values of check-boxes in admin UI not being shown."
 msgstr ""
+"`#5717 <https://projects.tigase.net/issues?q=Redmine%20ID:%205717>`__ "
+"修复了在未显示管理 UI 中复选框的默认值。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:623
 msgid ""
@@ -3549,24 +3617,33 @@ msgid ""
 "Supported added for `XEP-0363: HTTP File Upload "
 "<https://xmpp.org/extensions/xep-0363.html>`__."
 msgstr ""
+"`#5950 <https://projects.tigase.net/issues?q=Redmine%20ID:%205950>`__ "
+"支持添加 `XEP-0363: HTTP File Upload <https://xmpp.org/extensions/xep-0363."
+"html>`__."
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:625
 msgid ""
 "`#6159 <https://projects.tigase.net/issues?q=Redmine%20ID:%206159>`__ "
 "Fixed NPE thrown if scripts directory is not present."
 msgstr ""
+"`#6159 <https://projects.tigase.net/issues?q=Redmine%20ID:%206159>`__ "
+"修复了脚本目录不存在时抛出的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:627
 msgid ""
 "`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
 "version changed to tigase-http-api v2.0.0."
 msgstr ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"版本更改为 tigase-http-api v2.0.0。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:629
 msgid ""
 "`#6212 <https://projects.tigase.net/issues?q=Redmine%20ID:%206212>`__ "
 "Added mechanism for password changing through HTTP API."
 msgstr ""
+"`#6212 <https://projects.tigase.net/issues?q=Redmine%20ID:%206212>`__ "
+"添加了通过 HTTP API 更改密码的机制。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:631
 msgid ""
@@ -3574,12 +3651,16 @@ msgid ""
 "Fixed scripts returning 404 while handling rest/user/ requests even "
 "though user exists."
 msgstr ""
+"`#7307 <https://projects.tigase.net/issues?q=Redmine%20ID:%207307>`__ "
+"修复了即使用户存在，脚本在处理 rest/user/ 请求时返回 404问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:633
 msgid ""
 "`#7178 <https://projects.tigase.net/issues?q=Redmine%20ID:%207178>`__ Ad-"
 "hoc commands are now categorized in groups for better organization."
 msgstr ""
+"`#7178 <https://projects.tigase.net/issues?q=Redmine%20ID:%207178>`__ "
+"临时命令现在按组分类，以便更好地组织整理。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:635
 msgid ""
@@ -3587,28 +3668,36 @@ msgid ""
 "Added timeout reading for HTTP request headers, added configurable "
 "``accept-timeout``."
 msgstr ""
+"`#7568 <https://projects.tigase.net/issues?q=Redmine%20ID:%207568>`__ 添加了 "
+"HTTP 请求标头的超时读取，添加了可配置的``accept-timeout``。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:640
 msgid "message-archive"
-msgstr ""
+msgstr "消息存档"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:642
 msgid ""
 "`#4867 <https://projects.tigase.net/issues?q=Redmine%20ID:%204867>`__ "
 "fixed issue when changing MA jid."
 msgstr ""
+"`#4867 <https://projects.tigase.net/issues?q=Redmine%20ID:%204867>`__ "
+"修复了更改 MA jid 时的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:644
 msgid ""
 "`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ "
 "``message-archive`` is enabled by default."
 msgstr ""
+"`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ "
+"``message-archive``默认启用。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:646
 msgid ""
 "`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ "
 "Update message archive to be compatible with emojis."
 msgstr ""
+"`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ "
+"更新消息存档以其可以与表情符号兼容。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:648
 msgid ""
@@ -3616,12 +3705,16 @@ msgid ""
 "Added missing query statement block starts and ends to be compatible with"
 " SQL Server."
 msgstr ""
+"`#5391 <https://projects.tigase.net/issues?q=Redmine%20ID:%205391>`__ "
+"添加了开始和结束所缺少的查询语句块以与 SQL Server 兼容。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:650
 msgid ""
 "`#5604 <https://projects.tigase.net/issues?q=Redmine%20ID:%205604>`__ "
 "Modified access to static fields and functions."
 msgstr ""
+"`#5604 <https://projects.tigase.net/issues?q=Redmine%20ID:%205604>`__ "
+"修改了对静态字段和函数的访问。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:652
 msgid ""
@@ -3629,12 +3722,16 @@ msgid ""
 "Fixed duplication of groupchat messages with different ids by modifying "
 "hash algorithm."
 msgstr ""
+"`#5681 <https://projects.tigase.net/issues?q=Redmine%20ID:%205681>`__ "
+"通过修改哈希算法修复了具有不同 id 的群聊消息的重复的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:654
 msgid ""
 "`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
 "version changed to message-archive v2.0.0."
 msgstr ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"版本更改为消息存档 v2.0.0。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:656
 msgid ""
@@ -3642,40 +3739,53 @@ msgid ""
 "``feature-not-implemented`` response no longer occurs when removing "
 "stored messages."
 msgstr ""
+"`#7615 <https://projects.tigase.net/issues?q=Redmine%20ID:%207615>`__ "
+"``feature-not-implemented``对删除存储的消息时不再发生响应。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:661
+#, fuzzy
 msgid "MUC"
-msgstr ""
+msgstr "MUC"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:663
 msgid ""
 "`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ "
 "``muc`` now is enabled by default."
 msgstr ""
+"`#4888 <https://projects.tigase.net/issues?q=Redmine%20ID:%204888>`__ ``muc``"
+" 现在默认启用。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:665
 msgid ""
 "`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ MUC"
 " component is now compatible with emojis."
 msgstr ""
+"`#5033 <https://projects.tigase.net/issues?q=Redmine%20ID:%205033>`__ MUC "
+"组件现在与表情符号兼容。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:667
 msgid ""
 "`#5066 <https://projects.tigase.net/issues?q=Redmine%20ID:%205066>`__ "
 "Fixed issues working with MongoDB repository."
 msgstr ""
+"`#5066 <https://projects.tigase.net/issues?q=Redmine%20ID:%205066>`__ "
+"修复了使用 MongoDB 存储库的问题。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:669
 msgid ""
 "`#5085 <https://projects.tigase.net/issues?q=Redmine%20ID:%205085>`__ "
 "Removed invalid annotation parameter values."
 msgstr ""
+"`#5085 <https://projects.tigase.net/issues?q=Redmine%20ID:%205085>`__ "
+"删除了无效的注释参数值。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:671
 msgid ""
 "`#5559 <https://projects.tigase.net/issues?q=Redmine%20ID:%205559>`__ "
 "Fixed NPE while changing default room configuration."
 msgstr ""
+"`#5559 <https://projects.tigase.net/issues?q=Redmine%20ID:%205559>`__ "
+"在更改默认房间配置时修复了 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:673
 msgid ""
@@ -3683,6 +3793,8 @@ msgid ""
 "User may add more than one ``<item/>`` elements to query when querying "
 "room members."
 msgstr ""
+"`#5666 <https://projects.tigase.net/issues?q=Redmine%20ID:%205666>`__ "
+"用户在查询房间成员时可以添加多个``<item/>``元素进行查询。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:675
 msgid ""
@@ -3690,6 +3802,8 @@ msgid ""
 "Welcome messages may now be disabled globally, or in individual room "
 "configurations."
 msgstr ""
+"`#5715 <https://projects.tigase.net/issues?q=Redmine%20ID:%205715>`__ "
+"欢迎消息现在可以全部都禁用，也可以在单个房间配置中禁用。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:677
 msgid ""
@@ -3698,24 +3812,33 @@ msgid ""
 "`XEP-0048 7.2.16 <https://xmpp.org/extensions/xep-0045.html#enter-"
 "subject>`__."
 msgstr ""
+"`#5736 <https://projects.tigase.net/issues?q=Redmine%20ID:%205736>`__ "
+"根据`XEP-0048 7.2.16 <https://xmpp.org/extensions/xep-0045.html#enter-"
+"subject>`__，没有主题的房间现在返回空的 ``<subject/>`` 元素。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:679
 msgid ""
 "`#5813 <https://projects.tigase.net/issues?q=Redmine%20ID:%205813>`__ "
 "Fixed NPE during room creation."
 msgstr ""
+"`#5813 <https://projects.tigase.net/issues?q=Redmine%20ID:%205813>`__ "
+"修复了房间创建期间的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:681
 msgid ""
 "`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
 "version changed to tigase-muc v3.0.0."
 msgstr ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"版本更改为 tigase-muc v3.0.0。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:683
 msgid ""
 "`#6395 <https://projects.tigase.net/issues?q=Redmine%20ID:%206395>`__ "
 "Fixed ``tigase.db.UserNotFoundException`` during retrieval of MUC user."
 msgstr ""
+"`#6395 <https://projects.tigase.net/issues?q=Redmine%20ID:%206395>`__ "
+"修复了检索 MUC 用户期间的``tigase.db.UserNotFoundException`` 。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:685
 msgid ""
@@ -3723,50 +3846,64 @@ msgid ""
 "Introduced ``muc#roomconfig_maxresources`` to allow configuration of max "
 "number of resources for a single occupant."
 msgstr ""
+"`#6734 <https://projects.tigase.net/issues?q=Redmine%20ID:%206734>`__ 引入了 "
+"``muc#roomconfig_maxresources`` 以允许为单个占用者配置最大资源数。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:687
 msgid ""
 "`#7443 <https://projects.tigase.net/issues?q=Redmine%20ID:%207443>`__ "
 "Disabled XEP-0091 by default, added history attribute validation."
 msgstr ""
+"`#7443 <https://projects.tigase.net/issues?q=Redmine%20ID:%207443>`__ "
+"默认禁用 XEP-0091，添加历史属性验证。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:692
 msgid "socks5 Proxy"
-msgstr ""
+msgstr "socks5 代理"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:694
 msgid ""
 "`#2750 <https://projects.tigase.net/issues?q=Redmine%20ID:%202750>`__ "
 "Cleanup of code and removal of empty javadocs."
 msgstr ""
+"`#2750 <https://projects.tigase.net/issues?q=Redmine%20ID:%202750>`__ "
+"清理代码并删除空的 javadocs。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:696
 msgid ""
 "`#5867 <https://projects.tigase.net/issues?q=Redmine%20ID:%205867>`__ "
 "Fixed NPE during configuration dump when component is disabled."
 msgstr ""
+"`#5867 <https://projects.tigase.net/issues?q=Redmine%20ID:%205867>`__ "
+"修复了禁用组件时配置转储期间的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:698
 msgid ""
 "`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
 "version changed to tigase-socks5 v2.0.0."
 msgstr ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"版本更改为 tigase-socks5 v2.0.0。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:703
 msgid "stats"
-msgstr ""
+msgstr "统计数据"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:705
 msgid ""
 "`#5206 <https://projects.tigase.net/issues?q=Redmine%20ID:%205206>`__ "
 "Fixed exception causing duplicate error entry."
 msgstr ""
+"`#5206 <https://projects.tigase.net/issues?q=Redmine%20ID:%205206>`__ "
+"修复了导致重复错误条目的异常。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:707
 msgid ""
 "`#5728 <https://projects.tigase.net/issues?q=Redmine%20ID:%205728>`__ "
 "Fixed ``MySQLIntegrityConstraintViolationException`` in upload handler."
 msgstr ""
+"`#5728 <https://projects.tigase.net/issues?q=Redmine%20ID:%205728>`__ "
+"修复了上传处理程序中的``MySQLIntegrityConstraintViolationException``。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:709
 msgid ""
@@ -3774,20 +3911,24 @@ msgid ""
 "Removed usage of classes from javax.xml.ws package for JDKv9 "
 "compatibility."
 msgstr ""
+"`#6161 <https://projects.tigase.net/issues?q=Redmine%20ID:%206161>`__ 从 "
+"javax.xml.ws 包中删除了类的使用，以实现 JDKv9 兼容性。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:714
 msgid "STUN Server"
-msgstr ""
+msgstr "STUN 服务器"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:716
 msgid ""
 "`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
 "version changed to tigase-stun v2.0.0."
 msgstr ""
+"`#6176 <https://projects.tigase.net/issues?q=Redmine%20ID:%206176>`__ "
+"版本更改为 tigase-stun v2.0.0。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:721
 msgid "WebSocket"
-msgstr ""
+msgstr "网络套接字"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:723
 msgid ""
@@ -3795,3 +3936,6 @@ msgid ""
 "Websocket component has been improved to be more compliant with `rfc6455 "
 "<https://tools.ietf.org/html/rfc6455>`__"
 msgstr ""
+"`#6481 <https://projects.tigase.net/issues?q=Redmine%20ID:%206481>`__ "
+"Websocket 组件已改进这样更符合`rfc6455 <https://tools.ietf.org/html/"
+"rfc6455>`__"
