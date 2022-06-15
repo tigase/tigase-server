@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-06-15 21:27+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/tigase_server_binary_updates/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:2
 msgid "Tigase Server Binary Updates"
-msgstr ""
+msgstr "Tigase 服务器二进制更新"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:4
 msgid ""
@@ -34,6 +37,12 @@ msgid ""
 " there will never be a problem, but it is a precaution from preventing "
 "bad builds from arriving in the hands of our customers."
 msgstr ""
+"大多数开源项目都试图确保每夜构建正确编译，以方便其使用。但是，我们 Tigase 认"
+"为，在对这些构建未经过彻底测试和发布之前，应该将其分开。尽管我们知道很多安装"
+"都是从我们的每夜构建中运行的，但这也带来了额外的责任，以确保所有代码都能正常"
+"并且持续工作。因此，我们一般的做法是在每次代码提交之前运行所有基本功能测试，"
+"以确保其正常工作。虽然这并不能保证永远不会出现问题，但这是一种预防措施，可防"
+"止不良构建到达我们的客户手中。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:6
 msgid ""
@@ -44,26 +53,34 @@ msgid ""
 "something from the middle, the most recent features, but bug fixes, "
 "something like a beta or a release-candidate state."
 msgstr ""
+"另一方面，一些用户喜欢站在最前沿，并定期使用我们的夜间构建来探索新的代码并在"
+"新功能发布之前使用它们。而其他人更喜欢使用稳定且经过全面测试的公开版本。除此"
+"以外，还有些人则介于前面两者之间，想要最新的功能，但是比如错误修复这些，更喜"
+"欢测试版或最终测试版本。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:8
+#, fuzzy
 msgid ""
 "Should you choose to use the nightly builds, a few things you should "
 "consider:"
-msgstr ""
+msgstr "如果您选择使用每夜构建，您应该考虑以下几点："
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:10
+#, fuzzy
 msgid "Changes may be made to the code that can negatively affect performance."
-msgstr ""
+msgstr "可能会对性能产生负面影响的代码进行更改。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:12
+#, fuzzy
 msgid "Changes may be made to the code that can negatively affect security."
-msgstr ""
+msgstr "可能会对安全性产生负面影响的代码进行更改。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:14
+#, fuzzy
 msgid ""
 "We **highly** recommend testing these builds in your environments before "
 "upgrading."
-msgstr ""
+msgstr "我们**强烈**建议在升级之前在您的环境中测试这些构建。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:16
 msgid ""
@@ -71,45 +88,57 @@ msgid ""
 "link <https://build.tigase.net/nightlies/dists/>`__ which provides "
 "directories by date."
 msgstr ""
+"考虑到这些考虑，我们在 `此链接 <https://build.tigase.net/nightlies/dists/>`"
+"__ 提供了每夜构建，它按日期提供目录。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:18
+#, fuzzy
 msgid ""
 "Standard naming format is ``tigase-"
 "server-<version>-SNAPSHOT-b<build>-<type>`` where ``<version>`` is in the"
 " form of ``major.minor.bugfix``"
 msgstr ""
+"标准命名格式为``tigase-server-<version>-SNAPSHOT-b<build>-<type>`` 其中 "
+"``<version>`` 的格式为``major.minor.bugfix``"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:22
+#, fuzzy
 msgid ""
 "individual days may have the same builds as noted by the byyyy section of"
 " the file.\\*"
-msgstr ""
+msgstr "个别日期可能具有与文件的 byyyy 部分所述相同的构建。\\*"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:24
+#, fuzzy
 msgid ""
 "Just like the standard distributions, the builds are available with the "
 "following extensions (``<type>``):"
-msgstr ""
+msgstr "就像标准发行版一样，构建可以使用以下扩展名(``<type>``):"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:26
+#, fuzzy
 msgid "``javadoc.jar`` - Java installer for javadoc only"
-msgstr ""
+msgstr "``javadoc.jar`` - 仅适用于 javadoc 的 Java 安装程序"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:28
+#, fuzzy
 msgid "``dist.zip`` - Compressed binaries with no dependencies."
-msgstr ""
+msgstr "``dist.zip`` - 没有依赖关系的压缩二进制文件。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:30
+#, fuzzy
 msgid "``dist.tar.gz`` - tarball compressed binaries with no dependencies."
-msgstr ""
+msgstr "``dist.tar.gz`` - tarball 压缩的没有依赖项的二进制文件。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:32
+#, fuzzy
 msgid "``dist-max.zip`` - Compressed binaries with all dependencies."
-msgstr ""
+msgstr "``dist-max.zip`` - 具有所有依赖项的压缩二进制文件。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:34
+#, fuzzy
 msgid "``dist-max.tar.gz`` - tarball compressed binaries with all dependencies."
-msgstr ""
+msgstr "``dist-max.tar.gz`` - 具有所有依赖项的 tarball 压缩二进制文件。"
 
 #: ../../Tigase_Administration/Tigase_Server_Binary_Updates.rst:36
 msgid ""
@@ -119,4 +148,7 @@ msgid ""
 "<https://build.tigase.net/nightlies/tests/>`__. These tests can provide a"
 " quick examination of function before upgrading your current build."
 msgstr ""
-
+"我们还为每个受支持的数据库的每夜构建提供自动化测试。这些测试是在考虑功能和低"
+"内存参数的情况下完成的，并且可以在`此链接 <https://build.tigase.net/"
+"nightlies/tests/>`__ "
+"上获得。这些测试可以在升级当前版本之前提供对功能的快速检查。"
