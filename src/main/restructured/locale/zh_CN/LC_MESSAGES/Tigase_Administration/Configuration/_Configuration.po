@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-06-23 09:56+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/configuration/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:2
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:4
 msgid ""
@@ -29,6 +32,9 @@ msgid ""
 "about and in other sections you can learn all the details needed to "
 "configure the server."
 msgstr ""
+"当用户第一次尝试设置客户端时，他遇到了 2 个配置文件：``/etc`` 文件夹中的 "
+"``tigase.conf`` 和 ``config.tdsl``。以下是所有这些文件的简要说明，在其他部分"
+"中，您可以了解配置服务器所需的所有详细信息。"
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:6
 msgid ""
@@ -43,6 +49,13 @@ msgid ""
 "modify. At the moment this is the recommended way change the server "
 "configuration."
 msgstr ""
+":ref:`config.tdsl<dslConfig>` "
+"文件是一个简单的文本文件，其服务器参数格式为：**key** = **value**。当 XML "
+"配置文件丢失时，Tigase 服务器读取 ``config.tdsl`` "
+"文件并使用在那里找到的参数作为生成 XML 文件的默认值。因此，如果您更改 "
+"``config.tdsl`` 文件，您通常必须停止服务器，删除 XML "
+"文件并重新启动服务器。``config.tdsl`` 中的所有设置都被读取并应用于 XML 配置。"
+"属性文件易于阅读且修改起来非常安全。目前这是推荐的更改服务器配置的方法。"
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:8
 msgid ""
@@ -57,10 +70,17 @@ msgid ""
 "shell script which also scans the operating system environment for Java "
 "VM and other tools needed."
 msgstr ""
+":ref:`tigase.conf<manualconfig>` 是 Tigase "
+"服务器启动配置。它实际上不被服务器本身使用。"
+"它包含操作系统设置和环境参数以正确运行 `Java 虚拟机 <https://www.oracle.com/"
+"java/technologies/>`__。它仅在带有 Bash shell 的类 unix 系统上有用。如果您在 "
+"MS Windows 系统上运行服务器，则需使用 ``tigase.bat`` 和 ``wrapper.conf`` "
+"文件。 ``tigase.conf`` 文件由 ``scripts/tigase.sh`` shell 脚本读取和加载，"
+"该脚本还可以扫描操作系统环境以查找 Java VM 和其他所需工具。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:4
 msgid "DSL file format"
-msgstr ""
+msgstr "DSL 文件格式"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:6
 msgid ""
@@ -70,23 +90,28 @@ msgid ""
 "format. This file format was inspired by Groovy language syntax and new "
 "core feature of Tigase XMPP Server - Tigase Kernel Framework."
 msgstr ""
+"在以前的 Tigase XMPP 服务器版本中，配置存储在基于配置文件的属性中。从 Tigase "
+"XMPP Server 8.0.0 版本开始，将需要使用新的基于 DSL 的配置文件格式。"
+"这种文件格式的灵感来自 Groovy 语言语法和 Tigase XMPP 服务器的新核心功能 - "
+"Tigase 内核框架 。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:9
 msgid "why new format?"
-msgstr ""
+msgstr "为什么是新格式？"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:11
 msgid ""
 "In properties configuration format each line contained key and value with"
 " optional definition of type of stored value:"
-msgstr ""
+msgstr "在属性配置格式中，每一行都包含键和值以及存储值类型的可选定义："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:17
 msgid ""
 "where ``c2s/ports`` was name of property, ``[i]`` defined that type of "
 "value is array of integers, and ``5222,5223`` was comma separated list of"
 " values."
-msgstr ""
+msgstr "其中 ``c2s/ports`` 是属性名称，``[i]`` "
+"定义了值的类型是整数数组，``5222,5223`` 是逗号分隔的值列表。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:19
 msgid ""
@@ -95,6 +120,9 @@ msgid ""
 "defined by names path to property which name was in last part.From that "
 "you can see that it was domain based setting of properties."
 msgstr ""
+"这种格式有效，但实际上 ``c2s/ports`` 不是您配置的属性的名称，而是后来在 ``/``"
+" char 上拆分为由名称路径定义的部分的键，该名称在最后一部分中。从这您可以看到"
+"它是基于域的属性设置。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:21
 msgid ""
@@ -103,20 +131,25 @@ msgid ""
 "application, i.e.: to add new component and set some properties you "
 "needed to write:"
 msgstr ""
+"除了这个多部分键之外，我们还使用了以 ``--`` 开头的属性，这些属性是应用程序的"
+"每个部分都可以访问的全局属性，即：添加新组件并设置一些您需要编写的属性："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:30
 msgid ""
 "This lead to mistakes like duplicated definition of name and class for "
 "same number of component or redefined property value in other place of a "
 "configuration file - especially in cases where configuration was big."
-msgstr ""
+msgstr "这会导致错误，"
+"例如为相同数量的组件重复定义名称和类或在一个配置文件的其他位置重新定义属性值 "
+"- 特别是在配置很大的情况下。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:32
 msgid ""
 "In this configuration structure it was hard to tell where is "
 "configuration for particular component or what databases this "
 "installation uses. This could be defined all over the file."
-msgstr ""
+msgstr "在这种配置结构中，很难分辨特定组件的配置在哪里，或者这个安装使用什么数据库。"
+"这可以在整个文件中定义。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:34
 msgid ""
@@ -126,34 +159,39 @@ msgid ""
 "components. This would make configuration file even more complex, "
 "difficult and less readable."
 msgstr ""
+"在这个版本中，我们引入了 Tigase 内核框架，它允许在配置文件中配置 bean，"
+"甚至定义从外部 jars 加载的新 bean 的使用，这些 jars 可以修改 Tigase "
+"组件的行为。这将使配置文件更加复杂，困难且可读性更差。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:37
 msgid "What is DSL?"
-msgstr ""
+msgstr "什么是 DSL？"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:39
 msgid ""
 "DSL stands for domain-specific language - in this case language created "
 "for storage of configuration."
-msgstr ""
+msgstr "DSL 代表特定领域的语言 - 在这种情况下，语言是为存储配置而创建的。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:41
 msgid ""
 "Now we use domain based configuration which means that our configuration "
 "file is not a flat key=value storage but it defines objects, it's "
 "properties and assigned values."
-msgstr ""
+msgstr "现在我们使用基于域的配置，这意味着我们的配置文件不是平面键=值存储，而是定义对"
+"象，其属性和分配值。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:43
 msgid ""
 "To illustrate it better let's start with a simple example. In properties "
 "file in order to configure PubSub component named ``pubsub`` you would "
 "use following properties:"
-msgstr ""
+msgstr "为了更好地说明它，让我们从一个简单的例子开始。在属性文件中，为了配置名为 "
+"``pubsub`` 的 PubSub 组件，您将使用以下属性："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:51
 msgid "In DSL based configuration this would be replaced by following block"
-msgstr ""
+msgstr "在基于 DSL 的配置中，这将被以下块替换"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:60
 msgid ""
@@ -165,16 +203,22 @@ msgid ""
 "prefix. Entries after ``\\#`` are comments, to pass ``#`` you need to "
 "wrap whole part containing it in ``''``, ie. ``'test#242'``"
 msgstr ""
+"在其中我们定义名为 `pubsub` 的 bean 并将其在 ``()`` 块中的类设置为 ``tigase."
+"pubsub.PubSubComponent``。我们还使用 ``{}`` 字符之间的块来定义与 bean "
+"相关的属性。这意味着此属性将仅传递给 Tigase PubSub "
+"组件的此实例，与之前我们需要添加前缀的位置相同。 ``\\#`` 之后的条目是注释，"
+"要传递 ``#`` 你需要将包含它的整个部分包裹在 ``''`` 中，即 ``'test#242'``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:66
 msgid ""
 "If a string value assigned to a property contains any char from a "
 "following list ``=:,[]#+-*/`` it needs to be wrapped in a ``''``."
-msgstr ""
+msgstr "如果分配给属性的字符串值包含来自以下列表 ``=:,[]#+-*/`` 的任何字符，"
+"则需要将其包在 ``''`` 中。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:69
 msgid "Why DSL?"
-msgstr ""
+msgstr "为什么是 DSL？"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:71
 msgid ""
@@ -190,6 +234,12 @@ msgid ""
 "separated values can now be simplified lists with separate entries being "
 "able to be in multiple lines."
 msgstr ""
+"与旧的配置系统相比，DSL 配置格式有许多优势。组件的所有配置都在一个块中相关，"
+"因此它们不会分布在多个不同的行中。不需要长属性名称，不再需要为多个值调用一长"
+"串设置。为环境变量提供支持。不再需要转义某些字符，使设置一目了然。可以使用基"
+"本计算来设置值，例如 ``100 * 200 * 2`` 而不是 ``40000``。不再需要参数类型值，"
+"不再需要 [i]、[S]、[B] "
+"等。逗号分隔的值现在可以简化为列表，单独的条目可以位于多行中。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:73
 msgid ""
@@ -200,28 +250,34 @@ msgid ""
 "confusion, Tigase can automatically convert old style properties files to"
 " the DSL format using the following command:"
 msgstr ""
+"尽管格式可能看起来更复杂，像一段 java 代码，但格式是一致的并且可读性更强。"
+"在对 DSL 格式进行了一些体验之后，您会发现它远比看起来更直观和易于使用。当然，"
+"如果有任何真正的混淆，Tigase 可以使用以下命令自动将旧样式属性文件转换为 DSL "
+"格式："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:80
 msgid "Setting property"
-msgstr ""
+msgstr "设置属性"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:82
 msgid ""
 "To set property you just write property name followed by `=` and value to"
 " set. This is always done in context of bean which configuration property"
 " you want to set."
-msgstr ""
+msgstr "要设置属性，您只需编写属性名称，后跟 `=` 和要设置的值。"
+"这些总是在您要设置的配置属性的 bean 上下文中完成。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:88
 msgid ""
 "It is also possible to set property in main context by placing property "
 "outside of any context. This sets property which value is available to "
 "access by any bean."
-msgstr ""
+msgstr "也可以通过将属性放置在任何上下文之外的主上下文中设置属性。"
+"这设置了哪个值的属性可以被任何 bean 访问。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:92
 msgid "Setting global property"
-msgstr ""
+msgstr "设置全局属性"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:94
 msgid ""
@@ -231,14 +287,18 @@ msgid ""
 "are defined without scope (in global scope). This properties are global "
 "and accessible by any bean but also set as system property in JVM."
 msgstr ""
+"就像在属性文件中一样，"
+"仍然可以在没有任何上下文或全局范围内的任何其他属性的情况下使用以 ``--`` 开头"
+"的属性名称。格式与设置属性的情况相同，但它们是没有定义范围(在全局范围内）。此"
+"属性是全局的，任何 bean 都可以访问，但在 JVM 中也设置为系统属性。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:97
 msgid "Defining bean"
-msgstr ""
+msgstr "定义 bean"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:99
 msgid "You can configure bean by using following format:"
-msgstr ""
+msgstr "您可以使用以下格式配置 bean："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:107
 msgid ""
@@ -246,10 +306,13 @@ msgid ""
 "`beanName` must be wrapped in ``''``, if ``beanName`` contains characters"
 " like ``=:,[]#+-*/`` and is recommended, if ``beanName`` is numeric only."
 msgstr ""
+"其中 ``beanName`` 是您要配置 bean 的名称。 `beanName` 必须包在 ``''`` 中，"
+"如果 ``beanName`` 包含像 ``=:,[]#+-*/`` 这样的字符并且被推荐，如果 "
+"``beanName`` 只是数字。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:110
 msgid "Inside block between ``(` and `)`` you can define:"
-msgstr ""
+msgstr "``(`and`)`` 之间的块内你可以定义："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:112
 msgid ""
@@ -259,12 +322,17 @@ msgid ""
 " class will be used. In other case you need to pass name of class to use "
 "as a bean)_*"
 msgstr ""
+"``class`` 将被用作 bean，在上面的示例中，我们将 class 设置为 ``className``。 "
+"**(默认值：如果您尝试在 Tigase 框架中配置默认类的名称下配置 "
+"bean，则将使用此分配的类。在其他情况下，您需要传递类的名称以用作 bean)**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:113
 msgid ""
 "``active`` (boolean) whether you want the bean to be active or not (beans"
 " with ``active`` set to ``false`` are not loaded). *_(default: true)_*"
 msgstr ""
+"``active`` (布尔值）是否希望 bean 处于活动状态（不加载 ``active`` 设置为 "
+"``false`` 的 bean)。**(默认：true)**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:114
 msgid ""
@@ -273,6 +341,9 @@ msgid ""
 "most cases it is recommended to omit this field in configuration. "
 "*_(default: false)_*"
 msgstr ""
+"``exportable`` (boolean) 定义这个 bean "
+"是否应该被导出并且可用于内部范围以内的 "
+"bean。这是大多数情况下的高级选项，建议在配置中忽略此字段。**(默认：false)**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:116
 msgid ""
@@ -281,6 +352,9 @@ msgid ""
 "properties of bean would be placed in separate lines with indentation and"
 " first property will be placed in new line."
 msgstr ""
+"不仅 ``beanName`` 之间和 ``()`` 之间的空格是可选的，而且 ``()`` 之间和 ``{}``"
+" 之间的块也是可选的。建议将 bean "
+"的属性放置在带有缩进的单独行中，并将第一个属性放置在新行中。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:121
 msgid ""
@@ -289,6 +363,8 @@ msgid ""
 "definition for bean for which it is used to to `true`. This is done due "
 "to fact that default value of ``active`` is ``true``."
 msgstr ""
+"``()`` 块的使用非常重要。当在配置中使用这个块时，它会自动将 bean 定义的 "
+"``active`` 属性设置为 `true`。这是因为“active”的默认值为“true”。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:123
 msgid ""
@@ -296,28 +372,34 @@ msgid ""
 "may remain ``inactive``. In this state bean will not be loaded and as a "
 "result will not be used by Tigase XMPP Server."
 msgstr ""
+"如果您在配置中忽略它，您将设置 bean 配置，但它可能保持 "
+"``inactive``。在这种状态下，bean 不会被加载，因此 Tigase XMPP "
+"服务器不会使用它。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:126
 msgid "Configuring bean"
-msgstr ""
+msgstr "配置bean"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:128
 msgid ""
 "If you know that bean is defined and you do not want to change it's "
 "activity or class then you can just pass properties to configure bean in "
 "following way:"
-msgstr ""
+msgstr "如果您知道 bean 已定义并且您不想更改它的活动或类，"
+"那么您可以通过以下方式传递属性来配置 bean："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:138
 msgid ""
 "where ``beanName`` is name of bean to configure and `test` is name of "
 "property to set to ``true`` in this bean."
 msgstr ""
+"其中 ``beanName`` 是要配置的 bean 的名称，而 `test` 是要在这个 bean 中设置为 "
+"``true`` 的属性的名称。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:141
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:148
 msgid "Format of values"
-msgstr ""
+msgstr "值的格式"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:143
 msgid ""
@@ -325,103 +407,106 @@ msgid ""
 "string and only by defining expected format it was properly converted to "
 "expected value. In DSL it is possible to set values in two ways:"
 msgstr ""
+"在基于属性的配置文件中，每个属性都被定义为一个字符串，并且只有通过定义预期的"
+"格式，它才能正确转换为预期的值。在 DSL 中，可以通过两种方式设置值："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:146
 msgid "as an object"
-msgstr ""
+msgstr "作为一个对象"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:146
 msgid "Using this format you set list as a list and integer is set as an integer."
-msgstr ""
+msgstr "使用这种格式，您将列表设置为列表，并且将整数设置为整数。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:151
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:205
 msgid "Type"
-msgstr ""
+msgstr "类型"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:151
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:205
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:153
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:207
 msgid "**string**"
-msgstr ""
+msgstr "**字符串**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:153
 msgid "Wrap it in ``''``, ie. to set ``test`` as string you use ``'test'``"
-msgstr ""
+msgstr "把它包在 ``''`` 中，也就是将 ``test`` 设置为使用 ``'test'`` 的字符串"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:155
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:209
 msgid "**integer**"
-msgstr ""
+msgstr "**整数**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:155
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:209
 msgid "Just put value, ie. to set ``543`` use ``543``"
-msgstr ""
+msgstr "也就是，把值设置为 ``543`` 使用 ``543``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:157
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:211
 msgid "**long**"
-msgstr ""
+msgstr "**长整型**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:157
 msgid ""
 "Put value and follow it with ``L``, ie. to set ``23645434`` as long use "
 "``23645434L``"
-msgstr ""
+msgstr "输入数值并在其后面加上 ``L``，即设置 ``23645434`` 为长整型使用 ``23645434L``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:159
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:213
 msgid "**float**"
-msgstr ""
+msgstr "**浮点型**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:159
 msgid ""
 "Put value and follow it with ``f``, ie. to set ``231.342`` use "
 "``231.342f``"
-msgstr ""
+msgstr "输入数值并在其后面加上 ``f``，即将 ``231.342`` 设置为 ``231.342f``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:161
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:215
 msgid "**boolean**"
-msgstr ""
+msgstr "**布尔值**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:161
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:215
 msgid "To set value just use ``true`` or ``false``"
-msgstr ""
+msgstr "要设置值，只需使用 ``true`` 或 ``false``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:163
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:217
 msgid "**list**"
-msgstr ""
+msgstr "**列表**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:163
 msgid ""
 "Lists can be of many types and to make it simple we decided to use as a "
 "comma separated list of values in proper format wrapped in ``[]``."
-msgstr ""
+msgstr "列表可以有多种类型，为了简单起见，我们决定使用逗号分隔的值列表，"
+"以正确的格式放在 ``[]`` 中。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:165
 msgid "of strings - ``[ 'alfa', 'beta', 'gamma' ]``"
-msgstr ""
+msgstr "字符串列表 - ``[ 'alfa', 'beta', 'gamma' ]``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:167
 msgid "of integers - ``[ 1, 2, 3, 4]``"
-msgstr ""
+msgstr "整型列表 - ``[ 1, 2, 3, 4]``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:169
 msgid "You can write it in multiple lines if you want:"
-msgstr ""
+msgstr "如果需要，您可以将其写成多行："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:179
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:219
 msgid "**map**"
-msgstr ""
+msgstr "**映射**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:179
 msgid ""
@@ -429,52 +514,54 @@ msgid ""
 "format of map is the same as used for passing configuration to bean "
 "properties. Keys and values can be written in separate lines "
 "*(recommended)*:"
-msgstr ""
+msgstr "映射可以写成属性块并放在 ``{}`` 中。这种映射格式与用于将配置传递给 bean "
+"属性的格式相同。键和值可以写在单独的行中 *(推荐)*："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:192
 msgid "or in single line *(separation with spaces is not required)*:"
-msgstr ""
+msgstr "或单行 *(不需要用空格分开)*："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:200
 msgid "as a plain string"
-msgstr ""
+msgstr "作为纯字符串"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:200
 msgid ""
 "Very similar to properties based configuration, in fact values are passed"
 " in same format and later are converted to correct type by checking type "
 "expected by bean. *(Not recommended)*"
-msgstr ""
+msgstr "与基于属性的配置非常相似，实际上值以相同的格式传递，然后通过检查 bean "
+"预期的类型将其转换为正确的类型。*(不建议)*"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:202
 msgid "Types"
-msgstr ""
+msgstr "类型"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:207
 msgid "Just put value, ie. to set ``test`` use ``test``"
-msgstr ""
+msgstr "只是放入值，即设置 ``test`` 为 ``test``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:211
 msgid "Put value, ie. to set ``23645434`` as long use ``23645434``"
-msgstr ""
+msgstr "把值放入，即设置 ``23645434`` 为长整型使用 ``23645434``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:213
 msgid "Put value, ie. to set ``231.342`` use ``231.342``"
-msgstr ""
+msgstr "放入数值，即设置 ``231.342`` 为 ``231.342``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:217
 msgid ""
 "List needs to be written as comma separated list of values, ie. "
 "``test,abc,efg`` or ``1,2,3``"
-msgstr ""
+msgstr "列表需要写为用逗号分隔的值列表，即 ``test,abc,efg`` 或 ``1,2,3``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:219
 msgid "Not possible"
-msgstr ""
+msgstr "不可能"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:224
 msgid "Using values from System Properties and Environment Variables"
-msgstr ""
+msgstr "使用系统属性和环境变量中的值"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:226
 msgid ""
@@ -485,28 +572,34 @@ msgid ""
 " and assign them to bean properties. For this purpose we added functions "
 "which can be used in DSL and which will return values of:"
 msgstr ""
+"现在可以使用 `system properties <https://docs.oracle.com/javase/tutorial/"
+"essential/environment/sysprop.html>`__ 和 `environment variables "
+"<https://docs.oracle.com/javase/tutorial/essential/environment/env.html>`__ "
+"并将它们分配给 bean 属性。为此，我们添加了可在 DSL "
+"中使用的函数，这些函数将返回以下值："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:229
 msgid "system property"
-msgstr ""
+msgstr "系统属性"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:229
 msgid "``prop('property-name')`` or ``prop('property-name','default value')``"
-msgstr ""
+msgstr "``prop('property-name')`` 或 ``prop('property-name','default value')``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:232
 msgid "environment variable"
-msgstr ""
+msgstr "环境变量"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:232
+#, fuzzy
 msgid "``env('variable-name')``"
-msgstr ""
+msgstr "``env('variable-name')``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:234
 msgid ""
 "**Example of setting value of system property and environment variable to"
 " bean ``user``.**"
-msgstr ""
+msgstr "**将系统属性和环境变量的值设置为 bean ``user`` 的示例。**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:247
 msgid ""
@@ -515,10 +608,13 @@ msgid ""
 "wrapped in ``[]``, ie. ``property = [ env('some-variable') ]``. It needs "
 "to be set in following way ``property = env('some-variable')``"
 msgstr ""
+"对于列表接受的属性，不允许使用带有逗号分隔的变量/属性值，例如放在在 ``[]`` "
+"中的 ``value1,value2``，即 ``property = [ env('some-variable') ]``。"
+"它需要按以下方式设置 ``property = env('some-variable')``"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:250
 msgid "Computed values"
-msgstr ""
+msgstr "计算值"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:252
 msgid ""
@@ -527,28 +623,31 @@ msgid ""
 "computation, ie. concatenation of a strings or very simple mathematical "
 "expression. We currently support only following mathematical operations:"
 msgstr ""
+"通过 DSL 配置格式，我们引入了对属性的可计算值的支持。现在可以把值设置为作为计"
+"算结果的值，即字符串或非常简单的数学表达式的连接。我们目前仅支持以下数学运算"
+"："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:254
 msgid "add"
-msgstr ""
+msgstr "加法"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:256
 msgid "subtract"
-msgstr ""
+msgstr "减法"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:258
 msgid "multiply"
-msgstr ""
+msgstr "乘法"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:260
 msgid "divide"
-msgstr ""
+msgstr "除法"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:262
 msgid ""
 "**Example of setting environment variable related path and computed "
 "timeout.**"
-msgstr ""
+msgstr "**设置环境变量相关路径和计算超时的示例。**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:278
 msgid ""
@@ -558,10 +657,14 @@ msgid ""
 "value' ]``. It needs to be set in following way ``property = env('some-"
 "variable') + ',other-value'``."
 msgstr ""
+"对于列表所接受的属性，不允许使用带有逗号分隔值的计算值来设置值，例如放在 "
+"``[]`` 中的``value1,value2``，即 ``property = [ env('some-variable') + "
+"',other-value' ]``。它需要按以下方式设置 ``property = env('some-variable') + "
+"',other-value'``。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:281
 msgid "Period / Duration values"
-msgstr ""
+msgstr "Period / Duration 值"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:283
 msgid ""
@@ -574,6 +677,11 @@ msgid ""
 "<https://docs.oracle.com/javase/8/docs/api/java/time/Duration.html#parse-"
 "java.lang.CharSequence->`__ for detailed explanation)."
 msgstr ""
+"一些配置选项允许控制特定时期或特定持续时间内的任务执行。 DSL "
+"文件格式接受表示特定时间量的字符串，它遵循 Java 的本地结构（请参阅: `Period "
+"<https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-java."
+"lang.CharSequence->`__ 和 `Duration <https://docs.oracle.com/javase/8/docs/"
+"api/java/time/Duration.html#parse-java.lang.CharSequence->`__ 详细解释)."
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:285
 msgid ""
@@ -581,70 +689,74 @@ msgid ""
 "``PnDTnHnMn.nS`` with days considered to be exactly 24 hours, for "
 "example:"
 msgstr ""
+"``Duration`` 接受的格式是基于 ISO-8601的 持续时间格式 ``PnDTnHnMn.nS``，"
+"其中天数被认为是 24 小时，例如："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:287
 msgid "``PT20.345S`` - 20.345 seconds"
-msgstr ""
+msgstr "``PT20.345S`` - 20.345 秒"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:289
 msgid "``PT15M`` - 15 minutes (where a minute is 60 seconds)"
-msgstr ""
+msgstr "``PT15M`` - 15 分钟（一分钟为 60 秒）"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:291
 msgid "``PT10H`` - 10 hours (where an hour is 3600 seconds)"
-msgstr ""
+msgstr "``PT10H`` - 10 小时（其中 1 小时为 3600 秒）"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:293
 msgid "``P2D`` - 2 days (where a day is 24 hours or 86400 seconds)"
-msgstr ""
+msgstr "``P2D`` - 2 天（一天是 24 小时或 86400 秒）"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:295
 msgid "``P2DT3H4M`` - 2 days, 3 hours and 4 minutes"
-msgstr ""
+msgstr "``P2DT3H4M`` - 2天，3小时，4分钟"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:297
 msgid ""
 "``Period`` format is based on the ISO-8601 period formats PnYnMnD and "
 "PnW, for example, the following are valid inputs:"
-msgstr ""
+msgstr "``Period`` 格式是基于 ISO-8601 的周期格式 PnYnMnD 和 "
+"PnW，例如，以下是有效输入："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:299
 msgid "``P2Y`` - 2 years"
-msgstr ""
+msgstr "``P2Y`` - 2 年"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:301
 msgid "``P3M`` - 3 months"
-msgstr ""
+msgstr "``P3M`` - 3 月"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:303
 msgid "``P4W`` - 4 weeks"
-msgstr ""
+msgstr "``P4W`` - 4周"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:305
 msgid "``P5D`` - 5 days"
-msgstr ""
+msgstr "``P5D`` - 5天"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:307
 msgid "``P1Y2M3D`` - 1 year, 2 months, 3 days"
-msgstr ""
+msgstr "``P1Y2M3D`` - 1年，2个月，3天"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:309
 msgid "``P1Y2M3W4D`` - 1 year, 2 months, 3 weeks, 4 days"
-msgstr ""
+msgstr "``P1Y2M3W4D`` - 1年，2个月，3周，4天"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:313
 msgid "Example configuration file in DSL"
-msgstr ""
+msgstr "DSL 中的示例配置文件"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:391
 msgid "Default configuration"
-msgstr ""
+msgstr "默认配置"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:393
 msgid ""
 "Tigase XMPP Server is packaged with a basic ``config.tdsl`` file that "
 "tells the server to start up in setup mode."
-msgstr ""
+msgstr "Tigase XMPP 服务器包含一个基本的 ``config.tdsl`` "
+"文件，该文件告诉服务器以设置模式启动。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:406
 msgid ""
@@ -653,6 +765,9 @@ msgid ""
 "With this you can enter the setup process that is covered in `this "
 "section <#webinstall>`__."
 msgstr ""
+"这告诉 Tigase 在设置模式下运行，并告诉 http 组件允许使用用户名和密码 admin/"
+"tigase 登录。有了它，您可以进入 `this section <#webinstall>`__ "
+"中介绍的设置过程。"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:408
 msgid ""
@@ -660,37 +775,43 @@ msgid ""
 "manager``, ``connection-managers``, and ``component``. For more "
 "information, visit `Config Type <#configType>`__ property description."
 msgstr ""
+"配置类型还有其他选项: ``default``, ``session-manager``, ``connection-"
+"managers``, 和 ``component`` 。如需更多信息，请访问 `Config Type "
+"<#configType>`__ 属性说明。"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:4
 msgid "Startup File for tigase.sh - tigase.conf"
-msgstr ""
+msgstr "tigase.sh 的启动文件 - tigase.conf"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:6
 msgid ""
 "Property file names for ``tigase.sh`` startup script is a second "
 "parameter for the startup script. It can be skipped if environmental "
 "variables are set in different location or in different way."
-msgstr ""
+msgstr "``tigase.sh`` 启动脚本的属性文件名是启动脚本的第二个参数。如果环境变量设置在"
+"不同的位置或以不同的方式设置，则可以跳过它。"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:8
 msgid ""
 "Config file for startup script simply sets number of environment "
 "variables with the location of required components. Possible variables to"
 " set in this file are:"
-msgstr ""
+msgstr "启动脚本的配置文件简单地设置环境变量的数量以及所需组件的位置。在此文件中设置"
+"的可能变量是："
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:10
 msgid ""
 "``JAVA_HOME`` - location of Java installation home directory. **Must be "
 "set**."
-msgstr ""
+msgstr "``JAVA_HOME`` - Java 安装主目录的位置。 **必须设置**。"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:12
 msgid ""
 "``TIGASE_HOME`` - location of Tigase installation home directory. *By "
 "default script try to find this location by searching directories from "
 "the location where the script has been run.*"
-msgstr ""
+msgstr "``TIGASE_HOME`` - Tigase 安装主目录的位置。 "
+"*默认情况下，脚本尝试通过从脚本运行的位置搜索目录来找到此位置。*"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:14
 msgid ""
@@ -700,18 +821,23 @@ msgid ""
 "writable by Tigase process all console messages will be redirected to "
 "/dev/null**"
 msgstr ""
+"``TIGASE_CONSOLE_LOG`` - 如果服务器在后台运行，所有控制台消息将被重定向到的文"
+"件。默认情况下，它将是：``TIGASE_HOME/logs/tigase-console.log``。 **如果 "
+"Tigase 进程无法写入此文件/目录，所有控制台消息将被重定向到 /dev/null**"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:16
 msgid ""
 "``TIGASE_PID`` location of the file with server PID number. By default it"
 " will be ``TIGASE_HOME/logs/tigase.pid``."
 msgstr ""
+"``TIGASE_PID`` 带有服务器 PID 号的文件的位置。默认情况下，它将是 ``"
+"TIGASE_HOME/logs/tigase.pid``。"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:18
 msgid ""
 "``JAVA_OPTIONS`` - options for JVM like size of RAM allocated for the "
 "JVM, properties and so on."
-msgstr ""
+msgstr "``JAVA_OPTIONS`` - JVM 的选项，例如为 JVM 分配的 RAM 大小，属性等。"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:20
 msgid ""
@@ -720,10 +846,13 @@ msgid ""
 "you want to specify custom location of your configuration file you should"
 " use ``--config-file <path/to/config.tdsl>`` configuration"
 msgstr ""
+"``TIGASE_OPTIONS`` - （可选）Tigase 服务器程序的附加选项。您可以在此处为您的"
+"环境调整初始参数。如果你想为配置文件指定自定义位置，你应该使用 ``--config-"
+"file <path/to/config.tdsl>`` 配置"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:22
 msgid "Sample file to run **Tigase** with **PostgreSQL** database may look like:"
-msgstr ""
+msgstr "使用 **PostgreSQL** 数据库运行 **Tigase** 的示例文件可能如下所示："
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:33
 msgid ""
@@ -732,6 +861,8 @@ msgid ""
 "all data processing. So the ENC settings enforces ``UTF-8`` encoding for "
 "all operations."
 msgstr ""
+"请注意编码设置。JVM 默认使用操作系统环境中设置的编码。然而，XMPP 协议使用 "
+"``UTF-8`` 进行所有数据处理。因此 ENC 设置对所有操作强制执行 ``UTF-8`` 编码。"
 
 #: ../../Tigase_Administration/Configuration/Startup_Files.inc:35
 msgid ""
@@ -744,17 +875,23 @@ msgid ""
 " of libraries which are not used anyway it can cause a long startup time "
 "and high system loads."
 msgstr ""
+"另一个重要的设置是 \\\\'**CLASSPATH**'。它被有意设置为空字符串。 **tigase."
+"sh** 启动脚本根据 **jars/** 和 **libs/** 目录中的文件自行构建 **CLASSPATH**。"
+"建议将 **CLASSPATH** 设置为空字符串，因为 Tigase "
+"服务器会扫描所有可用的类以查找所有组件和插件实现。如果 **CLASSPATH** "
+"包含大量未使用的库，则可能会导致启动时间长和系统负载高。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:2
 msgid "Linux Settings for High Load Systems"
-msgstr ""
+msgstr "高负载系统的 Linux 设置"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:4
 msgid ""
 "There are a few basic settings you have to adjust for high load systems "
 "to make sure the server has enough resources to handle a big number of "
 "network connections."
-msgstr ""
+msgstr "您必须针对高负载系统调整一些基本设置，以确保服务器有足够的资源来处理大量网络"
+"连接。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:6
 msgid ""
@@ -763,12 +900,15 @@ msgid ""
 "handler, therefore if the limit is too low you can quickly run out of "
 "handlers and the server can not accept any more connections."
 msgstr ""
+"主要参数是允许进程同时保留的最大打开文件数。每个网络连接都使用一个文件处理程"
+"序，因此如果此限制数太低，您可能会很快用完处理程序，服务器将无法接受更多连接"
+"。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:8
 msgid ""
 "This limit is set on 2 levels - on the kernel level (``fs.file-max``) and"
 " on the system level (``nofile``)."
-msgstr ""
+msgstr "此限制设置在 2 个级别 - 内核级别（``fs.file-max``）和系统级别（``nofile``）。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:10
 msgid ""
@@ -777,16 +917,21 @@ msgid ""
 "connections) is: ``net.ipv4.ip_local_port_range``. This parameter can be "
 "set the same way as the ``fs.file-max`` property."
 msgstr ""
+"另一个在某些配置中可能很重要的内核属性（例如传输安装或当您使用代理进行 Bosh "
+"连接时）是：``net.ipv4.ip_local_port_range``。此参数的设置方式与 ``fs.file-"
+"max`` 属性相同。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:13
+#, fuzzy
 msgid "fs.file-max"
-msgstr ""
+msgstr "fs.file-max"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:15
 msgid ""
 "The ``fs.file-max`` kernel property is set via sysctl command. You can "
 "see current settings by executing the command:"
-msgstr ""
+msgstr "``fs.file-max`` 内核属性是通过 sysctl "
+"命令设置的。您可以通过执行以下命令查看当前设置："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:22
 msgid ""
@@ -794,23 +939,26 @@ msgid ""
 "connections, then this parameter should be at least as twice big as the "
 "number of network connections you expect to support. You can change this "
 "setting by executing the command:"
-msgstr ""
+msgstr "如果您计划运行具有大量服务器连接的高负载服务，则此参数应至少是您希望支持的网"
+"络连接数的两倍。您可以通过执行以下命令来更改此设置："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:30
+#, fuzzy
 msgid "net.ipv4.ip_local_port_range"
-msgstr ""
+msgstr "net.ipv4.ip_local_port_range"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:32
 msgid "You can see current settings by executing the command:"
-msgstr ""
+msgstr "您可以通过执行以下命令查看当前设置："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:39
 msgid "You can change this setting by executing the command:"
-msgstr ""
+msgstr "您可以通过执行以下命令来更改此设置："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:47
+#, fuzzy
 msgid "TCP_keepalive"
-msgstr ""
+msgstr "TCP_keepalive"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:49
 msgid ""
@@ -822,10 +970,16 @@ msgid ""
 "established and valid) and, by decreasing times and interval - will make "
 "detection of broken connections faster."
 msgstr ""
+"根据 `Using TCP keepalive to Detect Network Errors <http://www.gnugk.org/"
+"keepalive.html>`__ 和 `TCP Keepalive HOWTO <https://tldp.org/HOWTO/"
+"TCP-Keepalive-HOWTO/usingkeepalive .html>`__ 应该更改一些 keepalive "
+"设置以提高可靠性 - 它将启用 keep alive功能（检查连接是否已建立和有效），"
+"并且通过减少时间和间隔 - 将更快地检测断开的连接。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:64
+#, fuzzy
 msgid "/etc/sysctl.conf"
-msgstr ""
+msgstr "/etc/sysctl.conf"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:66
 msgid ""
@@ -834,31 +988,35 @@ msgid ""
 " the file: ``/etc/sysctl.conf`` and add the property at the end of the "
 "file:"
 msgstr ""
+"上述命令让系统记住新设置，直到下次系统重新启动。如果要使更改永久生效，则必须"
+"编辑文件：``/etc/sysctl.conf`` 并在文件末尾添加属性："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:77
 msgid "It will be automatically loaded next time you start the server."
-msgstr ""
+msgstr "下次启动服务器时会自动加载。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:79
 msgid "Command:"
-msgstr ""
+msgstr "命令："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:85
 msgid ""
 "Causes the ``/etc/systcl.conf`` to be reloaded which is useful when you "
 "have added more parameters to the file and don’t want to restart the "
 "server."
-msgstr ""
+msgstr "导致 ``/etc/systcl.conf`` "
+"被重新加载，当您向文件添加更多参数并且不想重新启动服务器时，这很有用。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:88
 msgid "nofile"
-msgstr ""
+msgstr "无文件"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:90
 msgid ""
 "This is the property used by the system limits. For example running the "
 "command ``ulimit -a`` shows you all limits set for the current user:"
-msgstr ""
+msgstr "这是被系统限制所使用的属性。例如，运行命令 ``ulimit -a`` "
+"会显示为当前用户设置的所有限制："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:110
 msgid ""
@@ -867,12 +1025,14 @@ msgid ""
 "user and **hard limit** which can not be exceeded. To see your **hard "
 "limit** execute command:"
 msgstr ""
+"为了让它更有趣和更复杂，有两种类型的系统限制：**软限制**，此时用户可以暂时超"
+"过，**硬限制**，此时用户不能超过。要查看您的 **硬限制** 执行如下命令："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:130
 msgid ""
 "The hard limits are usually bigger then the soft limits or sometimes the "
 "same."
-msgstr ""
+msgstr "硬限制通常大于软限制或有时相同。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:132
 msgid ""
@@ -880,23 +1040,26 @@ msgid ""
 "the property in file: ``/etc/security/limits.conf``. You have to append 2"
 " following lines to the end of the file:"
 msgstr ""
+"对我们来说最重要的参数是：**打开文件**。您可以更改文件中的属性：``/etc/"
+"security/limits.conf``。您必须将以下 2 行附加到文件末尾："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:139
 msgid ""
 "Where the ``jabber`` is the user name of the account running you IM "
 "service. You can also set the limits for all users on the machine in a "
 "following way:"
-msgstr ""
+msgstr "其中 ``jabber`` 是运行您的 IM "
+"服务的帐户的用户名。您还可以通过以下方式为机器上的所有用户设置限制："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:146
 msgid ""
 "For those changes to make an effect you have to logout from the modified "
 "account and login again. New limits should be applied."
-msgstr ""
+msgstr "要使这些更改生效，您必须从修改后的帐户注销并再次登录。新的限制应该被运用。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:150
 msgid "su and init script"
-msgstr ""
+msgstr "su 和 init 脚本"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:152
 msgid ""
@@ -905,14 +1068,16 @@ msgid ""
 "adjust PAM configuration by modifying /etc/pam.d/su file and uncomment "
 "following line:"
 msgstr ""
+"如果打算使用 init 脚本来启动（或者只是希望能够使用 su 命令启动服务器），"
+"则有必要通过修改 /etc/pam.d/su 文件并取消以下行的注释来调整 PAM 配置："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:158
 msgid "Afterwards the init scripts will respect configured limits."
-msgstr ""
+msgstr "之后， init 脚本将遵守配置的限制。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:2
 msgid "JVM settings and recommendations"
-msgstr ""
+msgstr "JVM 设置和建议"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:4
 msgid ""
@@ -922,30 +1087,34 @@ msgid ""
 "like to expound on those configuration options and provide hints for the "
 "optimal settings."
 msgstr ""
+"Tigase 配置文件 ``tigase.conf`` (在 `??? <#manualconfig>`__ "
+"中有更详细的描述）提到了几个与 JVM "
+"的操作相关的环境变量。在本指南中，我们将阐述这些配置选项并提供最佳设置提示。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:6
 msgid "Settings included in the ``etc/tigase.conf`` are as follows:"
-msgstr ""
+msgstr "``etc/tigase.conf`` 中包含的设置如下："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:18
 msgid ""
 "And while this file utilizes bash variables, JVM configuration options "
 "can be used in the same manner on all operating systems."
-msgstr ""
+msgstr "虽然此文件使用 bash 变量，但 JVM "
+"配置选项可以在所有操作系统上以相同的方式使用。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:20
 msgid ""
 "The guide will consists of two main parts - memory settings and Garbage "
 "Collector tweaks descriptions and hints."
-msgstr ""
+msgstr "该指南将包括两个主要部分 - 内存设置和垃圾收集器来调整描述和提示。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:22
 msgid "We recommend using ``-server`` JVM parameter in all cases."
-msgstr ""
+msgstr "我们建议在所有情况下都使用 ``-server`` JVM 参数。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:25
 msgid "Heap Sizing"
-msgstr ""
+msgstr "堆的大小"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:27
 msgid ""
@@ -955,6 +1124,9 @@ msgid ""
 "allocation and, by the rule of thumb - are the safest in such "
 "environments."
 msgstr ""
+"对于非生产部署（开发或说明环境），我们建议使用 JVM "
+"的默认内存设置（取决于底层操作系统），这会导致自动内存分配，并且根据经验法则 "
+"- 在此类环境中是最安全的环境。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:29
 #, python-format
@@ -965,16 +1137,19 @@ msgid ""
 "roughly 95% of the available memory, if Tigase will be the only service "
 "on the machine) to avoid allocation and deallocation."
 msgstr ""
+"对于生产环境，我们建议使用固定大小的 堆 - 初始大小和最大大小，可以（分别）"
+"使用 ``-Xms`` 和 ``-Xmx`` JVM 标志设置 - 理想情况下为相同的值（如果 Tigase "
+"将是机器上的唯一服务，应该是大约 95% 的可用内存）以避免分配和释放。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:31
 msgid ""
 "For convenience it’s possible to uncomment line with "
 "``PRODUCTION_HEAP_SETTINGS`` and adjust parameters accordingly."
-msgstr ""
+msgstr "为方便起见，可以取消注释行 ``PRODUCTION_HEAP_SETTINGS`` 并相应地调整参数。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:34
 msgid "Memory consideration - total usage"
-msgstr ""
+msgstr "内存考虑 - 总使用量"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:36
 msgid ""
@@ -984,30 +1159,34 @@ msgid ""
 "threads' stack, JIT code cache, garbage collector and others. In "
 "principle consider following equation:"
 msgstr ""
+"HEAP 大小并不是影响 JVM 内存使用的唯一因素。在尝试根据您的使用情况和机器规格"
+"调整大小时，您必须考虑计入总数的其他因素：加载的类、线程的堆栈、JIT "
+"代码缓存、垃圾收集器等等。原则上考虑以下等式："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:48
 msgid "In case of Tigase XMPP Server, apart from heap we limit remaining factors:"
-msgstr ""
+msgstr "在 Tigase XMPP 服务器的情况下，除了堆之外，我们还限制了其余因素："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:50
 msgid "direct memory to **128** MB"
-msgstr ""
+msgstr "直接内存到 **128** MB"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:52
 msgid "loaded classes to **128** MB"
-msgstr ""
+msgstr "加载类到 **128** MB"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:54
 msgid ""
 "single thread’s stack size to **228** KB (number of threads depends on "
 "number of CPU cores and may vary from 500 to couple of thousands)"
-msgstr ""
+msgstr "单线程的栈大小为 **228** KB（线程数取决于 CPU 内核的数量，可能从 500 "
+"到几千不等）"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:56
 msgid ""
 "In principle, in addition to HEAP’s maximum size defined by ``-Xmx`` you "
 "should add roughly **512** MB"
-msgstr ""
+msgstr "原则上，除了由 ``-Xmx`` 定义的堆的最大大小之外，您还应该添加大约 **512** MB"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:58
 msgid ""
@@ -1018,10 +1197,15 @@ msgid ""
 "Java process consume more memory than Xmx?](\\ https://plumbr.io/blog"
 "/memory-leaks/why-does-my-java-process-consume-more-memory-than-xmx)"
 msgstr ""
+"如果您对内存的详细跟踪感兴趣，请查看 [JVM 的内存占用](\\ https://spring.io/"
+"blog/2019/03/11/memory-footprint-of-the-jvm/)， [JVM中的Native Memory "
+"Tracking](\\ https://www.baeldung.com/native-memory-tracking-in-"
+"jvm)或者[为什么我的Java进程消耗的内存比Xmx多？](\\ https://plumbr.io/blog/"
+"memory-leaks/why-does-my-java-process-consume-more-memory-than-xmx)"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:62
 msgid "GC settings"
-msgstr ""
+msgstr "GC 设置"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:64
 msgid ""
@@ -1029,7 +1213,9 @@ msgid ""
 " deployment and use-case is different, however we will try to give a "
 "couple of pointers and recommendations proceed with short introduction to"
 " GC itself."
-msgstr ""
+msgstr "让我们首先声明没有 \"一个人可以统治一切\" - "
+"每个部署和用例都是不同的，但是我们将尝试给出一些指示和建议，并继续简要介绍 "
+"GC 本身。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:66
 msgid ""
@@ -1040,20 +1226,24 @@ msgid ""
 "Garbage Collector works. On the most basic level Heap is separated into "
 "couple of regions:"
 msgstr ""
+"XMPP 在内存分配方面非常具体 - "
+"短期对象（各种类型的节）通常超过长期对象（用户连接和相关数据）的数量。"
+"这是关于 JVM HEAP 的组织方式和垃圾收集器如何工作的重要信息。在最基本的层面上"
+"，堆被分成几个区域："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:69
 msgid "Generations"
-msgstr ""
+msgstr "代"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:71
 msgid "**Young Generation**, which is further divided in to:"
-msgstr ""
+msgstr "**年轻代**，其又分为："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:73
 msgid ""
 "**Eden** - the region when the objects are usually allocated when they "
 "are created;"
-msgstr ""
+msgstr "**Eden** - 创建对象时通常分配对象的区域；"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:75
 msgid ""
@@ -1062,6 +1252,8 @@ msgid ""
 "**Young Generation** (process is repeated several times until objects are"
 " finally considered *old enough*);"
 msgstr ""
+"**幸存者区** - (*to* 和 *from* - 其中一个始终为空) - 负责存储收集 **年轻代** "
+"(过程重复多次，直到最终考虑对象 *足够老*)后剩余的所有存活对象 ;"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:77
 msgid ""
@@ -1069,26 +1261,28 @@ msgid ""
 "remaining after running GC on **Survivor Spaces** - those would be *long-"
 "lived* objects (usually user connections and associated data);"
 msgstr ""
+"**老年代** - (*养老区*) - 负责在 **幸存者区** 上运行 GC 后剩余的活动对象 - "
+"这些将是 *长期* 对象（通常是用户连接和相关数据)；"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:80
 msgid "Minor, Major and Full GC - optimizing"
-msgstr ""
+msgstr "Minor，Major 和 Full GC - 优化"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:82
 msgid "General thinking suggests that:"
-msgstr ""
+msgstr "一般认为："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:84
 msgid "**Minor GC** cleans Young generation;"
-msgstr ""
+msgstr "**Minor GC** 清理年轻代；"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:86
 msgid "**Major GC** cleans Tenured space;"
-msgstr ""
+msgstr "**Major GC** 清理 Tenured 空间；"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:88
 msgid "**Full GC** cleans all heap."
-msgstr ""
+msgstr "**Full GC** 清理所有堆。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:90
 msgid ""
@@ -1105,30 +1299,41 @@ msgid ""
 "results should prove more helpful. In addition monitoring GC operation "
 "using for example VisualVM (with VisualGC plugin) will also be helpful."
 msgstr ""
+"然而，虽然我们可以肯定地说 Minor GC 会清理年轻代，但区分 Major GC 和 Full GC "
+"有点困难，特别是考虑到 Major GC 经常由 Minor GC "
+"触发，并且一些垃圾收集器可以同时执行清理。与其关注区分阶段，"
+"不如更关注垃圾收集器本身的实际操作 - 取消在 ``etc/tigase.conf`` 中的注释行 "
+"``GC_DEBUG=\" -XX:+PrintTenuringDistribution -XX:+PrintGCDetails -XX:+"
+"PrintGCDateStamps -XX:+PrintGCTimeStamps -Xloggc: logs/jvm.log -verbose:gc \""
+"`` (或向 java 命令行添加相同的属性)并随后分析结果应该会更有帮助。此外，"
+"使用示例 VisualVM（带有 VisualGC 插件）监控 GC 操作也将有所帮助。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:93
 msgid "Settings for XMPP"
-msgstr ""
+msgstr "XMPP 的设置"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:95
 msgid ""
 "Ideally we should limit both number of GC pauses as well as their "
 "duration. After running rather tests following conclusions were made:"
-msgstr ""
+msgstr "理想情况下，我们应该限制 GC "
+"暂停的次数及其持续时间。经过非同寻常的测试，得出以下结论："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:97
 msgid ""
 "Garbage Collection is the faster the more dead objects occupies given "
 "space, therefore on high-traffic installation it’s better to have rather "
 "large YoungGen resulting in lower promotion of the objects to the OldGen;"
-msgstr ""
+msgstr "垃圾回收速度越快，死对象占用给定空间越多，因此在高流量安装中，最好使用较大的 "
+"YoungGen，从而降低对象向 OldGen 的提升;"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:99
 msgid ""
 "with JVM8 default sizing of Young / Old generation changed, even tho "
 "NewRatio is still defaulting to “2” - setting it explicitly to \"2\" "
 "brought back previous sizing;"
-msgstr ""
+msgstr "随着 JVM8 的年轻/老年代默认大小发生变化，即使 NewRatio 仍然默认为“2” - "
+"将其显式设置为“2”会恢复以前的大小;"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:101
 msgid ""
@@ -1137,12 +1342,16 @@ msgid ""
 "``-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:NewRatio=2``) in general "
 "behaves best;"
 msgstr ""
+"启用并发标记和扫描 (CMS)（仅适用于 Tenured 空间），通常将 NewRatio "
+"的显式配置设置为默认值 2（即 ``-XX:+UseConcMarkSweepGC -XX:+UseParNewGC "
+"-XX:NewRatio=2``）表现最好;"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:103
 msgid ""
 "For small installations (few core CPU, less memory) with low traffic "
 "default Parallel collector may be a better solution;"
-msgstr ""
+msgstr "对于低流量的小型安装（核心 CPU "
+"少，内存少）默认并行收集器可能是更好的解决方案;"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:105
 msgid ""
@@ -1151,30 +1360,36 @@ msgid ""
 "thus resulting in longer pauses; in case of huge heaps G1 collector may "
 "be better solution to avoid longer pauses;"
 msgstr ""
+"使用根据实际使用情况调整的堆大小会更好，因为堆越大，需要执行收集的空间就越大"
+"，从而导致更长的暂停；如果堆很大，G1 收集器可能是避免更长暂停的更好解决方案;"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:107
 msgid ""
 "Considering all of the above using following options should be a good "
 "starting point toward further optimizing of Garbage Collection:"
-msgstr ""
+msgstr "考虑到上述所有因素，使用以下选项应该是进一步优化垃圾收集的良好起点："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:109
+#, fuzzy
 msgid ""
 "``GC=\"-XX:+UseBiasedLocking -XX:+UseConcMarkSweepGC -XX:+UseParNewGC "
 "-XX:+CMSIncrementalMode -XX:-ReduceInitialCardMarks "
 "-XX:CMSInitiatingOccupancyFraction=70 "
 "-XX:+UseCMSInitiatingOccupancyOnly\"``"
 msgstr ""
+"``GC=\"-XX:+UseBiasedLocking -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+"
+"CMSIncrementalMode -XX:-ReduceInitialCardMarks -XX:"
+"CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly\"``"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:112
 msgid "GC settings worth considering"
-msgstr ""
+msgstr "值得考虑的 GC 设置"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:114
 msgid ""
 "In addition to the general recommendation to use CMS collector, following"
 " options (or changes to the options) may be worth considering:"
-msgstr ""
+msgstr "除了使用 CMS 收集器的一般性建议外，以下选项(或对选项的更改)可能值得考虑："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:116
 msgid ""
@@ -1185,6 +1400,11 @@ msgid ""
 "above. Setting these to the same value fixes the young generation, just "
 "as setting -Xms and -Xmx to the same value fixes the total heap size."
 msgstr ""
+"``-XX:NewRatio=2`` - 定义年轻代和老生代的比例为 "
+"1:2。换句话说，eden和幸存者空间的组合大小将是总堆大小的三分之一。参数 "
+"NewSize 和 MaxNewSize "
+"从下方和上方限制了年轻代的大小。将它们设置为相同的值会修复年轻代，就像将 -"
+"Xms 和 -Xmx 设置为相同的值会修复总堆大小一样。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:118
 msgid ""
@@ -1192,6 +1412,8 @@ msgid ""
 "the old generation occupancy (0 to 100) at which to start a CMS "
 "collection cycle."
 msgstr ""
+"``-XX:CMSInitiatingOccupancyFraction=percent`` - 设置开始 CMS "
+"收集周期的老年代占用率(0 到 100)。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:120
 msgid ""
@@ -1199,6 +1421,9 @@ msgid ""
 "its decision when to start a CMS cycle on run time statistics but instead"
 " it uses the value of CMSInitiatingOccupancyFraction for every CMS cycle."
 msgstr ""
+"``-XX:+UseCMSInitiatingOccupancyOnly`` - 指示 JVM 不要根据运行时统计信息，"
+"而是使用每个 CMS 周期的 CMSInitiatingOccupancyFraction 的值来决定何时启动 "
+"CMS 周期。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:122
 msgid ""
@@ -1208,6 +1433,9 @@ msgid ""
 "JMV is the only one running on the installation default value is "
 "recommended."
 msgstr ""
+"``-XX:ParallelGCThreads=x`` - 设置年轻代和老年代用于并行垃圾回收的线程数。"
+"默认值取决于 JVM 可用的 CPU 数量。如果 Tigase JMV "
+"是安装中唯一的运行，建议使用默认值。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:124
 msgid ""
@@ -1216,6 +1444,8 @@ msgid ""
 " If the Tigase JMV is the only one running on the installation default "
 "value is recommended."
 msgstr ""
+"``-XX:ConcGCThreads=x`` - 设置用于并发 GC 的线程数。默认值取决于 JVM 可用的 "
+"CPU 数量。如果 Tigase JMV 是安装中唯一的运行，建议使用默认值。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:126
 msgid ""
@@ -1225,12 +1455,15 @@ msgid ""
 "improve concurrency and, on current multi-core hardware, improve "
 "throughput."
 msgstr ""
+"``-XX:+UseBiasedLocking`` 和 ``-XX:+DoEscapeAnalysis`` - 旨在消除锁定开销，但"
+"是它们对性能的影响是不可预测的，因此需要进行测试；减少锁定应该可提高并发性，"
+"并且在当前的多核硬件上，提高吞吐量。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:128
 msgid ""
 "``-XX:+OptimizeStringConcat`` - enables the optimization of String "
 "concatenation operations. This option is enabled by default."
-msgstr ""
+msgstr "``-XX:+OptimizeStringConcat`` - 启用字符串连接操作的优化。此选项默认被启用。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:130
 msgid ""
@@ -1241,6 +1474,10 @@ msgid ""
 "optimization for NUMA is made. The option is only available when the "
 "parallel garbage collector is used (-XX:+UseParallelGC)."
 msgstr ""
+"``-XX:+UseNUMA`` - 通过增加应用程序对低延迟内存的使用，在具有非统一内存架构（"
+"NUMA - 大多数现代计算机基于 NUMA 架构）的机器上启用应用程序的性能优化。默认情"
+"况下，此选项处于禁用状态，并且不会对NUMA进行优化。该选项仅在使用并行垃圾收集"
+"器时可用（-XX:+UseParallelGC）。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:132
 msgid ""
@@ -1251,14 +1488,18 @@ msgid ""
 "which typically increases performance when running the application with "
 "Java heap sizes less than 32 GB. This option works only for 64-bit JVMs."
 msgstr ""
+"``-XX:-UseCompressedOops`` -  禁用压缩指针的使用。此选项被默认启用，当 Java "
+"堆大小小于 32 GB 时使用压缩指针。启用此选项后，对象引用将表示为 32 "
+"位偏移量而不是 64 位指针，这通常会在运行 Java 堆大小小于 32 GB "
+"的应用程序时提高性能。此选项仅适用于 64 位 JVM。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:136
 msgid "What to use with Machine x, y, z?"
-msgstr ""
+msgstr "机器 x, y, z 使用什么？"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:139
 msgid "Server class machine (non-VM), > 16GB, >= 8 core CPU"
-msgstr ""
+msgstr "服务器类机器（非 VM) , > 16GB, >= 8 核 CPU"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:141
 msgid ""
@@ -1267,16 +1508,20 @@ msgid ""
 "needed. Adjusting Xms and Xms sizes for actual available memory is needed"
 " (or better yet, for the actual traffic!). Following should be used:"
 msgstr ""
+"对于此类设置，建议启用 CMS 垃圾收集器。根据流量使用情况和特定用例，"
+"可能需要调整 NewRatio。需要针对实际可用内存调整 Xms 和 Xms "
+"大小（或者更好的是，针对实际流量！）。应使用以下内容："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:153
 msgid ""
 "For installation with lot of available memory and intention to utilize it"
 " all, using G1GC collector may be a better idea :"
-msgstr ""
+msgstr "对于有大量可用内存并打算利用这些内存的安装，使用 G1GC "
+"收集器可能是一个更好的主意："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:167
 msgid "VM machine, 8GB of RAM, 4 core CPU equivalent"
-msgstr ""
+msgstr "VM 机器，8GB RAM，4 核 CPU 等效"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:169
 msgid ""
@@ -1286,10 +1531,13 @@ msgid ""
 "Xms sizes for actual available memory is needed (or better yet, for the "
 "actual traffic!). Following should be used:"
 msgstr ""
+"对于此类设置，还建议启用 CMS 垃圾收集器。根据流量使用情况和特定用例，"
+"可能需要调整 NewRatio（并且必须配置 NewRatio！）。需要针对实际可用内存调整 "
+"Xms 和 Xms 大小（或者更好的是，针对实际流量！）。应使用以下内容："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:183
 msgid "VM machine with 4GB or less of RAM, and less than 4 core CPU equivalent"
-msgstr ""
+msgstr "具有 4GB 或更少 RAM 且少于 4 核 CPU 的 VM 机器"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:185
 msgid ""
@@ -1301,16 +1549,23 @@ msgid ""
 "the actual traffic!). Following should be used (i.e. ``GC`` line should "
 "be commented so the defaults will be used):"
 msgstr ""
+"资源有限的小型安装可以在默认情况下更好地运行（对于直到 8 的 JVM "
+"版本，这是撰写本文时最新的版本）。同样 - 根据流量使用情况和特定用例，"
+"可能需要调整 NewRatio。建议针对实际可用内存调整 Xms 和 Xms "
+"大小（或者更好的是，针对实际流量！）。应该使用以下内容（即应该注释 ``GC`` "
+"行以便使用默认值）："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:199
 msgid "Additional resources"
-msgstr ""
+msgstr "其他资源"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:201
 msgid ""
 "`Sizing the Generations "
 "<https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/sizing.html>`__"
 msgstr ""
+"`Generations的大小 <https://docs.oracle.com/javase/8/docs/technotes/guides/"
+"vm/gctuning/sizing.html>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:203
 msgid ""
@@ -1318,16 +1573,18 @@ msgid ""
 "<http://www.c0t0d0s0.org/archives/6617-About-Java,-parallel-garbage-"
 "collection-and-processor-sets.html>`__"
 msgstr ""
+"`关于 Java, 并行垃圾收集和处理器集 <http://www.c0t0d0s0.org/archives/6617"
+"-About-Java,-parallel-garbage-collection-and-processor-sets.html>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:205
 msgid ""
 "`GC Threads <http://hiroshiyamauchi.blogspot.cl/2009/12/gc-"
 "threads.html>`__"
-msgstr ""
+msgstr "`GC 线程 <http://hiroshiyamauchi.blogspot.cl/2009/12/gc-threads.html>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:207
 msgid "`GCViewer readme <https://github.com/chewiebug/GCViewer#readme>`__"
-msgstr ""
+msgstr "`GCViewer 自述文件 <https://github.com/chewiebug/GCViewer#readme>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:209
 msgid ""
@@ -1335,16 +1592,18 @@ msgid ""
 "<http://docs.oracle.com/javase/7/docs/technotes/guides/vm/performance-"
 "enhancements-7.html>`__"
 msgstr ""
+"`Java HotSpot™ 虚拟机性能增强 <http://docs.oracle.com/javase/7/docs/"
+"technotes/guides/vm/performance-enhancements-7.html>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:211
 msgid ""
 "`Java Garbage Collection handbook <https://plumbr.eu/java-garbage-"
 "collection-handbook>`__"
-msgstr ""
+msgstr "`Java 垃圾收集手册 <https://plumbr.eu/java-garbage-collection-handbook>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:213
 msgid "Useful JVM Flags"
-msgstr ""
+msgstr "有用的 JVM 标志"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:215
 msgid ""
@@ -1352,6 +1611,8 @@ msgid ""
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-1-jvm-"
 "types-and-compiler-modes/>`__"
 msgstr ""
+"`第 1 部分 - JVM 类型和编译器模式 <https://blog.codecentric.de/en/2012/07/"
+"useful-jvm-flags-part-1-jvm-types-and-compiler-modes/>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:217
 msgid ""
@@ -1359,6 +1620,8 @@ msgid ""
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-2-flag-"
 "categories-and-jit-compiler-diagnostics/>`__"
 msgstr ""
+"`第 2 部分 - 标志类别和 JIT 编译器诊断) <https://blog.codecentric.de/en/2012/"
+"07/useful-jvm-flags-part-2-flag-categories-and-jit-compiler-diagnostics/>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:219
 msgid ""
@@ -1366,12 +1629,16 @@ msgid ""
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-3-printing-"
 "all-xx-flags-and-their-values/>`__"
 msgstr ""
+"`第 3 部分 - 打印所有 XX 标志及其值 <https://blog.codecentric.de/en/2012/07/"
+"useful-jvm-flags-part-3-printing-all-xx-flags-and-their-values/>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:221
 msgid ""
 "`Part 4 - Heap Tuning <https://blog.codecentric.de/en/2012/07/useful-jvm-"
 "flags-part-4-heap-tuning/>`__"
 msgstr ""
+"`第 4 部分 - 堆调整 <https://blog.codecentric.de/en/2012/07/"
+"useful-jvm-flags-part-4-heap-tuning/>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:223
 msgid ""
@@ -1379,28 +1646,36 @@ msgid ""
 "<https://blog.codecentric.de/en/2012/08/useful-jvm-flags-part-5-young-"
 "generation-garbage-collection/>`__"
 msgstr ""
+"`第 5 部分 - 年轻代垃圾回收 <https://blog.codecentric.de/en/2012/08/"
+"useful-jvm-flags-part-5-young-generation-garbage-collection/>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:225
 msgid ""
 "`Part 6 - Throughput Collector <https://blog.codecentric.de/en/2013/01"
 "/useful-jvm-flags-part-6-throughput-collector/>`__"
 msgstr ""
+"`第 6 部分 - 吞吐量收集器 <https://blog.codecentric.de/en/2013/01/"
+"useful-jvm-flags-part-6-throughput-collector/>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:227
 msgid ""
 "`Part 7 - CMS Collector <https://blog.codecentric.de/en/2013/10/useful-"
 "jvm-flags-part-7-cms-collector/>`__"
 msgstr ""
+"`第 7 部分 - CMS 收集器 <https://blog.codecentric.de/en/2013/10/"
+"useful-jvm-flags-part-7-cms-collector/>`__"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:229
 msgid ""
 "`Part 8 - GC Logging <https://blog.codecentric.de/en/2014/01/useful-jvm-"
 "flags-part-8-gc-logging/>`__"
 msgstr ""
+"`第 8 部分 - GC 日志记录 <https://blog.codecentric.de/en/2014/01/"
+"useful-jvm-flags-part-8-gc-logging/>`__"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:2
 msgid "Session Manager"
-msgstr ""
+msgstr "会话管理器"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:4
 msgid ""
@@ -1409,10 +1684,13 @@ msgid ""
 "session manager can effect operations throughout an entire XMPP "
 "installation, so care must be made when changing settings here."
 msgstr ""
+"Tigase 会话管理器可以配置大多数 Tigase 基本选项，也可以控制许多操作。"
+"对会话管理器的更改会影响整个 XMPP "
+"安装中的操作，因此在此处更改设置时必须小心。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:9
 msgid "Mobile Optimizations"
-msgstr ""
+msgstr "移动优化"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:11
 msgid ""
@@ -1424,83 +1702,96 @@ msgid ""
 "``ClientStateIndication`` and is independent from the MobileV1, MobileV2,"
 " MobileV3 settings."
 msgstr ""
+"默认情况下，Tigase 运用 XEP-0352 客户端状态指示，其通过允许 XMPP 服务器抑制或"
+"减少发送到客户端的更新数量，从而减少发送到非活动移动客户端的节数，从而实现更"
+"流畅的移动体验。此应用包含在处理器 ``ClientStateIndication`` 中，并且独立于 "
+"MobileV1、MobileV2、MobileV3 设置。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:13
 msgid ""
 "However, this can be fine tuned by using mobile plugins from Tigase which"
 " can be used at the same time by adding the following line to the "
 "``config.tdsl`` file:"
-msgstr ""
+msgstr "然而，这可以通过使用来自 Tigase 的移动插件进行微调，通过在 ``config.tdsl`` "
+"文件中添加以下行并同时使用它："
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:24
 msgid "Logic Options are:"
-msgstr ""
+msgstr "逻辑选项是："
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:27
+#, fuzzy
 msgid "MobileV1"
-msgstr ""
+msgstr "MobileV1"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:29
 msgid "Keeps all presence stanzas in queue until client is active."
-msgstr ""
+msgstr "将所有存在节保持在队列中直到客户端处于活动状态为止。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:37
+#, fuzzy
 msgid "MobileV2"
-msgstr ""
+msgstr "MobileV2"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:39
 msgid ""
 "This setting delays delivery of presences while client is in inactive "
 "state, but only keeps the last presence for each full jid. **This is the "
 "default setting for CSI logic**."
-msgstr ""
+msgstr "当客户端处于非活动状态时，此设置会延迟呈现状态的传递，但仅保留每个完整 jid "
+"的最后呈现状态。 **这是 CSI 逻辑的默认设置**。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:47
+#, fuzzy
 msgid "MobileV3"
-msgstr ""
+msgstr "MobileV3"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:49
 msgid ""
 "Keeps the same presence logic as MobileV2, but also queues Message "
 "Carbons. **Currently not supported by CSI processor, will cause issues**."
-msgstr ""
+msgstr "保持与 MobileV2 相同的存在逻辑，但也把 Message Carbons 排队。**目前不支持 "
+"CSI 处理器，会导致问题**。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:57
 msgid "Disabling CSI"
-msgstr ""
+msgstr "禁用 CSI"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:59
 msgid ""
 "If you wish to not use the ``ClientStateIndication`` processor, set the "
 "following in your ``config.tdsl`` file:"
-msgstr ""
+msgstr "如果您不想使用 ``ClientStateIndication`` 处理器，请在 ``config.tdsl`` "
+"文件中设置以下内容："
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:69
 msgid "A note about Mobile Plugins"
-msgstr ""
+msgstr "关于移动插件的说明"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:71
 msgid ""
 "Previously, you could enable Mobile optimization logic using by enabling "
 "``Mobile_V1 (){}`` bean to Session Manager: ``sess-man () {}`` bean."
 msgstr ""
+"之前，您可以通过启用 ``Mobile_V1 (){}`` bean 到会话管理器来启用移动优化逻辑"
+"：``sess-man () {}`` bean。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:73
 msgid ""
 "If you have used these in the past, it is recommended you change your "
 "system to use the CSI processor with the appropriate mobile processing "
 "logic."
-msgstr ""
+msgstr "如果您过去使用过这些，建议您更改系统以使用具有适当移动处理逻辑的 CSI 处理器。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:75
 msgid ""
 "If you require v3 logic, or do not wish to use CSI, be sure to disable it"
 " using the above option."
-msgstr ""
+msgstr "如果您需要 v3 逻辑，或者不希望使用 CSI，请务必使用上述选项禁用它。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:79
 msgid "threads-pool"
-msgstr ""
+msgstr "线程池"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:81
 msgid ""
@@ -1510,6 +1801,9 @@ msgid ""
 "resource usage. The downside of this setting is that packets can arrive "
 "out of order if they are processed within different thread pools."
 msgstr ""
+"``threadsNo`` 属性允许你微调 SM 插件(处理器)的线程池。使用默认设置，每个插件"
+"都有自己的线程池。这保证了最佳性能和最佳资源使用。此设置的缺点是，如果在不同"
+"的线程池中处理数据包，它们可能会乱序到达。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:83
 msgid ""
@@ -1524,56 +1818,66 @@ msgid ""
 "For example, setting a common thread pool for all plugins but "
 "registration and authentication can be done with following configuration:"
 msgstr ""
+"我们甚至可以微调这个数据包处理。比方说您希望大多数插件在单个线程池中执行以保"
+"留它们的数据包顺序，但对于一些选定插件应该在单独的线程池中执行以提高性能。比"
+"如说，身份验证数据包和用户注册实际上可以在单独的线程池中执行，因为我们不担心"
+"它们的顺序。无论如何，用户在进行身份验证之前都无法发送或接收任何其他内容。解"
+"决方案是为所选插件指定线程数。例如，为所有插件设置一个公共线程池，但注册和身"
+"份验证可以通过以下配置完成："
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:96
 msgid ""
 "This replaces the old ``--sm-threads-pool`` property, as well as "
 "specifying thread pools in ``--sm-plugins``."
-msgstr ""
+msgstr "这取代了旧的 ``--sm-threads-pool`` 属性，并在 ``--sm-plugins`` 中指定线程池。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:100
 msgid "Thread Pool factor"
-msgstr ""
+msgstr "线程池因子"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:102
 msgid ""
 "Session manager can control the number of available thread pools for each"
 " processor. By adding the following line to the ``config.tdsl`` file, the"
 " global thread pool can be increased by a specified factor:"
-msgstr ""
+msgstr "会话管理器可以控制每个处理器的可用线程池数量。通过在 ``config.tdsl`` "
+"文件中添加以下行，可以将全局线程池增加一个指定的因子："
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:110
 msgid "In this case, the global thread pools is increased by a factor or 3."
-msgstr ""
+msgstr "在这种情况下，全局线程池增加了 3 倍。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:114
+#, fuzzy
 msgid "Strategy"
-msgstr ""
+msgstr "Strategy"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:116
 msgid ""
 "The ``Strategy`` property allows users to specify Clustering Strategy "
 "class which should be used for handling clustering environment; by "
 "default ``SMNonCachingAllNodes`` is used."
-msgstr ""
+msgstr "``Strategy`` 属性允许用户指定用于处理集群环境的集群策略类；默认情况下使用 "
+"``SMNonCachingAllNodes`` 。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:118
 msgid ""
 "Any class implementing ``tigase.cluster.strategy.ClusteringStrategyIfc`` "
 "interface may be used for this setting."
-msgstr ""
+msgstr "任何实现 ``tigase.cluster.strategy.ClusteringStrategyIfc`` "
+"接口的类都可以用于此设置。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:120
 msgid "Example:"
-msgstr ""
+msgstr "例子:"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:128
 msgid "This replaces the old ``--sm-cluster-strategy-class`` setting from v7.1."
-msgstr ""
+msgstr "这替换了 v7.1 中的旧的 ``--sm-cluster-strategy-class`` 设置。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:4
 msgid "Virtual Hosts in Tigase Server"
-msgstr ""
+msgstr "Tigase 服务器中的虚拟主机"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:6
 msgid ""
@@ -1581,13 +1885,15 @@ msgid ""
 "installation. Virtual hosts can be added or removed, enabled or disabled "
 "during runtime without restarting the service or disrupting normal "
 "operation."
-msgstr ""
+msgstr "Tigase 服务器在单个服务器安装中支持多个虚拟主机。可以在运行时添加或删除，启用"
+"或禁用虚拟主机，而无需重新启动服务或中断正常操作。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:8
 msgid ""
 "This document describes how virtual hosts work in Tigase server and how "
 "to get the most out of this feature in your installation."
-msgstr ""
+msgstr "本文档描述了虚拟主机在 Tigase "
+"服务器中的工作方式以及如何在您的安装中充分利用此功能。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:10
 msgid ""
@@ -1597,6 +1903,9 @@ msgid ""
 "name. Any additional configuration needs to be configured using ad-hoc "
 "commands."
 msgstr ""
+"`'default-virtual-host' <#virtHosts>`_ 属性允许定义单个虚拟主机域的名称，该域"
+"将被视为此安装的默认虚拟主机域。它只允许您配置域名。任何额外的配置都需要使用 "
+"ad-hoc 命令进行配置。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:12
 msgid ""
@@ -1606,6 +1915,9 @@ msgid ""
 "Manage Virtual Domains <#adhocCommands>` for more information about ad-"
 "hoc commands."
 msgstr ""
+"虚拟主机应使用 ad-hoc 命令或管理 ui 进行管理，请访问 `添加和管理域 "
+"<#addManageDomain>`__ 以了解虚拟主机管理过程的说明或访问 `"
+"用于管理虚拟域的临时命令规范 <#adhocCommands>`__ 有关临时命令的更多信息。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:14
 msgid ""
@@ -1614,6 +1926,8 @@ msgid ""
 "details in the `Virtual Components for the Tigase Cluster "
 "<#virtualComponents>`__ section."
 msgstr ""
+"如果您的组件可能无法处理多个虚拟主机或集群模式，我们也开发了一个虚拟组件解决"
+"方案，详细信息请参见 `Tigase 集群的虚拟组件 <#virtualComponents>`__ 部分。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:16
 msgid ""
@@ -1621,10 +1935,12 @@ msgid ""
 " - `API Description for Virtual Domains Management in Tigase Server "
 "<#addManageDomain>`."
 msgstr ""
+"您可能还想参考 Vhosts API 以获取更多信息: - `Tigase 服务器中虚拟域管理的 API "
+"描述 <#addManageDomain>`__。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:24
 msgid "Default VHost configuration"
-msgstr ""
+msgstr "默认虚拟主机配置"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:26
 msgid ""
@@ -1633,6 +1949,9 @@ msgid ""
 "parameters. To do so you should specify each configuration option within "
 "``defaults`` bean belonging to ``vhost-man`` bean:"
 msgstr ""
+"可以在 TDSL 配置文件（即 ``etc/config."
+"tdsl``）中为所选参数指定所有虚拟主机的初始默认配置。为此，您应该在属于 "
+"``vhost-man`` bean 的 ``defaults`` bean 中指定每个配置选项："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:44
 msgid ""
@@ -1642,6 +1961,9 @@ msgid ""
 " described in `Specification for ad-hoc Commands Used to Manage Virtual "
 "Domains <#adhocCommands>`__."
 msgstr ""
+"在初始定义默认配置或首次启动 Tigase XMPP 服务器后，可以使用 ad-hoc "
+"命令配置虚拟主机默认值，方法是使用 ad-hoc 修改 ``default`` 的值，就如 `"
+"用于管理虚拟域的临时命令规范 <#adhocCommands>`__ 中所描述。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:46
 msgid ""
@@ -1649,34 +1971,37 @@ msgid ""
 "(configuration for domain ``default``) using Admin UI which by default is"
 " available at ``http://localhost:8080/admin/``."
 msgstr ""
+"或者，您可以使用管理 UI 编辑默认虚拟主机配置（域 ``default`` 的配置），"
+"这些在默认情况下可通过\n"
+"``http://localhost:8080/admin/`` 获得。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:51
 msgid "Specification for ad-hoc Commands Used to Manage Virtual Domains"
-msgstr ""
+msgstr "用于管理虚拟域的临时命令规范"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:53
 msgid ""
 "There are 3 ad-hoc commands for virtual domains management in the Tigase "
 "server:"
-msgstr ""
+msgstr "Tigase 服务器中有 3 个用于虚拟域管理的临时命令："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:55
 msgid ""
 "``VHOSTS_RELOAD`` used to reload virtual domains list from the repository"
 " (database)."
-msgstr ""
+msgstr "``VHOSTS_RELOAD`` 用于从存储库（数据库）重新加载虚拟域列表。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:57
 msgid ""
 "``VHOSTS_UPDATE`` used to add a new virtual domain or update information "
 "for existing one."
-msgstr ""
+msgstr "``VHOSTS_UPDATE`` 用于添加新的虚拟域或更新现有虚拟域的信息。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:59
 msgid ""
 "``VHOSTS_REMOVE`` used to remove an existing virtual host from the "
 "running server."
-msgstr ""
+msgstr "``VHOSTS_REMOVE`` 用于从正在运行的服务器中删除现有的虚拟主机。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:61
 msgid ""
@@ -1685,6 +2010,9 @@ msgid ""
 " to complete the command is carried as data forms described in `XEP-0004 "
 "<http://xmpp.org/extensions/xep-0004.html>`__."
 msgstr ""
+"命令的语法遵循 `XEP-0050 <http://xmpp.org/extensions/xep-0050.html>`__ "
+"中描述的规范。完成命令所需的额外信息以 `XEP-0004 <http://xmpp.org/extensions/"
+"xep-0004.html>`__ 中描述的数据形式携带。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:63
 msgid ""
@@ -1694,6 +2022,9 @@ msgid ""
 "to an account you have to set ``admins`` property in the ``config.tdsl`` "
 "configuration file."
 msgstr ""
+"仅当安装管理员发送所有命令时，服务器才会接受所有命令。如果命令是从任何其他帐"
+"户发送的，则返回 ``<not-authorized />`` 错误。若要授予帐户管理员权限，"
+"您必须在 ``admins`` 配置文件中设置 ``admins`` 属性。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:65
 msgid ""
@@ -1705,10 +2036,15 @@ msgid ""
 "domains already activated for the server installation the **JID** is: "
 "'vhost-man@existing.domain.com'."
 msgstr ""
+"命令被发送到 'vhost-man' 服务器组件，并且该节的 'to' 属性必须包含服务器上 "
+"VHostManager 的完整 JID。完整的 **JID** 包含组件名称：'vhost-man' "
+"和本地域，即已经在虚拟域列表中并且处于活动状态的域。"
+"假设已经为服务器安装激活的域之一 'existing.domain.com' 的 **JID** 是：'vhost-"
+"man@existing.domain.com'。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:68
 msgid "Reloading the Domains List from the Database"
-msgstr ""
+msgstr "从数据库重新加载域列表"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:70
 msgid ""
@@ -1716,33 +2052,36 @@ msgid ""
 "than configuration file, you have to send ``VHOSTS_RELOAD`` ad-hoc "
 "command to the VHostManager on the server."
 msgstr ""
+"为了从配置文件以外的永久存储库重新加载虚拟域，您必须向服务器上的 "
+"VHostManager 发送 ``VHOSTS_RELOAD`` 临时命令。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:72
 msgid "The reload command request is of the form:"
-msgstr ""
+msgstr "重新加载命令请求的形式为："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:83
 msgid ""
 "The server sends a response upon successful completion of the command "
 "with current number of virtual domains server by the installation:"
-msgstr ""
+msgstr "服务器在成功完成命令后使用当前虚拟域服务器数量通过安装发送响应："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:102
 msgid ""
 "If the command is sent from an account other than admin, the server "
 "returns an error:"
-msgstr ""
+msgstr "如果命令是从 admin 以外的帐户发送的，则服务器会返回错误："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:121
 msgid ""
 "The response doesn’t have any special meaning other then end-user "
 "information. The client may ignore the response as it is sent after the "
 "command has been executed."
-msgstr ""
+msgstr "除了最终用户信息之外，响应没有任何特殊含义。客户端可能会忽略响应，因为它是在"
+"命令执行后发送的。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:124
 msgid "Adding a New Domain or Updating Existing One"
-msgstr ""
+msgstr "添加新域或更新现有域"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:126
 msgid ""
@@ -1755,16 +2094,20 @@ msgid ""
 "registration via XMPP enabled/disabled for this domain and some more "
 "parameters not specified yet."
 msgstr ""
+"为了添加新域或更新现有域，您必须发送一个临时命令 ``VHOSTS_UPDATE`` ，其命令数"
+"据形式中至少包含一个域名。您还可以指定此域是启用还是禁用，但这些是可选的。未"
+"来的版本可能允许为域设置其他参数：此域的最大用户帐户数，对域启用/禁用匿名登录"
+"、对该域启用/禁用通过 XMPP 注册以及尚未指定的更多参数。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:128
 msgid "The domain add/update command request is of the form:"
-msgstr ""
+msgstr "域添加/更新命令请求的形式为："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:150
 msgid ""
 "Please note: Character case in the command field variable names does "
 "matter."
-msgstr ""
+msgstr "请注意：命令字段变量名称中的字符大小写确实很重要。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:152
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:194
@@ -1772,25 +2115,26 @@ msgid ""
 "Upon successful completion of the command the server sends a response "
 "back to the client with information of the existing number of virtual "
 "hosts on the server:"
-msgstr ""
+msgstr "成功完成命令后，服务器将响应返回给客户端，其中包含服务器上现有虚拟主机数量的"
+"信息："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:172
 msgid "Removing a Virtual Domain From the Server"
-msgstr ""
+msgstr "从服务器中删除虚拟域"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:174
 msgid ""
 "In order to remove a virtual domain you have to send ``VHOSTS_REMOVE`` "
 "command to the server with the domain name."
-msgstr ""
+msgstr "为了删除一个虚拟域，你必须发送 ``VHOSTS_REMOVE`` 命令到带有域名的服务器。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:176
 msgid "The domain remove command is sent by the client:"
-msgstr ""
+msgstr "域删除命令由客户端发送："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:216
 msgid "Virtual Components for the Cluster Mode"
-msgstr ""
+msgstr "集群模式的虚拟组件"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:218
 msgid ""
@@ -1801,6 +2145,9 @@ msgid ""
 " node only it will work correctly but it will be visible to users "
 "connected to this one node only."
 msgstr ""
+"假设您有一个集群安装，并且您希望在您的安装中还包含一个不支持集群模式的组件。"
+"如果您将它作为单独的实例放在所有节点上，它们将不同步，并且整体功能可能毫无用"
+"处。如果您只放置一个节点，它将正常工作，但其仅对连接到该节点的用户可见。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:220
 msgid ""
@@ -1811,6 +2158,10 @@ msgid ""
 "discovery list and must be visible somehow to users connected to all "
 "nodes."
 msgstr ""
+"理想情况下，您希望有一种机制将其安装在一个节点上，并在其他节点上进行一些重定"
+"向，以将该组件的所有数据包转发到该组件正在工作的节点。它自己的重定向是不够的"
+"，因为该组件必须在服务发现列表中可见，并且必须以某种方式对连接到所有节点的用"
+"户可见。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:222
 msgid ""
@@ -1819,6 +2170,9 @@ msgid ""
 "in fact they just forward all requests/packets to a cluster node where "
 "the real component is working."
 msgstr ""
+"这是虚拟组件很方便的地方。它们作为本地普通组件对用户可见，它们看起来似乎是真"
+"正的本地组件，但实际上它们只是将所有请求/数据包转发到真正组件上正在工作的集群"
+"节点。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:224
 msgid ""
@@ -1828,6 +2182,10 @@ msgid ""
 "components as well as third-party components connected over external "
 "component protocol (XEP-0114)."
 msgstr ""
+"虚拟组件是 Tigase 服务器中一个非常轻量级的 ServerComponent "
+"实现。它可以伪装成任何类型的组件，并且可以将所有数据包重定向到给定地址。"
+"它们可以模仿原生 Tigase 组件也可以作为通过外部组件协议 (XEP-0114) "
+"连接的第三方组件。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:226
 msgid ""
@@ -1838,54 +2196,61 @@ msgid ""
 " component is visible as ``muc.domain.oug`` in the installation. Thus the"
 " name of the component is: ``muc``"
 msgstr ""
+"配置非常简单明了，实际上它与任何 Tigase "
+"组件的配置非常相似。您将真实组件名称设置为组件名称和要加载的虚拟组件类名称。"
+"假设我们想以这种方式部署 MUC 组件。 MUC 组件在安装中显示为 ``muc.domain."
+"oug``。因此组件的名称是：``muc``"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:232
 msgid ""
 "This is pretty much all you need to load a virtual component. A few other"
 " options are needed to point to correct destination addresses for packets"
 " forwarding and to set correct service discovery parameters:"
-msgstr ""
+msgstr "这几乎是加载虚拟组件所需的全部内容。需要一些其他选项来指向正确的数据包转发目"
+"标地址并设置正确的服务发现参数："
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:246
 msgid "That’s it."
-msgstr ""
+msgstr "就是这些。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:2
 msgid "Settings for Custom Logging in Tigase"
-msgstr ""
+msgstr "Tigase 中的自定义日志设置"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:4
 msgid ""
 "Logging can be an important tool to monitor your server’s health and "
 "performance. Logging may be controlled and customized on a per-component "
 "basis."
-msgstr ""
+msgstr "日志记录可以成为监控服务器运行状况和性能的重要工具。日志记录可以在每个组件的"
+"基础上进行控制和定制。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:6
 msgid ""
 "A ``logging`` bean has been implemented to allow more flexible "
 "configuration of logging in the Tigase XMPP Server."
-msgstr ""
+msgstr "实现了一个 ``logging`` bean，以允许在 Tigase XMPP "
+"服务器中更灵活地配置日志记录。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:9
 msgid "Configuring logging"
-msgstr ""
+msgstr "配置日志记录"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:12
 msgid "In the config file"
-msgstr ""
+msgstr "在配置文件中"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:14
 msgid ""
 "Default logging configuration for your installation is kept in the config"
 " file and it may be adjusted there."
-msgstr ""
+msgstr "您安装的默认日志配置保存在配置文件中，并且可以在那里进行调整。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:45
 msgid ""
 "You only need to specify the settings you wish to customize, otherwise "
 "they will be left as default."
-msgstr ""
+msgstr "您只需要指定想要自定义的设置，否则它们将保留默认设置。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:47
 msgid ""
@@ -1893,12 +2258,15 @@ msgid ""
 " (all CData of all elements will be replaced by ``CData size: <length in "
 "bytes of the replaced string>``) or not; default: ``false``."
 msgstr ""
+"``packet-debug-full`` - 控制日志条目是否应该被混淆（所有元素的所有 CData "
+"将被替换为 ``CData size: <length in bytes of the replaced string>``) ; "
+"默认值: ``false``。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:49
 msgid ""
 "``rootLevel`` - Defines the root level of logging for all components not "
 "otherwise defined. Default is CONFIG"
-msgstr ""
+msgstr "``rootLevel`` - 为所有未另行定义的组件定义日志记录的根级别。默认是CONFIG"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:51
 msgid ""
@@ -1906,28 +2274,30 @@ msgid ""
 " server. This is similar to the --debug setting, however you must use "
 "``tigase.{package}`` format. Default is NONE."
 msgstr ""
+"``loggers`` - 定义在 tigase 服务器中运行的包的日志记录级别。这类似于 --debug "
+"设置，但是您必须使用 ``tigase.{package}`` 格式。默认为NONE。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:53
 msgid ""
 "``handlers`` - Defines the level of logging for File output and Console "
 "output."
-msgstr ""
+msgstr "``handlers`` - 定义文件输出和控制台输出的日志记录级别。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:55
 msgid ""
 "``FileHandler`` - is the file output for log files, with the following "
 "options:"
-msgstr ""
+msgstr "``FileHandler`` - 是日志文件的文件输出，有以下选项："
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:57
 msgid "``level`` - specifies the level of logs to be written, default is ALL."
-msgstr ""
+msgstr "``level`` - 指定要写入的日志级别，默认为 ALL。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:59
 msgid ""
 "``append`` - whether to append to the log or replace it during restart. "
 "Default is true."
-msgstr ""
+msgstr "``append`` - 是追加到日志还是在重启期间替换它。默认是true。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:61
 msgid ""
@@ -1935,37 +2305,41 @@ msgid ""
 "is 5. (default settings will continue appending logs until 5 files at "
 "10MB are reached, then the oldest file will be overwritten.)"
 msgstr ""
+"``count`` - 保持在设定限制的单个日志文件的数量。默认为 "
+"5。(默认设置将继续附加日志，直到达到 5 个 10MB "
+"的文件，然后最旧的文件将被覆盖。）"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:63
 #: ../../Tigase_Administration/Configuration/Logging.inc:73
 msgid ""
 "``formatter`` - specifies the package to format logging output. Default "
 "is tigase.util.LogFormatter."
-msgstr ""
+msgstr "``formatter`` - 指定要格式化日志输出的包。默认为 tigase.util.LogFormatter。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:65
 msgid "``limit`` - Byte limit for each log file. Default is 10000000 or 10MB."
-msgstr ""
+msgstr "``limit`` - 每个日志文件的字节限制。默认值为 10000000 或 10MB。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:67
 msgid ""
 "``pattern`` - Directory and filename of the log file with respect to the "
 "Tigase installation directory. Default is logs/tigase.log."
-msgstr ""
+msgstr "``pattern`` - 关于 Tigase 安装目录的日志文件的目录和文件名。默认为日志/tigase"
+".log。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:69
 msgid ""
 "``ConsoleHandler`` - Determines the formatting for Tigase output to "
 "console."
-msgstr ""
+msgstr "``ConsoleHandler`` - 决定 Tigase 输出到控制台的格式。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:71
 msgid "``level`` - specifies the level of logs to be written, default is WARNING."
-msgstr ""
+msgstr "``level`` - 指定要写入的日志级别，默认为 WARNING。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:77
 msgid "Disabling colored output"
-msgstr ""
+msgstr "禁用彩色输出"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:79
 msgid ""
@@ -1973,10 +2347,13 @@ msgid ""
 "disable it by setting ``disable_logger_color`` to ``true``. For "
 "convenience, you can uncomment in ``etc/tigase.conf`` following line:"
 msgstr ""
+"如果由于某种原因您不想在日志中显示彩色输出，您可以通过将 "
+"``disable_logger_color`` 设置为 ``true`` 来禁用它。为方便起见，您可以在 ``"
+"etc/tigase.conf`` 以下行中取消注释："
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:86
 msgid "Ad-hoc changes to the logging configuration"
-msgstr ""
+msgstr "对日志记录配置的临时更改"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:88
 msgid ""
@@ -1985,19 +2362,22 @@ msgid ""
 "domain is your server name) to reconfigure logging level of packets at "
 "runtime without requirement of restarting the Tigase XMPP Server."
 msgstr ""
+"也可以使用名为 **Set package logging** 的 ad-hoc 命令，在 ``message-"
+"router@domain`` (其中 domain 是您的服务器名称)用id ``logging-set`` "
+"来重新配置日志记录级别运行时的数据包，且无需重新启动 Tigase XMPP 服务器。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:90
 #: ../../Tigase_Administration/Configuration/Logging.inc:124
 msgid "**Note**"
-msgstr ""
+msgstr "**注意**"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:92
 msgid "Those changes will be applied to this single cluster node."
-msgstr ""
+msgstr "这些更改将应用于此单个集群节点。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:98
 msgid "Using Admin UI"
-msgstr ""
+msgstr "使用Admin UI"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:100
 msgid ""
@@ -2007,30 +2387,35 @@ msgid ""
 "section and select ``Set package logging`` command. This will bring to "
 "you a form which you need to fill in with following fields:"
 msgstr ""
+"如果您的 Tigase XMPP 服务器正在运行 HTTP 服务器并启用了 Admin UI，"
+"那么更改日志记录配置的最简单方法是使用 Admin UI。登录到 Web 界面后，打开 "
+"``Configuration`` 部分并选择 ``Set package logging`` "
+"命令。这将为您带来一个表格，您需要填写以下字段："
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:102
 #: ../../Tigase_Administration/Configuration/Logging.inc:113
 msgid ""
 "``Package name`` - should contain Java package or class name for which "
 "you wish to change logging level"
-msgstr ""
+msgstr "``Package name`` - 应包含您希望更改日志记录级别的 Java 包或类名"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:104
 #: ../../Tigase_Administration/Configuration/Logging.inc:115
 msgid ""
 "``Level`` - select a logging level you wish to apply to entered package "
 "name *(``OFF`` means that logging will be disabled)*"
-msgstr ""
+msgstr "``Level`` - 选择您希望的输入包名称的日志记录级别 (* ``OFF`` "
+"表示将禁用日志记录*)"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:106
 msgid ""
 "After pressing ``Submit`` your form will be passed to the server for "
 "validation and selected changes will be applied."
-msgstr ""
+msgstr "按下 ``Submit`` 后，您的表单将被传递到服务器进行验证，并将应用选定的更改。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:109
 msgid "Using ad-hoc command"
-msgstr ""
+msgstr "使用ad-hoc命令"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:111
 msgid ""
@@ -2044,22 +2429,30 @@ msgid ""
 "XMPP Server will return a form which you need to fill in with following "
 "fields:"
 msgstr ""
+"如果您有权访问 Tigase XMPP 服务器和支持执行 ad-hoc 命令的 XMPP 客户端的 XMPP "
+"管理员帐户，您可以将 XMPP 客户端连接到 Tigase XMPP 服务器并在 ``message-"
+"router@domain`` (其中 domain 是您的服务器名称)中查找可用的adh-hoc命令 "
+"。在找到的adh-hoc命令中，您应该找到名为 ``Set package logging`` 或 ``logging-"
+"set`` 的命令（这取决于您的 XMPP 客户端显示的内容，命令的 ID "
+"或名称）并且您应该执行它。 Tigase XMPP "
+"服务器将返回一个表单，您需要填写以下字段："
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:117
 msgid ""
 "After submitting the form, Tigase XMPP Server will validate your request "
 "and update logging configuration."
-msgstr ""
+msgstr "提交表单后，Tigase XMPP 服务器将验证您的请求并更新日志配置。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:120
 msgid "Using REST API"
-msgstr ""
+msgstr "使用 REST API"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:122
 msgid ""
 "If you have Tigase XMPP Server with REST API enabled, you can use it for "
 "configuring logging of Tigase XMPP Server as well."
-msgstr ""
+msgstr "如果您启用了 REST API 的 Tigase XMPP 服务器，您也可以使用它来配置 Tigase "
+"XMPP 服务器的日志记录。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:126
 msgid ""
@@ -2067,6 +2460,8 @@ msgid ""
 "in this case a valid admin credentials to authenticate a HTTP request "
 "using Basic HTTP Authentication."
 msgstr ""
+"与所有 HTTP REST API 请求一样，您将需要一个有效的 API 密钥，在这种情况下，"
+"需要一个有效的管理员凭据来使用基本 HTTP 身份验证对 HTTP 请求进行身份验证。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:128
 msgid ""
@@ -2075,17 +2470,22 @@ msgid ""
 "``Contect-Type`` set to ``application/xml`` and a following XML as a "
 "payload to set logging level of ``tigase.server`` package to ``ALL``."
 msgstr ""
+"您需要做的就是发送一个 HTTP POST 请求到 ``/rest/adhoc/message-router@domain."
+"com`` (其中域是您的服务器名称)，并将 ``Contect-Type`` 设置为 ``application/"
+"xml`` 和以下 XML 作为有效负载将 ``tigase.server`` 包的日志记录级别设置为 "
+"``ALL``。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:151
 msgid "Alternate loggers in Tigase - Logback"
-msgstr ""
+msgstr "Tigase 中的备用记录器 - Logback"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:153
 msgid ""
 "It’s possible to use Logback for logging purposes, which offers certain "
 "interesting features (async logging, better control over log rotation, on"
 " the fly changing logging configuration)"
-msgstr ""
+msgstr "可以将 Logback 用于日志记录目的，它提供了某些有趣的功能（异步日志记录，更好地"
+"控制日志轮换，动态更改日志记录配置）"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:155
 msgid ""
@@ -2094,6 +2494,9 @@ msgid ""
 "libraries (for logback it’s ``logback-classic.jar`` and ``logback-"
 "core.jar`` (provided in -dist-max)."
 msgstr ""
+"要求: \\* slf4j-api.jar (在 ``-dist-max`` 包中提供) \\* jul-to-slf4j.jar (在 "
+"``-dist-max`` 包中提供) \\* 所需的记录器库 (对于 logback 它是 ``logback-"
+"classic.jar`` 和 ``logback-core.jar`` (在 -dist-max中提供)。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:157
 msgid ""
@@ -2101,10 +2504,12 @@ msgid ""
 "build-in Java Logger handlers configuration, which in Tigase translates "
 "to adding following line to ``etc/config.tdsl``:"
 msgstr ""
+"配置归结为将 slf4j 桥处理程序添加到内置 Java Logger 处理程序配置列表中，在 "
+"Tigase 中，这转换为在 ``etc/config.tdsl`` 中添加以下行："
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:165
 msgid "After that ``etc/logback.xml`` configuration file will be used."
-msgstr ""
+msgstr "之后将使用 ``etc/logback.xml`` 配置文件。"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:167
 msgid ""
@@ -2113,27 +2518,31 @@ msgid ""
 "``LevelChangePropagator`` to eliminate translation overhead for disabled "
 "log statements:"
 msgstr ""
+"如 [jul-to-slf4j 桥接文档](\\ http://www.slf4j.org/legacy.html#jul-to-slf4j) "
+"中所述，必须包含 ``LevelChangePropagator`` 以消除禁用日志的翻译开销声明："
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:176
 msgid ""
 "NOTE, that it may be prudent to remove configuration of all old JUL "
 "logger by appending following to ``etc/logback.xml`` configuration:"
-msgstr ""
+msgstr "注意，通过将以下内容附加到 ``etc/logback.xml`` 配置来删除所有旧 JUL "
+"记录器的配置可能是谨慎的："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:2
 msgid "Tigase Advanced Options"
-msgstr ""
+msgstr "Tigase 高级选项"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:4
 msgid ""
 "This section is designed to include a number of advanced configuration "
 "options available within Tigase, but may not have a relevant section yet "
 "to house them."
-msgstr ""
+msgstr "本部分旨在包括 Tigase "
+"中可用的许多高级配置选项，但可能还没有相关部分来安置他们。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:7
 msgid "Using CAPTCHA for in-band registration"
-msgstr ""
+msgstr "使用 CAPTCHA 进行带内注册"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:9
 msgid ""
@@ -2143,26 +2552,31 @@ msgid ""
 "registering a new account to answer it. This may be enabled as a sub-"
 "option of enabling registration in config.tdsl:"
 msgstr ""
+"为了减少对 Tigase XMPP 服务器的虚假或垃圾邮件注册，现在可以将 CAPTCHA "
+"表单添加为带内注册的一部分。 CAPTCHA "
+"将生成一个随机数学方程式，并要求注册新帐户的用户回答它。这可以作为在 "
+"config.tdsl 中启用注册的子选项被启用："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:23
 msgid ""
 "3 unsuccessful attempts will result in the captcha being invalidated and "
 "a client will receive an error message."
-msgstr ""
+msgstr "3 次不成功的尝试将导致验证码无效，并且客户端将收到错误消息。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:27
 msgid "Enabling Empty Nicknames"
-msgstr ""
+msgstr "启用空昵称"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:29
 msgid ""
 "Tigase can now support users with empty nicknames. This can be enabled by"
 " adding the following code in config.tdsl."
-msgstr ""
+msgstr "Tigase 现在可以支持昵称为空的用户。这可以通过在 config.tdsl "
+"中添加以下代码来启用。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:41
 msgid "Enable Silent Ignore on Packets Delivered to Unavailable Resources"
-msgstr ""
+msgstr "对传送到不可用资源的数据包启用静默忽略"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:43
 msgid ""
@@ -2171,22 +2585,25 @@ msgid ""
 "You may set this globally, within standard message handling only, or "
 "within the AMP component using the following settings:"
 msgstr ""
+"您现在可以让 Tigase 忽略传送到不可用资源的数据包，以避免数据包反弹并产生不必"
+"要的流量。您可以在全局范围内，仅在标准消息处理内或在 AMP "
+"组件内使用以下设置进行设置："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:45
 msgid "Globally:"
-msgstr ""
+msgstr "在全局范围内："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:53
 msgid "Message Processing Only:"
-msgstr ""
+msgstr "仅消息处理："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:63
 msgid "AMP Component:"
-msgstr ""
+msgstr "AMP 组件："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:73
 msgid "Mechanism to count errors within Tigase"
-msgstr ""
+msgstr "Tigase 中的错误计数机制"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:75
 msgid ""
@@ -2198,10 +2615,16 @@ msgid ""
 "``ERROR`` and grouped by type. To enable counting of these errors, you "
 "must ensure the processor is included in your ``sess-man`` configuration:"
 msgstr ""
+"在统计信息中添加了一个新处理器来计算 Tigase 返回的错误数。这个名为 ``error-"
+"counter`` 的处理器将对 Tigase "
+"返回的所有错误进行计数，但默认情况下，如果未被启用，该数字始终为零。其可以在 "
+"JMX 中的 ``ErrorStatistics`` 下作为 MBean 对象找到，并包含带有 ``ERROR`` "
+"且按类型分组的数据包的值。要启用这些对错误数的计数，"
+"您必须确保处理器包含在您的 ``sess-man`` 配置中："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:84
 msgid "Including stream errors"
-msgstr ""
+msgstr "包括流错误"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:86
 msgid ""
@@ -2209,10 +2632,13 @@ msgid ""
 " as they are processed separately. To enable this to be added to the "
 "counter, the following line must be in your ``config.tdsl`` file."
 msgstr ""
+"默认情况下，流 ``ERROR`` "
+"数据包不包含在上述计数器中，因为它们是单独处理的。要将其添加到计数器中，"
+"以下行必须在您的 ``config.tdsl`` 文件中。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:97
 msgid "Stream resumption default & max-timeout"
-msgstr ""
+msgstr "流恢复默认值和最大超时"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:99
 msgid ""
@@ -2220,12 +2646,14 @@ msgid ""
 "change the maximum timeout time it will wait for reconnection if a client"
 " does not send a time to wait. Two settings are now available:"
 msgstr ""
+"``SteamManagementIOProcessor`` 现在有一个设置，如果客户端未发送等待时间，其可"
+"用于更改等待重新连接的最大超时时间。现在有两种设置可用："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:109
 msgid ""
 "The above setting in ``config.tdsl`` file will change the default timeout"
 " period to 90 seconds."
-msgstr ""
+msgstr "``config.tdsl`` 文件中的上述设置会将默认超时时间更改为 90 秒。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:119
 msgid ""
@@ -2233,11 +2661,12 @@ msgid ""
 "900 seconds. This can be handy if you expect a number of mobile phones to"
 " connect to your server and want to avoid duplicate messages being sent "
 "back and forth."
-msgstr ""
+msgstr "此设置会将流恢复允许的最长时间设置为 900 秒。如果您希望有许多手机连接到您的服"
+"务器并希望避免来回发送重复的消息，这可能会很方便。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:122
 msgid "Automatic subscription approval"
-msgstr ""
+msgstr "自动订阅批准"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:124
 msgid ""
@@ -2245,24 +2674,26 @@ msgid ""
 " roster authorizations for all users. Say you were hosting bots and "
 "wanted to automate the process. This can be done with the following "
 "settings:"
-msgstr ""
+msgstr "您可以设置一个服务器来自动批准所有用户的状态订阅或名册授权。比如您正在托管机"
+"器人并希望自动化该过程。这可以通过以下设置来完成："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:137
 msgid ""
 "Both of these settings are false by default, and you may use them "
 "together or separately."
-msgstr ""
+msgstr "这两个设置默认为 false，您可以一起使用，也可以单独使用。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:143
 msgid "The following behavior is followed when they are both activated:"
-msgstr ""
+msgstr "当它们都被激活时，将遵循以下行为："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:145
 msgid ""
 "Upon sending a subscription request - Both contacts will each others' "
 "subscription and be added to each others' roster. Presence information "
 "will immediately be exchanged between both parties."
-msgstr ""
+msgstr "发送订阅请求后 - "
+"双方联系人将彼此订阅并添加到彼此的名册中。存在信息将立即在双方之间交换。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:147
 msgid ""
@@ -2273,17 +2704,22 @@ msgid ""
 "notifications to the client. However, a roster push is generated to "
 "reflect changes to presence in user roster in a seamless manner."
 msgstr ""
+"在发送带有 unsubscribe 或 unsubscribed 类型的出席信息时，其遵循 RFC 中定义的"
+"关于处理这些节的规则（即调整用户/联系人的订阅类型），但不将这些节转发给接收实"
+"体以避免向客户端发送任何通知。但是，这会生成名册推送以无缝方式反映用户名册中"
+"存在的变化。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:149
 msgid ""
 "Simply adding an item to the roster (i.e. with <iq/> stanza with correct "
 "semantics) will also cause an automatic subscription between the user and"
 " the contact in a matter explained above."
-msgstr ""
+msgstr "简单地将一个项目添加到名册（即使用具有正确语义的 <iq/> "
+"节）也将导致用户和联系人之间的自动订阅，正如上所述。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:152
 msgid "Abuse Contacts"
-msgstr ""
+msgstr "滥用联系人"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:154
 msgid ""
@@ -2295,6 +2731,11 @@ msgid ""
 "describes usage of this feature for providing contact information to "
 "server administrators or abuse response team."
 msgstr ""
+"Tigase 支持 `XEP-0128: Service Discovery Extensions <https://xmpp.org/"
+"extensions/xep-0128.html>`__ 为服务器和组件发现信息提供附加信息。"
+"此功能的重要用途之一是 `XEP-0157: Contact Addresses for XMPP Services "
+"<https://xmpp.org/extensions/xep-0157.html>`__ "
+"，其描述了使用此功能向服务器提供联系信息管理员或滥用响应小组。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:156
 msgid ""
@@ -2303,10 +2744,14 @@ msgid ""
 " set to your abuse address URI (for email you need to prefix it with "
 "``mailto:`` and for XMPP address you need to prefix it with ``xmpp``):"
 msgstr ""
+"要设置滥用联系人详细信息，您应该在 ``etc/config.tdsl`` 文件的属性中设置 "
+"``disco-extensions``，并将子属性 ``abuse-addresses`` 设置为您的滥用地址 "
+"URI（对于电子邮件，您需要添加前缀使用 ``mailto:`` 并且对于 XMPP 地址，"
+"您需要使用 ``xmpp`` 作为前缀）："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:165
 msgid "Push Notifications"
-msgstr ""
+msgstr "推送通知"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:167
 msgid ""
@@ -2315,29 +2760,33 @@ msgid ""
 "notifications for messages received while his XMPP client is not "
 "connected enabled by default."
 msgstr ""
+"Tigase XMPP 服务器支持 `XEP-0357: Push Notifications <https://xmpp.org/"
+"extensions/xep-0357.html>`__ 并默认允许用户在其 XMPP "
+"客户端未连接时接收消息通知。"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:170
 msgid "Disabling notifications"
-msgstr ""
+msgstr "禁用通知"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:172
 msgid "You can disable this feature with following settings:"
-msgstr ""
+msgstr "您可以使用以下设置禁用此功能："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:180
 msgid "Removing body and sender from notifications"
-msgstr ""
+msgstr "从通知中删除正文和发件人"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:182
 msgid ""
 "If you wish Tigase XMPP Server not to forward body of the message or "
 "sender details in the push notification you can disable that with "
 "following settings:"
-msgstr ""
+msgstr "如果您希望 Tigase XMPP "
+"服务器不在推送通知中转发消息正文或发件人详细信息，您可以使用以下设置禁用它："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:193
 msgid "Overriding body of notifications"
-msgstr ""
+msgstr "覆盖通知的正文"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:195
 msgid ""
@@ -2345,12 +2794,14 @@ msgid ""
 "message in the push notification (for example to avoid indicating that "
 "there is an \"error\") you can do that with following settings:"
 msgstr ""
+"如果您希望 Tigase XMPP 服务器在推送通知中覆盖加密消息的转发正文（例如，"
+"为了避免指示存在\"error\"），您可以使用以下设置来实现："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:206
 msgid ""
 "Enabling push notifications for messages received when all resources are "
 "AWAY/XA/DND"
-msgstr ""
+msgstr "当所有资源都是 AWAY/XA/DND 时为收到的消息启用推送通知"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:208
 msgid ""
@@ -2359,6 +2810,9 @@ msgid ""
 "state. To enable this type of notifications you need to enable additional"
 " push delivery extension named ``away`` in default push processor:"
 msgstr ""
+"当收到新消息并且接收者的所有资源都处于 AWAY/XA/DND 状态时，Tigase XMPP "
+"Server 也可以发送推送通知。要启用这种类型的通知，"
+"您需要在默认推送处理器中启用名为 ``away`` 的附加推送扩展："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:218
 msgid ""
@@ -2370,10 +2824,14 @@ msgid ""
 "attribute with value of ``true`` in push ``enable`` element send to the "
 "server, as in following example:"
 msgstr ""
+"由于用户可能不期望这种行为，并且用户需要兼容的 XMPP 客户端来正确处理此通知（"
+"XMPP 客户端需要从服务器检索消息历史记录以获取实际消息），除了在服务器上启用此"
+"插件外，XMPP 客户端还需要显式激活此功能。他们可以通过在推送 ``enable`` "
+"元素中包含值为 ``true`` 的 ``away`` 属性发送到服务器，如下例所示："
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:220
 msgid "**Enabling Push notifications for away/xa/dnd account.**"
-msgstr ""
+msgstr "**为 away/xa/dnd 帐户启用推送通知。**"
 
 #: ../../Tigase_Administration/Configuration/Advanced_Options.inc:232
 msgid ""
@@ -2382,6 +2840,9 @@ msgid ""
 "stanza to enable push notification but without ``away`` attribute being "
 "set:"
 msgstr ""
+"如果稍后，用户决定为 away/xa/dnd "
+"状态的帐户禁用通知，它可能会禁用推送通知或再次发送节以启用推送通知，"
+"但没有设置 ``away`` 属性："
 
 #~ msgid ""
 #~ "`config.tdsl <#dslConfig>`__ file is a "
@@ -2423,4 +2884,3 @@ msgstr ""
 #~ "for Java VM and other tools "
 #~ "needed."
 #~ msgstr ""
-
