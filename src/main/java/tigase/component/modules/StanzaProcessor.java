@@ -104,20 +104,8 @@ public class StanzaProcessor implements ComponentStatisticsProvider {
 			}
 
 			if (!handled) {
-				final String t = packet.getElement().getAttributeStaticStr(Packet.TYPE_ATT);
-				final StanzaType type = (t == null) ? null : StanzaType.valueof(t);
-
-				// https://xmpp.org/rfcs/rfc6120.html#stanzas-semantics-iq
-				// An entity that receives a stanza of type "result" or "error" MUST NOT respond to the stanza
-				// by sending a further IQ response of type "result" or "error"; however, the requesting entity
-				// MAY send another request (e.g., an IQ of type "set" to provide obligatory information discovered
-				// through a get/result pair).
-				if (type != StanzaType.error && type != StanzaType.result) {
+				if (shouldSendException(packet)) {
 					throw new ComponentException(Authorization.FEATURE_NOT_IMPLEMENTED);
-				} else {
-					if (log.isLoggable(Level.FINER)) {
-						log.finer(packet.getElemName() + " stanza with type='" + type + "' ignored");
-					}
 				}
 			}
 		} catch (TigaseStringprepException e) {
@@ -146,13 +134,7 @@ public class StanzaProcessor implements ComponentStatisticsProvider {
 	 */
 	public void sendException(final Packet packet, final ComponentException e) {
 		try {
-			final StanzaType t = packet.getType();
-
-			if (t == StanzaType.error) {
-				if (log.isLoggable(Level.FINER)) {
-					log.log(Level.FINER, packet.getElemName() + " stanza already with type='error' ignored", e);
-				}
-
+			if (!shouldSendException(packet)) {
 				return;
 			}
 
@@ -170,6 +152,24 @@ public class StanzaProcessor implements ComponentStatisticsProvider {
 				log.log(Level.WARNING, "Problem during generate error response", e1);
 			}
 		}
+	}
+
+	protected boolean shouldSendException(final Packet packet) {
+		final StanzaType type = packet.getType();
+
+		// https://xmpp.org/rfcs/rfc6120.html#stanzas-semantics-iq
+		// An entity that receives a stanza of type "result" or "error" MUST NOT respond to the stanza
+		// by sending a further IQ response of type "result" or "error"; however, the requesting entity
+		// MAY send another request (e.g., an IQ of type "set" to provide obligatory information discovered
+		// through a get/result pair).
+		if (type == StanzaType.error || type == StanzaType.result) {
+			if (log.isLoggable(Level.FINER)) {
+				log.finer(packet.getElemName() + " stanza with type='" + type + "' ignored");
+			}
+			return false;
+		}
+
+		return true;
 	}
 
 	public void everyHour() {
