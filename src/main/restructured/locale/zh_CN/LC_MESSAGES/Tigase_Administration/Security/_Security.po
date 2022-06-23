@@ -3,33 +3,37 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-06-26 09:14+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/security/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Security/_Security.rst:2
 msgid "Security"
-msgstr ""
+msgstr "安全"
 
 #: ../../Tigase_Administration/Security/_Security.rst:4
 msgid ""
 "The articles here cover advanced security features built into to Tigase "
 "Server, and some options for adding your own levels of security."
-msgstr ""
+msgstr "此处的文章涵盖了 Tigase Server "
+"内置的高级安全功能，以及一些用于添加您自己的安全级别的选项。"
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:2
 msgid "XEP-0191: Blocking Command"
-msgstr ""
+msgstr "XEP-0191：阻止命令"
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:4
 msgid ""
@@ -40,18 +44,24 @@ msgid ""
 "some sample commands you may find helpful. To enable this feature, be "
 "sure the following is in your ``config.tdsl`` file:"
 msgstr ""
+"然而，XMPP 服务器中最简单的安全功能是阻止用户和 JIDS 的能力。 `XEP-0191 "
+"<http://xmpp.org/extensions/xep-0191>`__ 指定不使用隐私列表的简单屏蔽的参数。"
+"以下是细分和一些您可能会发现有用的示例命令。要启用此功能，请确保您的 ``config"
+".tdsl`` 文件中包含以下内容："
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:13
 msgid ""
 "If you have other plugins running, then just add ``'urn:xmpp:blocking' ()"
 " {}`` to the list to activate this feature."
-msgstr ""
+msgstr "如果您有其他插件正在运行，那么只需将 ``'urn:xmpp:blocking' () {}`` "
+"添加到列表中以激活此功能。"
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:15
 msgid ""
 "To confirm if your installation of Tigase supports this feature, a quick "
 "disco#info of your server should reveal the following feature:"
-msgstr ""
+msgstr "要确认您安装的 Tigase 是否支持此功能，您的服务器的快速 disco#info "
+"应显示以下功能："
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:21
 msgid ""
@@ -60,45 +70,50 @@ msgid ""
 "as an IQ stanza with a list of <item> fields. To retrieve the blocklist, "
 "the following command is issued:"
 msgstr ""
+"被阻止的用户以每个 JID 为基础存储在服务器上，"
+"因此一个用户可能只能看到他或她被阻止的 JIDs。被阻止的 JIDs 列表将作为带有 "
+"<item> 字段列表的 IQ 节返回。要检索阻止列表，发出以下命令："
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:29
 msgid "The server responds:"
-msgstr ""
+msgstr "服务器响应："
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:40
 msgid ""
 "To block a JID, a similar stanza to the one above is sent to the server "
 "with the items of the blocked JIDs you wish to add:"
-msgstr ""
+msgstr "要阻止 JID，将与上述类似的节发送到服务器，其中包含您希望添加的被阻止 JID "
+"的项目："
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:50
 msgid ""
 "The server will then push an unavailable presence to blocked contacts. "
 "Communication between a contact that is blocked, and an entity that "
 "blocked it will result in a <not-acceptable> error:"
-msgstr ""
+msgstr "然后，服务器会将不可用的状态推送给被阻止的联系人。"
+"被阻止的联系人与阻止它的实体之间的通信将导致 <not-acceptable> 错误："
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:62
 msgid ""
 "Unblocking a contact is just as easy as blocking, send an unblock stanza "
 "to the server:"
-msgstr ""
+msgstr "取消阻止联系人就像阻止一样简单，向服务器发送取消阻止节："
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:72
 msgid ""
 "The server will begin pushing presence information to unblocked contacts "
 "and resources so long as permissions have not changed between."
-msgstr ""
+msgstr "只要权限没有改变，服务器就会开始向未阻止的联系人和资源推送存在信息。"
 
 #: ../../Tigase_Administration/Security/XEP-0191_Blocking_Command.inc:74
 msgid ""
 "You may also opt to unblock all contacts and essentially clear out your "
 "blocked list using the following command:"
-msgstr ""
+msgstr "您也可以选择取消阻止所有联系人，并使用以下命令从根本上清除您的阻止列表："
 
 #: ../../Tigase_Administration/Security/Account_Registration_Limits.inc:2
 msgid "Account Registration Limits"
-msgstr ""
+msgstr "帐户注册限制"
 
 #: ../../Tigase_Administration/Security/Account_Registration_Limits.inc:4
 msgid ""
@@ -106,30 +121,34 @@ msgid ""
 " account registrations per second has been implemented. This may be "
 "configured by adding the following line in the ``config.tdsl`` file:"
 msgstr ""
+"为了保护 Tigase 服务器免受 DOS 攻击，已经限制了每秒帐户的注册数量。"
+"这可以通过在 ``config.tdsl`` 文件中添加以下行来配置："
 
 #: ../../Tigase_Administration/Security/Account_Registration_Limits.inc:11
 msgid ""
 "This setting allows for 10 registrations from a single IP per second. If "
 "the limit is exceeded, a ``NOT_ALLOWED`` error will be returned."
-msgstr ""
+msgstr "此设置允许每秒从单个 IP 进行 10 次注册。如果超出限制，将返回 ``NOT_ALLOWED`` "
+"错误。"
 
 #: ../../Tigase_Administration/Security/Account_Registration_Limits.inc:13
 msgid "It is possible to create two separate counters as well:"
-msgstr ""
+msgstr "也可以创建两个单独的计数器："
 
 #: ../../Tigase_Administration/Security/Account_Registration_Limits.inc:26
 msgid ""
 "Here we have one for c2s with a limit of 3, and a global for all other "
 "connection managers set at 10."
-msgstr ""
+msgstr "在这里，我们有一个用于 c2s 的计数器其限制为 3，"
+"而另外一个用于所有其他连接管理器的全局设置为 10。"
 
 #: ../../Tigase_Administration/Security/Account_Registration_Limits.inc:28
 msgid "You can also set individual components limits as well:"
-msgstr ""
+msgstr "您还可以设置单个组件限制："
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:2
 msgid "Brute-force attack prevention"
-msgstr ""
+msgstr "暴力攻击预防"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:4
 msgid ""
@@ -138,84 +157,96 @@ msgid ""
 "limit, it locks login ability for specific time (soft ban). When invalid "
 "login counter reaches second level, account will be disabled permanently."
 msgstr ""
+"暴力预防旨在保护 Tigase 服务器不会被猜测的用户密码破解。它计算无效的登录尝试"
+"，当它超过限制时，它会锁定特定时间的登录能力（软禁令）。当无效登录计数器达到"
+"第二级时，帐户将被永久禁用。"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:7
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:49
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:9
 msgid ""
 "Brute-force Prevention is configured by VHost. There is following lis of "
 "configuration parameters:"
-msgstr ""
+msgstr "暴力防护由 VHost 配置。有以下配置参数列表："
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:12
+#, fuzzy
 msgid "``brute-force-lock-enabled``"
-msgstr ""
+msgstr "``brute-force-lock-enabled``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:12
+#, fuzzy
 msgid "``boolean``"
-msgstr ""
+msgstr "``boolean``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:12
 msgid "Brute Force Prevention Enabled"
-msgstr ""
+msgstr "启用暴力预防"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:14
+#, fuzzy
 msgid "``brute-force-lock-after-fails``"
-msgstr ""
+msgstr "``brute-force-lock-after-fails``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:14
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:16
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:18
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:20
+#, fuzzy
 msgid "``long``"
-msgstr ""
+msgstr "``long``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:14
 msgid "Number of allowed invalid login"
-msgstr ""
+msgstr "允许的无效登录次数"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:16
+#, fuzzy
 msgid "``brute-force-period-time``"
-msgstr ""
+msgstr "``brute-force-period-time``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:16
 msgid "Time [sec] in what failed login tries are counted"
-msgstr ""
+msgstr "计算失败登录尝试的时间 [秒]"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:18
+#, fuzzy
 msgid "``brute-force-disable-after-fails``"
-msgstr ""
+msgstr "``brute-force-disable-after-fails``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:18
 msgid "Threshold beyond which account will be permanently disabled"
-msgstr ""
+msgstr "帐户将被永久禁用的阈值"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:20
+#, fuzzy
 msgid "``brute-force-lock-time``"
-msgstr ""
+msgstr "``brute-force-lock-time``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:20
 msgid "Time [sec] of soft ban (first threshold)"
-msgstr ""
+msgstr "软禁令的时间[秒]（第一个阈值）"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:22
+#, fuzzy
 msgid "``brute-force-mode``"
-msgstr ""
+msgstr "``brute-force-mode``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:22
+#, fuzzy
 msgid "``string``"
-msgstr ""
+msgstr "``string``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:22
 msgid "Working mode (see `Working modes <#bruteForcePrevention_WorkingModes>`__)"
-msgstr ""
+msgstr "工作模式（参见 :ref:`工作模式<bruteForcePrevention_WorkingModes>`）"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:26
 msgid "Detailed statistics"
-msgstr ""
+msgstr "详细统计"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:28
 msgid ""
@@ -225,36 +256,41 @@ msgid ""
 "IPs and JIDs that has been locked in statistics you should use following "
 "configuration:"
 msgstr ""
+"默认情况下，为了不污染统计数据，Brute-Force locker 将仅提供有关 locker IP 和 "
+"JID 数量（以及锁定尝试总数）的详细信息。为了获得相关已锁定在统计信息中的 IP "
+"和 JID 的详细信息，您应该使用以下配置："
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:39
 msgid "Working modes"
-msgstr ""
+msgstr "工作模式"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:41
 msgid "There are three working modes:"
-msgstr ""
+msgstr "共有三种工作模式："
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:43
 msgid ""
 "``Ip`` - it counts invalid login tries from IP, and locks login ability "
 "(soft ban) for IP what reach the threshold"
-msgstr ""
+msgstr "``Ip`` - 它计算来自 IP 的无效登录尝试，并锁定达到阈值的 IP 的登录（软禁令）"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:45
 msgid ""
 "``IpJid`` - it counts tries from IP to specific user account. Soft ban "
 "locks ability of login to specific JID from specific IP."
-msgstr ""
+msgstr "``IpJid`` - 它计算从 IP 到特定用户帐户的尝试。软禁令锁定从特定 IP 登录特定 "
+"JID 的能力。"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:47
 msgid ""
 "``Jid``- similar to ``IpJid`` but checks only JID. Soft ban locks ability"
 " of login to specific JID from all IPs."
-msgstr ""
+msgstr "``Jid``- 类似于 ``IpJid`` 但只检查 JID。软禁令锁定从所有 IP 登录到特定 JID "
+"的能力。"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:54
 msgid "Permanent ban"
-msgstr ""
+msgstr "永久禁令"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:56
 msgid ""
@@ -264,40 +300,45 @@ msgid ""
 "<https://xmpp.org/extensions/xep-0133.html#reenable-users>`__ Ad-hoc "
 "Command."
 msgstr ""
+"在 ``Jid`` 和 ``IpJid`` 模式下，当无效登录计数器达到 ``brute-force-disable-"
+"after-fails`` 阈值时，帐户状态将设置为 ``disabled``。要再次启用它，"
+"您应该使用 `Re-Enable User <https://xmpp.org/extensions/xep-0133.html"
+"#reenable-users>`__ Ad-hoc 命令。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:2
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:12
 msgid "Server Certificates"
-msgstr ""
+msgstr "服务器证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:4
 msgid ":ref:`Creating and Loading the Server Certificate in pem Files<certspem>`"
-msgstr ""
+msgstr ":ref:`在 pem 文件中创建和加载服务器证书<certspem>`"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:9
 msgid "Creating and Loading the Server Certificate in pem Files"
-msgstr ""
+msgstr "在 pem 文件中创建和加载服务器证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:14
 msgid ""
 "Server certificates are needed when you use secure socket connections - "
 "SSL/TLS."
-msgstr ""
+msgstr "使用安全套接字连接时需要服务器证书 - SSL/TLS。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:16
 msgid ""
 "For secure socket connection a proper certificate is needed. You can "
 "either generate your own self-signed certificate or obtain certificate "
 "from trusted third party organization."
-msgstr ""
+msgstr "对于安全套接字连接，需要适当的证书。您可以生成自己的自签名证书或从受信任的第"
+"三方组织获取证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:18
 msgid "Here are steps how to obtain certificate from a trusted organization."
-msgstr ""
+msgstr "以下是如何从受信任的组织获取证书的步骤。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:20
 msgid "Generating your Own Certificates"
-msgstr ""
+msgstr "生成您自己的证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:22
 msgid ""
@@ -306,57 +347,65 @@ msgid ""
 "can be useful to test server installations. **We do not recommend regular"
 " use of self-signed certificates**."
 msgstr ""
+"在 Linux 系统上可以轻松生成自签名证书。尽管它可能不被视为'信任的'证书颁发机构"
+"，但它对测试服务器安装很有用。 **我们不建议经常使用自签名证书**。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:26
 msgid ""
 "that Tigase v5.0 and later can automatically create self signed PEM files"
 " if needed. However we will cover doing this process by hand."
-msgstr ""
+msgstr "Tigase v5.0 及更高版本可以在需要时自动创建自签名 PEM "
+"文件。但是，我们将介绍手动如何执行此过程。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:28
 msgid ""
 "This tutorial assumes you are running a Linux-based operating system with"
 " access to command shell, and the 'Openssl' package is installed on the "
 "system."
-msgstr ""
+msgstr "本教程假设您正在运行基于 Linux 的操作系统，可以访问命令 shell，"
+"并且系统上安装了 'Openssl' 包。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:30
 msgid "The process takes the following steps:"
-msgstr ""
+msgstr "该过程采取以下步骤："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:31
 msgid ""
 "1. Create a local private key. This file ends with .key extension. It is "
 "recommended to create a new private key for the process."
-msgstr ""
+msgstr "1. 创建本地私钥。此文件以 .key 扩展名结尾。建议为该进程创建一个新的私钥。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:32
 msgid ""
 "2. Generate a certificate request. This file ends with the .csr extension"
 " and is the file sent to the Certificate Authority to be signed."
-msgstr ""
+msgstr "2. 生成证书请求。此文件以 .csr "
+"扩展名结尾，是发送给证书颁发机构以进行签名的文件。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:33
 msgid ""
 "3. CA signs private key. This can be done by your own computer, but can "
 "also be done by private CAs for a fee."
-msgstr ""
+msgstr "3. CA 签署私钥。这可以通过您自己的计算机完成，但也可以由私人 CAs "
+"完成，但需要付费。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:34
 msgid ""
 "4. Results are obtained from the CA. This is a ``.crt`` file which "
 "contains a separate public certificate."
-msgstr ""
+msgstr "4. 结果来自 CA。这是一个 ``.crt`` 文件，其中包含一个单独的公共证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:35
 msgid ""
 "5. Combine the ``.csr`` and ``.crt`` file into a unified ``.pem`` file. "
 "Tigase requires keys to be non-password protected PEM files."
 msgstr ""
+"5. 将 ``.csr`` 和 ``.crt`` 文件合并成一个统一的 ``.pem`` 文件。 Tigase "
+"要求密钥是不受密码保护的 PEM 文件。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:37
 msgid "**Generate local private key.**"
-msgstr ""
+msgstr "**生成本地私钥。**"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:43
 msgid ""
@@ -365,21 +414,25 @@ msgid ""
 "``domain.com.key``. The exact name is not important, and the file will be"
 " created in whatever directory you are currently in."
 msgstr ""
+"此命令使用 1024 位 RSA 算法生成私钥。 ``-out`` 指定文件的名称，"
+"在这种情况下它将是 ``domain.com."
+"key``。确切的名称并不重要，文件将在您当前所在的任何目录中创建。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:45
 msgid "**Generate a certificate request:.**"
-msgstr ""
+msgstr "**生成证书请求：**"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:51
 msgid ""
 "This command generates a certificate request using the file specified "
 "after ``-key``, and the result file will be ``domain.com.csr``. You will "
 "be asked a series of questions to generate the request."
-msgstr ""
+msgstr "该命令使用 ``-key`` 之后指定的文件生成证书请求，结果文件将是 ``domain.com."
+"csr``。您将被问到一系列问题以生成请求。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:68
 msgid "**Sign the Certificate Request:.**"
-msgstr ""
+msgstr "**签署证书请求：**"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:70
 msgid ""
@@ -391,23 +444,29 @@ msgid ""
 ":ref:`Certificate From Other Providers<OtherSources>` section for more "
 "information."
 msgstr ""
+"现在 .csr 文件将由证书颁发机构签名。在本教程中，我们将自签名我们的证书。但是"
+"，通常不建议采用这种做法，并且您会收到有关您的证书不受信任的通知。公司提供商"
+"业报价以从受信任的来源签署您的证书。有关更多信息，请参阅 "
+":ref:`来自其他提供商的证书<OtherSources>` 部分。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:76
 msgid ""
 "This command signs the certificate for 365 days and generates the "
 "``domain.com.crt`` file. You can, of course use any number of days you "
 "like."
-msgstr ""
+msgstr "此命令证书签名 365 天并生成 ``domain.com.crt`` "
+"文件。当然，您可以使用任意天数。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:78
 msgid "**Generate PEM file.**"
-msgstr ""
+msgstr "**生成 PEM 文件。**"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:80
 msgid ""
 "You should now have the following files in the working directory: ..\\\\ "
 "domain.com.key domain.com.csr domain.com.crt"
-msgstr ""
+msgstr "您现在应该在工作目录中有以下文件：..\\\\ domain.com.key domain.com.csr domain"
+".com.crt"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:86
 msgid ""
@@ -415,18 +474,20 @@ msgid ""
 "attach the certificate chain, that being certificate of the authority who"
 " has generated your certificate. You normally need to obtain certificates"
 " for your chain from the authority who has generated your certificate."
-msgstr ""
+msgstr "如果证书是由第三方机构颁发的，您必须附加证书链，即生成您的证书的机构的证书。"
+"您通常需要从生成您的证书的机构获取您的链的证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:88
 msgid "The result file should looks similar to:"
-msgstr ""
+msgstr "结果文件应类似于："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:114
 msgid ""
 "For Tigase server as well as many other servers (Apache 2.x), the order "
 "is following; your domain certificate, your private key, authority "
 "issuing your certificate, root certificate."
-msgstr ""
+msgstr "对于 Tigase 服务器以及许多其他服务器（Apache 2."
+"x），顺序如下；您的域证书，您的私钥，颁发证书的机构，根证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:118
 msgid ""
@@ -436,10 +497,14 @@ msgid ""
 "other services like Web server or e-mail server. Currently, Tigase can "
 "automatically sort certificates in PEM file while loading it.**"
 msgstr ""
+"**Tigase 需要 PEM 文件中的完整证书链（如上所述）！"
+"不同的应用程序可能需要具有不同顺序的证书和私钥的 pem 文件。因此，Web "
+"服务器或电子邮件服务器等其他服务不一定会使用相同的文件。目前，Tigase "
+"可以在加载 PEM 文件时自动对证书进行排序。**"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:123
 msgid "Installing/Loading Certificate To the Tigase Server"
-msgstr ""
+msgstr "将证书安装/加载到 Tigase 服务器"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:125
 msgid ""
@@ -450,6 +515,11 @@ msgid ""
 "all **pem** files found in given directory. By default, and to make "
 "things easy, we recommend the ``Tigase/certs`` directory."
 msgstr ""
+"安装和加载证书非常容易。服务器可以直接从 **pem** 文件加载所有证书。"
+"您只需为每个虚拟域创建一个单独的 pem "
+"文件，并将该文件放在服务器可访问的目录中。 Tigase "
+"服务器可以自动加载在给定目录中找到的所有 **pem** "
+"文件。默认情况下，为了方便起见，我们推荐使用 ``Tigase/certs`` 目录。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:127
 msgid ""
@@ -463,10 +533,17 @@ msgid ""
 "man@domain.com`` with payload containing your certificate; to get the "
 "required form fields make ``GET`` request to the same endpoint"
 msgstr ""
+"也可以使用：\\* Admin ad-hoc 命令通过 XMPP 客户端 - "
+"您应该访问到服务器的服务发现并在 ``VHost Manager`` 组件的命令列表中选择 ``"
+"Add SSL Certificate``，然后按照说明\\* Admin WebUI - 打开 "
+"``http://<host>/admin``，访问 ``Other``类别并在其中选择 ``Add SSL "
+"Certificate``，然后按照说明\\* REST API -使用包含您的证书的有效负载向 "
+"``http://localhost:8080/rest/adhoc/vhost-man@domain.com`` 发出 ``POST`` "
+"请求；为获取所需的表单字段，请向同一端点发出 ``GET`` 请求"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:132
 msgid "Certificate From Other Providers"
-msgstr ""
+msgstr "来自其他提供商的证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:134
 msgid ""
@@ -476,18 +553,24 @@ msgid ""
 " especially if it’s one from a new provider. Here is an example list of "
 "providers:"
 msgstr ""
+"有许多证书提供商免费或有偿提供证书。您可以使用其中的任何一个，但是您必须注意"
+"，有时证书可能无法被所有 XMPP "
+"服务器识别，特别是如果它是来自新提供商的证书。以下是提供商的示例列表："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:136
 msgid ""
 "LetsEncrypt - please see `Installing LetsEncrypt Certificates in Your "
 "Linux System<LetsEncryptCertificate>` for details"
 msgstr ""
+"LetsEncrypt - 有关详细信息，请参阅 :ref:`在 Linux 系统中安装 LetsEncrypt "
+"证书<LetsEncryptCertificate>`"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:138
 msgid ""
 "`CAcert <https://www.cacert.org/>`__ - free certificates with Web GUI. "
 "(WARNING: it’s not widely accepted)"
-msgstr ""
+msgstr "`CAcert <https://www.cacert.org/>`__ - 带有 Web GUI "
+"的免费证书。(警告：它没有被广泛接受）"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:140
 msgid ""
@@ -496,6 +579,9 @@ msgid ""
 "If you have a certificate from Verisign you can be sure it is identified "
 "as a valid certificate."
 msgstr ""
+"`Verisign <https://www.verisign.com/>`__ - "
+"与上述提供的证书相比，此证书非常昂贵，但此证书的提供者得到了所有人的认可。"
+"如果您拥有来自 Verisign 的证书，则可以确定此为有效证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:142
 msgid ""
@@ -503,6 +589,8 @@ msgid ""
 "/digital-certificates/ssl-certificates.php>`__ offers different kind of "
 "commercial certificates"
 msgstr ""
+"`Comodo 证书颁发机构 <http://www.comodo.com/business-security/"
+"digital-certificates/ssl-certificates.php>`__ 提供不同类型的商业证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:144
 msgid ""
@@ -510,7 +598,8 @@ msgid ""
 "website and request the certificate using certificate request generated "
 "above. I cannot provide any instructions for this as each of the "
 "providers listed have different requirements and interfaces."
-msgstr ""
+msgstr "要从第三方机构获取证书，您必须访问其网站并使用上面生成的证书请求来请求证书。"
+"我无法为此提供任何说明，因为列出的每个提供商都有不同的要求和接口。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:146
 msgid ""
@@ -518,10 +607,12 @@ msgid ""
 "your domain. Instructions are in the :ref:`next "
 "section<LetsEncryptCertificate>`."
 msgstr ""
+"我们 **强烈** 建议使用 LetsEncrypt 密钥进行自签名并保护您的域。说明在 "
+":ref:`下一节<LetsEncryptCertificate>`"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:149
 msgid "Using one certificate for multiple domains"
-msgstr ""
+msgstr "对多个域使用一个证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:153
 msgid ""
@@ -530,10 +621,13 @@ msgid ""
 "multiple files to match domains - same file will be loaded and make "
 "available for all domains (CNames) available in the certificate."
 msgstr ""
+"Tigase 尝试变得 *智能*，并自动检测通配符域和备用域，"
+"因此无需在多个文件中复制相同的证书以匹配域 - "
+"相同的文件将被加载并使其可用于证书中可用的所有域 (CNames)。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:158
 msgid "Installing LetsEncrypt Certificates in Your Linux System"
-msgstr ""
+msgstr "在 Linux 系统中安装 LetsEncrypt 证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:160
 msgid ""
@@ -541,6 +635,8 @@ msgid ""
 "Unlike previously self-signed certificates, we can use LetsEncrypt "
 "Certificates to certify your domains from a trusted source."
 msgstr ""
+"LetsEncrypt 是一个可信任的 CA，提供免费的安全证书。与以前的自签名证书不同，"
+"我们可以使用 LetsEncrypt 证书从受信任的来源认证您的域。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:162
 msgid ""
@@ -550,24 +646,27 @@ msgid ""
 "(DNS or webserver). After successful execution the certificate with all "
 "related files will be stored under ``/etc/letsencrypt/live/$domain``"
 msgstr ""
+"请参考官方 `certbot用户指南 <https://certbot.eff.org/docs/using.html>`__ 了解"
+"如何安装和操作该工具，选择所需的域认证方法（DNS或网络服务器）。成功执行后，"
+"所有相关文件的证书将存储在 ``/etc/letsencrypt/live/$domain`` 下"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:169
 msgid "In that directory, you will find four files:"
-msgstr ""
+msgstr "在该目录中，您将找到四个文件："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:171
 msgid "``privkey.pem`` - private key for the certificate"
-msgstr ""
+msgstr "``privkey.pem`` - 证书的私钥"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:173
 msgid "``cert.pem`` - contains the server certificate by itself"
-msgstr ""
+msgstr "``cert.pem`` - 本身包含服务器证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:175
 msgid ""
 "``chain.pem`` - contains the additional intermediate certificate or "
 "certificates"
-msgstr ""
+msgstr "``chain.pem`` - 包含额外的中间证书或证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:177
 msgid ""
@@ -575,6 +674,8 @@ msgid ""
 "leaf certificate or end-entity certificate). The server certificate is "
 "the first one in this file, followed by any intermediates."
 msgstr ""
+"``fullchain.pem`` - 所有证书，包括服务器证书（又名叶子证书或最终实体证书）。"
+"服务器证书是此文件中的第一个证书，然后是任何中间证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:179
 msgid ""
@@ -582,6 +683,8 @@ msgid ""
 "``fullchain.pem`` (or ``chain.pem`` - please consider actual issuers and "
 "certification chain!)."
 msgstr ""
+"对于 Tigase XMPP 服务器，我们只关心 ``privkey.pem`` 和 ``fullchain.pem`` (或 "
+"``chain.pem`` - 请考虑实际的颁发者和认证链！)。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:181
 msgid ""
@@ -590,12 +693,14 @@ msgid ""
 " `LetsEncrypt Chain of Trust website "
 "<https://letsencrypt.org/certificates/>`__."
 msgstr ""
+"此时我们需要获取根证书和中间证书，这可以通过从 `LetsEncrypt Chain of Trust "
+"website <https://letsencrypt.org/certificates/>`__ 下载这些证书来完成。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:185
 msgid ""
 "Please pay utmost attention to the actual certificate issuers and make "
 "sure that the certification chain is maintained!"
-msgstr ""
+msgstr "请高度关注实际的证书颁发者，并确保维护证书链！"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:187
 msgid ""
@@ -613,22 +718,32 @@ msgid ""
 " b) ``TrustID X3 Root`` from IdenTrust: "
 "https://letsencrypt.org/certs/trustid-x3-root.pem.txt"
 msgstr ""
+"在撰写本文时，LetsEncrypt 提供由 ``R3`` CertificateAuthorigy (CA) "
+"颁发的域证书。为了向根 CA 提供完整的链，您应该获得 Let's Encrypt R3 (``RSA "
+"2048, O = Let's Encrypt, CN = R3``) "
+"证书。根据所需的证书链，您有两个选择：1）（默认和推荐）使用自己的 "
+"LetsEncrypt CA：a）由 ISRG 根 X1 签名的 ``R3`` 证书：https://letsencrypt.org/"
+"certs/lets-encrypt-r3.pem b) ``ISRG Root X1`` 根证书：https://letsencrypt."
+"org/certs/isrgrootx1.pem 2)（旧版，与旧系统更兼容的选项）：IdenTrust "
+"的交叉签名证书：a)由 IdenTrust 交叉签名的 ``R3`` 证书：https://letsencrypt."
+"org/certs/lets-encrypt-r3-cross-signed.pem b) 来自 IdenTrust 的 ``TrustID X3 "
+"Root`` ：https://letsencrypt.org/certs/trustid-x3-root.pem.txt"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:189
 msgid "Considering first (recommended) option, you may obtain them using wget:"
-msgstr ""
+msgstr "考虑到第一个（推荐）选项，您可以使用 wget 获取它们："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:196
 msgid ""
 "These are the root certificate, and the intermediate certificate signed "
 "by root certificate."
-msgstr ""
+msgstr "这些是根证书，以及由根证书签名的中间证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:200
 msgid ""
 "IdenTrust cross-signed certificate will not function properly in the "
 "future!"
-msgstr ""
+msgstr "IdenTrust 交叉签名证书以后将无法正常运行！"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:202
 msgid ""
@@ -636,6 +751,8 @@ msgid ""
 "with the contents of ``isrgrootx1.pem`` and ``lets-encrypt-r3.pem`` into "
 "a single pem certificate."
 msgstr ""
+"获取您的 ``privkey.pem`` 证书的内容，并将它们与 ``isrgrootx1.pem`` 和 ``lets-"
+"encrypt-r3.pem`` 的内容组合成一个单独的pem证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:204
 msgid ""
@@ -644,12 +761,16 @@ msgid ""
 "subdirectory of Tigase XMPP Server installation or update it using admin "
 "ad-hoc (see :ref:`Storing and managing certificates<certificateStorage>`)"
 msgstr ""
+"根据您的配置，您或者需要在您的域之后命名文件，例如 ``mydomain.com.pem`` "
+"并将其放在 Tigase XMPP 服务器安装的 ``certs/`` 子目录下，或者使用管理员 ad-"
+"hoc 更新它（请参阅 :ref:`存储和管理证书<certificateStorage>`)"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:206
 msgid ""
 "If you moved all certs to a single directory, you may combine them using "
 "the following command under \\*nix operating systems:."
-msgstr ""
+msgstr "如果您将所有证书移动到单个目录，您可以在 \\*nix "
+"操作系统下使用以下命令将它们组合起来："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:215
 msgid ""
@@ -660,24 +781,29 @@ msgid ""
 " and you will have to use `DST Root CA X3 "
 "<https://letsencrypt.org/certs/trustid-x3-root.pem.txt>`__ certificate!"
 msgstr ""
+"如果你使用的是 ``isrgrootx1`` 根确保你使用 ``cert.pem`` 文件而不是 "
+"``fullchain.pem``，若使用不同的中间证书（`Let's Encrypt Authority X3 ("
+"IdenTrust cross-signed) <https://letsencrypt.org/certs/lets-encrypt-x3-cross-"
+"signed.pem.txt>`__ ），你将不得不使用 `DST Root CA X3 <https://letsencrypt."
+"org/certs/trustid -x3-root.pem.txt>`__ 证书！"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:217
 msgid "Your certificate should look something like this:"
-msgstr ""
+msgstr "您的证书应如下所示："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:239
 msgid ""
 "LetsEncrypt certificates expire 90 days from issue and need to be renewed"
 " in order for them to remain valid!"
-msgstr ""
+msgstr "LetsEncrypt 证书在颁发后 90 天到期，需要更新才能保持有效！"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:241
 msgid "You can check your certificate with utility class:"
-msgstr ""
+msgstr "您可以使用实用程序类检查您的证书："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:248
 msgid "Let’s encrypt and DNS verification"
-msgstr ""
+msgstr "让我们加密和DNS验证"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:250
 msgid ""
@@ -685,14 +811,17 @@ msgid ""
 " verification. Certbot support a number of DNS operators - you can check "
 "if your DNS provider is listed by executing ``$ certbot plugins``"
 msgstr ""
+"获得通配符（``*.domain.com``）证书的唯一方法是通过 DNS 验证。 Certbot "
+"支持许多 DNS 运营商 - 您可以通过执行 ``$ certbot plugins`` 来检查您的 DNS "
+"提供商是否在列表中"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:252
 msgid "AWS Route53"
-msgstr ""
+msgstr "AWS Route53"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:254
 msgid "If you want to use it with Amazon Cloud you should install plugin for AWS:"
-msgstr ""
+msgstr "如果您想将它与 Amazon Cloud 一起使用，您应该为 AWS 安装插件："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:262
 msgid ""
@@ -700,6 +829,8 @@ msgid ""
 "you should use: ``$( brew --prefix certbot )/libexec/bin/pip install "
 "certbot-dns-route53``"
 msgstr ""
+"如果您在 macOS 下使用 certbot 并通过 brew 安装它，那么您应该使用：``$( brew "
+"--prefix certbot )/libexec/bin/pip install certbot-dns-route53``"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:264
 msgid ""
@@ -707,16 +838,19 @@ msgid ""
 " to create dedicated policy for updating DNS as described in `plugin’s "
 "documentation <https://certbot-dns-route53.readthedocs.io/en/stable/>`__:"
 msgstr ""
+"您应该将您的凭据存储在 ``~/.aws/credentials`` 中（您可能希望创建用于更新 DNS "
+"的专用策略，如 `plugin’s documentation <https://certbot-dns-route53."
+"readthedocs.io/en/stable/>`__ 所描述:"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:272
 msgid ""
 "And afterward you should execute ``certbot`` with ``--dns-route53`` "
 "parameter"
-msgstr ""
+msgstr "之后你应该使用 ``--dns-route53`` 参数执行 ``certbot``"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:275
 msgid "Certbot update hook and Tigase API"
-msgstr ""
+msgstr "Certbot 更新钩子和 Tigase API"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:277
 msgid ""
@@ -728,6 +862,11 @@ msgid ""
 "particular domain configuration so it’s not necessary to specify "
 "UPDATE_DOMAINS)."
 msgstr ""
+"为了实现更高的自动化，可以自动更新通过 Tigase XMPP 服务器中的 ``certbot`` "
+"获得的证书。您应该使用以下部署挂钩 - 或将其添加到 ``/etc/letsencrypt/"
+"renewal-hooks/deploy/`` 或直接在带有 ``--deploy-hook`` 参数的 ``certboot`` "
+"命令行中使用它（在后一种情况下，它将被添加到特定的域配置中，因此没有必要指定 "
+"UPDATE_DOMAINS）。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:281
 msgid ""
@@ -736,21 +875,25 @@ msgid ""
 "(*ISRG Root X1* named ``isrgrootx1.pem`` and *Let’s Encrypt Authority X3*"
 " named ``letsencryptauthorityx3.pem``)"
 msgstr ""
+"请调整用于部署的帐户凭据（``USER``, ``PASS``, ``DOMAIN``）以及 Let's Encrypt "
+"证书的路径（*ISRG Root X1* 名为 ``isrgrootx1.pem`` 和 *Let’s Encrypt "
+"Authority X3* 名为 ``letsencryptauthorityx3.pem``）"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:364
 msgid ""
 "If you are not using wildcard certificate when you have to provide "
 "certificate for main domain as well as certificates for subdomains that "
 "mach all components that you want to expose (muc, pubsub, push, etc…)"
-msgstr ""
+msgstr "如果您没有使用通配符证书，则必须为主域提供证书以及为要公开的所有组件（muc, "
+"pubsub, push 等）的子域提供证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:369
 msgid "Storing and managing certificates"
-msgstr ""
+msgstr "存储和管理证书"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:372
 msgid "Filesystem"
-msgstr ""
+msgstr "文件系统"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:374
 msgid ""
@@ -760,17 +903,21 @@ msgid ""
 "``<domain>.pem``. For example for domain tigase.net it would be "
 "``certs/tigase.net.pem``."
 msgstr ""
+"默认情况下，Tigase 在 ``certs/`` 子目录中加载和存储证书。每个 *domain* "
+"证书都应该存储在一个文件中，此文件名由域名和 ``.pem`` 扩展名组成，即 "
+"``<domain>.pem``。例如对于域 tigase.net，它将是 ``certs/tigase.net.pem``。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:378
 msgid ""
 "Tigase tries to be *smart* and automatically detects wildcard domain and "
 "alternative domains so it’s not needed to duplicate same certificate in "
 "multiple files to match domains."
-msgstr ""
+msgstr "Tigase 尝试变得 *智能*，并自动检测通配符域和备用域，因此无需在多个文件中复制"
+"相同的证书来匹配域。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:381
 msgid "Database repository"
-msgstr ""
+msgstr "数据库存储库"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:383
 msgid ""
@@ -779,6 +926,9 @@ msgid ""
 "the filesystem. You can enable it by adding ``repository () {}`` bean to "
 "``'certificate-container' () {}`` in your TDSL configuration file:"
 msgstr ""
+"或者，可以使用数据库作为证书的存储。启用它后，证书将不会被读取或存储到文件系"
+"统中。您可以通过将 ``repository () {}`` bean 添加到 TDSL 配置文件中的 "
+"``'certificate-container' () {}`` 来启用它："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:391
 msgid ""
@@ -786,17 +936,20 @@ msgid ""
 "using either ad-hoc command ``Add SSL certificate`` from *VHost Manager* "
 "or via HTTP REST API."
 msgstr ""
+"如果您使用的是数据库存储库，那么您可以使用来自 *VHost Manager* 的临时命令 ``"
+"Add SSL certificate`` 或通过 HTTP REST API 来管理/更新证书。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:4
 msgid "Custom Authentication Connectors"
-msgstr ""
+msgstr "自定义身份验证连接器"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:6
 msgid ""
 "This article presents configuration options available to the "
 "administrator and describe how to set Tigase server up to use user "
 "accounts data from a different database."
-msgstr ""
+msgstr "本文介绍了管理员可用的配置选项，并描述了如何设置 Tigase "
+"服务器以使用来自不同数据库的用户帐户数据。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:8
 msgid ""
@@ -805,17 +958,21 @@ msgid ""
 "and the other is for all other user data like the user roster, vCard, "
 "private data storage, privacy lists and so on…​"
 msgstr ""
+"首先要知道的是 Tigase 服务器总是打开 2 个独立的数据库连接。一个连接用于用户登"
+"录数据，另一个用于所有其他用户数据，如用户名册、vCard、私人数据存储、隐私列表"
+"等……​"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:10
 msgid ""
 "In this article we still assume that Tigase server keeps user data in "
 "it’s own database and only login data is retrieved from the external "
 "database."
-msgstr ""
+msgstr "在本文中，我们仍然假设 Tigase "
+"服务器将用户数据保存在自己的数据库中，并且仅从外部数据库中检索登录数据。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:12
 msgid "At the moment Tigase offers following authentication connectors:"
-msgstr ""
+msgstr "目前 Tigase 提供以下身份验证连接器："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:14
 msgid ""
@@ -824,12 +981,17 @@ msgid ""
 "server. In fact the same physical implementation is used for all JDBC "
 "databases."
 msgstr ""
+"``mysql``, ``pgsql``, ``derby`` - 标准身份验证连接器，其用于从 Tigase "
+"服务器使用的主用户数据库加载用户登录数据。实际上，所有 JDBC "
+"数据库都使用相同的物理实现。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:16
 msgid ""
 "``drupal`` - is the authentication connector used to integrate the Tigase"
 " server with `Drupal CMS <http://drupal.org/>`__."
 msgstr ""
+"``drupal`` - 是用于将 Tigase 服务器与 `Drupal CMS <http://drupal.org/>`__ "
+"集成的身份验证连接器。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:18
 msgid ""
@@ -844,6 +1006,12 @@ msgid ""
 "parameters please refer to :ref:`Tigase Custom Auth "
 "documentation<custonAuthConnector>`."
 msgstr ""
+"``tigase-custom`` - 是可用于任何数据库的身份验证连接器。与 'tigase-auth' "
+"连接器不同，它允许您在配置文件中定义 SQL "
+"查询。这种实现的优点是您不必接触数据库。您可以使用简单的普通 SQL "
+"查询或存储过程。此时配置更加困难，因为您必须在配置文件中仔细输入所有 SQL 查询"
+"，并且更改查询通常涉及重新启动服务器。有关此实现和所有配置参数的更多详细信息"
+"，请参阅 :ref:`Tigase 自定义身份验证文档<custonAuthConnector>`。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:20
 msgid ""
@@ -860,6 +1028,13 @@ msgid ""
 "detailed description of this implementation please refer to :ref:`Tigase "
 "Auth documentation<tigaseAuthConnector>`."
 msgstr ""
+"|ss| ``tigase-auth``\\ |se|\\  (**DEPRECATED**) - 是可用于任何数据库的身份验"
+"证连接器。它执行存储过程以执行所有操作。因此，如果您不想暴露数据库结构，将服"
+"务器与外部数据库集成是一种非常方便的方法。您只需在数据库中提供一组存储过程。"
+"虽然实现服务器预期的所有存储过程可能需要做一些工作，"
+"但它允许您隐藏数据库结构并随时更改 SP 实现。您可以在用户登录/注销时添加更多操"
+"作而无需重新启动或触摸服务器。并且服务器端的配置非常简单。有关此实现的详细说"
+"明，请参阅 :ref:`Tigase Auth 文档<tigaseAuthConnector>`。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:22
 msgid ""
@@ -868,50 +1043,57 @@ msgid ""
 "long list with all available options and all details how to handle it. "
 "For the authentication connector setup however we only need 2 options:"
 msgstr ""
+"与往常一样，配置服务器的最简单方法是通过 ``config.tdsl`` 文件。在描述此文件的"
+"文章中，您可以找到包含所有可用选项的长列表以及如何处理它的所有详细信息。但是"
+"，对于身份验证连接器设置，我们只需要 2 个选项："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:38
 msgid ""
 "For example if you store authentication data in a ``drupal`` database on "
 "``localhost`` your settings would be:"
-msgstr ""
+msgstr "例如，如果您将身份验证数据存储在 ``localhost`` 上的 ``drupal`` "
+"数据库中，您的设置将是："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:53
 msgid ""
 "You have to use a class name if you want to attach your own "
 "authentication connector."
-msgstr ""
+msgstr "如果要附加自己的身份验证连接器，则必须使用类名。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:55
 msgid "Default is:"
-msgstr ""
+msgstr "默认为："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:65
 msgid ""
 "In the same exact way you can setup connector for any different database "
 "type."
-msgstr ""
+msgstr "以同样的方式，您可以为任何不同的数据库类型设置连接器。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:67
 msgid "For example, drupal configuration is below"
-msgstr ""
+msgstr "例如，drupal 配置如下"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:77
 msgid "Or tigase-custom authentication connector."
-msgstr ""
+msgstr "或 tigase-custom 身份验证连接器。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:87
 msgid "The different ``cls`` or classes are:"
-msgstr ""
+msgstr "不同的 ``cls`` 或类是:"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:89
+#, fuzzy
 msgid "Drupal - ``tigase.db.jdbc.DrupalWPAuth``"
-msgstr ""
+msgstr "Drupal - ``tigase.db.jdbc.DrupalWPAuth``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:91
+#, fuzzy
 msgid ""
 "MySQL, Derby, PostgreSQL, MS SQL Server - "
 "``tigase.db.jdbc.JDBCRepository``"
 msgstr ""
+"MySQL, Derby, PostgreSQL, MS SQL Server - ``tigase.db.jdbc.JDBCRepository``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:93
 msgid ""
@@ -919,6 +1101,8 @@ msgid ""
 "database format: ``mysql``, ``pgsql`` and ``derby``, ``sqlserver`` as "
 "they are applied automatically if the parameter is missing."
 msgstr ""
+"您通常可以跳过默认 Tigase 数据库格式的配置连接器：``mysql``, ``pgsql`` 和 "
+"``derby``, ``sqlserver`` ，因为如果缺少参数，它们会自动应用。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:95
 msgid ""
@@ -930,6 +1114,10 @@ msgid ""
 "and tries to retrieve the user roster, the server can not find such a "
 "user in the roster database."
 msgstr ""
+"要知道的另一件重要的事情是，如果您使用自定义身份验证连接器，则必须修改 "
+"``authRepository`` 。这是因为如果您从外部数据库检索用户登录数据，该外部数据库"
+"通常由外部系统管理。用户帐户在不通知 Tigase 服务器的情况下被添加。然后，当用"
+"户登录并尝试检索用户名册时，服务器在名册数据库中找不到这样的用户。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:99
 msgid ""
@@ -937,30 +1125,35 @@ msgid ""
 " main user database you have to add following option to the end of the "
 "database connection URL: ``autoCreateUser=true``."
 msgstr ""
+"要使用户帐户在身份验证数据库和主用户数据库之间保持同步，您必须在数据库连接 "
+"URL 的末尾添加以下选项：``autoCreateUser=true``。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:101
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:97
 msgid "For example:"
-msgstr ""
+msgstr "例如："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:111
 msgid ""
 "If you are interested in even further customizing your authentication "
 "connector by writing your own queries or stored procedures, please have a"
 " look at the following guides:"
-msgstr ""
+msgstr "如果您有兴趣通过编写自己的查询或存储过程来进一步自定义身份验证连接器，请查看"
+"以下指南："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:113
+#, fuzzy
 msgid ":ref:`Tigase Auth guide<tigaseAuthConnector>`"
-msgstr ""
+msgstr ":ref:`Tigase Auth guide<tigaseAuthConnector>`"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:115
+#, fuzzy
 msgid ":ref:`Tigase Custom Auth guide<custonAuthConnector>`"
-msgstr ""
+msgstr ":ref:`Tigase Custom Auth guide<custonAuthConnector>`"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:4
 msgid "Tigase Auth Connector (DEPRECATED)"
-msgstr ""
+msgstr "Tigase 身份验证连接器（已弃用）"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:10
 msgid ""
@@ -973,6 +1166,12 @@ msgid ""
 " in the :ref:`Custom Authentication Connectors<customAuthentication>` "
 "guide."
 msgstr ""
+"快捷方式名为 **tigase-auth** 的 Tigase Auth 连接器在类中实现：`"
+"tigase.db.jdbc.TigaseAuth <https://github.com/tigase/tigase-server/blob/"
+"master/src/main/java/tigase/db/jdbc/TigaseAuth.java>`__ "
+"。它允许您连接到任何外部数据库以执行用户身份验证。您可以在 :ref:`Custom "
+"Authentication Connectors<customAuthentication>` "
+"指南中找到如何设置自定义连接器的更多详细信息。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:12
 msgid ""
@@ -983,40 +1182,58 @@ msgid ""
 "repositories for the schema definition files (each component has it’s "
 "dedicated schema). For example:"
 msgstr ""
+"要使此连接器正常工作，您必须准备数据库以提供一组存储过程供 Tigase "
+"服务器执行所有身份验证操作。最好的描述是定义了所有存储过程的示例模式 - "
+"请参阅 Tigase 存储库以获取模式定义文件（每个组件都有其专用的模式）。例如："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:14
+#, fuzzy
 msgid ""
 "`tigase-server <https://github.com/tigase/tigase-"
 "server/tree/master/src/main/database>`__"
 msgstr ""
+"`tigase-server <https://github.com/tigase/tigase-server/tree/master/src/main/"
+"database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:16
+#, fuzzy
 msgid ""
 "`tigase-pubsub <https://github.com/tigase/tigase-"
 "pubsub/tree/master/src/main/database>`__"
 msgstr ""
+"`tigase-pubsub <https://github.com/tigase/tigase-pubsub/tree/master/src/main/"
+"database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:18
+#, fuzzy
 msgid ""
 "`tigase-muc <https://github.com/tigase/tigase-"
 "muc/tree/master/src/main/database>`__"
 msgstr ""
+"`tigase-muc <https://github.com/tigase/tigase-muc/tree/master/src/main/"
+"database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:20
+#, fuzzy
 msgid ""
 "`tigase-message-archiving <https://github.com/tigase/tigase-message-"
 "archiving/tree/master/src/main/database>`__"
 msgstr ""
+"`tigase-message-archiving <https://github.com/tigase/"
+"tigase-message-archiving/tree/master/src/main/database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:22
+#, fuzzy
 msgid ""
 "`tigase-socks5 <https://github.com/tigase/tigase-"
 "socks5/tree/master/src/main/database>`__"
 msgstr ""
+"`tigase-socks5 <https://github.com/tigase/tigase-socks5/tree/master/src/main/"
+"database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:24
 msgid "The absolute minimum of stored procedures you have to implement is:"
-msgstr ""
+msgstr "您必须实现的存储过程的绝对最小值是："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:26
 msgid ""
@@ -2292,4 +2509,3 @@ msgstr ""
 #~ "for ``sslContextContainer`` for particular "
 #~ "connection managers) or on VHost level."
 #~ msgstr ""
-
