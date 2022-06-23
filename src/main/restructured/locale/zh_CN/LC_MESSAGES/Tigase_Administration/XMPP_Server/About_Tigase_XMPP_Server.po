@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-06-18 09:14+0000\n"
+"PO-Revision-Date: 2022-06-24 10:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/about_tigase_xmpp_server/zh_Hans/>\n"
@@ -1027,7 +1027,6 @@ msgstr "`XEP-0357 <https://xmpp.org/extensions/xep-0357.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:97
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:537
-#, fuzzy
 msgid "Push Notifications"
 msgstr "推送通知"
 
