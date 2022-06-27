@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: 2022-06-26 09:14+0000\n"
+"PO-Revision-Date: 2022-06-28 08:53+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/security/zh_Hans/>\n"
@@ -1241,6 +1241,8 @@ msgid ""
 "is always called when the user tries to login to the XMPP server. This is"
 " the only procedure which must be implemented and actually must work."
 msgstr ""
+"``TigUserLoginPlainPw`` - 执行用户身份验证。当用户尝试登录 XMPP "
+"服务器时，总是会调用该程序。这是唯一必须实施并且必须切实可行的程序。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:28
 msgid ""
@@ -1250,6 +1252,9 @@ msgid ""
 "just needs to exist because Tigase expect it to exist and attempts to "
 "call it."
 msgstr ""
+"``TigUserLogout`` - 执行用户注销。当用户注销或与服务器断开连接时，始终调用该"
+"程序。这个程序必须执行，但它可以是空的并且什么也不做。它只需要存在，因为 "
+"Tigase 期望它存在并尝试调用它。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:30
 msgid ""
@@ -1258,30 +1263,33 @@ msgid ""
 "account, change user password or remove the user. In many cases this is "
 "fine as all the user management is handled by the external system."
 msgstr ""
+"使用上述 2 个存储程序，您只能在外部数据库上执行用户登录/注销。您不能注册用户"
+"帐户，更改用户密码或删除用户。在许多情况下，这是可以的，因为所有用户管理都由"
+"外部系统处理。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:32
 msgid ""
 "If you however want to allow for account management via XMPP you have to "
 "implement also following procedures:"
-msgstr ""
+msgstr "但是，如果您想允许通过 XMPP 进行帐户管理，您还必须执行以下程序："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:34
 msgid "``TigAddUserPlainPw`` - to add a new user account"
-msgstr ""
+msgstr "``TigAddUserPlainPw`` - 添加新用户帐户"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:36
 msgid "``TigRemoveUser`` - to remove existing user account"
-msgstr ""
+msgstr "``TigRemoveUser`` - 删除现有用户帐户"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:38
 msgid ""
 "``TigUpdatePasswordPlainPw`` - to change a user password for existing "
 "account"
-msgstr ""
+msgstr "``TigUpdatePasswordPlainPw`` - 更改现有帐户的用户密码"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:4
 msgid "Tigase Custom Auth Connector"
-msgstr ""
+msgstr "Tigase 自定义身份验证连接器"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:6
 msgid ""
@@ -1292,20 +1300,26 @@ msgid ""
 " It allows you to connect to any external database to perform user "
 "authentication and use a custom queries for all actions."
 msgstr ""
+"具有快捷方式名称的 Tigase 自定义身份验证连接器：**tigase-custom** "
+"在类中实现：`tigase.db.jdbc.TigaseCustomAuth <https://github.com/tigase/"
+"tigase-server/tree/master/src /main/java/tigase/db/jdbc/TigaseCustomAuth.java"
+">`__。它允许您连接到任何外部数据库来执行用户身份验证并对所有操作使用自定义查"
+"询。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:8
 msgid ""
 "You can find more details how to setup a custom connector in the Custom "
 "Authentication Connectors guide."
-msgstr ""
+msgstr "您可以在自定义身份验证连接器指南中找到有关如何设置自定义连接器的更多详细信息"
+"。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:10
 msgid "The basic configuration is very simple:"
-msgstr ""
+msgstr "基本配置非常简单："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:21
 msgid "That’s it."
-msgstr ""
+msgstr "就这些"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:23
 msgid ""
@@ -1314,25 +1328,28 @@ msgid ""
 " own queries in the configuration file. The shortest possible description"
 " is the following example of the content from the ``config.tdsl`` file:"
 msgstr ""
+"连接器正确加载并使用预定义的默认查询列表开始工作。在大多数情况下，您可能还想"
+"在配置文件中定义自己的查询。最短的可能描述是来自 ``config.tdsl`` "
+"文件中的以下内容示例："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:25
 msgid ""
 "This query is used to check connection to the database, whether it is "
 "still alive or not"
-msgstr ""
+msgstr "此查询用于检查与数据库的连接是否还持活"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:35
 msgid ""
 "This is database initialization query, normally we do not use it, "
 "especially in clustered environment"
-msgstr ""
+msgstr "这是数据库初始化查询，一般我们不用，尤其是集群环境"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:47
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:127
 msgid ""
 "``online_status`` column does not exist and would need to be added for "
 "that query to work."
-msgstr ""
+msgstr "``online_status`` 列不存在，需要添加该查询才能工作。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:49
 msgid ""
@@ -1345,28 +1362,34 @@ msgid ""
 " JID passed as a parameter. If they match, the authentication is "
 "successful."
 msgstr ""
+"下面的查询在数据库级别执行用户身份验证。 Tigase "
+"服务器不需要知道身份验证算法或密码编码类型，它只需将从客户端接收到的用户 ID "
+"(BareJID) 和密码传递给存储过程。如果身份验证成功，则该过程返回用户裸 JID，"
+"否则返回 null。 Tigase 检查从查询返回的 JID 是否与作为参数传递的 JID "
+"匹配。如果它们匹配，则认证成功。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:62
 msgid ""
 "``TigUserLoginPlainPw`` is no longer part of a Tigase XMPP Server "
 "database schema and would need to be created."
-msgstr ""
+msgstr "``TigUserLoginPlainPw`` 不再是 Tigase XMPP "
+"服务器数据库模式的一部分，需要创建。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:64
 msgid ""
 "Below query returns number of user accounts in the database, this is "
 "mainly used for the server metrics and monitoring components."
-msgstr ""
+msgstr "下面的查询返回数据库中用户帐户的数量，这主要用于服务器指标和监控组件。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:74
 msgid "The Below query is used to add a new user account to the database."
-msgstr ""
+msgstr "下面的查询用于向数据库添加新的用户帐户。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:84
 msgid ""
 "Below query is used to remove existing account with all user’s data from "
 "the database."
-msgstr ""
+msgstr "下面的查询用于从数据库中删除包含所有用户数据的现有帐户。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:94
 msgid ""
@@ -1376,31 +1399,35 @@ msgid ""
 "password from the database and compares it with data received from the "
 "client."
 msgstr ""
+"如果未定义 ``user-login-query``，则此查询用于用户身份验证，即没有可用的数据库"
+"级用户身份验证算法。在这种情况下，Tigase "
+"服务器从数据库中加载用户密码，并将其与从客户端接收到的数据进行比较。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:104
 msgid ""
 "Below query is used for user password update in case user decides to "
 "change his password."
-msgstr ""
+msgstr "以下查询用于用户密码更新，以防用户决定更改密码。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:114
 msgid ""
 "This query is called on user logout event. Usually we use a stored "
 "procedure which records user logout time and marks user as offline in the"
 " database."
-msgstr ""
+msgstr "此查询在用户注销时被调用。通常我们使用一个存储过程来记录用户注销时间并在数据"
+"库中将用户标记为离线。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:129
 msgid ""
 "This configuration specifies what non-sasl authentication mechanisms to "
 "expose to the client"
-msgstr ""
+msgstr "此配置指定向客户端公开哪些非 SASL 身份验证机制"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:139
 msgid ""
 "This setting to specify what sasl authentication mechanisms expose to the"
 " client"
-msgstr ""
+msgstr "此设置指定向客户端公开哪些 sasl 身份验证机制"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:149
 msgid ""
@@ -1410,147 +1437,166 @@ msgid ""
 " call, otherwise it is executed as a plain SQL query. Each configuration "
 "value is stripped from white characters on both ends before processing."
 msgstr ""
+"查询在配置文件中定义，它们可以是普通的 SQL 查询或存储过程。如果查询以字符 ``{"
+" call`` 开头， 则服务器假定这是一个存储过程的调用，否则它作为普通 SQL "
+"查询执行。在处理之前，每个配置值都从两端的白色字符中去除。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:151
 msgid ""
 "Please don’t use semicolon ``;`` at the end of the query as many JDBC "
 "drivers get confused and the query may not work."
-msgstr ""
+msgstr "请不要在查询末尾使用分号 ``;``，因为许多 JDBC "
+"驱动程序会混淆，查询可能无法正常工作。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:153
 msgid ""
 "Some queries can take arguments. Arguments are marked by question marks "
 "``?`` in the query. Refer to the configuration parameters description for"
 " more details about what parameters are expected in each query."
-msgstr ""
+msgstr "一些查询可以带参数。参数在查询中用问号 ``?`` "
+"标记。有关每个查询中预期的参数的更多详细信息，请参阅配置参数说明。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:155
 msgid ""
 "This example shows how to use a stored procedure to add a user as a query"
 " with 2 required parameters (username, and password)."
-msgstr ""
+msgstr "此示例说明如何使用存储过程将用户添加为具有 2 "
+"个必需参数（用户名和密码）的查询。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:165
 msgid "The same query with plain SQL parameters instead:"
-msgstr ""
+msgstr "使用普通 SQL 参数的相同查询："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:171
 msgid ""
 "The order of the query arguments is important and must be exactly as "
 "described in specification for each parameter."
-msgstr ""
+msgstr "查询参数的顺序很重要，并且必须与每个参数的规范中描述的完全相同。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:174
 msgid "Query Name"
-msgstr ""
+msgstr "查询名称"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:174
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:174
 msgid "Arguments"
-msgstr ""
+msgstr "参数"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:174
 msgid "Example Query"
-msgstr ""
+msgstr "示例查询"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:176
+#, fuzzy
 msgid "``conn-valid-query``"
-msgstr ""
+msgstr "``conn-valid-query``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:176
 msgid "Query executed periodically to ensure active connection with the database."
-msgstr ""
+msgstr "定期执行查询以确保与数据库保持连接。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:176
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:178
 msgid "Takes no arguments."
-msgstr ""
+msgstr "不接受任何参数。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:176
+#, fuzzy
 msgid "``select 1``"
-msgstr ""
+msgstr "``select 1``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:178
+#, fuzzy
 msgid "``init-db-query``"
-msgstr ""
+msgstr "``init-db-query``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:178
 msgid "Database initialization query which is run after the server is started."
-msgstr ""
+msgstr "服务器启动后运行的数据库初始化查询。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:178
+#, fuzzy
 msgid "``update tig_users set online_status = 0``"
-msgstr ""
+msgstr "``update tig_users set online_status = 0``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:180
+#, fuzzy
 msgid "``add-user-query``"
-msgstr ""
+msgstr "``add-user-query``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:180
 msgid "Query adding a new user to the database."
-msgstr ""
+msgstr "向数据库添加新用户查询。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:180
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:188
 msgid "Takes 2 arguments: ``(user_id (JID), password)``"
-msgstr ""
+msgstr "接受 2 个参数： ``(user_id (JID), password)``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:180
+#, fuzzy
 msgid "``insert into tig_users (user_id, user_pw) values (?, ?)``"
-msgstr ""
+msgstr "``insert into tig_users (user_id, user_pw) values (?, ?)``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:182
+#, fuzzy
 msgid "``del-user-query``"
-msgstr ""
+msgstr "``del-user-query``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:182
 msgid "Removes a user from the database."
-msgstr ""
+msgstr "从数据库中删除用户。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:182
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:184
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:190
 msgid "Takes 1 argument: ``(user_id (JID))``"
-msgstr ""
+msgstr "接受 1 个参数： ``(user_id (JID))``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:182
+#, fuzzy
 msgid "``delete from tig_users where user_id = ?``"
-msgstr ""
+msgstr "``delete from tig_users where user_id = ?``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:184
+#, fuzzy
 msgid "``get-password-query``"
-msgstr ""
+msgstr "``get-password-query``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:184
 msgid "Retrieves user password from the database for given user_id (JID)."
-msgstr ""
+msgstr "从数据库中找回给定 user_id (JID) 的用户密码。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:184
+#, fuzzy
 msgid "``select user_pw from tig_users where user_id = ?``"
-msgstr ""
+msgstr "``select user_pw from tig_users where user_id = ?``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:186
+#, fuzzy
 msgid "``update-password-query``"
-msgstr ""
+msgstr "``update-password-query``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:186
 msgid "Updates (changes) password for a given user_id (JID)."
-msgstr ""
+msgstr "更新（更改）给定 user_id (JID) 的密码。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:186
 msgid "Takes 2 arguments: ``(password, user_id (JID))``"
-msgstr ""
+msgstr "接受 2 个参数： ``(password, user_id (JID))``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:186
+#, fuzzy
 msgid "``update tig_users set user_pw = ? where user_id = ?``"
-msgstr ""
+msgstr "``update tig_users set user_pw = ? where user_id = ?``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:188
+#, fuzzy
 msgid "``user-login-query``"
-msgstr ""
+msgstr "``user-login-query``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:188
 msgid ""
@@ -1563,30 +1609,41 @@ msgid ""
 "expects a result set with user_id to be returned from the query if login "
 "is successful and empty results set if the login is unsuccessful."
 msgstr ""
+"执行用户登录。通常在有用于此目的的特殊 SP "
+"时使用。这是需要找回用户密码的替代方法。因此，必须至少定义其中一个查询"
+"：``user-login-query`` 或 ``get-password-query``。如果定义了两个查询，则使用 "
+"``user-login-query``。通常，此方法应仅与纯文本密码身份验证或 sasl-plain "
+"一起使用。如果登录成功，Tigase 期望从查询返回一个带有 user_id "
+"的结果集，如果登录不成功，则返回空结果集。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:188
+#, fuzzy
 msgid "``select user_id from tig_users where (user_id = ?) AND (user_pw = ?)``"
-msgstr ""
+msgstr "``select user_id from tig_users where (user_id = ?) AND (user_pw = ?)``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:190
+#, fuzzy
 msgid "``user-logout-query``"
-msgstr ""
+msgstr "``user-logout-query``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:190
 msgid ""
 "This query is called when user logs out or disconnects. It can record "
 "that event in the database."
-msgstr ""
+msgstr "当用户注销或断开连接时调用此查询。它可以在数据库中记录该事件。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:190
+#, fuzzy
 msgid ""
 "``update tig_users, set online_status = online_status - 1 where user_id ="
 " ?``"
 msgstr ""
+"``update tig_users, set online_status = online_status - 1 where user_id = ?``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:192
+#, fuzzy
 msgid "``non-sasl-mechs``"
-msgstr ""
+msgstr "``non-sasl-mechs``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:192
 msgid ""
@@ -1595,10 +1652,14 @@ msgid ""
 "work only with ``get-password-query`` active and only when password are "
 "stored in plain text format in the database."
 msgstr ""
+"逗号分隔的非 SASL 身份验证机制列表。可能的机制是：``password`` 和 "
+"``digest``。摘要机制只能在 ``get-password-query`` "
+"激活且密码以纯文本格式存储在数据库中时起作用。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:194
+#, fuzzy
 msgid "``sasl-mechs``"
-msgstr ""
+msgstr "``sasl-mechs``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:194
 msgid ""
@@ -1608,29 +1669,35 @@ msgid ""
 "mechanisms will work only with the ``get-password-query`` active and only"
 " when passwords are stored in plain text format in the database."
 msgstr ""
+"逗号分隔的 SASL 身份验证机制列表。可能的机制都是 Java "
+"实现支持的机制。最常见的是：``PLAIN``, ``DIGEST-MD5``, ``CRAM-MD5``。\"Non-"
+"PLAIN\" 机制仅在 ``get-password-query`` "
+"激活且密码以纯文本格式存储在数据库中时才有效。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Drupal_Auth.inc:2
 msgid "Drupal Authentication"
-msgstr ""
+msgstr "Drupal 身份验证"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Drupal_Auth.inc:4
 msgid ""
 "Currently, we can only check authentication against a **Drupal** database"
 " at the moment. Full **Drupal** authentication is not implemented as of "
 "yet."
-msgstr ""
+msgstr "目前，我们目前只能针对 **Drupal** 数据库检查身份验证。完整的 **Drupal** "
+"身份验证尚未被实现。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Drupal_Auth.inc:6
 msgid ""
 "As **Drupal** keeps encrypted passwords in database the only possible "
 "authorization protocols are those based on PLAIN passwords."
-msgstr ""
+msgstr "由于 **Drupal** 将加密密码保存在数据库中，唯一可能的授权协议是那些基于 PLAIN "
+"密码的协议。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Drupal_Auth.inc:8
 msgid ""
 "To protect your passwords **Tigase** server must be used with SSL or TLS "
 "encryption."
-msgstr ""
+msgstr "为了保护您的密码 **Tigase** 服务器必须使用 SSL 或 TLS 加密。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Drupal_Auth.inc:10
 msgid ""
@@ -1642,13 +1709,19 @@ msgid ""
 "adding new users is implemented only to ease user accounts migration from"
 " different repository types from earlier **Tigase** server installations."
 msgstr ""
+"**Drupal** 基于数据库的授权的实现位于 ``tigase.db.jdbc.DrupalAuth`` "
+"类中。尽管此类能够向存储库添加新用户，但由于 **Drupal** "
+"中的缓存问题，我建议关闭带内注册。数据库中的更改尚未与 **Drupal** 同步。"
+"添加新用户的功能仅用于简化从早期 **Tigase** "
+"服务器安装的不同存储库类型迁移用户帐户。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Drupal_Auth.inc:12
 msgid ""
 "The purpose of that implementation was to allow all accounts "
 "administration tasks from **Drupal** like: account creation, all accounts"
 " settings, like e-mail, full name, password changes and so on."
-msgstr ""
+msgstr "该实现的目的是允许来自 **Drupal** 的所有帐户管理任务，例如：帐户创建，所有帐"
+"户设置，比如电子邮件，全名，密码更改等。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Drupal_Auth.inc:14
 msgid ""
@@ -1658,28 +1731,33 @@ msgid ""
 "then server won’t allow user to login trough XMPP even if user provides "
 "valid password."
 msgstr ""
+"**Tigase** 服务器使用来自 **Drupal** 数据库的以下字段：name（用户帐户名），pa"
+"ss（用户帐户密码），status（帐户状态）。服务器立即获取所有更改。"
+"如果用户状态不是 1，那么即使用户提供了有效的密码，服务器也不会允许用户通过 "
+"XMPP 登录。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Drupal_Auth.inc:16
 msgid ""
 "There is no *Roster* management in **Drupal** yet. So Roster management "
 "have to be done from the XMPP client."
-msgstr ""
+msgstr "**Drupal** 中还没有 *Roster* 管理。所以名册管理必须从 XMPP 客户端完成。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/LDAP_Auth.inc:2
 msgid "LDAP Authentication Connector"
-msgstr ""
+msgstr "LDAP 身份验证连接器"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/LDAP_Auth.inc:4
 msgid ""
 "Tigase XMPP Server offers support for authenticating users against an "
 "LDAP server in **Bind** **Authentication** mode."
-msgstr ""
+msgstr "Tigase XMPP 服务器支持在 **Bind** **Authentication** 模式下针对 LDAP "
+"服务器对用户进行身份验证。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/LDAP_Auth.inc:6
 msgid ""
 "Configuration for the LDAP support is really simple you just have to add "
 "a few lines to your ``config.tdsl`` file."
-msgstr ""
+msgstr "LDAP 支持的配置非常简单，您只需在 ``config.tdsl`` 文件中添加几行即可。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/LDAP_Auth.inc:18
 msgid ""
@@ -1689,20 +1767,23 @@ msgid ""
 "can control what Tigase should put into this part. In your configuration "
 "you must replace this string with one of the following:"
 msgstr ""
+"请注意 ``USER_ID`` 元素，这是用于验证特定用户配置的特殊元素。 Tigase LDAP "
+"连接器在身份验证期间将其替换为适当的数据。您可以控制 Tigase "
+"应该在这部分中添加什么内容。在您的配置中，您必须将此字符串替换为以下之一："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/LDAP_Auth.inc:20
 msgid "``%1$s`` - use user name only for authentication (JabberID’s localpart)"
-msgstr ""
+msgstr "``%1$s`` - 仅使用用户名进行身份验证（JabberID 的本地部分）"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/LDAP_Auth.inc:22
 msgid ""
 "``%2$s`` - use domain name only for authentication (JabberID’s domain "
 "part)"
-msgstr ""
+msgstr "``%2$s`` - 仅使用域名进行身份验证（JabberID 的域部分）"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/LDAP_Auth.inc:24
 msgid "``%3$s`` - use the whole Jabber ID (JID) for authentication"
-msgstr ""
+msgstr "``%3$s`` - 使用整个 Jabber ID (JID) 进行身份验证"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/LDAP_Auth.inc:28
 msgid ""
@@ -1711,10 +1792,13 @@ msgid ""
 " in `??? <#autoCreateUser>`__ - otherwise you may run into problems with "
 "data access."
 msgstr ""
+"请确保您在主数据源（UserRepository 和 **不是** 以上 AuthRepository）中包含 "
+"``autoCreateUser=true``，如 `[autoCreateUser] <#autoCreateUser>`__ - "
+"否则您可能会遇到数据访问问题。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/SASL_EXTERNAL.inc:2
 msgid "Configuration of SASL EXTERNAL"
-msgstr ""
+msgstr "SASL 外部配置"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/SASL_EXTERNAL.inc:4
 msgid ""
@@ -1723,18 +1807,22 @@ msgid ""
 "Authority (CA) certificate in the VHost (domain) configuration, for "
 "example ``/path/to/cacert.pem``"
 msgstr ""
+"为了启用 SASL 外部设置 \"Client Certificate CA\" (``client-trust-extension-"
+"ca-cert-path``) 到包含 VHost（域）配置中的证书颁发机构 (CA) 证书的路径，例如 "
+"``/path/to/cacert.pem``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/SASL_EXTERNAL.inc:6
 msgid ""
 "File ``cacert.pem`` contains Certificate Authority certificate which is "
 "used to sign clients certificate."
-msgstr ""
+msgstr "文件 ``cacert.pem`` 包含用于签署客户端证书的证书颁发机构证书。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/SASL_EXTERNAL.inc:8
 msgid ""
 "Client certificate must include user’s Jabber ID as ``XmppAddr`` in "
 "``subjectAltName``:"
-msgstr ""
+msgstr "客户端证书必须在 ``subjectAltName`` 中包含用户作为 ``XmppAddr`` 的 Jabber ID "
+"："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/SASL_EXTERNAL.inc:10
 msgid ""
@@ -1746,6 +1834,12 @@ msgid ""
 "of “id-on-xmppAddr” as specified in Section 13.7.1.4 of RFC 6120, "
 "`XEP-0178 <http://xmpp.org/extensions/xep-0178.html#c2s>`__."
 msgstr ""
+"正如 RFC 3920 中指定和在 RFC 6120 中更新的那样，在流协商过程中，XMPP "
+"客户端可以提供证书（“client certificate”）。如果 JabberID "
+"包含在客户端证书中，则将其封装为 id-on-xmppAddr 对象标识符（“xmppAddr”），即 "
+"otherName 类型的 subjectAltName 条目，其 ASN.1 对象标识符为“id-on-xmppAddr”，"
+"正如 RFC 6120 的第 13.7.1.4 节，`XEP-0178 <http://xmpp.org/extensions/"
+"xep-0178.html#c2s>`__ 中所述。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/SASL_EXTERNAL.inc:12
 msgid ""
@@ -1753,6 +1847,8 @@ msgid ""
 "configuration and enabling option ``Client Certificate Required`` "
 "(``client-trust-extension-cert-required``)."
 msgstr ""
+"可以使制作客户端证书 **必需** 使用相同的 VHost 配置并启用选项 ``Client "
+"Certificate Required`` (``client-trust-extension-cert-required``)。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/SASL_EXTERNAL.inc:14
 msgid ""
@@ -1761,16 +1857,20 @@ msgid ""
 "does not provide certificate or certificate will be invalid, **TLS "
 "handshake will be interrupted and client will be disconnected**."
 msgstr ""
+"如果启用此选项，则客户端 **必须提供** 证书。该证书将根据 ``clientCertCA`` "
+"进行验证。如果客户端不提供证书或证书无效，**TLS "
+"握手将被中断并将客户端连接断开**。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/SASL_EXTERNAL.inc:16
 msgid ""
 "Using this options does not force client to use SASL EXTERNAL. Client "
 "still may authenticate with other SASL mechanisms."
-msgstr ""
+msgstr "使用此选项不会强制客户端使用 SASL EXTERNAL。客户端仍然可以使用其他 SASL "
+"机制进行身份验证。"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:2
 msgid "SASL Mechanisms"
-msgstr ""
+msgstr "SASL 机制"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:4
 msgid ""
@@ -1778,40 +1878,46 @@ msgid ""
 "used as `SASL <https://tools.ietf.org/html/rfc4422>`__ mechanisms. Tigase"
 " XMPP Server provides many SASL-based authentication mechanisms such as:"
 msgstr ""
+"XMPP 协议支持多种身份验证方式，但大多用作 `SASL <https://tools.ietf.org/html/"
+"rfc4422>`__ 机制。 Tigase XMPP Server 提供了许多基于 SASL "
+"的身份验证机制，例如："
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:6
 msgid "PLAIN *(enabled)*"
-msgstr ""
+msgstr "PLAIN *(启用)*"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:8
+#, fuzzy
 msgid "ANONYMOUS"
-msgstr ""
+msgstr "ANONYMOUS"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:10
+#, fuzzy
 msgid "EXTERNAL"
-msgstr ""
+msgstr "EXTERNAL"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:12
 msgid "SCRAM-SHA-1 *(enabled)*"
-msgstr ""
+msgstr "SCRAM-SHA-1 *(启用)*"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:14
 msgid "SCRAM-SHA-256 *(enabled)*"
-msgstr ""
+msgstr "SCRAM-SHA-256 *(启用)*"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:16
+#, fuzzy
 msgid "SCRAM-SHA-512"
-msgstr ""
+msgstr "SCRAM-SHA-512"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:18
 msgid ""
 "Most of them are enabled by default on default Tigase XMPP Server "
 "installation."
-msgstr ""
+msgstr "它们中的大多数在默认的 Tigase XMPP 服务器安装中默认启用。"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:21
 msgid "Enabling and disabling SASL mechanisms (credentials encoder/decoder)"
-msgstr ""
+msgstr "启用和禁用 SASL 机制（凭证编码器/解码器）"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:23
 msgid ""
@@ -1823,6 +1929,10 @@ msgid ""
 "most cases will) impact which SASL mechanisms may be allowed to use on "
 "your installation."
 msgstr ""
+"如果您想启用或禁用基于密码的身份验证机制之一，例如 ``SCRAM-SHA-1``, ``SCRAM-"
+"SHA-256`` 或 ``SCRAM-SHA-512``，您可以通过启用或禁用安装中使用的编码器和解码"
+"器。通过启用编码器/解码器，您可以决定密码以何种形式存储在数据库中。这些更改可"
+"能（并且在大多数情况下）会影响哪些 SASL 机制允许在您的安装中使用。"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:27
 msgid ""
@@ -1836,32 +1946,40 @@ msgid ""
 "log in to your installation as system will reject their credentials as it"
 " may not have matching credentials for particular SASL mechanism)*."
 msgstr ""
+"在大多数情况下，您应该同时启用或禁用这两种相同类型（凭证编码器和解码器）。此"
+"规则的唯一例外是当您更改那些已经工作的安装时。在这种情况下，您应该只启用您想"
+"要启用的类型的编码器并要求用户更改他们的密码。在用户更改密码后，您应该重新配"
+"置服务器以启用特定类型的解码器。 "
+"*（在其他情况下，用户可能无法登录到您的安装，因为系统将拒绝他们的凭据，"
+"因为它可能没有与特定 SASL 机制匹配的凭据）*。"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:30
 msgid "**Enabling SCRAM-SHA-512 encoder**"
-msgstr ""
+msgstr "**启用 SCRAM-SHA-512 编码器**"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:43
 msgid "**Disabling SCRAM-SHA-1 decoder**"
-msgstr ""
+msgstr "**禁用 SCRAM-SHA-1 解码器**"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:56
 msgid ""
 "It is strongly recommended not to disable encoders if you have enabled "
 "decoder of the same type as it may lead to the authentication issues, if "
 "client tries to use a mechanism which that is not available."
-msgstr ""
+msgstr "如果您启用了相同类型的解码器，强烈建议不要禁用编码器，因为如果客户端尝试使用"
+"不可用的机制，可能会导致身份验证问题。"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:2
 msgid "Application passwords"
-msgstr ""
+msgstr "应用程序密码"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:4
 msgid ""
 "In recent versions of Tigase XMPP Server it is possible to create and use"
 " multiple username and password pairs to authorize connection to the "
 "single XMPP account."
-msgstr ""
+msgstr "在最新版本的 Tigase XMPP 服务器中，"
+"可以创建和使用多个用户名和密码对来授权连接到单个 XMPP 帐户。"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:6
 msgid ""
@@ -1870,10 +1988,12 @@ msgid ""
 "security of the account as even if one password compromised you can still"
 " log in and block lost or compromised device."
 msgstr ""
+"有了这个，现在可以为访问同一帐户的多个客户端设置多个密码，这可用于提高帐户的"
+"安全性，因为即使一个密码被泄露，您仍然可以登录并阻止丢失或受损的设备。"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:9
 msgid "Adding application password"
-msgstr ""
+msgstr "添加应用程序密码"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:11
 msgid ""
@@ -1882,64 +2002,68 @@ msgid ""
 "``sess-man``) while logged in the XMPP account for which you want to add "
 "a new application password."
 msgstr ""
+"要添加新的用户名-密码对，您需要在登录XMPP 帐户并为其添加新应用程序密码时执行 "
+"``Add user credentials`` 临时命令（ ``sess-man`` 的命令节点 ``auth-"
+"credentials-delete``）。"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:13
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:41
 msgid ""
 "During execution for a command you will be provided with a form to fill "
 "in with following fields:"
-msgstr ""
+msgstr "在执行命令期间，您将获得一个表格，用于填写以下字段："
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:15
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:43
 msgid "The Jabber ID for the account (``jid``) - bare JID of your account"
-msgstr ""
+msgstr "帐户的 Jabber ID (``jid``) - 您帐户的裸 JID"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:17
 msgid ""
 "Credential ID (``credentialId``) - username for the new application "
 "password"
-msgstr ""
+msgstr "凭据 ID (``credentialId``) - 新应用程序密码的用户名"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:19
 msgid "Password (``password``) - a new password"
-msgstr ""
+msgstr "密码 (``password``) - 新密码"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:21
 msgid "After submitting this form a new credential will be added."
-msgstr ""
+msgstr "提交此表格后，将添加新的凭据。"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:24
 msgid "Login in with application password"
-msgstr ""
+msgstr "使用应用程序密码登录"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:26
 msgid ""
 "To log in with new password the XMPP client can use any SASL mechanism "
 "but it needs to provide (in SASL message):"
-msgstr ""
+msgstr "要使用新密码登录，XMPP 客户端可以使用任何 SASL 机制，但需要提供（在 SASL "
+"消息中）："
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:28
 msgid "``authzid`` - account JID"
-msgstr ""
+msgstr "``authzid`` - 帐号 JID"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:30
 msgid "``authcid`` - username for application password"
-msgstr ""
+msgstr "``authcid`` - 应用程序密码的用户名"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:32
 msgid "``passwd`` - application password"
-msgstr ""
+msgstr "``passwd`` - 申请密码"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:34
 msgid ""
 "With proper values, you application will be able to log in using "
 "application password."
-msgstr ""
+msgstr "使用正确的值，您的应用程序将能够用应用程序密码登录。"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:37
 msgid "Removing application password"
-msgstr ""
+msgstr "删除应用程序密码"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:39
 msgid ""
@@ -1948,20 +2072,24 @@ msgid ""
 "account. Then you need to execute ``Delete user credentials`` ad-hoc "
 "command (command node ``auth-credentials-delete`` at ``sess-man``)."
 msgstr ""
+"如果您的设备被盗用或丢失并且您想删除应用程序密码，"
+"您需要使用其他不同设备并登录您的 XMPP 帐户。然后你需要执行 ``Delete user "
+"credentials`` 临时命令（``sess-man`` 的命令节点 ``auth-credentials-"
+"delete``）。"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:45
 msgid ""
 "Credential ID (``credentialId``) - username for the application password "
 "which you want to remove"
-msgstr ""
+msgstr "凭据 ID (``credentialId``) - 要删除的应用程序密码的用户名"
 
 #: ../../Tigase_Administration/Security/Application_Passwords.inc:47
 msgid "After submitting this form a credential will be removed."
-msgstr ""
+msgstr "提交此表格后，证书将被删除。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:2
 msgid "Packet Filtering"
-msgstr ""
+msgstr "包过滤"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:4
 msgid ""
@@ -1969,21 +2097,22 @@ msgid ""
 "server. The most common use for packet filtering is to restrict users "
 "from sending or receiving packets based on the sender or received "
 "address."
-msgstr ""
+msgstr "Tigase 提供了不同的方法来过滤通过服务器的 XMPP "
+"数据包。包过滤最常见的用途是根据发送者或接收地址限制用户发送或接收数据包。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:6
 msgid ""
 "There are also different possible scenarios: time based filtering, "
 "content filtering, volume filtering and so on."
-msgstr ""
+msgstr "还有不同的可能场景：基于时间的过滤，内容过滤，音量过滤等。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:8
 msgid "All pages in this section describe different filtering strategies."
-msgstr ""
+msgstr "本节中的所有页面都描述了不同的过滤策略。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:11
 msgid "Domain Based Packet Filtering"
-msgstr ""
+msgstr "基于域的包过滤"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:13
 msgid ""
@@ -1991,7 +2120,8 @@ msgid ""
 "user communication based on the source/destination domain name. This is "
 "especially useful if we want to limit user communication within a single "
 "- own domain only or a list of domains."
-msgstr ""
+msgstr "基于域的数据包过滤是一个简单的过滤器，其允许根据源/目标域名限制用户通信。如果"
+"我们希望仅在单个自己的域或域列表中限制用户通信，这将特别有用。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:15
 msgid ""
@@ -1999,11 +2129,12 @@ msgid ""
 "with anybody in the world. A company may also have a few different "
 "domains used by different branches or departments. An administrator may "
 "restrict communication to a list of domains."
-msgstr ""
+msgstr "公司可能不希望雇主在工作时间与世界上任何人聊天。一家公司也可能有几个不同的域"
+"被不同的分支机构或部门使用。管理员可以将通信限制为域列表。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:18
 msgid "Introduction"
-msgstr ""
+msgstr "介绍"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:20
 msgid ""
@@ -2011,7 +2142,8 @@ msgid ""
 "different filtering rules for each user. There is also a per-domain "
 "configuration and global-installation setting (applied from most general "
 "to most specific, i.e. from installation to user)."
-msgstr ""
+msgstr "限制是基于每个用户的。因此管理员可以为每个用户设置不同的过滤规则。还有一个按"
+"域配置和全局安装设置（从最一般到最具体的应用，即从安装到用户）。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:22
 msgid ""
@@ -2019,53 +2151,55 @@ msgid ""
 "list where the user control the filter. Domain filter can not be changed "
 "or controlled by the user. The system administrator can change the "
 "settings based on the company policy."
-msgstr ""
+msgstr "普通用户无法更改设置。所以这不像用户控制过滤器的隐私列表。域过滤器不能由用户"
+"更改或控制。系统管理员可以根据公司政策更改设置。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:24
 msgid "There are predefined rules for packet filtering:"
-msgstr ""
+msgstr "包过滤有预定义的规则："
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:26
 msgid "``ALL`` - user can send and receive packets from anybody."
-msgstr ""
+msgstr "``ALL`` - 用户可以发送和接收来自任何人的数据包。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:28
 msgid ""
 "``LOCAL`` - user can send and receive packets within the server "
 "installation only and all it’s virtual domains."
-msgstr ""
+msgstr "``LOCAL`` - 用户只能在服务器安装及其所有虚拟域内发送和接收数据包。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:30
 msgid "``OWN`` - user can send and receive packets within his own domains only"
-msgstr ""
+msgstr "``OWN`` - 用户只能在自己的域内发送和接收数据包"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:32
 msgid ""
 "``BLOCK`` - user can’t communicate with anyone. This could be used as a "
 "means to temporarily disable account or domain."
-msgstr ""
+msgstr "``BLOCK`` - 用户无法与任何人交流。这可以用作暂时禁用帐户或域的一种手段。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:34
 msgid ""
 "``LIST`` - user can send and receive packets within listed domains only "
 "(i.e. *whitelist*)."
-msgstr ""
+msgstr "``LIST`` - 用户只能在列出的域内发送和接收数据包（即 *白名单*）。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:36
 msgid ""
 "``BLACKLIST`` - user can communicate with everybody (like ``ALL``), "
 "except contacts on listed domains."
-msgstr ""
+msgstr "``BLACKLIST`` - 用户可以与所有人通信（如 ``ALL``），除了列出的域中的联系人。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:38
 msgid "``CUSTOM`` - user can communicate only within custom created rules set."
-msgstr ""
+msgstr "``CUSTOM`` - 用户只能在自定义创建的规则集中进行通信。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:40
 msgid ""
 "Whitelist (``LIST``) and blacklist (``BLACKLIST``) settings are mutually "
 "exclusive, i.e. at any given point of time only one of them can be used."
-msgstr ""
+msgstr "白名单 ( ``LIST``) 和黑名单 ( ``BLACKLIST``) "
+"设置是互斥的，即在任何给定时间点，只能使用其中一个。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:42
 msgid ""
@@ -2076,14 +2210,18 @@ msgid ""
 "global server configuration. If there is no filtering policy altogether "
 "server applies defaults based on following criteria:"
 msgstr ""
+"那些适用于特定用户的规则存储在用户存储库中，并为每个用户会话加载。如果没有为"
+"特定用户存储规则，则服务器尝试为特定用户的 VHost 应用规则，并且如果没有 "
+"VHost 过滤策略，服务器使用全局服务器配置。如果完全没有过滤策略，服务器将根据"
+"以下条件应用默认值："
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:44
 msgid "If this is **Anonymous** user then ``LOCAL`` rule is applied"
-msgstr ""
+msgstr "如果这是 **Anonymous** 用户，则应用 ``LOCAL`` 规则"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:46
 msgid "For all **other** users ``ALL`` rule is applied."
-msgstr ""
+msgstr "对于所有 **other** 用户，应用 ``ALL`` 规则。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:51
 msgid ""
@@ -2092,14 +2230,17 @@ msgid ""
 "in the configuration file. However if you have a list of loaded plugins "
 "in the configuration file make sure ``domain-filter`` is on the list."
 msgstr ""
+"过滤由必须在启动时加载的域过滤器插件执行。如果配置文件中未设置插件列表，则默"
+"认加载。但是，如果您在配置文件中有加载插件的列表，请确保 ``domain-filter`` "
+"在列表中。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:53
 msgid "There is no other configuration required for the plugin to work."
-msgstr ""
+msgstr "该插件无需其他配置即可工作。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:56
 msgid "Administration, Rules Management"
-msgstr ""
+msgstr "行政，规则管理"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:58
 msgid ""
@@ -2107,7 +2248,8 @@ msgid ""
 "separately, it is not practical for large installations. In most cases "
 "users are stored in the database and a third-party system keeps all the "
 "user information."
-msgstr ""
+msgstr "尽管可以为每个用户单独控制域过滤规则，但对于大型安装来说并不实用。在大多数情"
+"况下，用户存储在数据库中，第三方系统保存所有用户信息。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:60
 msgid ""
@@ -2117,10 +2259,14 @@ msgid ""
 "server/tree/master/src/main/groovy/tigase/admin/UserDomainFilter.groovy>`__"
 " script. It enables modifying rules for a given user JID."
 msgstr ""
+"要更改单个用户的规则，您可以使用可加载的管理脚本功能并加载 `"
+"UserDomainFilter.groovy <https://github.com/tigase/tigase-server/tree/master/"
+"src/main/groovy/tigase/admin/UserDomainFilter.groovy>`__ 脚本。"
+"它可以修改给定用户 JID 的规则。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:63
 msgid "Implementation"
-msgstr ""
+msgstr "执行"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:65
 msgid ""
@@ -2129,6 +2275,9 @@ msgid ""
 " which allows the Tigase server to access user data. Filtering rules are "
 "loaded from user repository using following command:"
 msgstr ""
+"如果您有一个保存和管理所有用户信息的第三方系统，那么您可能拥有自己的 "
+"UserRepository 实现，它允许 Tigase "
+"服务器访问用户数据。使用以下命令从用户存储库加载过滤规则："
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:72
 msgid ""
@@ -2136,47 +2285,53 @@ msgid ""
 "``DomainFilter.ALLOWED_DOMAINS_KEY`` is a property key: ``allowed-"
 "domains``. The user repository MUST return one of following only:"
 msgstr ""
+"其中 ``user_id`` 是没有资源部分的用户 Jabber ID，``DomainFilter."
+"ALLOWED_DOMAINS_KEY`` 是属性键：``allowed-"
+"domains``。用户存储库必须仅返回以下之一："
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:74
 msgid "``ALL`` - if the user is allowed to communicate with anybody"
-msgstr ""
+msgstr "``ALL`` - 如果允许用户与任何人通信"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:76
 msgid ""
 "``LOCAL`` - if the user is allowed to communicate with users on the same "
 "server installation."
-msgstr ""
+msgstr "``LOCAL`` - 如果允许用户与同一服务器安装上的用户进行通信。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:78
 msgid ""
 "``OWN`` - if the user is allowed to communicate with users within his own"
 " domain only."
-msgstr ""
+msgstr "``OWN`` - 如果只允许用户与他自己域内的用户进行通信。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:80
 msgid ""
 "``LIST`` - list of domains within which the user is allowed to "
 "communicate with other users. No wild-cards are supported. User’s own "
 "domain should be included too."
-msgstr ""
+msgstr "``LIST`` - "
+"允许用户与其他用户通信的域列表。不支持通配符。用户自己的域也应该包括在内。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:82
 msgid ""
 "``BLACKLIST`` - list of domains within which the user is NOT allowed to "
 "communicate with other users. No wild-cards are supported. User’s own "
 "domain should NOT be included."
-msgstr ""
+msgstr "``BLACKLIST`` - "
+"不允许用户与其他用户通信的域列表。不支持通配符。不应包含用户自己的域。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:84
 msgid ""
 "``CUSTOM`` - list of rules defining custom communication permissions "
 "(server processes stanza according to first matched rule, similar to "
 "XEP-0016) in the following format:"
-msgstr ""
+msgstr "``CUSTOM`` - 定义自定义通信权限的规则列表（服务器根据第一个匹配的规则处理节，"
+"类似于 XEP-0016），格式如下："
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:106
 msgid "``null`` - a java null if there are no settings for the user."
-msgstr ""
+msgstr "``null`` - 如果用户没有设置，则返回 java null。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:108
 msgid ""
@@ -2186,6 +2341,11 @@ msgid ""
 "domains-list\". The user repository MUST return semicolon separated list "
 "of domains: ``domain1.com;domain2.com,domain3.org``"
 msgstr ""
+"在 ``LIST`` 和 ``BLACKLIST`` "
+"过滤选项的情况下，为白名单/黑名单提供域列表是必不可少的。 ``DomainFilter."
+"ALLOWED_DOMAINS_LIST_KEY`` 是一个属性键：“allowed-domains-"
+"list”。用户存储库必须返回分号分隔的域列表：``domain1.com;domain2.com,domain3."
+"org``"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:110
 msgid ""
@@ -2194,16 +2354,20 @@ msgid ""
 "server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter.java>`__ "
 "plugin. Please refer to source code for more implementation details."
 msgstr ""
+"过滤由 `tigase.xmpp.impl.DomainFilter <https://github.com/tigase/"
+"tigase-server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter 执行."
+"java>`__ 插件实现。更多实现细节请参考源代码。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:2
 msgid "Access Control Lists in Tigase"
-msgstr ""
+msgstr "Tigase 中的访问控制列表"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:4
 msgid ""
 "Tigase offers support for **Access Control List (ACL)** to allow for fine"
 " grained access to administration commands on the server."
-msgstr ""
+msgstr "Tigase 提供对 **访问控制列表 (ACL)** "
+"的支持，以允许对服务器上的管理命令进行细粒度访问。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:6
 msgid ""
@@ -2213,41 +2377,47 @@ msgid ""
 "(**BareJIDs**) listed in the ``config.tdsl`` file under ``admins = []`` "
 "(please see :ref:`admins<admins>` for details)."
 msgstr ""
+"默认情况下，所有管理命令只能由服务管理员访问（通过服务发现可见并且可以执行）"
+"。服务管理员是在 ``admins = []`` 下的 ``config.tdsl`` 文件中列出的具有 JID "
+"(**BareJIDs**) 的现有帐户（有关详细信息，请参阅 :ref:`admins<admins>`）。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:8
 msgid ""
 "Additionally, other XMPP users and entities can be assigned permissions "
 "to execute a command or commands using Tigase’s ACL capabilities."
-msgstr ""
+msgstr "此外，可以为其他 XMPP 用户和实体分配权限以使用 Tigase 的 ACL "
+"功能执行一个或多个命令。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:10
 msgid ""
 "The following is a list of possible ACL modifiers for administrator "
 "command accessibility:"
-msgstr ""
+msgstr "以下是管理员命令可访问的可能的 ACL 修饰符列表："
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:12
 msgid ""
 "``ALL`` - Everybody can execute the command, even users from different "
 "federated servers."
-msgstr ""
+msgstr "``ALL`` - 每个人都可以执行该命令，即使是来自不同联合服务器的用户。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:14
 msgid ""
 "``ADMIN`` - Local server administrators can execute the command, this is "
 "a default setting if no ACL is set for a command."
-msgstr ""
+msgstr "``ADMIN`` - 本地服务器管理员可以执行命令，如果没有为命令设置 "
+"ACL，此为默认设置。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:16
 msgid ""
 "``LOCAL`` - All users with accounts on the local server can execute the "
 "command. Users from other, federated servers will not be able to execute "
 "the command."
-msgstr ""
+msgstr "``LOCAL`` - 在本地服务器上拥有帐户的所有用户都可以执行该命令。来自其他联合服"
+"务器的用户将无法执行该命令。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:18
 msgid "``NONE`` - No one will be allowed to execute this command"
-msgstr ""
+msgstr "``NONE`` - 不允许任何人执行此命令"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:20
 msgid ""
@@ -2256,6 +2426,8 @@ msgid ""
 "checking permissions for the manipulated item, this value will behave in "
 "the same way as ``LOCAL``."
 msgstr ""
+"``DOMAIN_OWNER`` - 只有作为正在操作项目的域的所有者的用户才被允许执行评论。如"
+"果脚本没有检查被操作项的权限，则此值的行为方式与 ``LOCAL`` 相同。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:22
 msgid ""
@@ -2264,6 +2436,8 @@ msgid ""
 "domain. If script is not checking permissions for the manipulated item, "
 "this value will behave in the same way as ``LOCAL``."
 msgstr ""
+"``DOMAIN_ADMIN`` - 只有作为域管理员之一的用户才能执行操作与域相关的项目的命令"
+"。如果脚本没有检查被操作项的权限，则此值的行为方式与 ``LOCAL`` 相同。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:24
 msgid ""
@@ -2272,12 +2446,14 @@ msgid ""
 "specifically for admin accounts, and automatically all users within that "
 "domain would be able to run the command."
 msgstr ""
+"``example.com`` - 只有在所选域中拥有帐户的用户才能执行该命令。专门为管理员帐"
+"户设置域可能很有用，并且该域中的所有用户都将能够自动运行该命令。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:26
 msgid ""
 "``user@example.com`` - Comma separated list of JIDs of users who can "
 "execute the command."
-msgstr ""
+msgstr "``user@example.com`` - 可以执行命令的用户的 JID 的逗号分隔列表。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:28
 msgid ""
@@ -2285,6 +2461,9 @@ msgid ""
 "accessed by the designated service wide administrators, that is accounts "
 "listed as admins in the ``config.tdsl`` file."
 msgstr ""
+"在任何情况下，无论 ACL "
+"设置如何，任何命令都可以由指定的服务范围管理员执行和访问，即在 ``config."
+"tdsl`` 文件中列为管理员的帐户。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:30
 msgid ""
@@ -2294,6 +2473,9 @@ msgid ""
 "modifier. However, most others can be combined with JID to broaden access"
 " to specific accounts."
 msgstr ""
+"多个 ACL 修饰符可以组合并应用于任何命令。这可能并不总是有意义的。例如 ALL "
+"取代所有其他设置，因此将其与任何其他修饰符结合使用是没有意义的。但是，"
+"大多数其他修饰符可以与 JID 结合以扩大对特定帐户的访问。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:32
 msgid ""
@@ -2302,6 +2484,9 @@ msgid ""
 "anybody from a local or remote service will always be able to execute the"
 " command, no matter what other modifiers are added."
 msgstr ""
+"在 Tigase 服务器上，检查访问控制列表中的第一个匹配修饰符。因此，如果您将 ALL "
+"与任何其他修饰符结合使用，则无论添加了哪些其他修饰符，本地或远程服务中的任何"
+"人都将始终能够执行该命令。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:34
 msgid ""
@@ -2319,29 +2504,37 @@ msgid ""
 "tasks such as removing the vhost, updating its configuration, setting SSL"
 " certificate can be done by the domain owner or administrator only."
 msgstr ""
+"请注意，ACL 列表在命令框架级别上工作。在实际执行命令之前验证访问。命令本身可"
+"能存在其他访问限制。在许多情况下，即使允许所有本地用户执行命令（LOCAL 修饰符"
+"），某些命令也只允许由域所有者或域管理员（当然也包括服务范围的管理员）执行。"
+"所有与用户管理相关的命令，例如添加新用户，删除用户，更改密码等……都属于此类别"
+"。进行域 (vhost) 管理时，任何本地用户都可以创建/注册新域（如果设置了 LOCAL "
+"ACL 修饰符），但随后的所有域管理任务，例如删除 vhost、更新其配置、设置 SSL "
+"证书只能由域所有者或管理员完成。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:36
 msgid ""
 "The ACL list is set for a specific Tigase component and a specific "
 "command. Therefore the configuration property must specify all the "
 "details. So the general format for configuring ACL for a command is this:"
-msgstr ""
+msgstr "ACL 列表是为特定 Tigase 组件和特定命令设置的。因此配置属性必须指定所有细节。"
+"所以为命令配置 ACL 的一般格式是这样的："
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:46
 msgid "The breakdown is as such:"
-msgstr ""
+msgstr "细分是这样的："
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:48
 msgid ""
 "``comp-id`` is the Tigase server component ID such as: sess-man, vhost-"
 "man, c2s, etc.."
-msgstr ""
+msgstr "``comp-id`` 是 Tigase 服务器组件 ID 如：sess-man、vhost-man、c2s 等。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:50
 msgid ""
 "``commands`` is a static text which indicates that the property is for "
 "component’s command settings."
-msgstr ""
+msgstr "``commands`` 是一个静态文本，以表示该属性用于组件的命令设置。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:52
 msgid ""
@@ -2349,36 +2542,39 @@ msgid ""
 "dns, http://jabber.org/protocol/admin#add-user, user-roster-management, "
 "etc…"
 msgstr ""
+"``command-id`` 是我们为其设置 ACL 的命令 ID，例如 query-dns、http://jabber."
+"org/protocol/admin#add-user、user-roster-management 等……"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:54
 msgid "Here are a few examples:"
-msgstr ""
+msgstr "这里有一些例子："
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:56
 msgid "*Allowing local users to create and manage their own domains*"
-msgstr ""
+msgstr "*允许本地用户创建和管理自己的域*"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:69
 msgid ""
 "In fact all the commands except item-add can be executed by the domain "
 "owner or administrator."
-msgstr ""
+msgstr "事实上，除了 item-add 之外的所有命令都可以由域所有者或管理员执行。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:71
 msgid "*Allowing local users to execute user management commands:*"
-msgstr ""
+msgstr "*允许本地用户执行用户管理命令：*"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:87
 msgid ""
 "As in the previous example, the commands will by executed only by local "
 "users who are the specific domain administrators."
-msgstr ""
+msgstr "与前面的示例一样，这些命令将仅由作为特定域管理员的本地用户执行。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:89
 msgid ""
 "*Allowing users from a specific domain to execute query-dns command and "
 "some other users for given JIDs from other domains:*"
-msgstr ""
+msgstr "*允许来自特定域的用户执行 query-dns 以及来自其他域的给定 JID "
+"的其他一些用户：*"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:99
 msgid ""
@@ -2390,10 +2586,15 @@ msgid ""
 "them is ``AS:CommandId`` which is what you have to use for the ACL "
 "setting."
 msgstr ""
+"为了能够设置正确的 ACL 属性，您需要知道组件名称和命令 ID。组件 ID "
+"可以在正在运行的服务器上的服务发现信息或启动期间的服务器日志中找到。"
+"可以在命令脚本源代码中找到命令 "
+"ID。每个脚本在其代码的开头都包含一个元数据列表。其中之一是 ``AS:CommandId`` "
+"，这是您必须用于 ACL 设置的内容。"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:2
 msgid "TLS/SSL encryption features configuration"
-msgstr ""
+msgstr "TLS/SSL 加密功能配置"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:4
 msgid ""
@@ -2407,6 +2608,11 @@ msgid ""
 "``sslContextContainer`` for particular connection managers) or on VHost "
 "level."
 msgstr ""
+"Tigase 允许调整在建立 TLS 连接时使用的最重要的参数 - "
+"在连接协商期间将使用的一组协议和密码。最重要的一个是 ``hardened-mode`` - "
+"它是最通用的配置，其提供了三步调整设置 - 详情请参阅 :ref:`hardened-"
+"mode<hardenedMode>`。 ``hardened-mode`` 可以通过 TDSL 配置文件（在 ``root`` "
+"级别或对于特定连接管理器的 ``sslContextContainer``）或 VHost 级别进行配置。"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:6
 msgid ""
@@ -2416,6 +2622,9 @@ msgid ""
 "default sets. They both takes an array of strings, which ten be removed "
 "from the lists."
 msgstr ""
+"如果你想禁用某些协议或密码，你可以使用两个选项：分别是 ``tls-disabled-"
+"protocols`` 和 ``tls-disabled-ciphers``。顾名思义，它们允许禁用默认集中的某些"
+"项目。他们都接受一个字符串数组，从列表中删除哪十个。"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:8
 msgid ""
@@ -2428,6 +2637,12 @@ msgid ""
 "<https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-"
 "names.html#sslcontext-algorithms>`__"
 msgstr ""
+"假设您想删除对 ``SSL``, ``SSLv2`` 和 ``SSLv3`` "
+"协议的支持。您应该简单地使用以下配置：``'tls-disabled-protocols' = ['SSL', "
+"'SSLv2', 'SSLv3']``。协议的完整列表取决于您使用的特定 Java 版本 - "
+"请参阅文档了解详细信息。例如对于默认的 Java11 列表，您可以查看 `SSLContext "
+"Algorithms <https://docs.oracle.com/en/java/javase/11/docs/specs/security/"
+"standard-names.html#sslcontext-algorithms>`__"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:10
 msgid ""
@@ -2437,6 +2652,10 @@ msgid ""
 "names.html#jsse-cipher-suite-names>`__. It’s also possible to use regular"
 " expressions to quickly eliminate groups of ciphers."
 msgstr ""
+"``tls-disabled-ciphers`` 遵循相同的格式并使用 `JSSE Cipher Suite Names "
+"<https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names"
+".html#jsse-cipher-suite-names>`__ "
+"中定义的名称。也可以使用正则表达式来快速消除密码组。"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:12
 msgid ""
@@ -2448,6 +2667,12 @@ msgid ""
 "Therefore if you configure Tigase with ``'tls-enabled-protocols' = [ "
 "'TLSv1.2' ]`` then **only** ``TLSv1.2`` will be supported by Tigase."
 msgstr ""
+"如果您只想启用特定的协议或密码，而不考虑 ``hardened-mode`` 或以上禁用选项，"
+"您可以使用 ``tls-enabled-protocols`` 和 ``tls-enabled-ciphers`` - "
+"这两个选项也接受数组，它们将会配置Tigase "
+"以仅使用提供的那些协议或密码（不支持正则表达式）。因此，如果您使用 ``'tls-"
+"enabled-protocols' = [ 'TLSv1.2' ]`` 配置 Tigase，那么 Tigase 将 **仅** 支持 "
+"``TLSv1.2``。"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:14
 msgid ""
@@ -2458,6 +2683,11 @@ msgid ""
 "extension-jsse-reference-guide.html#GUID-D9B216E8-3EFC-4882-B76E-"
 "17A87D8F2F9D>`__. Tigase defaults Diffie-Hellman keys of 4096 bits."
 msgstr ""
+"您可能有兴趣调整的最后一个选项是 ``ephemeral-key-size`` - 它遵循 `"
+"Customizing Size of Ephemeral Diffie-Hellman Keys <https://docs.oracle.com/"
+"en/java/javase/11/security/java-secure-socket-extension-jsse-reference-guide."
+"html#GUID-D9B216E8-3EFC-4882-B76E-17A87D8F2F9D>`__ 中概述的 Java 配置功能 。"
+"Tigase 默认 Diffie-Hellman 密钥为 4096 位元。"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:18
 msgid ""
@@ -2467,10 +2697,13 @@ msgid ""
 "installations that may be less secure) then you should only adjust "
 "``hardened-mode`` setting (and switch it to ``strict``)."
 msgstr ""
+"我们尝试提供最佳的默认选项集，因此 **建议使用 Tigase 提供的默认值**。如果你想"
+"让你的系统非常安全（考虑到安装可能不太安全的连接问题），那么你应该只调整 "
+"``hardened-mode`` 设置（并将其切换为 ``strict``）。"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:21
 msgid "Testing hosts TLS capabilities"
-msgstr ""
+msgstr "测试主机 TLS 功能"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:23
 msgid ""
@@ -2480,10 +2713,13 @@ msgid ""
 "<https://github.com/mozilla/cipherscan>`__. For example for our "
 "installation ``tigase.im`` result would look like this:"
 msgstr ""
+"如果您遇到 TLS 连接问题，比较两个安装是否支持相同的协议和密码集会很有帮助。"
+"最通用和最有用的工具之一是 `Mozilla’s CipherScan <https://github.com/mozilla/"
+"cipherscan>`__。例如，对于我们的安装 ``tigase.im`` 结果将如下所示："
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:56
 msgid "TLS 1.3 compatibility"
-msgstr ""
+msgstr "TLS 1.3 兼容性"
 
 #: ../../Tigase_Administration/Security/TLS_Features_Configuration.inc:58
 msgid ""
@@ -2491,6 +2727,9 @@ msgid ""
 "disabled by default. It can be enabled by setting property ``tls-disable-"
 "tls13`` of ``sslContextContainer`` bean to ``false``:"
 msgstr ""
+"由于兼容性问题，目前默认禁用 TLS 1.3（版本 8.1.x）。可以通过将 "
+"``sslContextContainer`` bean 的属性 ``tls-disable-tls13`` 设置为 ``false`` "
+"来启用它："
 
 #~ msgid ""
 #~ "Tigase allows adjusting the most "
