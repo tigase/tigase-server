@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: 2022-06-23 09:56+0000\n"
+"PO-Revision-Date: 2022-06-28 19:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/configuration/zh_Hans/>\n"
@@ -2211,7 +2211,7 @@ msgstr "这几乎是加载虚拟组件所需的全部内容。需要一些其他
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:246
 msgid "That’s it."
-msgstr "就是这些。"
+msgstr "就这些"
 
 #: ../../Tigase_Administration/Configuration/Logging.inc:2
 msgid "Settings for Custom Logging in Tigase"
