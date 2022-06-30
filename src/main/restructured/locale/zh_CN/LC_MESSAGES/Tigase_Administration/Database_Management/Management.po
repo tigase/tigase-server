@@ -3,165 +3,189 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-01 06:34+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/database_management/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:2
 msgid "Database Management"
-msgstr ""
+msgstr "数据库管理"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:4
 msgid ""
 "Tigase is coded to perform with multiple database types and numbers. "
 "Owing to it’s versatile nature, there are some tools and procedures that "
 "may be of use to certain administrators."
-msgstr ""
+msgstr "Tigase 被编码以使用多种数据库类型和数字来执行。由于它的多功能性，有一些工具和"
+"程序可能对某些管理员有用。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:7
 msgid "Recommended database versions"
-msgstr ""
+msgstr "推荐的数据库版本"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:9
 msgid ""
 "As of v8.0.0 here are the minimum and recommended versions of databases "
 "for use with Tigase:"
-msgstr ""
+msgstr "从 v8.0.0 开始，以下是用于 Tigase 的最低和推荐的数据库版本："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:12
 msgid "Database"
-msgstr ""
+msgstr "数据库"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:12
 msgid "Recommended Version"
-msgstr ""
+msgstr "推荐版本"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:12
 msgid "Minimum Version"
-msgstr ""
+msgstr "最低版本"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:12
 msgid "Additional Information"
-msgstr ""
+msgstr "补充信息"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:14
+#, fuzzy
 msgid "DerbyDB"
-msgstr ""
+msgstr "DerbyDB"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:14
+#, fuzzy
 msgid "10.12.1.1"
-msgstr ""
+msgstr "10.12.1.1"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:14
 msgid "Included with Tigase XMPP Server"
-msgstr ""
+msgstr "包含在 Tigase XMPP 服务器中"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
+#, fuzzy
 msgid "MySQL"
-msgstr ""
+msgstr "MySQL"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
+#, fuzzy
 msgid "5.7"
-msgstr ""
+msgstr "5.7"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
+#, fuzzy
 msgid "5.6.4"
-msgstr ""
+msgstr "5.6.4"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
 msgid "Required to properly support timestamp storage with millisecond precision"
-msgstr ""
+msgstr "需要以毫秒精度来正确支持时间戳存储"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:18
+#, fuzzy
 msgid "SQLServer"
-msgstr ""
+msgstr "SQLServer"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:18
+#, fuzzy
 msgid "2014"
-msgstr ""
+msgstr "2014"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:18
+#, fuzzy
 msgid "2012"
-msgstr ""
+msgstr "2012"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:18
 msgid "2012 needed so we can count use fetch-offset pagination feature."
-msgstr ""
+msgstr "需要 2012 ，这样我们可以计算使用 fetch-offset 分页功能。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:20
+#, fuzzy
 msgid "PostgreSQL"
-msgstr ""
+msgstr "PostgreSQL"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:20
+#, fuzzy
 msgid "13.0"
-msgstr ""
+msgstr "13.0"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:20
+#, fuzzy
 msgid "9.4"
-msgstr ""
+msgstr "9.4"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:20
 msgid ""
 "New UA schema requires at least 9.4; if using version older than 13 "
 "manual installation of ``uuid-ossp`` extension is required (1)"
-msgstr ""
+msgstr "新的 UA 架构至少需要 9.4；如果使用早于 13 的版本，则需要手动安装 ``uuid-"
+"ossp`` 扩展 (1)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:22
+#, fuzzy
 msgid "MongoDB"
-msgstr ""
+msgstr "MongoDB"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:22
+#, fuzzy
 msgid "3.2"
-msgstr ""
+msgstr "3.2"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:22
+#, fuzzy
 msgid "3.0"
-msgstr ""
+msgstr "3.0"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:24
+#, fuzzy
 msgid "MariaDB"
-msgstr ""
+msgstr "MariaDB"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:24
+#, fuzzy
 msgid "?"
-msgstr ""
+msgstr "?"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:24
+#, fuzzy
 msgid "10.0.12"
-msgstr ""
+msgstr "10.0.12"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:24
 msgid ""
 "Basic features works with 10.0.12-MariaDB Homebrew, but is not fully "
 "tested."
-msgstr ""
+msgstr "基本功能适用于 10.0.12-MariaDB Homebrew，但尚未经过全面测试。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:29
 msgid ""
 "For PostgreSQL version older than 13.0 manual installation of ``uuid-"
 "ossp`` by the superuser to the *created database* is required:"
-msgstr ""
+msgstr "对于早于 13.0 的 PostgreSQL 版本，需要由超级用户手动安装 ``uuid-ossp`` 到 "
+"*创建的数据库*："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:35
 msgid ""
 "Although Tigase may support other versions of databases, these are the "
 "ones we are most familiar with in offering support and advice. Use of "
 "databases outside these guidelines may result in unforeseen errors."
-msgstr ""
+msgstr "尽管 Tigase 可能支持其他版本的数据库，但这些是我们在提供支持和建议方面最熟悉"
+"的版本。在这些准则之外使用数据库可能会导致无法预料的错误。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:38
 msgid "Database Watchdog"
-msgstr ""
+msgstr "数据库监管"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:40
 msgid ""
@@ -170,24 +194,29 @@ msgid ""
 "sent once every 60 minutes to each connected repository. However this can"
 " be overridden as a part of the dataSource property:"
 msgstr ""
+"只有当数据库连接空闲时，才可以定期测试 Tigase "
+"的可用性和数据库的存在性。默认情况下，此 ping 每 60 "
+"分钟发送一次到每个连接的存储库。但是，这可以作为 dataSource "
+"属性的一部分被覆盖："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:54
 msgid "This setting changes frequency to 30 minutes."
-msgstr ""
+msgstr "此设置将频率更改为 30 分钟。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:65
 msgid "This one changes to 15 minutes."
-msgstr ""
+msgstr "这个更改为 15 分钟。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:69
 msgid ""
 "see `Period / Duration values <#Period-Duration-values>`__ for format "
 "details"
-msgstr ""
+msgstr "有关格式详细信息，请参阅 :ref:`Period / Duration values<Period-Duration-"
+"values>`"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:72
 msgid "Using modified database schema"
-msgstr ""
+msgstr "使用修改后的数据库模式"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:74
 msgid ""
@@ -199,10 +228,15 @@ msgid ""
 "in any way. Moreover it will not check if schema version is correct or "
 "not."
 msgstr ""
+"如果您正在使用带有修改架构（更改的过程或表）的 Tigase XMPP Server，"
+"并且您不希望 Tigase XMPP Server 维护它并自动升级，您可以对任何数据源禁用 "
+"``schema-management``。如果对特定数据源禁用了 ``schema-management``，那么 "
+"Tigase XMPP 服务器将不会以任何方式更新或修改数据库模式。而且它将不会检查模式"
+"版本是否正确。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:76
 msgid "**Disabling ``schema-management`` for ``default`` data source**"
-msgstr ""
+msgstr "*为* ``default`` *数据源禁用* ``schema-management``"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:89
 msgid ""
@@ -210,24 +244,27 @@ msgid ""
 "responsibility to maintain database schema and update it if needed (ie. "
 "if Tigase XMPP Server schema was changed)."
 msgstr ""
+"如果 ``schema-management`` "
+"被禁用，那么管理员有责任维护数据库架构并在需要时对其进行更新（也就是：如果 "
+"Tigase XMPP 服务器架构已更改）。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:94
 msgid "Schema files maintenance"
-msgstr ""
+msgstr "架构文件维护"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:96
 msgid ""
 "This document describes schema files layout and assumptions about it. In "
 "addition it describes how and when it should be updated."
-msgstr ""
+msgstr "本文档描述了模式文件布局和有关它的假设。此外，它还描述了更新的方式和时间。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:99
 msgid "Assumptions"
-msgstr ""
+msgstr "假设"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:101
 msgid "Following assumptions are in place:"
-msgstr ""
+msgstr "存在以下假设："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:103
 msgid ""
@@ -236,6 +273,9 @@ msgid ""
 "detailed checking of loaded version (it’s already handled on the schema "
 "level as of version 8.0.0)"
 msgstr ""
+"所有模式文件都 *可加载* 多次 - "
+"这是迄今为止最重要的假设，它允许在不明确和详细检查加载版本的情况下逃脱（"
+"它已经在版本 8.0.0 的模式级别上处理）"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:105
 msgid ""
@@ -244,6 +284,9 @@ msgid ""
 "possible to override it in code via annotations - please see Developer "
 "Guild in Server documentation for details)"
 msgstr ""
+"所需的模式版本是根据组件版本计算的（其在项目配置文件中设置 - 通常是 ``pom."
+"xml``，但可以通过注释在代码中覆盖它 - "
+"请参阅服务器文档中的开发者手册了解详细信息）"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:107
 msgid ""
@@ -252,6 +295,9 @@ msgid ""
 "two major versions behind (and all maintenance version schema files) - "
 "this will allow *quick upgrade* even from rather older versions"
 msgstr ""
+"我们将维护 *\"3 versions schema files\"*，即在分发包中，我们将为 "
+"``current_version`` 和后面两个主要版本（以及所有维护版本模式文件）"
+"提供模式版本 - 这将允许 *快速升级* 即使是从更旧的版本"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:109
 msgid ""
@@ -260,28 +306,32 @@ msgid ""
 "are aiming at frequent releases thus mandatory schema version check will "
 "be done only with final version)"
 msgstr ""
+"``SNAPSHOT`` 版本将打印一个日志条目，其表面架构可能已经更改，并建议运行升级（"
+"我们的目标是频繁发布，因此强制架构版本检查将仅对最终版本进行）"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:112
 msgid "Checks"
-msgstr ""
+msgstr "检查"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:114
 msgid "We will check:"
-msgstr ""
+msgstr "我们将检查："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:116
 msgid ""
 "if it’s possible to upgrade the schema (based on the current schema "
 "version in the database and available SQL files and their respective "
 "versions - if );"
-msgstr ""
+msgstr "是否可以升级模式（基于数据库中的当前模式版本和可用的 SQL 文件及其各自的版本 -"
+" 是否 ）；"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:118
 msgid ""
 "if it’s required to upgrade the schema during server startup (until 7.1.x"
 " [inclusive] it was done only for tigase-server, will be done by all "
 "components)"
-msgstr ""
+msgstr "是否需要在服务器启动期间升级架构（直到 7.1.x [包括] 它仅用于 tigase-"
+"server，将由所有组件完成）"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:120
 msgid ""
@@ -289,6 +339,9 @@ msgid ""
 "(if schema is already in the latest required version, executing all SQL "
 "files is not required hence speeding up upgrade)"
 msgstr ""
+"是否在 ``upgrade-schema`` "
+"运行期间需要升级架构（如果架构已经是所需的最新版本，则不需要执行所有 SQL "
+"文件，因此可以加快升级速度）"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:122
 msgid ""
@@ -296,32 +349,36 @@ msgid ""
 " a prompt to re-run ``upgrade-schema`` will be printed in the ``logs"
 "/tigase-console.log``"
 msgstr ""
+"在 ``SNAPSHOT`` 版本启动期间，即使架构版本匹配，也会在 ``logs/tigase-console."
+"log`` 中打印重新运行 ``upgrade-schema`` 的提示"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:125
 msgid "Schema files layout"
-msgstr ""
+msgstr "架构文件布局"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:128
 msgid "Filename layout"
-msgstr ""
+msgstr "文件名布局"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:130
 msgid "Basic schema filename layout consists of 3 basic parts:"
-msgstr ""
+msgstr "基本模式文件名布局由 3 个基本部分组成："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:132
 msgid ""
 "name of relational database management system (RDBMS) for which it’s "
 "intended (e.g. ``derby``, ``mysql``, ``postgresql``, ``sqlserver``);"
 msgstr ""
+"它所针对的关系数据库管理系统 (RDBMS) "
+"的名称（例如，``derby``，``mysql``，``postgresql``，``sqlserver``）；"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:134
 msgid "name of the Tigase component for which it’s intended;"
-msgstr ""
+msgstr "预期的 Tigase 组件的名称；"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:136
 msgid "version of the schema file."
-msgstr ""
+msgstr "架构文件的版本。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:138
 msgid ""
@@ -332,16 +389,20 @@ msgid ""
 " Procedures (``-sp``), base schema (``-schema``) and setting properties "
 "(``-props``). In principle the filename pattern looks as follows"
 msgstr ""
+"对于每个组件和版本，可以（但不是强制）将所有与数据库相关的功能拆分为多个文件"
+"，但必须将它们链接/包含在特定数据库/组件/版本文件的基础文件中。这允许分离存储"
+"过程（``-sp``）、基本模式（``-schema``）和设置属性（``-props``）。原则上，文"
+"件名模式如下所示"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:144
 msgid ""
 "For example schema file for version 7.0.0 of Tigase Server for Derby "
 "looks as follow:"
-msgstr ""
+msgstr "例如，Tigase Server for Derby 版本 7.0.0 的模式文件如下所示："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:152
 msgid "Files structure"
-msgstr ""
+msgstr "文件结构"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:154
 msgid ""
@@ -352,69 +413,78 @@ msgid ""
 " any given time (two of them being \\``upgrades'' to the oldest, base "
 "schema):"
 msgstr ""
+"如前所述，我们应该支持所有匹配 ``old-stable``, ``stable`` 和 ``master`` "
+"的版本，这意味着 *current-version* 后面的两个主要版本，即版本： *current-"
+"version - 2*)。这导致在任何给定时间在存储库中都有 3 个版本的模式（其中两个是 "
+"upgrades`` 到最旧的基本模式）："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:156
 msgid "``current-version`` *minus* 2: base schema"
-msgstr ""
+msgstr "``current-version`` *减* 2：基本架构"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:158
 msgid ""
 "``current-version`` *minus* 1: all changes from ``current-version`` "
 "*minus* 2 to ``current-version`` *minus* 1"
 msgstr ""
+"``current-version`` *减* 1: 从 ``current-version`` *减* 2 到 ``current-"
+"version`` *减* 1 的所有更改"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:160
 msgid ""
 "``current-version``: all changes from ``current-version`` *minus* 1 to "
 "``current-version``"
 msgstr ""
+"``current-version``: 所有从 ``current-version`` *减* 1 到 ``current-version``"
+" 的改变"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:164
 msgid ""
 "``current-version`` *MUST* always match version of the component (defined"
 " in pom.xml)."
-msgstr ""
+msgstr "``current-version`` *必须* 总是匹配组件的版本（在 pom.xml 中定义）。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:168
 msgid ""
 "It’s possible to have multiple files within version (related to smaller, "
 "maintenance upgrade) as the SchemaLoader would collect all files which "
 "version falls within range and ."
-msgstr ""
+msgstr "版本中可能有多个文件（与较小的维护升级相关），因为 SchemaLoader "
+"会收集版本范围内的所有文件。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:170
 msgid ""
 "For example with the release of version 8.0.0 this will translate to "
 "following versions:"
-msgstr ""
+msgstr "例如，随着版本 8.0.0 的发布，这将转换为以下版本："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:172
 msgid "``7.0.0``: base schema"
-msgstr ""
+msgstr "``7.0.0``: 基本架构"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:174
 msgid "``7.1.0``: all changes from ``7.0.0`` to ``7.1.0``"
-msgstr ""
+msgstr "``7.1.0``：从 ``7.0.0`` 到 ``7.1.0`` 的所有变化"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:176
 msgid "``8.0.0``: all changes from ``7.1.0`` to ``8.0.0``"
-msgstr ""
+msgstr "``8.0.0``：从 ``7.1.0`` 到 ``8.0.0`` 的所有变化"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:180
 msgid "All schema files must be stored under ``src/main/database/``"
-msgstr ""
+msgstr "所有架构文件必须存储在 ``src/main/database/`` 下"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:183
 msgid "Handling of changes in the schema"
-msgstr ""
+msgstr "处理架构中的更改"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:185
 msgid "There are two main workflows defined"
-msgstr ""
+msgstr "定义了两个主要工作流"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:188
 msgid "During release of the version"
-msgstr ""
+msgstr "在版本发布期间"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:190
 msgid ""
@@ -426,26 +496,32 @@ msgid ""
 "version for component with ``setVersion('component','<current-version"
 "></current-version>');`` )."
 msgstr ""
+"由于我们最多只保留 3 个版本的架构，因此在版本发布后，我们需要调整（展平）"
+"文件以维护在 *Files structure* "
+"中定义的结构（这可能会发生，特定版本的架构不会有任何更改，这将导致相对空的 "
+"``current-version`` 架构文件 - 仅使用 ``setVersion('component','<current-"
+"version></current-version>');`` 设置组件的当前版本)。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:192
 msgid ""
 "For example we are about to release version ``8.0.0``. This results in "
 "the following versions of the schema (in the example for the server) in "
 "the repository:"
-msgstr ""
+msgstr "例如，我们即将发布版本 ``8.0."
+"0``。这会在存储库中生成以下架构版本（在服务器示例中）："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:194
 msgid "``<database>-server-schema-7.0.0.sql``: base schema"
-msgstr ""
+msgstr "``<database>-server-schema-7.0.0.sql``: 基本架构"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:196
 msgid "``<database>-server-schema-7.1.0.sql``: including changes for ``7.1.0``"
-msgstr ""
+msgstr "``<database>-server-schema-7.1.0.sql``: 包括对 ``7.1.0`` 的更改"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:198
 #: ../../Tigase_Administration/Database_Management/Management.rst:208
 msgid "``<database>-server-schema-8.0.0.sql``: including changes for ``8.0.0``"
-msgstr ""
+msgstr "``<database>-server-schema-8.0.0.sql``: 包括对 ``8.0.0`` 的更改"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:202
 msgid ""
@@ -453,6 +529,8 @@ msgid ""
 "well, e.g.: ``<database>-server-schema-7.1.1.sql`` and ``<database"
 ">-server-schema-7.1.2.sql``"
 msgstr ""
+"列表中也可能会有维护版本，例如：``<database>-server-schema-7.1.1.sql`` 和 "
+"``<database>-server-schema-7.1.2.sql``"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:204
 msgid ""
@@ -462,52 +540,58 @@ msgid ""
 "we *MUST* incorporate all the changes in ``7.1.0`` onto ``7.0.0`` "
 "creating new base file with version ``7.1.0``, i.e.:"
 msgstr ""
+"发布后，我们在 pom.xml 中指定下一个发布的版本（例如和 ``8.1.0`` "
+"相同的版本将是 ``current-version`` 这使得最旧的可用版本是 ``7.1.0``。因此，"
+"我们 *必须* 将 ``7.1.0`` 中的所有更改合并到 ``7.0.0`` 中，创建版本为 ``7.1."
+"0`` 的新基础文件，即："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:206
 msgid "``<database>-server-schema-7.1.0.sql``: base schema"
-msgstr ""
+msgstr "``<database>-server-schema-7.1.0.sql``: 基本架构"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:210
 msgid "``<database>-server-schema-8.1.0.sql``: including changes for ``8.1.0``"
-msgstr ""
+msgstr "``<database>-server-schema-8.1.0.sql``: 包括对 ``8.1.0`` 的更改"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:213
 msgid "Maintenance releases"
-msgstr ""
+msgstr "维护发布"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:215
 msgid ""
 "Following cases will be discussed with solid-version examples. Comments "
 "will be provided in-line Following assumptions are made:"
-msgstr ""
+msgstr "以下案例将使用实体版本示例进行讨论。评论将在线提供并做以下假设："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:217
 msgid "Version succession: ``5.1.0``, ``5.2.0``, ``7.0.0``, ``7.1.0``, ``8.0.0``"
-msgstr ""
+msgstr "版本继承: ``5.1.0``, ``5.2.0``, ``7.0.0``, ``7.1.0``, ``8.0.0``"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:219
 msgid ""
 "Versions mapping: ``master`` (``8.0.0``), ``stable`` (``7.1.0``), ``old-"
 "stable`` (``7.0.0``):"
 msgstr ""
+"版本映射：``master`` (``8.0.0``), ``stable`` (``7.1.0``), ``old-stable`` (``7"
+".0.0``):"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:221
 #: ../../Tigase_Administration/Database_Management/Management.rst:257
 #: ../../Tigase_Administration/Database_Management/Management.rst:293
 msgid "schema files in ``old-stable`` branch"
-msgstr ""
+msgstr "``old-stable`` 分支中的架构文件"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:223
 #: ../../Tigase_Administration/Database_Management/Management.rst:259
 #: ../../Tigase_Administration/Database_Management/Management.rst:295
 msgid "5.1.0 (base)"
-msgstr ""
+msgstr "5.1.0 (基础版)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:225
 #: ../../Tigase_Administration/Database_Management/Management.rst:261
 #: ../../Tigase_Administration/Database_Management/Management.rst:297
 msgid "5.2.0 (upgrade)"
-msgstr ""
+msgstr "5.2.0 (升级版)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:227
 #: ../../Tigase_Administration/Database_Management/Management.rst:233
@@ -516,19 +600,19 @@ msgstr ""
 #: ../../Tigase_Administration/Database_Management/Management.rst:299
 #: ../../Tigase_Administration/Database_Management/Management.rst:305
 msgid "7.0.0 (upgrade)"
-msgstr ""
+msgstr "7.0.0 (升级版)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:229
 #: ../../Tigase_Administration/Database_Management/Management.rst:267
 #: ../../Tigase_Administration/Database_Management/Management.rst:301
 msgid "schema files in ``stable`` branch"
-msgstr ""
+msgstr "``stable`` 分支中的架构文件"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:231
 #: ../../Tigase_Administration/Database_Management/Management.rst:269
 #: ../../Tigase_Administration/Database_Management/Management.rst:303
 msgid "5.2.0 (base)"
-msgstr ""
+msgstr "5.2.0 (基础版)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:235
 #: ../../Tigase_Administration/Database_Management/Management.rst:241
@@ -537,85 +621,87 @@ msgstr ""
 #: ../../Tigase_Administration/Database_Management/Management.rst:307
 #: ../../Tigase_Administration/Database_Management/Management.rst:313
 msgid "7.1.0 (upgrade)"
-msgstr ""
+msgstr "7.1.0 (升级版)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:237
 #: ../../Tigase_Administration/Database_Management/Management.rst:277
 #: ../../Tigase_Administration/Database_Management/Management.rst:309
 msgid "schema files in ``master`` branch"
-msgstr ""
+msgstr "``master`` 分支中的架构文件"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:239
 #: ../../Tigase_Administration/Database_Management/Management.rst:279
 #: ../../Tigase_Administration/Database_Management/Management.rst:311
 msgid "7.0.0 (base)"
-msgstr ""
+msgstr "7.0.0 (基础版)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:243
 #: ../../Tigase_Administration/Database_Management/Management.rst:285
 msgid "8.0.0 (upgrade)"
-msgstr ""
+msgstr "8.0.0 (升级版)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:247
 msgid "Making a change in ``old-stable`` (and ``stable``)"
-msgstr ""
+msgstr "在 ``old-stable`` (和 ``stable``) 中进行更改"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:249
 msgid ""
 "If we made a schema change in ``old-stable`` version (and it’s branch) we"
 " must:"
-msgstr ""
+msgstr "如果我们在 ``old-stable`` 版本（和它的分支）中进行了架构更改，我们必须："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:251
 msgid "create a new file with upgraded version number;"
-msgstr ""
+msgstr "创建具有升级版本号的新文件;"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:253
 msgid "propagate the change to the ``stable`` and ``master`` branch."
-msgstr ""
+msgstr "将更改传播到 ``stable`` 和 ``master`` 分支。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:255
 msgid "Repository changes:"
-msgstr ""
+msgstr "存储库更改："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:265
 msgid ""
 "7.0.1 (upgrade) **←** making a *change* here results in the schema "
 "version being bumped to 7.0.1"
-msgstr ""
+msgstr "7.0.1（升级) **←** 在此处进行 *更改* 会导致架构版本升级到 7.0.1"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:273
 #: ../../Tigase_Administration/Database_Management/Management.rst:281
 msgid "7.0.1 (upgrade) **←** we must port the *change* here"
-msgstr ""
+msgstr "7.0.1（升级) **←** 我们必须在此处移植 *变化*"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:289
 msgid "Making a change in ``master``"
-msgstr ""
+msgstr "在 ``master`` 中进行更改"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:291
 msgid ""
 "If we made a schema change in ``master`` version we don’t propagate the "
 "change to the ``stable`` and ``old-stable`` branch."
-msgstr ""
+msgstr "如果我们在 ``master`` 版本中进行了架构更改，我们不会将更改传播到 ``stable`` "
+"和 ``old-stable`` 分支。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:315
 msgid ""
 "8.0.0 (upgrade) **←** we make the *change* here, as this is the "
 "development version schema version remains the same."
-msgstr ""
+msgstr "8.0.0 (升级) **←** 我们在此处进行 "
+"*更改*，因为这是开发版本，架构版本保持不变。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:319
 msgid "Implementation details"
-msgstr ""
+msgstr "实施细节"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:322
 msgid "In-file control"
-msgstr ""
+msgstr "文件内控制"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:324
 msgid "There are two main control instructions (intended for ``SchemaLoader``):"
-msgstr ""
+msgstr "有两个主要的控制指令（用于 ``SchemaLoader``):"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:326
 msgid ""
@@ -623,16 +709,19 @@ msgid ""
 "must be placed in own, separate file with the query being enclosed by the"
 " two of them, for example:"
 msgstr ""
+"用 ``-- QUERY START:`` 和 ``-- QUERY END:`` 表示查询 - "
+"每个都必须放在自己的单独文件中，查询由它们两个包围，例如："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:334
 msgid ""
 "sourcing other file with ``-- LOAD FILE: <path to .sql file>`` - path "
 "must be on the same line, following control instruction, for example:"
-msgstr ""
+msgstr "使用 ``-- LOAD FILE: <path to .sql file>`` 获取其他文件 - "
+"路径必须在同一行，遵循控制指令，例如："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:341
 msgid "Storing version in the database"
-msgstr ""
+msgstr "在数据库中存储版本"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:343
 msgid ""
@@ -641,24 +730,26 @@ msgid ""
 "particular repository. There will be an associated stored procedure to "
 "obtain and set version:"
 msgstr ""
+"每个存储库都有一个表 ``tig_schema_versions`` ，其中包含了有关所有已安装组件的"
+"信息及其在该特定存储库中的版本。此时会有一个关联的存储过程来获取和设置版本："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:345
 msgid "table:"
-msgstr ""
+msgstr "表："
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:356
 msgid "stored procedures ``get/setVersion(‘component’,'version');``"
-msgstr ""
+msgstr "存储过程 ``get/setVersion(‘component’,'version');``"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:358
 msgid ""
 "It will be stored and maintained in the file named ``<RDBMS_name>-common-"
 "schema-<version>.sql``"
-msgstr ""
+msgstr "它将在名为 ``<RDBMS_name>-common-schema-<version>.sql`` 的文件中存储和维护"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:2
 msgid "Database Preparation"
-msgstr ""
+msgstr "数据库准备"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:4
 msgid ""
@@ -668,6 +759,9 @@ msgid ""
 "Therefore the manual process to prepare database is different for each "
 "database system."
 msgstr ""
+"Tigase 通常在每个数据库上使用相同的数据库模式和同一组存储过程和函数。但是，每"
+"个数据库的存储过程的架构创建的脚本和代码是不同的。因此，每个数据库系统手动准"
+"备数据库的过程是不同的。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:6
 msgid ""
@@ -679,50 +773,59 @@ msgid ""
 " may visit the :ref:`Schema files maintenance<Schemafilesmaintenance>` "
 "section of our Redmine installation for more detailed information."
 msgstr ""
+"从 v8.0.0 开始，大部分数据库任务已经自动化，其可以使用简单的文本调用，也可以"
+"使用交互式问答风格。我们 **不推荐**手动操作，但是我们将不同数据库的手动激活保"
+"留在附录中。如果您对我们如何管理和更新我们的数据库模式感兴趣，您可以访问我们 "
+"Redmine 安装的 :ref:`Schema 文件维护<Schemafilesmaintenance>` "
+"部分以获取更多详细信息。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:8
 msgid ":ref:`The DBSchemaLoader Utility<SchemaUtility>`"
-msgstr ""
+msgstr ":ref:`DBSchemaLoader 实用程序<SchemaUtility>`"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:10
 msgid ":ref:`Hashed User Passwords in Database<HashedUserPasswordsinDatabase>`"
-msgstr ""
+msgstr ":ref:`数据库中的哈希用户密码<HashedUserPasswordsinDatabase>`"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:12
 msgid ":ref:`Support for MongoDB<PreparingTigaseforMongoDB>`"
-msgstr ""
+msgstr ":ref:`支持 MongoDB<PreparingTigaseforMongoDB>`"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:14
 msgid "Appendix entries"
-msgstr ""
+msgstr "附录条目"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:16
 msgid ""
 ":ref:`Manual installtion for MySQL<Prepare-the-MySQL-Database-for-the-"
 "Tigase-Server>`"
-msgstr ""
+msgstr ":ref:`MySQL 的手动安装<Prepare-the-MySQL-Database-for-the-Tigase-Server>`"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:18
 msgid ""
 ":ref:`Manual installtion for Derby<Prepare-the-Derby-Database-for-the-"
 "Tigase-Server>`"
-msgstr ""
+msgstr ":ref:`Derby 的手动安装<Prepare-the-Derby-Database-for-the-Tigase-Server>`"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:20
 msgid ""
 ":ref:`Manual installtion for SQLServer<Prepare-the-MS-SQL-Server-"
 "Database-for-the-Tigase-Server>`"
 msgstr ""
+":ref:`SQLServer 的手动安装<Prepare-the-MS-SQL-Server-Database-for-the-Tigase-"
+"Server>`"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation.inc:22
 msgid ""
 ":ref:`Manual installtion for PostGRESQL<Prepare-the-PostgreSQL-Database-"
 "for-the-Tigase-Server>`"
 msgstr ""
+":ref:`PostGRESQL的手动安装<Prepare-the-PostgreSQL-Database-for-the-Tigase-"
+"Server>`"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:4
 msgid "Schema Utility"
-msgstr ""
+msgstr "架构实用程序"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:6
 msgid ""
@@ -730,6 +833,8 @@ msgid ""
 "can be done using tasks instead of calling the specific method. Support "
 "for Derby, MySQL, PostgreSQL, MSSQL, and MongoDB is available."
 msgstr ""
+"随着 v8.0.0 的发布，现在可以使用任务而不是调用特定方法来调用 Tigase "
+"dbSchemaLoader 实用程序。支持 Derby，MySQL，PostgreSQL，MSSQL 和 MongoDB。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:8
 msgid ""
@@ -737,112 +842,119 @@ msgid ""
 "first have the database environment up and running, and have established "
 "user credentials. You may use root or an account with administrator write"
 " privileges."
-msgstr ""
+msgstr "要将此实用程序与任何数据库一起使用，您首先需要启动并运行数据库环境，并建立用"
+"户凭据。您可以使用 root 或具有管理员写入权限的帐户。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:11
 msgid "Operation & Variables"
-msgstr ""
+msgstr "操作和变量"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:13
 msgid "Operation"
-msgstr ""
+msgstr "操作"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:15
 msgid ""
 "Operating the schema utility is quite easy! To use it run this command "
 "from the installation directory:"
-msgstr ""
+msgstr "操作架构实用程序非常简单！要使用它，请从安装目录运行此命令："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:21
 msgid ""
 "Operations are now converted to tasks, of which there are now three: "
 "``install-schema``, ``upgrade-schema``, and ``destroy-schema``."
 msgstr ""
+"操作现在转换为任务，现在有其中三个：``install-schema``, ``upgrade-schema``, "
+"和 ``destroy-schema``。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:23
 msgid ""
 "``upgrade-schema``: Upgrade the schema of the database specified in your "
 "``config.tdsl`` configuration file. (options are ignored for this option)"
-msgstr ""
+msgstr "``upgrade-schema``: 升级 ``config.tdsl`` "
+"配置文件中指定的数据库架构。（此选项在这里被忽略）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:25
 msgid "``install-schema``: Install a schema to database."
-msgstr ""
+msgstr "``install-schema``：将架构安装到数据库。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:27
 msgid "``destroy-schema``: Destroy database and schemas. **DANGEROUS**"
-msgstr ""
+msgstr "``destroy-schema``: 销毁数据库和架构。**危险**"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:29
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:85
 msgid "Options"
-msgstr ""
+msgstr "选项"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:31
 msgid ""
 "Use the following options to customize. Options in bold are required, "
 "*{potential options are in brackets}*:"
-msgstr ""
+msgstr "使用以下选项进行自定义。粗体选项是必需的，{*可能的选项在括号中*}："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:33
 msgid "``--help`` Prints the help for the task."
-msgstr ""
+msgstr "``--help`` 打印任务的帮助。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:35
 msgid ""
 "``-I`` or ``--interactive`` - enables interactive mode which will prompt "
 "for parameters not defined."
-msgstr ""
+msgstr "``-I`` 或 ``--interactive`` - 启用交互模式，该模式将提示输入未定义的参数。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:37
 msgid ""
 "``-T`` or ``--dbType`` - database type {derby, mongodb, mysql, "
 "postgresql, sqlserver}."
 msgstr ""
+"``-T`` 或 ``--dbType`` - 数据库类型 "
+"{derby，mongodb，mysql，postgresql，sqlserver}。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:39
 msgid ""
 "``-C`` or ``--components`` - Allows the specification of components for "
 "use when installing a schema."
-msgstr ""
+msgstr "``-C`` 或 ``--components`` - 允许指定在安装架构时使用的组件。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:42
 msgid "Usage"
-msgstr ""
+msgstr "用法"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:44
 msgid "upgrade-schema"
-msgstr ""
+msgstr "升级-架构"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:46
 msgid ""
 "This task will locate any schema versions above your current one, and "
 "will install them to the database configured in the ``config.tdsl`` file."
-msgstr ""
+msgstr "此任务将找到高于您当前版本的任何架构版本，并将它们安装到``config.tdsl`` "
+"文件里配置的数据库中。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:50
 msgid ""
 "To use this utility, you must have Tigase XMPP server fully setup with a "
 "configured configuration file."
-msgstr ""
+msgstr "要使用此实用程序，您必须使用已配置的配置文件完全设置 Tigase XMPP 服务器。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:56
 msgid "Windows users will need to run the command using the following command:"
-msgstr ""
+msgstr "Windows 用户需要使用以下命令运行该命令："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:65
 msgid "install-schema"
-msgstr ""
+msgstr "安装架构"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:67
 msgid "This task will install a schema using the parameters provided."
-msgstr ""
+msgstr "此任务将使用提供的参数安装架构。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:69
 msgid ""
 "**If you are setting up a server manually, we HIGHLY recommend using this"
 " method**"
-msgstr ""
+msgstr "**如果您手动设置服务器，我们强烈建议使用此方法**"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:75
 msgid ""
@@ -852,26 +964,29 @@ msgid ""
 " adds the administrator, this is highly recommended with the ``-N`` "
 "passing the password."
 msgstr ""
+"此命令将使用 Derby 数据库在 ``localhost`` 上托管的名为 ``tigasedb`` "
+"的数据库上安装 tigase。编辑数据库的用户名和密码是 ``tigase_pass`` 和 "
+"``root``。请注意，``-J`` 显式添加管理员，强烈建议使用 ``-N`` 传递密码。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:77
 msgid "If you are using a windows system, you need to call the program directly:"
-msgstr ""
+msgstr "如果使用的是windows系统，需要直接调用程序："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:87
 msgid ""
 "Options for schema installation are as follows, required options are in "
 "bold"
-msgstr ""
+msgstr "架构安装选项如下，必填选项以粗体显示"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:89
 msgid "``--help``, Outputs the help."
-msgstr ""
+msgstr "``--help``, 输出帮助。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:91
 msgid ""
 "``-I``, ``--interactive`` - enables interactive mode, which will result "
 "in prompting for any missing parameters."
-msgstr ""
+msgstr "``-I``, ``--interactive`` - 启用交互模式，这将导致提示任何缺少的参数。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:93
 msgid ""
@@ -883,6 +998,12 @@ msgid ""
 "archive,monitor,muc,pubsub,s2s,ws2s). **This is required for certain "
 "components like socks5.**"
 msgstr ""
+"``-C``, ``--components=`` - 启用的组件标识符列表（+/-），可能的值: [``amp``, "
+"``bosh``, ``c2s``, ``eventbus``, ``ext-disco``, ``http``, ``mdns``, "
+"``message-archive``, ``monitor``, ``muc``, ``pubsub``, ``push``, ``s2s``, "
+"``socks5``, ``test``, ``unified-archive``, ``upload``, ``ws2s``] (默认: "
+"amp,bosh,c2s,eventbus,http,message-archive,monitor,muc,pubsub,s2s,ws2s) "
+"。**这对于某些组件（如 socks5）是必需的。**"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:95
 msgid ""
@@ -890,18 +1011,21 @@ msgid ""
 "[``derby``, ``mongodb``, ``mysql``, ``postgresql``, ``sqlserver``] "
 "(*required*)"
 msgstr ""
+"``-T``, ``--dbType=`` - 数据库服务器类型，可能的值为: [``derby``, ``mongodb``"
+", ``mysql``, ``postgresql``, ``sqlserver``] (*必需的*)"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:97
 msgid ""
 "``-D``, ``--dbName=`` - name of the database that will be created (by "
 "default it is ``tigasedb``). (*required*)"
-msgstr ""
+msgstr "``-D``, ``--dbName=`` - 数据库的名称将被创建（默认为 tigasedb）。（*必需的*）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:99
 msgid ""
 "``-H``, ``--dbHostname=`` - address of the database instance (by default "
 "it is ``localhost``). (*required*)"
-msgstr ""
+msgstr "``-H``, ``--dbHostname=`` - 数据库实例的地址（默认为 "
+"``localhost``）。（*必需的*）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:101
 msgid ""
@@ -909,6 +1033,8 @@ msgid ""
 "specifically to access Tigase XMPP Server database (default is "
 "``tigase_user``). (*required*)"
 msgstr ""
+"``-U``, ``--dbUser=`` - 将专门创建用于访问 Tigase XMPP 服务器数据库的用户名（"
+"默认为 ``tigase_user``）。（*必需的*）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:103
 msgid ""
@@ -916,138 +1042,150 @@ msgid ""
 "specifically to access Tigase XMPP Server database (default is "
 "``tigase_pass``). (*required*)"
 msgstr ""
+"``-P``, ``--dbPass=`` - 将专门创建用于访问 Tigase XMPP "
+"服务器数据库的用户密码（默认为 ``tigase_pass``）。（*必需的*）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:105
 msgid ""
 "``-R``, ``--rootUser=`` - database root account username used to create "
 "user and database (default is ``root``). (*required*)"
 msgstr ""
+"``-R``, ``--rootUser=`` - 创建数据库 root 帐户用户名（默认为 "
+"``root``）其用于创建用户和数据库。（*必需的*）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:107
 msgid ""
 "``-A``, ``--rootPass=`` - database root account password used to create "
 "user and database (default is ``root``). (*required*)"
 msgstr ""
+"``-A``, ``--rootPass=`` - 创建数据库 root 帐户用户名（默认为 "
+"``root``）其用于创建用户和数据库。（*必需的*）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:109
 msgid ""
 "``-S``, ``--useSSL`` - enable SSL support for database connection (if the"
 " database supports it) (default is false)."
-msgstr ""
+msgstr "``-S``, ``--useSSL`` - 为数据库连接启用 SSL 支持（如果数据库支持)(默认为 "
+"false）。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:111
 msgid ""
 "``-F``, ``--file=`` - comma separated list of SQL files that will be "
 "processed."
-msgstr ""
+msgstr "``-F``, ``--file=`` - 用逗号分隔的将要被处理的 SQL 文件列表。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:113
 msgid ""
 "``-Q``, ``--query=`` - custom queries to be executed, see `Query function"
 " <#queryschema>`__ for details."
 msgstr ""
+"``-Q``, ``--query=`` - 要执行的自定义查询，请参阅 :ref:`Query "
+"function<queryschema>` 了解详细信息。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:115
 msgid ""
 "``-L``, ``--logLevel=`` - logger level used during loading process "
 "(default is ``CONFIG``)."
-msgstr ""
+msgstr "``-L``, ``--logLevel=`` - 加载过程中使用的记录器级别（默认为 ``CONFIG``)。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:117
 msgid "``-J``, ``--adminJID=`` - comma separated list of administrator JID(s)."
-msgstr ""
+msgstr "``-J``, ``--adminJID=`` - 用逗号分隔的管理员 JID(s) 的列表。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:119
 msgid ""
 "``-N``, ``--adminJIDpass=`` - password that will be used for the entered "
 "JID(s) - one password for all configured JIDs."
-msgstr ""
+msgstr "``-N``, ``--adminJIDpass=`` - 将用于输入JID(s) 的密码 - "
+"一个密码可用于所有配置的JIDs。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:121
 msgid "``--getURI=`` - generate database URI (default is ``false``)."
-msgstr ""
+msgstr "``--getURI=`` - 生成数据库 URI（默认为 ``false``）。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:123
 msgid ""
 "``--ignoreMissingFiles=`` - force ignoring missing files errors (default "
 "is ``false``)."
-msgstr ""
+msgstr "``--ignoreMissingFiles=`` - 强制忽略丢失的文件错误（默认为 ``false``）。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:125
 msgid "Query function"
-msgstr ""
+msgstr "查询功能"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:127
 msgid ""
 "Should you decide to customize your own functions, or have specific "
 "information you want to put into the database, you can use the -query "
 "function to perform a single query step."
-msgstr ""
+msgstr "如果您决定自定义自己的函数，或者想要将特定信息放入数据库，您可以使用 -query "
+"函数执行单个查询步骤。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:133
 msgid ""
 "Of course this would break the schema for tigasedb by adding an "
 "unexpected table, you will receive the following message:"
-msgstr ""
+msgstr "当然，这会添加一个意想不到的表其会破坏 tigasedb 的架构，您将收到以下消息："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:139
 msgid ""
 "But this is a demonstration how you may run a query through the database "
 "without the need to use another tool. Note that you will need to select "
 "the specific database for each query."
-msgstr ""
+msgstr "但这是一个示范，演示如何通过数据库运行查询而无需使用其他工具。请注意，您需要"
+"为每个查询选择特定的数据库。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:141
 msgid "destroy-schema"
-msgstr ""
+msgstr "破坏架构"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:144
 msgid "This will destroy the database specified in the configuration file."
-msgstr ""
+msgstr "这将破坏配置文件中指定的数据库。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:148
 msgid "**THIS ACTION IS NOT REVERSIBLE**"
-msgstr ""
+msgstr "**此操作不可逆**"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:154
 msgid ""
 "Only use this if you wish to destroy a database and not have the "
 "information recoverable."
-msgstr ""
+msgstr "仅当您希望破坏数据库并且没有可恢复信息时才使用此选项。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:156
 msgid "Windows users will need to call the method directly:"
-msgstr ""
+msgstr "Windows 用户需要直接调用该方法："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:163
 msgid "A note about MySQL"
-msgstr ""
+msgstr "关于 MySQL 的注意事项"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:165
 msgid "If you are using these commands, you may result in the following error:"
-msgstr ""
+msgstr "如果您使用这些命令，可能会导致以下错误："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:171
 msgid ""
 "If this occurs, you will need to upgrade your version of MySQL using the "
 "following command:"
-msgstr ""
+msgstr "如果发生这种情况，您将需要使用以下命令升级您的 MySQL 版本："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:177
 msgid ""
 "After entering the password and upgrading MySQL the schema error should "
 "no longer show when working with Tigase databases."
-msgstr ""
+msgstr "输入密码并升级 MySQL 后，在使用 Tigase 数据库时不应再显示架构错误。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:4
 msgid "Prepare the MySQL Database for the Tigase Server"
-msgstr ""
+msgstr "为 Tigase 服务器准备 MySQL 数据库"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:6
 msgid ""
 "This guide describes how to prepare MySQL database for connecting Tigase "
 "server."
-msgstr ""
+msgstr "本指南介绍如何准备 MySQL 数据库以连接 Tigase 服务器。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:8
 msgid ""
@@ -1056,21 +1194,25 @@ msgid ""
 "command line. To make sure it works on all platforms in the same way, we "
 "will first show how to do it under MySQL command line client."
 msgstr ""
+"MySQL 数据库可以通过多种方式进行准备。大多数 Linux 发行版都包含一些工具，"
+"其允许您从 shell 命令行完成所有步骤。为了确保它以相同的方式在所有平台上工作，"
+"我们将首先展示如何在 MySQL 命令行客户端下进行操作。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:11
 msgid "Configuring from MySQL command line tool"
-msgstr ""
+msgstr "从 MySQL 命令行工具配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:13
 msgid ""
 "Run the MySQL command line client in either Linux or MS Windows "
 "environment and enter following instructions from the Tigase installation"
 " directory:"
-msgstr ""
+msgstr "在 Linux 或 MS Windows 环境中运行 MySQL 命令行客户端，并从 Tigase "
+"安装目录输入以下指令："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:19
 msgid "Once logged in, create the database for the Tigase server:"
-msgstr ""
+msgstr "登录后，为 Tigase 服务器创建数据库："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:25
 msgid ""
@@ -1079,25 +1221,28 @@ msgid ""
 "or over the network) use one of following commands or all if you are not "
 "sure:"
 msgstr ""
+"添加 ``tigase_user`` 用户并授予它对 ``tigasedb`` 数据库的访问权限。取决您计划"
+"如何连接到数据库（本地或通过网络），如果您不确定，请使用以下全部命令或命令之"
+"一："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:27
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:134
 msgid "Grant access to tigase_user connecting from any network address."
-msgstr ""
+msgstr "授予对从任何网络地址连接的 tigase_user 的访问权限。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:34
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:143
 msgid "Grant access to tigase_user connecting from localhost."
-msgstr ""
+msgstr "授予对从 localhost 连接的 tigase_user 的访问权限。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:41
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:152
 msgid "Grant access to tigase_user connecting from local machine only."
-msgstr ""
+msgstr "仅授予对从本地计算机连接的 tigase_user 的访问权限。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:48
 msgid "And now you can update user permission changes in the database:"
-msgstr ""
+msgstr "现在您可以更新数据库中的用户权限变化："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:56
 msgid ""
@@ -1106,35 +1251,39 @@ msgid ""
 "log.html#sysvar_log_bin_trust_function_creators>`__ option in MySQL "
 "server, for example by running:"
 msgstr ""
+"必须在 MySQL 服务器中启用 `log_bin_trust_function_creators <https://dev.mysql"
+".com/doc/refman/8.0/en/replication-options-binary-log."
+"html#sysvar_log_bin_trust_function_creators>`__ 选项，例如通过运行："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:62
 msgid "Installing Schemas"
-msgstr ""
+msgstr "安装架构"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:64
 msgid ""
 "Starting with v8.0.0 the Schemas are no longer linked, and will need to "
 "manually be installed in the following order."
-msgstr ""
+msgstr "从 v8.0.0 开始，架构不再链接，需要按照以下顺序手动安装。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:66
 msgid "Switch to the database you have created:"
-msgstr ""
+msgstr "切换到您创建的数据库："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:74
 msgid ""
 "We are assuming you run the mysql client in Linux from the Tigase "
 "installation directory, so all file links will be relative."
-msgstr ""
+msgstr "我们假设您在 Linux 中从 Tigase 安装目录运行 mysql "
+"客户端，因此所有文件链接都是相对的。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:76
 msgid "Next install the schema files:"
-msgstr ""
+msgstr "接下来安装架构文件："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:82
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:171
 msgid "You will need to repeat this process for the following files:"
-msgstr ""
+msgstr "您需要对以下文件重复此过程："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:55
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:73
@@ -1143,79 +1292,86 @@ msgstr ""
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:62
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:115
 msgid "Other components may require installation such as:"
-msgstr ""
+msgstr "其他组件可能需要安装，例如："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:107
 msgid "Windows instructions:"
-msgstr ""
+msgstr "Windows 说明:"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:109
 msgid ""
 "On Windows you have probably to enter the full path, assuming Tigase is "
 "installed in C:\\Program Files\\Tigase:"
-msgstr ""
+msgstr "在 Windows 上，您可能必须输入完整路径，假设 Tigase 安装在 C:\\Program "
+"Files\\Tigase 中："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:120
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:72
 msgid "Configuring From the Linux Shell Command Line"
-msgstr ""
+msgstr "从 Linux Shell 命令行进行配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:122
 msgid "Follow steps below to prepare the MySQL database:"
-msgstr ""
+msgstr "按照以下步骤准备 MySQL 数据库："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:124
 msgid "Create the database space for the Tigase server:"
-msgstr ""
+msgstr "为 Tigase 服务器创建数据库空间："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:130
+#, fuzzy
 msgid ""
 "Add the ``tigase_user`` user and grant access to the tigasedb database. "
 "Depending on how you plan to connect to the database (locally or over the"
 " network) use one of following commands or all if you are not sure:"
 msgstr ""
+"添加 ``tigase_user`` 用户并授予它对 ``tigasedb`` 数据库的访问权限。取决您计划"
+"如何连接到数据库（本地或通过网络），如果您不确定，请使用以下全部命令或命令之"
+"一："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:132
 msgid "Selective access configuration"
-msgstr ""
+msgstr "选择性访问配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:161
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:33
 msgid "Schema Installation"
-msgstr ""
+msgstr "架构安装"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:163
 msgid "Load the proper mysql schemas into the database."
-msgstr ""
+msgstr "将正确的 mysql 架构加载到数据库中。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:197
 msgid "Configuring MySQL for UTF-8 Support"
-msgstr ""
+msgstr "为支持 UTF-8 配置 MySQL"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:199
 msgid "In my.conf put following lines:"
-msgstr ""
+msgstr "在 my.conf 中放入以下几行："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:216
 msgid "Then connect to the database from the command line shell check settings:"
-msgstr ""
+msgstr "然后从命令行shell检查设置连接到数据库："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:223
 msgid ""
 "If any of these shows something else then 'utf8' then you need to fix it "
 "using the command:"
-msgstr ""
+msgstr "如果其中任何一个显示其他内容然后显示 "
+"'utf8'，那么您需要使用以下命令对其进行修复："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:229
 msgid ""
 "You can now also test your database installation if it accepts UTF-8 "
 "data. The easiest way to ensure this is to just to create an account with"
 " UTF-8 characters:"
-msgstr ""
+msgstr "您现在还可以测试您的数据库安装是否接受 UTF-8 数据。"
+"确保这一点的最简单方法是创建一个带有 UTF-8 字符的帐户："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:235
 msgid "And then check that the account has been created:"
-msgstr ""
+msgstr "然后检查该帐户是否已创建："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:241
 msgid ""
@@ -1224,6 +1380,9 @@ msgid ""
 "shell settings to make sure your command line shell supports UTF-8 "
 "characters and passes them correctly to MySQL:"
 msgstr ""
+"如果最后一个命令没有给您任何结果，则意味着您的设置仍然存在问题。"
+"您可能还想检查您的 shell 设置以确保您的命令行 shell 支持 UTF-8 "
+"字符并将它们正确传递给 MySQL："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:249
 msgid ""
@@ -1233,6 +1392,10 @@ msgid ""
 "You have to edit ``etc/config.tdsl`` file and append this to the database"
 " connection string."
 msgstr ""
+"似乎 MySQL 5.0.x "
+"在连接字符串中还需要额外的参数：'&useUnicode=true&characterEncoding=UTF-8' "
+"而 MySQL 5.1.x 似乎不需要它，但对于两个版本都有此字符串并没有什么坏处。"
+"您必须编辑 ``etc/config.tdsl`` 文件并将其附加到数据库连接字符串上。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:251
 msgid ""
@@ -1241,10 +1404,14 @@ msgid ""
 "Tigase version 4.4.x and up, however if you use an older version of the "
 "Tigase server, you can reload stored procedures using the file from SVN."
 msgstr ""
+"但是，对于 MySQL 5.1.x，您还需要更新 Tigase "
+"使用的所有数据库存储过程和函数的代码。此更新针对 Tigase 版本 4.4.x "
+"及更高版本，但是如果您使用旧版本的 Tigase 服务器，您可以使用来自 SVN "
+"的文件重新加载存储过程。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:254
 msgid "Other MySQL Settings Worth Considering"
-msgstr ""
+msgstr "其他值得考虑的 MySQL 设置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:256
 msgid ""
@@ -1252,15 +1419,16 @@ msgid ""
 "improvements. Please note, you will have to review them as some of them "
 "may impact data reliability and are useful for performance or load tests "
 "installations only."
-msgstr ""
+msgstr "还有许多其他尤其是对于性能改进有用的选项。请注意，您必须查看它们，因为其中一"
+"些可能会影响数据可靠性，并且仅对性能或负载测试安装有用。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:264
 msgid "Some the general MySQL settings which mainly affect performance:"
-msgstr ""
+msgstr "一些主要影响性能的通用MySQL 设置："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:279
 msgid "InnoDB specific settings:"
-msgstr ""
+msgstr "InnoDB 特定设置："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:302
 msgid ""
@@ -1268,10 +1436,13 @@ msgid ""
 "only tested on our systems. If you have found better settings for your "
 "systems, feel free to `let us know <http://tigase.net/contact>`__."
 msgstr ""
+"这些设置可能未针对您的系统进行全面优化，并且仅在我们的系统上进行了测试。如果"
+"您为您的系统找到了更好的设置，请随时 `让我们知道 <http://tigase.net/"
+"contact>`__。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:305
 msgid "Support for emoji and other icons"
-msgstr ""
+msgstr "支持表情符号和其他图标"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:307
 msgid ""
@@ -1280,6 +1451,9 @@ msgid ""
 "settings to support emojis and other icons, we recommend you use the "
 "following in your MySQL configuration file:"
 msgstr ""
+"Tigase 数据库架构可以支持表情符号和其他图标，但是在 ``mysqld`` 设置中使用 "
+"UTF-8 将不允许这样做。要使用设置来支持表情符号和其他图标，我们建议您在 MySQL "
+"配置文件中使用以下内容："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:316
 msgid ""
@@ -1287,6 +1461,9 @@ msgid ""
 " set, with ``utf8_general_ci`` as collation, and only fields which "
 "require support for emojis will be converted to ``utf8mb4``."
 msgstr ""
+"这样做，Tigase XMPP 服务器数据库仍将使用 ``utf8`` 字符集，以 "
+"``utf8_general_ci`` 作为排序规则，并且只有需要支持表情符号的字段才会转换为 "
+"``utf8mb4``。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:320
 msgid ""
@@ -1298,6 +1475,12 @@ msgid ""
 "``&connectionCollation=utf8mb4_bin`` as a last resort. This changes "
 "situation from previous versions that shipped older MySQL JDBC connector."
 msgstr ""
+"如果由于某种原因，将上述设置应用于您的 MySQL 实例，您仍然会收到 "
+":literal:`java.sql.SQLException: Incorrect string value: ` you should add to "
+"your database URI passed in Tigase XMPP Server following configuration "
+"`&useUnicode=true&characterEncoding=UTF-8`。如果这也失败了，"
+"那么你可以尝试添加 ``&connectionCollation=utf8mb4_bin`` 作为最后一着。"
+"这改变了以前发布旧 MySQL JDBC 连接器的版本的情况。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:324
 msgid ""
@@ -1305,90 +1488,95 @@ msgid ""
 "collation as it will work properly and is fastest from "
 "``utf8mb4_general_ci`` collations supported by MySQL"
 msgstr ""
+"Tigase XMPP 服务器数据库应该使用 ``utf8_general_ci`` 排序规则创建，"
+"因为它可以正常工作并且是 MySQL 支持的 ``utf8mb4_general_ci`` 排序规则中最快的"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:4
 msgid "Prepare the Derby Database for the Tigase Server"
-msgstr ""
+msgstr "为 Tigase 服务器准备 Derby 数据库"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:6
 msgid ""
 "This guide describes how to prepare Derby database for connecting the "
 "Tigase server."
-msgstr ""
+msgstr "本指南介绍如何准备 Derby 数据库以连接 Tigase 服务器。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:9
 msgid "Basic Setup"
-msgstr ""
+msgstr "基本设置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:10
 msgid ""
 "Preparation of Derby database is quite simple, but the following "
 "assumptions are made"
-msgstr ""
+msgstr "Derby 数据库的准备非常简单，但是做了以下假设"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:12
 msgid "``DerbyDB`` - Derby database name"
-msgstr ""
+msgstr "``DerbyDB`` - Derby 数据库名称"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:14
 msgid "``database/`` directory contains all necessary schema files"
-msgstr ""
+msgstr "``database/`` 目录包含所有必要的架构文件"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:16
 msgid "``jars/`` and ``libs/`` directories contains Tigase and Derby binaries"
-msgstr ""
+msgstr "``jars/`` 和 ``libs/`` 目录包含 Tigase 和 Derby 二进制文件"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:18
 msgid "General Approach"
-msgstr ""
+msgstr "通常的做法"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:20
 msgid ""
 "From the main Tigase directory execute following commands (Linux and "
 "Windows accordingly)"
-msgstr ""
+msgstr "从 Tigase 主目录执行以下命令（相应的 Linux 和 Windows）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:24
 msgid "You must use these sql files on order FIRST!"
-msgstr ""
+msgstr "您必须首先使用这些 sql 文件！"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:26
+#, fuzzy
 msgid "**Linux**"
-msgstr ""
+msgstr "**Linux**"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:32
+#, fuzzy
 msgid "**Windows**"
-msgstr ""
+msgstr "**Windows**"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:38
 msgid ""
 "This will create Derby database named DerbyDB in the main Tigase "
 "directory and load common version for common v0.1."
-msgstr ""
+msgstr "这将在 Tigase 主目录中创建名为 DerbyDB 的 Derby 数据库，并加载 common v0.1 "
+"的 common 版本。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:40
 msgid "You will need to repeat this process again in for following order:"
-msgstr ""
+msgstr "您将需要按以下顺序再次重复此过程："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:64
 msgid "Connecting Tigase to database"
-msgstr ""
+msgstr "将 Tigase 连接到数据库"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:66
 msgid ""
 "Once the database is setup, configure the ``config.tdsl`` file in Tigase "
 "and add the following configuration:"
-msgstr ""
+msgstr "设置数据库后，在 Tigase 中配置 ``config.tdsl`` 文件并添加以下配置："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:4
 msgid "Prepare the MS SQL Server Database for the Tigase Server"
-msgstr ""
+msgstr "为 Tigase 服务器准备 MS SQL Server 数据库"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:6
 msgid ""
 "This guide describes how to prepare the MS SQL Server database for "
 "connecting the Tigase server to it."
-msgstr ""
+msgstr "本指南介绍如何准备 MS SQL Server 数据库以将 Tigase 服务器连接到它。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:8
 msgid ""
@@ -1396,10 +1584,12 @@ msgid ""
 "present. The following guide will describe the necessary configurations "
 "required for using MS SQL Server with Tigase XMPP Server."
 msgstr ""
+"预计存在 Microsoft SQL Server 的有效安装。以下指南将描述将 MS SQL Server 与 "
+"Tigase XMPP Server 一起使用所需的必要配置。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:11
 msgid "Preparing MS SQL Server Instance"
-msgstr ""
+msgstr "准备 MS SQL Server 实例"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:13
 msgid ""
@@ -1415,10 +1605,18 @@ msgid ""
 " Port property (if missing) to the default value - 1433. A restart of the"
 " instance may be required afterwards."
 msgstr ""
+"安装 MS SQL Server 后，需要配置实例以处理传入的 JDBC 连接。为此，需要打开 *"
+"SQL Server Configuration Manager*。在左侧面板中找到 *SQL Server "
+"Configuration Manager*，然后找到 *SQL Server Network Configuration → "
+"Protocols for ${INSTANCE_NAME}*。在右侧面板中选择实例后，选择 TCP/IP 并打开 "
+"*Properties*，在 General 部分的 Protocol 选项卡中为 Enabled 属性选择 Yes。在 "
+"IP 地址选项卡中，为您希望 MS SQL Server 处理的所有 IP "
+"地址的活动和启用属性选择是。随后将 TCP 端口属性（如果缺失）设置为默认值 - "
+"1433。之后可能需要重新启动实例。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:16
 msgid "Configuration using MS SQL Server Management Studio"
-msgstr ""
+msgstr "使用 MS SQL Server Management Studio 进行配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:18
 msgid ""
@@ -1428,14 +1626,17 @@ msgid ""
 "Connect and in the Connect to Server dialog enter administrator "
 "credentials."
 msgstr ""
+"为了准备数据库，您可以使用向导或在查询编辑器中直接执行查询。首先，"
+"您需要建立与 MS SQL Server 实例的连接。从对象资源管理器中选择连接并在连接到服"
+"务器对话框中输入管理员凭据。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:20
 msgid "Using Wizards"
-msgstr ""
+msgstr "使用向导"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:22
 msgid "Create Login"
-msgstr ""
+msgstr "创建登录"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:24
 msgid ""
@@ -1444,10 +1645,13 @@ msgid ""
 "select SQL Server authentication and enter desired password subsequently "
 "confirming action with OK"
 msgstr ""
+"在左侧面板中选择 Security → Logins 并从上下文菜单中选择 New "
+"Login，在向导窗口中输入所需的登录名，选择 SQL Server "
+"身份验证并输入所需的密码，然后单击 OK 确认操作"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:26
 msgid "Create Database"
-msgstr ""
+msgstr "创建数据库"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:28
 msgid ""
@@ -1456,44 +1660,49 @@ msgid ""
 " enter previously created Login name into Owner field; subsequently "
 "confirming action with OK."
 msgstr ""
+"从对象资源管理器中选择数据库节点并从上下文菜单中选择新数据库；在向导窗口中输"
+"入所需的数据库名称，并在所有者字段中输入先前创建的登录名；随后用 OK "
+"确认操作。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:31
 msgid "Using Queries"
-msgstr ""
+msgstr "使用查询"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:33
 msgid ""
 "From the Object Explorer root node’s context menu select New Query. In "
 "the Query windows execute following statements adjusting details to your "
 "liking:"
-msgstr ""
+msgstr "从 Object Explorer 根节点的上下文菜单中选择 New "
+"Query。在查询窗口中执行以下语句，根据您的喜好调整详细信息："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:52
 msgid "Import Schema"
-msgstr ""
+msgstr "导入架构"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:54
 msgid ""
 "From the File menu Select Open → File (or use Ctrl+O) and then open "
 "following files:"
-msgstr ""
+msgstr "从文件菜单中选择 Open → File（或使用 Ctrl+O），然后打开以下文件："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:71
 msgid ""
 "These files must be done sequentially! They are not linked, and so may "
 "need to be done one at a time."
-msgstr ""
+msgstr "这些文件必须按顺序完成！它们没有关联，因此可能需要一次完成一个。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:82
 msgid ""
 "Subsequently select created database from the list of Available Databases"
 " (Ctrl+U) available on the toolbar and execute each of the opened files "
 "in the order listed above."
-msgstr ""
+msgstr "随后从工具栏上可用的数据库 (Ctrl+U) "
+"列表中选择创建的数据库，并按上面列出的顺序执行每个打开的文件。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:85
 msgid "Configuring from command line tool"
-msgstr ""
+msgstr "从命令行工具配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:87
 msgid ""
@@ -1501,7 +1710,8 @@ msgid ""
 "line as well. In order to do that, execute following commands from the "
 "directory where Tigase XMPP Server is installed otherwise paths to the "
 "schema need to be adjusted accordingly:"
-msgstr ""
+msgstr "数据库的创建和架构的导入也可以从命令行完成。为此，请从安装 Tigase XMPP "
+"服务器的目录中执行以下命令，否则需要相应地调整架构的路径："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:99
 msgid ""
@@ -1509,52 +1719,55 @@ msgid ""
 "\\db-create-sqlserver.cmd (note: it needs to be executed from main Tigase"
 " XMPP Server directory due to maintain correct paths):"
 msgstr ""
+"以上可以使用提供的脚本 %tigase-server%\\scripts\\db-create-sqlserver.cmd "
+"自动化（注意：由于保持正确的路径，它需要从主 Tigase XMPP Server 目录执行）："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:105
 msgid "If no parameters are provided then the following defaults are used:"
-msgstr ""
+msgstr "如果未提供参数，则使用以下默认值："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:117
 msgid "Tigase configuration - config.tdsl"
-msgstr ""
+msgstr "Tigase 配置 - config.tdsl"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:119
 msgid "Configuration of the MS SQL Server follows general database convention."
-msgstr ""
+msgstr "MS SQL Server 的配置遵循普遍数据库约定。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:129
 msgid "where any number of additional parameters can (and should) consist of:"
-msgstr ""
+msgstr "其中任何数量的附加参数可以（并且应该）包括："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:131
 msgid "``databaseName`` - name of the database"
-msgstr ""
+msgstr "``databaseName`` - 数据库名称"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:133
 msgid "``user`` - username configured to access database"
-msgstr ""
+msgstr "``user`` - 配置为访问数据库的用户名"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:135
 msgid "``password`` - password for the above username"
-msgstr ""
+msgstr "``password`` - 上述用户名的密码"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:137
 msgid "``schema`` - name of the database schema"
-msgstr ""
+msgstr "``schema`` - 数据库架构的名称"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:139
 msgid ""
 "``lastUpdateCount`` - 'false' value causes all update counts to be "
 "returned, including those returned by server triggers"
-msgstr ""
+msgstr "``lastUpdateCount`` - 'false' value "
+"导致返回所有更新计数，包括服务器触发器返回的更新计数"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:141
 msgid "Example:"
-msgstr ""
+msgstr "例子："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:152
 msgid "JDBC: jTDS vs MS JDBC driver"
-msgstr ""
+msgstr "JDBC：jTDS vs MS JDBC 驱动程序"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:154
 msgid ""
@@ -1570,130 +1783,142 @@ msgid ""
 "archive. Copy sqljdbc_4.0/enu/sqljdbc4.jar file to ${tigase-server}/jars "
 "directory."
 msgstr ""
+"Tigase XMPP Server 支持两个旨在与 Microsoft SQL Server 一起使用的 JDBC "
+"驱动程序 - 一个由 Microsoft 自己创建和提供，另一个实现 - jTDS。 Tigase "
+"在分发包中随后者一起提供。从版本 7.1.0 开始，我们建议使用 Tigase 附带的 jDTS "
+"驱动程序，因为 Microsoft 创建的 JDBC "
+"驱动程序可能会导致集群安装中的某些组件出现问题。 MS 驱动程序可以从网站下载：`"
+"JDBC Drivers 4.0, 4.1 for SQL Server <http://www.microsoft.com/en-us/"
+"download/details.aspx?displaylang=en&id=11774>`__ 然后解压档案。将 sqljdbc_4."
+"0/enu/sqljdbc4.jar 文件复制到 ${tigase-server}/jars 目录。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:156
 msgid "Depending on the driver used ``uri`` needs to be configured accordingly."
-msgstr ""
+msgstr "根据使用 ``uri`` 的驱动程序需要进行相应的配置。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:158
 msgid "Microsoft driver:"
-msgstr ""
+msgstr "Microsoft 驱动:"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:168
 msgid "jDTS driver"
-msgstr ""
+msgstr "jDTS 驱动"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:4
 msgid "Prepare the PostgreSQL Database for the Tigase Server"
-msgstr ""
+msgstr "为 Tigase 服务器准备 PostgreSQL 数据库"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:6
 msgid ""
 "This guide describes how to prepare PostgreSQL database for connecting to"
 " Tigase server."
-msgstr ""
+msgstr "本指南介绍如何准备 PostgreSQL 数据库以连接到 Tigase 服务器。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:8
 msgid ""
 "The PostgreSQL database can be prepared in many ways. Below are presented"
 " two possible ways. The following assumptions apply to both methods:"
-msgstr ""
+msgstr "可以通过多种方式准备 PostgreSQL "
+"数据库。下面介绍两种可能的方式。以下假设适用于这两种方法："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:10
 msgid "``admin_db_user`` - database user with admin rights"
-msgstr ""
+msgstr "``admin_db_user`` - 具有管理员权限的数据库用户"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:12
 msgid "``tigase_user`` - database user for Tigase"
-msgstr ""
+msgstr "``tigase_user`` - Tigase 的数据库用户"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:14
 msgid "``tigasedb`` - database for Tigase"
-msgstr ""
+msgstr "``tigasedb`` - Tigase 数据库"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:17
 msgid "Configuring from PostgreSQL Command Line Tool"
-msgstr ""
+msgstr "从 PostgreSQL 命令行工具配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:19
 msgid "Run the PostgreSQL command line client and enter following instructions:"
-msgstr ""
+msgstr "运行 PostgreSQL 命令行客户端并输入以下指令："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:21
 msgid "Add the ``tigase_user``:"
-msgstr ""
+msgstr "添加 ``tigase_user``:"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:27
 msgid ""
 "Next, Create the database for the Tigase server with ``tigase_user`` as "
 "owner of database:"
-msgstr ""
+msgstr "接下来，为 Tigase 服务器创建数据库，并使用 ``tigase_user`` 作为数据库所有者："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:35
 msgid ""
 "Load database schema to initialize the Tigase server from the file that "
 "corresponds to the version of Tigase you want to use. First you need to "
 "switch to ``tigasedb``."
-msgstr ""
+msgstr "加载数据库架构以从您要使用的 Tigase 版本相对应的文件中初始化 Tigase 服务器。"
+"首先你需要切换到 ``tigasedb``。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:41
 msgid "Begin by applying the basic Schema"
-msgstr ""
+msgstr "首先应用基本架构"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:47
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:100
 msgid "Continue by adding the schema files listed below:"
-msgstr ""
+msgstr "继续添加下面列出的架构文件："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:74
 msgid "Follow steps below to prepare the PostgreSQL database:"
-msgstr ""
+msgstr "按照以下步骤准备 PostgreSQL 数据库："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:76
 msgid "First, add the ``tigase_user``:"
-msgstr ""
+msgstr "首先，添加 ``tigase_user``:"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:82
 msgid ""
 "You will be asked for credentials for admin_db_user and password for new "
 "database user."
-msgstr ""
+msgstr "系统将要求您提供 admin_db_user 的凭据和新数据库用户的密码。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:84
 msgid ""
 "Create the database for the Tigase server with tigase_user as owner of "
 "database:"
-msgstr ""
+msgstr "使用 tigase_user 作为数据库所有者为 Tigase 服务器创建数据库："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:90
 msgid "Database Schema Installation"
-msgstr ""
+msgstr "数据库架构安装"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:92
 msgid "Load database schema to initialize the Tigase server"
-msgstr ""
+msgstr "加载数据库模式以初始化 Tigase 服务器"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:126
 msgid ""
 "The above commands should be executed from the main Tigase directory. The"
 " initialization schema file should be also available locally in database/"
 " directory of your Tigase installation."
-msgstr ""
+msgstr "上述命令应从 Tigase 主目录执行。初始化架构文件也应该在 Tigase 安装的 "
+"database/ 目录中本地可用。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:4
 msgid "Preparing Tigase for MongoDB"
-msgstr ""
+msgstr "为 MongoDB 准备 Tigase"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:6
 msgid ""
 "Tigase now supports MongoDB for auth, settings, and storage repositories."
 " If you wish to use MongoDB for Tigase, please use this guide to help "
 "you."
-msgstr ""
+msgstr "Tigase 现在支持 MongoDB 进行身份验证，设置和存储库。如果您希望将 MongoDB "
+"用于 Tigase，请使用本指南来帮助您。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:9
 msgid "Dependencies"
-msgstr ""
+msgstr "依赖项"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:11
 msgid ""
@@ -1703,10 +1928,14 @@ msgid ""
 "``jars/`` directory located in Tigase XMPP Server installation directory."
 " If you are using a dist-max distribution, it is already included."
 msgstr ""
+"要运行 Tigase MongoDB 支持库，需要适用于 Java 的 MongoDB 驱动程序，可以从 `"
+"这里 <https://github.com/mongodb/mongo-java-driver/releases>`__ 下载。"
+"此驱动程序需要放置在 Tigase XMPP Server 安装目录中的 ``jars/`` 目录中。"
+"如果您使用的是 dist-max 发行版，则它已经包含在内。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:14
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:16
 msgid ""
@@ -1716,6 +1945,10 @@ msgid ""
 "running mongo.exe in a cmd window for windows, or run mongo in linux. "
 "Once connected, enter then following:"
 msgstr ""
+"请注意，全新安装的 MongoDB 没有安装用户或数据库。设置 MongoDB 后，"
+"您将需要创建一个用于 Tigase 的用户。为此，通过在 windows 的 cmd 窗口中运行 "
+"mongo.exe 来调出 mongo 控制台，或者在 linux 中运行 "
+"mongo。连接后，输入以下内容："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:28
 msgid ""
@@ -1723,10 +1956,12 @@ msgid ""
 "the database. Once you receive a ``user successfully created`` message, "
 "you are ready to install tigase on MongoDB."
 msgstr ""
+"一定要给这个用户一个 ``root`` 角色，以便正确地写入数据库。一旦收到 ``user "
+"successfully created`` 消息，就可以在 MongoDB 上安装 tigase。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:30
 msgid "Configuration of user repository for Tigase XMPP Server"
-msgstr ""
+msgstr "Tigase XMPP 服务器的用户存储库配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:32
 msgid ""
@@ -1738,12 +1973,18 @@ msgid ""
 "``UserRepository``. Tigase XMPP Server will create proper collections in "
 "MongoDB if they do not exist so no schema files are necessary."
 msgstr ""
+"要将 Tigase XMPP 服务器配置用于 MongoDB，您需要在 etc/config.tdsl 文件中将 "
+"``dataSource`` 设置为正确的 MongoDB URI，其指向应该使用的 MongoDB "
+"数据库（如果不存在，它将由 MongoDB 创建）。 ``userRepository`` "
+"属性不应设置为让 Tigase XMPP 服务器自动检测 ``UserRepository`` 的正确实现。 "
+"Tigase XMPP 服务器将在 MongoDB "
+"中创建适当的集合（如果它们不存在），则不需要架构文件。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:34
 msgid ""
 "Example configuration of XMPP Server pointing to MongoDB database "
 "``tigase_test`` in a local instance:"
-msgstr ""
+msgstr "XMPP 服务器在本地实例中指向 MongoDB 数据库 ``tigase_test`` 的示例配置："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:50
 msgid ""
@@ -1751,6 +1992,8 @@ msgid ""
 "implementation, it can be forced to use one provided by Tigase using the "
 "following lines in ``etc/config.tdsl`` file:"
 msgstr ""
+"如果 Tigase 服务器无法检测到正确的存储层实现，则可以强制使用由Tigase通过 ``"
+"etc/config.tdsl`` 文件中的以下行提供的其中之一："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:65
 msgid ""
@@ -1758,10 +2001,12 @@ msgid ""
 "MongoDB using this URI. Also MongoDB URI can be passed as any URI in "
 "configuration of any component."
 msgstr ""
+"每个组件都应该能够使用正确的实现来支持使用此 URI 的 MongoDB。 MongoDB URI "
+"也可以作为任何组件配置中的任何 URI 传递。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:67
 msgid "Configuration for MUC"
-msgstr ""
+msgstr "MUC 的配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:69
 msgid ""
@@ -1770,6 +2015,9 @@ msgid ""
 "use a different MongoDB database to store MUC message archive, you can do"
 " this by adding the following lines to ``etc/config.tdsl`` file:"
 msgstr ""
+"默认情况下，如果 Tigase 配置使用 MongoDB 作为默认存储，MUC 组件将使用 "
+"MongoDB 存储数据。但是，如果您想使用不同的 MongoDB 数据库来存储 MUC "
+"消息存档，您可以通过在 ``etc/config.tdsl`` 文件中添加以下行来做到这一点："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:77
 msgid ""
@@ -1777,10 +2025,12 @@ msgid ""
 "MongoDB, you can force it to use one provided by Tigase by using the "
 "following line in the ``config.tdsl`` file:"
 msgstr ""
+"如果 MUC 组件无法为 MongoDB 检测和使用适当的存储层，您可以通过在 ``config."
+"tdsl`` 文件中使用以下行来强制它使用 Tigase 提供的存储层："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:86
 msgid "Configuration for PubSub"
-msgstr ""
+msgstr "PubSub 的配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:88
 msgid ""
@@ -1789,17 +2039,23 @@ msgid ""
 "use a different MongoDB database to store PubSub component data, you can "
 "do this by adding the following lines to ``etc/config.tdsl`` file:"
 msgstr ""
+"默认情况下，如果 Tigase 配置将MongoDB 用作默认存储，则 PubSub 组件将使用 "
+"MongoDB 存储数据。但是，如果您想使用不同的 MongoDB 数据库来存储 PubSub "
+"组件数据，您可以通过在 ``etc/config.tdsl`` 文件中添加以下行来实现："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:96
+#, fuzzy
 msgid ""
 "If the PubSub components fails to detect and use a proper storage layer "
 "for MongoDB, you can force it to use one provided by Tigase by using the "
 "following line in the ``config.tdsl`` file:"
 msgstr ""
+"如果 MUC 组件无法为 MongoDB 检测和使用适当的存储层，您可以通过在 ``config."
+"tdsl`` 文件中使用以下行来强制它使用 Tigase 提供的存储层："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:105
 msgid "Configuration for Message Archiving"
-msgstr ""
+msgstr "消息归档的配置"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:107
 msgid ""
@@ -1809,6 +2065,9 @@ msgid ""
 "archives, you can do this by adding the following lines to "
 "``etc/config.tdsl`` file:"
 msgstr ""
+"默认情况下，如果将 Tigase 配置将MongoDB 用作默认存储，则消息存档组件将使用 "
+"MongoDB 存储数据。但是，如果您想使用不同的 MongoDB 数据库来存储消息存档，"
+"您可以通过在 ``etc/config.tdsl`` 文件中添加以下行来做到这一点："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:115
 msgid ""
@@ -1816,10 +2075,12 @@ msgid ""
 "layer for MongoDB, you can force it to use one provided by Tigase by "
 "using the following line in the ``config.tdsl`` file:"
 msgstr ""
+"如果消息存档组件未能检测到并为 MongoDB 使用适当的存储层，您可以通过在 "
+"``config.tdsl`` 文件中使用以下行来强制它使用 Tigase 提供的存储层："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:125
 msgid "Schema Description"
-msgstr ""
+msgstr "架构描述"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:127
 msgid ""
@@ -1827,10 +2088,12 @@ msgid ""
 " part of it. More collections may be created if additional components of "
 "Tigase XMPP Server are loaded and configured to use MongoDB."
 msgstr ""
+"该描述仅包含架构的基本描述，并且仅包含其基本部分。如果加载并配置 Tigase XMPP "
+"服务器的其他组件以使用 MongoDB，则可能会创建更多集合。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:130
 msgid "Tigase XMPP Server Schema"
-msgstr ""
+msgstr "Tigase XMPP 服务器架构"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:132
 msgid ""
@@ -1838,172 +2101,186 @@ msgid ""
 "collections: . tig_users - contains list of users . tig_nodes - contains "
 "data related to users in tree-like way"
 msgstr ""
+"UserRespository 和 AuthRepository 的基本架构由两个集合组成： . tig_users - "
+"包含用户列表。 tig_nodes - 以树状方式包含与用户相关的数据"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:134
 msgid "``tig_users`` collection contains the following fields:"
-msgstr ""
+msgstr "``tig_users`` 集合包含以下字段："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:136
+#, fuzzy
 msgid "Table 9. tig_users"
-msgstr ""
+msgstr "Table 9. tig_users"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:139
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:155
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:173
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:195
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:139
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:155
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:173
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:195
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:141
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:157
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:197
+#, fuzzy
 msgid "\\_id"
-msgstr ""
+msgstr "\\_id"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:141
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:159
 msgid "id of user which is SHA256 hash of users jid (raw byte array)."
-msgstr ""
+msgstr "用户 id 是用户 jid 的 SHA256 哈希（原始字节数组）。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:143
+#, fuzzy
 msgid "user_id"
-msgstr ""
+msgstr "user_id"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:143
 msgid "contains full user jid."
-msgstr ""
+msgstr "包含完整的用户 jid。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:145
 msgid "domain"
-msgstr ""
+msgstr "域"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:145
 msgid "domain to which user belongs for easier lookup of users by domain."
-msgstr ""
+msgstr "用户所属的域，以便于按域查找用户。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:147
 msgid "password"
-msgstr ""
+msgstr "密码"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:147
 msgid "password of user (will be removed after upgrade to 8.0.0)."
-msgstr ""
+msgstr "用户密码（升级到 8.0.0 后将被删除）。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:150
 msgid "``tig_nodes`` collection contains the following fields"
-msgstr ""
+msgstr "``tig_nodes`` 集合包含以下字段"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:152
+#, fuzzy
 msgid "Table 10. tig_nodes"
-msgstr ""
+msgstr "Table 10. tig_nodes"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:157
 msgid "id of row auto-generated by MongoDB."
-msgstr ""
+msgstr "由 MongoDB 自动生成的行的 id。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:159
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:199
+#, fuzzy
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:161
 msgid "node"
-msgstr ""
+msgstr "节点"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:161
 msgid "full path of node in tree-like structure separated by / (may not exist)."
-msgstr ""
+msgstr "树状结构中节点的完整路径，由 / 分隔（可能不存在）。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:163
 msgid "key"
-msgstr ""
+msgstr "键"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:163
 msgid "key for which value for node is set."
-msgstr ""
+msgstr "为其设置节点值的键。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:165
 msgid "value"
-msgstr ""
+msgstr "值"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:165
 msgid "value which is set for node key."
-msgstr ""
+msgstr "为节点键设置的值。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:168
 msgid ""
 "Tigase XMPP Server also uses additional collections for storage of "
 "Offline Messages"
-msgstr ""
+msgstr "Tigase XMPP 服务器还使用其他的集合来存储离线消息"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:170
+#, fuzzy
 msgid "Table 11. msg_history collection"
-msgstr ""
+msgstr "Table 11. msg_history collection"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:175
+#, fuzzy
 msgid "from"
-msgstr ""
+msgstr "from"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:175
 msgid "full user jid of message sender."
-msgstr ""
+msgstr "消息发送者的完整用户 jid。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:177
+#, fuzzy
 msgid "from_hash"
-msgstr ""
+msgstr "from_hash"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:177
 msgid "SHA256 hash of message sender jid as raw byte array."
-msgstr ""
+msgstr "消息发送者 jid 的 SHA256 哈希作为原始字节数组。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:179
+#, fuzzy
 msgid "to"
-msgstr ""
+msgstr "to"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:179
 msgid "full users jid of message recipient."
-msgstr ""
+msgstr "消息接收者的完整用户 jid。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:181
+#, fuzzy
 msgid "to_hash"
-msgstr ""
+msgstr "to_hash"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:181
 msgid "SHA256 hash of message recipient full jid as raw byte array."
-msgstr ""
+msgstr "消息接收者完整 jid 的 SHA256 哈希作为原始字节数组。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:183
+#, fuzzy
 msgid "ts"
-msgstr ""
+msgstr "ts"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:183
 msgid "timestamp of message as date."
-msgstr ""
+msgstr "消息的时间戳作为日期。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:185
 msgid "message"
-msgstr ""
+msgstr "消息"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:185
 msgid "serialized XML stanza containing message."
-msgstr ""
+msgstr "包含消息的序列化 XML 节。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:187
+#, fuzzy
 msgid "expire-at"
-msgstr ""
+msgstr "expire-at"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:187
 msgid ""
 "timestamp of expiration of message (if message contains AMP expire-at "
 "set)."
-msgstr ""
+msgstr "消息过期的时间戳（如果消息包含 AMP expire-at set）。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:190
 msgid ""
@@ -2011,56 +2288,58 @@ msgid ""
 "AuthRepository, we moved ``password`` field from ``tig_users`` collection"
 " to a newly created collection called ``tig_user_credentials``."
 msgstr ""
+"由于 AuthRepository 中身份验证和凭据存储的变化，我们将 ``password`` 字段从 "
+"``tig_users`` 集合移动到了一个新创建的名为 ``tig_user_credentials`` 的集合。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:192
 msgid "This new collection has following fields:"
-msgstr ""
+msgstr "这个新集合有以下字段："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:197
 msgid "id of document automatically generated by MongoDB"
-msgstr ""
+msgstr "MongoDB自动生成的文档id"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:199
 msgid "SHA256 hash of a user for which credentails are stored"
-msgstr ""
+msgstr "存储凭据用户的 SHA256 哈希"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:201
 msgid "username"
-msgstr ""
+msgstr "用户名"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:201
 msgid "username provided during authentication (or ``default``)"
-msgstr ""
+msgstr "身份验证期间提供的用户名（或 ``default``）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:203
 msgid "account_status"
-msgstr ""
+msgstr "帐户状态"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:203
 msgid ""
 "name of an account state (copy of value stored in user document "
 "from`tig_users`)"
-msgstr ""
+msgstr "帐户状态的名称（来自`tig_users`的用户文档中存储的值的副本）"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:206
 msgid ""
 "Additionally for each mechanism we store separate field in this object, "
 "so for:"
-msgstr ""
+msgstr "此外，对于每种机制，我们在此对象中存储单独的字段，因此对于："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:208
 msgid "``PLAIN`` we have ``PLAIN`` field with value for this mechanism"
-msgstr ""
+msgstr "``PLAIN`` 我们有 ``PLAIN`` 字段，该字段具有此机制的值"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:210
 msgid ""
 "``SCRAM-SHA-1`` we have ``SCRAM-SHA-1`` field with value for this "
 "mechanism"
-msgstr ""
+msgstr "``SCRAM-SHA-1`` 我们有 ``SCRAM-SHA-1`` 字段，该字段具有此机制的值"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:212
 msgid "etc…​"
-msgstr ""
+msgstr "等等……​"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:214
 msgid ""
@@ -2070,16 +2349,20 @@ msgid ""
 "field in ``tig_user`` exists. If it does, and it is filled credentials "
 "will be migrated to the new collection."
 msgstr ""
+"升级不是一步完成的，而是在特定用户登录后完成。在身份验证期间，如果 "
+"``tig_user_credentials`` 中没有数据，Tigase XMPP Server 将检查 ``tig_user`` "
+"中 ``password`` "
+"字段是否存在。如果确实存在，并且已填写凭据，则将迁移到新集合。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:4
 msgid "Hashed User Passwords in Database"
-msgstr ""
+msgstr "数据库中的哈希用户密码"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:8
 msgid ""
 "This feature is still available, but passwords are stored encrypted by "
 "default since v8.0.0. We do not recommend using these settings."
-msgstr ""
+msgstr "此功能仍然可用，但自 v8.0.0 起，密码默认加密存储。我们不建议使用这些设置。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:10
 msgid ""
@@ -2088,6 +2371,8 @@ msgid ""
 "one of already supported ways or to even add a new encoding algorithm on "
 "your own."
 msgstr ""
+"默认情况下，用户密码以纯文本形式存储在 Tigase 的数据库中。但是，有一种简单的"
+"方法可以让它们以一种已经支持的方式进行编码，甚至可以自己添加新的编码算法。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:12
 msgid ""
@@ -2099,50 +2384,55 @@ msgid ""
 " authentication method is perhaps less of a problem than storing plain-"
 "text passwords in the database."
 msgstr ""
+"在数据库中以哈希格式存储密码可以避免使用纯文本密码验证机制。您不能在数据库中"
+"使用哈希密码和非纯文本密码身份验证。另一方面，"
+"服务器和客户端之间的连接几乎总是由 SSL/TLS "
+"保护，因此纯文本密码验证方法可能比将纯文本密码存储在数据库中的问题更小。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:14
 msgid "Nevertheless, it is simple enough to adjust this in Tigase’s database."
-msgstr ""
+msgstr "尽管如此，在 Tigase 的数据库中进行调整还是很简单的。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:17
 msgid "Shortcut"
-msgstr ""
+msgstr "快捷方式"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:19
 msgid ""
 "Connect to your database from a command line and execute following "
 "statement for MySQL database:"
-msgstr ""
+msgstr "从命令行连接到您的数据库并对 MySQL 数据库执行以下语句："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:25
 msgid "Where encoding mode is one of the following:"
-msgstr ""
+msgstr "其中编码模式是以下之一："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:27
 msgid ""
 "``MD5-PASSWORD`` the database stores MD5 hash code from the user’s "
 "password."
-msgstr ""
+msgstr "``MD5-PASSWORD`` 数据库存储来自用户密码的 MD5 哈希码。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:29
 msgid ""
 "``MD5-USERID-PASSWORD`` the database stores MD5 hash code from "
 "concatenated user’s bare JID and password."
-msgstr ""
+msgstr "``MD5-USERID-PASSWORD`` 数据库存储来自连接用户的裸 JID 和密码的 MD5 哈希码。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:31
 msgid ""
 "``MD5-USERNAME-PASSWORD`` the database stores MD5 hash code from "
 "concatenated user’s name (localpart) and password."
-msgstr ""
+msgstr "``MD5-USERNAME-PASSWORD`` 数据库存储来自连接用户名（localpart）和密码的 MD5 "
+"哈希码。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:33
 msgid "For example:"
-msgstr ""
+msgstr "例如："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:40
 msgid "Full Route"
-msgstr ""
+msgstr "全程路线"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:42
 msgid ""
@@ -2152,29 +2442,35 @@ msgid ""
 "DB schema can be retrieved using another stored function called: "
 "``TigGetDBProperty(key)``."
 msgstr ""
+"密码存储在数据库中的方式由 Tigase 数据库架构属性控制。"
+"数据库架构中的属性可以通过一个名为 ``TigPutDBProperty(key, value)`` "
+"的存储程序来设置。还可以用另一个名为 ``TigGetDBProperty(key)`` 的存储函数从 "
+"DB 架构中检索属性。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:44
 msgid ""
 "The simplest way to call them is via command-line interface to the "
 "database."
-msgstr ""
+msgstr "调用它们的最简单方法是通过数据库的命令行界面。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:46
 msgid ""
 "For the purpose of this guide let’s say we have a MySQL database and a "
 "test account: ``test@example.com`` with password ``test77``."
-msgstr ""
+msgstr "就本指南而言，假设我们有一个 MySQL 数据库和一个测试帐户：``test@example."
+"com``，密码为 ``test77``。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:48
 msgid ""
 "By default, most of DB actions for Tigase, are performed using stored "
 "procedures including user authentication. So, the first thing to do is to"
 " make sure the stored procedures are working correctly."
-msgstr ""
+msgstr "默认情况下，Tigase 的大多数 DB 操作包括用户身份验证都是使用存储程序执行的。因"
+"此，首先要做的是确保存储程序正常工作。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:51
 msgid "Create a Test User Account"
-msgstr ""
+msgstr "创建测试用户帐户"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:53
 msgid ""
@@ -2187,64 +2483,71 @@ msgid ""
 "they are sensitive on the data format and always have to pass password in"
 " the exact format it is stored in the database."
 msgstr ""
+"要添加新用户帐户，我们使用存储程序：``TigAddUserPlainPw(bareJid, password)``"
+"。如您所见，程序名称有一个奇怪的附录：``PlainPw``。不管它是如何存储在数据库中"
+"的，这个程序接受普通密码。因此，无论是明文密码还是在数据库中哈希码，它都是安"
+"全且易于使用的。也有没有此附录的程序版本，但它们对数据格式很敏感，并且始终必"
+"须以存储在数据库中的确切格式传递密码。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:55
 msgid "So, let’s add a new user account:"
-msgstr ""
+msgstr "所以，让我们添加一个新的用户帐户："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:61
 msgid ""
 "If the result was 'Query OK', then it means the user account has been "
 "successfully created."
-msgstr ""
+msgstr "如果结果为'Query OK'，则表示用户帐户已成功创建。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:64
 msgid "Test User Authentication"
-msgstr ""
+msgstr "测试用户身份验证"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:66
 msgid "We can now test user authentication:"
-msgstr ""
+msgstr "我们现在可以验证用户身份："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:72
 msgid "If authentication was successful the result looks like this:"
-msgstr ""
+msgstr "如果身份验证成功，结果如下所示："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:85
 msgid "If authentication was unsuccessful, the result looks like this:"
-msgstr ""
+msgstr "如果身份验证不成功，结果如下所示："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:99
 msgid "Password Encoding Check"
-msgstr ""
+msgstr "密码编码检查"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:101
 msgid ""
 "``TigGetDBProperty`` is a function, not a procedure in MySQL database so "
 "we have to use select to call it:"
-msgstr ""
+msgstr "``TigGetDBProperty`` 是一个函数，而不是 MySQL 数据库中的程序，"
+"所以我们必须使用 select 来调用它："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:107
 msgid "Most likely output is this:"
-msgstr ""
+msgstr "最有可能的输出是这样的："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:118
 msgid ""
 "Which means a default password encoding is used, in plain-text and thus "
 "no encoding. And we can actually check this in the database directly:"
-msgstr ""
+msgstr "这意味着使用默认密码编码，以纯文本形式，因此没有编码。我们实际上可以直接在数"
+"据库中检查这个："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:124
 msgid "And expected result with plain-text password format would be:"
-msgstr ""
+msgstr "纯文本密码格式的预期结果是："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:136
 msgid "Password Encoding Change"
-msgstr ""
+msgstr "密码编码更改"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:138
 msgid "Now let’s set password encoding to MD5 hash:"
-msgstr ""
+msgstr "现在让我们将密码编码设置为 MD5 哈希："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:144
 msgid ""
@@ -2253,14 +2556,16 @@ msgid ""
 "database are still in plain-text format. Therefore we expect that attempt"
 " to authenticate the user would fail:"
 msgstr ""
+"'Query OK'，表示密码编码已成功更改。当然，我们只是改变了属性。数据库中所有现"
+"有的密码仍然是纯文本格式。因此，我们预计对用户进行身份验证的尝试会失败："
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:158
 msgid "We can fix this by updating the user’s password in the database:"
-msgstr ""
+msgstr "我们可以通过更新数据库中的用户密码来解决这个问题："
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:2
 msgid "Tigase Server and Multiple Databases"
-msgstr ""
+msgstr "Tigase 服务器和多个数据库"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:4
 msgid ""
@@ -2272,6 +2577,11 @@ msgid ""
 " every data type or component can store information in a different "
 "location, simple and easy to setup through the configuration file."
 msgstr ""
+"在 Tigase XMPP Server 中几乎总是可以从所有其他 XMPP 信息（如花名册、电子名片"
+"等）中分离用户身份验证数据。配置可能而且非常简单。此外，始终可以容易地为每个 "
+"Tigase 组件（MUC, PubSub, AMP）分配不同的数据库，以记录服务器统计信息。几乎每"
+"种数据类型或组件都可以将信息存储在不同的位置，这些可通过配置文件简单易行地进"
+"行设置。"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:6
 msgid ""
@@ -2283,14 +2593,17 @@ msgid ""
 "virtual domain if each domain refers to a different customer or group of "
 "people."
 msgstr ""
+"然而，鲜为人知的是，每个虚拟域也可以有不同的数据库。这可用于用户存储库和身份"
+"验证存储库。这也允许非常有趣的配置，例如用户数据库共享，其中每个分片保留特定"
+"域的用户，或者如果每个域指的是不同的客户或一组人，则基于虚拟域物理拆分数据。"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:8
 msgid "How can we do that then?"
-msgstr ""
+msgstr "那我们怎么做呢？"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:10
 msgid "This is very easy to do through the Tigase’s configuration file."
-msgstr ""
+msgstr "这通过 Tigase 的配置文件很容易做到。"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:32
 msgid ""
@@ -2300,45 +2613,51 @@ msgid ""
 "However, you can have a separate, both user and authentication repository"
 " for each virtual domain."
 msgstr ""
+"此配置仅为用户存储库和身份验证存储库定义了一个默认数据库。默认意味着当没有为"
+"特定虚拟域指定存储库时使用它。但是，对每个虚拟域您可以拥有一个单独的用户和身"
+"份验证存储库。"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:34
 msgid "Here is, how it works:"
-msgstr ""
+msgstr "下面是它的工作原理："
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:36
 msgid "First, let’s define our default database for all VHosts"
-msgstr ""
+msgstr "首先，让我们为所有 VHost 定义我们的默认数据库"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:58
 msgid ""
 "Now, we have VHost: domain1.com User authentication data for this VHost "
 "is stored in Drupal database"
-msgstr ""
+msgstr "现在，我们有了 VHost: domain1.com 这个 VHost 的用户身份验证数据存储在 Drupal "
+"数据库中"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:74
 msgid "All other user data is stored in Tigase’s standard database in MySQL"
-msgstr ""
+msgstr "所有其他用户数据都存储在 Tigase 的 MySQL 标准数据库中"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:87
 msgid ""
 "Next VHost: domain2.com User authentication is in LDAP server but all "
 "other user data is stored in Tigase’s standard database"
-msgstr ""
+msgstr "Next VHost: domain2.com 用户身份验证在 LDAP 服务器中，"
+"但所有其他用户数据都存储在 Tigase 的标准数据库中"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:99
 msgid ""
 "Now is something new, we have a custom authentication repository and "
 "separate user settings for a single domain. Please note how we define the"
 " VHost for which we set custom parameters"
-msgstr ""
+msgstr "现在这是新事物，我们有一个自定义身份验证存储库和单个域的单独用户设置。"
+"请注意我们如何定义为其设置自定义参数的 VHost"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:109
 msgid "All other user data is stored in the same as default repository"
-msgstr ""
+msgstr "所有其他用户数据存储在与默认存储库相同的位置"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:122
 msgid "When combined, the DSL output should look like this:"
-msgstr ""
+msgstr "组合后，DSL 输出应如下所示："
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:142
 msgid ""
@@ -2346,6 +2665,9 @@ msgid ""
 "pointing to a different LDAP server with different access credentials and"
 " parameters. User information is stored in a postgreSQL database."
 msgstr ""
+"Next VHost: domain3.com 用户身份验证再次在 LDAP 服务器中，"
+"但指向具有不同访问凭据和参数的不同 LDAP 服务器。用户信息存储在 postgreSQL "
+"数据库中。"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:162
 msgid ""
@@ -2353,6 +2675,8 @@ msgid ""
 "data are stored on a separate MySQL server with custom stored procedures "
 "for both user login and user logout processing."
 msgstr ""
+"对于 VHost: domain4.com 的所有数据，身份验证和用户 XMPP 数据都存储在单独的 "
+"MySQL 服务器上，并带有用于用户登录和用户注销处理的自定义存储过程。"
 
 #: ../../Tigase_Administration/Database_Management/Multiple_Databases.inc:183
 msgid ""
@@ -2363,10 +2687,13 @@ msgid ""
 "pool, so it won’t create an excessive number of connections to the "
 "database."
 msgstr ""
+"如您所见，它需要一些编写，但灵活性非常广泛，您可以根据需要或想要设置任意数量"
+"的单独数据库。如果一个数据库（由数据库连接字符串识别）在不同的 VHost "
+"之间共享，Tigase 仍然使用单个连接池，因此它不会创建过多的数据库连接。"
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:2
 msgid "Importing User Data"
-msgstr ""
+msgstr "导入用户数据"
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:4
 msgid ""
@@ -2375,6 +2702,9 @@ msgid ""
 "that easy to import data from an external source. Therefore a simple data"
 " import functionality has been added to repository utilities package."
 msgstr ""
+"您可以轻松地在 Tigase 兼容存储库之间复制数据，这些存储库是具有数据库连接器的"
+"存储库。但是，从外部源导入数据并不容易。因此，一个简单的数据导入功能已添加到"
+"存储库实用程序包中。"
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:6
 msgid ""
@@ -2382,10 +2712,12 @@ msgid ""
 "``./scripts/repo.sh`` depending on whether you use a binary package or "
 "source distribution."
 msgstr ""
+"您可以通过命令 ``./bin/repo.sh`` 或 ``./scripts/repo.sh`` "
+"访问存储库实用程序，其取决于您使用的是二进制包还是源代码分发。"
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:8
 msgid "``-h`` parameter gives you a list of all possible parameters:"
-msgstr ""
+msgstr "``-h`` 参数为您提供所有可能参数的列表："
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:46
 msgid ""
@@ -2395,6 +2727,9 @@ msgid ""
 "inside the ``repo.sh`` script you can find at the end of the script "
 "following lines:"
 msgstr ""
+"最关键的参数是源存储库类名和初始化字符串。因此，您可以使用一些示例预设参数并"
+"针对您的系统进行调整。如果您查看 ``repo.sh`` "
+"脚本，您可以在脚本末尾找到以下几行："
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:56
 msgid ""
@@ -2402,42 +2737,44 @@ msgid ""
 "with ``tigase`` as the database name, ``root`` the database user and "
 "``mypass`` the user password."
 msgstr ""
+"您可以看到源存储库已被设置为 MySQL 数据库，其数据库名称为 ``tigase`` ，"
+"数据库用户为 ``root`` ，用户密码为 ``mypass``。"
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:58
 msgid "You can adjust these settings for your system."
-msgstr ""
+msgstr "您可以为您的系统调整这些设置。"
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:60
 msgid "Now to import data to your repository simply execute the command:"
-msgstr ""
+msgstr "现在要将数据导入您的存储库，只需执行以下命令："
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:66
 msgid "*Note, the import function is available from* **b895**"
-msgstr ""
+msgstr "*注意，导入功能可从* **b895** *获得*"
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:68
 msgid ""
 "The format of the import file is very simple. This is a flat file with "
 "comma separated values:"
-msgstr ""
+msgstr "导入文件的格式非常简单。这是一个带有逗号分隔值的平面文件："
 
 #: ../../Tigase_Administration/Database_Management/Importing_User_Data.inc:74
 msgid ""
 "To create such a file from MySQL database you will have to execute a "
 "command like this one:"
-msgstr ""
+msgstr "要从 MySQL 数据库创建这样的文件，您必须执行如下命令："
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:2
 msgid "Importing Existing Data"
-msgstr ""
+msgstr "导入现有数据"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:4
 msgid "Information about importing user data from other databases."
-msgstr ""
+msgstr "关于从其他数据库导入用户数据的信息。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:7
 msgid "Connecting the Tigase Server to MySQL Database"
-msgstr ""
+msgstr "将 Tigase 服务器连接到 MySQL 数据库"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:9
 msgid ""
@@ -2445,16 +2782,18 @@ msgid ""
 "`initial MySQL database setup <#prepareMysql>`__. It will help you with "
 "database preparation for connecting with Tigase server."
 msgstr ""
+"在继续阅读本手册之前，请先查看 :ref:`initial MySQL database "
+"setup<prepareMysql>`。它将帮助您准备用于连接 Tigase 服务器的数据库。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:11
 msgid "This guide describes MySQL database connection parameters."
-msgstr ""
+msgstr "本指南介绍 MySQL 数据库连接参数。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:13
 msgid ""
 "This guide is actually very short as there are example configuration "
 "files which can be used and customized for your environment."
-msgstr ""
+msgstr "本指南实际上非常短，因为有一些示例配置文件可用于您的环境并对其进行自定义。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:29
 msgid ""
@@ -2464,18 +2803,22 @@ msgid ""
 "``jdbc:mysql://[hostname]/[database name]?user=[user name]&password=[user"
 " password]``"
 msgstr ""
+"这是为 Tigase 设置 SQL 存储库的基本设置。 dataSource 包含 ``default`` 的 "
+"uri，它是 mysql 数据库。 MySQL "
+"连接器需要以下格式的连接字符串：``jdbc:mysql://[hostname]/[database "
+"name]?user=[user name]&password=[user password]``"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:31
 msgid "Edit the ``config.tdsl`` file for your environment."
-msgstr ""
+msgstr "为您的环境编辑 ``config.tdsl`` 文件。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:33
 msgid "Start the server using following command:"
-msgstr ""
+msgstr "使用以下命令启动服务器："
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:40
 msgid "Integrating Tigase Server with Drupal"
-msgstr ""
+msgstr "将 Tigase 服务器与 Drupal 集成"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:42
 msgid ""
@@ -2486,10 +2829,14 @@ msgid ""
 "update user details and so on. Administrator can temporarily disable user"
 " account and this is followed by Tigase server too."
 msgstr ""
+"首先，Tigase 可以根据 Drupal 数据库对用户进行身份验证，这意味着您在 Drupal "
+"网站和 XMPP 服务器上拥有相同的用户帐户。此外，在这样的配置中，"
+"所有帐户管理都是通过 Drupal Web 界面完成的，例如帐户创建，密码更改更新用户详"
+"细信息等。管理员可以暂时禁用用户帐户，随后 Tigase 服务器也可以这样做。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:45
 msgid "Connecting to Drupal Database"
-msgstr ""
+msgstr "连接到 Drupal 数据库"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:47
 msgid ""
@@ -2497,22 +2844,25 @@ msgid ""
 "``config.tdsl`` file where you can put initial setting for Tigase "
 "configuration."
 msgstr ""
+"使用 Drupal 数据库设置 Tigase 的最佳方法是通过 ``config.tdsl`` 文件，"
+"您可以在其中放置 Tigase 配置的初始设置。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:49
 msgid ""
 "If you look in ``etc/`` directory of your Tigase installation you should "
 "find a the file there."
-msgstr ""
+msgstr "如果你查看 Tigase 安装的 ``etc/`` 目录，你应该会在那里找到一个文件。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:51
 msgid "All you need to connect to Drupal database is set the following:"
-msgstr ""
+msgstr "连接到 Drupal 数据库所需的所有设置如下："
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:67
 msgid ""
 "Typically, you will need to have drupal for authentication, and another "
 "for user repository. In this case, we will use SQL for user DB."
-msgstr ""
+msgstr "通常，您需要一个用于身份验证的 drupal，另一个用于用户存储库。在这种情况下，"
+"我们将对用户 DB 使用 SQL。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:89
 msgid ""
@@ -2521,91 +2871,103 @@ msgid ""
 "details about setting up and connecting to MySQL database can be found in"
 " the `MySQL guide <#prepareMysql>`__."
 msgstr ""
+"理论上，您可以将 Tigase 数据库架构加载到 Drupal 数据库，然后两个 ``db-uris`` "
+"将具有相同的数据库连接字符串。有关设置和连接 MySQL 数据库的更多详细信息，"
+"请参阅 :ref:`MySQL 指南<prepareMysql>`。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:91
 msgid "Now run the Tigase server."
-msgstr ""
+msgstr "现在运行 Tigase 服务器。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:97
 msgid ""
 "Now you can register an account on your Drupal website and connect with "
 "an XMPP client using the account details."
-msgstr ""
+msgstr "现在您可以在您的 Drupal 网站上注册一个帐户，并使用帐户详细信息与 XMPP "
+"客户端连接。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:101
 msgid ""
 "You have to enable plain password authentication in your XMPP client to "
 "connect to Tigase server with Drupal database."
-msgstr ""
+msgstr "您必须在 XMPP 客户端中启用纯密码身份验证才能使 Drupal 数据库连接到 Tigase "
+"服务器。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:104
 msgid "PostgreSQL Database Use"
-msgstr ""
+msgstr "PostgreSQL 数据库使用"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:106
 msgid ""
 "This guide describes how to configure Tigase server to use `PostgreSQL "
 "<http://www.postgresql.org/>`__ database as a user repository."
 msgstr ""
+"本指南介绍如何配置 Tigase 服务器以使用 `PostgreSQL <http://www.postgresql."
+"org/>`__ 数据库作为用户存储库。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:108
 msgid ""
 "If you used an XML based user repository before you can copy all user "
 "data to PostgreSQL database using repository management tool. All steps "
 "are described below."
-msgstr ""
+msgstr "如果您使用基于 XML 的用户存储库，"
+"则可以使用存储库管理工具将所有用户数据复制到 PostgreSQL "
+"数据库。所有步骤如下所述。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:111
 msgid "PostgreSQL Database Preparation"
-msgstr ""
+msgstr "PostgreSQL 数据库准备"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:113
 msgid ""
 "Create new database user account which will be used to connect to your "
 "database:"
-msgstr ""
+msgstr "创建将用于连接到您的数据库的新数据库用户帐户："
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:122
 msgid "Now using new database user account create database for your service:"
-msgstr ""
+msgstr "现在使用新的数据库用户帐户为您的服务创建数据库："
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:129
 msgid "Now you can load the database schema:"
-msgstr ""
+msgstr "现在您可以加载数据库架构："
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:135
 msgid "Now the database is ready for Tigase server to use."
-msgstr ""
+msgstr "现在数据库已准备好供 Tigase 服务器使用。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:138
 msgid "Server Configuration"
-msgstr ""
+msgstr "服务器配置"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:140
 msgid ""
 "Server configuration is almost identical to MySQL database setup. The "
 "only difference is the connection string which usually looks like:"
-msgstr ""
+msgstr "服务器配置几乎与 MySQL "
+"数据库设置相同。唯一的区别是连接字符串通常看起来像这样："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:2
 msgid "Schema Updates"
-msgstr ""
+msgstr "架构更新"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:4
 msgid ""
 "This is a repository for Schema updates in case you have to upgrade from "
 "older installations."
-msgstr ""
+msgstr "这是架构更新的存储库，以防您必须从旧安装升级。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:6
 msgid ""
 "`Tigase Server Schema v7.1 Updates <#tigaseServer71>`__ Applies to v7.1.0"
 " and v8.0.0"
 msgstr ""
+"`Tigase Server Schema v7.1 Updates <#tigaseServer71>`__ 适用于 v7.1.0 和 v8.0"
+".0"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:9
 msgid "Changes to Schema in v8.0.0"
-msgstr ""
+msgstr "v8.0.0 中对架构的更改"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:11
 msgid ""
@@ -2615,10 +2977,13 @@ msgid ""
 " achieve this goal. This document, as well one in the HTTP API, will "
 "describe the changes to the schemas in this new version."
 msgstr ""
+"对于 Tigase XMPP Server 8.0.0 版，我们决定改进其所提供的身份验证和安全性。为"
+"此，需要更改存储库和数据库架构的实现以达到此目标。本文档以及 HTTP API "
+"中的文档将描述此新版本中架构的更改。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:14
 msgid "Reasons"
-msgstr ""
+msgstr "原因"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:16
 msgid ""
@@ -2629,6 +2994,10 @@ msgid ""
 "However an MD5 hash of a password is not really a secure method as it is "
 "possible to revert this mechanism using rainbow tables."
 msgstr ""
+"在 8.0.0 版之前，用户密码存储在 ``tig_users`` 表中的 ``user_pw`` "
+"数据库字段中，但以明文形式存储。也可以将其改为启用存储密码的 MD5 哈希，"
+"但是这种有限的身份验证机制仅限 SASL PLAIN。然而，密码的 MD5 "
+"哈希并不是一种真正安全的方法，因为可以使用彩虹表恢复这种机制。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:18
 msgid ""
@@ -2638,32 +3007,36 @@ msgid ""
 "mechanism can also used these encrypted passwords. The storage of "
 "encrypted passwords is now enabled **by default** in v8.0.0 of Tigase."
 msgstr ""
+"因此，我们决定改变这一点，仅以 ``PBKDF2`` 形式存储密码的加密版本，"
+"这可以很容易地用于 ``SCRAM-SHA-1`` 身份验证机制或 ``SCRAM-SHA-256``。 SASL "
+"PLAIN 机制也可以使用这些加密密码。现在在 Tigase v8.0.0 中 **默认情况下** "
+"启用了加密密码的存储。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:21
 msgid "Summary of changes"
-msgstr ""
+msgstr "变更摘要"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:23
 msgid "Added support for storage of encrypted password"
-msgstr ""
+msgstr "增加了对存储加密密码的支持"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:25
 msgid "Passwords are no longer stored in plaintext on any database."
-msgstr ""
+msgstr "密码不再以明文形式存储在任何数据库中。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:27
 msgid "Using same salt for any subsequent authentications"
-msgstr ""
+msgstr "对任何后续身份验证使用相同的盐"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:29
 msgid ""
 "This allows clients to reuse calculated credentials and keep them instead"
 " of storing plaintext passwords."
-msgstr ""
+msgstr "这允许客户端重新用计算的凭据并保留它们，而不是存储明文密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:31
 msgid "Disabled usage of stored procedure for authentication"
-msgstr ""
+msgstr "禁止使用存储过程进行身份验证"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:33
 msgid ""
@@ -2673,26 +3046,30 @@ msgid ""
 "but they are updated to use passwords stored in ``tig_user_credentials`` "
 "table."
 msgstr ""
+"在以前的版本中，Tigase 使用存储程序 ``TigUserLoginPlainPw`` 和 "
+"``TigUserLogin`` 进行 SASL PLAIN 身份验证。从版本 8.0.0 "
+"开始，这些程序不再使用，但它们已被更新为使用存储在 ``tig_user_credentials`` "
+"表中的密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:35
 msgid ""
 "It is still possible to use this procedures for authentication, but to do"
 " that you need add:"
-msgstr ""
+msgstr "仍然可以使用此程序进行身份验证，但要做到这一点，您需要添加："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:41
 msgid "to configuration block of **every** authentication repository."
-msgstr ""
+msgstr "到 **every** 身份验证存储库的配置块。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:43
 msgid ""
 "To enable this for default repository, the ``authRepository`` "
 "configuration block will look like this:"
-msgstr ""
+msgstr "要为默认存储库启用此功能，``authRepository`` 配置块将如下所示："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:54
 msgid "Deprecated API"
-msgstr ""
+msgstr "已弃用的 API"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:56
 msgid ""
@@ -2700,16 +3077,19 @@ msgid ""
 "used. Most of them were used for authentication using stored procedures, "
 "retrieval of password in plaintext or for password change."
 msgstr ""
+"``AuthRepository`` API 的某些方法已被弃用，不应使用。它们中的大多数用于使用存"
+"储程序进行身份验证，以明文检索密码或更改密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:58
 msgid ""
 "For most of these methods, new versions based on ``tig_user_credentials``"
 " table and user credentials storage are provided where possible."
-msgstr ""
+msgstr "对于这些方法中的大多数，在可能的情况下提供了基于 ``tig_user_credentials`` "
+"表和用户凭证存储的新版本。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:60
 msgid "Deprecated storage procedures"
-msgstr ""
+msgstr "不推荐使用的存储程序"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:62
 msgid ""
@@ -2719,10 +3099,13 @@ msgid ""
 "However, these procedures will not be used any more and will be "
 "depreciated and removed in future versions of Tigase XMPP Server."
 msgstr ""
+"用于身份验证和密码操作的存储程序已被更新为新形式，从而旧版本的 Tigase XMPP "
+"服务器可以在集群滚动更新期间使用它们。但是，这些程序将不再被使用，并且将在 "
+"Tigase XMPP Server 的未来版本中不被推荐和删除。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:64
 msgid "Usage of MD5 hashes of passwords"
-msgstr ""
+msgstr "密码的 MD5 哈希值的使用"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:66
 msgid ""
@@ -2736,24 +3119,30 @@ msgid ""
 " have used a different one, then just replace ``MD5-PASSWORD`` with ``MD5"
 "-USERNAME-PASSWORD`` or ``MD5-USERID-PASSWORD``."
 msgstr ""
+"如果您在以前版本的 Tigase XMPP 服务器中更改了 ``password-encoding`` 数据库属"
+"性，那么您将需要修改您的配置以使其正常工作。如果您只希望允许使用旧密码进行访"
+"问并以新形式存储更改的密码，那么您需要为正确的身份验证存储库来启用凭据解码器"
+"。在此示例中，我们将提供 ``password-encoding`` 数据库属性的 ``MD5-PASSWORD`` "
+"值所需的更改。如果您使用了不同值，那么只需将 ``MD5-PASSWORD`` 替换为 ``MD5"
+"-USERNAME-PASSWORD`` 或 ``MD5-USERID-PASSWORD``。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:68
 msgid "**Usage of MD5 decoder.**"
-msgstr ""
+msgstr "**使用 MD5 解码器。**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:80
 msgid ""
 "If you wish to store passwords in MD5 form then use following entries in "
 "your configuration file:"
-msgstr ""
+msgstr "如果您希望以 MD5 形式存储密码，请在配置文件中使用以下条目："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:82
 msgid "**Usage of MD5 encoder.**"
-msgstr ""
+msgstr "**使用 MD5 编码器。**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:95
 msgid "Enabling and disabling credentials encoders/decoders"
-msgstr ""
+msgstr "启用和禁用凭证编码器/解码器"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:97
 msgid ""
@@ -2762,43 +3151,48 @@ msgid ""
 "stored in the database. Those changes may impact which SASL mechanisms "
 "may be allowed to use on your installation."
 msgstr ""
+"您可以启用安装中使用的编码器和解码器。通过启用编码器/解码器，您可以决定密码以"
+"何种形式存储在数据库中。这些更改可能会影响允许在您的安装中使用哪些 SASL "
+"机制。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:99
 msgid "**Enabling PLAIN decoder.**"
-msgstr ""
+msgstr "**启用 PLAIN 解码器。**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:111
 msgid "**Disabling SCRAM-SHA-1 encoder.**"
-msgstr ""
+msgstr "**禁用 SCRAM-SHA-1 编码器。**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:126
 msgid ""
 "It is strongly recommended not to disable encoders if you have enabled "
 "decoder of the same type as it may lead to the authentication issues, if "
 "client tries to use a mechanism which that is not available."
-msgstr ""
+msgstr "如果您启用了相同类型的解码器，强烈建议不要禁用编码器，因为如果客户端尝试使用"
+"不可用的机制，可能会导致身份验证问题。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:128
 msgid "Schema changes"
-msgstr ""
+msgstr "架构更改"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:130
 msgid ""
 "This change resulted in a creation of the new table "
 "``tig_user_credentials`` with following fields:"
-msgstr ""
+msgstr "此更改导致创建具有以下字段的新表 ``tig_user_credentials`` ："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:133
+#, fuzzy
 msgid "**uid**"
-msgstr ""
+msgstr "**uid**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:133
 msgid "id of a user row in ``tig_users``."
-msgstr ""
+msgstr "``tig_users`` 中用户行的 id。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:136
 msgid "**username**"
-msgstr ""
+msgstr "**用户名**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:136
 msgid ""
@@ -2806,24 +3200,26 @@ msgid ""
 "``authzid`` localpart is equal to ``authcid`` then row with ``default`` "
 "value will be used)."
 msgstr ""
+"用于身份验证的用户名（如果未提供 ``authzid`` 或 ``authzid`` localpart 等于 "
+"``authcid``，则将使用具有 ``default`` 值的行）。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:139
 msgid "**mechanism**"
-msgstr ""
+msgstr "**机制**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:139
 msgid ""
 "name of mechanism for which this credentials will be used, ie. ``SCRAM-"
 "SHA-1`` or ``PLAIN``."
-msgstr ""
+msgstr "将使用此凭据的机制的名称，即 ``SCRAM-SHA-1`` 或 ``PLAIN``。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:142
 msgid "**value**"
-msgstr ""
+msgstr "**值**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:142
 msgid "serialized value required for mechanism to confirm that credentials match."
-msgstr ""
+msgstr "确认凭据匹配的机制所需的序列化值。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:146
 msgid ""
@@ -2831,10 +3227,12 @@ msgid ""
 "from ``tig_users`` table from ``user_pw`` field and moved to "
 "``tig_user_credentials`` table."
 msgstr ""
+"在执行 ``upgrade-schema`` 任务期间，密码将从 ``tig_users`` 表的 ``user_pw`` "
+"字段中删除并移动到 ``tig_user_credentials`` 表。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:148
 msgid "Added password reset mechanism"
-msgstr ""
+msgstr "添加密码重置机制"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:150
 msgid ""
@@ -2843,13 +3241,17 @@ msgid ""
 "mechanism HTTP API component and its REST module **must** to be enabled "
 "on Tigase XMPP Server installation."
 msgstr ""
+"作为 Tigase HTTP API 组件和 Tigase Extras "
+"的一部分，我们开发了一种允许用户重置密码的机制。要使用此机制， HTTP API "
+"组件及其 REST 模块 **必须** 在Tigase XMPP 服务器安装上启用。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:154
 msgid ""
 "Additionally this mechanism need to be enabled in the configuration file."
 " For more information about configuration of this mechanism please check "
 "Tigase HTTP API component documentation."
-msgstr ""
+msgstr "此外，需要在配置文件中启用此机制。有关此机制配置的更多信息，请查看 Tigase "
+"HTTP API 组件文档。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:156
 msgid ""
@@ -2861,10 +3263,16 @@ msgid ""
 "Server will send an email to the user’s email address (provided during "
 "registration) with a link to the password change form."
 msgstr ""
+"假设 HTTP API 组件配置为在端口 8080 *(默认)* 上运行，那么在 Web "
+"浏览器中访问地址 http://localhost:8080/rest/user/resetPassword 后，"
+"它将出现一个 Web "
+"表单。通过填写并提交此表格，用户将启动密码重置过程。在此过程中，Tigase XMPP "
+"服务器将向用户的电子邮件地址（在注册时提供）发送一封电子邮件，其中包含指向密"
+"码更改表单的链接。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:159
 msgid "Upgrading from v7.1.x"
-msgstr ""
+msgstr "从 v7.1.x 升级"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:161
 msgid ""
@@ -2874,142 +3282,152 @@ msgid ""
 "made, it will be time to run the schema upgrade. Be sure that your schema"
 " is up to date, and should be v7.1.0 Schema."
 msgstr ""
+"从以前版本的 Tigase 升级时，建议您先备份数据库。请参阅数据库软件的文档以了解"
+"如何导出副本。备份完成后，就该运行架构升级了。确保您的架构是最新的，"
+"并且应该是 v7.1.0 架构。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:163
 msgid "To upgrade, use the new ``upgrade-schema`` task of SchemaManager:"
-msgstr ""
+msgstr "要升级，请使用 SchemaManager 的 ``upgrade-schema`` 新任务："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:165
 msgid "In linux"
-msgstr ""
+msgstr "在linux中"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:171
 msgid "In Windows"
-msgstr ""
+msgstr "在 Windows 中"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:177
 msgid "You will need to configure the following switches:"
-msgstr ""
+msgstr "您将需要配置以下开关语句："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "``-T`` Specifies Database Type"
-msgstr ""
+msgstr "``-T`` 指定数据库类型"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid ""
 "Possible values are: ``mysql``, ``derby``, ``sqlserver``, ``postgresql``,"
 " ``mongodb``"
-msgstr ""
+msgstr "可能的值为：``mysql``, ``derby``, ``sqlserver``, ``postgresql``, ``mongodb``"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "``-D`` Specifies Databse Name"
-msgstr ""
+msgstr "``-D`` 指定数据库名称"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "The explicit name of the database you wish to upgrade."
-msgstr ""
+msgstr "您要升级的数据库的显式名称。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "``-H`` Specifies Host address"
-msgstr ""
+msgstr "``-H`` 指定主机地址"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid ""
 "By default, this is localhost, but may be set to IP address or FQDNS "
 "address."
-msgstr ""
+msgstr "默认情况下，这是 localhost，但可以设置为 IP 地址或 FQDNS 地址。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "``-U`` Specifies Username"
-msgstr ""
+msgstr "``-U`` 指定用户名"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid ""
 "This is the username that is authorized to make changes to the database "
 "defined in -D."
-msgstr ""
+msgstr "这是被授权对 -D 中定义的数据库进行更改的用户名。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "``-P`` Specifies Password"
-msgstr ""
+msgstr "``-P`` 指定密码"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "The password for username specified in -U."
-msgstr ""
+msgstr "-U 中指定的用户名密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:194
 msgid "``-R`` Password for Administrator or Root DB account."
-msgstr ""
+msgstr "``-R`` 管理员或 Root DB 帐户的密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:196
 msgid "``-A`` Password for Administrator or Root DB account."
-msgstr ""
+msgstr "``-A`` 管理员或 Root DB 帐户的密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:198
 msgid "``-J`` Jid of user authorized as admin user from Tigase."
-msgstr ""
+msgstr "``-J`` Tigase 授权为管理员用户的用户 Jid。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:200
 msgid "``-N`` Password for user specified in -J."
-msgstr ""
+msgstr "``-N`` 在 -J 中指定的用户密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "``-F`` Points to the file that will perform the upgrade."
-msgstr ""
+msgstr "``-F`` 指向将执行升级的文件。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc
 msgid "Will follow this form database/{dbname}-server-schema-8.0.0.sql"
-msgstr ""
+msgstr "将遵循这种形式 database/{dbname}-server-schema-8.0.0.sql"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:206
 msgid "Tigase Server Schema v7.2 Updates"
-msgstr ""
+msgstr "Tigase 服务器架构 v7.2 更新"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:209
 msgid "**FOR ALL USERS UPGRADING TO v8.0.0 FROM A v7.0.2 INSTALLATION**"
-msgstr ""
+msgstr "**适用于从 v7.0.2 安装升级到 v8.0.0 的所有用户**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:211
 msgid ""
 "The schema has changed for the main database, and the pubsub repository. "
 "In order to upgrade to the new schemas, you will need to do the "
 "following:"
-msgstr ""
+msgstr "主数据库和 pubsub 存储库的架构已更改。为了升级到新模式，您需要执行以下操作："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:213
 msgid ""
 "Upgrade the Main database schema to v7.1 using the ``database/${DB_TYPE"
 "}-schema-upgrade-to-7-1.sql`` file"
-msgstr ""
+msgstr "使用 ``database/${DB_TYPE}-schema-upgrade-to-7-1.sql`` "
+"文件将主数据库模式升级到 v7.1"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:215
 msgid ""
 "Upgrade the Pubsub Schema to v3.1.0 using the ``database/${DB_TYPE"
 "}-pubsub-schema-3.1.0.sql`` file"
 msgstr ""
+"使用 ``database/${DB_TYPE}-pubsub-schema-3.1.0.sql`` 文件将 Pubsub "
+"架构升级到 v3.1.0"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:217
 msgid ""
 "Upgrade the Pubsub Schema to v3.2.0 using the ``database/${DB_TYPE"
 "}-pubsub-schema-3.2.0.sql`` file"
 msgstr ""
+"使用 ``database/${DB_TYPE}-pubsub-schema-3.2.0.sql`` 文件将 Pubsub "
+"架构升级到 v3.2.0"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:219
 msgid ""
 "Upgrade the Pubsub Schema to v3.3.0 using the ``database/${DB_TYPE"
 "}-pubsub-schema-3.3.0.sql`` file"
 msgstr ""
+"使用 ``database/${DB_TYPE}-pubsub-schema-3.3.0.sql`` 文件将 Pubsub "
+"架构升级到 v3.3.0"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:221
 msgid ""
 "All three commands may be done at the same time in that order, it is "
 "suggested you make a backup of your current database to prevent data "
 "loss."
-msgstr ""
+msgstr "这三个命令可以按顺序同时执行，建议您对当前数据库进行备份，以防止数据丢失。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:224
 msgid "Tigase Schema Change for v7.1"
-msgstr ""
+msgstr "v7.1 的 Tigase 架构更改"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:226
 msgid ""
@@ -3018,22 +3436,24 @@ msgid ""
 "auto-incremented column for Primary Key items appended to the previous "
 "schema."
 msgstr ""
+"Tigase 对其数据库进行了更改，以在 tig_pairs 表中包含主键，来提高 Tigase "
+"服务器的性能。这是附加到先前架构的主键项的自动递增列。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:230
 msgid ""
 "You MUST update your database to be compliant with the new schema. If you"
 " do not, Tigase will not function properly.**"
-msgstr ""
+msgstr "**您必须更新您的数据库以符合新架构。否则，Tigase 将无法正常工作。**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:234
 msgid "*This change will affect all users of Tigase using v7.1.0 and newer.*"
-msgstr ""
+msgstr "*此更改将影响所有使用 v7.1.0 及更高版本的 Tigase 用户。*"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:236
 msgid ""
 "If you are installing a new version of v8.0.0 on a new database, the "
 "schema should automatically be installed."
-msgstr ""
+msgstr "如果要在新数据库上安装新版本的 v8.0.0，则应自动安装架构。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:238
 msgid ""
@@ -3042,60 +3462,63 @@ msgid ""
 "class to run the -schema-upgrade-to-7.1.sql file to the database. The "
 "command is as follows:"
 msgstr ""
+"首先，关闭所有正在运行的 Tigase 实例，以防止与数据库编辑发生冲突。"
+"然后从命令行使用 DBSchemaLoader 类将 -schema-upgrade-to-7.1.sql "
+"文件运行到数据库。命令如下："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:240
 msgid "In a linux environment"
-msgstr ""
+msgstr "在linux环境下"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:246
 msgid "In a windows environment"
-msgstr ""
+msgstr "在windows环境下"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:252
 msgid "All variables will be required, they are as follows:"
-msgstr ""
+msgstr "所有变量都是必需的，它们如下："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:254
 msgid "``${HOSTNAME}`` - Hostname of the database you wish to upgrade."
-msgstr ""
+msgstr "``${HOSTNAME}`` - 您要升级的数据库的主机名。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:256
 msgid "``${DB_TYPE}`` - Type of database [derby, mysql, postgresql, sqlserver]."
-msgstr ""
+msgstr "``${DB_TYPE}`` - 数据库类型 [derby, mysql, postgresql, sqlserver]。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:258
 msgid "``${ROOT_USER}`` - Username of root user."
-msgstr ""
+msgstr "``${ROOT_USER}`` - root 用户的用户名。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:260
 msgid "``${ROOT_USER_PASS}`` - Password of specified root user."
-msgstr ""
+msgstr "``${ROOT_USER_PASS}`` - 指定 root 用户的密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:262
 msgid "``${DB_USER}`` - Login of user that can edit database."
-msgstr ""
+msgstr "``${DB_USER}`` - 可以用来编辑数据库的用户的登录名。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:264
 msgid "``${DB_USER_PASS}`` - Password of the specified user."
-msgstr ""
+msgstr "``${DB_USER_PASS}`` - 指定用户的密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:266
 msgid "``${DB_NAME}`` - Name of the database to be edited."
-msgstr ""
+msgstr "``${DB_NAME}`` - 要编辑的数据库的名称。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:268
 msgid "``${DB_VERSION}`` - In this case, we want this to be 7.1."
-msgstr ""
+msgstr "``${DB_VERSION}`` - 在这种情况下，我们希望这是 7.1。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:270
 msgid ""
 "``${ADMIN_JID}`` - Bare JID of a database user with admin privileges. "
 "Must be contained within quotation marks."
-msgstr ""
+msgstr "``${ADMIN_JID}`` - 具有管理员权限的数据库用户的裸 JID。必须包含在引号内。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:272
 msgid "``${ADMIN_JID_PASS}`` - Password of associated admin JID."
-msgstr ""
+msgstr "``${ADMIN_JID_PASS}`` - 关联管理员 JID 的密码。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:274
 msgid ""
@@ -3103,20 +3526,23 @@ msgid ""
 "database with the filename. i.e. postgresql-update-to-7.1.sql for "
 "postgresql database."
 msgstr ""
+"请注意，用于更新的 SQL 文件将有与文件名关联的数据库。即 postgresql-update-to-"
+"7.1.sql 用于 postgresql 数据库。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:276
 msgid "A finalized command will look something like this:"
-msgstr ""
+msgstr "最终的命令将如下所示："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:282
 msgid ""
 "Once this has successfully executed, you may restart you server. Watch "
 "logs for any db errors that may indicate an incomplete schema upgrade."
-msgstr ""
+msgstr "成功执行后，您可以重新启动服务器。观察任何可能表明架构升级不完整的数据库错误"
+"的日志。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:285
 msgid "Changes to Pubsub Schema"
-msgstr ""
+msgstr "对 Pubsub 架构的更改"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:287
 msgid ""
@@ -3124,6 +3550,9 @@ msgid ""
 " v7.1 without having to reform your databases, use this guide to update "
 "your databases to be compatible with the new version of Tigase."
 msgstr ""
+"Tigase 对 PubSub 架构进行了更改，要升级到 PubSub Schema v7.1 "
+"而无需改进您的数据库，请使用本指南更新您的数据库以使其与新版本的 Tigase "
+"兼容。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:291
 msgid ""
@@ -3131,6 +3560,8 @@ msgid ""
 "instructions for v3.1.0, v3.2.0 and then v3.3.0 before you run Tigase "
 "V7.1.0."
 msgstr ""
+"当前的 PubSub Schema 是 v3.3.0，在运行 Tigase V7.1.0 之前，您需要对 v3.1.0，"
+"v3.2.0 和 v3.3.0 重复这些说明。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:293
 msgid ""
@@ -3139,25 +3570,33 @@ msgid ""
 "schema, first be sure to create a backup! Then apply the appropriate "
 "PubSub schema to your MySQL and it will add the new storage procedure."
 msgstr ""
+"PubSub Schema 已被简化以更好地利用资源，此更改会影响 Tigase "
+"的所有用户。要为新架构准备数据库，首先要确保创建备份！然后将适当的 PubSub "
+"架构应用于您的 MySQL，它将添加新的存储程序。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:295
 msgid ""
 "All these files should be in your /database folder within Tigase, however"
 " if you are missing the appropriate files, use the links below and place "
 "them into that folder."
-msgstr ""
+msgstr "所有这些文件都应该在 Tigase 中的 /database "
+"文件夹中，但是如果您缺少相应的文件，请使用下面的链接并将它们放入该文件夹中。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:297
 msgid ""
 "The MySQL schema can be found `Here <https://github.com/tigase/tigase-"
 "pubsub/blob/master/src/main/database/mysql-pubsub-4.1.0.sql>`__."
 msgstr ""
+"`这里 <https://github.com/tigase/tigase-pubsub/blob/master/src/main/database/"
+"mysql-pubsub-4.1.0.sql>`__ 可以找到 MySQL 架构。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:299
 msgid ""
 "The Derby schema can be found `Here <https://github.com/tigase/tigase-"
 "pubsub/blob/master/src/main/database/derby-pubsub-4.1.0.sql>`__."
 msgstr ""
+"`这里 <https://github.com/tigase/tigase-pubsub/blob/master/src/main/database/"
+"derby-pubsub-4.1.0.sql>`__ 可以找到Derby架构。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:301
 msgid ""
@@ -3165,99 +3604,104 @@ msgid ""
 "/tigase-pubsub/blob/master/src/main/database/postgresql-"
 "pubsub-4.1.0.sql>`__."
 msgstr ""
+"`这里 <https://github.com/tigase/tigase-pubsub/blob/master/src/main/database/"
+"postgresql-pubsub-4.1.0.sql>`__ 可以找到PostGRESQL 架构。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:303
 msgid ""
 "The same files are also included in all distributions of v8.0.0 in "
 "[tigaseroot]/database/ . All changes to database schema are meant to be "
 "backward compatible."
-msgstr ""
+msgstr "相同的文件也包含在 [tigaseroot]/database/ 的所有 v8.0.0 "
+"发行版中。对数据库模式的所有更改都是为了向后兼容。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:305
 msgid ""
 "You can use a utility in Tigase to update the schema using the following "
 "command from the Tigase root:"
-msgstr ""
+msgstr "您可以使用 Tigase 中的实用程序从 Tigase 根目录使用以下命令更新架构："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:307
+#, fuzzy
 msgid "Linux"
-msgstr ""
+msgstr "Linux"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:313
+#, fuzzy
 msgid "Windows:"
-msgstr ""
+msgstr "Windows:"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:321
 msgid ""
 "**Some variation may be necessary depending on how your java build uses "
 "``-cp`` option**"
-msgstr ""
+msgstr "**可能需要一些变化，取决于您的 java 构建如何使用** ``-cp`` **选项**"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:323
 msgid "Use the following options to customize. Options in bold are required.:"
-msgstr ""
+msgstr "使用以下选项进行自定义。粗体字为必填项："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:325
 msgid ""
 "``-dbType`` database_type {derby, mysql, postgresql, sqlserver} "
 "(*required*)"
-msgstr ""
+msgstr "``-dbType`` database_type {derby, mysql, postgresql, sqlserver} (*必需*)"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:327
 msgid "``-schemaVersion`` schema version {4, 5, 5-1}"
-msgstr ""
+msgstr "``-schemaVersion`` 架构版本 {4, 5, 5-1}"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:329
 msgid "``-dbName`` database name (*required*)"
-msgstr ""
+msgstr "``-dbName`` 数据库名称（*必需*）"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:331
 msgid "``-dbHostname`` database hostname (default is localhost)"
-msgstr ""
+msgstr "``-dbHostname`` 数据库主机名（默认为 localhost）"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:333
 msgid "``-dbUser`` tigase username"
-msgstr ""
+msgstr "``-dbUser`` tigase 用户名"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:335
 msgid "``-dbPass`` tigase user password"
-msgstr ""
+msgstr "``-dbPass`` tigase 用户密码"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:337
 msgid "``-rootUser`` database root username (*required*)"
-msgstr ""
+msgstr "``-rootUser`` 数据库根用户名（*必填*）"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:339
 msgid "``-rootPass`` database root password (*required*)"
-msgstr ""
+msgstr "``-rootPass`` 数据库根密码（*必需*）"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:341
 msgid "``-file path`` to sql schema file (*required*)"
-msgstr ""
+msgstr "``-file path`` 到 sql 架构文件（*必需*）"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:343
 msgid "``-query`` sql query to execute"
-msgstr ""
+msgstr "``-query`` 要执行的sql查询"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:345
 msgid "``-logLevel`` java logger Level"
-msgstr ""
+msgstr "``-logLevel`` java logger 级别"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:347
 msgid "``-adminJID`` comma separated list of admin JIDs"
-msgstr ""
+msgstr "``-adminJID`` 逗号分隔的管理员 JID 列表"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:349
 msgid "``-adminJIDpass`` password (one for all entered JIDs"
-msgstr ""
+msgstr "``-adminJIDpass`` 密码（一个其可用于所有输入的 JIDs ）"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:353
 msgid "Arguments take following precedent: query, file, whole schema"
-msgstr ""
+msgstr "参数接受以下先例：查询，文件，整个架构"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:355
 msgid "As a result your final command should look something like this:"
-msgstr ""
+msgstr "因此，您的最终命令应如下所示："
 
 #~ msgid ""
 #~ "Starting with v8.0.0, most of the "
@@ -3310,4 +3754,3 @@ msgstr ""
 #~ "<#Prepare-the-PostgreSQL-Database-for-"
 #~ "the-Tigase-Server>`__"
 #~ msgstr ""
-
