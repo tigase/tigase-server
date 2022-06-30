@@ -23,7 +23,7 @@ Server Components
 Legacy documentation website
 ^^^^^^^^^^^^^^^^^
 
--  `Legacy documentation website <https://docs.tigase.net/`__ Our legacy documentation website which contains documentation for older versions of componetns and applications
+-  `Legacy documentation website <https://docs.tigase.net/>`__ Our legacy documentation website which contains documentation for older versions of componetns and applications
 
 .. toctree::
    :caption: Tigase XMPP Server Distribution Administration Guide
