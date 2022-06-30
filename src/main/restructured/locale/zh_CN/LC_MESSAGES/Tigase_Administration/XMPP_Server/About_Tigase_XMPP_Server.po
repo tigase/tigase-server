@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-06-24 10:14+0000\n"
+"PO-Revision-Date: 2022-07-01 04:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/about_tigase_xmpp_server/zh_Hans/>\n"
@@ -373,7 +373,6 @@ msgstr "规格"
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:89
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:106
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:301
-#, fuzzy
 msgid "Name"
 msgstr "名称"
 
