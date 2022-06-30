@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: 2022-06-28 19:14+0000\n"
+"PO-Revision-Date: 2022-07-01 00:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/configuration/zh_Hans/>\n"
@@ -1869,7 +1869,7 @@ msgstr "任何实现 ``tigase.cluster.strategy.ClusteringStrategyIfc`` "
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:120
 msgid "Example:"
-msgstr "例子:"
+msgstr "例子："
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:128
 msgid "This replaces the old ``--sm-cluster-strategy-class`` setting from v7.1."
