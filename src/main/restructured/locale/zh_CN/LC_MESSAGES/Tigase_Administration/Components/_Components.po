@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 02:43-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-02 22:14+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/components/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Components/Components.inc:2
 msgid "Components"
-msgstr ""
+msgstr "组件"
 
 #: ../../Tigase_Administration/Components/Components.inc:4
 msgid ""
@@ -27,30 +30,33 @@ msgid ""
 "them and optionally give some extra parameters. To do so open the "
 "``config.tdsl`` file you use in your installation."
 msgstr ""
+"唯一的步骤是告诉服务器要加载哪些组件，如何命名它们并提供一些可选的额外参数。"
+"为此，请打开您在安装中使用的 ``config.tdsl`` 文件。"
 
 #: ../../Tigase_Administration/Components/Components.inc:6
 msgid ""
 "Let’s say you want to just add PubSub for now. All you need to do is add "
 "the following to the properties file:"
-msgstr ""
+msgstr "假设您现在只想添加 PubSub。您需要做的就是将以下内容添加到属性文件中："
 
 #: ../../Tigase_Administration/Components/Components.inc:12
 msgid ""
 "Normally, this is not necessary since pubsub is loaded by default, "
 "however this is just an example of loading a class with the DSL format."
-msgstr ""
+msgstr "通常，这不是必需的，因为默认情况下会加载 pubsub，但这只是加载具有 DSL "
+"格式的类的示例。"
 
 #: ../../Tigase_Administration/Components/Components.inc:18
 msgid ""
 "As you can see, we can customize the name of a component in the "
 "deceleration, here we are using pubsub-priv."
-msgstr ""
+msgstr "如您所见，我们可以在减速中自定义一个组件的名称，这里我们使用的是pubsub-priv。"
 
 #: ../../Tigase_Administration/Components/Components.inc:20
 msgid ""
 "Although this may be rare, it allows for wide compatibility and platform "
 "stability."
-msgstr ""
+msgstr "虽然这可能很少见，但它允许广泛的兼容性和平台稳定性。"
 
 #: ../../Tigase_Administration/Components/Components.inc:22
 msgid ""
@@ -58,43 +64,48 @@ msgid ""
 "MUC, MSN Transport and so on…​. Therefore instead of the above second "
 "PubSub we can load the MUC component:"
 msgstr ""
+"通常，我们希望加载几个不同的组件，例如 PubSub，MUC，MSN Transport "
+"等等……。因此，我们可以加载 MUC 组件，而不是上面的第二个 PubSub："
 
 #: ../../Tigase_Administration/Components/Components.inc:29
 msgid "Changes to the ``config.tdsl`` file will take effect upon server restart."
-msgstr ""
+msgstr "对 ``config.tdsl`` 文件的更改将在服务器重新启动时生效。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:2
 msgid "Advanced Message Processing - AMP XEP-0079"
-msgstr ""
+msgstr "高级消息处理 - AMP XEP-0079"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:4
 msgid ""
 "Tigase server offers support for `XEP-0079: Advanced Message Processing "
 "<http://xmpp.org/extensions/xep-0079.html>`__ (often abbreviated to AMP)."
 msgstr ""
+"Tigase 服务器提供对 `XEP-0079: Advanced Message Processing <http://xmpp.org/"
+"extensions/xep-0079.html>`__ (通常缩写为 AMP）的支持。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:6
 msgid ""
 "It is enabled by default but there are several configuration options that"
 " you may tweak."
-msgstr ""
+msgstr "它默认启用，但您可以调整几个配置选项。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:8
 msgid ""
 "Configuration of AMP is not very complex, but as it is implemented as a "
 "component in the Tigase server it does needs a few settings to get it "
 "right."
-msgstr ""
+msgstr "AMP 的配置不是很复杂，但由于它是作为 Tigase "
+"服务器中的一个组件实现的，因此确实需要一些设置才能使其正确。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:10
 msgid ""
 "Here is a first, brief overview of the AMP configuration and later "
 "detailed explanation of each parameter."
-msgstr ""
+msgstr "这是 AMP 配置的第一个简要概述，随后是每个参数的详细说明。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:24
 msgid "First of all: plugins"
-msgstr ""
+msgstr "首先：插件"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:26
 msgid ""
@@ -108,6 +119,13 @@ msgid ""
 " plugin now. Hence you have to switch ``message`` and ``msgoffline`` "
 "plugins off (the ``amp`` plugin is loaded by default):"
 msgstr ""
+"即使整个功能是在组件内部实现的，您也需要一种将带有 ``AMP`` "
+"有效负载的消息转发到该组件的方法。这就是 ``amp`` 插件的作用。 ``amp`` "
+"插件拦截所有 ``<message/>`` 数据包，即使没有 AMP 有效负载，"
+"将其中一些重定向到 ``AMP`` 组件，而其他以标准方式处理。因此，您不再需要 "
+"``message`` 插件或 ``msgoffline`` 插件。这些都是 ``amp`` "
+"插件现在提供的所有功能。因此，您必须关闭 ``message`` 和 ``msgoffline`` 插件（"
+"默认情况下会加载 ``amp`` 插件）："
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:36
 msgid ""
@@ -117,18 +135,21 @@ msgid ""
 "line of the example configuration, which forwards all packets to the "
 "address ``amp@your-domain.tld``:"
 msgstr ""
+"``amp`` 插件需要知道将所有 ``amp`` 数据包转发到哪里。默认情况下，插件使用给定"
+"机器的主机名，因为大多数安装都是如此。但是，这是由示例配置的最后一行配置的，"
+"它将所有数据包转发到地址 ``amp@your-domain.tld``:"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:47
 msgid "Secondly: component"
-msgstr ""
+msgstr "第二：组件"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:49
 msgid "By default Tigase loads the component with the standard name ``amp``"
-msgstr ""
+msgstr "默认情况下，Tigase 使用标准名称 ``amp`` 加载组件"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:52
 msgid "Optional parameters"
-msgstr ""
+msgstr "可选参数"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:54
 msgid ""
@@ -138,6 +159,9 @@ msgid ""
 "for a high traffic and high load installations. It does not use "
 "``UserRepository`` for storing messages."
 msgstr ""
+"组件和插件之间还共享一个参数。可连接到存储离线消息的数据库。 AMP "
+"组件具有用于存储离线消息的专用架构，专为高流量和高负载安装而设计。它不使用 "
+"``UserRepository`` 来存储消息。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:56
 msgid ""
@@ -146,6 +170,9 @@ msgid ""
 "location to reduce performance degradation of rest of the system. You can"
 " set a database connection string using following property:"
 msgstr ""
+"默认情况下，使用与 ``UserRepository`` 相同的物理数据库，但您可以更改它并将消"
+"息存储在完全独立的位置，以减少系统其余部分性能的下降。您可以使用以下属性设置"
+"数据库连接字符串："
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:66
 msgid ""
@@ -156,12 +183,17 @@ msgid ""
 "information by other users who are not authorized for presence updates. "
 "There are a few possible ways to prevent this."
 msgstr ""
+"`XEP-0079 <http://xmpp.org/extensions/xep-0079.html>`__ 规范有一个 `Section "
+"9. - Security Considerations <http://xmpp.org/extensions/xep-0079."
+"html#security>`__。 正如其所描述的，在某些情况下，AMP 协议可用于向未授权进行"
+"状态更新的其他用户显示用户的状态信息。有几种可能的方法可以防止这种情况。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:68
 msgid ""
 "Tigase’s implementation offers 3 modes to handle ``AMP`` requests to "
 "prevent revealing user’s status to non-authorized users:"
-msgstr ""
+msgstr "Tigase 的实现提供了 3 种模式来处理 ``AMP`` "
+"请求，以防止向非授权用户泄露用户的状态："
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:74
 msgid ""
@@ -171,11 +203,14 @@ msgid ""
 "not be feasible or possible to run in this mode for services under a high"
 " load with lots of AMP messages."
 msgstr ""
+"在这种模式下，服务器执行严格的检查。 ``AMP`` 规范已完全处理。然而，这涉及到每"
+"个离线用户的名册加载，因此它可能会影响服务性能。对于具有大量 AMP "
+"消息的高负载服务，在此模式下运行可能不可行或不可能。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:76
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:86
 msgid "In the XEP this mode is described in the following way:"
-msgstr ""
+msgstr "在 XEP 中，这种模式是这样描述的："
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:78
 msgid ""
@@ -185,6 +220,9 @@ msgid ""
 "authorized; this is the RECOMMENDED behavior. This is also the default in"
 " Tigase.*"
 msgstr ""
+"*仅当发送者被授权接收接收者的存在时才接受相关条件，因此如果发送者未被授权，"
+"服务器必须回复 <not-acceptable/> 错误条件；这是推荐的行为。这也是 Tigase "
+"中的默认设置。*"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:84
 msgid ""
@@ -193,6 +231,8 @@ msgid ""
 "user status without looking into the user’s roster. This does not affect "
 "performance but it does impact the ``AMP`` compliance."
 msgstr ""
+"只需返回错误响应即可有效地执行虚拟检查，这样每次默认操作可能会在不查看用户名"
+"册的情况下显示用户状态。这不会影响性能，但会影响 ``AMP`` 合规性。"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:88
 msgid ""
@@ -202,6 +242,9 @@ msgid ""
 "slightly less restrictive but still unnecessarily restricts the "
 "functionality of the system, so is NOT RECOMMENDED.*"
 msgstr ""
+"*仅当动作为 \"drop\" 时才接受相关条件，因此如果动作为 \"alert\", \"error\", "
+"或 \"notify\"; 服务器必须回复<not-acceptable/"
+">错误条件；这限制性稍小，但仍不必要地限制了系统的功能，因此不推荐。*"
 
 #: ../../Tigase_Administration/Components/Advanced_Message_Processing.inc:90
 msgid ""
@@ -210,42 +253,44 @@ msgid ""
 "users. It does not impact the server performance and it offers full AMP "
 "compliance."
 msgstr ""
+"它不做任何检查。它的作用就像所有用户都有权接收通知，即使它可能会向未经授权的"
+"用户透露用户状态。但它不会影响服务器性能，并提供完整的 AMP 合规性。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:2
 msgid "Server Monitoring"
-msgstr ""
+msgstr "服务器监控"
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:4
 msgid ""
 "All the documentation and resources related to the Tigase server "
 "monitoring."
-msgstr ""
+msgstr "与 Tigase 服务器监控相关的所有文档和资源。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:6
 msgid ""
 ":ref:`Setting up Remote Monitoring in the Server<Setting-Up-Remote-"
 "Monitoring-in-the-Server>`"
-msgstr ""
+msgstr ":ref:`在服务器中设置远程监控<Setting-Up-Remote-Monitoring-in-the-Server>`"
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:8
 msgid ""
 ":ref:`Statistics Logger Configuration<Configuration-of-statistics-"
 "loggers>`"
-msgstr ""
+msgstr ":ref:`在服务器中设置远程监控<Setting-Up-Remote-Monitoring-in-the-Server>`"
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:10
 msgid ""
 ":ref:`Retrieving Statistics from the Server<Retrieving-statistics-from-"
 "the-server>`"
-msgstr ""
+msgstr ":ref:`从服务器检索统计信息<Retrieving-statistics-from-the-server>`"
 
 #: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:12
 msgid ":ref:`Monitor Component<Monitor-Component>`"
-msgstr ""
+msgstr ":ref:`监控组件<Monitor-Component>`"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:4
 msgid "Setting Up Remote Monitoring in the Server"
-msgstr ""
+msgstr "在服务器中设置远程监控"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:6
 msgid ""
@@ -254,28 +299,33 @@ msgid ""
 "biggest control and visibility to the server states, all of the "
 "monitoring services give the same basic set of the server statistics:"
 msgstr ""
+"Tigase 服务器可以通过以下协议进行远程监控：``JMX/RMI``, ``SNMP`` 和 "
+"``HTTP``。尽管 ``JMX`` 为服务器状态提供了最大的控制和可见性，但所有监视服务都"
+"提供了相同的基本服务器统计数据集："
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:8
 msgid "Number of network connections for s2s, c2s and Bosh"
-msgstr ""
+msgstr "s2s，c2s 和 Bosh 的网络连接数"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:10
 msgid ""
 "Last second, last minute and last hour load for all main components: SM, "
 "MR, c2s, s2s, Bosh, MUC and PubSub"
-msgstr ""
+msgstr "所有主要组件的最后一秒, 最后一分钟和最后一小时负载：SM, MR, c2s, s2s, Bosh, "
+"MUC 和 PubSub"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:12
 msgid ""
 "System statistics - memory usage (heap and non heap) and the server "
 "uptime in milliseconds and human readable text."
-msgstr ""
+msgstr "系统统计信息 - 内存使用情况（堆和非堆）和服务器正常运行时间（以毫秒为单位）和"
+"人类可读的文本。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:14
 msgid ""
 "Users statistics - number of registered users and number of online user "
 "session."
-msgstr ""
+msgstr "用户统计 - 注册用户数和在线用户会话数。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:16
 msgid ""
@@ -283,23 +333,26 @@ msgid ""
 "while the HTTP server doesn’t offer any access restriction mechanisms. "
 "Therefore HTTP monitoring is recommended to operate behind a firewall."
 msgstr ""
+"JMX/RMI 和 SNMP 服务器提供基本的安全性能并且可以限制访问，而 HTTP "
+"服务器不提供任何访问限制机制。因此，建议 HTTP 监控在防火墙后运行。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:18
 msgid ""
 "The monitoring itself causes very low overhead in terms of the resources "
 "and CPU consumption on top of the normal Tigase processing requirements "
 "so it can be left on without worrying about performance degradation."
-msgstr ""
+msgstr "在正常的 Tigase 处理要求之上，监视本身在资源和 CPU "
+"消耗方面导致非常低的开销，因此可以保留它而不必担心性能下降。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:20
 msgid ""
 "NOTE This works with the Tigase server from version **4.2.0** or build "
 "**1418**."
-msgstr ""
+msgstr "注意 这适用于版本 **4.2.0** 或构建 **1418** 的 Tigase 服务器。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:23
 msgid "What You Need"
-msgstr ""
+msgstr "你需要什么"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:25
 msgid ""
@@ -308,10 +361,13 @@ msgid ""
 "extras[https://github.com/tigase/tigase-extras] built and included in the"
 " ``jars/`` directory."
 msgstr ""
+"统计二进制文件是内置的 ``-dist-max`` ，不需要额外的文件。如果你已经下载了 "
+"``-dist`` 文件，你需要构建 tigase-extras[https://github.com/tigase/tigase-"
+"extras] 并将其包含在 ``jars/`` 目录中。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:28
 msgid "Activation"
-msgstr ""
+msgstr "激活"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:30
 msgid ""
@@ -2530,4 +2586,3 @@ msgstr ""
 #~ " but from the **real** node (in "
 #~ "this case: ``EventName|tigase:demo``)."
 #~ msgstr ""
-
