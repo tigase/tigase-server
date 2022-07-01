@@ -15,15 +15,20 @@ Server Components
 -  `Tigase HTTP API <../../projects/tigase-tigase-http-api/en/latest/>`__ Operate and manage Tigase via HTTP... and more!
 -  `Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ Implementation of XEP-0045: PubSub protocol
 
-Server Components
+XMPP Clients
 ^^^^^^^^^^^^^^^^^
 
 -  `SiskinIM <../../projects/tigase-siskinim/en/latest/>`__ iOS XMPP Client
 
+XMPP Libraries
+^^^^^^^^^^^^^^^^^
+
+-  `Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang XMPP Library
+
 Legacy documentation website
 ^^^^^^^^^^^^^^^^^
 
--  `Legacy documentation website <https://docs.tigase.net/>`__ Our legacy documentation website which contains documentation for older versions of componetns and applications
+-  `Legacy documentation website <https://docs-legacy.tigase.net/>`__ Our legacy documentation website which contains documentation for older versions of componetns and applications
 
 .. toctree::
    :caption: Tigase XMPP Server Distribution Administration Guide
