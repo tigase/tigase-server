@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 02:43-0700\n"
-"PO-Revision-Date: 2022-07-02 22:14+0000\n"
+"PO-Revision-Date: 2022-07-04 09:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/components/zh_Hans/>\n"
@@ -374,7 +374,8 @@ msgid ""
 "You can either run the Tigase installer and use the configuration wizard "
 "to activate the monitoring or edit etc/config.tdsl file and add following"
 " lines:"
-msgstr ""
+msgstr "您可以运行 Tigase 安装程序并使用配置向导来激活监控或编辑 etc/config.tdsl "
+"文件并添加以下行："
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:46
 msgid ""
@@ -382,45 +383,49 @@ msgid ""
 "to activate. Each server is responsible for activation of a different "
 "protocol and takes a single parameter - port number. There are following "
 "protocols supported right now:"
-msgstr ""
+msgstr "如您所见，您要激活的每个监控服务器都有一个单独的块。"
+"每个服务器负责激活不同的协议并采用单个参数 - 端口号。目前支持以下协议："
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:48
 msgid "``jmx`` - activating monitoring via JMX/RMI"
-msgstr ""
+msgstr "``jmx`` - 通过 JMX/RMI 激活监控"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:50
 msgid "``http`` - activating monitoring over HTTP protocol"
-msgstr ""
+msgstr "``http`` - 通过 HTTP 协议激活监控"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:52
 msgid "``snmp`` - activating monitoring over SNMP protocol"
-msgstr ""
+msgstr "``snmp`` - 通过 SNMP 协议激活监控"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:54
 msgid ""
 "You can have all protocols active at the same time or any combination of "
 "them or none."
-msgstr ""
+msgstr "您可以同时激活所有协议或它们的任意组合或不激活。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:57
 msgid "Security"
-msgstr ""
+msgstr "安全"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:59
 msgid ""
 "Both JMX and SNMP offer security protection to limit access to monitoring"
 " data. The security configuration is a bit different for both."
-msgstr ""
+msgstr "JMX 和 SNMP 都可提供安全保护来限制对监控数据的访问。两者的安全配置略有不同。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:62
+#, fuzzy
 msgid "JMX"
-msgstr ""
+msgstr "JMX"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:64
 msgid ""
 "After the server installation or in the SVN repository you can find 2 "
 "files in the ``etc/`` directory: ``jmx.access`` and ``jmx.password``."
 msgstr ""
+"服务器安装后或在 SVN 存储库中，您可以在 ``etc/`` 目录中找到 2 个文件：``jmx."
+"access`` 和 ``jmx.password``。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:66
 msgid ""
@@ -429,6 +434,9 @@ msgid ""
 "``readonly`` or with read-write ``readwrite`` access. There are example "
 "entries in the file already and the content may simply look like:"
 msgstr ""
+"``jmx.access`` 是一个用户权限文件。您可以使用它来指定用户是否可以只读 "
+"``readonly`` 或读写 ``readwrite`` "
+"访问监控数据。文件中已有示例条目，内容可能如下所示："
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:73
 msgid ""
@@ -437,16 +445,21 @@ msgid ""
 "There are example entries already provided for you convenience. Content "
 "of the file may look like the example below:"
 msgstr ""
+"``jmx.password`` "
+"是一个用户密码文件。您可以在此处设置用户密码，格式也是非常简单，与 "
+"jmx.access "
+"相同。为方便起见，已经提供了示例条目。该文件的内容可能类似于以下示例："
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:80
 msgid ""
 "Using above to files you can control who and how can access the JMX "
 "monitoring services."
-msgstr ""
+msgstr "使用上述文件，您可以控制谁以及如何访问 JMX 监控服务。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:82
+#, fuzzy
 msgid "SNMP"
-msgstr ""
+msgstr "SNMP"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:84
 msgid ""
@@ -456,6 +469,9 @@ msgid ""
 " restrict access per user, host and what kind access is allowed. The "
 "simplest possible configuration may look like this:"
 msgstr ""
+"使用 ACL（访问控制列表）控制对 SNMP 监控的访问，该访问控制列表可以在位于 ``"
+"etc/`` 目录中的文件 ``snmp.acl`` 中进行配置。它包含许多详细说明如何设置 ACL "
+"和限制每个用户，主机的访问以及允许的访问类型。最简单的配置可能如下所示："
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:101
 msgid ""
@@ -465,30 +481,35 @@ msgid ""
 "the server specific statistics. The MIB contains definition for all the "
 "server statistics exposed via SNMP."
 msgstr ""
+"您可能还需要 Tigase MIB 定义：`TIGASE-MANAGEMENT-MIB.mib <https://github.com/"
+"tigase/tigase-server/blob/master/src/main/resources/mib/JVM-MANAGEMENT-MIB."
+"mib>`__ 以用于服务器特定的统计信息。 MIB 包含通过 SNMP "
+"公开的所有服务器统计信息的定义。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:103
+#, fuzzy
 msgid "HTTP"
-msgstr ""
+msgstr "HTTP"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:105
 msgid ""
 "Access the server at example.com:9080 and you will be presented with an "
 "Agent View."
-msgstr ""
+msgstr "访问 example.com:9080 上的服务器，您将看到一个代理视图。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:4
 msgid "Retrieving statistics from the server"
-msgstr ""
+msgstr "从服务器检索统计信息"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:6
 msgid ""
 "By default we can retrieve server statistics using XMPP, no additional "
 "setup is necessary."
-msgstr ""
+msgstr "默认情况下，我们可以使用 XMPP 检索服务器统计信息，无需额外设置。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:9
 msgid "Retrieving statistics using XMPP"
-msgstr ""
+msgstr "使用 XMPP 检索统计信息"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:11
 msgid ""
@@ -498,10 +519,13 @@ msgid ""
 "remember, that only administrator (a user whose JID is configured as "
 "administrative) can access the statistics."
 msgstr ""
+"通过 XMPP 协议访问统计数据需要任何 XMPP 客户端能够执行 `XEP-0050: Ad-Hoc "
+"Commands <http://xmpp.org/extensions/xep-0050."
+"html>`__。必须记住，只有管理员（其 JID 配置为管理的用户）才能访问统计信息。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:14
 msgid "Psi XMPP Client"
-msgstr ""
+msgstr "Psi XMPP 客户端"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:16
 msgid ""
@@ -511,28 +535,35 @@ msgid ""
 "from application menu or from context menu of the particular account "
 "account:"
 msgstr ""
+"出于本指南的目的，将使用 `Psi <http://psi-im.org/>`__ "
+"客户端。成功配置并连接到具有管理权限的帐户后，"
+"我们需要从应用程序菜单或特定帐户的上下文菜单访问 *Service Discovery*："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:18
+#, fuzzy
 msgid "|roster-discovery|"
-msgstr ""
+msgstr "|roster-discovery|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:74
+#, fuzzy
 msgid "roster-discovery"
-msgstr ""
+msgstr "roster-discovery"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:20
 msgid ""
 "In the *Service Discovery* window we need to find *Server Statistics* "
 "component:"
-msgstr ""
+msgstr "在 *Service Discovery* 窗口中，我们需要找到 *Server Statistics* 组件："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:22
+#, fuzzy
 msgid "|discovery-stats|"
-msgstr ""
+msgstr "|discovery-stats|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:75
+#, fuzzy
 msgid "discovery-stats"
-msgstr ""
+msgstr "discovery-stats"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:24
 msgid ""
@@ -540,26 +571,30 @@ msgid ""
 "component after expanding the tree. To execute ad-hoc command simply "
 "double click on the particular node which will open window with "
 "statistics:"
-msgstr ""
+msgstr "我们可以访问所有组件的统计信息，也可以在展开树后选择特定组件。要执行临时命令"
+"，只需双击将打开统计窗口的特定节点："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:26
+#, fuzzy
 msgid "|server-stats|"
-msgstr ""
+msgstr "|server-stats|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:76
+#, fuzzy
 msgid "server-stats"
-msgstr ""
+msgstr "server-stats"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:28
 msgid ""
 "In this window, in addition to see the statistics, we can adjust *Stats "
 "level* by selecting desired level from the list and confirm by clicking "
 "*Finish*."
-msgstr ""
+msgstr "在此窗口中，除了查看统计信息外，我们还可以通过从列表中选择所需级别来调整 *"
+"Stats level*，然后单击 *Finish* 进行确认。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:31
 msgid "Retrieving statistics using JMX"
-msgstr ""
+msgstr "使用 JMX 检索统计信息"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:33
 msgid ""
@@ -568,10 +603,14 @@ msgid ""
 "Afterwards we can use a number of tools to get to the statistics, for "
 "example the following:"
 msgstr ""
+"为了通过 JMX 访问统计信息，我们需要在 Tigase 中启用对它的支持 - `Monitoring "
+"Activation "
+"<#monitoring_activation>`__。之后我们可以使用一些工具来获取统计信息，例如："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:36
+#, fuzzy
 msgid "JConsole"
-msgstr ""
+msgstr "JConsole"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:38
 msgid ""
@@ -579,14 +618,18 @@ msgid ""
 "of the remote process, including IP, port and credentials from "
 "**etc/jmx.**\\ \\* files:"
 msgstr ""
+"打开 JConsole 后，我们要么选择本地进程，要么提供远程进程的详细信息，包括来自 "
+"**etc/jmx.**\\\\* 文件的 IP，端口和凭据："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:40
+#, fuzzy
 msgid "|jconsole|"
-msgstr ""
+msgstr "|jconsole|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:77
+#, fuzzy
 msgid "jconsole"
-msgstr ""
+msgstr "jconsole"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:42
 msgid ""
@@ -595,18 +638,24 @@ msgid ""
 "accessing statistics for all components or only for particular component "
 "as well as adjusting level for which we want to obtain statistics:"
 msgstr ""
+"之后我们去找到 MBeans 选项卡，从中我们可以访问 ``tigase.stats`` MBean。"
+"它提供了与 XMPP 类似的选项 - 访问所有组件的统计信息或仅访问特定组件的统计信息"
+"，以及调整我们想要获取统计信息的级别："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:44
+#, fuzzy
 msgid "|jconsole-1|"
-msgstr ""
+msgstr "|jconsole-1|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:78
+#, fuzzy
 msgid "jconsole-1"
-msgstr ""
+msgstr "jconsole-1"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:48
+#, fuzzy
 msgid "StatsDumper.groovy"
-msgstr ""
+msgstr "StatsDumper.groovy"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:50
 msgid ""
@@ -617,50 +666,55 @@ msgid ""
 "Simple JMX client that connects to Tigase and periodically saves all "
 "statistics to files."
 msgstr ""
+"为了收集一段时间内的统计信息，可以使用以下 groovy 脚本：`StatsDumper.groovy "
+"<https://raw.githubusercontent.com/tigase/tigase-server/master/src/main/"
+"restructured/files/StatsDumper.groovy>`__。它是一个简单的 JMX 客户端，连接到 "
+"Tigase 并定期将所有统计信息保存到文件中。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:52
 msgid "It takes following parameters:"
-msgstr ""
+msgstr "它接受以下参数："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:58
 msgid "``hostname`` - address of the instance"
-msgstr ""
+msgstr "``hostname`` - 实例地址"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:60
 msgid "``username`` - JMX username"
-msgstr ""
+msgstr "``username`` - JMX 用户名"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:62
 msgid "``password`` - JMX username"
-msgstr ""
+msgstr "``password`` - JMX 用户名"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:64
 msgid "``dir`` - directory to which save the files with statistics"
-msgstr ""
+msgstr "``dir`` - 保存带有统计信息的文件的目录"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:66
 msgid "``port`` - port on which to make the connection"
-msgstr ""
+msgstr "``port`` - 建立连接的端口"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:68
 msgid ""
 "``delay``\\ (ms) - initial delay in milliseconds after which statistics "
 "should be saved"
-msgstr ""
+msgstr "``delay``\\ (ms) - 初始延迟（以毫秒为单位），之后应保存统计信息"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:70
 msgid "``interval``\\ (ms) - interval between each retrieval/saving of statistics"
-msgstr ""
+msgstr "``interval``\\ (ms) - 每次检索/保存统计信息之间的间隔"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:72
 msgid ""
 "``loadhistory``\\ (bool) - indicates whether or not load statistics "
 "history from server (if such is enabled in Tigase)"
-msgstr ""
+msgstr "``loadhistory``\\ (bool) - 表明是否从服务器加载统计历史记录（如果在 Tigase "
+"中启用）"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:4
 msgid "Monitor Component"
-msgstr ""
+msgstr "监控组件"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:6
 msgid ""
@@ -671,6 +725,10 @@ msgid ""
 "sent to system administrators to let them know an event has occurred! "
 "Lets begin with setup and requirements."
 msgstr ""
+"Tigase 包含一个 **Monitor Component** "
+"以帮助进行监控。这允许您为某些预定义任务设置阈值，并且当超过这些阈值时，"
+"您或其他 JIDs 可以收到一条消息。您甚至可以配置邮件程序扩展，将电子邮件发送给"
+"系统管理员，让他们知道发生了什么事情！让我们从设置和要求开始。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:8
 msgid ""
@@ -679,36 +737,39 @@ msgid ""
 "specification. Events are delivered to subscribers as a normal PubSub "
 "notification."
 msgstr ""
+"Monitor 组件基于 eventbus，而 eventbus 又基于有限的 `PubSub <http://www.xmpp."
+"org/extensions/xep-0060.html>`__ 规范。事件作为普通的 PubSub "
+"通知传递给订阅者。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:10
 msgid ""
 "Each component or client may subscribe for specific types of events. Only"
 " components on cluster nodes are allowed to publish events."
-msgstr ""
+msgstr "每个组件或客户端都可以订阅特定类型的事件。只允许集群节点上的组件发布事件。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:13
 msgid "Setup"
-msgstr ""
+msgstr "设置"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:15
 msgid ""
 "Monitor Component is enabled by default on v7.1.0 b4001 and later, so no "
 "setup needed!"
-msgstr ""
+msgstr "监视器组件在 v7.1.0 b4001 及更高版本上默认启用，因此无需设置！"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:18
 msgid "How it Works"
-msgstr ""
+msgstr "这个怎么工作"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:20
 msgid ""
 "Events in Eventbus are identified by two elements: name of event and its "
 "namespace:"
-msgstr ""
+msgstr "Eventbus 中的事件由两个元素标识：事件名称及其命名空间："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:28
 msgid "Where event name is ``EventName`` and namespace is ``tigase:demo``."
-msgstr ""
+msgstr "其中事件名称是 ``EventName``，命名空间是 ``tigase:demo``。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:30
 msgid ""
@@ -717,6 +778,8 @@ msgid ""
 " have to add a way to convert the event name and namespace to a node "
 "name:"
 msgstr ""
+"侦听器可以订阅特定事件或具有特定命名空间的所有事件。因为在 pubsub 中，只有一"
+"个节点名存在，所以我们要添加一种方法，将事件名和命名空间转换为节点名："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:36
 msgid ""
@@ -725,25 +788,29 @@ msgid ""
 "events with a specific namespace, use an asterisk (``*``) instead of the "
 "event name: ``*|tigase:demo``."
 msgstr ""
+"例如，要订阅 ``<EventName xmlns=\"tigase:demo\">``，节点必须是：``EventName|t"
+"igase:demo``。如果您希望订阅具有特定命名空间的所有事件，请使用星号（``*``）而"
+"不是事件名称：``*|tigase:demo``。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:43
 msgid "Available Tasks"
-msgstr ""
+msgstr "可用任务"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:45
 msgid ""
 "Monitor Component has several pre-defined tasks that can be monitored and"
 " set to trigger. What follows is the list of tasks with the options "
 "attributed to each task."
-msgstr ""
+msgstr "Monitor Component 有几个预定义的任务可以被监控并设置为触发。以下是任务列表，"
+"其中包含每个任务的选项。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid "**disk-task** - Used to check disk usage."
-msgstr ""
+msgstr "**disk-task** - 用于检查磁盘使用情况。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid "Available Options"
-msgstr ""
+msgstr "可用选项"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:50
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:59
@@ -752,44 +819,45 @@ msgstr ""
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:87
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:94
 msgid "``enabled`` - Enable or disable task, Boolean value."
-msgstr ""
+msgstr "``enabled`` - 启用或禁用任务，布尔值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:52
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:61
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:70
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:79
 msgid "``period`` - Period of running check, Integer value."
-msgstr ""
+msgstr "``period`` - 运行检查的周期，整数值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:54
 msgid "``threshold`` - Percentage of used space on disk, Float value."
-msgstr ""
+msgstr "``threshold`` - 磁盘上已用空间的百分比，浮点值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid "**cpu-temp-task** - Used to check CPU temperature."
-msgstr ""
+msgstr "**cpu-temp-task** - 用于检查 CPU 温度。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:63
 msgid "``cpuTempThreshold`` - Temperature threshold of CPU in °C."
-msgstr ""
+msgstr "``cpuTempThreshold`` - CPU 的温度阈值，以°C 为单位。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid "**load-checker-task** - Used to check system load."
-msgstr ""
+msgstr "**load-checker-task** - 用于检查系统负载。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:72
 msgid "``averageLoadThreshold`` - Average percent load threshold, Long value."
-msgstr ""
+msgstr "``averageLoadThreshold`` - 平均百分比负载阈值，long 值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid "**memory-checker-task** - Used to check memory usage."
-msgstr ""
+msgstr "**memory-checker-task** - 用于检查内存使用情况。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:81
 msgid ""
 "``maxHeapMemUsagePercentThreshold`` - Alarm when percent of used Heap "
 "memory is larger than, Integer value."
-msgstr ""
+msgstr "``maxHeapMemUsagePercentThreshold`` - "
+"已用堆内存百分比大于此值时发出警报，此值为整数值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:83
 msgid ""
