@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 02:43-0700\n"
-"PO-Revision-Date: 2022-07-04 09:14+0000\n"
+"PO-Revision-Date: 2022-07-06 22:39+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/components/zh_Hans/>\n"
@@ -863,11 +863,12 @@ msgstr "``maxHeapMemUsagePercentThreshold`` - "
 msgid ""
 "``maxNonHeapMemUsagePercentThreshold`` - Alarm when percent of used Non "
 "Heap memory is larger than, Integer value."
-msgstr ""
+msgstr "``maxNonHeapMemUsagePercentThreshold`` - "
+"已用非堆内存百分比大于此值时发出警报，此值为整数值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid "**logger-task** - Used to transmit log entries depending on level entered."
-msgstr ""
+msgstr "**logger-task** - 用于根据输入级别传输的日志条目。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:89
 msgid ""
@@ -875,38 +876,41 @@ msgid ""
 "Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, "
 "and ALL."
 msgstr ""
+"``levelThreshold`` - 将成为阈值的最小日志级别。可能的值为 "
+"SEVERE、WARNING、INFO、CONFIG、FINE、FINER、FINEST 和 ALL。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid "**connections-task** - Used to check users disconnections."
-msgstr ""
+msgstr "**connections-task** - 用于检查用户断开连接。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid ""
 "**NOTE: The event will be generated only if both thresholds (amount and "
 "percentage) will be fulfilled.**"
-msgstr ""
+msgstr "**注意：仅当满足两个阈值（数量和百分比）时才会生成事件。**"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:96
+#, fuzzy
 msgid "``period`` - Period of running check in ms, Integer value."
-msgstr ""
+msgstr "``period`` - 运行检查的周期，整数值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:98
 msgid ""
 "``thresholdMinimal`` - Minimal amount of disconnected users required to "
 "generate alarm."
-msgstr ""
+msgstr "``thresholdMinimal`` - 生成警报所需断开连接用户的最小数量。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:100
 msgid ""
 "``threshold`` - Minimal percent of disconnected users required to "
 "generate alarm."
-msgstr ""
+msgstr "``threshold`` - 生成警报所需的断开连接用户的最小百分比。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:7
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:103
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:306
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:105
 msgid ""
@@ -916,60 +920,68 @@ msgid ""
 " override ones in config.tdsl, but they will only last until the server "
 "restarts."
 msgstr ""
+"监视器的配置可以通过以下两种方式之一完成；通过 ``config.tdsl`` 文件中的行，"
+"或者通过将 XMPP 节发送到服务器。您也可以通过 HTTP REST 发送 XMPP 节。 XMPP "
+"节配置将覆盖 config.tdsl 中的配置，但它们只会持续到服务器重新启动。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:107
+#, fuzzy
 msgid "config.tdsl"
-msgstr ""
+msgstr "config.tdsl"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:109
 msgid ""
 "Tasks can be configured in the ``config.tdsl`` file. See `available tasks"
 " <#availableTasks>`__ for the tasks that can be setup."
 msgstr ""
+"可以在 ``config.tdsl`` 文件中配置任务。有关可以设置的任务，请参阅 :ref:`"
+"available tasks<availableTasks>`。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:111
 msgid "To enable a specific monitor task, use the following line:"
-msgstr ""
+msgstr "要启用特定的监控任务，请使用以下行："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:121
 msgid ""
 "Where monitor is the component name for ``MonitorComponent``, and "
 "``$TASKNAME`` is one of the `available task names <#availableTasks>`__."
 msgstr ""
+"其中 monitor 是 ``MonitorComponent`` 的组件名称，而 ``$TASKNAME`` 是 :ref:`"
+"available task<availableTasks>` 之一。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:123
 msgid ""
 "This format will be the same for other settings for tasks, and it’s best "
 "to group settings under one heading. For example:"
-msgstr ""
+msgstr "此格式与任务的其他设置相同，最好将设置分组在一个标题下。例如："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:134
 msgid ""
 "sets the check period to 1000 milliseconds and enables ``connections-"
 "task``."
-msgstr ""
+msgstr "将检查周期设置为 1000 毫秒并启用 ``connections-task``。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:138
 msgid ""
 "Once triggers have been activated, they will become dormant. Think of "
 "these as one-shot settings."
-msgstr ""
+msgstr "一旦触发器被激活，它们就会进入休眠状态。将这些视为一次性设置。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:141
 msgid "Subscription Limitations"
-msgstr ""
+msgstr "订阅限制"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:143
 msgid "To define list of JIDs allowed to subscribe for events:"
-msgstr ""
+msgstr "要定义允许订阅事件的 JIDs 列表："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:153
 msgid "If this is not specified, all users can subscribe."
-msgstr ""
+msgstr "如果以上未指定，则所有用户都可以订阅。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:155
 msgid "Configuration via XMPP"
-msgstr ""
+msgstr "通过 XMPP 配置"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:157
 msgid ""
@@ -978,44 +990,50 @@ msgid ""
 "This is done using a series of ``iq`` stanzas send to the monitor "
 "component."
 msgstr ""
+"我们还可以使用 XMPP "
+"节配置事件总线监视器组件。这允许我们在服务器运行时设置和更改配置。"
+"这是使用一系列发送到监视器组件的 ``iq`` 节来完成的。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:159
 msgid ""
 "We can query each component for its current settings using the following "
 "stanza."
-msgstr ""
+msgstr "我们可以使用以下节查询每个组件的当前设置。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:167
 msgid ""
 "The server will return the component current settings which will make "
 "things easier if you wish to edit them. In this case, the server has "
 "returned the following to us"
-msgstr ""
+msgstr "服务器将返回组件当前设置，如果您想编辑它们，这将变得更容易。在这种情况下，服"
+"务器已向我们返回以下内容"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:190
 msgid ""
 "This tells us that the disk-task setting is not active, has a period of "
 "60000ms, and will trigger when disk usage is over 80%."
-msgstr ""
+msgstr "这告诉我们，disk-task 设置不活跃，有 60000ms 的周期，当磁盘使用率超过 80% "
+"时会触发。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:192
 msgid ""
 "To send new settings to the monitor component, we can send a similar "
 "stanza back to the monitor component."
-msgstr ""
+msgstr "要将新设置发送到监视器组件，我们可以将类似的节发送回监视器组件。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:213
 msgid ""
 "To which a successful update will give you an XMPP success stanza to let "
 "you know everything is set correctly."
-msgstr ""
+msgstr "成功的更新将为您提供 XMPP 成功节，让您知道一切设置正确。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:215
 msgid ""
 "Alternatively, you can update specific settings by editing a single field"
 " without adding anything else. For example, if we just wanted to turn the"
 " disk-task on we could send the following stanza:"
-msgstr ""
+msgstr "或者，您可以通过编辑单个字段而不添加任何其他内容来更新特定设置。例如，如果我"
+"们只想打开磁盘任务，我们可以发送以下节："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:229
 msgid ""
@@ -1023,40 +1041,46 @@ msgid ""
 "changed, specifically the ``<field type=\"boolean\" "
 "var=x-task#enabled\">`` fields:"
 msgstr ""
+"要设置任何其他值，请不要忘记某些部分可能需要更改，特别是 ``<field type="
+"\"boolean\" var=x-task#enabled\">`` 字段:"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid ""
 "Your field type will be defined by the type of variable specified in the "
 "`Available Tasks <#availableTasks>`__ section."
-msgstr ""
+msgstr "您的字段类型将由 :ref:`Available Tasks<availableTasks>` "
+"部分中指定的变量类型定义。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:233
 msgid ""
 "``var=x task#`` will be followed by the property value taken directly "
 "from the `Available Tasks <#availableTasks>`__ section."
-msgstr ""
+msgstr "``var=x task#`` 后跟直接取自 :ref:`Available Tasks<availableTasks>` "
+"部分的属性值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:236
 msgid "Getting the Message"
-msgstr ""
+msgstr "获取消息"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:238
 msgid ""
 "Without a place to send messages to, monitor will just trigger and shut "
 "down. There are two different methods that monitor can deliver alarm "
 "messages and relevant data; XMPP messages and using the mailer extension."
-msgstr ""
+msgstr "如果没有发送消息的地方，监视器只会触发并关闭。监视器有两种不同的方法来传递警"
+"报消息和相关数据； XMPP 消息并使用邮件程序扩展。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:240
 msgid "XMPP notification"
-msgstr ""
+msgstr "XMPP 通知"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:242
 msgid ""
 "In order to retrieve notifications, a subscription to the "
 "``eventbus@<VHost>`` user must be made. Keep in mind that subscriptions "
 "are not persistent across server restarts, or triggers."
-msgstr ""
+msgstr "为了检索通知，必须订阅 ``eventbus@<VHost>`` "
+"用户。请记住，订阅在服务器重新启动或触发后是会变化的。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:243
 msgid ""
@@ -1070,6 +1094,12 @@ msgid ""
 "task|tigase:monitor:event``. Applied to an XMPP stanza, it will look "
 "something like this:"
 msgstr ""
+"监视器架构与大多数 XMPP 订阅请求非常相似，但如果您想订阅某个任务或所有任务，"
+"请进行一些调整以区分它。每个任务都被视为一个节点，每个节点都有以下模式：``eve"
+"ntName|eventXMLNS``。由于每个监控任务都有 ``tigase:monitor:event`` 事件 "
+"XMLNS，我们只需要从任务列表中选择事件名称。所以像上面的例子一样，"
+"我们的磁盘任务事件节点将是 ``disk-task|tigase:monitor:event`` 。其用于 XMPP "
+"节，它看起来像这样："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:255
 msgid ""
@@ -1077,48 +1107,51 @@ msgid ""
 "want to receive those messages. You can even have them sent to a MUC or "
 "any component with a JID."
 msgstr ""
+"不要忘记将 ``$USER_JID`` 替换为您想要接收这些消息的用户的裸 JID。"
+"您甚至可以将它们发送到 MUC 或任何具有 JID 的组件。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:257
 msgid "Available events are as follows:"
-msgstr ""
+msgstr "可用的事件如下："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:259
 msgid "DiskUsageMonitorEvent for ``disk-task``"
-msgstr ""
+msgstr "``disk-task`` 的 DiskUsageMonitorEvent"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:261
 msgid "LoggerMonitorEvent for ``logger-task``"
-msgstr ""
+msgstr "``logger-task`` 的LoggerMonitorEvent"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:263
 msgid "HeapMemoryMonitorEvent for ``memory-checker-task``"
-msgstr ""
+msgstr "``memory-checker-task`` 的HeapMemoryMonitorEvent"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:265
 msgid "LoadAverageMonitorEvent for ``load-checker-task``"
-msgstr ""
+msgstr "``load-checker-task`` 的LoadAverageMonitorEvent"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:267
 msgid "CPUTempMonitorEvent for ``cpu-temp-task``"
-msgstr ""
+msgstr "``cpu-temp-task`` 的 CPUTempMonitorEvent"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:269
 msgid "UsersDisconnected for ``connections-task``"
-msgstr ""
+msgstr "``connections-task`` 的UsersDisconnected"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:271
 msgid ""
 "Alternatively, you can also subscribe to all events within the eventbus "
 "by using a wildcard \\* in place of the event XMLNS like this example:"
-msgstr ""
+msgstr "或者，您还可以使用通配符 \\* 代替事件 XMLNS "
+"来订阅事件总线中的所有事件，如下例所示："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:283
 msgid "Sample notification from Monitor"
-msgstr ""
+msgstr "来自 Monitor 的示例通知"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:300
 msgid "Mailer Extension"
-msgstr ""
+msgstr "邮件扩展"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:302
 msgid ""
@@ -1126,83 +1159,91 @@ msgid ""
 "the monitor component to a specified E-mail address so system "
 "administrators who are not logged into the XMPP server."
 msgstr ""
+"*Tigase Server Monitor Mailer Extension* (TSMME) "
+"可以将消息从监视器组件发送到指定的电子邮件地址，以方便那些未登录到 XMPP "
+"服务器的系统管理员。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:304
 msgid ""
 "For v7.1.0 versions and later, TSMME is already included in your "
 "distribution package and no extra installation is needed."
-msgstr ""
+msgstr "对于 v7.1.0 及更高版本，TSMME 已包含在您的分发包中，无需额外安装。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:308
 msgid ""
 "Tigase Mailer Extension may be configured via the ``config.tdsl`` file in"
 " the following manner:"
-msgstr ""
+msgstr "Tigase Mailer Extension 可以通过 ``config.tdsl`` 文件用以下方式配置："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:321
 msgid "Here is an explanation of those variables."
-msgstr ""
+msgstr "这是对这些变量的解释。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:323
 msgid "``mailer-smtp-host`` - SMTP Server hostname."
-msgstr ""
+msgstr "``mailer-smtp-host`` - SMTP 服务器主机名。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:325
 msgid "``mailer-smtp-port`` - SMTP Server port."
-msgstr ""
+msgstr "``mailer-smtp-port`` - SMTP服务器端口。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:327
 msgid "``mailer-smtp-usernam`` - name of sender account."
-msgstr ""
+msgstr "``mailer-smtp-usernam`` - 发件人帐户的名称。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:329
 msgid "``mailer-smtp-password`` - password of sender account."
-msgstr ""
+msgstr "``mailer-smtp-password`` - 发件人帐户的密码。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:331
 msgid ""
 "``mailer-from-address`` - sender email address. It will be set in field "
 "from in email."
-msgstr ""
+msgstr "``mailer-from-address`` - 发件人电子邮件地址。它将在电子邮件中的字段中设置。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:333
 msgid ""
 "``mailer-to-addresses`` - comma separated notification receivers email "
 "addresses."
-msgstr ""
+msgstr "``mailer-to-addresses`` - 逗号分隔的通知接收者电子邮件地址。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:335
 msgid ""
 "It is recommended to create a specific e-mail address in your mail server"
 " for this purpose only, as the account settings are stored in plaintext "
 "without encryption."
-msgstr ""
+msgstr "建议仅出于此目的在您的邮件服务器中创建一个特定的电子邮件地址，因为帐户设置以"
+"明文形式存储而没有加密。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:4
 msgid "Configuration of statistics loggers"
-msgstr ""
+msgstr "统计记录器的配置"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:6
 msgid ""
 "It is possible to enable and configure automatic storage of statistics "
 "information. To do that you need to configure any of following statistics"
 " loggers as a ``StatisticsCollector`` component sub-beans:"
-msgstr ""
+msgstr "可以启用和配置统计信息的自动存储。为此，您需要将以下任何统计记录器配置为 "
+"``StatisticsCollector`` 组件子 bean："
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:9
+#, fuzzy
 msgid "``tigase.stats.CounterDataArchivizer``"
-msgstr ""
+msgstr "``tigase.stats.CounterDataArchivizer``"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:9
 msgid ""
 "every execution put current basic server metrics (CPU usage, memory "
 "usage, number of user connections, uptime) into database (overwrites "
 "previous entry)."
-msgstr ""
+msgstr "每次执行都会将当前的基本服务器指标（CPU "
+"使用率，内存使用率，用户连接数，正常运行时间）放入数据库（覆盖先前的条目）。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:12
+#, fuzzy
 msgid "``tigase.stats.CounterDataLogger``"
-msgstr ""
+msgstr "``tigase.stats.CounterDataLogger``"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:12
 msgid ""
@@ -1211,14 +1252,18 @@ msgid ""
 "connector, number of processed packets of different types, uptime, etc) "
 "into the database."
 msgstr ""
+"每次执行都会在数据库中插入新的行，其中包含一组新的服务器统计数据（CPU 使用率"
+"，内存使用率，每个连接器的用户连接数，已处理的不同类型的数据包数，正常运行时"
+"间等）。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:15
+#, fuzzy
 msgid "``tigase.stats.CounterDataFileLogger``"
-msgstr ""
+msgstr "``tigase.stats.CounterDataFileLogger``"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:15
 msgid "every execution store all server statistics into separate file."
-msgstr ""
+msgstr "每次执行都将所有服务器统计信息存储到单独的文件中。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:17
 msgid ""
@@ -1227,17 +1272,21 @@ msgid ""
 "prefixed with ``stat`` and located in ``logs/server_statistics`` "
 "following entry is needed:"
 msgstr ""
+"``tigase.stats.CounterDataFileLogger`` 以每 60 秒将级别为 ``FINE`` "
+"的统计数据归档到以 ``stat`` 为前缀并位于 ``logs/server_statistics`` "
+"的文件中，以下条目是所需要的："
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:2
 msgid "Server to Server Protocol Settings"
-msgstr ""
+msgstr "服务器到服务器协议设置"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:4
 msgid ""
 "Tigase server-to-server communication component facilitates communication"
 " with other XMPP servers (federation) and allows you to tweak it’s "
 "configuration to get a better performance in your installation."
-msgstr ""
+msgstr "Tigase 服务器到服务器通信组件促进了与其他 XMPP "
+"服务器（联合）的通信，并允许您调整其配置以获得更好的安装性能。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:6
 msgid ""
@@ -1245,35 +1294,36 @@ msgid ""
 "settings chosen. There are however, a set of configuration parameters you"
 " can adjust the server behavior to achieve optimal performance on your "
 "installation."
-msgstr ""
+msgstr "默认情况下启用 S2S（或服务器到服务器）协议并选择最佳设置。但是，您可以使用一"
+"组配置参数来调整服务器行为，以在您的安装中实现最佳性能。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:8
 msgid ""
 "This documents describes following elements of the Tigase server "
 "configuration:"
-msgstr ""
+msgstr "本文档描述了 Tigase 服务器配置的以下元素："
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:10
 msgid "Number of concurrent connections to external servers"
-msgstr ""
+msgstr "与外部服务器的并发连接数"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:12
 msgid "The connection throughput parameters"
-msgstr ""
+msgstr "连接吞吐量参数"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:14
 msgid ""
 "Maximum waiting time for packets addressed to external servers and the "
 "connection inactivity time"
-msgstr ""
+msgstr "发往外部服务器的数据包的最长等待时间和连接不活动时间"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:16
 msgid "Custom plugins selecting connection to the remote server"
-msgstr ""
+msgstr "自定义插件选择连接到远程服务器"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:19
 msgid "Number of Concurrent Connections"
-msgstr ""
+msgstr "并发连接数"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:21
 msgid ""
@@ -1282,6 +1332,9 @@ msgid ""
 " can get much better throughput and performance if you open multiple "
 "connections to the remote server."
 msgstr ""
+"通常只需要一个到远程服务器的连接就可以将 XMPP 节发送到该服务器。然而，在某些"
+"情况下，在高负载下，如果您打开到远程服务器的多个连接，您可以获得更好的吞吐量"
+"和性能。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:23
 msgid ""
@@ -1290,12 +1343,15 @@ msgid ""
 " remote server. This way you can spread the traffic evenly among cluster "
 "nodes and improve the performance for s2s connections."
 msgstr ""
+"当远程服务器以集群模式工作时尤其如此。理想情况下，您希望打开与远程服务器上每"
+"个集群节点的连接。这样，您可以在集群节点之间平均分配流量并提高 s2s "
+"连接的性能。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:25
 msgid ""
 "Tigase server offers 2 different parameters to tweak the number of "
 "concurrent, s2s connections:"
-msgstr ""
+msgstr "Tigase 服务器提供 2 个不同的参数来调整并发 s2s 连接的数量："
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:27
 msgid ""
@@ -1307,10 +1363,15 @@ msgid ""
 "connections to ``muc.jabber.org`` even if this is the same physical "
 "server behind the same IP address."
 msgstr ""
+"``max-out-total-conns`` - 此属性指定 Tigase 服务器打开到任何远程 XMPP "
+"服务器的最大传出连接。这是 **per domain** 限制，这意味着此限制适用于 Tigase "
+"连接到的每个远程域。如果设置为 ``4`` ，那么 Tigase 最多打开 4 个到 ``jabber."
+"org`` 的连接加上最多 4 个到 ``muc.jabber.org`` 的连接，即使这是同一 IP "
+"地址后面的同一物理服务器。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:29
 msgid "To adjust the limit you have to add following to the ``config.tdsl`` file:"
-msgstr ""
+msgstr "要调整限制，您必须在 ``config.tdsl`` 文件中添加以下内容："
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:37
 msgid ""
@@ -1323,16 +1384,22 @@ msgid ""
 "connection to ``jabber.org`` plus a maximum of 1 connection to "
 "``muc.jabber.org`` and other subdomains."
 msgstr ""
+"``max-out-per-ip-conns`` - 此属性指定 Tigase 服务器打开到任何远程 XMPP "
+"服务器到其单个 IP 地址的最大传出连接。这也是 **per domain** 限制，"
+"这意味着此限制适用于 Tigase 连接到的每个远程域。如果设置为 ``1``，"
+"并且上述限制设置为 ``4``，并且远程服务器在 1 个 IP 地址后面可见，那么 Tigase "
+"最多打开 1 个到 ``jabber.org`` 的连接 加上最多 1 个到 ``muc.jabber.org`` "
+"和其他子域的连接。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:39
 msgid ""
 "To adjust the limit you have to add following line to the ``config.tdsl``"
 " file:"
-msgstr ""
+msgstr "要调整限制，您必须在 ``config.tdsl`` 文件中添加以下内容："
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:49
 msgid "Connection Throughput"
-msgstr ""
+msgstr "连接吞吐量"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:51
 msgid ""
@@ -1343,13 +1410,17 @@ msgid ""
 "for every single s2s connection. You may soon run out of all available "
 "memory."
 msgstr ""
+"当然，每个人都希望他的服务器以最大吞吐量运行。这会带来资源成本，通常会增加内"
+"存使用量。如果您的安装中有大量 s2s 连接，这一点尤其重要。高吞吐量意味着每个 "
+"s2s 连接都有大量内存用于网络缓冲区。您可能很快就会用完所有可用内存。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:53
 msgid ""
 "There is one configuration property which allows you to adjust the "
 "network buffers for s2s connections to lower your memory usage or "
 "increase data throughput for s2s communication."
-msgstr ""
+msgstr "有一个配置属性允许您调整 s2s 连接的网络缓冲区，以降低内存使用量或增加 s2s "
+"通信的数据吞吐量。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:55
 msgid ""
@@ -1357,16 +1428,19 @@ msgid ""
 "<#netBuffHighThroughput>`__ or `net-buff-Standard <#netBuffStandard>`__ "
 "property descriptions."
 msgstr ""
+"有关更多详细信息，请参阅 :ref:`net-buff-high-"
+"throughput<netBuffHighThroughput>` 或 :ref:`net-buff-"
+"Standard<netBuffStandard>` 属性描述。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:58
 msgid "Maximum Packet Waiting Time and Connection Inactivity Time"
-msgstr ""
+msgstr "最大数据包等待时间和连接不活动时间"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:60
 msgid ""
 "There are 2 timeouts you can set for the component controlling s2s "
 "communication."
-msgstr ""
+msgstr "您可以为控制 s2s 通信的组件设置 2 个超时。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:62
 msgid ""
@@ -1380,6 +1454,12 @@ msgid ""
 " waiting for sending before it is returned to the sender with an error. "
 "The timeout is specified in seconds:"
 msgstr ""
+"``max-packet-waiting-time`` - "
+"这设置了等待发送到某个远程服务器的数据包的最长时间。有时，由于网络问题或 DNS "
+"问题，可能无法立即将消息发送到远程服务器。建立新连接可能需要一些时间，或者服"
+"务器之间可能存在通信问题，或者远程服务器可能已重新启动。 Tigase 在放弃之前会"
+"尝试几次连接到远程服务器。此参数指定数据包等待发送多长时间后返回给发送者并出"
+"现错误。超时以秒为单位指定："
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:70
 msgid ""
@@ -1390,10 +1470,13 @@ msgid ""
 " and reconnects when it is necessary. The timeout is specified in "
 "seconds:"
 msgstr ""
+"``max-inactivity-time`` - 此参数指定关闭之前的最大 s2s "
+"连接不活动时间。如果一个连接长时间不使用，保持它打开并占用资源是没有意义的。 "
+"Tigase 在指定时间后关闭 s2s 连接，并在必要时重新连接。超时以秒为单位指定："
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:79
 msgid "Custom Plugin: Selecting s2s Connection"
-msgstr ""
+msgstr "自定义插件：选择 s2s 连接"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:81
 msgid ""
@@ -1402,6 +1485,9 @@ msgid ""
 "of several nodes. In such a case you can also have a control over XMPP "
 "packets distribution among s2s connections to a single remote server."
 msgstr ""
+"有时对于非常大的安装，您可能希望设置更多到远程服务器的 s2s "
+"连接，尤其是当它们在多个节点的集群中工作时。在这种情况下，"
+"您还可以控制与单个远程服务器的 s2s 连接之间的 XMPP 数据包分发。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:83
 msgid ""
@@ -1410,14 +1496,18 @@ msgid ""
 "and set your class name in the configuration using following parameter in"
 " ``config.tdsl`` file:"
 msgstr ""
+"这段代码是可插拔的，您可以编写自己的连接选择器。实现 "
+"``S2SConnectionSelector`` 接口并使用 ``config.tdsl`` "
+"文件中的以下参数在配置中设置您的类名就足够了："
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:91
 msgid "The default selector picks connections randomly."
-msgstr ""
+msgstr "默认选择器随机选择连接。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:94
+#, fuzzy
 msgid "skip-tls-hostnames"
-msgstr ""
+msgstr "skip-tls-hostnames"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:96
 msgid ""
@@ -1432,10 +1522,18 @@ msgid ""
 "back. Enabling this can be done on any vhost, but must be configured "
 "under the s2s component."
 msgstr ""
+"``s2s-skip-tls-hostnames`` 属性禁用 TLS 握手，以便 s2s "
+"连接到选定的远程域。不幸的是，一些服务器（某些版本的 Openfire - [`1 "
+"<http://community.igniterealtime.org/thread/36206>`__] or [`2 "
+"<http://community.igniterealtime.org/thread/30578>`__]) 在 s2s 上进行 TLS 握"
+"手有问题，这会阻止建立可用的连接。这完全阻止了与这些服务器的任何通信。作为一"
+"种解决方法，您可以为这些域禁用 TLS 以恢复通信。可以在任何 vhost "
+"上启用此功能，但必须在 s2s 组件下进行配置。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:105
+#, fuzzy
 msgid "ejabberd-bug-workaround"
-msgstr ""
+msgstr "ejabberd-bug-workaround"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:107
 msgid ""
@@ -1449,14 +1547,19 @@ msgid ""
 "certificate is fully trusted and in theory this dialback could be "
 "avoided. By default, this is not enabled."
 msgstr ""
+"此属性激活 EJabberd 中的 s2s 实现中的错误的解决方法。即使回拨是预期/需要的， "
+"EJabberd 不会在 TLS 握手后在流功能中发送回拨。这会导致连接不可用，因为 "
+"EJabberd 也不接受此连接上的任何数据包。解决方法现在默认启用，直到没有错误的 "
+"EJabberd 版本足够流行。该解决方法的一个缺点是即使 SSL 证书完全受信任，也会始"
+"终执行回拨，理论上可以避免这种回拨。默认情况下，此功能未启用。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:117
 msgid "This replaces the old ``--s2s-ejabberd-bug-workaround-active`` property."
-msgstr ""
+msgstr "这替换了旧的 ``--s2s-ejabberd-bug-workaround-active`` 属性。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:2
 msgid "Tigase Load Balancing"
-msgstr ""
+msgstr "Tigase 负载均衡"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:4
 msgid ""
@@ -1468,27 +1571,33 @@ msgid ""
 "connect. It is required that the user JID to be known for the redirection"
 " to work correctly."
 msgstr ""
+"Tigase 包含负载平衡功能，允许将用户重定向到最合适的集群节点。功能依赖于 see-"
+"other-host XMPP 流错误消息。该机制背后的基本原理是，如果实现返回的主机与用户"
+"当前尝试连接的主机不同，则用户将获得重定向。需要知道用户 JID "
+"才能使重定向正常工作。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:7
 msgid "Available Implementations"
-msgstr ""
+msgstr "可用的实现"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:9
 msgid ""
 "Tigase implementation is, as usual, extensible and allows for different, "
 "pluggable redirection strategies that implement the ``SeeOtherHostIfc`` "
 "interface."
-msgstr ""
+msgstr "Tigase 实现像往常一样是可扩展的，并允许实现 ``SeeOtherHostIfc`` "
+"接口的不同的，可插入的重定向策略。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:11
 msgid "Currently there are three strategies available:"
-msgstr ""
+msgstr "目前有三种可用的策略："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:13
 msgid ""
 "``SeeOtherHost`` - most basic implementation returning either single host"
 " configured in ``config.tdsl`` file or name of the current host;"
-msgstr ""
+msgstr "``SeeOtherHost`` - 最基本的实现返回在 ``config.tdsl`` "
+"文件中配置的单个主机或当前主机的名称；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:15
 msgid ""
@@ -1498,6 +1607,9 @@ msgid ""
 "selection would be made is by default composed and reflects all connected"
 " nodes, alternatively hosts list can be configured in the config.tdsl;"
 msgstr ""
+"``SeeOtherHostHashed`` （默认） - SeeOtherHostIfc 基于用户 JID 哈希值返回重定"
+"向主机的集群环境的默认实现；默认情况下，将从中进行选择的可用节点列表由所有连"
+"接的节点组成并反映所有连接的节点，或者可以在 config.tdsl 中配置主机列表；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:17
 msgid ""
@@ -1505,6 +1617,8 @@ msgid ""
 "redirect information from database in the form of pairs ``user_id`` and "
 "``node_id`` to which given user should be redirected."
 msgstr ""
+"``SeeOtherHostDB`` -SeeOtherHost 的扩展实现使用来自数据库的重定向信息，以 "
+"``user_id`` 和 ``node_id`` 对的形式，给定的用户应该被重定向到。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:19
 msgid ""
@@ -1512,40 +1626,47 @@ msgid ""
 "the lookup table to provide relevant redirection hostname/IP (by default "
 "internal Tigase tig_cluster_nodes table will be used)"
 msgstr ""
+"``SeeOtherHostDualIP`` - 将内部 Tigase "
+"集群节点与查找表匹配以提供相关的重定向主机名/IP（默认情况下将使用内部 Tigase "
+"tig_cluster_nodes 表）"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:22
 msgid "Configuration Options"
-msgstr ""
+msgstr "配置选项"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:24
 msgid ""
 "The most basic configuration is related to the choice of actual "
 "redirection implementation by declaring class for each connector:"
-msgstr ""
+msgstr "最基本的配置是通过为每个连接器声明类来选择实际的重定向实现："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:38
 msgid "Possible values are:"
-msgstr ""
+msgstr "可能的值为："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:40
+#, fuzzy
 msgid "``tigase.server.xmppclient.SeeOtherHost``"
-msgstr ""
+msgstr "``tigase.server.xmppclient.SeeOtherHost``"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:42
+#, fuzzy
 msgid "``tigase.server.xmppclient.SeeOtherHostHashed``"
-msgstr ""
+msgstr "``tigase.server.xmppclient.SeeOtherHostHashed``"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:44
+#, fuzzy
 msgid "``tigase.server.xmppclient.SeeOtherHostDB``"
-msgstr ""
+msgstr "``tigase.server.xmppclient.SeeOtherHostDB``"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:46
+#, fuzzy
 msgid "``tigase.server.xmppclient.SeeOtherHostDualIP``"
-msgstr ""
+msgstr "``tigase.server.xmppclient.SeeOtherHostDualIP``"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:48
 msgid "``none`` - disables redirection"
-msgstr ""
+msgstr "``none`` - 禁用重定向"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:50
 msgid ""
@@ -1553,63 +1674,69 @@ msgid ""
 "options need to be prefixed with the corresponding connection manager ID,"
 " i.e. c2s, bosh or ws; we will use c2s in the examples:"
 msgstr ""
+"所有选项都是基于每个连接管理器配置的，因此所有选项都需要以相应的连接管理器 "
+"ID 为前缀，即 c2s、bosh 或 ws；我们将在示例中使用 c2s："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:61
 msgid ""
 "``'default-host' = 'host1;host2;host3'`` - a semicolon separated list of "
 "hosts to be used for redirection."
-msgstr ""
+msgstr "``'default-host' = 'host1;host2;host3'`` - 用于重定向的主机的分号分隔列表。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:63
 msgid ""
 "``'phases' = []`` - an array of phases in which redirection should be "
 "active, currently possible values are:"
-msgstr ""
+msgstr "``'phases' = []`` - 重定向应该处于活动状态的阶段数组，当前可能的值是："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:65
 msgid "``OPEN`` which enables redirection during opening of the XMPP stream;"
-msgstr ""
+msgstr "``OPEN`` 在打开 XMPP 流期间启用重定向；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:67
 msgid "``LOGIN`` which enables redirection upon authenticating user session;"
-msgstr ""
+msgstr "``LOGIN`` 在验证用户会话时启用重定向；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:69
 msgid "By default redirection is currently enabled only in the ``OPEN`` phase."
-msgstr ""
+msgstr "默认情况下，重定向当前仅在 ``OPEN`` 阶段启用。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:72
+#, fuzzy
 msgid "SeeOtherHostDB"
-msgstr ""
+msgstr "SeeOtherHostDB"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:74
 msgid "For ``SeeOtherHostDB`` implementation there are additional options:"
-msgstr ""
+msgstr "对于 ``SeeOtherHostDB`` 实现，还有其他选项："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:85
 msgid ""
 "``db-url`` - a JDBC connection URI which should be used to query redirect"
 " information; if not configured the default ``dataSource`` will be used;"
-msgstr ""
+msgstr "``db-url`` - 用于查询重定向信息的 JDBC 连接 URI；如果未配置，将使用默认的 "
+"``dataSource``；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:87
 msgid "``get-host-query`` - a SQL query which should return redirection hostname;"
-msgstr ""
+msgstr "``get-host-query`` - 应返回重定向主机名的 SQL 查询；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:89
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:118
 msgid ""
 "``get-all-data-query`` - a SQL helper query which should return all "
 "redirection data from database;"
-msgstr ""
+msgstr "``get-all-data-query`` - 一个 SQL "
+"辅助查询，它应该从数据库返回所有重定向数据；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:91
 msgid "``get-all-query-timeout`` - allows to set timeout for executed queries."
-msgstr ""
+msgstr "``get-all-query-timeout`` - 允许为执行的查询设置超时。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:94
+#, fuzzy
 msgid "SeeOtherHostDualIP"
-msgstr ""
+msgstr "SeeOtherHostDualIP"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:96
 msgid ""
@@ -1618,6 +1745,9 @@ msgid ""
 "default internal Tigase ``tig_cluster_nodes`` table is used (and "
 "appropriate repository implementation will be used)."
 msgstr ""
+"这种机制将内部 Tigase "
+"集群节点与查找表进行匹配，以提供匹配和相关的重定向主机名/IP。默认情况下，"
+"使用内部 Tigase ``tig_cluster_nodes`` 表（并且将使用适当的存储库实现）。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:98
 msgid ""
@@ -1625,11 +1755,12 @@ msgid ""
 "should be used. Note that for global use, all connection managers must "
 "have the same class defined. You can define each connection manager "
 "individually."
-msgstr ""
+msgstr "要启用此重定向机制，应使用配置/类。请注意，对于全局使用，所有连接管理器必须定"
+"义相同的类。您可以单独定义每个连接管理器。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:112
 msgid "It offers following configuration options:"
-msgstr ""
+msgstr "它提供以下配置选项："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:114
 msgid ""
@@ -1638,16 +1769,20 @@ msgid ""
 "(and appropriate repository implementation will be used); alternatively "
 "it’s possible to use ``eventbus`` source;"
 msgstr ""
+"``data-source`` - 重定向信息源的配置 - 默认情况下将使用内部 Tigase "
+"``tig_cluster_nodes`` 表（并将使用适当的存储库实现）；或者，可以使用 "
+"``eventbus`` 源；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:116
 msgid ""
 "``db-url`` - a JDBC connection URI which should be used to query redirect"
 " information; if not configured ``user-db-uri`` will be used;"
-msgstr ""
+msgstr "``db-url`` - 用于查询重定向信息的 JDBC 连接 URI；如果未配置 ``user-db-uri`` "
+"其将被使用；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:120
 msgid "``get-all-query-timeout`` - allows to set timeout for executed queries;"
-msgstr ""
+msgstr "``get-all-query-timeout`` - 允许为执行的查询设置超时；"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:122
 msgid ""
@@ -1656,14 +1791,16 @@ msgid ""
 "node) redirection won’t be generated; with this it’s possible to "
 "configure fallback redirection address."
 msgstr ""
+"``fallback-redirection-host`` - 如果不存在重定向信息（即未为特定节点配置辅助"
+"主机名），则不会生成重定向；这样就可以配置回退重定向地址。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:124
 msgid "All options are configured or on per-component basis:"
-msgstr ""
+msgstr "所有选项均已配置或基于每个组件："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:138
 msgid "EventBus as a source of information"
-msgstr ""
+msgstr "EventBus 作为信息源"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:140
 msgid ""
@@ -1671,21 +1808,24 @@ msgid ""
 "of redirection data. In order to do that ``eventbus-repository-"
 "notifications`` needs to be enabled in ClusterConnectionManager:"
 msgstr ""
+"可以利用 EventBus 和内部 Tigase 事件作为重定向数据的来源。为此，需要在 "
+"ClusterConnectionManager 中启用 ``eventbus-repository-notifications``："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:150
 msgid "Auxiliary setup options"
-msgstr ""
+msgstr "辅助设置选项"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:153
 msgid "Enforcing redirection"
-msgstr ""
+msgstr "强制重定向"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:155
 msgid ""
 "It’s possible to enforce redirection of connections on the particular "
 "port of connection manager with ``force-redirect-to`` set to Integer with"
 " the following general setting option:"
-msgstr ""
+msgstr "可以使用以下常规设置选项在连接管理器的特定端口上强制重定向连接，并将 ``force-"
+"redirect-to`` 设置为整数："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:167
 msgid ""
@@ -1694,10 +1834,13 @@ msgid ""
 " will utilize hostname retrieved from ``SeeOtherHost`` implementation and"
 " will be only used when such value is returned):"
 msgstr ""
+"例如，为 ``c2s`` 连接管理器启用额外的端口 ``5322``，"
+"并强制将所有连接重定向到端口 ``5222`` （它将利用从 ``SeeOtherHost`` "
+"实现中检索到的主机名，并且仅返回此类值时使用）："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:184
 msgid "Configuring hostnames"
-msgstr ""
+msgstr "配置主机名"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:186
 msgid ""
@@ -1712,21 +1855,28 @@ msgid ""
 "property. Those properties can be set via ``etc/tigase.conf`` "
 "(uncommenting following lines, or manually exposing in environment):"
 msgstr ""
+"为了以自动化方式充分利用 ``SeeOtherHostDualIP`` 设置，现在可以提供主要（*内部"
+"*）和辅助（*外部*）主机名/IP（它们需要正确，``InetAddress."
+"getByName(property);`` 将用于验证正确性）。它可以通过 JVM 属性 ``tigase-"
+"primary-address`` 和 ``tigase-secondary-address`` 来完成。"
+"您还可以通过提供实现 ``tigase.util.DNSResolverIfc`` 接口的类作为 ``resolver-"
+"class`` 属性的值来利用DNS解析器的不同实现。这些属性可以通过 ``etc/tigase."
+"conf`` 设置（取消注释以下行，或在环境中手动公开）："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:195
 msgid "or in the ``etc/config.tdsl`` (they will be converted to JVM properties):"
-msgstr ""
+msgstr "或在 ``etc/config.tdsl`` 中（它们将被转换为 JVM 属性）："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:2
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:2
 msgid "External Component Configuration"
-msgstr ""
+msgstr "外部组件配置"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:4
 msgid ""
 "Tigase can connect to external components, this guide will show you how "
 "this can be accomplished."
-msgstr ""
+msgstr "Tigase 可以连接到外部组件，本指南将向您展示如何实现这一点。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:6
 msgid ""
@@ -1738,33 +1888,41 @@ msgid ""
 "are pluggable so more protocols can be supported or custom extensions to "
 "existing protocols can be added."
 msgstr ""
+"配置遵循与所有其他组件相同的标准。它也更强大，因为单个 Tigase "
+"实例可以控制多个 TCP/IP "
+"端口和每个端口上的许多外部组件，甚至允许同一组件的多个连接。"
+"它支持具有协议自动检测机制的 XEP-0114 和 XEP-0225。协议是可插拔的，因此可以支"
+"持更多协议，或者可以添加对现有协议的自定义扩展。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:8
 msgid ""
 "The implementation also supports a scripting API and new domains with "
 "passwords can be added at run-time using ad-hoc commands. New scripts can"
 " be loaded to even further control all connected external components."
-msgstr ""
+msgstr "该实现还支持脚本 API，并且可以在运行时使用 ad-hoc "
+"命令添加带有密码的新域。可以加载新脚本以进一步控制所有连接的外部组件。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:10
 msgid ""
 "Pages in this guide describe in details all the administration aspects of"
 " setting up and managing external components."
-msgstr ""
+msgstr "本指南中的页面详细描述了设置和管理外部组件的所有管理方面。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:12
 msgid "`External Component Configuration <#External-Component-Configuration>`__"
-msgstr ""
+msgstr ":ref:`外部组件配置<External-Component-Configuration>`"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:14
 msgid "`Tigase as an External Component <#Tigase-as-an-External-Component>`__"
-msgstr ""
+msgstr ":ref:`Tigase 作为外部组件<Tigase-as-an-External-Component>`"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:16
 msgid ""
 "`Load Balancing External Components in Cluster Mode <#Load-Balancing-"
 "External-Components-in-Cluster-Mode>`__"
 msgstr ""
+":ref:`集群模式下的外部组件负载均衡<Load-Balancing-External-Components-in-"
+"Cluster-Mode>`"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:4
 msgid ""
@@ -1774,6 +1932,9 @@ msgid ""
 "enable the component and set the initial configuration to accept or "
 "initiate connections for an external component."
 msgstr ""
+"对于所有 Tigase 组件，您可以通过 :ref:`DSL 配置<dslConfig>` 部分中详细描述的 "
+"``config.tdsl`` 文件加载和配置外部组件。本文档描述了如何启用组件并设置初始配"
+"置以接受或启动外部组件的连接。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:6
 msgid ""
@@ -1783,12 +1944,15 @@ msgid ""
 "``tigase.server.ext.ComponentProtocol`` (class doesn’t have to be "
 "specified when using default name)."
 msgstr ""
+"首先要做的是指定组件类和组件名称，这在 Tigase 安装中必须是唯一的。"
+"最常用的名称是 ``ext`` ，类是 ``tigase.server.ext.ComponentProtocol`` "
+"（使用默认名称时不必指定类）。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:8
 msgid ""
 "The following line in the ``config.tdsl`` will load the component during "
 "the server startup time:"
-msgstr ""
+msgstr "``config.tdsl`` 中的以下行将在服务器启动期间加载组件："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:14
 msgid ""
@@ -1797,13 +1961,14 @@ msgid ""
 "is necessary to configure the virtual host domains of the external "
 "component during run-time via ad-hoc commands to make use of this "
 "component."
-msgstr ""
+msgstr "虽然这会加载组件，但没有提供任何额外的配置，该组件实际上是无用的。"
+"有必要在运行时通过 ad-hoc 命令配置外部组件的虚拟主机域以使用该组件。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:16
 msgid ""
 "You may additionally configure the ```bind-ext-hostnames`` "
 "<#bindExtHostnames>`__ property."
-msgstr ""
+msgstr "您可以另外配置 :ref:`bind-ext-hostnames<bindExtHostnames>` 属性。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:18
 msgid ""
@@ -1816,64 +1981,76 @@ msgid ""
 "on ``ext`` component using ad-hoc capable XMPP client, ie. `Psi <http"
 "://psi-im.org>`__."
 msgstr ""
+"要使用 Admin UI 配置外部组件连接，您需要打开 Admin UI 网页（"
+"如果您登录到默认情况下运行 Tigase XMPP 服务器的同一台计算机上，它应该在 "
+"http://localhost:8080/admin/ 可用）。然后您应该单击管理 UI 网页左侧的 "
+"``Configuration``，然后在 ``ext`` 组件上选择 ``Add new item`` 或在 ``ext`` "
+"上使用具有 ad-hoc 能力的 XMPP 客户端的组件执行相应的 ad-hoc 命令 ，即 `Psi "
+"<http://psi-im.org>`__。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:20
+#, fuzzy
 msgid "|adminui ext add item button|"
-msgstr ""
+msgstr "|adminui ext add item button|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:56
+#, fuzzy
 msgid "adminui ext add item button"
-msgstr ""
+msgstr "adminui ext add item button"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:22
 msgid ""
 "You will be presented with a form which you should fill to configure "
 "external component connection details:"
-msgstr ""
+msgstr "您将看到一个表单，您应该填写该表单以配置外部组件连接详细信息："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:24
+#, fuzzy
 msgid "|adminui ext add item form|"
-msgstr ""
+msgstr "|adminui ext add item form|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:57
+#, fuzzy
 msgid "adminui ext add item form"
-msgstr ""
+msgstr "adminui ext add item form"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:26
 msgid "*Domain name* - external component domain name (``muc.devel.tigase.org``)"
-msgstr ""
+msgstr "*域名* - 外部组件域名（``muc.devel.tigase.org``）"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:28
 msgid ""
 "*Domain password* - password for authentication of the external component"
 " connection (``muc-pass``)"
-msgstr ""
+msgstr "*域密码* - 用于验证外部组件连接的密码 (``muc-pass``)"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:30
 msgid ""
 "*Connection type* - ``accept`` to make component wait for connection or "
 "``connect`` force component to connect to the server (``connect``)"
-msgstr ""
+msgstr "*连接类型* - ``accept`` 使组件等待连接或 ``connect`` "
+"强制组件连接到服务器（``connect``）"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:32
 msgid ""
 "*Port number* - port on which component should wait for connection or on "
 "which it try to connect (``5270``)"
-msgstr ""
+msgstr "*端口号* - 组件应等待连接或尝试连接的端口（``5270``）"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:34
 msgid ""
 "*Remote host* - host to connect to (``devel.tigase.org``) *(may be left "
 "blank if component will only accept connections)*"
-msgstr ""
+msgstr "*远程主机* - 连接到的主机（``devel.tigase."
+"org``）(*如果组件只接受连接，可以留空*)"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:36
 msgid "*Protocol* - id of protocol used for establishing connection"
-msgstr ""
+msgstr "*Protocol* - 用于建立连接的协议 ID"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:38
 msgid "if connection type is ``connect``:"
-msgstr ""
+msgstr "如果连接类型是 ``connect``:"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:40
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:48
@@ -1881,6 +2058,8 @@ msgid ""
 "``XEP-0114: Jabber Component Protocol (accept)`` - for `XEP-0114: Jabber "
 "Component Protocol <https://xmpp.org/extensions/xep-0114.html>`__"
 msgstr ""
+"``XEP-0114: Jabber Component Protocol (accept)`` - 用于 `XEP-0114：Jabber "
+"组件协议 <https://xmpp.org/extensions/xep-0114.html>`__"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:42
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:50
@@ -1888,21 +2067,23 @@ msgid ""
 "``XEP-0225: Component Connections`` - for `XEP-0225: Component "
 "Connections <https://xmpp.org/extensions/xep-0225.html>`__"
 msgstr ""
+"``XEP-0225: Component Connections`` - 用于 `XEP-0225：组件连接 <https://xmpp."
+"org/extensions/xep-0225.html>`__"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:44
 msgid "if connection type is ``accept``:"
-msgstr ""
+msgstr "如果连接类型是 ``accept``:"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:46
 msgid ""
 "``Autodetect`` - for automatic detection of protocol used by incoming "
 "connection *(recommended)*"
-msgstr ""
+msgstr "``Autodetect`` - 用于自动检测传入连接使用的协议(*推荐*)"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:52
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:92
 msgid "Additional options may be left with defaults."
-msgstr ""
+msgstr "其他选项可能会保留默认值。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:54
 msgid ""
@@ -1912,10 +2093,14 @@ msgid ""
 "corresponding ad-hoc commands on ``ext`` component using ad-hoc capable "
 "XMPP client, ie. `Psi <http://psi-im.org>`__."
 msgstr ""
+"稍后，如果您想修改此值，可以使用管理 UI 通过单击在 ``ext`` 组件里的 "
+"``Configuration`` 和 ``Remove an item`` 或 ``Update item configuration`` "
+"或者通过使用具有 ad-hoc 能力的 XMPP 客户端在 ``ext`` 组件上执行相应的 ad-hoc "
+"命令，即 `Psi <http://psi-im.org>`__。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:2
 msgid "Tigase as an External Component"
-msgstr ""
+msgstr "Tigase 作为外部组件"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:4
 msgid ""
@@ -1925,6 +2110,9 @@ msgid ""
 "a component and you do not want to restart the main server every time you"
 " make a change."
 msgstr ""
+"在某些情况下，您希望将一个或多个 Tigase 组件与主服务器分开部署，"
+"或者您可能希望运行一些连接到不同 XMPP 服务器的 Tigase "
+"组件，或者您可能正在处理一个组件并且您不想重新启动每次进行更改时的主服务器。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:6
 msgid ""
@@ -1934,14 +2122,18 @@ msgid ""
 "<http://xmpp.org/extensions/xep-0114.html>`__ or `XEP-0225 "
 "<http://xmpp.org/extensions/xep-0225.html>`__ connection."
 msgstr ""
+"有一种方法可以在 *外部组件模式* 下运行 Tigase 服务器。事实上，您可以将 "
+"Tigase 的任何组件作为外部组件运行，并通过 `XEP-0114 <http://xmpp.org/"
+"extensions/xep-0114.html>`__ 或 `XEP-0225 <http://xmpp.org/extensions/"
+"xep-0225.html>`__ 将它们连接到主 XMPP 服务器。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:8
 msgid "Let’s look at the examples…​"
-msgstr ""
+msgstr "让我们看看例子……​"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:11
 msgid "Usage with shared database (since version 8.0.0)"
-msgstr ""
+msgstr "与共享数据库一起使用（自 8.0.0 版起）"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:13
 msgid ""
@@ -1953,6 +2145,11 @@ msgid ""
 "external component manager on the main server by adding following line to"
 " the config file:"
 msgstr ""
+"当您在 \"external component mode\" 下使用 Tigase 服务器 8.0.0 或更高版本，"
+"同时使用共享默认的 \"user repository\" 并且您的主服务器也运行 Tigase XMPP "
+"Server 8.0.0 或更高版本时，您可以从远程管理中受益来自主服务器的组件连接。要使"
+"用它，您需要通过在配置文件中添加以下行来在主服务器上启用外部组件和外部组件管"
+"理器："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:20
 msgid ""
@@ -1960,6 +2157,8 @@ msgid ""
 "``ext-man`` component of the main server to configure connection details "
 "of the servers running in the ``component`` mode."
 msgstr ""
+"有了它，您可以使用主服务器的 ``ext-man`` 组件中可用的管理 UI "
+"或临时命令来配置 ``component`` 模式下运行的服务器的连接详细信息。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:22
 msgid ""
@@ -1967,38 +2166,42 @@ msgid ""
 "item`` at the ``ext-man`` component, which will present you with a "
 "following form to fill in external component connectivity details:"
 msgstr ""
+"在管理 UI 中，您单击 ``Configuration`` 部分并在 ``ext-man`` 组件中选择 ``Add "
+"new item``，这将显示以下表单以填写外部组件连接详细信息："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:24
+#, fuzzy
 msgid "|adminui extman add item form|"
-msgstr ""
+msgstr "|adminui extman add item form|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:283
+#, fuzzy
 msgid "adminui extman add item form"
-msgstr ""
+msgstr "adminui extman add item form"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:27
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:159
 msgid "A Simple Case - MUC as an External Component"
-msgstr ""
+msgstr "一个简单的案例 - MUC 作为外部组件"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:29
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:161
 msgid "A few assumptions:"
-msgstr ""
+msgstr "几个假设："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:31
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:163
 msgid ""
 "We want to run a MUC component for a domain: ``muc.devel.tigase.org`` and"
 " password ``muc-pass``"
-msgstr ""
+msgstr "我们想为一个域运行一个 MUC 组件：``muc.devel.tigase.org`` 和密码 ``muc-pass``"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:33
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:165
 msgid ""
 "The main server works at an address: devel.tigase.org and for the same "
 "virtual domain"
-msgstr ""
+msgstr "主服务器工作在一个地址：devel.tigase.org 和相同的虚拟域"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:35
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:167
@@ -2006,25 +2209,28 @@ msgid ""
 "We want to connect to the server using `XEP-0114 "
 "<http://xmpp.org/extensions/xep-0114.html>`__ protocol and port ``5270``."
 msgstr ""
+"我们想使用 `XEP-0114 <http://xmpp.org/extensions/xep-0114.html>`__ "
+"协议和端口 ``5270`` 连接到服务器。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:37
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:169
 msgid ""
 "There is a special configuration type for this case which simplifies "
 "setting needed to run Tigase as an external component:"
-msgstr ""
+msgstr "这种情况有一种特殊的配置类型，它简化了将 Tigase 作为外部组件运行所需的设置："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:43
 msgid ""
 "Knowing that we can now create simple configuration file for Tigase XMPP "
 "Server:"
-msgstr ""
+msgstr "知道我们现在可以为 Tigase XMPP 服务器创建简单的配置文件："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:66
 msgid ""
 "where ``master_server_default_database_url`` is the same URL as the one "
 "used on the main server for default data source."
-msgstr ""
+msgstr "其中 ``master_server_default_database_url`` 与主服务器上用于默认数据源的 URL "
+"相同。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:68
 msgid ""
@@ -2033,54 +2239,59 @@ msgid ""
 "connections and to connect from the external component to the master "
 "server."
 msgstr ""
+"有了这些，我们可以在主服务器上使用 ad-hoc 命令或管理 UI 来配置 Tigase XMPP "
+"服务器以接受外部组件连接并从外部组件连接到主服务器。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:70
 msgid ""
 "**Adding external component connection settings to the manager (ext-man) "
 "using Admin UI.**"
-msgstr ""
+msgstr "**使用管理 UI 将外部组件连接设置添加到管理器 (ext-man)。**"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:72
+#, fuzzy
 msgid "|adminui extman add item form external muc|"
-msgstr ""
+msgstr "|adminui extman add item form external muc|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:284
+#, fuzzy
 msgid "adminui extman add item form external muc"
-msgstr ""
+msgstr "adminui extman add item form external muc"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:74
 msgid "You need to pass:"
-msgstr ""
+msgstr "你需要通过："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:76
 msgid "Domain name - external component domain name (``muc.devel.tigase.org``)"
-msgstr ""
+msgstr "域名 - 外部组件域名（``muc.devel.tigase.org``）"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:78
 msgid ""
 "Domain password - password for authentication of the external component "
 "connection (``muc-pass``)"
-msgstr ""
+msgstr "域密码 - 用于验证外部组件连接的密码 (``muc-pass``)"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:80
 msgid ""
 "Connection type - ``accept`` to make component wait for connection or "
 "``connect`` force component to connect to the server (``connect``)"
-msgstr ""
+msgstr "连接类型 - ``accept`` 使组件等待连接或 ``connect`` "
+"强制组件连接到服务器（``connect``）"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:82
 msgid ""
 "Port number - port on which component should wait for connection or on "
 "which it try to connect (``5270``)"
-msgstr ""
+msgstr "端口号 - 组件应该等待连接或尝试连接的端口（``5270``）"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:84
 msgid "Remote host - host to connect to (``devel.tigase.org``)"
-msgstr ""
+msgstr "远程主机 - 要连接的主机（``devel.tigase.org``）"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:86
 msgid "Protocol - id of protocol used for establishing connection"
-msgstr ""
+msgstr "协议 - 用于建立连接的协议 ID"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:88
 msgid ""
@@ -2088,6 +2299,8 @@ msgid ""
 "using `XEP-0114: Jabber Component Protocol "
 "<https://xmpp.org/extensions/xep-0114.html>`__"
 msgstr ""
+"`XEP-0114：Jabber 组件协议（接受）` - 使用 `XEP-0114：Jabber 组件协议 "
+"<https://xmpp.org/extensions/xep-0114.html>`__ 建立连接"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:90
 msgid ""
@@ -2095,11 +2308,13 @@ msgid ""
 "`XEP-0225: Component Connections "
 "<https://xmpp.org/extensions/xep-0225.html>`__"
 msgstr ""
+"``XEP-0225: Component Connections`` - 使用 `XEP-0225: Component Connections "
+"<https://xmpp.org/extensions/xep-0225.html>`__ 建立连接"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:94
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:209
 msgid "More Components"
-msgstr ""
+msgstr "更多组件"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:96
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:211
@@ -2107,13 +2322,14 @@ msgid ""
 "Suppose you want to run more than one component as an external components"
 " within one Tigase instance. Let’s add another - PubSub component to the "
 "configuration above and see how to set it up."
-msgstr ""
+msgstr "假设您想在一个 Tigase 实例中运行多个组件作为外部组件。"
+"让我们在上面的配置中添加另一个 - PubSub 组件，看看如何设置它。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:98
 msgid ""
 "The most straightforward way is just to add another component to the "
 "server running in the component mode for the component domain"
-msgstr ""
+msgstr "最直接的方法就是为组件域添加另一个组件到以组件模式运行的服务器"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:121
 msgid ""
@@ -2121,7 +2337,8 @@ msgid ""
 "component settings and to the external component manager settings. You "
 "basically do the same thing as you did while adding only MUC component as"
 " the external component."
-msgstr ""
+msgstr "然后将新的连接域添加到主服务器外部组件设置和外部组件管理器设置。在只添加 MUC "
+"组件作为外部组件时，您基本上做了同样的事情。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:123
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:246
@@ -2131,6 +2348,9 @@ msgid ""
 "example, what if we want to run even more components? Opening a separate "
 "connection for each component is a tad overkill."
 msgstr ""
+"但是请注意，我们正在打开到同一服务器的两个连接。这会浪费资源并使系统过于复杂"
+"。例如，如果我们想运行更多的组件怎么办？为每个组件打开一个单独的连接有点矫枉"
+"过正。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:125
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:248
@@ -2140,6 +2360,9 @@ msgid ""
 "hostnames`` contains a comma separated list of all hostnames (external "
 "domains) which should reuse the existing connection."
 msgstr ""
+"事实上，有一种方法可以为作为外部组件运行的所有组件域重复使用相同的连接。属性 "
+"``bind-ext-hostnames`` 包含一个逗号分隔的所有主机名（外部域）列表，这些主机名"
+"应该可以重复使用现有的连接。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:127
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:250
@@ -2149,6 +2372,9 @@ msgid ""
 "<http://xmpp.org/extensions/xep-0225.html>`__ only), you must use this "
 "protocol for the functionality."
 msgstr ""
+"然而，有一个问题。由于您正在重复使用连接（主机名绑定仅在 `XEP-0225 "
+"<http://xmpp.org/extensions/xep-0225.html>`__ "
+"中定义），因此您必须使用此协议来实现功能。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:129
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:252
@@ -2157,6 +2383,8 @@ msgid ""
 "`XEP-0225 <http://xmpp.org/extensions/xep-0225.html>`__ protocol used by "
 "both external domains:"
 msgstr ""
+"这是一个示例配置，通过两个外部域使用的 `XEP-0225 <http://xmpp.org/extensions/"
+"xep-0225.html>`__ 协议进行单个连接："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:154
 msgid ""
@@ -2164,10 +2392,12 @@ msgid ""
 "man`` for PubSub component, only for MUC component but you need to user "
 "``client`` as the value for protocol field."
 msgstr ""
+"使用此配置，您无需在 ``ext-man`` 中为 PubSub 组件配置条目，只需为 MUC "
+"组件配置条目，但您需要使用 ``client`` 作为协议字段的值。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:157
 msgid "Usage with a separate database"
-msgstr ""
+msgstr "使用单独的数据库"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:175
 msgid ""
@@ -2176,6 +2406,9 @@ msgid ""
 " use this configuration type, your ``config.tdsl`` file may look like "
 "this:"
 msgstr ""
+"这会为 Tigase 生成一个配置，默认情况下只加载一个组件 - "
+"用于外部组件连接的组件。如果您使用这种配置类型，您的 ``config.tdsl`` "
+"文件可能如下所示："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:198
 msgid ""
@@ -2184,40 +2417,45 @@ msgid ""
 "``etc/externalComponentItems`` which will be loaded to the local database"
 " and then removed."
 msgstr ""
+"要使这个新实例连接到 Tigase XMPP 服务器，您需要在 ``etc/"
+"externalComponentItems`` "
+"处再创建一个具有外部连接配置的文件，该文件将被加载到本地数据库然后删除。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:206
 msgid ""
 "While loading configuration from ``etc/externalComponentItems`` file is "
 "supported, we recommend usage of shared database if possible. In future "
 "this method may be deprecated."
-msgstr ""
+msgstr "虽然支持从 ``etc/externalComponentItems`` "
+"文件加载配置，但我们建议尽可能使用共享数据库。将来可能会弃用此方法。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:213
 msgid ""
 "The most straightforward way is just to add another external component "
 "connection to the main server for the component domain using Admin UI or "
 "ad-hoc command on the main server."
-msgstr ""
+msgstr "最直接的方法是在主服务器上使用 Admin UI 或 ad-hoc "
+"命令为组件域添加另一个外部组件连接到主服务器。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:215
 msgid ""
 "Then we can use following configuration on the server running in the "
 "``component`` mode:"
-msgstr ""
+msgstr "然后我们可以在以 ``component`` 模式运行的服务器上使用以下配置："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:239
 msgid ""
 "and we need to create a file with configuration for external component "
 "connection which will be loaded to the internal database:"
-msgstr ""
+msgstr "我们需要创建一个包含外部组件连接配置的文件，该文件将加载到内部数据库："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:277
 msgid "and example of the external connections configuration file:"
-msgstr ""
+msgstr "以及外部连接配置文件的示例："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:2
 msgid "Load Balancing External Components in Cluster Mode"
-msgstr ""
+msgstr "集群模式下的外部组件负载均衡"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:4
 msgid ""
@@ -2225,45 +2463,51 @@ msgid ""
 " Tigase XMPP Server and how to make Tigase’s components work as external "
 "components in a cluster mode."
 msgstr ""
+"本文档描述了如何使用 Tigase XMPP Server 对任何外部组件进行负载平衡，"
+"以及如何使 Tigase 的组件在集群模式下作为外部组件工作。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:6
 msgid ""
 "*Please note, all configuration options described here apply to Tigase "
 "XMPP Server version 8.0.0 or later.*"
-msgstr ""
+msgstr "*请注意，此处描述的所有配置选项都适用于 Tigase XMPP 服务器版本 8.0.0 "
+"或更高版本。*"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:8
 msgid "These are actually 2 separate topics:"
-msgstr ""
+msgstr "这些实际上是 2 个独立的主题："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:10
 msgid ""
 "One is to distribute load over many instances of a single component to "
 "handle larger traffic, or perhaps for high availability."
-msgstr ""
+msgstr "一种是将负载分布在单个组件的多个实例上以处理更大的流量，或者可能实现高可用性"
+"。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:12
 msgid ""
 "The second is to make Tigase’s components work as an external component "
 "and make it work in a cluster mode, even if the component itself does not"
 " support cluster mode."
-msgstr ""
+msgstr "第二是让 Tigase "
+"的组件作为外部组件工作，使其工作在集群模式下，即使组件本身不支持集群模式。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:14
 msgid ""
 "Here are step by step instructions and configuration examples teaching "
 "how to achieve both goals."
-msgstr ""
+msgstr "以下是分步说明和配置示例，教您如何实现这两个目标。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:17
 msgid "Load Balancing External Component"
-msgstr ""
+msgstr "负载平衡外部组件"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:19
 msgid ""
 "The first, and most simple scenario is to connect multiple instances of "
 "an external component to a single Tigase XMPP Server to distribute load."
-msgstr ""
+msgstr "第一个也是最简单的场景是将外部组件的多个实例连接到单个 Tigase XMPP "
+"服务器以分配负载。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:21
 msgid ""
@@ -2271,31 +2515,35 @@ msgid ""
 "would be to spread load over more instances/machines and the second is to"
 " improve reliability in case one component fails the other one can take "
 "over the work."
-msgstr ""
+msgstr "至少有两个原因表明这将是最佳解决方案：一个是将负载分散到更多实例/机器上，第二"
+"个是提高可靠性，以防一个组件发生故障，另一个组件可以接管工作。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:23
 msgid "So here is a simple picture showing the use case."
-msgstr ""
+msgstr "所以这里有一张显示用例的简单图片。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:25
+#, fuzzy
 msgid "|ExternalCompClustering002|"
-msgstr ""
+msgstr "|ExternalCompClustering002|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:80
+#, fuzzy
 msgid "ExternalCompClustering002"
-msgstr ""
+msgstr "ExternalCompClustering002"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:27
 msgid ""
 "We have a single machine running Tigase XMPP Server and 2 instances of "
 "the MUC component connecting to Tigase."
-msgstr ""
+msgstr "我们有一台运行 Tigase XMPP 服务器的机器和两个连接到 Tigase 的 MUC 组件实例。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:29
 msgid ""
 "On the server side we will enable ``ComponentProtocol`` component as we "
 "need to do to enable external component without clustering support."
-msgstr ""
+msgstr "在服务器端，我们将启用 ``ComponentProtocol`` "
+"组件，因为我们需要在不支持集群的情况下启用外部组件。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:31
 msgid ""
@@ -2304,27 +2552,35 @@ msgid ""
 "``Configuration`` section of the web page just as it is described in "
 "`External Component Configuration <#tigaseExternalComponent>`__ section."
 msgstr ""
+"然后使用 Admin UI，我们将在网页的 ``Configuration`` 部分中使用 ``Add item`` "
+"位置为 ``ext`` 组件添加新的外部组件连接设置，就像在 :ref:`External Component "
+"Configuration<tigaseExternalComponent>` 部分描述的那样。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:33
+#, fuzzy
 msgid "|adminui ext add item form_1|"
-msgstr ""
+msgstr "|adminui ext add item form_1|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:81
+#, fuzzy
 msgid "adminui ext add item form_1"
-msgstr ""
+msgstr "adminui ext add item form_1"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:35
 msgid ""
 "The only change here is that we will specify value for field ``Load "
 "balancer class`` and we will use ``ReceiverBareJidLB`` as a value."
 msgstr ""
+"这里唯一的变化是我们将为字段 ``Load balancer class`` 指定值，我们将使用 "
+"``ReceiverBareJidLB`` 作为值。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:37
 msgid ""
 "The configuration for both instances of the MUC component (identical for "
 "both of them) can be done in the same way as it is done for a single "
 "instance of the MUC component. There is nothing to change here."
-msgstr ""
+msgstr "MUC 组件的两个实例的配置（两者相同）可以按照与 MUC "
+"组件的单个实例相同的方式完成。这里没有什么可以改变的。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:39
 msgid ""
@@ -2332,6 +2588,8 @@ msgid ""
 "value of ``Load balancer class`` field in ``Add item`` form is set to "
 "**ReceiverBareJidLB**."
 msgstr ""
+"区别是服务器配置中的一个小元素。在 ``Add item`` 表单中的 ``Load balancer "
+"class`` 字段的值设置为 **ReceiverBareJidLB**。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:41
 msgid ""
@@ -2342,6 +2600,9 @@ msgid ""
 "the MUC room address. This way we just distribute MUC rooms and traffic "
 "over different MUC component instances."
 msgstr ""
+"这是负载平衡插件类。负载平衡插件决定流量如何在不同组件连接（即不同组件实例）"
+"之间分配。对于 MUC 组件，基于接收者裸 JID 分配流量是有意义的，因为这是 MUC "
+"房间地址。这样，我们只需在不同的 MUC 组件实例上分配 MUC 房间和流量。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:43
 msgid ""
@@ -2351,6 +2612,9 @@ msgid ""
 "source bare JID. And it is possible if you use plugin with class name: "
 "**SenderBareJidLB**."
 msgstr ""
+"然而，这种分配策略并不总是适用于所有可能的组件。例如，对于传输，这根本行不通"
+"。为传输分配负载的更好方法是基于源裸 "
+"JID。如果你使用类名的插件这是可能的：**SenderBareJidLB**。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:45
 msgid ""
@@ -2360,10 +2624,13 @@ msgid ""
 "plugin for that yet but it is easy enough to write one and put the class "
 "name in configuration."
 msgstr ""
+"这是现在可用的两种基本负载分配策略。对于某些用例，它们都不够好。如果您有 "
+"PubSub，那么您可能希望基于 PubSub "
+"节点分配负载。目前还没有插件，但很容易编写一个并将类名放入配置中。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:48
 msgid "External Component and Cluster"
-msgstr ""
+msgstr "外部组件和集群"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:50
 msgid ""
@@ -2373,6 +2640,10 @@ msgid ""
 " a single Tigase server. Now we want to connect a single MUC component to"
 " many Tigase servers (or many Tigase cluster nodes)."
 msgstr ""
+"如果您想在没有实现集群的集群模式下使用 Tigase "
+"的组件，有一种方法可以使其具有集群能力。在上一节中，我们将许多 MUC "
+"组件连接到单个 Tigase 服务器。现在我们想将单个 MUC 组件连接到许多 Tigase "
+"服务器（或许多 Tigase 集群节点）。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:52
 msgid ""
@@ -2380,14 +2651,19 @@ msgid ""
 "test.org** and the server is installed on three cluster nodes: **red"
 ".xmpp-test.org,** **green.xmpp-test.org** and **blue.xmpp-test.org.**"
 msgstr ""
+"假设我们有 Tigase XMPP 服务器为域工作：**xmpp-test.org** "
+"并且服务器安装在三个集群节点上：**red.xmpp-test.org,** **green.xmpp-test. "
+"org** 和 **blue.xmpp-test.org.**"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:54
+#, fuzzy
 msgid "|ExternalCompClustering003 0|"
-msgstr ""
+msgstr "|ExternalCompClustering003 0|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:82
+#, fuzzy
 msgid "ExternalCompClustering003 0"
-msgstr ""
+msgstr "ExternalCompClustering003 0"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:56
 msgid ""
@@ -2396,12 +2672,15 @@ msgid ""
 "and on each of cluster nodes we need to enable ``ComponentProtocol`` "
 "component."
 msgstr ""
+"我们希望能够将 MUC 组件连接到所有节点。为此，我们将 Tigase XMPP "
+"服务器配置为在集群模式下运行，并且在每个集群节点上我们需要启用 "
+"``ComponentProtocol`` 组件。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:58
 msgid ""
 "This can be simply done by adding following line to the server "
 "configuration file:"
-msgstr ""
+msgstr "这可以通过在服务器配置文件中添加以下行来简单地完成："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:64
 msgid ""
@@ -2410,6 +2689,9 @@ msgid ""
 "``Configuration`` section of the web page just as it is described in "
 "`External Component Configuration <#tigaseExternalComponent>`__ section."
 msgstr ""
+"完成此操作后，我们需要在网页的 ``Configuration`` 部分中使用 ``Add item`` "
+"位置为 ``ext`` 组件添加新的外部组件连接设置，正如 "
+":ref:`外部组件配置<tigaseExternalComponent>` 部分中所述。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:66
 msgid ""
@@ -2418,6 +2700,8 @@ msgid ""
 "configuration of the component to use with single node Tigase XMPP Server"
 " installation."
 msgstr ""
+"如您所见，这里没有什么特别之处。最有趣的部分来自 MUC 方面，"
+"但从组件配置到与单节点 Tigase XMPP 服务器安装一起使用，这只是一个很小的变化。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:68
 msgid ""
@@ -2428,10 +2712,14 @@ msgid ""
 "field a semicolon separated list of all of the cluster nodes to which "
 "external component should connect."
 msgstr ""
+"当您使用管理 UI 添加/配置外部组件设置时（为 ``ext-man`` 组件 ``Add item`` 或 "
+"``Update item configuration`` ）或使用单独的配置文件（当您不使用共享数据库时)"
+" 那么您需要将分号分隔的所有集群节点列表作为 ``Remote host`` "
+"字段的值传递，外部组件应连接到这些节点。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:70
 msgid "In our case it would be:"
-msgstr ""
+msgstr "在我们的例子中，它将是："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:76
 msgid ""
@@ -2440,17 +2728,21 @@ msgid ""
 "domain and the rest are addresses of the host to connect to. This can be "
 "a list of domain names or IP addresses."
 msgstr ""
+"如您所见，远程主机名不是一个简单的域，而是一个带有几个逗号分隔部分的字符串。"
+"第一部分是我们的远程域，其余部分是要连接的主机地址。这可以是域名或 IP "
+"地址列表。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:78
 msgid ""
 "Of course it is possible to connect multiple external component to all "
 "cluster nodes, this way the whole installation would be really working in"
 " the cluster and also load balanced."
-msgstr ""
+msgstr "当然，可以将多个外部组件连接到所有集群节点，这样整个安装将真正在集群中工作并"
+"且负载均衡。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:2
 msgid "Client to Server Communication"
-msgstr ""
+msgstr "客户端到服务器通信"
 
 #: ../../Tigase_Administration/Components/C2S.inc:4
 msgid ""
@@ -2460,28 +2752,32 @@ msgid ""
 "however doing so will only allow communication of internal components, "
 "and S2S communications."
 msgstr ""
+"客户端到服务器的通信是 XMPP 通信的一个组成部分。 C2S "
+"处理与服务器的所有客户端通信，并负责过滤和处理远程通信。可以禁用 C2S，"
+"但是这样做只会允许内部组件的通信和 S2S 通信。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:9
 msgid "To disable C2S, use the following line in ``config.tdsl`` folder."
-msgstr ""
+msgstr "要禁用 C2S，请在 ``config.tdsl`` 文件夹中使用以下行。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:15
 msgid "Otherwise, C2S component is activated by default."
-msgstr ""
+msgstr "否则，默认激活 C2S 组件。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:18
 msgid "Connections"
-msgstr ""
+msgstr "连接"
 
 #: ../../Tigase_Administration/Components/C2S.inc:20
 msgid ""
 "The connections container houses all configuration related to connections"
 " with the component. Each port may be configured individually."
-msgstr ""
+msgstr "连接容器包含与组件连接相关的所有配置。每个端口都可以单独配置。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:36
+#, fuzzy
 msgid "new-connections-throttling"
-msgstr ""
+msgstr "new-connections-throttling"
 
 #: ../../Tigase_Administration/Components/C2S.inc:38
 msgid ""
@@ -2492,20 +2788,23 @@ msgid ""
 " huge number of users trying to connect at the same time. Mostly this "
 "happens after a server restart."
 msgstr ""
+"该属性允许您限制服务器在特定端口上每秒接受的新用户连接数。在限制范围内建立的"
+"连接被正常处理，所有其他连接都被简单地断开。这使您可以避免服务器过载，以防有"
+"大量用户同时尝试连接。这通常发生在服务器重新启动后。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:50
 msgid ""
 "Here, this limits the number to 150 connections per second before "
 "connection attempts are dropped."
-msgstr ""
+msgstr "在这里，这将连接尝试数限制为每秒 150 个连接，然后连接尝试被丢弃。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:52
 msgid "This replaces the old ``--new-connections-throttling`` property."
-msgstr ""
+msgstr "这取代了旧的 ``--new-connections-throttling`` 属性。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:55
 msgid "Resumption timeout"
-msgstr ""
+msgstr "恢复超时"
 
 #: ../../Tigase_Administration/Components/C2S.inc:57
 msgid ""
@@ -2516,27 +2815,32 @@ msgid ""
 "coverage, and you do not want to close the stream right away. By default,"
 " Tigase sets this value to 60 seconds."
 msgstr ""
+"现在可以设置服务器使用的默认流恢复超时。这允许控制服务器等待客户端重新连接的"
+"时间。这对于管理连接到您的服务器的移动客户端特别有用，因为它们可能没有完全覆"
+"盖，并且您不想立即关闭流。默认情况下，Tigase 将此值设置为 60 秒。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:67
 msgid ""
 "This sets the default timeout to 90 seconds. You may, if you choose, "
 "specify a maximum timeout time, which will allow the server to wait "
 "between the default and maximum before a connection is closed."
-msgstr ""
+msgstr "这会将默认超时设置为 90 秒。如果您愿意，您可以指定最大超时时间，这将允许服务"
+"器在连接关闭之前在默认值和最大值之间等待。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:79
 msgid ""
 "If the max-resumption-timeout is not set, it will always equal the "
 "resumption-timeout number, or default is none is set."
-msgstr ""
+msgstr "如果未设置 max-resumption-timeout，它将始终等于 resumption-timeout 数，"
+"或者默认为 none 设置。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:81
 msgid "Available since v7.1.0"
-msgstr ""
+msgstr "从 v7.1.0 开始可用"
 
 #: ../../Tigase_Administration/Components/C2S.inc:84
 msgid "Packet Redelivery"
-msgstr ""
+msgstr "数据包重新投递"
 
 #: ../../Tigase_Administration/Components/C2S.inc:86
 msgid ""
@@ -2547,16 +2851,20 @@ msgid ""
 " 90, 135, and so on until the retry count is reached. By default this "
 "count is 15, however it can be changed by using the following setting:"
 msgstr ""
+"通常数据包由 C2S 处理，并且通常在第一次运行时处理，但是如果发送失败，将在 60 "
+"秒后重试发送该数据包。如果第二次尝试失败，延迟将增加 1.5 倍。"
+"这意味着下一次重试将发生在 90，135 ..，直到达到重试计数。默认情况下，"
+"此计数为 15，但可以使用以下设置进行更改："
 
 #: ../../Tigase_Administration/Components/C2S.inc:94
 msgid ""
 "This setting prevents packet redelivery attempts from continuing into "
 "infinity (or when the host machine runs out of memory)."
-msgstr ""
+msgstr "此设置可防止数据包重新传递尝试持续到无穷大（或当主机内存不足时）。"
 
 #: ../../Tigase_Administration/Components/External_Service_Discovery_Component.inc:2
 msgid "Tigase External Service Discovery"
-msgstr ""
+msgstr "Tigase 外部服务发现"
 
 #: ../../Tigase_Administration/Components/External_Service_Discovery_Component.inc:4
 msgid ""
@@ -2565,10 +2873,13 @@ msgid ""
 "<http://xmpp.org/extensions/xep-0215.html>`__ which allows discovery of "
 "external services which are not accessible using XMPP protocol."
 msgstr ""
+"欢迎使用 Tigase 外部服务发现组件用户指南。组件提供对 `XEP-0215: External "
+"Service Discovery <http://xmpp.org/extensions/xep-0215.html>`__ 的支持，"
+"它允许发现使用 XMPP 协议无法访问的外部服务。"
 
 #: ../../Tigase_Administration/Components/External_Service_Discovery_Component.inc:7
 msgid "Setup & Configuration"
-msgstr ""
+msgstr "设置和配置"
 
 #: ../../Tigase_Administration/Components/External_Service_Discovery_Component.inc:9
 msgid ""
@@ -2577,20 +2888,24 @@ msgid ""
 "default registered under name ``ext-disco`` and disabled. To enable it "
 "you need to enable it in configuration. Example:"
 msgstr ""
+"组件（在类 ``tigase.server.extdisco.ExternalServiceDiscoveryComponent`` "
+"中实现）默认注册在名称 ``ext-disco`` "
+"下并禁用。要启用它，您需要在配置中启用它。例子："
 
 #: ../../Tigase_Administration/Components/External_Service_Discovery_Component.inc:11
 msgid "in DSL format:"
-msgstr ""
+msgstr "DSL 格式："
 
 #: ../../Tigase_Administration/Components/External_Service_Discovery_Component.inc:17
 msgid ""
 "Additionally you need to activate ``urn:xmpp:extdisco:2`` XMPP processor "
 "in ``SessionManager`` by:"
-msgstr ""
+msgstr "此外，您需要通过以下方式在 ``SessionManager`` 中激活 ``urn:xmpp:extdisco:2`` "
+"XMPP 处理器:"
 
 #: ../../Tigase_Administration/Components/External_Service_Discovery_Component.inc:19
 msgid "in DSL - enable subbean of ``sess-man``:"
-msgstr ""
+msgstr "在 DSL 中 - 启用 ``sess-man`` 的子 bean："
 
 #: ../../Tigase_Administration/Components/External_Service_Discovery_Component.inc:27
 msgid ""
@@ -2601,6 +2916,10 @@ msgid ""
 "easiest and flexible way to add, modify or remove entries for services "
 "which will be returned by discovery."
 msgstr ""
+"服务器返回的外部服务列表可以使用为此组件提供的临时命令进行配置。只有使用支持 "
+"AdHoc 命令的 XMPP 客户端或使用 Tigase Admin UI 的服务器管理员才能访问 AdHoc "
+"命令。 AdHoc "
+"命令的使用提供了简单和灵活的方法来添加，修改或删除将由发现返回的服务条目。"
 
 #~ msgid ""
 #~ "`Setting up Remote Monitoring in the "
