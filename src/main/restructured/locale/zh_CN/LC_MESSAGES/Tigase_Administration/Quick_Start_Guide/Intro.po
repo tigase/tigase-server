@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-07 20:07+0000\n"
+"PO-Revision-Date: 2022-07-07 20:21+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -216,7 +216,7 @@ msgstr "逐步完成安装过程"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:73
 msgid "You will be greeted by the following \"About software\" page."
-msgstr "您将看到以下\"About software\"的页面。"
+msgstr "您将看到以下 \"About software\" 的页面。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:75
 #, fuzzy
@@ -256,7 +256,7 @@ msgid ""
 "agreement type in your name or company and click \"Next\" to go to the "
 "next page."
 msgstr "您将看到有关我们的商业产品和许可的一些信息。请仔细阅读协议，并用您的姓名或公"
-"司确认该协议，然后单击\"Next\"进入下一页。"
+"司确认该协议，然后单击 \"Next\" 进入下一页。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:89
 msgid "**Basic Tigase server configuration**"
@@ -271,15 +271,14 @@ msgid ""
 "later)."
 msgstr ""
 "此页面将查看您的基本配置设置，其中包括服务器类型，您希望使用的域，并让您有机"
-"会为域指定管理员。此外，您将选择Tigase服务器使用的数据库类型（稍后进行配置）"
-"。"
+"会为域指定管理员。此外，您将选择Tigase服务器使用的数据库类型(稍后进行配置)。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:93
 msgid ""
 "If you do not specify an administrator and password, one is made for you,"
 " which will be admin@yourdomain and password is tigase."
-msgstr "如果您没有指定管理员和密码，则会为您自动设置一个： "
-"admin@yourdomain，密码为tigase。"
+msgstr "如果您没有指定管理员和密码，则会为您自动设置一个:admin@yourdomain，其密码为ti"
+"gase。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:95
 #, fuzzy
@@ -294,8 +293,8 @@ msgid ""
 "making this decisions, click \"Next\"."
 msgstr ""
 "在此页面上，您将看到Tigase XMPP服务器所支持的可能连接选项列表以及启用/禁用每"
-"个选项的方法（桌面，移动，http，websocket，联合等）。勾选相应选项后，"
-"单击\"Next\"。"
+"个选项的方法(桌面，移动，http，websocket，联合等)。勾选相应选项后，单击 "
+"\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:99
 #, fuzzy
@@ -317,7 +316,7 @@ msgstr "在这一步也将能够在您的安装上启用集群"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:105
 msgid "When you will be ready, click \"Next\"."
-msgstr "选择好以后，单击\"Next\"。"
+msgstr "选择好以后，单击 \"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:107
 #, fuzzy
