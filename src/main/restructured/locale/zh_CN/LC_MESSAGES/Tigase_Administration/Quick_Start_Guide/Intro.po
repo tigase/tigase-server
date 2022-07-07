@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-07 19:00+0000\n"
+"PO-Revision-Date: 2022-07-07 19:19+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -35,9 +35,8 @@ msgid ""
 msgstr "在将 Tigase 服务器开始安装到你的系统之前，请确保首先满足系统最低要求："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:9
-#, fuzzy
 msgid "**Java Development Kit (JDK) 11 (LTS)** - We recommend OpenJDK"
-msgstr "**Java开发工具包（JDK)11(LTS)**-我们推荐OpenJDK"
+msgstr "**Java开发工具包（JDK)11(LTS)** - 我们推荐OpenJDK"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:11
 #, fuzzy
