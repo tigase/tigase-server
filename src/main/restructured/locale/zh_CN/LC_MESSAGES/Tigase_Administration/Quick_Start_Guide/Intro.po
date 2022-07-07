@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-07 21:15+0000\n"
+"PO-Revision-Date: 2022-07-08 06:45+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -108,13 +108,11 @@ msgid ""
 "environment, please see the :ref:`Windows Installation<winWebInstall>` "
 "section."
 msgstr ""
-"当Tigase XMPP服务器启动时，它会查找默认配置文件: ``etc/config."
-"tdsl``。如果此文件未被修改，您可以运行 Web "
-"安装程序。这将引导您完成Tigase的配置。如果您在Windows环境中安装Tigase，"
-"请参阅 :ref:`Windows安装<winWebInstall>` 部分。"
+"当Tigase XMPP服务器启动时，它会查找默认配置文件: ``etc/config.tdsl``。如果此"
+"文件未被修改，您可以运行Web安装程序。这将引导您完成Tigase的配置。如果您在Wind"
+"ows环境中安装Tigase，请参阅 :ref:`Windows安装<winWebInstall>` 部分。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:10
-#, fuzzy
 msgid "Download and Extract"
 msgstr "下载并解压"
 
@@ -126,10 +124,9 @@ msgid ""
 "Once you have the distribution binary extract it and navigate to the "
 "directory:"
 msgstr ""
-"首先下载 Tigase XMPP Server 并解压。你可以下载 `官方二进制文件 "
-"<https://tigase.net/downloads>`__，或者最新最好的 `试运行 <https://build."
-"tigase.net/nightlies/dists/"
-">`__。一旦获得分发二进制文件后，可将其解压缩并浏览此目录："
+"首先下载Tigase XMPP Server并解压。你可以下载 `官方二进制文件 <https://tigase."
+"net/downloads>`__，或者最新最好的 `试运行 <https://build.tigase.net/"
+"nightlies/dists/>`__。一旦获得分发二进制文件后，可将其解压缩并浏览此目录："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:22
 msgid "Do not run as root user!"
@@ -143,7 +140,7 @@ msgstr "启动服务器"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:30
 msgid "Please make sure ``JAVA_HOME`` is set and points to your JVM installation"
-msgstr "请确保 ``JAVA_HOME`` 已设置并指向您的JVM 安装"
+msgstr "请确保 ``JAVA_HOME`` 已设置并指向您的JVM安装"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:38
 msgid "Verify Tigase is ready to start installation"
@@ -245,7 +242,6 @@ msgid ""
 msgstr "步骤的顺序和设计可能略有不同，因此我们仅提供如何继续安装的大致概述:"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:85
-#, fuzzy
 msgid "**Advanced Clustering Strategy information**"
 msgstr "**高级聚类策略信息**"
 
@@ -281,7 +277,6 @@ msgstr "如果您没有指定管理员和密码，则会为您自动设置一个
 "gase。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:95
-#, fuzzy
 msgid "**Connectivity**"
 msgstr "**连接**"
 
@@ -293,11 +288,10 @@ msgid ""
 "making this decisions, click \"Next\"."
 msgstr ""
 "在此页面上，您将看到Tigase "
-"XMPP服务器所支持的可能连接选项列表以及启用/禁用每个选项的方法(桌面，移动, "
-"http, websocket，联合等)。勾选相应选项后，单击\"Next\"。"
+"XMPP服务器所支持的可能连接选项列表以及启用/禁用每个选项的方法(桌面，移动， "
+"http，websocket，联合等)。勾选相应选项后，单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:99
-#, fuzzy
 msgid "**Features**"
 msgstr "**特征**"
 
@@ -307,7 +301,7 @@ msgid ""
 " as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or "
 "disabled."
 msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能(例如MUC, PubSub, MIX, "
-"MAM，推送通知)应该被启用或被禁用。"
+"MAM,推送通知)应该被启用或被禁用。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:103
 #, fuzzy
@@ -319,7 +313,6 @@ msgid "When you will be ready, click \"Next\"."
 msgstr "选择好以后，单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:107
-#, fuzzy
 msgid "**Database configuration**"
 msgstr "**数据库配置**"
 
@@ -397,7 +390,6 @@ msgid "**Finished**"
 msgstr "**已完成**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:129
-#, fuzzy
 msgid ""
 "You have now finished the installation, proceed to the next step to "
 "restart the server."
