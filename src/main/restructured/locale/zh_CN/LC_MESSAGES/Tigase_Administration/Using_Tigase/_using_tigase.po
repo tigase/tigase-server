@@ -3,103 +3,112 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-08 22:12+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/using_tigasse/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:2
 msgid "Using Tigase"
-msgstr ""
+msgstr "使用 Tigase"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:4
 msgid ""
 "This section keeps set of documents which apply to all the Tigase server "
 "version and contain more generic or introductory information on general "
 "use and features."
-msgstr ""
+msgstr "本节保留了适用于所有 Tigase "
+"服务器版本的文档集，并包含有关一般用途和功能的更多通用或介绍性信息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:6
 msgid ":ref:`Tigase Log Guide<Tigase-Log-Guide>`"
-msgstr ""
+msgstr ":ref:`Tigase 日志指南<Tigase-Log-Guide>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:8
 msgid "ref:`Debugging Tigase<Debuging-Tigase>`"
-msgstr ""
+msgstr ":ref:`调试Tigase<Debuging-Tigase>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:10
 msgid "ref:`Basic System Checks<Basic-System-Checks>`"
-msgstr ""
+msgstr ":ref:`基本系统检查<Basic-System-Checks>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:12
 msgid "ref:`Add and Manage Domains<addManageDomain>`"
-msgstr ""
+msgstr ":ref:`添加和管理域<addManageDomain>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:14
 msgid "ref:`Presence Forwarding<Presence-Forwarding>`"
-msgstr ""
+msgstr ":ref:`Presence转发<Presence-Forwarding>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:16
 msgid "ref:`Watchdog<Watchdog>`"
-msgstr ""
+msgstr ":ref:`监视器<Watchdog>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:18
 msgid "ref:`Runtime Environment Tip<Tigase-Tip-Checking-the-Runtime-Environment>`"
-msgstr ""
+msgstr ":ref:`运行环境提示<Tigase-Tip-Checking-the-Runtime-Environment>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:20
 msgid "ref:`Checking Cluster Connections<Checking-Cluster-Connections>`"
-msgstr ""
+msgstr ":ref:`检查集群连接<Checking-Cluster-Connections>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:22
 msgid ""
 "ref:`Best Practices for Connecting to Tigase XMPP server From Web Browser"
 "<Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-Browser>`"
 msgstr ""
+":ref:`从 Web 浏览器连接到 Tigase XMPP 服务器的最佳实践<Best-Practices-for-"
+"Connecting-to-Tigase-XMPP-server-From-Web-Browser>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:24
 msgid "`Scripting Support in Tigase<Scripting-support-in-Tigase>`"
-msgstr ""
+msgstr ":ref:`Tigase 中的脚本支持<Scripting-support-in-Tigase>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:26
 msgid ""
 "ref:`Scripting Introduction - Hello World!<Scripting-Introduction - "
 "Hello-World!>`"
-msgstr ""
+msgstr ":ref:`脚本介绍- Hello World!<Scripting-Introduction - Hello-World!>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:28
 msgid ""
 "ref:`Tigase Scripting Version 4.4.x Update for Administrators<Tigase-"
 "Scripting-Version-4.4.x-Update-for-Administrators>`"
 msgstr ""
+":ref:`面向管理员的 Tigase 脚本版本 4.4.x 更新<Tigase-Scripting-Version-4.4.x"
+"-Update-for-Administrators>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:30
 msgid "ref:`Tigase and Python Scripting<Tigase-and-Python>`"
-msgstr ""
+msgstr ":ref:`Tigase 和 Python 脚本<Tigase-and-Python>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:32
 msgid "ref:`Configuration Wizards<tigase3xconfiguration>`"
-msgstr ""
+msgstr ":ref:`配置向导<tigase3xconfiguration>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:2
 msgid "Offline Messages"
-msgstr ""
+msgstr "离线消息"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:4
 msgid ""
 "Tigase like any XMPP server supports storing of messages for users who "
 "are offline so that they may receive messages sent to them while they "
 "were not logged in."
-msgstr ""
+msgstr "Tigase 像任何 XMPP 服务器一样支持为离线用户存储消息，以便他们可以在未登录时接"
+"收发送给他们的消息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:6
 msgid ""
@@ -108,6 +117,8 @@ msgid ""
 "guide has multiple sections for setting limits globally, per user, and "
 "others."
 msgstr ""
+"默认情况下，Tigase ``MessageAmp`` 处理器负责存储离线消息，并且会自动存储离线"
+"消息。本指南包含多个部分，用于在全局，每个用户等其他方面设置限制。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:8
 msgid ""
@@ -116,16 +127,19 @@ msgid ""
 "on your system, view your ``config.tdsl`` file and be sure the following "
 "is there in your plugins line:"
 msgstr ""
+"此处列出的许多功能都需要使用默认打开的高级消息处理器插件。为确保 AMP "
+"已打开您的系统，请查看您的 ``config.tdsl`` 文件并确保您的 plugins "
+"行中有以下内容："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:16
 msgid ""
 "Messages will be delivered to intended recipients when they first login "
 "after roster exchange."
-msgstr ""
+msgstr "当他们在名册交换后首次登录时，消息将被传递给预期的收件人。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:19
 msgid "Offline Message Limits"
-msgstr ""
+msgstr "离线消息限制"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:21
 msgid ""
@@ -137,21 +151,28 @@ msgid ""
 "200 messages on barejid-barejid paid, add the following entries to the "
 "``config.tdsl`` file:"
 msgstr ""
+"自 v7.1.0 起，Tigase "
+"现已添加对基于每个用户限制存储的离线消息数量的支持。默认情况下，Tigase "
+"带有为每个用户设置的存储离线消息的限制。默认情况下，barejid-barejid "
+"对的此限制为 100 条脱机消息。这个值可以通过 ``store-limit`` 属性改变。要在 "
+"barejid-barejid 上付费更改为 200 条消息，请将以下条目添加到 ``config.tdsl`` "
+"文件中："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:34
 msgid "This setting applies to every user."
-msgstr ""
+msgstr "此设置适用于每个用户。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:37
 msgid "User Limit"
-msgstr ""
+msgstr "用户限制"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:39
 msgid ""
 "Each user is able to configure the number of offline messages which "
 "should be stored for him. To enable this feature, the following lines "
 "need to be entered into the ``config.tdsl`` file:"
-msgstr ""
+msgstr "每个用户都可以配置应该为他存储的离线消息的数量。要启用此功能，需要在 ``config"
+".tdsl`` 文件中输入以下行："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:52
 msgid ""
@@ -160,10 +181,13 @@ msgid ""
 " stored in ``tig_pairs`` key with the value and a proper record from "
 "``tig_nodes`` points to this record."
 msgstr ""
+"用户特定限制的值将存储在 ``offline-msgs`` 子节点和 ``store-limit`` 键下的 "
+"UserRepository 中。数据存储将存储在 ``tig_pairs`` 键中，其值和来自 "
+"``tig_nodes`` 的适当记录指向该记录。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:55
 msgid "Handling of Offline Messages Exceeding Limits"
-msgstr ""
+msgstr "离线消息超限处理"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:57
 msgid ""
@@ -171,6 +195,9 @@ msgid ""
 "limitations: . ``error`` sending message with error type back to sender. "
 ". ``drop`` drop of message without notifications to sender."
 msgstr ""
+"有两种可能的方式来处理超出限制的离线消息： . ``error`` "
+"将带有错误类型的消息发送回发件人。 . ``drop`` "
+"在没有通知发件人的情况下丢弃消息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:59
 msgid ""
@@ -181,23 +208,28 @@ msgid ""
 "needs. This is done by adding the following line to your ``config.tdsl`` "
 "file."
 msgstr ""
+"默认情况下，Tigase 向原始发件人发送一条错误类型为 ``service-unavailable`` "
+"的消息，并根据 `XEP-0160 <http://www.xmpp.org/extensions/xep-0160.html>`__ "
+"正确描述错误。但是，可以更改此行为以更好地满足您的需求。"
+"这是通过将以下行添加到您的 ``config.tdsl`` 文件来完成的。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:69
 msgid ""
 "This will force Tigase to drop packets that exceed the offline message "
 "limit."
-msgstr ""
+msgstr "这将强制 Tigase 丢弃超过离线消息限制的数据包。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:72
 msgid "Setting the Limits by User"
-msgstr ""
+msgstr "按用户设置限制"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:74
 msgid ""
 "Users wishing to set a custom limit of stored offline messages for "
 "barejid-barejid pairs needs to send the following XMPP stanza to the "
 "server:"
-msgstr ""
+msgstr "希望为 barejid-barejid 对设置存储离线消息的自定义限制的用户需要将以下 XMPP "
+"节发送到服务器："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:82
 msgid ""
@@ -205,103 +237,109 @@ msgid ""
 "string). . ``${limit}`` is the integer value of the offline message "
 "limit. This can be set to ``false`` to disable offline message limits."
 msgstr ""
+"其中：. ``${random-id}`` 是节的随机 ID（可以是任何字符串）。. ``${limit}`` "
+"是离线消息限制的整数值。 其可以设置为 ``false`` 以禁用离线消息限制。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:84
 msgid ""
 "In response, the server will send back an ``iq`` stanza with a result "
 "type:"
-msgstr ""
+msgstr "作为响应，服务器将返回一个带有结果类型的 ``iq`` 节："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:92
 msgid "Example of Setting Limit of Stored Offline Messages to 10"
-msgstr ""
+msgstr "将存储的离线消息限制设置为 10 的示例"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:94
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:112
 msgid "XMPP client sends the following to the server:"
-msgstr ""
+msgstr "XMPP 客户端向服务器发送以下内容："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:102
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:120
 msgid "Server response:"
-msgstr ""
+msgstr "服务器响应："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:110
 msgid "Example of Disabling Offline Message Limit"
-msgstr ""
+msgstr "禁用离线消息限制示例"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:129
 msgid "Storing offline messages without body content"
-msgstr ""
+msgstr "存储没有正文内容的离线消息"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:131
 msgid "Tigase can now store offline messages without ``<body/>`` content."
-msgstr ""
+msgstr "Tigase 现在可以存储没有 ``<body/>`` 内容的离线消息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:133
 msgid ""
 "See `XEP-0334 <http://xmpp.org/extensions/xep-0334.html>`__ for protocol "
 "details."
-msgstr ""
+msgstr "有关协议详细信息，请参阅 `XEP-0334 <http://xmpp.org/extensions/xep-0334."
+"html>`__。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:135
 msgid ""
 "This can include message receipts, and messages with specific ``do-not-"
 "store`` tags."
-msgstr ""
+msgstr "这可以包括消息回执和带有特定 ``do-not-store`` 标签的消息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:137
 msgid ""
 "Support has been added to set a list of paths and xmlns to trigger and "
 "place storage of offline messages using the following settings in "
 "``config.tdsl``:"
-msgstr ""
+msgstr "添加了支持以设置路径列表和 xmlns 以使用 ``config.tdsl`` "
+"中的以下设置触发和放置离线消息的存储："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:147
 msgid "This example results in two settings:"
-msgstr ""
+msgstr "此示例产生两个设置："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:150
+#, fuzzy
 msgid "``/message/received[urn:xmpp:receipts]``"
-msgstr ""
+msgstr "``/message/received[urn:xmpp:receipts]``"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:150
 msgid ""
 "Results in storage of messages with a ``recieved`` subelement and with "
 "the xlmns set to ``urn:xmpp:receipts``"
-msgstr ""
+msgstr "结果存储带有 ``recieved`` 子元素和xlmns设置为 ``urn:xmpp:receipts`` 的消息"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:153
+#, fuzzy
 msgid "``/message/store-offline``"
-msgstr ""
+msgstr "``/message/store-offline``"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:153
 msgid ""
 "Results in storing messages with a ``store-offline`` subelement without "
 "checking xmlns."
-msgstr ""
+msgstr "导致在不检查 xmlns 的情况下使用 ``store-offline`` 子元素存储消息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:156
 msgid "Filtering of offline storage"
-msgstr ""
+msgstr "过滤离线存储"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:158
 msgid "It is possible to set storage of other types to save:"
-msgstr ""
+msgstr "可以设置其他类型的存储来保存："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:168
 msgid "The above setting in the ``config.tdsl`` file will cause that:"
-msgstr ""
+msgstr "``config.tdsl`` 文件中的上述设置将导致："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:170
 msgid ""
 "messages with ``<store-offline>`` subelement will be stored without "
 "checking for associated xmlns."
-msgstr ""
+msgstr "带有 ``<store-offline>`` 子元素的消息将被存储而不检查关联的 xmlns。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:172
 msgid "messages with ``<do-not-store>`` element **will not** be saved."
-msgstr ""
+msgstr "带有 ``<do-not-store>`` 元素的消息 **不会** 被保存。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:174
 msgid ""
@@ -310,47 +348,53 @@ msgid ""
 "be checked by these matchers and if any of them result in a positive they"
 " will override default settings."
 msgstr ""
+"这些中的任何一个都可以根据您的安装进行调整，请记住，'-' 将停止存储具有指定属"
+"性的消息。这些匹配器将检查消息，如果其中任何一个结果为肯定，它们将覆盖默认设"
+"置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:176
 msgid ""
 "For example, if you wanted to store messages with <received> element, but"
 " not ones with <plain> element, your filter will look like this:"
-msgstr ""
+msgstr "例如，如果您想存储带有 <received> 元素的消息，而不是带有 <plain> "
+"元素的消息，您的过滤器将如下所示："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:186
 msgid "However…​."
-msgstr ""
+msgstr "然而…​."
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:190
 msgid ""
 "**THE ABOVE STATEMENT WILL NOT WORK** As it will just store all messages "
 "with <received> subelement."
-msgstr ""
+msgstr "**上述声明将不起作用** 因为它只会存储所有带有 <received> 子元素的消息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:192
 msgid "The below statement will properly filter your results."
-msgstr ""
+msgstr "以下语句将正确过滤您的结果。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:202
 msgid ""
 "Filtering logic is done in order from left to right. Matches on the first"
 " statement will ignore or override matches listed afterwards."
-msgstr ""
+msgstr "过滤逻辑按从左到右的顺序完成。第一条语句上的匹配项将忽略或覆盖后面列出的匹配"
+"项。"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:205
 msgid "Disabling Offline Messages"
-msgstr ""
+msgstr "禁用离线消息"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:207
 msgid ""
 "If you wish to disable the storing of offline messages, use the following"
 " line in your ``config.tdsl`` file. This will not disable other features "
 "of the AMP plugin."
-msgstr ""
+msgstr "如果您希望禁用离线消息的存储，请在 ``config.tdsl`` 文件中使用以下行。"
+"这不会禁用 AMP 插件的其他功能。"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:2
 msgid "Last Activity"
-msgstr ""
+msgstr "最后的活动"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:4
 msgid ""
@@ -359,32 +403,37 @@ msgid ""
 "retrieval information when particular contact was active last time. It’s "
 "not enabled by default."
 msgstr ""
+"Tigase XMPP 服务器支持 `XEP-0012: Last Activity <https://xmpp.org/extensions/"
+"xep-0012.html>`__ "
+"扩展，允许在特定联系人最后处于活动状态时检索信息。默认情况下未启用。"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:6
 msgid "The functionality itself is split in two plugins:"
-msgstr ""
+msgstr "功能本身分为两个插件："
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:8
 msgid ""
 "``jabber:iq:last-marker`` - responsible for updating information about "
 "last activity of user"
-msgstr ""
+msgstr "``jabber:iq:last-marker`` - 负责更新有关用户最后活动的信息"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:10
 msgid ""
 "``jabber:iq:last`` - responsible for handling requests to retrieve last "
 "activity information (it depends on ``jabber:iq:last-marker`` plugin)."
 msgstr ""
+"``jabber:iq:last`` - 负责处理请求以检索最后活动信息 (这取决于 ``jabber:iq"
+":last-marker`` 插件)。"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:12
 msgid ""
 "In order to enable functionality you should add both plugins to your "
 "configuration file"
-msgstr ""
+msgstr "为了启用功能，您应该将两个插件都添加到配置文件中"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:23
 msgid "What updates last activity"
-msgstr ""
+msgstr "更新最后活动的内容"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:25
 msgid ""
@@ -392,16 +441,18 @@ msgid ""
 "presence stanza. It’s possible to control whether ``<presence/>`` and/or "
 "``<message/>`` should update with respective options:"
 msgstr ""
+"默认情况下，标记插件只会更新存在节上的最后一个活动信息。可以控制 ``<presence/"
+">`` 和/或 ``<message/>`` 是否应该使用各自的选项进行更新："
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:36
 msgid ""
 "Those settings will cause updating last activity information for both "
 "``<message/>`` and ``<presence/>`` stanzas"
-msgstr ""
+msgstr "这些设置将导致更新 ``<message/>`` 和 ``<presence/>`` 节的最后活动信息"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:39
 msgid "Persist everything to repository"
-msgstr ""
+msgstr "将所有内容持久化到存储库"
 
 #: ../../Tigase_Administration/Using_Tigase/LastActivity.inc:41
 msgid ""
@@ -413,10 +464,14 @@ msgid ""
 "update times to be persisted (please bear in mind that this could cause "
 "higher impact on the repository)."
 msgstr ""
+"为了降低对性能的影响，默认情况下最后一个活动信息不那么频繁地保存到存储库。在"
+"具有多个集群节点且用户连接了多个资源的安装中，这可能会产生稍微不太准确的结果"
+"。为了获得更准确的结果，您应该将 ``persistAllToRepository`` 设置为 ``true``，"
+"这将导致所有更新时间都被持久化（请记住，这可能会对存储库造成更大的影响）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:4
 msgid "Tigase Log Guide"
-msgstr ""
+msgstr "Tigase 日志指南"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:6
 msgid ""
@@ -425,10 +480,14 @@ msgid ""
 "documents we will look at where tigase generates logs, what they contain,"
 " and how we can customize them to our needs."
 msgstr ""
+"Tigase 具有多个级别的日志记录，可帮助提供有关进程，组件或流量的有针对性的详细"
+"信息。在这些文档中，我们将了解 tigase "
+"生成日志的位置，它们包含的内容，以及我们如何根据需要自定义它们。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:9
+#, fuzzy
 msgid "install.log"
-msgstr ""
+msgstr "install.log"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:11
 msgid ""
@@ -437,10 +496,14 @@ msgid ""
 " to see if any files were not written to your hard drive upon "
 "installation."
 msgstr ""
+"此日志文件是安装 Tigase 服务器时生成的文件的基本列表。尽管您可能不需要使用它"
+"，但它可以提供一个方便的列表，以查看安装时是否有任何文件未写入您的硬盘驱动器"
+"。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:14
+#, fuzzy
 msgid "derby.log"
-msgstr ""
+msgstr "derby.log"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:16
 msgid ""
@@ -450,10 +513,14 @@ msgid ""
 " it’s a very small file with only 10 lines. It is overwritten on startup "
 "of the database."
 msgstr ""
+"如果您使用的是与 Tigase 一起安装的 derby 数据库，这则是数据库本身的启动日志。"
+"可以在此文件中找到可能与数据库相关的问题。通常，如果一切正常，它就是一个只有 "
+"10 行的非常小的文件。它在数据库启动时被覆盖。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:19
+#, fuzzy
 msgid "etc/config-dump.properties"
-msgstr ""
+msgstr "etc/config-dump.properties"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:21
 msgid ""
@@ -463,18 +530,23 @@ msgid ""
 "TDSL. Lets take the value for admins, listing who is administrator for "
 "the server."
 msgstr ""
+"config-dump.properties 是为 Tigase "
+"和组件中的每个选项列出的所有属性的转储文件。日志行的结构与 Tigase XMPP "
+"Server 配置文件 - TDSL 的结构相同。让我们取 admins "
+"的值，列出谁是服务器的管理员。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:27
 msgid "The admin parameter which is an array of strings and has 3 users listed."
-msgstr ""
+msgstr "admin 参数是一个字符串数组，列出了 3 个用户。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:29
 msgid "This file is re-written every time tigase starts."
-msgstr ""
+msgstr "每次启动 tigase 时都会重写此文件。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:32
+#, fuzzy
 msgid "logs/tigase.log.#"
-msgstr ""
+msgstr "logs/tigase.log.#"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:34
 msgid ""
@@ -485,6 +557,10 @@ msgid ""
 "to turn on debug logging, and how to manipulate log settings. Entries to "
 "these logs are made in the following format:"
 msgstr ""
+"tigase.log 文件是进行大部分日志记录的地方。可以通过编辑 int.properties "
+"文件中的文件来操作写入这些 long 的规则。要了解如何操作，请参阅本手册的 "
+":ref:`调试Tigase<debuggingTigase>` 部分，了解有关如何打开调试日志记录以及如何"
+"操作日志设置的更多详细信息。这些日志的条目采用以下格式："
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:40
 msgid ""
@@ -493,10 +569,13 @@ msgid ""
 " - for components it would be ``<direction>_<int>_<component name>``, for"
 " plugins it will just be the plugin name."
 msgstr ""
+"这些日志的格式如下：``<timestamp> <thread_name> <class>.<method>    "
+"<log_level>: <message> <thread_name>``。这可能会有所不同 - 对于组件，它将是 "
+"``<direction>_<int>_<component name>``，对于插件，它将只是插件名称。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:42
 msgid "Let’s look at another example from the log file."
-msgstr ""
+msgstr "让我们看一下日志文件中的另一个示例。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:48
 msgid ""
@@ -505,6 +584,8 @@ msgid ""
 "process thread identifier (14). As you can see, the format otherwise is "
 "nearly identical."
 msgstr ""
+"进程 ID 有时可能以不同的格式出现，例如 ``[in_14-muc]`` ，它指定组件 (muc) "
+"以及进程线程标识符 (14)。如您所见，其他方面的格式几乎相同。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:50
 msgid ""
@@ -517,6 +598,12 @@ msgid ""
 "renamed tigase.log.1. Using this scheme, tigase.log.0 will **always** be "
 "your most recent log."
 msgstr ""
+"``tigase.log.#`` 文件是 *rotated* - 这意味着服务器在第一次运行时开始写入 "
+"tigase.log.0，并继续转储信息，直到达到日志大小限制。此时，Tigase 将 "
+"tigase.log.0 重命名为 tigase.log.1。将创建一个新的 tigase.log.0，并且 Tigase "
+"将开始记录到该文件。当此文件已满时，tigase.log.1 将重命名为 tigase.log.2，"
+"tigase.log.0 将重命名为 tigase.log.1。使用此方案，tigase.log.0 将 **始终** "
+"是您最近的日志。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:52
 msgid ""
@@ -524,6 +611,8 @@ msgid ""
 "rotation of 10 files. You can edit these values by editing the "
 "``config.tdsl`` file and adding the following lines."
 msgstr ""
+"默认情况下，Tigase 的限制为 10000000 字节或 10MB，文件轮换为 10 个文件。"
+"您可以通过编辑 ``config.tdsl`` 文件并添加以下行来编辑这些值。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:63
 msgid ""
@@ -532,6 +621,9 @@ msgid ""
 "the collective log space is, the larger number of sectors on hard disk "
 "are active. Large log blocks may impact system performance."
 msgstr ""
+"这段代码，如果输入 ``config.tdsl`` 文件，将文件大小增加到 15，"
+"最大文件大小增加到 20MB。请注意，集体日志空间越大，硬盘上活动的扇区数就越多。"
+"大的日志块可能会影响系统性能。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:65
 msgid ""
@@ -539,10 +631,13 @@ msgid ""
 " running. This is a temporary file only and is deleted once Tigase is "
 "cleanly shut down.*"
 msgstr ""
+"*当服务器运行时，您可能会在目录中看到一个 tigase.log.0.lck "
+"文件。这只是一个临时文件，一旦完全关闭 Tigase 就会被删除。*"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:68
+#, fuzzy
 msgid "logs/statistics.log.#"
-msgstr ""
+msgstr "logs/statistics.log.#"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:70
 msgid ""
@@ -551,10 +646,14 @@ msgid ""
 "XMPP server. Mainly it will consist output of LicenceChecker. The "
 "numbering logic will be the same as ``tigase.log.#`` files."
 msgstr ""
+"如果您使用的是未经许可的 Tigase XMPP 服务器副本，统计日志将复制与向 Tigase "
+"发送统计信息相关的任何信息。主要包括LicenceChecker 的输出。编号逻辑将与 "
+"``tigase.log.#`` 文件相同。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:73
+#, fuzzy
 msgid "logs/tigase.pid"
-msgstr ""
+msgstr "logs/tigase.pid"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:75
 msgid ""
@@ -562,10 +661,13 @@ msgid ""
 " current run of Tigase. It is only valid for the current or most recent "
 "run cycle and is overwritten every time Tigase starts."
 msgstr ""
+"``tigase.pid`` 是一个仅包含当前运行 Tigase 的进程 ID 或 PID "
+"的文件。它仅对当前或最近的运行周期有效，并在每次 Tigase 启动时被覆盖。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:78
+#, fuzzy
 msgid "logs/tigase-console.log"
-msgstr ""
+msgstr "logs/tigase-console.log"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:82
 msgid ""
@@ -574,6 +676,8 @@ msgid ""
 " exceptions in this file indicate with high probability serious issues "
 "with server operation."
 msgstr ""
+"这是最重要的日志文件，其中包含与 Tigase XMPP 服务器操作相关的最基本信息。此文"
+"件中的任何错误或异常都极有可能表明服务器操作存在严重问题。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:84
 msgid ""
@@ -589,72 +693,85 @@ msgid ""
 "WARNING in the logs. Although they may contain important information, the"
 " program will continue to operate as normal are not of too great concern."
 msgstr ""
+"该文件包含与 Tigase 的运行环境相关的信息，并且是服务器本身关于正在加载的内容"
+"，何时以及是否遇到任何问题的转储。它将首先加载 Java 类（随后确保 Java 环境存"
+"在且正常运行）。然后它将开始加载配置文件，并将默认值添加到尚未自定义的设置中"
+"。然后，您可以看到正在加载的所有组件，以及在需要默认值的地方添加的设置。最后"
+"，您将看到已加载的所有插件以及其中的任何参数的日志。您可能会在日志中看到诸如 "
+"INFO 或 WARNING "
+"之类的标签。尽管它们可能包含重要信息，但程序将继续正常运行其并不太值得关注。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:86
 msgid ""
 "ERROR flags are issues you will want to pay attention as they may list "
 "problems that prevent Tigase or components from properly functioning."
-msgstr ""
+msgstr "错误标志是您需要注意的问题，因为它们可能会列出阻止 Tigase "
+"或组件正常运行的问题。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:90
 msgid ""
 "Windows does not create this file, rather the output is shown in the "
 "command line and is not dumped to a file."
-msgstr ""
+msgstr "Windows 不会创建此文件，而是在命令行中显示输出并且不会转储到文件中。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:92
 msgid ""
 "If Tigase is gracefully shut down, tigase-console.log will add statistics"
 " from the server’s operation life in the following format."
-msgstr ""
+msgstr "如果 Tigase 正常关闭，tigase-console.log "
+"将按以下格式添加服务器运行寿命的统计信息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:98
 msgid ""
 "*Any component that may have a statistic, whether used or not, will place"
 " a value here*"
-msgstr ""
+msgstr "*任何可能具有统计信息的组件，无论是否使用，都会在此处放置一个值*"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:100
 msgid "This file can be handy if you are tracking issues in the server."
-msgstr ""
+msgstr "如果您要跟踪服务器中的问题，此文件会很方便。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:102
 msgid "tigase-console.log is appended during each run session of the server."
-msgstr ""
+msgstr "tigase-console.log 在服务器的每个运行会话期间附加。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:105
 msgid "Log File Location"
-msgstr ""
+msgstr "日志文件位置"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:107
 msgid ""
 "You can also change the location of log files if you have a specific "
 "directory you wish to use. The configuration may be made by the following"
 " lines in your ``config.tdsl`` file:"
-msgstr ""
+msgstr "如果您有想要使用的特定目录，也可以更改日志文件的位置。可以通过 ``config."
+"tdsl`` 文件中的以下行进行配置："
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:117
 msgid ""
 "This setting changes the log file location to /var/log/tigase/ where all "
 "log files will be made. Files in the original location will be left."
-msgstr ""
+msgstr "此设置将日志文件位置更改为 /var/log/tigase/"
+"，所有日志文件都将在其中生成。原始位置的文件将被保留。"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:4
 msgid "Debuging Tigase"
-msgstr ""
+msgstr "调试 Tigase"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:6
 msgid ""
 "If something goes wrong and you can’t find out why it is not working as "
 "expected, you might want more detailed debugging options switched on."
-msgstr ""
+msgstr "如果出现问题并且您无法找出它没有按预期工作的原因，您可能需要打开更详细的调试"
+"选项。"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:8
 msgid ""
 "Tigase is a Java application and it uses Java logging library, this gives"
 " you the flexibility to switch logging on for selected Java packages or "
 "even for a single Java class."
-msgstr ""
+msgstr "Tigase 是一个 Java 应用程序，它使用 Java 日志库，这使您可以灵活地为选定的 "
+"Java 包甚至单个 Java 类切换日志记录。"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:10
 msgid ""
@@ -663,17 +780,20 @@ msgid ""
 "keep all the detailed logging entries. So this is the place where you "
 "should look in case of problems."
 msgstr ""
+"日志文件存储在 ``logs/`` 目录中。 ``tigase-console.log`` "
+"存储基本的日志数据，但是是主要的日志文件。 ``tigase.log.N`` "
+"文件保存所有详细的日志条目。因此，这是您在出现问题时应该查看的地方。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:25
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:13
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:15
 msgid ""
 "By default, Tigase has the old ``debug = ['server']`` setting is turned "
 "on and does not need to be added."
-msgstr ""
+msgstr "默认情况下，Tigase 已打开旧的 ``debug = ['server']`` 设置，不需要再添加。"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:17
 msgid ""
@@ -683,48 +803,52 @@ msgid ""
 "character data is: ``tigase.xmpp.XMPPIOService``. To enable all debugging"
 " info for this class you have to modify the debug line:"
 msgstr ""
+"然而，人们想看看网络层面发生了什么。那就是服务器发送和接收的内容 - "
+"实际的字符数据。打印所有接收和发送的字符数据的类是：``tigase.xmpp."
+"XMPPIOService``。要启用此类的所有调试信息，您必须修改调试行："
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:23
 msgid ""
 "You can also have debugging switched on for many packages/classes at the "
 "same time:"
-msgstr ""
+msgstr "您还可以同时为许多包/类打开调试："
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:29
 msgid "Other packages you might be interested in are:"
-msgstr ""
+msgstr "您可能感兴趣的其他软件包是："
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:31
 msgid ""
 "``io`` can print out what is going on a very low level network level "
 "including TLS/SSL stuff."
-msgstr ""
+msgstr "``io`` 可以打印出在非常低级别的网络级别上发生的事情，包括 TLS/SSL 的东西。"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:33
 msgid "``xml`` would print the XML parser debugging data."
-msgstr ""
+msgstr "``xml`` 将打印 XML 解析器调试数据。"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:35
 msgid "``cluster`` would print all the clustering related stuff."
-msgstr ""
+msgstr "``cluster`` 将打印所有与聚类相关的东西。"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:37
 msgid "``xmpp.impl`` would print logs from all plugins loaded to Tigase server."
-msgstr ""
+msgstr "``xmpp.impl`` 将打印加载到 Tigase 服务器的所有插件的日志。"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:40
 msgid "Non-Tigase packages"
-msgstr ""
+msgstr "非 Tigase 包"
 
 #: ../../Tigase_Administration/Using_Tigase/Debugging_Tigase.inc:42
 msgid ""
 "To enable logging for your own packages from those different than Tigase,"
 " you have to use another option which has been made available for this:"
-msgstr ""
+msgstr "要为您自己的包从不同于 Tigase "
+"的包中启用日志记录，您必须使用另一个可用的选项："
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:4
 msgid "Basic System Checks"
-msgstr ""
+msgstr "基本系统检查"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:6
 msgid ""
@@ -733,6 +857,8 @@ msgid ""
 "basic settings which are essential to successfully run XMPP service for "
 "hundreds or thousands of online users."
 msgstr ""
+"以前，有一篇关于 :ref:`Linux settings for high load systems<linuxhighload>` "
+"的配置文章。这描述了为成百上千的在线用户成功运行 XMPP 服务所必需的基本设置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:8
 msgid ""
@@ -743,6 +869,9 @@ msgid ""
 " a DDOS attack and can start blocking incoming connections or throttle "
 "the traffic."
 msgstr ""
+"当然，高负载和高流量系统需要更多的调整和调整。如果您使用 selinux，则必须小心"
+"，因为它可能会在高负载下干扰服务。此外，某些防火墙设置可能会导致问题，"
+"因为系统可能会确定它受到 DDOS 攻击，并且可以开始阻止传入连接或限制流量。"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:10
 msgid ""
@@ -753,20 +882,25 @@ msgid ""
 " have some suggestions for different values or different parameters to "
 "add, please let me know.*"
 msgstr ""
+"无论如何，每次部署 XMPP 服务时都需要进行一些基本检查，以确保它能够正常运行。"
+"我正在尝试让上面提到的文章保持最新，并添加在使用不同安装时发现的所有设置和参"
+"数。 *如果您对添加不同的值或不同的参数有一些建议，请告诉我。*"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:12
 msgid ""
 "If you want to run a service on a few cluster nodes (5 or even 10), then "
 "manually checking every machine and adjusting these settings is time "
 "consuming and it is very easy to forget about."
-msgstr ""
+msgstr "如果您想在几个集群节点（5 个甚至 10 "
+"个）上运行服务，那么手动检查每台机器并调整这些设置非常耗时，而且很容易忘记。"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:14
 msgid ""
 "To overcome this problem I started to work on a shell script which would "
 "run all the basic checks and report problems found. Ideally it should be "
 "also able to adjust some parameters for you."
-msgstr ""
+msgstr "为了克服这个问题，我开始编写一个 shell 脚本，该脚本将运行所有基本检查并报告发"
+"现的问题。理想情况下，它还应该能够为您调整一些参数。"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:16
 msgid ""
@@ -777,34 +911,40 @@ msgid ""
 "<https://github.com/tigase/tigase-server/blob/master/scripts/machine-"
 "check.sh>`__ and run for yourself."
 msgstr ""
+"在 Tigase 服务器 `scripts/ <https://github.com/tigase/tigase-server/blob/"
+"master/scripts/>`__ 存储库中找到一个名为 ``machine-check.sh`` "
+"的脚本。它执行文章中的所有基本检查，并在必要时尝试调整它们。 `查看代码 "
+"<https://github.com/tigase/tigase-server/blob/master/scripts/machine-check."
+"sh>`__ 并自己运行。"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:18
 msgid "Any comments or suggestions, as usual, are very much appreciated."
-msgstr ""
+msgstr "像往常一样，任何意见或建议都非常感谢。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:4
 msgid "Add and Manage Domains (VHosts)"
-msgstr ""
+msgstr "添加和管理域 (VHosts)"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:6
 msgid ""
 "Tigase XMPP Server offers an easy to use and very flexible way to add and"
 " manage domains hosted on installation (vhosts)."
-msgstr ""
+msgstr "Tigase XMPP Server "
+"提供了一种易于使用且非常灵活的方式来添加和管理安装时托管的域（vhosts）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:8
 msgid "There are two ways of managing domains you host on your server:"
-msgstr ""
+msgstr "有两种方法可以管理您在服务器上托管的域："
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:10
 msgid "using web-based admin management console - :ref:`Admin UI<usingAdminUI>`"
-msgstr ""
+msgstr "使用基于 Web 的管理控制台 - :ref:`Admin UI<usingAdminUI>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:12
 msgid ""
 "using XMPP ad-hoc commands by XMPP client, ie. `Psi <http://psi-"
 "im.org/>`__"
-msgstr ""
+msgstr "通过 XMPP 客户端使用 XMPP ad-hoc 命令，即 `Psi <http://psi-im.org/>`__"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:16
 msgid ""
@@ -813,10 +953,13 @@ msgid ""
 "your account JID is added to :ref:`the list of the "
 "administrators<admins>` in the Tigase XMPP Server configuration file."
 msgstr ""
+"要使用其中任何一种方式，您需要成为服务器的管理员，这意味着您在此 XMPP "
+"服务器上创建了一个 XMPP 帐户，并且您的帐户JID已添加到 Tigase "
+"XMPP服务器配置文件中的 :ref:`管理员列表<admins>` 中。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:21
 msgid "Using Admin UI"
-msgstr ""
+msgstr "使用Admin UI"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:23
 msgid ""
@@ -825,6 +968,9 @@ msgid ""
 "server. Assuming that your are logged on the same machine which hosts "
 "Tigase XMPP Server, it will be available at http://localhost:8080/admin/."
 msgstr ""
+"首先，您需要打开 Admin UI 网页。默认情况下，管理 UI 已启用并且可在 XMPP "
+"服务器上的路径 ``/admin/`` 的端口 ``8080`` 上使用。假设您登录到托管 Tigase "
+"XMPP 服务器的同一台机器上，它将在 http://localhost:8080/admin/ 上可用。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:25
 msgid ""
@@ -834,10 +980,14 @@ msgid ""
 "correct credentials you will get access to the Admin UI and Tigase XMPP "
 "Server configuration and management web-based interface."
 msgstr ""
+"当系统提示您输入用户名和密码以登录管理 UI 时，请使用您的 XMPP "
+"管理员帐户的完整 JID "
+"填写用户名，并使用该帐户的密码填写密码字段。提交正确的凭据后，您将可以访问 "
+"Admin UI 和 Tigase XMPP Server 配置和管理基于 Web 的界面。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:28
 msgid "Adding a new domain"
-msgstr ""
+msgstr "添加新域"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:30
 msgid ""
@@ -845,35 +995,43 @@ msgid ""
 "Admin UI (by clicking on ``Configuration`` label and then selecting ``Add"
 " new item`` position which mentions ``vhost-man``."
 msgstr ""
+"要添加新域，您需要打开管理 UI 的 ``Configuration`` 部分（通过单击 "
+"``Configuration`` 标签，然后选择提及 ``vhost-man`` 的 ``Add new item`` "
+"位置）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:32
+#, fuzzy
 msgid "|adminui vhost add item button|"
-msgstr ""
+msgstr "|adminui vhost add item button|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:138
+#, fuzzy
 msgid "adminui vhost add item button"
-msgstr ""
+msgstr "adminui vhost add item button"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:34
 msgid ""
 "After doing that, you will be presented with a form which you need to "
 "fill in. This form allows you to pass ``Domain name`` to add and other "
 "options (some of the are advanced options)."
-msgstr ""
+msgstr "完成此操作后，您将看到一个需要填写的表格。此表格允许您传递 ``Domain name`` "
+"以添加和其他选项（其中一些是高级选项）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:36
+#, fuzzy
 msgid "|adminui vhost add item form|"
-msgstr ""
+msgstr "|adminui vhost add item form|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:139
+#, fuzzy
 msgid "adminui vhost add item form"
-msgstr ""
+msgstr "adminui vhost add item form"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:40
 msgid ""
 "All options with exception of ``Domain name`` may be changed later on by "
 "modifying vhost settings."
-msgstr ""
+msgstr "以后可以通过修改虚拟主机设置来更改除 ``Domain name`` 之外的所有选项。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:42
 msgid ""
@@ -883,10 +1041,13 @@ msgid ""
 "something was not OK, it will display an error to help you fix this issue"
 " which you encountered."
 msgstr ""
+"当您准备好时，请使用表格下方的按钮提交表格。因此，您将看到此操作的结果。如果"
+"成功，它会显示 ``Operation successful`` "
+"消息，如果出现问题，它会显示错误以帮助您解决遇到的问题。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:45
 msgid "Modifying domain settings"
-msgstr ""
+msgstr "修改域设置"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:47
 msgid ""
@@ -894,50 +1055,60 @@ msgid ""
 "need to open ``Configuration`` section of the Admin UI and then select "
 "``Update item configuration`` position which mentions ``vhost-man``."
 msgstr ""
+"修改域设置与添加新域非常相似。您需要打开管理 UI 的 ``Configuration`` 部分，"
+"然后选择提及 ``vhost-man`` 的 ``Update item configuration`` 位置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:49
+#, fuzzy
 msgid "|adminui vhost update item button|"
-msgstr ""
+msgstr "|adminui vhost update item button|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:140
+#, fuzzy
 msgid "adminui vhost update item button"
-msgstr ""
+msgstr "adminui vhost update item button"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:51
 msgid ""
 "You will be presented with a list of domains hosted on this Tigase XMPP "
 "Server installation. From them you should choose the one for which you "
 "wish to modify settings."
-msgstr ""
+msgstr "您将看到托管在此 Tigase XMPP "
+"服务器安装上的域列表。从它们中，您应该选择要修改设置的那个。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:53
+#, fuzzy
 msgid "|adminui vhost update item domains list|"
-msgstr ""
+msgstr "|adminui vhost update item domains list|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:141
+#, fuzzy
 msgid "adminui vhost update item domains list"
-msgstr ""
+msgstr "adminui vhost update item domains list"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:55
 msgid ""
 "After submitting this selection, you will be presented with a the same "
 "form as the one used during adding a new domain. It presents "
 "configuration options for this domain and currently used values."
-msgstr ""
+msgstr "提交此选择后，您将看到与添加新域时使用的相同的表单。它提供了该域的配置选项和"
+"当前使用的值。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:57
+#, fuzzy
 msgid "|adminui vhost update item form|"
-msgstr ""
+msgstr "|adminui vhost update item form|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:142
+#, fuzzy
 msgid "adminui vhost update item form"
-msgstr ""
+msgstr "adminui vhost update item form"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:59
 msgid ""
 "Now you should adjust them as you wish and submit this form using the "
 "button below the form."
-msgstr ""
+msgstr "现在您应该根据需要调整它们并使用表单下方的按钮提交此表单。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:61
 msgid ""
@@ -946,10 +1117,12 @@ msgid ""
 "was not OK, it will display an error to help you fix this issue which you"
 " encountered."
 msgstr ""
+"因此，您将看到此操作的结果。如果成功，它会显示 ``Operation successful`` "
+"消息，如果出现问题，它会显示错误以帮助您解决遇到的问题。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:64
 msgid "Removing a domain"
-msgstr ""
+msgstr "删除域"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:66
 msgid ""
@@ -958,29 +1131,37 @@ msgid ""
 "Admin UI and then select ``Remove an item`` position which mentions "
 "``vhost-man``."
 msgstr ""
+"从 Tigase XMPP 服务器安装中删除托管域也非常简单。您需要打开管理 UI 的 "
+"``Configuration`` 部分，然后选择提及 ``vhost-man`` 的 ``Remove an item`` "
+"位置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:68
+#, fuzzy
 msgid "|adminui vhost remove item button|"
-msgstr ""
+msgstr "|adminui vhost remove item button|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:143
+#, fuzzy
 msgid "adminui vhost remove item button"
-msgstr ""
+msgstr "adminui vhost remove item button"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:70
 msgid ""
 "You will be presented with a list of domains hosted on this Tigase XMPP "
 "Server installation. From them you should select the one which should be "
 "removed."
-msgstr ""
+msgstr "您将看到托管在此 Tigase XMPP "
+"服务器安装上的域列表。从它们中，选择应该删除的那个。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:72
+#, fuzzy
 msgid "|adminui vhost remove item domains list|"
-msgstr ""
+msgstr "|adminui vhost remove item domains list|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:144
+#, fuzzy
 msgid "adminui vhost remove item domains list"
-msgstr ""
+msgstr "adminui vhost remove item domains list"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:74
 msgid ""
@@ -990,10 +1171,14 @@ msgid ""
 "and if something was not OK, it will display an error to help you fix "
 "this issue which you encountered."
 msgstr ""
+"提交您的选择后，Tigase XMPP "
+"服务器将尝试从托管域列表中删除该域，并将结果显示给您。如果成功，它会显示 ``"
+"Operation successful`` "
+"消息，如果出现问题，它会显示错误以帮助您解决遇到的问题。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:77
 msgid "Using ad-hoc commands"
-msgstr ""
+msgstr "使用ad-hoc命令"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:79
 msgid ""
@@ -1001,19 +1186,21 @@ msgid ""
 "domain we have good news! You do not have to ask an administrator to add "
 "your domain or add users for your domain anymore. You can do it on your "
 "own."
-msgstr ""
+msgstr "对于有兴趣使用我们的服务来托管自己的 XMPP 域的每个人，我们都有好消息！您不必"
+"再要求管理员添加您的域或为您的域添加用户。你可以自己做。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:81
 msgid ""
 "Please note, this is very new stuff. Something may go wrong or may not be"
 " polished. Please report any problems, notices or suggestions."
-msgstr ""
+msgstr "请注意，这是非常新的东西。某些事情可能会出错或可能无法完善。请报告任何问题，"
+"通知或建议。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:83
 msgid ""
 "This is the guide to walk you through the new functions and describes how"
 " to add a new domain and new users within your domain."
-msgstr ""
+msgstr "这是指导您完成新功能的指南，并描述了如何在您的域中添加新域和新用户。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:85
 msgid ""
@@ -1024,6 +1211,11 @@ msgid ""
 "domains and user management. You may use other clients as well, but we "
 "can only offer support and help if you use Psi client."
 msgstr ""
+"您可以从 XMPP 客户端执行所有操作，也可以使用我们的 Web "
+"应用程序连接到服务并执行管理命令。我推荐 `Psi <http://psi-im.org/>`__ "
+"因为它对用于域和用户管理的 XMPP "
+"协议部分提供了出色的支持。您也可以使用其他客户端，但我们只能在您使用 Psi "
+"客户端时提供支持和帮助。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:87
 msgid ""
@@ -1033,10 +1225,14 @@ msgid ""
 "ahead and register an account on the website either the `Tigase.IM "
 "<http://www.tigase.im/>`__ or `Jabber.Today <http://jabber.today/>`__."
 msgstr ""
+"其次，您需要在服务器上拥有一个帐户。这是因为此处描述的所有命令和功能仅对本地"
+"用户可用。因此，如果您还没有在我们这里注册域名，请去网站 `Tigase.IM "
+"<http://www.tigase.im/>`__ 或 `Jabber.Today <http://jabber.today/>`__ "
+"上注册一个帐户 。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:90
 msgid "Adding a New Domain"
-msgstr ""
+msgstr "添加新域"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:92
 msgid ""
@@ -1044,20 +1240,25 @@ msgid ""
 "server using the account on the Psi client. We will be using the "
 "following account: green@tigase.im which is this guide."
 msgstr ""
+"在其中一个网站上注册帐户后，使用 Psi 客户端上的帐户连接到 XMPP "
+"服务器。我们将使用以下帐户：green@tigase.im，这用于本指南。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:94
 msgid ""
 "When you are ready right click on the account name in Psi roster window "
 "to bring up context menu. Select **Service Discovery** element."
-msgstr ""
+msgstr "准备好后，右键单击 Psi 名册窗口中的帐户名称以显示上下文菜单。选择 "
+"**服务发现** 元素。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:96
+#, fuzzy
 msgid "|service disco menu|"
-msgstr ""
+msgstr "|service disco menu|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:145
+#, fuzzy
 msgid "service disco menu"
-msgstr ""
+msgstr "service disco menu"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:98
 msgid ""
@@ -1067,14 +1268,20 @@ msgid ""
 "PubSub components. The new stuff on the list, which we are interested in,"
 " are 2 elements: **VHost Manager** and **Session Manager**."
 msgstr ""
+"如右侧示例所示，会弹出一个新窗口。服务发现窗口是 XMPP "
+"服务上安装的所有内容应该显示的地方。列表中的大多数元素都是众所周知的传输，"
+"MUC 和 PubSub 组件。我们感兴趣的列表中的新内容是 2 个元素：**VHost Manager** "
+"和 **Session Manager**。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:100
+#, fuzzy
 msgid "|service disco window vhost|"
-msgstr ""
+msgstr "|service disco window vhost|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:146
+#, fuzzy
 msgid "service disco window vhost"
-msgstr ""
+msgstr "service disco window vhost"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:102
 msgid ""
@@ -1083,6 +1290,8 @@ msgid ""
 "information to all other parts of the system and also allows you to add "
 "new hosts and remove/update existing virtual hosts."
 msgstr ""
+"Tigase 中的 **VHost Manager** 组件负责管理和控制安装中的虚拟主机。它为系统的"
+"所有其他部分提供虚拟主机信息，还允许您添加新主机和删除/更新现有虚拟主机。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:104
 msgid ""
@@ -1090,6 +1299,8 @@ msgid ""
 "users. In most cases online users but it can also perform some actions on"
 " user repository where all user data is stored."
 msgstr ""
+"Tigase 中的 **Session Manager** 组件负责管理用户。在大多数情况下是管理在线用"
+"户，但它也可以对存储所有用户数据的用户存储库执行一些操作。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:106
 msgid ""
@@ -1099,14 +1310,20 @@ msgid ""
 "**Update…​** . These are for adding, removing and updating VHost "
 "information. For now, just select the first element **Add…​.**"
 msgstr ""
+"选择 **VHost Manager** 并双击它。出现一个新窗口（可能隐藏在服务发现窗口后面）"
+"。该窗口包含另一个菜单，其中包含一些项目：**Add…​, Remove…​** and "
+"**Update…​**。这些用于添加，删除和更新 VHost 信息。现在，只需选择第一个元素 "
+"**Add...​.**"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:108
+#, fuzzy
 msgid "|command menu add vhost|"
-msgstr ""
+msgstr "|command menu add vhost|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:147
+#, fuzzy
 msgid "command menu add vhost"
-msgstr ""
+msgstr "command menu add vhost"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:110
 msgid ""
@@ -1120,14 +1337,23 @@ msgid ""
 "You do not need to add your user name to the list as Owners can always "
 "manage users for the domain."
 msgstr ""
+"单击 **Execute**，您会看到一个新窗口，您可以在其中输入所有 VHost "
+"配置详细信息。所有字段都应该是不言自明的。暂时为 **Other parameters** "
+"留一个空白字段。 **Owner** 是您，"
+"即控制域并可以更改域配置设置或可以从服务中删除域的 Jabber ID。 "
+"**Administrators** 字段可以留空，也可以包含逗号分隔的 Jabber ID 列表，供可以"
+"管理域内用户的人员使用。您无需将用户名添加到列表中，因为所有者始终可以管理域"
+"的用户。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:112
+#, fuzzy
 msgid "|add vhost window|"
-msgstr ""
+msgstr "|add vhost window|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:148
+#, fuzzy
 msgid "add vhost window"
-msgstr ""
+msgstr "add vhost window"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:114
 msgid ""
@@ -1141,25 +1367,33 @@ msgid ""
 "our service. The XMPP guide describes all the details about DNS settings."
 " Please refer to these instructions if you need more details."
 msgstr ""
+"准备就绪后，单击 **Finish** 按钮。希望一切都完成了。如果出现问题，您可以获得"
+"确认一切正常的窗口或打印错误消息的窗口。有什么问题？我决定对服务施加一些限制"
+"以防止滥用。限制之一是用户现在可以为自己注册的最大域数为 "
+"**25**。另一个限制是您添加的域必须具有指向我们服务的有效DNS条目。 XMPP "
+"指南描述了有关DNS设置的所有详细信息。如果您需要更多详细信息，请参阅这些说明。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:117
 msgid "Adding a New User"
-msgstr ""
+msgstr "添加新用户"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:119
 msgid ""
 "Adding a new user process is quite similar, almost identical to adding a "
 "new domain. This time, however we have to select **Session Manager** in "
 "the service discovery window."
-msgstr ""
+msgstr "添加新用户进程非常相似，几乎与添加新域相同。但是这一次，"
+"我们必须在服务发现窗口中选择 **Session Manager**。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:121
+#, fuzzy
 msgid "|service disco window sm|"
-msgstr ""
+msgstr "|service disco window sm|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:149
+#, fuzzy
 msgid "service disco window sm"
-msgstr ""
+msgstr "service disco window sm"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:123
 msgid ""
@@ -1168,28 +1402,36 @@ msgid ""
 "administrators - **Add user**. I am going to make available more commands"
 " in the future and I am waiting for your suggestions."
 msgstr ""
+"双击 **Session Manager** 会出现一个带有 SM 命令列表的窗口。目前，"
+"只有一个命令可供域管理员使用 - **Add "
+"user**。我将在未来提供更多命令，我正在等待您的建议。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:125
+#, fuzzy
 msgid "|command menu add user|"
-msgstr ""
+msgstr "|command menu add user|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:150
+#, fuzzy
 msgid "command menu add user"
-msgstr ""
+msgstr "command menu add user"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:127
 msgid ""
 "If you click **Execute** a window presented on the left shows up. Fill "
 "all fields accordingly and press **Finish**."
-msgstr ""
+msgstr "如果您单击 **Execute**，则会显示左侧的窗口。相应地填写所有字段，然后按 "
+"**Finish**。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:129
+#, fuzzy
 msgid "|add user window|"
-msgstr ""
+msgstr "|add user window|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:151
+#, fuzzy
 msgid "add user window"
-msgstr ""
+msgstr "add user window"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:131
 msgid ""
@@ -1200,10 +1442,13 @@ msgid ""
 "add a user for a domain to which you do not have permission or to non-"
 "existen domain."
 msgstr ""
+"如果一切顺利，您刚刚添加了一个新用户，您应该会看到一个确认操作成功的窗口。如"
+"果出现问题，应该会显示一个带有错误消息的窗口。可能的错误也许是您尝试添加已存"
+"在的用户，或者您可能尝试为您没有权限的域或不存在的域添加用户。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:134
 msgid "SSL Certificate Management"
-msgstr ""
+msgstr "SSL 证书管理"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:136
 msgid ""
@@ -1212,35 +1457,39 @@ msgid ""
 "Loading the Server Certificate in pem Files <#certspem>`__ section of "
 "documentation for more information."
 msgstr ""
+"SSL 证书管理已实施，并且可以在 .pem 格式中操作证书。有关更多详细信息，"
+"请参阅文档的 :ref:`在pem文件中创建和加载服务器证书<certspem>` "
+"部分以获取更多信息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:4
 msgid "Presence Forwarding"
-msgstr ""
+msgstr "Presence转发"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:6
 msgid ""
 "Have you ever thought of displaying your users presence status on the "
 "website? Or, maybe, you wanted to integrate XMPP service with your own "
 "system and share not only users' accounts but also presence status?"
-msgstr ""
+msgstr "你有没有想过在网站上显示你的用户存在状态？或者，也许，您想将 XMPP "
+"服务与您自己的系统集成，并且不仅共享用户的帐户，还共享在线状态？"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:8
 msgid ""
 "Not only is it possible but also very simple. You have a new option in "
 "the domain control form."
-msgstr ""
+msgstr "不仅有可能而且非常简单。您在域控制表单中有一个新选项。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:10
 msgid "Actually there are 2 new options:"
-msgstr ""
+msgstr "实际上有两个新选项："
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:12
 msgid "Presence forward address"
-msgstr ""
+msgstr "Presence转发地址"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:14
 msgid "Message forward address - not fully implemented yet"
-msgstr ""
+msgstr "消息转发地址 - 尚未完全实现"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:16
 msgid ""
@@ -1255,14 +1504,23 @@ msgid ""
 "and the bot is connecting with this resource.** Otherwise the presence "
 "won’t be delivered to the bot."
 msgstr ""
+"Presence 转发地址可以是任何 XMPP "
+"地址。通常你希望它是一个可以收集用户存在信息的机器人地址。"
+"一旦将此选项设置为有效的 XMPP 地址，Tigase 就会在每次用户更改其状态时转发用户"
+"的状态。当然，状态会被正常处理，并从联系人列表（名册）中分发给所有人，以及这"
+"个特殊地址。它可以是组件或机器人。如果这是连接到常规 XMPP 帐户的机器人，**"
+"确保 presence 转发地址包含资源部分，并且机器人正在与此资源连接。** 否则 "
+"presence 将不会传递给机器人。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:18
+#, fuzzy
 msgid "|vhost presence forward|"
-msgstr ""
+msgstr "|vhost presence forward|"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:62
+#, fuzzy
 msgid "vhost presence forward"
-msgstr ""
+msgstr "vhost presence forward"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:20
 msgid ""
@@ -1271,6 +1529,8 @@ msgid ""
 "see this option can be specified separately for each domain, so you can "
 "have a different forward address for each domain."
 msgstr ""
+"如屏幕截图所示，有新的输入行，其中包含 presence 转发地址和消息转发地址选项。"
+"如您所见，可以为每个域单独指定此选项，因此您可以为每个域设置不同的转发地址。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:22
 msgid ""
@@ -1279,6 +1539,9 @@ msgid ""
 "website, we offer this feature to all our users who have own domains and "
 "this can be set on per-domain basis."
 msgstr ""
+"如果您有自己的 Tigase 安装，也可以全局设置转发地址，并且所有域都可以相同。但"
+"是，对于本网站，我们向所有拥有自己域的用户提供此功能，并且可以在每个域的基础"
+"上进行设置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:24
 msgid ""
@@ -1290,20 +1553,27 @@ msgid ""
 "enough to store users' presence information in a database and then load "
 "it from a web application."
 msgstr ""
+"现在，最大的问题。这个怎么用？我在下面附上一个示例代码。只需几行代码，您就可"
+"以将命令行机器人作为客户端连接到服务器，该客户端将收集用户的所有存在。"
+"下面的代码是一个简单的 Groovy "
+"脚本，它接收状态数据包并将它们显示在控制台上。但是，"
+"将用户的存在信息存储在数据库中然后从 Web 应用程序加载它应该很容易。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:26
 msgid ""
 "The bot/client uses our `JaXMPP2 <https://github.com/tigase/jaxmpp>`__ "
 "library which is included in current builds of Tigase XMPP Server."
 msgstr ""
+"bot/client 用户使用我们的 `JaXMPP2 <https://github.com/tigase/jaxmpp>`__ 库，"
+"该库包含在 Tigase XMPP 服务器的当前版本中。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:28
 msgid "You should be able to find a few more code examples on the wiki page."
-msgstr ""
+msgstr "您应该能够在 wiki 页面上找到更多代码示例。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:4
 msgid "Watchdog"
-msgstr ""
+msgstr "监视器"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:6
 msgid ""
@@ -1322,31 +1592,40 @@ msgid ""
 "system and environments to keep those broken connections from becoming a "
 "problem."
 msgstr ""
+"实施 Tigase 的监视器是为了帮助 Tigase 关闭已经过时或不活动的连接。有时连接会"
+"延迟，可能会丢失数据包或服务中断。一段时间后，如果重新建立该连接，服务器和客"
+"户端（或服务器和服务器）将继续运行，就好像什么都没发生一样。但是，这些连接间"
+"隙可能会持续更长时间，并且某些安装将依赖操作系统来检测和关闭过时的连接。"
+"某些操作系统或环境可能需要长达 2 小时或更长时间才能确定连接是否不良并等待来自"
+"外部实体的响应，并且可能未被配置。这不仅会降低性能，还会导致安全问题。为了解"
+"决这个问题，我们引入了监视器来监控独立于操作系统和环境的连接，以防止那些断开"
+"的连接成为问题。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:9
 msgid "Setup"
-msgstr ""
+msgstr "设置"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:11
 msgid ""
 "No extra setup is necessary, Watchdog is already included with your build"
 " of Tigase (as long as it’s 7.1.0 or newer). Follow the steps in the "
 "configuration section."
-msgstr ""
+msgstr "无需额外设置，您的 Tigase 版本中已经包含 监视器（只要它是 7.1.0 "
+"或更高版本）。按照配置部分中的步骤操作。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:14
 msgid "Watchdog Configuration"
-msgstr ""
+msgstr "监视器配置"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:16
 msgid ""
 "To configure watchdog, the following lines need to be present or edited "
 "in ``config.tdsl`` file:"
-msgstr ""
+msgstr "要配置监视器，需要在 ``config.tdsl`` 文件中出现或编辑以下行："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:24
 msgid "The three settings are as follows:"
-msgstr ""
+msgstr "三个设置如下："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:26
 msgid ""
@@ -1354,18 +1633,22 @@ msgid ""
 "watchdog will consider before it determines a connection may be stale. "
 "This setting sets the timeout at 70000ms or 70 seconds."
 msgstr ""
+"``'watchdog-timeout'= 70000`` "
+"此设置设置监视器在确定连接可能过时之前将考虑的时间量。此设置将超时设置为 "
+"70000 毫秒或 70 秒。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:28
 msgid ""
 "``'watchdog-delay' = 60000`` This setting sets how often the watchdog "
 "should conduct the check, the default delay at 60000ms or 60 seconds."
-msgstr ""
+msgstr "``'watchdog-delay' = 60000`` 此设置设置监视器执行检查的频率，默认延迟为 "
+"60000 毫秒或 60 秒。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:30
 msgid ""
 "``'watchdog-ping-type'`` This setting determines the type of ping sent to"
 " components when watchdog is testing for activity."
-msgstr ""
+msgstr "``'watchdog-ping-type'`` 此设置决定当监视器测试活动时发送到组件的 ping 类型。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:32
 msgid ""
@@ -1374,6 +1657,9 @@ msgid ""
 " if we wanted to change the Client2Server settings to include watchdog, "
 "use the following lines in config.tdsl:"
 msgstr ""
+"如果您选择，您可以通过将特定组件添加到组件设置来为特定组件指定单独的监视器设"
+"置，例如，如果我们想要更改 Client2Server 设置以包含监视器，请在 config.tdsl "
+"中使用以下行："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:41
 msgid ""
@@ -1381,10 +1667,12 @@ msgid ""
 "``watchdog-delay`` default is set to 10 min ``watchdog-ping-type`` "
 "default is set to XMPP"
 msgstr ""
+"如果未设置任何设置，则将使用全局或设置。 ``watchdog-delay`` 默认设置为 10 "
+"分钟 ``watchdog-ping-type`` 默认设置为 XMPP"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:44
 msgid "Logic"
-msgstr ""
+msgstr "逻辑"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:46
 msgid ""
@@ -1392,23 +1680,25 @@ msgid ""
 "round trip to different components, clustered connections, and if one "
 "variable is larger than the other, watchdog will commence closing that "
 "stale connection. Here is a breakdown:"
-msgstr ""
+msgstr "监视器比较它自己的 ping，并记录往返不同组件，集群连接所需的时间，如果一个变量"
+"大于另一个变量，监视器将开始关闭该陈旧连接。这是一个细分："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:48
 msgid ""
 "A check is performed of a connection(s) on every ``watchdog-delay`` "
 "interval."
-msgstr ""
+msgstr "在每个 ``watchdog-delay`` 间隔上执行一次连接检查。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:50
 msgid "During this check two things occur"
-msgstr ""
+msgstr "在此检查期间，会发生两件事"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:52
 msgid ""
 "If the last transfer time exceeds ``max-inactivity-time`` a stop service "
 "command is given to terminate and broadcast unavailable presence."
-msgstr ""
+msgstr "如果最后一次传输时间超过了 ``max-inactivity-"
+"time``，则会给出停止服务命令来终止并广播不可用的存在。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:54
 msgid ""
@@ -1417,26 +1707,30 @@ msgid ""
 "``watchdog-ping-type``). This ping may be one of two varieties (set in "
 "config.tdsl)"
 msgstr ""
+"如果最后一次传输时间低于 ``max-inactivity-time`` 但超过 ``watchdog-"
+"timeout``，监视器将尝试发送ping (of ``watchdog-ping-type``)。此 ping "
+"可能是两种类型之一（在 config.tdsl 中设置）"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:56
 msgid ""
 "``WHITESPACE`` ping which will yield the time of the last data transfer "
 "in any direction."
-msgstr ""
+msgstr "``WHITESPACE`` ping 将产生在任何方向上的最后一次数据传输的时间。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:58
 msgid "``XMPP`` ping which will yield the time of the last received xmpp stanza."
-msgstr ""
+msgstr "``XMPP`` ping 将产生最后收到的 xmpp 节的时间。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:60
 msgid ""
 "If the 2nd option is true, the connection will remain open, and another "
 "check will begin after the ``watchdog-delay`` time has expired."
-msgstr ""
+msgstr "如果第二个选项为真，则连接将保持打开状态，并且在 ``watchdog-delay`` "
+"时间到期后将开始另一次检查。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:62
 msgid "For example, lets draw this out and get a visual representation"
-msgstr ""
+msgstr "例如，让我们把它画出来并得到一个视觉表示"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:72
 msgid ""
@@ -1444,28 +1738,31 @@ msgid ""
 "is 10 seconds, so the check is done every 60 seconds (``'watchdog-delay' "
 "= 60000``)"
 msgstr ""
+"此行表示执行检查的频率。每个 ``-`` （破折号）为 10 秒，因此每 60 秒检查一次（"
+" ``'watchdog-delay' = 60000`` ）"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:74
 msgid ""
 "This line is client activity, here the client sent a message at 40 "
 "seconds (marked by ``+``) and has gone idle."
-msgstr ""
+msgstr "这一行是客户端活动，这里客户端在 40 秒时发送了一条消息（由 ``+`` "
+"标记）并且已经空闲。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:76
 msgid ""
 "The following line represents the watchdog logic, with timeout at 120 "
 "seconds and max inactivity timeout at 180 seconds:"
-msgstr ""
+msgstr "以下行表示监视器逻辑，超时时间为 120 秒，最大不活动超时时间为 180 秒："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:86
 msgid "How the check is performed:"
-msgstr ""
+msgstr "如何执行检查："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:88
 msgid ""
 "30 seconds - at this point *last transfer* or *last received* time is "
 "updated."
-msgstr ""
+msgstr "30 秒 - 此时 *上次传输* 或 *上次接收* 时间已更新。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:90
 msgid ""
@@ -1473,18 +1770,21 @@ msgid ""
 "last client transfer was 20s ago - but it’s lower than both inactivity "
 "(so don’t disconnect) and timeout (so don’t send ping)."
 msgstr ""
+"60 秒 - 监视器运行 - 它检查连接并说：\\_ok，上次客户端传输是 20 秒前 - "
+"但其低于不活动（所以不要断开连接）和超时（所以不要发送 ping）值。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:92
 msgid ""
 "120 seconds - 2nd check - last transfer was 100s ago - still lower than "
 "both values - do nothing."
-msgstr ""
+msgstr "120 秒 - 第二次检查 - 上次传输是 100 秒前 - 仍然低于两个值 - 什么都不做。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:94
 msgid ""
 "180 seconds - 3rd check - last transfer was 160s ago - lower than "
 "inactivity but greater than delay - ping it sent."
-msgstr ""
+msgstr "180 秒 - 第三次检查 - 上次传输是 160 秒前 - 低于不活动但大于延迟 - ping "
+"它已发送。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:96
 msgid ""
@@ -1492,12 +1792,16 @@ msgid ""
 "hasn’t responded, watchdog compares idle time to ``max-inactivity-"
 "timeout`` and finds out that it is greater, connection is terminated."
 msgstr ""
+"240 秒 - 第 4 次检查 - 上次传输是 220 秒前 - 客户端仍然没有响应，"
+"监视器将空闲时间与 ``max-inactivity-timeout`` "
+"进行比较，发现它更大，连接终止。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:98
 msgid ""
 "300 seconds - watchdog is run again but given the connection was "
 "terminatet there is no XMPP session to check for that particular client."
-msgstr ""
+msgstr "300 秒 - 再次运行监视器，但由于连接已终止，因此没有 XMPP "
+"会话来检查该特定客户端。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:102
 msgid ""
@@ -1506,6 +1810,8 @@ msgid ""
 "4 instead of waiting for step 5. **NOTE** This MAY cause JVM to throw an "
 "exception."
 msgstr ""
+"连接可能已断开，这可以在发送 ping 期间检测到，并且连接将在第 4 步被切断，"
+"而不是等待第 5 步。**注意** 这可能会导致 JVM 抛出异常。"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:106
 msgid ""
@@ -1515,16 +1821,20 @@ msgid ""
 "times to better suit your needs. Below is a short list of components with"
 " thier default settings:"
 msgstr ""
+"全局设置可能并不适合每种设置。由于每个组件都有自己的 ``max-inactivity-time`` "
+"设置，您可能会发现有必要设计自定义监视器设置，或编辑不活动时间以更好地满足您"
+"的需求。以下是具有默认设置的组件的简短列表："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:128
 msgid ""
 "Again remember, for Watchdog to properly work, the ``max-inactivity-"
 "time`` MUST be longer than the ``watchdog-timeout`` setting"
-msgstr ""
+msgstr "再次记住，为了让监视器正常工作，``max-inactivity-time`` 必须比 ``watchdog-"
+"timeout`` 设置长"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:131
 msgid "Testing"
-msgstr ""
+msgstr "测试"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:133
 msgid ""
@@ -1532,53 +1842,59 @@ msgid ""
 "it is working (or how it might be fighting your settings). To do so, "
 "enter the following line into your ``config.tdsl`` file:"
 msgstr ""
+"tigase.log.0 文件可以透露一些关于监视器的信息以及它是如何工作的（或者它可能如"
+"何与您的设置发生冲突）。为此，请在 ``config.tdsl`` 文件中输入以下行："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:139
 msgid ""
 "This will set debug mode for your log, and enable some more information "
 "about what Tigase is doing. These logs are truncated for simplicity. Lets"
 " look at the above scenario in terms of the logs:"
-msgstr ""
+msgstr "这将为您的日志设置调试模式，并启用有关 Tigase 正在做什么的更多信息。为简单起"
+"见，这些日志被截断。让我们根据日志看一下上述场景："
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:141
 msgid "**Stage Two.**"
-msgstr ""
+msgstr "**第二阶段。**"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:147
 msgid "**Stage Three.**"
-msgstr ""
+msgstr "**第三阶段。**"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:153
 msgid "**Stage Four.**"
-msgstr ""
+msgstr "**第四阶段。**"
 
 #: ../../Tigase_Administration/Using_Tigase/Watchdog.inc:160
 msgid "**Stage Five.**"
-msgstr ""
+msgstr "**第五阶段。**"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:4
 msgid "Tips and Tricks"
-msgstr ""
+msgstr "技巧和窍门"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:6
 msgid ""
 "The section contains some short tricks and tips helping in different "
 "kinds of issues related to the server administration and maintenance."
-msgstr ""
+msgstr "该部分包含一些简短的技巧和技巧，可帮助解决与服务器管理和维护相关的不同类型的"
+"问题。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:8
 msgid "`Runtime Environment Tip <#tigaseTip_RuntimeEnvironment>`__"
-msgstr ""
+msgstr ":ref:`运行环境提示<Tigase-Tip-Checking-the-Runtime-Environment>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:10
 msgid ""
 "`Best Practices for Connecting to Tigase XMPP server From Web Browser "
 "<#bestWebPrax>`__"
 msgstr ""
+":ref:`从Web 浏览器连接到Tigase XMPP服务器的最佳实践<Best-Practices-for-"
+"Connecting-to-Tigase-XMPP-server-From-Web-Browser>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:13
 msgid "Tigase Tip: Checking the Runtime Environment"
-msgstr ""
+msgstr "Tigase 提示：检查运行时环境"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:15
 msgid ""
@@ -1588,6 +1904,9 @@ msgid ""
 "the server. It worked fine in our development environment and it just "
 "didn’t on the target system."
 msgstr ""
+"最近发生的事情是，我们非常努力地解决了其中一个 Tigase 安装上的一些烦人的问题"
+"。但是不管我们怎么做，上传新版本并重新启动服务器后问题仍然存在。它在我们的开"
+"发环境中运行良好，但在目标系统上却没有。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:17
 msgid ""
@@ -1597,12 +1916,16 @@ msgid ""
 "the logs were not being generated in the proper locations. This led us to"
 " finding the issue: improper environment settings."
 msgstr ""
+"事实证明，由于目标系统上的特定环境设置，无论上传什么更新，总是启动旧版本的 "
+"Tigase 服务器。我们最终通过注意到日志没有在正确的位置生成定位了问题。这导致我"
+"们发现了问题：环境设置不当。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:19
 msgid ""
 "The best way to check all the environment settings used to start the "
 "Tigase server is to use… ``check`` command line parameter:"
-msgstr ""
+msgstr "检查用于启动 Tigase 服务器的所有环境设置的最佳方法是使用... ``check`` "
+"命令行参数："
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:51
 msgid ""
@@ -1610,34 +1933,38 @@ msgid ""
 "old version of the server files. The quick ``check`` command may be a "
 "real time saver."
 msgstr ""
+"在我们的例子中，``TIGASE_HOME`` 被设置为一个指向旧版本服务器文件的固定位置。"
+"快速的 ``check`` 命令可能是一个实时的节省程序。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:56
 msgid "Best Practices for Connecting to Tigase XMPP server From Web Browser"
-msgstr ""
+msgstr "从 Web 浏览器连接到 Tigase XMPP 服务器的最佳实践"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:58
 msgid ""
 "Currently we have 2 ways to connect to Tigase XMPP Server from web "
 "browsers:"
-msgstr ""
+msgstr "目前我们有两种方法可以从 Web 浏览器连接到 Tigase XMPP 服务器："
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:60
 msgid "BOSH (Bidirectional-streams Over Synchronous HTTP)"
-msgstr ""
+msgstr "BOSH（同步 HTTP 上的双向流）"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:62
 msgid "WebSocket (XMPP over WebSocket)"
-msgstr ""
+msgstr "WebSocket（基于 WebSocket 的 XMPP）"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:64
 msgid ""
 "You will find more information about these ways for connecting to Tigase "
 "XMPP Server with some useful tips below."
-msgstr ""
+msgstr "您将找到有关这些连接到 Tigase XMPP "
+"服务器的方法的更多信息，其中包含一些有用的提示。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:67
+#, fuzzy
 msgid "BOSH"
-msgstr ""
+msgstr "BOSH"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:69
 msgid ""
@@ -1648,6 +1975,10 @@ msgid ""
 " easy to use in single server mode. It’s enabled by default in Tigase "
 "XMPP Server and available at port 5280."
 msgstr ""
+"`XEP-0124 <http://xmpp.org/extensions/xep-0124.html>`__ 中指定的 BOSH "
+"协议是第一个被定义允许从 Web 浏览器与 XMPP 服务器建立 XMPP "
+"连接的协议，因为该协议广泛被支持和使用。在单服务器模式下也很容易使用。它在 "
+"Tigase XMPP 服务器中默认启用，可在端口 5280 使用。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:71
 msgid ""
@@ -1660,10 +1991,16 @@ msgid ""
 "same node of a cluster (i.e. all request from ``192.168.122.32`` should "
 "be forwarded always to node ``t1``."
 msgstr ""
+"在集群模式下，我们可以使用负载均衡器部署它，保证来自 Web 浏览器的每个 BOSH "
+"连接都将转发到同一个 Tigase XMPP 服务器实例。所以在集群模式下，"
+"如果我们有两个 XMPP 服务器 ``t1`` 和 ``t2``，其托管域是 ``example."
+"com``，我们需要有一个负载均衡器，它将响应对域 ``example.com`` 的 HTTP 请求，"
+"并将来自同一 IP 地址的所有请求转发到集群的同一节点（即来自 ``192.168.122.32``"
+" 的所有请求应始终转发到节点 ``t1``） 。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:74
 msgid "Tip #1 - BOSH in Cluster Mode Without Load Balancer"
-msgstr ""
+msgstr "提示 #1 - 没有负载均衡器的集群模式下的 BOSH"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:76
 msgid ""
@@ -1676,10 +2013,16 @@ msgid ""
 "connection fails due to network connection issues, the XMPP client should"
 " randomly pick other node from list of rest of available nodes."
 msgstr ""
+"还有一种方法可以在不启用负载平衡器的情况下使用 BOSH。在这种情况下，XMPP "
+"客户端需要有更多关于所有可用集群节点的逻辑和知识（节点名称将识别来自 "
+"Internet 的特定集群节点）。利用这些知识，XMPP "
+"客户端应该从可用节点列表中随机选择一个节点，并始终与该特定节点建立 BOSH "
+"连接。如果由于网络连接问题导致 BOSH 连接失败，XMPP "
+"客户端应从剩余可用节点列表中随机选择其他节点。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:78
 msgid "*Solution:*"
-msgstr ""
+msgstr "*解决方案：*"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:80
 msgid ""
@@ -1691,11 +2034,15 @@ msgid ""
 "this custom feature by addition of of following line to "
 "``etc/config.tdsl`` config file:"
 msgstr ""
+"Tigase XMPP 服务器默认通过在 BOSH 响应的 ``body`` 元素中发送额外的 ``host`` "
+"属性来为此问题提供服务器端解决方案。作为该属性的值 Tigase XMPP Server "
+"将服务器集群节点的域名发送到客户端连接到的以及应该打开该会话的下一个连接。"
+"可以通过在 ``etc/config.tdsl`` 配置文件中添加以下行来禁用此自定义功能："
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:88
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:128
 msgid "*Example:*"
-msgstr ""
+msgstr "*例子：*"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:90
 msgid ""
@@ -1708,10 +2055,17 @@ msgid ""
 " server it tries to connect to (``example.com`` should be value of ``to``"
 " attribute of XMPP stream)."
 msgstr ""
+"我们有服务器 ``t1.example.com`` and ``t2.example.com``，它们是集群托管域 "
+"``example.com`` 的节点。 Web 客户端从 Web 服务器检索集群节点列表，"
+"然后当它需要连接到 XMPP 服务器时，它从检索到的集群节点列表（即 ``t2.example."
+"com``）中随机选择主机并尝试使用 BOSH 协议进行连接托管 ``t2.example.com``，"
+"但它应该发送 ``example.com`` 作为它尝试连接的服务器的名称（``example.com`` "
+"应该是 XMPP 流的 ``to`` 属性的值）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:93
+#, fuzzy
 msgid "WebSocket"
-msgstr ""
+msgstr "WebSocket"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:95
 msgid ""
@@ -1725,10 +2079,17 @@ msgid ""
 "protocol enabled without encryption on port 5290. To use this protocol "
 "you need to use library which supports XMPP-over-WebSocket protocol."
 msgstr ""
+"WebSocket 协议是一种新的标准化协议，当前许多版本的浏览器都支持它。"
+"目前有一个协议草案 `draft-ietf-xmpp-websocket-00 <https://datatracker.ietf."
+"org/doc/draft-ietf-xmpp-websocket/>`__ 其描述了使用 WebSocket 连接到 "
+"XMPP服务器。 WebSocket 协议连接到 XMPP 服务器的 Tigase XMPP Server "
+"实现非常接近本规范草案。默认情况下，Tigase XMPP 服务器启用了 XMPP-over-"
+"WebSocket 协议，但未在端口 5290 上加密。要使用此协议，您需要使用支持 XMPP-"
+"over-WebSocket 协议的库。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:98
 msgid "Tip #1 - Encrypted WebSocket Connection"
-msgstr ""
+msgstr "提示 #1 - 加密的 WebSocket 连接"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:100
 msgid ""
@@ -1736,6 +2097,8 @@ msgid ""
 "Server. To do this you need to add following lines to ``etc/config.tdsl``"
 " config file:"
 msgstr ""
+"可以在 Tigase XMPP 服务器中启用加密的 WebSocket 连接。为此，"
+"您需要将以下行添加到 ``etc/config.tdsl`` 配置文件："
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:118
 msgid ""
@@ -1745,16 +2108,20 @@ msgid ""
 "installed in Tigase XMPP Server instance. This certificate is located in "
 "``certs/default.pem``."
 msgstr ""
+"在此示例中，我们在端口 5290 上启用了 WebSocket 端点，其允许未加密的连接，"
+"并在端口 5291 上启用了加密的 WebSocket 端点。由于这是 TLS/SSL 连接（无 "
+"STARTTLS），它使用安装在 Tigase XMPP 服务器实例中的默认证书。该证书位于 ``"
+"certs/default.pem`` 中。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:122
 msgid ""
 "There is no default configuration for non-default ports. All ports "
 "outside 443 MUST be configured."
-msgstr ""
+msgstr "非默认端口没有默认配置。必须配置 443 以外的所有端口。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:124
 msgid "Tip #2 - Encrypted WebSocket Connection - Dealing With Multiple VHosts"
-msgstr ""
+msgstr "提示 #2 - 加密的 WebSocket 连接 - 处理多个虚拟主机"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:126
 msgid ""
@@ -1774,6 +2141,15 @@ msgid ""
 "connect using connection URL that would contain name of server under "
 "which it can be identified from internet."
 msgstr ""
+"如提示 #1 中所述，WebSocket 端点是普通的 TLS/SSL 端口，因此它始终为 Tigase "
+"XMPP 服务器实例提供默认证书。如果我们托管单个域并且默认证书匹配我们的域，那也"
+"没关系。但是如果我们托管多个域，如果我们的默认证书是域 ``example2.com`` ，"
+"我们不能使用 ``wss://example1.com:5291/`` 连接 URL。在这种情况下，"
+"建议对可以从 Internet 访问服务器的域使用默认证书。此域应标识此服务器，这样此"
+"域不会指向群集的两个节点。在我们为每个集群节点部署单独的证书之后，"
+"我们应该遵循与 BOSH 的提示 #1 相同的提示。我们基于 Web 的 XMPP 客户端应该了解"
+"集群的每个节点，当它需要连接时，它应该从可用集群节点列表中随机选择一个节点，"
+"并尝试使用包含服务器名称的连接 URL 进行连接从互联网上识别。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:130
 msgid ""
@@ -1792,10 +2168,20 @@ msgid ""
 "client to connect to domain ``example2.com``, which is one of hosted "
 "vhosts."
 msgstr ""
+"我们有服务器 ``t1.example1.com`` 和 ``t2.example1.com``，它们是托管域 "
+"``example2.com`` 中集群的节点。我们的每个节点都包含默认 SSL "
+"证书，其域名与集群节点匹配。 Web 客户端从 Web 服务器检索集群节点列表，"
+"然后当它需要连接到 XMPP 服务器时，它从检索到的集群节点列表（即 ``t2.example1."
+"com`` ）中随机选择主机并尝试使用 WebSocket 加密协议进行连接使用以下 URL : "
+"``wss://t2.example1.com:5291/`` 托管 ``t2.example1.com`` 。连接后，"
+"客户端仍应发送 example2.com 作为它尝试连接的服务器的名称（``example2.com`` "
+"应该是 XMPP "
+"流的属性值）。这将允许浏览器验证证书，因为它将与浏览器连接到同一个域，"
+"并且它将允许 XMPP 客户端连接到域 ``example2.com``，这是托管的虚拟主机之一。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:2
 msgid "Licensing"
-msgstr ""
+msgstr "许可"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:4
 msgid ""
@@ -1806,26 +2192,30 @@ msgid ""
 "to register. However, If you are using Tigase ACS or other commercial "
 "pieces of software, you will be required to register."
 msgstr ""
+"随着 v7.1.0 的发布，用户和商业客户现在可以自己注册并从我们的服务器请求许可证"
+"文件。此过程使每个人都可以在需要时更轻松地获得有效的许可证文件。不想注册的用"
+"户无需注册。但是，如果您使用 Tigase ACS 或其他商业软件，则需要注册。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:8
 msgid ""
 "Tigase XMPP Server will shut down during license check if no "
 "installation-id or license is received within a given period of time."
-msgstr ""
+msgstr "如果在给定的时间段内没有收到安装 ID 或许可证，Tigase XMPP "
+"服务器将在许可证检查期间关闭。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:10
 msgid ""
 "**Again, Tigase XMPP Server will still be available free under AGPLv3, "
 "and free users will not need to register.**"
-msgstr ""
+msgstr "**再次重申，Tigase XMPP Server 在 AGPLv3 下仍可免费使用，免费用户无需注册。**"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:14
 msgid "COMMERCIAL COMPONENTS REQUIRE THE USE OF A LICENSE."
-msgstr ""
+msgstr "商业组件需要使用许可证。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:17
 msgid "Registering for a License"
-msgstr ""
+msgstr "注册许可证"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:19
 msgid ""
@@ -1835,10 +2225,13 @@ msgid ""
 "register via a web portal if your installation has limitations on network"
 " connectivity."
 msgstr ""
+"目前有两种方法可以注册 Tigase 商业产品的许可证。 **最简单和推荐的方法是使用内"
+"置的自动注册功能**。但是，如果您的安装对网络连接有限制，您也可以通过门户网站"
+"注册。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:24
 msgid "Automatic Registration (recommended)"
-msgstr ""
+msgstr "自动注册（推荐）"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:26
 msgid ""
@@ -1853,16 +2246,24 @@ msgid ""
 " When the license is due to be expired, this mechanism will update your "
 "license file automatically."
 msgstr ""
+"一旦在 Tigase XMPP 服务器上激活了商业组件，程序就会从我们的服务器中检索 *"
+"Installation ID*，并在您的 ``etc/`` 目录中创建一个名为 ``installation-id`` "
+"的文件，其中包含您实例的 *安装 ID* 的目录。安装 ID "
+"是使用完整的集群映射生成的，并且同一集群中的所有机器都应具有相同的 *安装 "
+"ID*。然后，此 *安装 ID* 将与服务器详细信息一起发送到许可证服务器，"
+"并且将在您的 *tigasedir/etc* "
+"目录中制作适当的许可证文件。当许可证到期时，此机制将自动更新您的许可证文件。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:29
 msgid "Manual"
-msgstr ""
+msgstr "手动"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:33
 msgid ""
 "This method should be used only in extreme cases when :ref:`Automatic "
 "Registration (recommended)<AutomaticLicenceRegistration>` can’t be used."
-msgstr ""
+msgstr "此方法应仅在无法使用 :ref:`自动注册(推荐)<AutomaticLicenceRegistration>` "
+"的极端情况下使用。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:35
 msgid ""
@@ -1871,32 +2272,38 @@ msgid ""
 "obtain *Installation IDs* from our web portal in a three-step process: "
 "registration, generating hash, and obtaining license file."
 msgstr ""
+"如果您不想使用自动方法，您可能决定使用我们的门户网站生成许可文件。"
+"离线安装可以通过三个步骤从我们的门户网站获取 "
+"*安装ID*：注册、生成哈希和获取许可证文件。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:37
 msgid "Generating Installation ID"
-msgstr ""
+msgstr "生成安装 ID"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:39
 msgid ""
 "For offline installations, you may obtain an *Installation ID* from this "
 "address: https://license.tigase.software/register."
-msgstr ""
+msgstr "对于离线安装，您可以从以下地址获取 *安装 ID*：https://license.tigase."
+"software/register。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:41
 msgid "Data Fields:"
-msgstr ""
+msgstr "数据字段："
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:43
 msgid ""
 "``Customer name``: Company or user name used to identify machines. "
 "Multiple clusters or servers can have the same customer name."
-msgstr ""
+msgstr "``Customer name``: "
+"用于识别机器的公司或用户名。多个集群或服务器可以具有相同的客户名称。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:45
 msgid ""
 "``VHosts``: Comma separated list of VHosts you will be using on this "
 "node. NOTE: these fields are case sensitive!"
-msgstr ""
+msgstr "``VHosts``: "
+"您将在此节点上使用的VHosts的逗号分隔列表。注意：这些字段区分大小写！"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:47
 msgid ""
@@ -1904,30 +2311,33 @@ msgid ""
 "licenses - it’s available in the ``etc/tigase-console.log`` after startup"
 " (if such licenses are present)."
 msgstr ""
+"``Legacy license hashes``: 复制为所有旧版许可证生成的摘要哈希 - 它在启动后在 "
+"``etc/tigase-console.log`` 中可用（如果存在此类许可证）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:49
 msgid ""
 "``Captcha question``: Enter the basic math answer for this form to prove "
 "you are not a robot."
-msgstr ""
+msgstr "``Captcha question``: 输入此表格的基本数学答案以证明您不是机器人。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:51
 msgid "The next page will provide you with an installation ID like the following:"
-msgstr ""
+msgstr "下一页将为您提供安装 ID，如下所示："
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:57
 msgid "Edit your ``config.tdsl`` file and add your installation-id"
-msgstr ""
+msgstr "编辑您的 ``config.tdsl`` 文件并添加您的安装 ID"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:63
 msgid ""
 "Note that the ``installation-id`` file will be made automatically once "
 "the license file is installed and verified by the server."
-msgstr ""
+msgstr "请注意，一旦安装许可证文件被安装并由服务器验证，``installation-id`` "
+"文件将自动生成。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:65
 msgid "Obtaining a Server Code"
-msgstr ""
+msgstr "获取服务器代码"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:67
 msgid ""
@@ -1939,10 +2349,14 @@ msgid ""
 "based on your server’s configuration. Copy the contents of the Code field"
 " and proceed to the next section."
 msgstr ""
+"获得 *安装ID* 后，您将需要生成服务器代码。这可以通过访问管理UI页面并导航到许"
+"可证部分来完成。到达那里后，单击检索代码以获取许可证。选择您要为其生成代码的"
+"组件，然后单击提交。您将看到根据您的服务器配置填写的安装ID，模块，VHosts字段"
+"。复制代码字段的内容并继续下一部分。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:69
 msgid "Obtaining license file"
-msgstr ""
+msgstr "获取许可证文件"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:71
 msgid ""
@@ -1953,6 +2367,10 @@ msgid ""
 "*etc/* folder and restart your server, your license is now activated and "
 "installed on your server."
 msgstr ""
+"打开一个新的浏览器并导航到这个地址：https://license.tigase.software/retrieve"
+"，在那里，将最后一步生成的代码粘贴到该字段中，然后单击提交。之后，系统会提示"
+"您下载许可证文件，将此文件放在您的 *etc/* "
+"文件夹中并重新启动服务器，您的许可证现在已激活并安装在您的服务器上。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:73
 msgid ""
@@ -1960,10 +2378,13 @@ msgid ""
 " it in the same ``etc/`` directory with the name "
 "``<component_name>.license`` (e.g.: ``etc/acs.license``)**"
 msgstr ""
+"**如果您被提供手动生成的许可证，您需要将其放在同一个** ``etc/`` "
+"**目录中，命名为** ``<component_name>.license`` (**例如**：``etc/acs."
+"license``)"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:76
 msgid "What happens if I do not use a license file or it is expired?"
-msgstr ""
+msgstr "如果我不使用许可证文件或它已过期会怎样？"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:78
 msgid ""
@@ -1974,16 +2395,20 @@ msgid ""
 "expired the server will then contact Tigase master server in order to "
 "obtain a valid one."
 msgstr ""
+"Tigase允许在没有许可证的情况下使用商业产品，但必须完成验证过程，否则服务器将"
+"关闭。在运行的第一个小时内，Tigase将检查许可证文件的存在和有效性。如果没有找"
+"到，或者它无效或过期，服务器将联系Tigase主服务器以获得一个有效的文件。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:80
 msgid ""
 "Communications will be made to license.tigase.software over https (port "
 "443) to verify the license or download a new one."
-msgstr ""
+msgstr "将通过 https（端口 443）与 license.tigase.software "
+"进行通信，以验证许可证或下载新许可证。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:83
 msgid "Demo mode"
-msgstr ""
+msgstr "演示模式"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:85
 msgid ""
@@ -1994,83 +2419,89 @@ msgid ""
 "this information cannot be sent, the server will assume unauthorized use "
 "and will shut down."
 msgstr ""
+"如果找不到有效的许可证，Tigase "
+"将恢复为演示模式。大多数功能将可以被使用，但有一个事先声明。"
+"该服务器的统计信息有关您的服务器及其使用情况将发送到 https://stats.tigase.sof"
+"tware。详细信息在下一节中。如果无法发送此信息，服务器将假定未经授权使用并关闭"
+"。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:88
 msgid "Statistics Sent"
-msgstr ""
+msgstr "已发送统计信息"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:90
 msgid ""
 "Statistics of your server may be sent to Tigase server’s if the all of "
 "following happens:"
-msgstr ""
+msgstr "如果发生以下所有情况，您的服务器的统计信息可能会发送到 Tigase 服务器："
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:92
 msgid "You are using commercial Tigase components."
-msgstr ""
+msgstr "您正在使用商业 Tigase 组件。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:94
 msgid "You have registered an ``installation-id``."
-msgstr ""
+msgstr "您已经注册了一个 ``installation-id``。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:96
 msgid "You do not have a current license to run Tigase commercial components."
-msgstr ""
+msgstr "您当前没有运行 Tigase 商业组件的许可证。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:98
 msgid ""
 "If these conditions exist, statistics will be sent to our servers and a "
 "warning will be posted in your logs. The following is an example of what "
 "information will be sent."
-msgstr ""
+msgstr "如果存在这些情况，统计数据将发送到我们的服务器，并在您的日志中发布警告。以下"
+"是一个示例告诉你哪些信息将被发送。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:102
 msgid ""
 "The text below has been better formatted for readability, but does not "
 "reflect the actual text being sent to Tigase."
-msgstr ""
+msgstr "下面的文本已被更好地格式化以提高可读性，但并不反映发送到 Tigase 的实际文本。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:251
 msgid "Unauthorized use"
-msgstr ""
+msgstr "未经授权的使用"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:253
 msgid ""
 "Tigase will consider itself unauthorized if the following conditions are "
 "met:"
-msgstr ""
+msgstr "如果满足以下条件，Tigase 将认为自己未经授权："
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:255
 msgid "if Tigase XMPP Server does not have a valid license file and"
-msgstr ""
+msgstr "如果Tigase XMPP服务器没有有效的许可证文件并且"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:257
 msgid ""
 "cannot contact the licensing server to obtain installation id and "
 "attached licenses."
-msgstr ""
+msgstr "无法联系许可服务器以获取安装ID和附加的许可证。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:259
 msgid "Then the program will then attempt to send statistics."
-msgstr ""
+msgstr "然后程序将尝试发送统计信息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:261
 msgid "if unable to sent statistics the server after a random number of retries."
-msgstr ""
+msgstr "如果在随机重试后无法向服务器发送统计信息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:263
 msgid ""
 "if these retries are not successful within 10 attempts, the server will "
 "then shutdown."
-msgstr ""
+msgstr "如果这些重试在 10 次尝试中未成功，则服务器将关闭。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:265
 msgid "If you are experiencing this condition, please contact Tigase."
-msgstr ""
+msgstr "如果您遇到这种情况，请联系Tigase。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:268
 msgid "Manual mode"
-msgstr ""
+msgstr "手动模式"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:270
 msgid ""
@@ -2082,29 +2513,34 @@ msgid ""
 " system will not seek communication unless the license is invalid or "
 "expired."
 msgstr ""
+"如果您无法通过所需端口（端口 443 上的https）打开与 ``stats.tigase.software`` "
+"或 ``license.tigase.software`` 的通信，您可以请求使用手动模式。手动模式需要Ti"
+"gase创建要在本地机器上使用的许可证文件。这个必须和上面的信息放在同一个文件夹"
+"里，除非License失效或过期，否则License检查系统不会寻求通信。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:2
 msgid "Tigase Clustering"
-msgstr ""
+msgstr "Tigase聚类"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:4
 msgid ""
 "Tigase Clustering allows the use of a number of servers to be unified in "
 "delivering, from what a client or user sees, a single unified platform. "
 "There are two typical reasons why clustering should be employed:"
-msgstr ""
+msgstr "Tigase聚类允许使用多个服务器来统一交付，从客户或用户的角度来看，是一个统一的"
+"平台。为何应该使用集群有两个典型的原因："
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:6
 msgid "High Availability"
-msgstr ""
+msgstr "高可用性"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:12
 msgid "Load Balancing"
-msgstr ""
+msgstr "负载均衡"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:18
 msgid "With Tigase, you don’t have to choose between either/or!"
-msgstr ""
+msgstr "使用Tigase，您不必在两者之间做出选择！"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:20
 msgid ""
@@ -2112,52 +2548,55 @@ msgid ""
 "Balancing** allowing addition of new nodes at runtime with a simple "
 "configuration. All without a severe tax on resource consumption."
 msgstr ""
+"**Tigase 聚类** 提供 **完全冗余** 和 **自动负载平衡** 其允许在运行时通过简单"
+"的配置添加新节点。所有这些都没有对资源消耗造成严重负担。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:22
 msgid ""
 "All basic components support clustering configuration, and some may be "
 "turned on or off."
-msgstr ""
+msgstr "所有基础组件都支持集群配置，并且部分组件可以开启或关闭。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:27
 msgid ""
 "To enable Clustering on Tigase servers, use the following line in your "
 "``config.tdsl`` file:"
-msgstr ""
+msgstr "要在Tigase服务器上启用集群，请在 ``config.tdsl`` 文件中使用以下行："
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:33
 msgid "That’s it!"
-msgstr ""
+msgstr "就这些！"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:36
 msgid "Custom Ports"
-msgstr ""
+msgstr "自定义端口"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:38
 msgid ""
 "You can customize ports for the cluster component, just be sure that each"
 " clustered server also has the same settings so they can communicate."
-msgstr ""
+msgstr "您可以为集群组件自定义端口，只需确保每个集群服务器也具有相同的设置，以便它们"
+"可以通信。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:49
 msgid ""
 "You can fine tune each port configuration, however this is not typically "
 "needed."
-msgstr ""
+msgstr "您可以微调每个端口配置，但这通常不是必需的。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:52
 msgid "Custom Port Configuration"
-msgstr ""
+msgstr "自定义端口配置"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:54
 msgid ""
 "Each port has it’s own details that can be manipulated via the following "
 "ports. Again **THIS IS OPTIONAL**"
-msgstr ""
+msgstr "每个端口都有自己的详细信息，可以通过以下端口进行操作。再次强调 **这是可选的**"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:76
 msgid "Multi-node configuration"
-msgstr ""
+msgstr "多节点配置"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:78
 msgid ""
@@ -2166,76 +2605,85 @@ msgid ""
 "connect to VIA Server to Server traffic. Nodes that are added or removed "
 "will be periodically updated."
 msgstr ""
+"每个节点都应该有 ``'cluster-mode' = true`` 以启用您希望连接到的集群。"
+"他们将自动发现其他节点以连接到VIA "
+"Server到Server的流量。添加或删除的节点将定期更新。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:81
 msgid "Traffic Control"
-msgstr ""
+msgstr "流量管制"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:83
 msgid ""
 "You can customize the traffic going between clustered servers with a few "
 "options."
-msgstr ""
+msgstr "您可以使用几个选项自定义集群服务器之间的流量。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:85
+#, fuzzy
 msgid "cm-ht-traffic-throttling"
-msgstr ""
+msgstr "cm-ht-traffic-throttling"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:87
 msgid ""
 "This setting will control the number of bytes sent over non-user "
 "connections. Namely, Server to Server or S2S connections."
-msgstr ""
+msgstr "此设置将控制通过非用户连接发送的字节数。即服务器到服务器或S2S连接。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:93
 msgid ""
 "The format is as follows: ``{traffic-type}:{maximum-traffic}:{max-"
 "lifespan-traffic}:{action}``"
 msgstr ""
+"格式如下：``{traffic-type}:{maximum-traffic}:{max-lifespan-"
+"traffic}:{action}``"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:96
 msgid "**traffic-type**"
-msgstr ""
+msgstr "**流量类型**"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:96
 msgid ""
 "Specifies the type of traffic controlled. This can either be **XMPP** or "
 "**bin**. XMPP limits the number of packets transferred, whereas bin "
 "limits the number of bytes transferred."
-msgstr ""
+msgstr "指定控制的流量类型。这可以是 **XMPP** 或 "
+"**bin**。XMPP限制传输的数据包数量，而bin限制传输的字节数。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:99
 msgid "**maximum-traffic**"
-msgstr ""
+msgstr "**最大流量**"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:99
 msgid "Specifies how many bytes or packets may be sent within one minute."
-msgstr ""
+msgstr "指定一分钟内可以发送多少字节或数据包。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:102
 msgid "**max-lifespan-traffic**"
-msgstr ""
+msgstr "**流量最大寿命**"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:102
 msgid ""
 "Specifies how many bytes or packets may be sent within the lifetime of "
 "the connection. 0 means unlimited."
-msgstr ""
+msgstr "指定在连接的生命周期内可以发送多少字节或数据包。0表示无限制。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:105
 msgid "**action**"
-msgstr ""
+msgstr "**操作**"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:105
 msgid ""
 "Specifies the action to be taken which can be **disc** which disconnects "
 "the connection, or **drop** which will drop any data exceeding the "
 "thresholds."
-msgstr ""
+msgstr "指定要采取的操作，可以是 **disc** 断开连接，或 **drop** "
+"其将丢弃任何超过阈值的数据。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:107
+#, fuzzy
 msgid "cm-see-other-host"
-msgstr ""
+msgstr "cm-see-other-host"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:109
 msgid ""
@@ -2243,54 +2691,59 @@ msgid ""
 "``SeeOtherHostIfc`` implementation. For more details, see `Tigase Load "
 "Balancing <#loadBalancing>`__ documentation."
 msgstr ""
+"这允许通过选择 ``SeeOtherHostIfc`` "
+"实现来特定使用负载平衡机制。有关更多详细信息，请参阅 "
+":ref:`Tigase负载平衡<loadBalancing>` 文档。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:112
 msgid "Old configuration method"
-msgstr ""
+msgstr "旧配置方法"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:114
 msgid ""
 "While these options are still available these settings CAN be less "
 "reliable. **Use ONLY if you need specific setups that cannot be "
 "accommodated by the automatic cluster mode**."
-msgstr ""
+msgstr "虽然这些选项仍然可用，但这些设置可能不太可靠。**仅当您需要自动集群模式无法满"
+"足的特定设置时使用**。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:118
 msgid "Specifying Specific nodes"
-msgstr ""
+msgstr "指定特定节点"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:120
 msgid ""
 "You can still use the old method of specifying every node on each server."
 " Server 3 needs the following set"
-msgstr ""
+msgstr "您仍然可以使用在每台服务器上指定每个节点的旧方法。服务器3需要以下设置"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:126
 msgid "Server 2 needs"
-msgstr ""
+msgstr "服务器2需要"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:132
 msgid "and so on…​"
-msgstr ""
+msgstr "等等…"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:134
 msgid "However, we do not recommend this."
-msgstr ""
+msgstr "但是，我们不建议这样做。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:136
 msgid "Password and Port configuration"
-msgstr ""
+msgstr "密码和端口配置"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:138
 msgid ""
 "You may specify a password and port to specific cluster servers if that "
 "is required. To do so, you will need to add {password}:{port} to the "
 "domain, like this example:"
-msgstr ""
+msgstr "如果需要，您可以指定特定集群服务器的密码和端口。为此，您需要将{password}:{por"
+"t}添加到域中，如下例所示："
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:147
 msgid "Checking Cluster Connections"
-msgstr ""
+msgstr "检查集群连接"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:149
 msgid ""
@@ -2299,28 +2752,33 @@ msgid ""
 "that there are actual network connections established between cluster "
 "nodes. The other is to check internal status of the server."
 msgstr ""
+"设置集群后，您可能需要验证集群是否正常运行。现在可以通过两种方式完成 - "
+"首先检查集群节点之间是否建立了实际的网络连接。另一种是检查服务器的内部状态。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:152
 msgid "Established connections"
-msgstr ""
+msgstr "已建立的连接"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:154
 msgid ""
 "There are number of ways to check for opened connections, simplest one "
 "use command line. (Tigase uses port *5277* for cluster connections)"
-msgstr ""
+msgstr "有多种方法可以检查打开的连接，最简单的一种是使用命令行。（Tigase使用端口 "
+"*5277* 进行集群连接）"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:156
+#, fuzzy
 msgid "Linux"
-msgstr ""
+msgstr "Linux"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:162
+#, fuzzy
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:170
 msgid "Cluster nodes connected (using XMPP)"
-msgstr ""
+msgstr "连接的集群节点（使用XMPP）"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:172
 msgid ""
@@ -2330,10 +2788,13 @@ msgid ""
 " that only an administrator (a user whose JID is configured as "
 "administrative) has access."
 msgstr ""
+"通过XMPP协议验证集群连接性需要任何 XMPP客户端能够使用 `XEP-0030: Service "
+"Discovery <http://xmpp.org/extensions/xep-0030."
+"html>`__。请务必记住，只有管理员（其JID配置为管理的用户）才有访问权限。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:174
 msgid "Psi XMPP Client"
-msgstr ""
+msgstr "Psi XMPP客户端"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:176
 msgid ""
@@ -2343,14 +2804,19 @@ msgid ""
 "from application menu or from context menu of the particular account "
 "account:"
 msgstr ""
+"出于本指南的目的，将使用 `Psi <http://psi-im.org/>`__ "
+"客户端。成功配置并连接到具有管理权限的帐户后，"
+"我们需要从应用程序菜单或特定帐户的上下文菜单访问 *Service Discovery*："
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:178
+#, fuzzy
 msgid "|roster-discovery|"
-msgstr ""
+msgstr "|roster-discovery|"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:184
+#, fuzzy
 msgid "roster-discovery"
-msgstr ""
+msgstr "roster-discovery"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:180
 msgid ""
@@ -2360,28 +2826,33 @@ msgid ""
 "(either *connected* or *disconnected*). Node column will contain actual "
 "hostname of the cluster node:"
 msgstr ""
+"在 *Service Discovery* 窗口中，我们需要找到 *Cluster Connection Manager* "
+"组件。展开组件的树节点后，所有集群节点的列表将显示当前状态（*已连接* 或 "
+"*已断开*）。节点列将包含集群节点的实际主机名："
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:182
+#, fuzzy
 msgid "|discovery-nodes|"
-msgstr ""
+msgstr "|discovery-nodes|"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:185
+#, fuzzy
 msgid "discovery-nodes"
-msgstr ""
+msgstr "discovery-nodes"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:2
 msgid "Anonymous Users & Authentication"
-msgstr ""
+msgstr "匿名用户和身份验证"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:4
 msgid ""
 "To support anonymous users, you must first enable anonymous "
 "authentication on your server."
-msgstr ""
+msgstr "要支持匿名用户，您必须首先在您的服务器上启用匿名身份验证。"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:7
 msgid "Anonymous Authentication"
-msgstr ""
+msgstr "匿名认证"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:9
 msgid ""
@@ -2392,10 +2863,14 @@ msgid ""
 "ANONYMOUS may not be totally secure as users can connect without prior "
 "permission (username and password)."
 msgstr ""
+"Tigase Server在某些场景下可以通过SASL-ANONYMOUS支持匿名登录。这可以通过调整 *"
+"Anonymous enabled* 选项在每个VHost基础上启用，如 :ref:`添加和管理域(VHosts"
+")<Add-and-Manage-Domains-(VHosts)>` 中所述，默认情况下此设置为false SASL-"
+"ANONYMOUS可能并不完全安全，因为用户无需事先许可（用户名和密码）即可连接。"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:12
 msgid "Anonymous User Features"
-msgstr ""
+msgstr "匿名用户功能"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:14
 msgid ""
@@ -2405,42 +2880,45 @@ msgid ""
 "connect anonymously to ``xmpp.example.com`` use the following "
 "credentials,"
 msgstr ""
+"要匿名连接到您的服务器，您必须使用支持匿名身份验证和用户的客户端。使用服务器"
+"名称作为用户名连接到服务器，没有密码。例如，要匿名连接到 ``xmpp.example."
+"com``，请使用以下凭据，"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:16
 msgid "Username: ``xmpp.example.com`` Password:"
-msgstr ""
+msgstr "用户名：``xmpp.example.com`` 密码："
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:18
 msgid ""
 "In this mode all login information is stored in memory, and cannot be "
 "retrieved at a later date."
-msgstr ""
+msgstr "在这种模式下，所有登录信息都存储在内存中，以后无法检索。"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:20
 msgid "Other features of Anonymous Authentication"
-msgstr ""
+msgstr "匿名身份验证的其他功能"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:22
 msgid "Temporary Jid is assigned and destroyed the moment of login/logout."
-msgstr ""
+msgstr "临时Jid在登录/注销时被分配和销毁。"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:24
 msgid "Anonymous users cannot access the database"
-msgstr ""
+msgstr "匿名用户无法访问数据库"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:26
 msgid ""
 "Anonymous users cannot communicate outside the server (use s2s "
 "connections)"
-msgstr ""
+msgstr "匿名用户无法在服务器外部进行通信（使用s2s连接）"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:28
 msgid "Anonymous users have a default limit on traffic generated per user."
-msgstr ""
+msgstr "匿名用户对每个用户生成的流量有默认限制。"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:31
 msgid "Reconnection on Anonymous"
-msgstr ""
+msgstr "匿名重新连接"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:33
 msgid ""
@@ -2452,10 +2930,15 @@ msgid ""
 " for session storage in memory rather than using client-side data for "
 "reconnection."
 msgstr ""
+"在我们的JaXMPP服务器等产品上，使用SASL-"
+"ANONYMOUS连接的用户可以使用cookie管理重新连接到现有会话。但是，可以使用 `"
+"Bosh Session Cache <http://docs.tigase.org/tigase-server/snapshot/"
+"Development_Guide/html/#boshsessioncache>`__ "
+"改进和扩展重新连接，它允许将会话存储在内存中而不是使用客户端数据来重新连接。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:4
 msgid "Scripting support in Tigase"
-msgstr ""
+msgstr "Tigase中的脚本支持"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:6
 msgid ""
@@ -2464,6 +2947,8 @@ msgid ""
 "upload them to the server, and execute them. The guide also contains API "
 "description with code examples."
 msgstr ""
+"Tigase服务器支持4.3.1及更高版本的脚本语言。这些页面详细描述了此功能如何创建新"
+"脚本，将它们上传到服务器并执行它们。该指南还包含带有代码示例的API描述。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Scripting_Support.inc:10
 msgid ""
@@ -2474,10 +2959,14 @@ msgid ""
 "You cannot expect Tigase server to run on 10MB RAM system if you enabled "
 "Python, Scala or any other non-standard language."
 msgstr ""
+"Tigase服务器以其非常低的内存消耗而闻名，并且可以在不到10MB的RAM内存下成功运行"
+"。但是，向Tigase服务器添加对任何非标准（默认）语言的脚本支持会显著增加安装的"
+"内存需求。如果您启用Python，Scala或任何其他非标准语言，"
+"您不能期望Tigase服务器在10MB RAM系统上运行。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:4
 msgid "Scripting Introduction - Hello World!"
-msgstr ""
+msgstr "脚本介绍 - Hello World!"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:6
 msgid ""
@@ -2486,12 +2975,14 @@ msgid ""
 " It contains also an introduction to the scripting API with the first "
 "*Hello world!* example."
 msgstr ""
+"本文档是描述Tigase服务器中的脚本支持系列的第一篇，展示了如何加载，安装，更新"
+"和调用脚本。它还包含对脚本API的介绍以及第一个 *Hello world!* 示例。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:8
 msgid ""
 "Since Tigase version 4.3.1 the server supports scripting for "
 "administrator commands as well as standard commands."
-msgstr ""
+msgstr "自Tigase版本 4.3.1 起，服务器支持管理员命令和标准命令的脚本。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:10
 msgid ""
@@ -2501,6 +2992,10 @@ msgid ""
 "installed. More details can be found on the `Java scripting project site "
 "<https://docs.oracle.com/javase/8/docs/technotes/guides/scripting/prog_guide/api.html>`__."
 msgstr ""
+"理论上可以使用许多不同的语言编写脚本，唯一的要求是安装该语言的支持 `JSR-223 "
+"<http://www.jcp.org/en/jsr/detail?id=223>`__ 。更多详细信息可在 `Java "
+"scripting project site <https://docs.oracle.com/javase/8/docs/technotes/"
+"guides/scripting/prog_guide/api.html>`__ 上找到。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:12
 msgid ""
@@ -2512,13 +3007,19 @@ msgid ""
 "<https://github.com/tigase/tigase-server/blob/master/src/main>`__ "
 "contains a few examples for these languages."
 msgstr ""
+"在实践中，某些语言比其他语言得到更好的支持，目前我们推荐 `Groovy <http"
+"://groovy-lang.org/>`__。然而，以下语言也被证实可以工作: `Scala <http://www."
+"scala-lang.org/>`__, `Python <http://www.python.org/>`__ 和 `Ruby <http://www"
+".ruby-lang.org/>`__。 `tigase-server GitHub <https://github.com/tigase/"
+"tigase-server/blob/master/src/main>`__ 包含这些语言的一些示例。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:16
 msgid ""
 "the default Tigase installation contains only libraries for Groovy. "
 "Adding support for a different language is as simple as copying a few JAR"
 " files to the Tigase ``libs/`` directory."
-msgstr ""
+msgstr "默认的Tigase安装只包含Groovy的库。添加对不同语言的支持就像将几个JAR "
+"文件复制到Tigase ``libs/`` 目录一样简单。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:18
 msgid ""
@@ -2527,6 +3028,9 @@ msgid ""
 "`src/main/groovy/tigase/admin <https://github.com/tigase/tigase-"
 "server/blob/master/src/main/groovy/tigase/admin>`__."
 msgstr ""
+"本指南中提供的所有示例也可以在Tigase SVN存储库中的目录中作为即用型脚本使用：`"
+"src/main/groovy/tigase/admin <https://github.com/tigase/tigase-server/blob/"
+"master/src/main/groovy/tigase/admin>`__。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:20
 msgid ""
@@ -2537,38 +3041,46 @@ msgid ""
 "well. As the whole thing is based on the service discovery and ad-hoc "
 "commands you need a XMPP client with a good support for both features."
 msgstr ""
+"该脚本仅使用标准XMPP扩展，绝不具体到任何特定解决方案。我们使用并更喜欢Psi客户"
+"端。整个指南和所有屏幕截图都是使用Psi客户端创建的。但是，您也可以使用任何其他"
+"支持这些扩展的客户端。由于整个事情都是基于服务发现和临时命令，"
+"因此您需要一个对这两个功能都有良好支持 XMPP客户端。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:22
 msgid ""
 "To follow the guide and run all the examples you need will need to have "
 "installed Tigase server version 4.3.1 or newer and you have to connect to"
 " the server as administrator."
-msgstr ""
+msgstr "要遵循该指南并运行您需要的所有示例，您需要安装Tigase服务器版本4.3."
+"1或更高版本，并且您必须以管理员身份连接到服务器。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:25
 msgid "Loading Script at Run Time"
-msgstr ""
+msgstr "在运行时加载脚本"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:27
 msgid ""
 "All the scripting stuff is usually based on the service discovery and ad-"
 "hoc commands in the Tigase server."
-msgstr ""
+msgstr "所有脚本内容通常基于Tigase服务器中的服务发现和临时命令。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:29
+#, fuzzy
 msgid "|service disco|"
-msgstr ""
+msgstr "|service disco|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:186
+#, fuzzy
 msgid "service disco"
-msgstr ""
+msgstr "service disco"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:31
 msgid ""
 "The first thing to do, therefore, is to browse service discovery on the "
 "running server. The result you receive will depend on your installation "
 "and installed components."
-msgstr ""
+msgstr "因此，首先要做的是浏览正在运行的服务器上的服务发现。您收到的结果将取决于您的"
+"安装和已安装的组件。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:33
 msgid ""
@@ -2578,47 +3090,53 @@ msgid ""
 "management. Their names are descriptive enough: ``New command script`` "
 "and ``Remove command script``."
 msgstr ""
+"现在最有趣的是所有在其节点部分带有\"http://jabber.org/protocol/admin\"的项目"
+"。您可能已经加载了一些脚本，但是有两个用于脚本管理的命令。它们的名称足以描述"
+"自己：``New command script`` 和 ``Remove command script``。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:35
 msgid ""
 "The first is for adding a new script or updating existing and the second "
 "is for removing script from the server."
-msgstr ""
+msgstr "第一个用于添加新脚本或更新现有脚本，第二个用于从服务器中删除脚本。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:37
 msgid ""
 "To add a new script you have just to execute ``New command script``. In "
 "Psi this is done by double clicking on the element in service discovery "
 "list."
-msgstr ""
+msgstr "要添加新脚本，您只需执行 ``New command "
+"script``。在Psi中，这是通过双击服务发现列表中的元素来完成的。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:39
+#, fuzzy
 msgid "|hello1 new script|"
-msgstr ""
+msgstr "|hello1 new script|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:187
+#, fuzzy
 msgid "hello1 new script"
-msgstr ""
+msgstr "hello1 new script"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:41
 msgid ""
 "The screenshot above shows a couple of options to set for the loaded "
 "script:"
-msgstr ""
+msgstr "上面的屏幕截图显示了为加载脚本设置的几个选项："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:44
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:44
 msgid ""
 "is what shows as the script name in the service discovery window. There "
 "are no special restrictions on what to put there."
-msgstr ""
+msgstr "是在服务发现窗口中显示为脚本名称的内容。其中放什么东西没有特别的限制。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:47
 msgid "Command id"
-msgstr ""
+msgstr "命令id"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:47
 msgid ""
@@ -2626,10 +3144,12 @@ msgid ""
 "the \"http://jabber.org/protocol/admin\" in node part. This needs to be "
 "unique or existing script is overwritten."
 msgstr ""
+"是脚本的唯一 ID（管理命令）。这是节点部分中\"http://jabber.org/protocol/"
+"admin\"之后显示的内容。这需要是独一无二的，否则现有的脚本会被覆盖。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:50
 msgid "Language"
-msgstr ""
+msgstr "语言"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:50
 msgid ""
@@ -2637,30 +3157,34 @@ msgid ""
 "installation. Tigase automatically detects all libraries for scripting "
 "languages and lists them here. So all you need is to select the correct "
 "language for your script."
-msgstr ""
+msgstr "您的安装支持的所有脚本语言的下拉列表。 Tigase自动检测所有脚本语言库并在此处列"
+"出。因此，您只需为您的脚本选择正确的语言。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:53
 msgid "Script text"
-msgstr ""
+msgstr "脚本文本"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:53
 msgid "is just your script content."
-msgstr ""
+msgstr "只是您的脚本内容。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:55
 msgid ""
 "When your script is ready and all fields are correctly set, simply press "
 "\"**Finish**\" button and you should receive a message confirming that "
 "the script has been loaded successfully."
-msgstr ""
+msgstr "当您的脚本准备好并且所有字段都设置正确时，只需按\"**Finish**\"按钮"
+"，您应该会收到一条消息，确认脚本已成功加载。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:57
+#, fuzzy
 msgid "|loaded ok small|"
-msgstr ""
+msgstr "|loaded ok small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:188
+#, fuzzy
 msgid "loaded ok small"
-msgstr ""
+msgstr "loaded ok small"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:59
 msgid ""
@@ -2668,61 +3192,70 @@ msgid ""
 "Groovy. What it does is displays a window (ad-hoc command result) with a "
 "message: \"*Hello admin, how are you?*\"."
 msgstr ""
+"在本指南中，我们将创建一个用Groovy编写的简单\"Hello world\"脚本"
+"。它的作用是显示一个带有消息的窗口（临时命令结果）：\"*Hello admin, how are "
+"you?*\"。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:61
 msgid "It uses a basic scripting API which is described line by line below:"
-msgstr ""
+msgstr "它使用下面逐行描述的基本脚本API："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:63
 msgid "It imports basic Tigase classes."
-msgstr ""
+msgstr "它导入基本的Tigase类。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:65
 msgid ""
 "Sets a local variable ``p`` which points to a ``packet`` variable with "
 "data received from the client."
-msgstr ""
+msgstr "设置一个局部变量 ``p`` ，它指向一个带有从客户端接收到的数据的 ``packet`` "
+"变量。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:67
 msgid ""
 "Creates a ``res`` variable which is response sent back to the client "
 "(administrator). The response to the client is of type ``result``. Other "
 "possible types will be introduced later."
-msgstr ""
+msgstr "创建一个 ``res`` 变量，它是发送回客户端（管理员）的响应。对客户端的响应是 "
+"``result`` 类型。其他可能的类型将在后面介绍。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:69
 msgid ""
 "We operate on ad-hoc commands here so the script uses Tigase utility "
 "class to set/retrieve command parameters. It sets the window title and a "
 "simple message displayed to the user (administrator)."
-msgstr ""
+msgstr "我们在这里对临时命令进行操作，因此脚本使用Tigase实用程序类来设置/检索命令参数"
+"。它设置窗口标题和显示给用户（管理员）的简单消息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:71
 msgid "The last line returns new packet as a script execution result."
-msgstr ""
+msgstr "最后一行返回新数据包作为脚本执行结果。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:73
 msgid "The first, very simple version looks like this:"
-msgstr ""
+msgstr "第一个非常简单的版本如下所示："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:85
 msgid "Executing Script"
-msgstr ""
+msgstr "执行脚本"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:87
 msgid ""
 "Once the script is successfully loaded you will have to reload/refresh "
 "the service discovery window which now should display one more element on"
 " the list."
-msgstr ""
+msgstr "成功加载脚本后，您将不得不重新加载/刷新服务发现窗口，该窗口现在应该在列表中再"
+"显示一个元素。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:89
+#, fuzzy
 msgid "|service disco with new hello|"
-msgstr ""
+msgstr "|service disco with new hello|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:189
+#, fuzzy
 msgid "service disco with new hello"
-msgstr ""
+msgstr "service disco with new hello"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:91
 msgid ""
@@ -2731,37 +3264,43 @@ msgid ""
 "command node is set to: \"http://jabber.org/protocol/admin#hello\" if "
 "\"**hello**\" is what is set as the script ID."
 msgstr ""
+"如您所见，脚本名称设置为您在脚本加载窗口中输入的 \"Description\" - \"*Hello "
+"world script*\"。如果脚本ID设置为\"**hello**\"，则命令节点设置为：\"http"
+"://jabber.org/protocol/admin#hello\"。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:93
 msgid ""
 "To execute the script you just have to double click on the script name "
 "(or click execute command if you use any other client)."
-msgstr ""
+msgstr "要执行脚本，您只需双击脚本名称（如果您使用任何其他客户端，请单击执行命令）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:95
 msgid ""
 "As a result you should see a simple window similar to the screenshot "
 "below displaying our message."
-msgstr ""
+msgstr "结果，您应该会看到一个类似于下面显示我们消息的屏幕截图的简单窗口。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:97
+#, fuzzy
 msgid "|hello1 result small|"
-msgstr ""
+msgstr "|hello1 result small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:190
+#, fuzzy
 msgid "hello1 result small"
-msgstr ""
+msgstr "hello1 result small"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:100
 msgid "Interaction in Scripts"
-msgstr ""
+msgstr "脚本中的交互"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:102
 msgid ""
 "Displaying just a message is very nice but is not very useful in most "
 "cases. Normally you need to ask the user for some more data or parameters"
 " before you can perform any real processing."
-msgstr ""
+msgstr "只显示一条消息非常好，但在大多数情况下并不是很有用。通常，您需要向用户询问更"
+"多数据或参数，然后才能执行任何实际程序。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:104
 msgid ""
@@ -2770,20 +3309,25 @@ msgid ""
 "document we present very simple examples, just an introduction so let’s "
 "ask about the administrator name before displaying a greeting."
 msgstr ""
+"因此，在大多数情况下，管理员脚本必须显示一个带有输入字段的新窗口，要求用户提"
+"供更多数据。在本文档中，我们提供了非常简单的示例，这只是一个介绍，所以让我们"
+"在显示问候语之前询问管理员名称。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:106
+#, fuzzy
 msgid "|hello2 asking for name small|"
-msgstr ""
+msgstr "|hello2 asking for name small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:191
+#, fuzzy
 msgid "hello2 asking for name small"
-msgstr ""
+msgstr "hello2 asking for name small"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:108
 msgid ""
 "To ask the user for some more information we have to extend example above"
 " with some more code:"
-msgstr ""
+msgstr "要向用户询问更多信息，我们必须使用更多代码扩展上面的示例："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:133
 msgid ""
@@ -2792,14 +3336,19 @@ msgid ""
 "``name`` input field. If the name had been provided the greeting is "
 "displayed, otherwise the script asks for the user name."
 msgstr ""
+"如果您比较这两个脚本，您会发现它们非常相似。然而，在显示问候语之前，"
+"脚本会尝试从 ``name`` "
+"输入字段中检索数据。如果提供了名称，则会显示问候语，否则脚本会询问用户名。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:135
+#, fuzzy
 msgid "|hello2 result small|"
-msgstr ""
+msgstr "|hello2 result small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:192
+#, fuzzy
 msgid "hello2 result small"
-msgstr ""
+msgstr "hello2 result small"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:137
 msgid ""
@@ -2810,36 +3359,43 @@ msgid ""
 "**Finish** and **Cancel**. Whichever you press some data is sent back to "
 "the server."
 msgstr ""
+"请注意，在这种情况下，发回给用户的数据包的类型是表单而不是 ``result``。"
+"实际的区别是 ``result`` 类型只显示 **OK** "
+"按钮，按下该按钮时不会向服务器发送任何数据。表单数据包显示更多按钮 - "
+"**Finish** 和 **Cancel**。无论您按哪个，都会将一些数据发送回服务器。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:139
 msgid ""
 "This script demonstrates use of two new methods from the utility class "
 "\"Command\": getFieldValue and addFieldValue."
-msgstr ""
+msgstr "该脚本演示了如何使用实用程序类\"Command\"中的两个新方法：getFieldValue 和 "
+"addFieldValue。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:141
 msgid ""
 "The first argument to all Command methods is the packet with ad-hoc "
 "command."
-msgstr ""
+msgstr "所有Command方法的第一个参数是带有 ad-hoc 命令的数据包。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:143
 msgid "The second argument is usually the input field name"
-msgstr ""
+msgstr "第二个参数通常是输入字段名称"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:145
 msgid ""
 "These two method parameters are actually enough to read the ad-hoc "
 "command data. Methods creating input fields in the ad-hoc command need a "
 "few arguments more:"
-msgstr ""
+msgstr "这两个方法参数实际上足以读取ad-hoc命令数据。在ad-"
+"hoc命令中创建输入字段的方法还需要一些参数："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:147
 msgid ""
 "Next arguments sets a default value displayed to the user. The way to it "
 "is set in the example above is specific to Groovy language and is quite "
 "useful what will be apparent in later examples."
-msgstr ""
+msgstr "下一个参数设置显示给用户的默认值。上面示例中设置的方法是特定于Groovy语言的，"
+"并且非常有用，这将在后面的示例中显而易见。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:149
 msgid ""
@@ -2847,40 +3403,46 @@ msgid ""
 " in the `XEP-0004 <http://xmpp.org/extensions/xep-0004.html#protocol-"
 "fieldtypes>`__ article."
 msgstr ""
+"之后，我们必须指定字段类型。所有字段类型都在 `XEP-0004 <http://xmpp.org/"
+"extensions/xep-0004.html#protocol-fieldtypes>`__ 文章中定义。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:151
 msgid ""
 "The last argument specifies the field label which is displayed to the "
 "user."
-msgstr ""
+msgstr "最后一个参数指定显示给用户的字段标签。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:153
+#, fuzzy
 msgid "|hello2 new script|"
-msgstr ""
+msgstr "|hello2 new script|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:193
+#, fuzzy
 msgid "hello2 new script"
-msgstr ""
+msgstr "hello2 new script"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:155
 msgid ""
 "There are a few other different utility methods in the Command class to "
 "set different types of input fields and they will be described in details"
 " later on."
-msgstr ""
+msgstr "Command类中还有其他一些不同的实用方法来设置不同类型的输入字段，稍后将详细介绍"
+"。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:157
 msgid ""
 "To reload the script simply call \"New command script\" again, enter the "
 "script text and make sure you entered exactly the same command ID to "
 "replace the old script with the new one."
-msgstr ""
+msgstr "要重新加载脚本，只需再次调用\"New command script\""
+"，输入脚本文本并确保输入的命令ID完全相同，以用新脚本替换旧脚本。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:159
 msgid ""
 "Or of course, you can enter a new command id to create a new command and "
 "make it available on your server."
-msgstr ""
+msgstr "或者，当然，您可以输入新的命令ID来创建新命令并使其在您的服务器上可用。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:161
 msgid ""
@@ -2890,10 +3452,13 @@ msgid ""
 "the \"Finish\" button you will see another window with a greeting message"
 " along with your name."
 msgstr ""
+"当脚本加载到服务器上时，尝试执行它。您应该得到一个新的对话框窗口，询问您的姓"
+"名，如本节开头的屏幕截图所示。当您输入您的姓名并单击\"Finish\"按钮后"
+"，您将看到另一个窗口，其中包含您的姓名和问候消息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:164
 msgid "Automatic Scripts Loading at Startup Time"
-msgstr ""
+msgstr "启动时自动加载脚本"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:166
 msgid ""
@@ -2903,12 +3468,15 @@ msgid ""
 "emergency cases if something wrong is going on and you want to act "
 "without affecting the service."
 msgstr ""
+"本指南中描述的最后一件事是如何在Tigase服务器启动时自动加载脚本。在运行时加载"
+"脚本，更新和删除脚本的能力非常有用，特别是在紧急情况下，如果出现问题并且您想"
+"在不影响服务的情况下采取此行动。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:168
 msgid ""
 "If you, however have a few dozens scripts you don’t want to manually load"
 " them every time the server restarts."
-msgstr ""
+msgstr "但是，如果您有几十个脚本，您不想在每次服务器重新启动时手动加载它们。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:170
 msgid ""
@@ -2919,25 +3487,29 @@ msgid ""
 "copy all your scripts to this directory and they will be loaded next time"
 " the server starts."
 msgstr ""
+"Tigase服务器在启动时自动加载位于管理脚本目录中的所有脚本。除非您在配置中设置"
+"不同，否则它在此：**YourTigaseInstallationDir/scripts/admin/"
+"**。您所要做的就是将所有脚本复制到此目录，它们将在下次服务器启动时加载。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:172
 msgid ""
 "But hold on. What about the script parameters: language, description, "
 "command id? How are you supposed to set them?"
-msgstr ""
+msgstr "但是等一等。脚本参数呢？语言，描述，命令ID？你应该如何设置它们？"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:174
 msgid ""
 "Language is simple. It is detected automatically by the script file "
 "extension. So just make sure file extensions are correct and the language"
 " is sorted."
-msgstr ""
+msgstr "语言很简单。它由脚本文件扩展名自动检测。因此，只需确保文件扩展名正确且语言已"
+"排序。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:176
 msgid ""
 "The script description and command id needs a little bit more work. You "
 "have to include in your script following lines:"
-msgstr ""
+msgstr "脚本描述和命令ID需要更多的工作。您必须在脚本中包含以下几行："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:184
 msgid ""
@@ -2947,10 +3519,13 @@ msgid ""
 "description or command id. Put these in your script file and the loader "
 "will detect them and set correctly for your script."
 msgstr ""
+"请注意，在 ``AS:Description:`` 或 ``AS:CommandId:`` 字符串之后必须至少有一个"
+"空格。之后的所有内容，直到行尾，都被视为脚本描述或命令ID。将它们放入您的脚本"
+"文件中，加载器将检测它们并为您的脚本正确设置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:4
 msgid "Tigase Scripting Version 4.4.x Update for Administrators"
-msgstr ""
+msgstr "面向管理员的Tigase脚本版本4.4.x更新"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:6
 msgid ""
@@ -2958,7 +3533,8 @@ msgid ""
 " administrator tasks. The possibility to load new scripts or replace old "
 "ones at the server runtime opens quite new area for the service "
 "maintenance."
-msgstr ""
+msgstr "脚本功能在Tigase服务器中对于各种管理员任务非常有用。在服务器运行时加载新脚本"
+"或替换旧脚本的可能性为服务维护开辟了一个全新的领域。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:8
 msgid ""
@@ -2970,6 +3546,10 @@ msgid ""
 "reinvent the wheel every time and implementing scripting capabilities for"
 " each component separately."
 msgstr ""
+"在早期版本的Tigase服务器脚本功能仅在会话管理器组件中可用，"
+"而它在许多其他地方可能非常有用 - 连接管理器，MUC，PubSub，VHostManager 以及在"
+"为特定对象创建的全新自定义组件中更为重要。每次都重新发明wheel并为每个组件单独"
+"实现脚本功能是非常浪费的。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:10
 msgid ""
@@ -2977,14 +3557,15 @@ msgid ""
 "the Tigase server. It is now part of the API and is automatically "
 "available to all components without any additional coding. A detailed "
 "developer guide will be published separately."
-msgstr ""
+msgstr "因此，脚本功能已在Tigase服务器的核心中实现。它现在是API的一部分，无需任何额外"
+"编码即可自动用于所有组件。详细的开发者指南将单独发布。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:12
 msgid ""
 "This document describes changes from the user/administrator perspective "
 "because there are some usability changes related to the new "
 "implementation."
-msgstr ""
+msgstr "本文档从用户/管理员的角度描述了更改，因为有一些与新实现相关的可用性更改。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:14
 msgid ""
@@ -2994,27 +3575,34 @@ msgid ""
 " testing and experiments using Psi client and then switch to your "
 "preferred application for your day-to-day use."
 msgstr ""
+"请注意。描述和屏幕截图取自Psi客户端，很可能在其他客户端上用于临时命令和服务发"
+"现的界面看起来不同。我建议使用 "
+"Psi客户端进行一些初始测试和实验，然后切换到您喜欢的应用程序以供您日常使用。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:16
 msgid ""
 "As it always was in the Tigase you can access all the functions via XMPP "
 "service discovery on the server. However, as soon as you connect to the "
 "server you can see some changes there."
-msgstr ""
+msgstr "就像在Tigase中一样，您可以通过服务器上的XMPP服务发现访问所有功能。但是，一旦"
+"您连接到服务器，您就可以在那里看到一些变化。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:18
+#, fuzzy
 msgid "|new service disco admin|"
-msgstr ""
+msgstr "|new service disco admin|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:40
+#, fuzzy
 msgid "new service disco admin"
-msgstr ""
+msgstr "new service disco admin"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:20
 msgid ""
 "There are no command on the list. They are hidden from the main service "
 "discovery list. You can see on the list only the server main components."
-msgstr ""
+msgstr "列表中没有命令。它们隐藏在主服务发现列表中。您只能在列表中看到服务器主要组件"
+"。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:22
 msgid ""
@@ -3030,6 +3618,12 @@ msgid ""
 "'Execute command\" icon on top of the window when your component is "
 "selected."
 msgstr ""
+"出于多种原因，必须这样做。其中之一显然是对主服务器内容的更干净的访问。另一个"
+"可能更重要的是避免将不同组件的一长串命令混合在一起。不同组件的命令可以具有相"
+"同的名称/描述，它们甚至可以做类似的事情，但它们在不同的服务器组件上执行。为了"
+"避免任何混淆并尽量减少出错的机会，这些命令现在与其组件紧密相连。要访问特定组"
+"件的命令列表，您必须双击列表中的组件名称或在选择组件时单击窗口顶部的\"Execute"
+" command\"图标。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:24
 msgid ""
@@ -3039,29 +3633,37 @@ msgid ""
 "command or delete existing one and of course execute any of the commands "
 "showing on the list."
 msgstr ""
+"应显示一个新窗口，其中包含可用命令的下拉列表。所有命令都与所选组件相关，"
+"并在\"inside the component environment\"执行"
+"。您当然可以添加新命令或删除现有命令，当然还可以执行列表中显示的任何命令。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:26
+#, fuzzy
 msgid "|new command list|"
-msgstr ""
+msgstr "|new command list|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:41
+#, fuzzy
 msgid "new command list"
-msgstr ""
+msgstr "new command list"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:28
 msgid ""
 "As a reminder, in the window title you can see the component ID and you "
 "should check it before running any command to make sure you accidentally "
 "don’t break your system."
-msgstr ""
+msgstr "提醒一下，在窗口标题中您可以看到组件ID，您应该在运行任何命令之前检查它，以确"
+"保您不会意外破坏系统。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:30
+#, fuzzy
 msgid "|new add command|"
-msgstr ""
+msgstr "|new add command|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:42
+#, fuzzy
 msgid "new add command"
-msgstr ""
+msgstr "new add command"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:32
 msgid ""
@@ -3071,6 +3673,9 @@ msgid ""
 "server it is written to the hard drive and will be automatically loaded "
 "at next startup time."
 msgstr ""
+"脚本添加窗口也做了一些小的改动。正如您在屏幕截图中看到的那样，"
+"添加了一个附加选项 - \"Save to disk\"。这意味着一旦您将脚本提交到服务器，它就"
+"会被写入硬盘驱动器，并将在下次启动时自动加载。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:34
 msgid ""
@@ -3081,6 +3686,9 @@ msgid ""
 "Otherwise the server won’t be able to write script files on the hard "
 "drive."
 msgstr ""
+"默认情况下启用此选项，因为这似乎是管理员希望保存他的新脚本以供以后重用的逻辑"
+"选择。但是，这需要正确配置服务器并授予对存储所有脚本的目录的写入权限。否则服"
+"务器将无法在硬盘上写入脚本文件。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:36
 msgid ""
@@ -3090,6 +3698,9 @@ msgid ""
 "users. In the new version all the administrator specific elements are "
 "hidden for the rest of users."
 msgstr ""
+"与以前的版本一样，只有具有管理员权限的用户才能执行命令并访问服务器上的所有关"
+"键元素。但是，用户长时间要求进行另一项更改。在新版本中，所有管理员特定的元素"
+"都对其余用户隐藏。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:38
 msgid ""
@@ -3099,10 +3710,13 @@ msgid ""
 "general users who would otherwise see a lot of stuff which can’t be used "
 "by them anyway."
 msgstr ""
+"服务器组件不会出现在服务发现中，用户看不到管理员命令，也无法执行它们。这并不"
+"是为了提高服务器的安全性，而是为了减少普通用户的困惑，否则他们会看到很多他们"
+"无论如何都无法使用的东西。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:4
 msgid "Tigase and Python"
-msgstr ""
+msgstr "Tigase和Python"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:6
 msgid ""
@@ -3111,6 +3725,8 @@ msgid ""
 " the second shows a few code examples with explanation of the differences"
 " between Python usage and some other languages."
 msgstr ""
+"本文介绍了如何让Python在Tigase服务器中作为临时命令的脚本语言工作。第一部分是"
+"安装，第二部分是一些代码示例，解释了Python使用和其他一些语言之间的差异。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:8
 msgid ""
@@ -3120,10 +3736,13 @@ msgid ""
 "proper Python style. If you have any suggestions or have a better code "
 "examples I am happy to include them in the guide.*"
 msgstr ""
+"*请注意，我们不是Python开发人员，这绝不是Python开发指南。所有代码示例仅用于展"
+"示可用的API，当然还有更好的方法以正确的Python风格来实现。如果您有任何建议或有"
+"更好的代码示例，我很乐意将它们包含在指南中。*"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:11
 msgid "Installation"
-msgstr ""
+msgstr "安装"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:13
 msgid ""
@@ -3132,6 +3751,9 @@ msgid ""
 "Restart the server and you are ready to start scripting and executing "
 "Python."
 msgstr ""
+"简而言之，安装非常简单：只需将本文附带的文件复制到您的Tigase安装中，"
+"将其复制到 ``libs/`` "
+"目录中。重新启动服务器，您就可以开始编写脚本和执行Python。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:15
 msgid ""
@@ -3144,14 +3766,21 @@ msgid ""
 "executed within JVM and can easily exchange data between the main "
 "application (Tigase server) and the script."
 msgstr ""
+"理论上，Tigase提供在 `JSR-223 <http://www.jcp.org/en/jsr/detail?id=223>`__ "
+"中定义的脚本支持。您可以使用任何支持JVM的语言。这还包括独立的python实现，JSR-"
+"223 插件充当桥梁。但是，这没有多大意义，因为您无法与JVM代码（Tigase "
+"API）进行交互。因此，您需要一种在 JVM "
+"中执行的语言，并且可以轻松地在主应用程序（Tigase服务器）和脚本之间交换数据。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:17
+#, fuzzy
 msgid "|lang list no python small|"
-msgstr ""
+msgstr "|lang list no python small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:69
+#, fuzzy
 msgid "lang list no python small"
-msgstr ""
+msgstr "lang list no python small"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:19
 msgid ""
@@ -3164,6 +3793,11 @@ msgid ""
 "downloaded from the `Jython website "
 "<http://wiki.python.org/jython/DownloadInstructions>`__."
 msgstr ""
+"最好的方法是使用Jython实现。它在JVM中运行良好，更重要的是，它与Tigase服务器完"
+"美集成。 Tigase服务器使用 Jython-2.2.1 进行了测试，并确认可以正常工作。但是，"
+"建议使用 Jython-2.5.1 "
+"版本，并且所有示例都在安装此版本的情况下执行。请注意，Jython-2.5."
+"0根本不工作。两个受支持的版本都可以从 Jython网站 下载。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:21
 msgid ""
@@ -3173,6 +3807,9 @@ msgid ""
 "all is ready to go. Please note, this is the same file as the one "
 "attached to this article for your convenience."
 msgstr ""
+"**版本 2.5.1** 安装起来更简单一些。当您下载并运行Jython安装程序时，"
+"在您安装Jython的目录中找到 ``jython.jar`` 文件。将文件复制到Tigase的 **libs/"
+"** 目录，然后一切准备就绪。请注意，为方便起见，此文件与本文所附文件相同。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:23
 msgid ""
@@ -3183,6 +3820,10 @@ msgid ""
 "unpacked and ``jython-engine.jar`` file needs to be copied to the Tigase "
 "``libs/`` directory."
 msgstr ""
+"**版本 2.2.1** 需要更多的工作。第一部分是一样的。然而，复制 ``jython.jar`` 文"
+"件是不够的。要让Jython与Tigase服务器一起工作，还需要一个文件。您必须单独安装J"
+"SR-223引擎。二进制文件必须解压缩，并且需要将 ``jython-engine.jar`` "
+"文件复制到Tigase ``libs/`` 目录。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:25
 msgid ""
@@ -3196,18 +3837,27 @@ msgid ""
 " list of available scripting languages. If \"*python*\" is on the list it"
 " means everything is ok and support for Python is enabled."
 msgstr ""
+"检查Jython是否已正确安装以及是否启用了对Python的支持的最佳方法，即尝试向 "
+"Tigase 服务器提交新脚本。浏览服务器服务发现，选择\"*Session manager*"
+"\"组件并运行\"*Execute command*\"功能"
+"。此时应该出现一个新窗口，其中包含所有可用的临时命令的列表。选择\"*New "
+"command script*\"项并单击 \"*Execute*\"。此时应该出现临时命令对话框窗口。"
+"其中一个字段是\"*Language*\"，其中包含可用脚本语言的下拉列表。如果\"*python*"
+"\"在列表中，则表示一切正常并且启用了对Python的支持。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:27
+#, fuzzy
 msgid "|lang list with python small|"
-msgstr ""
+msgstr "|lang list with python small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:70
+#, fuzzy
 msgid "lang list with python small"
-msgstr ""
+msgstr "lang list with python small"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:30
 msgid "Writing Python Scripts"
-msgstr ""
+msgstr "写Python脚本"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:32
 msgid ""
@@ -3216,6 +3866,9 @@ msgid ""
 "from the script itself. Hence you cannot simply pass script results by "
 "calling \"*return*\" statement directly from the script."
 msgstr ""
+"Python脚本的工作方式与Groovy或其他语言脚本类似，但有一个显著差异。"
+"您不能从脚本本身调用\"*return*\" 。因此，您不能通过直接从脚本调用\"*return*"
+"\"语句来简单地传递脚本结果。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:34
 msgid ""
@@ -3225,26 +3878,30 @@ msgid ""
 "these variables the Python (or any other language) can pass execution "
 "results back to the Tigase server."
 msgstr ""
+"为了克服这个问题，Tigase提供了另一种传递脚本执行结果的方法。它在脚本完成时检"
+"查一个特殊变量的值：“result”和“packet”。通过为这些变量之一赋值，Python（或任"
+"何其他语言）可以将执行结果传回Tigase服务器。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:36
 msgid ""
 "``result`` allows to return simple text (or characters String) from the "
 "script."
-msgstr ""
+msgstr "``result`` 允许从脚本返回简单的文本（或字符串）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:38
 msgid ""
 "``packet`` allows to return Packet instance which is send back to the "
 "user."
-msgstr ""
+msgstr "``packet`` 允许返回发送回给用户的Packet实例。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:40
 msgid "The simplest possible Python script may look like this one:"
-msgstr ""
+msgstr "最简单的Python脚本可能如下所示："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:42
+#, fuzzy
 msgid "``result = \"Hello world!\"``"
-msgstr ""
+msgstr "``result = \"Hello world!\"``"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:44
 msgid ""
@@ -3254,12 +3911,15 @@ msgid ""
 " so please have a look at the `article <#newElements>`__ describing new "
 "elements as well."
 msgstr ""
+"有关如何加载和执行脚本的说明，请参阅在Tigase服务器中编写脚本的 "
+":ref:`介绍性文章<scriptingintro>`。 Tigase 4.4.0及更高版本有一些小的变化，"
+"所以请查看描述新元素的 :ref:`文章<newElements>`。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:46
 msgid ""
 "An example of a more advanced script asks the user for providing required"
 " parameters for the actual script execution:"
-msgstr ""
+msgstr "一个更高级的脚本示例要求用户提供实际脚本执行所需的参数："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:65
 msgid ""
@@ -3268,6 +3928,9 @@ msgid ""
 "all languages can return execution results via these special variables, "
 "it could be argued there is no difference at all."
 msgstr ""
+"除了这个微小的差异之外，Tigase管理员命令的Python脚本的其余部分与所有其他语言"
+"相同。由于所有语言都可以通过这些特殊变量返回执行结果，因此可以说根本没有区别"
+"。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:67
 msgid ""
@@ -3277,6 +3940,9 @@ msgid ""
 "best integration with JVM and Tigase API, however I will try to include "
 "Python example code as well."
 msgstr ""
+"在开发人员指南中的 *\"组件实现 - 第6课 - 脚本支持\"* "
+"文章中，我将介绍可用于脚本框架的Tigase服务器API。我的主要语言是 Groovy，"
+"因为它提供了与JVM 和Tigase API的最佳集成，但我也会尝试包含Python示例代码。"
 
 #~ msgid "`Tigase Log Guide <#Tigase-Log-Guide>`__"
 #~ msgstr ""
@@ -3351,4 +4017,3 @@ msgstr ""
 #~ " (recommended) <#AutomaticLicenceRegistration>`__ can’t"
 #~ " be used."
 #~ msgstr ""
-
