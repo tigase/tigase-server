@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-07 19:19+0000\n"
+"PO-Revision-Date: 2022-07-07 19:38+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -39,25 +39,23 @@ msgid "**Java Development Kit (JDK) 11 (LTS)** - We recommend OpenJDK"
 msgstr "**Java开发工具包（JDK)11(LTS)** - 我们推荐OpenJDK"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:11
-#, fuzzy
 msgid ""
 "**Administrator access** - We recommend that you install Tigase Server "
 "from a user login with administrator access."
-msgstr "**管理员访问权限** - 我们建议您从有管理员访问权限的用户登录安装 Tigase "
+msgstr "**管理员访问权限** - 我们建议您从有管理员访问权限的用户登录安装Tigase "
 "Server。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:17
-#, fuzzy
 msgid ""
 "You should always run the latest point/bugfix release of the recommended "
 "JDK."
-msgstr "您应该始终运行推荐的 JDK 的最新版本/错误修复版本。"
+msgstr "您应该始终运行推荐的JDK 的最新版本/错误修复版本。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:21
 msgid ""
 "While it should be possible to use newer versions of the JDK, we don’t "
 "guarantee it and we recommend using the one mentioned above."
-msgstr "虽然应该可以使用更新版本的 JDK，但我们不保证这一点，我们建议使用上述版本。"
+msgstr "虽然应该可以使用更新版本的JDK，但我们不保证这一点，我们建议使用上述版本。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:24
 msgid "Contents"
@@ -134,9 +132,8 @@ msgstr ""
 ">`__。一旦获得分发二进制文件后，可将其解压缩并浏览此目录："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:22
-#, fuzzy
 msgid "Do not run as root user!"
-msgstr "不要以root用户身份运行！"
+msgstr "不要以root用户身份运行!"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:26
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:283
@@ -145,24 +142,20 @@ msgid "Start the Server"
 msgstr "启动服务器"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:30
-#, fuzzy
 msgid "Please make sure ``JAVA_HOME`` is set and points to your JVM installation"
-msgstr "请确保 ``JAVA_HOME`` 已设置并指向您的 JVM 安装"
+msgstr "请确保 ``JAVA_HOME`` 已设置并指向您的JVM 安装"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:38
-#, fuzzy
 msgid "Verify Tigase is ready to start installation"
-msgstr "确保Tigase 已准备好开始安装"
+msgstr "确保Tigase已准备好开始安装"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:40
-#, fuzzy
 msgid ""
 "Tigase should start listening on port 8080 - you can check it using "
 "``lsof`` command:"
-msgstr "Tigase 开始监听端口 8080 - 你可以使用 ``lsof``命令检查它："
+msgstr "Tigase开始监听端口 8080 - 你可以使用 ``lsof``命令检查它："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:48
-#, fuzzy
 msgid ""
 "You can also check console log under ``logs/tigase-console.log``, which "
 "should point you directly to the installer."
@@ -170,9 +163,8 @@ msgstr "您还可以检查 ``logs/tigase-console.log`` "
 "下的控制台日志，它应该直接指向安装程序。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:53
-#, fuzzy
 msgid "Connect to the Web Installer"
-msgstr "连接到 Web 安装程序"
+msgstr "连接到Web安装程序"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:55
 #, fuzzy
@@ -180,43 +172,38 @@ msgid "Some points before you can connect:"
 msgstr "连接前的几个要点:"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:57
-#, fuzzy
 msgid ""
 "This setup page is restricted access, however for first setup there is a "
 "default account set to setup Tigase: Username: ``admin`` Password: "
 "``tigase``"
-msgstr "此设置页面是受限访问的，但是第一次设置的时候，有一个默认帐户来设置 Tigase： "
-"用户名：``admin`` 密码：``tigase``"
+msgstr "此设置页面是受限访问的，但是第一次设置的时候，有一个默认帐户来设置Tigase：用"
+"户名：``admin`` 密码：``tigase``"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:59
-#, fuzzy
 msgid ""
 "This combination will only be valid once as it will be removed from "
 "``config.tdsl`` file on completion of setup process. After this point the"
 " setup page will only be accessible using the following:"
-msgstr "上面的设置仅一次有效，因为在安装过程完成后它将被从 config.tdsl "
-"文件中删除。在此之后，只能使用以下方式访问设置页面："
+msgstr "上面的设置仅一次有效，因为在安装过程完成后它将被从config."
+"tdsl文件中删除。在此之后，只能使用以下方式访问设置页面："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:61
-#, fuzzy
 msgid ""
 "JID accounts listed as administrators in admins line in ``config.tdsl`` "
 "file."
-msgstr "JID 帐户在 config.tdsl 文件中的 admins 行中被列为管理员。"
+msgstr "JID帐户在config.tdsl 文件中的admins行中被列为管理员。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:63
-#, fuzzy
 msgid ""
 "Username and password combinations added to ``config.tdsl`` file "
 "manually, or at the last page in this process."
-msgstr "手动把用户名和密码组合添加到 config.tdsl 文件中或添加在此过程的最后一页。"
+msgstr "手动把用户名和密码组合添加到 ``config.tdsl`` 文件中或添加在此过程的最后一页。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:65
-#, fuzzy
 msgid ""
 "Point your browser to http://localhost:8080/setup/ unless you are working"
 " remotely. You can also use the domain name, or IP address."
-msgstr "除非您在远程工作，否则您的浏览器将指向 http://localhost:8080/setup/。"
+msgstr "除非您在远程工作，否则您的浏览器将指向http://localhost:8080/setup/。"
 "您也可以使用域名或 IP 地址。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:67
@@ -245,9 +232,8 @@ msgid "web install 01"
 msgstr "web install 01"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:77
-#, fuzzy
 msgid "Read it and then click \"Next\""
-msgstr "阅读它，然后单击“下一步”"
+msgstr "阅读它，然后单击\"Next\""
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:79
 #, fuzzy
@@ -269,14 +255,13 @@ msgid "**Advanced Clustering Strategy information**"
 msgstr "**高级聚类策略信息**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:87
-#, fuzzy
 msgid ""
 "You will see some information about our commercial products and "
 "licensing. Please read though the agreement, and as a confirmation of "
 "agreement type in your name or company and click \"Next\" to go to the "
 "next page."
 msgstr "您将看到有关我们的商业产品和许可的一些信息。请仔细阅读协议，并用您的姓名或公"
-"司确认该协议，然后单击“下一步”进入下一页。"
+"司确认该协议，然后单击\"Next\"进入下一页。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:89
 #, fuzzy
@@ -296,12 +281,11 @@ msgstr ""
 "服务器使用的数据库类型（稍后进行配置）。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:93
-#, fuzzy
 msgid ""
 "If you do not specify an administrator and password, one is made for you,"
 " which will be admin@yourdomain and password is tigase."
-msgstr "如果您没有指定管理员和密码，则会为您自动设置一个： admin@yourdomain，密码为 "
-"tigase。"
+msgstr "如果您没有指定管理员和密码，则会为您自动设置一个： "
+"admin@yourdomain，密码为tigase。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:95
 #, fuzzy
@@ -309,16 +293,15 @@ msgid "**Connectivity**"
 msgstr "**连接**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:97
-#, fuzzy
 msgid ""
 "At this page you will be presented with a list of possible connectivity "
 "options supported by Tigase XMPP Server and a way to enable/disable each "
 "of them (desktop, mobile, http, websocket, federation, etc.). After "
 "making this decisions, click \"Next\"."
 msgstr ""
-"在此页面上，您将看到 Tigase XMPP 服务器所支持的可能连接选项列表以及启用/禁用"
-"每个选项的方法（桌面，移动，http，websocket，联合等）。勾选相应选项后，单击“"
-"下一步”。"
+"在此页面上，您将看到Tigase XMPP服务器所支持的可能连接选项列表以及启用/禁用每"
+"个选项的方法（桌面，移动，http，websocket，联合等）。勾选相应选项后，"
+"单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:99
 #, fuzzy
@@ -330,7 +313,7 @@ msgid ""
 "Now you will be able to select which features of Tigase XMPP Server (such"
 " as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or "
 "disabled."
-msgstr "现在您将可以选择 Tigase XMPP 服务器的哪些相关功能（例如 "
+msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能（例如 "
 "MUC、PubSub、MIX、MAM、推送通知）应该被启用或被禁用。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:103
@@ -339,9 +322,8 @@ msgid "At this step will also be able to enable clustering on your installation"
 msgstr "在这一步也将能够在您的安装上启用集群"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:105
-#, fuzzy
 msgid "When you will be ready, click \"Next\"."
-msgstr "选择好以后，单击“下一步”。"
+msgstr "选择好以后，单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:107
 #, fuzzy
@@ -349,13 +331,12 @@ msgid "**Database configuration**"
 msgstr "**数据库配置**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:109
-#, fuzzy
 msgid ""
 "This is where the database is configured. The type of database selected "
 "in step 3 will influence available options. **BE SURE TO SPECIFY DATABASE"
 " ROOT USER ACCOUNT AND PASSWORD**"
-msgstr "在这里可以配置数据库。步骤 3 中选择的数据库类型将影响可用的选项。 "
-"**请务必指定数据库根用户帐号和密码**"
+msgstr "在这里可以配置数据库。步骤 3 "
+"中选择的数据库类型将影响可用的选项。**请务必指定数据库根用户帐号和密码**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:111
 #, fuzzy
@@ -363,7 +344,6 @@ msgid "**Database connectivity check**"
 msgstr "**数据库连接检查**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:113
-#, fuzzy
 msgid ""
 "After database setup, you should see a page with executed actions and "
 "their results. All presented items should be \"green\", meaning that "
@@ -372,8 +352,9 @@ msgid ""
 "this issue. If setup is completed, click \"Next\"."
 msgstr ""
 "数据库设置后，您应该会看到一个包含已执行操作及其结果的页面。所有出现的项目都"
-"应该是“绿色”，这意味着一切顺利。如果任何内容显示为“红色”或“黄色”，请阅读此标"
-"题下方的说明以了解有关此问题的更多信息。如果设置完成，请单击“下一步”。"
+"应该是“绿色”，这意味着一切顺利。如果任何内容显示为\"红色\"或\"黄色\""
+"，请阅读此标题下方的说明以了解有关此问题的更多信息。如果设置完成，请单击 "
+"\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:115
 #, fuzzy
@@ -381,7 +362,6 @@ msgid "**Setup security**"
 msgstr "**设置安全性**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:117
-#, fuzzy
 msgid ""
 "The Setup Access Page will be locked from the admin/tigase user as "
 "specified above. This is your chance to have the setup pages add a "
@@ -389,9 +369,9 @@ msgid ""
 "process later. If left blank, only JIDs listed in admin will be allowed "
 "to access."
 msgstr ""
-"如上所述，设置访问页面将被 admin/tigase 用户锁定。此时你可以在设置页面添加除"
-"管理员帐户之外的特定用户，以便稍后重新访问此设置。如果留空，则仅允许 admin "
-"中列出的 JIDs 访问。"
+"如上所述，设置访问页面将被admin/tigase 用户锁定。此时你可以在设置页面添加除管"
+"理员帐户之外的特定用户，以便稍后重新访问此设置。如果留空，则仅允许admin中列出"
+"的JIDs访问。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:119
 #, fuzzy
@@ -417,9 +397,8 @@ msgstr "如果您是自定义设置，或者想自己进行设置，"
 "您可以复制并粘贴此处的内容以编辑当前的 ``config.tdsl`` 文件。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:125
-#, fuzzy
 msgid "Click \"Save\" to write the file to disk."
-msgstr "单击“保存”将文件写入磁盘。"
+msgstr "单击 \"Save\" 将文件写入磁盘。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:127
 #, fuzzy
@@ -439,13 +418,12 @@ msgid "Restart the Server"
 msgstr "重启服务器"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:134
-#, fuzzy
 msgid ""
 "It is recommended at this point to stop the server manually and restart "
 "it using the proper script for your OS. From the Tigase base directory "
 "enter"
-msgstr "此时,建议手动停止服务器并使用适合您操作系统的脚本重新启动它。从 Tigase "
-"基本目录输入如下命令"
+msgstr "此时,建议手动停止服务器并使用适合您操作系统的脚本重新启动它。从Tigase基本目录"
+"输入如下命令"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:145
 msgid ""
