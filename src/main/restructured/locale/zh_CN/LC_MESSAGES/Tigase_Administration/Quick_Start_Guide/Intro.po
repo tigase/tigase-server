@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-06-20 23:27+0000\n"
+"PO-Revision-Date: 2022-07-07 19:00+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -80,7 +80,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:28
 msgid ":ref:`Installation Using Web Installer<webinstall>`"
-msgstr ":ref:`使用 Web 安装程序进行安装<#webinstall>`__"
+msgstr ":ref:`使用 Web 安装程序进行安装<webinstall>`"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:30
 msgid ":ref:`Manual installation in console mode<manualinstall>`"
