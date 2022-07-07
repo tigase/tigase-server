@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-07 19:38+0000\n"
+"PO-Revision-Date: 2022-07-07 19:55+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -167,9 +167,8 @@ msgid "Connect to the Web Installer"
 msgstr "连接到Web安装程序"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:55
-#, fuzzy
 msgid "Some points before you can connect:"
-msgstr "连接前的几个要点:"
+msgstr "连接前的几个要点："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:57
 msgid ""
@@ -207,7 +206,6 @@ msgstr "除非您在远程工作，否则您的浏览器将指向http://localhos
 "您也可以使用域名或 IP 地址。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:67
-#, fuzzy
 msgid "Enter the username and password above to gain access."
 msgstr "输入上面的用户名和密码以获得访问权限。"
 
@@ -217,9 +215,8 @@ msgid "Step Through the Installation Process"
 msgstr "逐步完成安装过程"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:73
-#, fuzzy
 msgid "You will be greeted by the following \"About software\" page."
-msgstr "您将看到以下“关于软件”的页面。"
+msgstr "您将看到以下\"About software\"的页面。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:75
 #, fuzzy
@@ -236,11 +233,10 @@ msgid "Read it and then click \"Next\""
 msgstr "阅读它，然后单击\"Next\""
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:79
-#, fuzzy
 msgid ""
 "The setup consists of several steps that help you configure your "
 "installation: selecting features and providing database configuration."
-msgstr "此设置包括了帮助您配置安装的几个步骤：功能选择和数据库配置。"
+msgstr "此设置包括了帮助您配置安装的几个步骤: 功能选择和数据库配置。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:83
 #, fuzzy
@@ -264,9 +260,8 @@ msgstr "您将看到有关我们的商业产品和许可的一些信息。请仔
 "司确认该协议，然后单击\"Next\"进入下一页。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:89
-#, fuzzy
 msgid "**Basic Tigase server configuration**"
-msgstr "**基本 Tigase 服务器配置**"
+msgstr "**基本Tigase服务器配置**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:91
 msgid ""
@@ -277,8 +272,8 @@ msgid ""
 "later)."
 msgstr ""
 "此页面将查看您的基本配置设置，其中包括服务器类型，您希望使用的域，并让您有机"
-"会为域指定管理员。此外，您将选择Tigase "
-"服务器使用的数据库类型（稍后进行配置）。"
+"会为域指定管理员。此外，您将选择Tigase服务器使用的数据库类型（稍后进行配置）"
+"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:93
 msgid ""
@@ -314,7 +309,7 @@ msgid ""
 " as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or "
 "disabled."
 msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能（例如 "
-"MUC、PubSub、MIX、MAM、推送通知）应该被启用或被禁用。"
+"MUC，PubSub，MIX，MAM，推送通知）应该被启用或被禁用。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:103
 #, fuzzy
@@ -339,7 +334,6 @@ msgstr "在这里可以配置数据库。步骤 3 "
 "中选择的数据库类型将影响可用的选项。**请务必指定数据库根用户帐号和密码**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:111
-#, fuzzy
 msgid "**Database connectivity check**"
 msgstr "**数据库连接检查**"
 
@@ -351,8 +345,9 @@ msgid ""
 "please read description presented below this header to learn more about "
 "this issue. If setup is completed, click \"Next\"."
 msgstr ""
-"数据库设置后，您应该会看到一个包含已执行操作及其结果的页面。所有出现的项目都"
-"应该是“绿色”，这意味着一切顺利。如果任何内容显示为\"红色\"或\"黄色\""
+"数据库设置后，您应该会看到一个包含已执行操作及其结果的页面。"
+"所有出现的项目都应该是\"绿色\"，这意味着一切顺利。如果任何内容显示为\"红色"
+"\"或\"黄色\""
 "，请阅读此标题下方的说明以了解有关此问题的更多信息。如果设置完成，请单击 "
 "\"Next\"。"
 
@@ -398,7 +393,7 @@ msgstr "如果您是自定义设置，或者想自己进行设置，"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:125
 msgid "Click \"Save\" to write the file to disk."
-msgstr "单击 \"Save\" 将文件写入磁盘。"
+msgstr "单击\"Save\"将文件写入磁盘。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:127
 #, fuzzy
@@ -422,8 +417,8 @@ msgid ""
 "It is recommended at this point to stop the server manually and restart "
 "it using the proper script for your OS. From the Tigase base directory "
 "enter"
-msgstr "此时,建议手动停止服务器并使用适合您操作系统的脚本重新启动它。从Tigase基本目录"
-"输入如下命令"
+msgstr "此时，建议手动停止服务器并使用适合您操作系统的脚本重新启动它。从Tigase基本目"
+"录输入如下命令"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:145
 msgid ""
