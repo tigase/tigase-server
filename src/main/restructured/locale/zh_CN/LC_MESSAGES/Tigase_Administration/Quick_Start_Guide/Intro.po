@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-07 20:45+0000\n"
+"PO-Revision-Date: 2022-07-07 21:15+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -111,7 +111,7 @@ msgstr ""
 "当Tigase XMPP服务器启动时，它会查找默认配置文件: ``etc/config."
 "tdsl``。如果此文件未被修改，您可以运行 Web "
 "安装程序。这将引导您完成Tigase的配置。如果您在Windows环境中安装Tigase，"
-"请参阅 :ref:`Windows 安装<winWebInstall>` 部分。"
+"请参阅 :ref:`Windows安装<winWebInstall>` 部分。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:10
 #, fuzzy
@@ -202,8 +202,8 @@ msgstr "手动把用户名和密码组合添加到 ``config.tdsl`` 文件中或�
 msgid ""
 "Point your browser to http://localhost:8080/setup/ unless you are working"
 " remotely. You can also use the domain name, or IP address."
-msgstr "除非您在远程工作，否则您的浏览器将指向http://localhost:8080/setup/。"
-"您也可以使用域名或 IP 地址。"
+msgstr "除非您在远程工作，否则您的浏览器将指向http://localhost:8080/setup/"
+"。您也可以使用域名或IP地址。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:67
 msgid "Enter the username and password above to gain access."
@@ -292,9 +292,9 @@ msgid ""
 "of them (desktop, mobile, http, websocket, federation, etc.). After "
 "making this decisions, click \"Next\"."
 msgstr ""
-"在此页面上，您将看到Tigase XMPP服务器所支持的可能连接选项列表以及启用/禁用每"
-"个选项的方法(桌面，移动，http，websocket，联合等)。勾选相应选项后，单击\"Next"
-"\"。"
+"在此页面上，您将看到Tigase "
+"XMPP服务器所支持的可能连接选项列表以及启用/禁用每个选项的方法(桌面，移动, "
+"http, websocket，联合等)。勾选相应选项后，单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:99
 #, fuzzy
@@ -306,8 +306,8 @@ msgid ""
 "Now you will be able to select which features of Tigase XMPP Server (such"
 " as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or "
 "disabled."
-msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能(例如 "
-"MUC，PubSub，MIX，MAM，推送通知)应该被启用或被禁用。"
+msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能(例如MUC, PubSub, MIX, "
+"MAM，推送通知)应该被启用或被禁用。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:103
 #, fuzzy
@@ -316,7 +316,7 @@ msgstr "在这一步也将能够在您的安装上启用集群"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:105
 msgid "When you will be ready, click \"Next\"."
-msgstr "选择好以后，单击 \"Next\"。"
+msgstr "选择好以后，单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:107
 #, fuzzy
@@ -362,7 +362,7 @@ msgid ""
 "process later. If left blank, only JIDs listed in admin will be allowed "
 "to access."
 msgstr ""
-"如上所述，设置访问页面将被admin/tigase 用户锁定。此时你可以在设置页面添加除管"
+"如上所述，设置访问页面将被admin/tigase用户锁定。此时你可以在设置页面添加除管"
 "理员帐户之外的特定用户，以便稍后重新访问此设置。如果留空，则仅允许admin中列出"
 "的JIDs访问。"
 
@@ -380,7 +380,6 @@ msgstr "此时安装几乎快要完成，您将看到一个页面显示生成的
 "文件中)将是什么样子。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:123
-#, fuzzy
 msgid ""
 "If you have a custom setup, or would like to put your own settings in, "
 "you may copy and past the contents here to edit the current "
@@ -423,8 +422,8 @@ msgid ""
 "startup you should setup startup scripts as described in :ref:`Tigase "
 "Script Selection<tigaseScriptStart>`"
 msgstr ""
-"为了使 Tigase XMPP 服务器在系统启动时自动启动，您应该按照 :ref:`Tigase "
-"脚本选择<tigaseScriptStart>` 中的说明设置启动脚本"
+"为了使Tigase XMPP服务器在系统启动时自动启动，您应该按照 "
+":ref:`Tigase脚本选择<tigaseScriptStart>` 中的说明设置启动脚本"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:147
 msgid ""
@@ -434,21 +433,18 @@ msgid ""
 " Tigase to read settings from this file on startup as follows."
 msgstr ""
 "为了进一步微调服务器 ，需要编辑``etc/tigase.conf``。同时确保 ``JAVA_HOME`` "
-"的路径是正确的 , 并在需要时使用``JAVA_OPTIONS`` -Xmx（最大）和 "
-"-Xms（初始）时以增加内存。您需要告诉 Tigase "
-"启动时按照如下所示从该文件中读取设置。"
+"的路径是正确的 , 并在需要时使用``JAVA_OPTIONS`` -Xmx（最大）和 -Xms（初始）时"
+"以增加内存。您需要告诉Tigase启动时按照如下所示从该文件中读取设置。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:149
-#, fuzzy
 msgid ""
 "Everything should be running smooth at this point. Check the logfiles in "
 "``logs/`` if you experience any problems."
 msgstr "此时一切都应该运行顺利。如果遇到任何问题，请检查 ``logs/`` 中的日志文件。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:152
-#, fuzzy
 msgid "Verify Tigase is Running"
-msgstr "确认 Tigase 是否正在运行"
+msgstr "确认Tigase是否正在运行"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:154
 #, fuzzy
@@ -456,19 +452,16 @@ msgid "You should see a list of listening ports."
 msgstr "您应该会看到一个监听端口列表。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:170
-#, fuzzy
 msgid "Windows Instructions for using Web Installer"
-msgstr "Windows 使用 Web 安装程序的说明"
+msgstr "Windows使用Web安装程序的说明"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:172
-#, fuzzy
 msgid ""
 "There are a few steps involved with setting up Tigase with the web "
 "installer in a Windows environment. Please follow this guide."
-msgstr "在 Windows 环境中使用 Web 安装程序设置 Tigase 涉及几个步骤。请遵循本指南。"
+msgstr "在Windows环境中使用Web安装程序设置Tigase涉及几个步骤。请遵循本指南。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:174
-#, fuzzy
 msgid ""
 "First step is to extract the distribution archive in it’s entirety to the"
 " intended running directory. Once there, run the ``Setup.bat`` file "
@@ -476,26 +469,25 @@ msgid ""
 "the correct folders before Tigase begins operation."
 msgstr ""
 "第一步是将分发存档完整地提取到想要的运行目录下。在那里，运行 ``win-stuff`` "
-"文件夹里的 ``Setup.bat`` 文件。在 Tigase "
-"开始操作之前以上操作会将需要的文件移动到正确的文件夹中。"
+"文件夹里的 ``Setup.bat`` "
+"文件。在Tigase开始操作之前以上操作会将需要的文件移动到正确的文件夹中。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:176
-#, fuzzy
 msgid ""
 "From here, you have a few options how to run Tigase; ``run.bat`` will "
 "operate Tigase using a java command, or ``tigase.bat`` which will start "
 "Tigase using the wrapper. You may also install Tigase and run it as a "
 "service."
 msgstr ""
-"从这里开始，您可以选择不同方法来运行 Tigase； ``run.bat`` 将使用 java "
-"命令执行 Tigase，或 ``tigase.bat`` 将使用包装器启动 Tigase。您也可以安装 "
-"Tigase 并将其作为服务运行。"
+"从这里开始，您可以选择不同方法来运行Tigase； ``run.bat`` "
+"将使用java命令执行Tigase，或 ``tigase.bat`` "
+"将使用包装器启动Tigase。您也可以安装Tigase并将其作为服务运行。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:178
 msgid ""
 "Once this setup is finished, web installer will continue the same from "
 ":ref:`here<connecttoWebInstall>`."
-msgstr "完成此设置后，Web 安装程序将从 :ref:`这里<connecttoWebInstall>` "
+msgstr "完成此设置后，Web安装程序将从 :ref:`这里<connecttoWebInstall>` "
 "继续执行相同的操作。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:4
@@ -509,7 +501,7 @@ msgid ""
 "binary packages. Please pick up the latest version of the distribution "
 "archive in our `download section <https://tigase.net/downloads>`__."
 msgstr ""
-"我们首选的安装 Tigase 服务器的方法是使用 `Web 安装程序 <#webinstall>`__ "
+"我们首选的安装Tigase服务器的方法是使用 :ref:`Web安装程序<webinstall>` "
 "和其中一个二进制包附带的配置程序。请在我们的 `下载部分 <https://tigase.net/"
 "downloads>`__ 中获取最新版本的分发存档。"
 
@@ -522,17 +514,17 @@ msgid ""
 "packages to install the server manually. Please continue reading to learn"
 " how to install and setup the server in a few easy steps…​"
 msgstr ""
-"然而，在许多情况下，并不总是可以使用 Web 安装程序。在许多情况下，您只有 ssh "
-"访问权限，甚至只有控制台模式下的直接访问权限。我们将在下一个版本中提供纯文本"
-"安装程序，但目前您可以使用我们的二进制包手动安装服务器。请继续阅读以了解如何"
-"通过几个简单的步骤安装和设置服务器……​"
+"然而，在许多情况下，并不总是可以使用Web安装程序。在许多情况下，您只有ssh访问"
+"权限，甚至只有控制台模式下的直接访问权限。我们将在下一个版本中提供纯文本安装"
+"程序，但目前您可以使用我们的二进制包手动安装服务器。请继续阅读以了解如何通过"
+"几个简单的步骤安装和设置服务器……​"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:10
 msgid ""
 "If you have an old version of the Tigase server running and working and "
 "you intend to upgrade it please always backup the old version first."
-msgstr "如果您有旧版本的 Tigase "
-"服务器正在运行和工作，并且您打算升级它，请先备份旧版本。"
+msgstr "如果您有旧版本的Tigase服务器正在运行和工作，并且您打算升级它，请先备份旧版本"
+"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:14
 msgid ""
