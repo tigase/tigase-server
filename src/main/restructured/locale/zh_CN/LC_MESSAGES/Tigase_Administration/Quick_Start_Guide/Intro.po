@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-07 19:55+0000\n"
+"PO-Revision-Date: 2022-07-07 20:07+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -239,11 +239,10 @@ msgid ""
 msgstr "此设置包括了帮助您配置安装的几个步骤: 功能选择和数据库配置。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:83
-#, fuzzy
 msgid ""
 "Order and design of the steps may slightly differ thus we only provide a "
 "broad overview of how to proceed:"
-msgstr "步骤的顺序和设计可能略有不同，因此我们仅提供如何继续安装的大致概述："
+msgstr "步骤的顺序和设计可能略有不同，因此我们仅提供如何继续安装的大致概述:"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:85
 #, fuzzy
@@ -308,8 +307,8 @@ msgid ""
 "Now you will be able to select which features of Tigase XMPP Server (such"
 " as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or "
 "disabled."
-msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能（例如 "
-"MUC，PubSub，MIX，MAM，推送通知）应该被启用或被禁用。"
+msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能(例如 "
+"MUC，PubSub，MIX，MAM，推送通知)应该被启用或被禁用。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:103
 #, fuzzy
@@ -330,8 +329,8 @@ msgid ""
 "This is where the database is configured. The type of database selected "
 "in step 3 will influence available options. **BE SURE TO SPECIFY DATABASE"
 " ROOT USER ACCOUNT AND PASSWORD**"
-msgstr "在这里可以配置数据库。步骤 3 "
-"中选择的数据库类型将影响可用的选项。**请务必指定数据库根用户帐号和密码**"
+msgstr "在这里可以配置数据库。步骤3中选择的数据库类型将影响可用的选项。**请务必指定数"
+"据库根用户帐号和密码**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:111
 msgid "**Database connectivity check**"
@@ -348,8 +347,8 @@ msgstr ""
 "数据库设置后，您应该会看到一个包含已执行操作及其结果的页面。"
 "所有出现的项目都应该是\"绿色\"，这意味着一切顺利。如果任何内容显示为\"红色"
 "\"或\"黄色\""
-"，请阅读此标题下方的说明以了解有关此问题的更多信息。如果设置完成，请单击 "
-"\"Next\"。"
+"，请阅读此标题下方的说明以了解有关此问题的更多信息。如果设置完成，"
+"请单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:115
 #, fuzzy
@@ -374,13 +373,12 @@ msgid "**Saving configuration**"
 msgstr "**保存配置**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:121
-#, fuzzy
 msgid ""
 "The installation is almost complete and you will be presented with a page"
 " showing what the resulting configuration (stored in ``config.tdsl`` "
 "file) will look like."
-msgstr "此时安装几乎快要完成，您将看到一个页面显示生成的配置（存储在 ``config.tdsl`` "
-"文件中）将是什么样子。"
+msgstr "此时安装几乎快要完成，您将看到一个页面显示生成的配置(存储在 ``config.tdsl`` "
+"文件中)将是什么样子。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:123
 #, fuzzy
