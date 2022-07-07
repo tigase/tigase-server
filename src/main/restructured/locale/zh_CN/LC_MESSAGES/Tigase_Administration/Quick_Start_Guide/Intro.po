@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-07 20:21+0000\n"
+"PO-Revision-Date: 2022-07-07 20:45+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -108,10 +108,10 @@ msgid ""
 "environment, please see the :ref:`Windows Installation<winWebInstall>` "
 "section."
 msgstr ""
-"当 Tigase XMPP 服务器启动时，它会查找默认配置文件: ``etc/config."
-"tdsl``。如果此文件未被修改，您可以运行 Web 安装程序。这将引导您完成Tigase "
-"的配置。如果您在 Windows 环境中安装 Tigase，请参阅 :ref:`Windows "
-"安装<winWebInstall>` 部分。"
+"当Tigase XMPP服务器启动时，它会查找默认配置文件: ``etc/config."
+"tdsl``。如果此文件未被修改，您可以运行 Web "
+"安装程序。这将引导您完成Tigase的配置。如果您在Windows环境中安装Tigase，"
+"请参阅 :ref:`Windows 安装<winWebInstall>` 部分。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:10
 #, fuzzy
@@ -216,7 +216,7 @@ msgstr "逐步完成安装过程"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:73
 msgid "You will be greeted by the following \"About software\" page."
-msgstr "您将看到以下 \"About software\" 的页面。"
+msgstr "您将看到以下\"About software\"的页面。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:75
 #, fuzzy
@@ -256,7 +256,7 @@ msgid ""
 "agreement type in your name or company and click \"Next\" to go to the "
 "next page."
 msgstr "您将看到有关我们的商业产品和许可的一些信息。请仔细阅读协议，并用您的姓名或公"
-"司确认该协议，然后单击 \"Next\" 进入下一页。"
+"司确认该协议，然后单击\"Next\"进入下一页。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:89
 msgid "**Basic Tigase server configuration**"
@@ -293,8 +293,8 @@ msgid ""
 "making this decisions, click \"Next\"."
 msgstr ""
 "在此页面上，您将看到Tigase XMPP服务器所支持的可能连接选项列表以及启用/禁用每"
-"个选项的方法(桌面，移动，http，websocket，联合等)。勾选相应选项后，单击 "
-"\"Next\"。"
+"个选项的方法(桌面，移动，http，websocket，联合等)。勾选相应选项后，单击\"Next"
+"\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:99
 #, fuzzy
