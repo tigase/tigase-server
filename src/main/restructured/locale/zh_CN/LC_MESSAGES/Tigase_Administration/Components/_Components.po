@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 02:43-0700\n"
-"PO-Revision-Date: 2022-07-06 22:39+0000\n"
+"PO-Revision-Date: 2022-07-09 09:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/components/zh_Hans/>\n"
@@ -525,7 +525,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:14
 msgid "Psi XMPP Client"
-msgstr "Psi XMPP 客户端"
+msgstr "Psi XMPP客户端"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:16
 msgid ""
