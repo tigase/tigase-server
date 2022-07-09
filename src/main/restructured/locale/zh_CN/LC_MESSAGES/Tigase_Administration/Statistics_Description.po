@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-10 07:14+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/statistics_description/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:4
 msgid "Appendix I - Statistics description"
-msgstr ""
+msgstr "附录 I - 统计说明"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:6
 msgid ""
@@ -30,10 +33,14 @@ msgid ""
 "pubsub, you would look for pubsub/Max queue size. Statistics will not be "
 "provided by components that are not enabled."
 msgstr ""
+"统计数据分为数据源，组件和处理器。您可能会看到为公共组件部分中定义的多个组件"
+"收集的相同统计信息。请注意，统计信息由 {$component}/statistic 定义，"
+"因此如果您想要 pubsub 上的 Max queue size，您将查找 pubsub/Max queue "
+"size。未启用的组件不会提供统计信息。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:9
 msgid "Data source statistics"
-msgstr ""
+msgstr "数据源统计"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:11
 msgid ""
@@ -4753,4 +4760,3 @@ msgstr ""
 #: ../../Tigase_Administration/Statistics_Description.rst:698
 msgid "No exclusive ws2s specific statistics."
 msgstr ""
-
