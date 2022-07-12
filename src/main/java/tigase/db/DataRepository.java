@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xmpp.jid.BareJID;
 
 import java.sql.*;
@@ -44,7 +45,8 @@ public interface DataRepository
 		derby,
 		mysql,
 		postgresql,
- 		@Deprecated
+		@Deprecated
+		@TigaseDeprecated(since = "8.3.0", removeIn = "9.0.0")
 		jtds,
 		sqlserver,
 		other
