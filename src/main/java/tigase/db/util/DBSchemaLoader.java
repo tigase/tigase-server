@@ -136,8 +136,7 @@ public class DBSchemaLoader
 			new TypeInfo(10, "derby", "Derby (built in database)", "org.apache.derby.jdbc.EmbeddedDriver"),
 			new TypeInfo(20, "mysql", "MySQL", "com.mysql.cj.jdbc.Driver"),
 			new TypeInfo(30, "postgresql", "PostgreSQL", "org.postgresql.Driver"),
-			new TypeInfo(40, "sqlserver", "SQLServer", "net.sourceforge.jtds.jdbc.Driver",
-						 "You have selected MS SQL Server as your database. While we provide you, for easy install, with open-source jTDS JDBC driver allowing to connect to MS SQL Server, we recommend using JDBC driver from Microsoft."))
+			new TypeInfo(40, "sqlserver", "SQLServer", "com.microsoft.sqlserver.jdbc.SQLServerDriver"))
 			.collect(Collectors.toList());
 
 	public DBSchemaLoader() {

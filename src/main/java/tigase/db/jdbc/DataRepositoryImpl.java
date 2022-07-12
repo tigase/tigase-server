@@ -269,9 +269,6 @@ public class DataRepositoryImpl
 				check_table_query = DERBY_CHECK_TABLE_QUERY;
 				break;
 			case jtds:
-				driverClass = "net.sourceforge.jtds.jdbc.Driver";
-				check_table_query = SQLSERVER_CHECK_TABLE_QUERY;
-				break;
 			case sqlserver:
 				driverClass = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 				check_table_query = SQLSERVER_CHECK_TABLE_QUERY;
