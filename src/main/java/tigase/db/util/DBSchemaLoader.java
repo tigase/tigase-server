@@ -1188,7 +1188,7 @@ public class DBSchemaLoader
 
 		switch (database) {
 			case "sqlserver":
-				db_uri.append("jtds:sqlserver:");
+				db_uri.append("sqlserver:");
 				break;
 			default:
 				db_uri.append(database).append(":");
@@ -1217,6 +1217,8 @@ public class DBSchemaLoader
 				db_uri.append(";cacheMetaData=false");
 				if (Boolean.TRUE.equals(params.isUseSSL())) {
 					db_uri.append(";encrypt=true");
+				} else {
+					db_uri.append(";encrypt=false");
 				}
 				if (params.getOtherParameters() != null && !params.getOtherParameters().isEmpty()) {
 					for (Map.Entry<String, String> entry : params.getOtherParameters().entrySet()) {

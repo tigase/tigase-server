@@ -118,7 +118,7 @@ Configuration of the MS SQL Server follows general database convention.
 -----
 dataSource {
     default () {
-        uri = 'jdbc:[jtds:]sqlserver://db_hostname:port[;property=val]'
+        uri = 'jdbc:sqlserver://db_hostname:port[;property=val]'
     }
 }
 -----

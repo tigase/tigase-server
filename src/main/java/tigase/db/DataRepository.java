@@ -44,6 +44,7 @@ public interface DataRepository
 		derby,
 		mysql,
 		postgresql,
+ 		@Deprecated
 		jtds,
 		sqlserver,
 		other

@@ -129,7 +129,7 @@ MSSql support works out of the box, however Tigase provides an open source drive
 
    dataSource () {
        default () {
-           uri = 'jdbc:jtds:sqlserver://localhost;databaseName=tigasedb;user=tigase_user;password=tigase_pass;schema=dbo;lastUpdateCount=false;cacheMetaData=false'
+           uri = 'jdbc:sqlserver://localhost;databaseName=tigasedb;user=tigase_user;password=tigase_pass;schema=dbo;lastUpdateCount=false;cacheMetaData=false'
        }
    }
 

@@ -122,7 +122,7 @@ Configuration of the MS SQL Server follows general database convention.
 
    dataSource {
        default () {
-           uri = 'jdbc:[jtds:]sqlserver://db_hostname:port[;property=val]'
+           uri = 'jdbc:sqlserver://db_hostname:port[;property=val]'
        }
    }
 
@@ -148,12 +148,10 @@ Example:
        }
    }
 
-JDBC: jTDS vs MS JDBC driver
+JDBC: jTDS vs MS JDBC driver (obsolete)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Tigase XMPP Server supports two JDBC drivers intended to be used with Microsoft SQL Server - one created and provided by Microsoft itself and the alternative implementation - jTDS. Tigase is shipped with the latter in the distribution packages. Starting with the version 7.1.0 we recommend using jDTS driver that is shipped with Tigase as JDBC driver created by Microsoft can cause problems with some components in cluster installations. MS driver can be downloaded form the website: `JDBC Drivers 4.0, 4.1 for SQL Server <http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774>`__ then unpack the archive. Copy sqljdbc_4.0/enu/sqljdbc4.jar file to ${tigase-server}/jars directory.
-
-Depending on the driver used ``uri`` needs to be configured accordingly.
+Previously Tigase XMPP Server was shipped with the jTDS open source driver however since 8.3.0 we switched to the FOSS driver provided by the Microsoft itself. Previous jdbc url will fallback to the Microsoft driver automatically.
 
 -  Microsoft driver:
 
@@ -162,15 +160,5 @@ Depending on the driver used ``uri`` needs to be configured accordingly.
       dataSource {
           default () {
               uri = 'jdbc:sqlserver://...'
-          }
-      }
-
--  jDTS driver
-
-   .. code:: bash
-
-      dataSource {
-          default () {
-              uri = 'jdbc:jdts://...'
           }
       }
