@@ -3,71 +3,76 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-16 23:14+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/properties_guide/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Properties/_properties.rst:2
 msgid "Appendix II - Properties Guide"
-msgstr ""
+msgstr "Appendix II - 属性指南"
 
 #: ../../Tigase_Administration/Properties/_general.inc:2
 msgid "General"
-msgstr ""
+msgstr "通用"
 
 #: ../../Tigase_Administration/Properties/_general.inc:7
 msgid "admins"
-msgstr ""
+msgstr "管理员"
 
 #: ../../Tigase_Administration/Properties/_general.inc:9
 msgid "**Description:** Specifies a list of administrator accounts."
-msgstr ""
+msgstr "**描述：** 指定管理员帐户列表。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:11
 msgid ""
 "**Default value:** the administration account created when the server is "
 "setup. Typically it would be something like ``admins = "
 "['admin@server.com']``."
-msgstr ""
+msgstr "**默认值：** 设置服务器时创建的管理帐户。通常它会类似于 ``admins = "
+"['admin@server.com']``。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:13
 msgid "**Example:** ``admins = [ 'admin@domain.com', 'user2@domain.com' ]``"
-msgstr ""
+msgstr "**示例：** ``admins = [ 'admin@domain.com', 'user2@domain.com' ]``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:15
 msgid "**Possible values:** Comma seperated values of Bare JIDs."
-msgstr ""
+msgstr "**可能的值：** Bare JID的逗号分隔值。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:17
 #: ../../Tigase_Administration/Properties/_general.inc:144
 #: ../../Tigase_Administration/Properties/_general.inc:170
 msgid "**Available since:** 2.0.0"
-msgstr ""
+msgstr "**从以下版本开始可用：** 2.0.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:20
 msgid "Certificate Container"
-msgstr ""
+msgstr "证书容器"
 
 #: ../../Tigase_Administration/Properties/_general.inc:22
 msgid ""
 "The certificate container houses all configuration related to SSL "
 "certificate configuration. This container replaces a number of former — "
 "properties."
-msgstr ""
+msgstr "证书容器包含与 SSL 证书配置相关的所有配置。这个容器取代了许多以前的 — 属性。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:25
+#, fuzzy
 msgid "ssl-certs-location"
-msgstr ""
+msgstr "ssl-certs-location"
 
 #: ../../Tigase_Administration/Properties/_general.inc:27
 msgid ""
@@ -77,20 +82,24 @@ msgid ""
 " directory where the server SSL certificates are stored in files in PEM "
 "format."
 msgstr ""
+"此选项允许您指定存储SSL证书的位置。该属性的含义取决于SSL容器 :ref:`class "
+"implementation<sslContainerClass>`。默认情况下，它只指向服务器 "
+"SSL证书存储在PEM格式文件中的目录。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:29
 msgid ""
 "Default location is ``/certs`` however it can be changed using the "
 "following setting:"
-msgstr ""
+msgstr "默认位置是 ``/certs``，但是可以使用以下设置进行更改："
 
 #: ../../Tigase_Administration/Properties/_general.inc:38
 msgid "This replaces the former ``--ssl-certs-location`` property."
-msgstr ""
+msgstr "这取代了以前的 ``--ssl-certs-location`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:41
+#, fuzzy
 msgid "ssl-def-cert-domain"
-msgstr ""
+msgstr "ssl-def-cert-domain"
 
 #: ../../Tigase_Administration/Properties/_general.inc:43
 msgid ""
@@ -105,62 +114,70 @@ msgid ""
 "does not automatically generate a self-signed certificate, then it can "
 "use a default one."
 msgstr ""
+"此属性允许您为证书指定默认别名/域名。它主要用于在SSL协商过程中加载未知域名的"
+"证书。与TLS协议中在握手时域名是已知的不同，对于SSL域名是未知的，因此服务器不"
+"知道使用哪个证书。在此属性中指定域名允许您在这种情况下使用特定域的证书。如果"
+"其中一个虚拟域没有证书并且容器不会自动生成自签名证书，则有时也会使用此属性值"
+"，那么它可以使用默认证书。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:45
 msgid "This may be configured as follows:"
-msgstr ""
+msgstr "这可以配置如下："
 
 #: ../../Tigase_Administration/Properties/_general.inc:54
 msgid "This replaces the former ``--ssl-def-cert-domain`` property."
-msgstr ""
+msgstr "这取代了以前的 ``--ssl-def-cert-domain`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:57
 msgid "Component"
-msgstr ""
+msgstr "组件"
 
 #: ../../Tigase_Administration/Properties/_general.inc:59
 msgid ""
 "**Description:** Container specifying component configuration. All "
 "components if they require configuration must be called in the conf.tdsl "
 "file in the following manner:"
-msgstr ""
+msgstr "**描述：** 容器指定组件配置。所有需要配置的组件都必须按以下方式在conf."
+"tdsl文件中调用："
 
 #: ../../Tigase_Administration/Properties/_general.inc:67
 msgid ""
 "DSL allows for custom naming of the component, and specifying of the "
 "class in the same line. This method replaces the old ``comp-class`` and "
 "``comp-name`` style of configuration."
-msgstr ""
+msgstr "DSL允许对组件进行自定义命名，并在同一行中指定类。此方法取代了旧的 ``comp-"
+"class`` 和 ``comp-name`` 配置样式。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:69
 msgid "For example, what used to be"
-msgstr ""
+msgstr "例如，其过去是这样"
 
 #: ../../Tigase_Administration/Properties/_general.inc:78
 msgid "is now"
-msgstr ""
+msgstr "现在是"
 
 #: ../../Tigase_Administration/Properties/_general.inc:85
 msgid ""
 "In fact, if you are using the default class & name for a component, you "
 "don’t need to specify it either, so MUC in this is now called by"
-msgstr ""
+msgstr "事实上，如果你使用一个组件的默认类和名称，你也不需要指定它，所以这里的MUC现在"
+"被如下调用"
 
 #: ../../Tigase_Administration/Properties/_general.inc:91
 msgid ""
 "**Default value:** By default, component configuration runs of default, "
 "and does not need to be specified."
-msgstr ""
+msgstr "**默认值：** 默认情况下，组件配置默认运行，无需指定。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:93
 msgid ""
 "There are many many configuration options under each component, which are"
 " specified in `component documentation <#loadComponent>`__."
-msgstr ""
+msgstr "每个组件下有很多很多配置选项，具体在 :ref:`组件文档<loadComponent>` 中指定。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:96
 msgid "Ports"
-msgstr ""
+msgstr "端口"
 
 #: ../../Tigase_Administration/Properties/_general.inc:98
 msgid ""
@@ -169,14 +186,17 @@ msgid ""
 " list of ports numbers. For example for the server to server connection "
 "manager named s2s the property would like like the example below:"
 msgstr ""
+"ports属性是连接的子类，用于为连接管理器设置端口列表。 'list of ports'是一个逗"
+"号分隔的端口号列表。例如，对于名为s2s的服务器到服务器连接管理器，该属性类似于"
+"以下示例："
 
 #: ../../Tigase_Administration/Properties/_general.inc:108
 msgid "Each port many be individually configured underneath ports"
-msgstr ""
+msgstr "每个端口都可以在端口下单独配置"
 
 #: ../../Tigase_Administration/Properties/_general.inc:121
 msgid "this replaces the ``--cmpname-ports`` property."
-msgstr ""
+msgstr "这替换了 ``--cmpname-ports`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:34
 #: ../../Tigase_Administration/Properties/_cluster.inc:47
@@ -209,18 +229,19 @@ msgstr ""
 #: ../../Tigase_Administration/Properties/_vhost.inc:116
 #: ../../Tigase_Administration/Properties/_vhost.inc:137
 msgid "**Available since:** 8.0.0"
-msgstr ""
+msgstr "**从以下版本可用：** 8.0.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:126
 msgid "config-type"
-msgstr ""
+msgstr "配置类型"
 
 #: ../../Tigase_Administration/Properties/_general.inc:128
 msgid ""
 "**Description:** This property sets the server type and determines what "
 "components are started up without needing to declare and configure all "
 "components. Possible values are listed below:"
-msgstr ""
+msgstr "**说明：** 该属性设置服务器类型，决定启动哪些组件，且无需声明和配置所有组件。"
+"下面列出了可能的值："
 
 #: ../../Tigase_Administration/Properties/_general.inc:130
 msgid ""
@@ -229,6 +250,9 @@ msgid ""
 " component as well as basic server components. This should be changed "
 "after the server is configured."
 msgstr ""
+"``setup`` - "
+"此设置将设置一个基本服务器，为解包后的初始设置做好准备。这是默认设置，会启动 "
+"http 组件以及基本的服务器组件。这应该在配置服务器后更改。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:132
 msgid ""
@@ -237,6 +261,8 @@ msgid ""
 "included in configuration are: session manager, client-to-server "
 "connection manager and server-to-server connection manager."
 msgstr ""
+"``default`` - 创建默认配置文件。这是典型安装最可能需要的配置。配置中包含的组"
+"件有：会话管理器、客户端到服务器连接管理器和服务器到服务器连接管理器。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:134
 msgid ""
@@ -247,6 +273,9 @@ msgid ""
 "machines (one or more). Components included in configuration are: sm and "
 "ext2s."
 msgstr ""
+"``session-manager`` - 例如仅使用会话管理器和外部组件创建配置。这对于分布式安"
+"装很有用，您希望将会话管理器安装在不同的机器上，而组件管理不同机器（一台或多"
+"台）上的网络连接。配置中包含的组件有：sm 和 ext2s。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:136
 msgid ""
@@ -257,6 +286,9 @@ msgid ""
 "machines (one or more). Components included in configuration are: c2s, "
 "s2s, ext2s."
 msgstr ""
+"``connection-managers`` - 例如使用管理网络连接的组件创建配置。这对于分布式安"
+"装很有用，您希望将会话管理器安装在不同的机器上，而组件管理不同机器（一台或多"
+"台）上的网络连接。配置中包含的组件有：c2s，s2s，ext2s。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:138
 msgid ""
@@ -268,10 +300,14 @@ msgid ""
 "components. You have to configure the external component connection, "
 "domain name, password, port, etc…​"
 msgstr ""
+"``component`` - 生成只有一个组件的配置 - 组件管理外部组件连接，XEP-0114 或 XE"
+"P-0225。这用于将Tigase实例部署为连接到主服务器的外部组件。您必须添加更多由该"
+"实例处理的组件，通常是MUC，PubSub "
+"或任何其他自定义组件。你必须配置外部组件连接，域名，密码，端口等…​"
 
 #: ../../Tigase_Administration/Properties/_general.inc:140
 msgid "**Default value:** ``'config-type' = 'setup'``"
-msgstr ""
+msgstr "**默认值：** ``'config-type' = 'setup'``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:142
 msgid ""
@@ -279,44 +315,50 @@ msgid ""
 "managers``\\ \\|\\ ``session-manager``\\ \\|\\ ``connection-managers``\\ "
 "\\|\\ ``component``"
 msgstr ""
+"**可能的值：** ``setup``\\ \\|\\ ``default``\\ \\|\\ ``connection-managers``"
+"\\ \\|\\ ``session-manager``\\ \\|\\ ``connection-managers``\\ \\|\\ "
+"``component``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:147
 msgid "debug-packages"
-msgstr ""
+msgstr "调试包"
 
 #: ../../Tigase_Administration/Properties/_general.inc:149
 msgid ""
 "**Default value:** No default as Tigase does not expect custom classes "
 "out of the box."
-msgstr ""
+msgstr "**默认值：** 没有默认值，因为 Tigase 不希望自定义类开箱即用。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:151
 msgid ""
 "**Example:** ``'debug-packages' = [ 'com.company.CustomPlugin' , "
 "'com.company.custom' ]``"
 msgstr ""
+"**示例：** ``'debug-packages' = [ 'com.company.CustomPlugin' , "
+"'com.company.custom' ]``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:153
 msgid "**Possible values:** comma separated list of Java packages or classes."
-msgstr ""
+msgstr "**可能的值：** Java包或类的逗号分隔列表。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:155
 msgid ""
 "**Description:** This property is used to turn debugging on for any "
 "package not located within the default Tigase packages. Be sure class "
 "case is correct."
-msgstr ""
+msgstr "**描述：** 此属性用于为不在默认 Tigase "
+"包中的任何包打开调试。确保类案例是正确的。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:17
 #: ../../Tigase_Administration/Properties/_general.inc:157
 #: ../../Tigase_Administration/Properties/_general.inc:365
 #: ../../Tigase_Administration/Properties/_performance.inc:157
 msgid "**Available since:** 5.0.0"
-msgstr ""
+msgstr "**从以下版本可用：** 5.0.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:160
 msgid "debug"
-msgstr ""
+msgstr "调试"
 
 #: ../../Tigase_Administration/Properties/_general.inc:162
 msgid ""
@@ -332,23 +374,31 @@ msgid ""
 "guide. If you wish to debug packages not compiled with Tigase, use the "
 "`debug-packages <#debugPackages>`__ setting."
 msgstr ""
+"**描述：** ``debug`` 属性用于打开指定 Tigase 包的调试日志。例如，如果你想为 "
+"tigase.server 包打开调试日志，那么你必须使用 server "
+"参数。如果您的服务器有任何问题，从 Tigase "
+"团队获得帮助的最佳方式是生成至少启用此功能的配置并运行服务器。然后从 ``logs/"
+"tigase-console.log`` 日志文件中，可以为我们提供最好的信息来提供帮助。有关服务"
+"器日志记录和调整日志记录级别的更多详细信息，请参阅管理员指南中的调试 Tigase "
+"文章。如果您希望调试未使用 Tigase 编译的包，请使用 "
+":ref:`调试包<debugPackages>` 设置。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:164
 #: ../../Tigase_Administration/Properties/_general.inc:234
 msgid "**Default value:** 'none'"
-msgstr ""
+msgstr "**默认值：** 'none'"
 
 #: ../../Tigase_Administration/Properties/_general.inc:166
 msgid "**Example:** ``debug = [ 'server', 'xmpp.impl' ]``"
-msgstr ""
+msgstr "**示例：** ``debug = [ 'server', 'xmpp.impl' ]``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:168
 msgid "**Possible values:** Comma separated list of Tigase’s package names."
-msgstr ""
+msgstr "**可能的值：** Tigase包名称的逗号分隔列表。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:173
 msgid "monitoring"
-msgstr ""
+msgstr "监控"
 
 #: ../../Tigase_Administration/Properties/_general.inc:175
 msgid ""
@@ -359,10 +409,14 @@ msgid ""
 "child bean under ``monitoring ()``. If a protocol is not specified, "
 "monitoring under that will not be available."
 msgstr ""
+"**描述：** 此属性通过选定 TCP/IP "
+"端口号上的选定协议激活监视接口。有关详细信息，请参阅用户指南中的 "
+":ref:`监控指南<serverMonitoring>`。每个监控协议都应该在 ``monitoring ()`` "
+"下的它自己的子 bean 中调用。如果未指定协议，则无法进行该协议下的监控。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:177
 msgid "**Default value:** By default monitoring is disabled."
-msgstr ""
+msgstr "**默认值：** 默认情况下禁用监控。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:11
 #: ../../Tigase_Administration/Properties/_general.inc:179
@@ -374,19 +428,19 @@ msgstr ""
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:65
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:160
 msgid "**Example:**"
-msgstr ""
+msgstr "**例子：**"
 
 #: ../../Tigase_Administration/Properties/_general.inc:197
 msgid "DO NOT CONFUSE monitoring with monitor component."
-msgstr ""
+msgstr "不要将监控与监控组件混淆。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:199
 msgid "**Possible values:** 'list of monitoring protocols with port numbers.'"
-msgstr ""
+msgstr "**可能的值：**'list of monitoring protocols with port numbers.'"
 
 #: ../../Tigase_Administration/Properties/_general.inc:204
 msgid "plugins"
-msgstr ""
+msgstr "插件"
 
 #: ../../Tigase_Administration/Properties/_general.inc:206
 msgid ""
@@ -397,13 +451,18 @@ msgid ""
 "``'sess-man'`` bean. For example, to turn on the personal eventing "
 "protocol, the following may be used:"
 msgstr ""
+"**描述：** 以前的 ``--sm-plugins`` 属性已被新的 DSL "
+"格式化样式所取代。以前一长串不间断的优点和缺点已被分隔的风格所取代。"
+"受会话管理器控制的插件现在将是 ``'sess-man'`` bean "
+"的子项。例如，要打开个人事件协议，可以使用以下内容："
 
 #: ../../Tigase_Administration/Properties/_general.inc:214
 msgid ""
 "Should any plugin require configuration, those configurations will be "
 "under it’s own brackets. For example, this section not only turns on "
 "jabber:iq:auth but also sets the treads to 16."
-msgstr ""
+msgstr "如果任何插件需要配置，这些配置将在它自己的括号下。例如，此部分不仅打开了 "
+"jabber:iq:auth，而且还将线程数设置为 16。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:224
 msgid ""
@@ -413,37 +472,44 @@ msgid ""
 "name, then no single quotes are not required. If you need to disable "
 "certain plugins, you can do so after declaring the bean."
 msgstr ""
+"您可能已经注意到，需要转义字符（例如 ``:`` 或 ``-`` ）的 bean "
+"或配置选项将落入单引号以包含任何特殊字符。如果 bean "
+"名称中没有特殊字符，则不需要单引号。如果你需要禁用某些插件，你可以在声明 "
+"bean 之后这样做。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:232
 msgid ""
 "Typically if a bean is called, it is automatically active. Session "
 "manager plugins will typically look like a list of plugins without "
 "configurations. The example section will show what one will look like."
-msgstr ""
+msgstr "通常，如果调用 bean，它会自动激活。会话管理器插件通常看起来像一个没有配置的插"
+"件列表。示例部分将显示其会是什么样子。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:276
 msgid "**Possible values:** DSL format plugins list and configurations."
-msgstr ""
+msgstr "**可能的值：** DSL格式插件列表和配置。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:281
 msgid "priority-queue-implementation"
-msgstr ""
+msgstr "优先队列实现"
 
 #: ../../Tigase_Administration/Properties/_general.inc:283
 msgid "**Default value:** ``tigase.util.PriorityQueueRelaxed``"
-msgstr ""
+msgstr "**默认值：** ``tigase.util.PriorityQueueRelaxed``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:285
 msgid ""
 "**Example:** ``'priority-queue-implementation' = "
 "'tigase.util.PriorityQueueStrict``"
 msgstr ""
+"**例子：** ``'priority-queue-implementation' = 'tigase.util."
+"PriorityQueueStrict``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:287
 msgid ""
 "**Possible values:** class name extending "
 "``tigase.util.PriorityQueueAbstract``."
-msgstr ""
+msgstr "**可能的值：** 类名扩展 ``tigase.util.PriorityQueueAbstract``。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:289
 msgid ""
@@ -453,6 +519,10 @@ msgid ""
 " let Tigase load it instead of the default one. Currently following queue"
 " implementations are available:"
 msgstr ""
+"**描述：** ``priority-queue-implementation`` 属性设置 Tigase "
+"的内部队列实现。您可以在已经可用和准备使用之间进行选择，"
+"或者您可以创建自己的队列实现并让 Tigase "
+"加载它而不用默认设置。目前有以下队列实现可用："
 
 #: ../../Tigase_Administration/Properties/_general.inc:291
 msgid ""
@@ -463,6 +533,10 @@ msgid ""
 "have been dropped. Packets loss (drops) can typically happen for the "
 "lowest priority packets (presences) under a very high load."
 msgstr ""
+"**tigase.util.workqueue.PriorityQueueRelaxed** - 专门的优先级队列，旨在有效处"
+"理非常高的负载并防止更高优先级队列的数据包丢失。这意味着有时候，在系统过载的"
+"情况下，数据包有可能会在被丢弃的情况下乱序到达。在非常高的负载下，优先级最低"
+"的数据包（存在）通常会发生数据包丢失（丢弃）。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:293
 msgid ""
@@ -475,6 +549,11 @@ msgid ""
 "(drops) can typically happen for all packets with the same probability, "
 "depending which priority queue is overloaded."
 msgstr ""
+"**tigase.util.workqueue.PriorityQueueStrict** - 专门的优先级队列，旨在有效处"
+"理非常高的负载，但更喜欢丢失包而不是包重新排序。它适用于负载非常高的系统，其"
+"中数据包顺序对系统正常运行至关重要。这意味着具有相同源和目标地址的相同优先级"
+"的数据包永远不会重新排序。数据包丢失（丢弃）通常会以相同的概率发生在所有数据"
+"包上，具体将取决于哪个优先级队列过载。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:295
 msgid ""
@@ -487,6 +566,11 @@ msgid ""
 " same type are never reordered. Packets loss (drops) can typically happen"
 " for all packets which do not fit into the single queue."
 msgstr ""
+"**tigase.util.workqueue.NonpriorityQueue** - 专门的非优先级队列。所有数据包都"
+"存储在一个物理集合中，因此它们永远不会重新排序。数据包没有优先级，因此系统关"
+"键数据包可能必须等待低优先级数据包被处理。在许多情况下，这可能会影响服务器的"
+"功能和性能。因此，应该非常谨慎地选择这种队列类型。相同类型的数据包永远不会重"
+"新排序。对于不适合单个队列的所有数据包，通常会发生数据包丢失（丢弃）。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:299
 msgid ""
@@ -497,30 +581,34 @@ msgid ""
 "'message' may take over 'iq' packet or 'iq' packet may take over "
 "'presence' packet and so on…​ This is unpredictable.*"
 msgstr ""
+"*由于数据包由 SessionManager 组件中的插件处理，并且每个插件都有自己的线程池和"
+"自己的队列，无论您设置什么队列类型，都可能发生数据包重新排序。重新排序可能只"
+"发生在不同的数据包类型之间。也就是说'message'可能会接管'iq'数据包或'iq'数据包"
+"可能会接管'presence'数据包等等... 这是不可预测的。*"
 
 #: ../../Tigase_Administration/Properties/_general.inc:301
 #: ../../Tigase_Administration/Properties/_performance.inc:90
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:120
 msgid "**Available since:** 5.1.0"
-msgstr ""
+msgstr "**从以下版本开始可用：** 5.1.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:304
 msgid "roster-implementation"
-msgstr ""
+msgstr "名册实现"
 
 #: ../../Tigase_Administration/Properties/_general.inc:306
 msgid "**Default value:** ``RosterFlat.class.getCanonicalName()``"
-msgstr ""
+msgstr "**默认值：** ``RosterFlat.class.getCanonicalName()``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:308
 msgid "**Example:** ``'roster-implementation' = 'my.pack.CustomRosterImpl'``"
-msgstr ""
+msgstr "**示例：** ``'roster-implementation' = 'my.pack.CustomRosterImpl'``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:310
 msgid ""
 "**Possible values:** Class extending "
 "tigase.xmpp.impl.roster.RosterAbstract."
-msgstr ""
+msgstr "**可能的值：** 扩展 tigase.xmpp.impl.roster.RosterAbstract 的类。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:312
 msgid ""
@@ -529,6 +617,9 @@ msgid ""
 "for a customized roster storage, extended roster content, or in some "
 "cases for some custom logic for certain roster elements."
 msgstr ""
+"**描述：** ``roster-implementation`` 属性允许您指定不同的 RosterAbstract 实现"
+"。这可能对自定义名册存储，扩展名册内容或在某些情况下对于某些名册元素的某些自"
+"定义逻辑很有用。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:314
 #: ../../Tigase_Administration/Properties/_general.inc:339
@@ -537,20 +628,21 @@ msgstr ""
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:56
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:151
 msgid "**Available since:** 5.2.0"
-msgstr ""
+msgstr "**从以下版本可用：** 5.2.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:317
+#, fuzzy
 msgid "s2s-secret"
-msgstr ""
+msgstr "s2s-secret"
 
 #: ../../Tigase_Administration/Properties/_general.inc:319
 #: ../../Tigase_Administration/Properties/_general.inc:651
 msgid "**Default value:** ``none``"
-msgstr ""
+msgstr "**默认值：** ``无``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:331
 msgid "**Possible values:** 'ascii string.'"
-msgstr ""
+msgstr "**可能的值：**'ascii 字符串。'"
 
 #: ../../Tigase_Administration/Properties/_general.inc:333
 msgid ""
@@ -559,12 +651,15 @@ msgid ""
 " which means the secret is automatically generated for each s2s "
 "connection and handshake."
 msgstr ""
+"**描述：** 此属性是s2s机密的全局设置，用于在 Tigase "
+"安装上生成回拨密钥。默认为null，表示每次s2s连接和握手都会自动生成secret。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:335
 msgid ""
 "This is a global property which is overridden by settings for each VHost "
 "(see `??? <#addManageDomain>`__)"
-msgstr ""
+msgstr "这是一个全局属性，被每个 VHost 的设置覆盖 (参见 "
+":ref:`添加和管理域(VHosts)<addManageDomain>`)"
 
 #: ../../Tigase_Administration/Properties/_general.inc:337
 msgid ""
@@ -575,55 +670,60 @@ msgid ""
 "configure a default values for all of them, instead of having to provide "
 "individual configuration for each vhost."
 msgstr ""
+"如提供的示例中所示，未定义配置的所有虚拟主机的'defaults'设置。此设置主要适用"
+"于init.property文件中列出的许多虚拟主机的安装，这些主机没有指定单独的设置。它"
+"允许为所有这些配置默认值，而不必为每个虚拟主机提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:342
 msgid "scripts-dir"
-msgstr ""
+msgstr "脚本目录"
 
 #: ../../Tigase_Administration/Properties/_general.inc:344
 msgid "**Default value:** ``scripts/admin``"
-msgstr ""
+msgstr "**默认值：** ``scripts/admin``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:346
 msgid "**Example:** ``'scripts-dir' = ''/opt/admin-scripts'``"
-msgstr ""
+msgstr "**例子：** ``'scripts-dir' = ''/opt/admin-scripts'``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:348
 msgid "**Possible values:** path to a directory on the file system."
-msgstr ""
+msgstr "**可能的值：** 文件系统上目录的路径。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:350
 msgid ""
 "**Description:** This property sets the directory where all administrator"
 " scripts for ad-hoc commands are stored."
-msgstr ""
+msgstr "**描述：** 此属性设置存储临时命令的所有管理员脚本的目录。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:47
 #: ../../Tigase_Administration/Properties/_general.inc:352
 #: ../../Tigase_Administration/Properties/_performance.inc:103
 #: ../../Tigase_Administration/Properties/_performance.inc:116
 msgid "**Available since:** 4.3.0"
-msgstr ""
+msgstr "**从以下版本可用：** 4.3.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:355
 msgid "ssl-container-class"
-msgstr ""
+msgstr "ssl 容器类"
 
 #: ../../Tigase_Administration/Properties/_general.inc:357
 msgid "*Default value:** ``tigase.io.SSLContextContainer``"
-msgstr ""
+msgstr "**默认值：** ``tigase.io.SSLContextContainer``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:359
 msgid ""
 "**Example:** ``rootSslContextContainer (class: "
 "class.implementing.SSLContextContainerIFC) {}``"
 msgstr ""
+"**例子：** ``rootSslContextContainer (class: class.implementing."
+"SSLContextContainerIFC) {}``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:361
 msgid ""
 "**Possible values:** a class implementing "
 "tigase.io.SSLContectContainerIfc."
-msgstr ""
+msgstr "**可能的值：** 实现 tigase.io.SSLContectContainerIfc 的类。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:363
 msgid ""
@@ -633,26 +733,29 @@ msgid ""
 "certificates from PEM files which is a common storage used on many "
 "systems."
 msgstr ""
+"**描述：** ``rootSslContextContainer`` 属性允许您指定一个实现 SSL/TLS "
+"证书存储的类。本描述示例中提供的类允许从 PEM "
+"文件加载证书，这是许多系统上使用的通用存储。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:368
 msgid "stats"
-msgstr ""
+msgstr "统计数据"
 
 #: ../../Tigase_Administration/Properties/_general.inc:370
 msgid ""
 "The stats block contains settings for statistics collection. To begin the"
 " stats block, use the following:"
-msgstr ""
+msgstr "数据块包含统计信息收集的设置。要开始统计数据块，请使用以下命令："
 
 #: ../../Tigase_Administration/Properties/_general.inc:376
 msgid ""
 "**Default value:** 'By default, stats is not listed in the "
 "``config.tdsl`` file'"
-msgstr ""
+msgstr "**默认值：**'By default, stats is not listed in the ``config.tdsl`` file'"
 
 #: ../../Tigase_Administration/Properties/_general.inc:378
 msgid "**Description**"
-msgstr ""
+msgstr "**描述**"
 
 #: ../../Tigase_Administration/Properties/_general.inc:380
 msgid ""
@@ -666,39 +769,46 @@ msgid ""
 "Therefore caching large number of statistics sets requires lots of "
 "memory.**"
 msgstr ""
+"Tigase XMPP Server 可以在给定时间段内其内部存储服务器的统计信息。这允许您连接"
+"到正在运行的系统并收集所有服务器指标以及存储在服务器上的历史数据。当您的生产"
+"系统上发生某些事情时，这非常有用，您可以连接并查看这究竟是什么时候发生的，以"
+"及其这次周围的其他指标。**请注意，Tigase XMPP 服务器会生成大约 1,000 "
+"个不同的系统指标。因此缓存大量统计数据集需要大量内存。**"
 
 #: ../../Tigase_Administration/Properties/_general.inc:383
 msgid "stats-history-size"
-msgstr ""
+msgstr "统计历史大小"
 
 #: ../../Tigase_Administration/Properties/_general.inc:385
 msgid ""
 "Stats-history defines the size of the history buffer. That is how many "
 "complete sets of historic metrics to store in memory."
-msgstr ""
+msgstr "Stats-history "
+"定义了历史缓冲区的大小。这就是要存储在内存中的完整历史指标集的数量。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:394
 msgid "stats-history-interval"
-msgstr ""
+msgstr "统计历史间隔"
 
 #: ../../Tigase_Administration/Properties/_general.inc:396
 msgid "Sets the interval for which statistics will be gathered from the server."
-msgstr ""
+msgstr "设置从服务器收集统计信息的时间间隔。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:406
 msgid "stats-logger"
-msgstr ""
+msgstr "统计记录器"
 
 #: ../../Tigase_Administration/Properties/_general.inc:408
 msgid ""
 "Allow enabling and configuring components responsible for storing "
 "statistic information. Note that this controls the logging system for "
 "retrieving using JMX, clients, or ad-hoc commands."
-msgstr ""
+msgstr "允许启用和配置负责存储统计信息的组件。请注意，这控制了使用 JMX，客户端或 ad-"
+"hoc 命令检索的日志记录系统。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:418
 msgid "Currently following classes are available:"
-msgstr ""
+msgstr "目前提供以下类："
 
 #: ../../Tigase_Administration/Properties/_general.inc:420
 msgid ""
@@ -706,6 +816,9 @@ msgid ""
 "basic server metrics (CPU usage, memory usage, number of user "
 "connections, uptime) into database (overwrites previous entry)"
 msgstr ""
+"``tigase.stats.CounterDataArchivizer`` - 每次执行都会将当前的基本服务器指标（"
+"CPU "
+"使用率，内存使用率，用户连接数，正常运行时间）放入数据库（覆盖先前的条目）"
 
 #: ../../Tigase_Administration/Properties/_general.inc:422
 msgid ""
@@ -714,84 +827,91 @@ msgid ""
 "of user connections per connector, number of processed packets of "
 "different types, uptime, etc) into the database"
 msgstr ""
+"``tigase.stats.CounterDataLogger`` - 每次执行都会在数据库中插入新的行，其中包"
+"含一组新的服务器统计信息（CPU使用率，内存使用率，每个连接器的用户连接数，已处"
+"理的不同类型的数据包数，正常运行时间等）"
 
 #: ../../Tigase_Administration/Properties/_general.inc:424
 msgid ""
 "``tigase.stats.CounterDataFileLogger`` - every execution store all server"
 " statistics into separate file."
-msgstr ""
+msgstr "``tigase.stats.CounterDataFileLogger`` - "
+"每次执行都将所有服务器统计信息存储到单独的文件中。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:426
 #: ../../Tigase_Administration/Properties/_general.inc:459
 msgid "frequency"
-msgstr ""
+msgstr "频率"
 
 #: ../../Tigase_Administration/Properties/_general.inc:428
 msgid ""
 "stats-logger may also be controlled using frequency, which is the time "
 "interval between executions of the archiver ``.execute()`` method in "
 "seconds."
-msgstr ""
+msgstr "统计记录器也可以使用频率来控制，频率是归档器 ``.execute()`` "
+"方法执行之间的时间间隔，以秒为单位。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:445
 msgid "stats-file-logger"
-msgstr ""
+msgstr "统计文件记录器"
 
 #: ../../Tigase_Administration/Properties/_general.inc:447
 msgid ""
 "This allows configuring of statistics gathering to an external file. This"
 " only has one class, and may be controlled independently from the "
 "internal statistics."
-msgstr ""
+msgstr "这允许将统计信息收集配置到外部文件。这只有一个类，并且可以独立于内部统计来控"
+"制。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:461
 msgid ""
 "stats-file-logger may also be controlled using frequency, which is the "
 "time interval between executions of the archiver ``.execute()`` method in"
 " seconds."
-msgstr ""
+msgstr "统计文件记录器也可以使用频率来控制，频率是归档器 ``.execute()`` "
+"方法执行之间的时间间隔，以秒为单位。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:472
 msgid "file configuration"
-msgstr ""
+msgstr "文件配置"
 
 #: ../../Tigase_Administration/Properties/_general.inc:474
 msgid ""
 "You can customize the file output for stats-file-logger using the "
 "following setting options, these are all optional."
-msgstr ""
+msgstr "您可以使用以下设置选项自定义统计文件记录器的文件输出，这些都是可选的。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:490
 msgid "**'stats-datetime'** - Whether to include date & time timestamp."
-msgstr ""
+msgstr "**'stats-datetime'** - 是否包含日期和时间戳。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:492
 msgid ""
 "**'stats-datetime-format'** - Specifies the formatting of datetime "
 "timestamp."
-msgstr ""
+msgstr "**'stats-datetime-format'** - 指定日期时间戳的格式。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:494
 msgid ""
 "**'stats-directory'** - The directory to which the statistics file should"
 " be saved."
-msgstr ""
+msgstr "**'stats-directory'** - 应该保存统计文件的目录。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:496
 msgid ""
 "**'stats-filename'** - The filename prefix to name the output statistics "
 "file."
-msgstr ""
+msgstr "**'stats-filename'** - 命名输出统计文件的文件名前缀。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:498
 msgid "**'stats-level'** - Sets the level of statistics to be gathered."
-msgstr ""
+msgstr "**'stats-level'** - 设置要收集的统计信息的级别。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:500
 msgid ""
 "**'stats-unixtime'** - Control the format of the timestamp to use java "
 "DateFormat pattern."
-msgstr ""
+msgstr "**'stats-unixtime'** - 控制时间戳的格式以使用java DateFormat模式。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:502
 msgid ""
@@ -801,10 +921,13 @@ msgid ""
 " (using java DateFormat pattern) and also set level of the statistics we "
 "want to save (using java Logger.Level)"
 msgstr ""
+"其相应配置：文件应该保存到的目录，文件名前缀，文件名中是否包含unix时间戳，是"
+"否包含日期时间戳，时间戳控制格式（使用java "
+"DateFormat模式）以及设置我们要保存的统计信息的级别（使用java Logger.Level）"
 
 #: ../../Tigase_Administration/Properties/_general.inc:505
 msgid "Database logger"
-msgstr ""
+msgstr "数据库记录器"
 
 #: ../../Tigase_Administration/Properties/_general.inc:507
 msgid ""
@@ -813,11 +936,13 @@ msgid ""
 "possible to store statistics in any database - simply define new data "
 "source and configure logger with it’s name."
 msgstr ""
+"这允许配置收集到数据库的统计信息。无需额外配置 ``default`` 数据源其将被使用，"
+"但可以在任何数据库中存储统计信息 - 只需定义新数据源并使用其名称配置记录器。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:509
 #: ../../Tigase_Administration/Properties/_repository.inc:44
 msgid "**Note**"
-msgstr ""
+msgstr "**注意**"
 
 #: ../../Tigase_Administration/Properties/_general.inc:511
 msgid ""
@@ -825,14 +950,16 @@ msgid ""
 "executing ``./scripts/tigase.sh upgrade-schema etc/tigase.conf`` from the"
 " main Tigase directory"
 msgstr ""
+"启用组件后，应通过从Tigase主目录执行 ``./scripts/tigase.sh upgrade-schema "
+"etc/tigase.conf`` 来加载它的数据库架构"
 
 #: ../../Tigase_Administration/Properties/_general.inc:528
 msgid "Example configuration block"
-msgstr ""
+msgstr "示例配置块"
 
 #: ../../Tigase_Administration/Properties/_general.inc:557
 msgid "stream-error-counter"
-msgstr ""
+msgstr "流错误计数器"
 
 #: ../../Tigase_Administration/Properties/_general.inc:559
 msgid ""
@@ -841,27 +968,30 @@ msgid ""
 "made. Without enabling this, statistics will return 0. This setting turns"
 " on stream-error-counter for both c2s and ws2s:"
 msgstr ""
+"**描述：** 将流错误计数器添加到您希望计算流错误数的用逗号分隔的组件处理器。如"
+"果不启用此功能，统计信息将返回 0。此设置为c2s和ws2s打开流错误计数器："
 
 #: ../../Tigase_Administration/Properties/_general.inc:574
 msgid ""
 "You may if you wish turn off stream error counters by setting ``active = "
 "false``."
-msgstr ""
+msgstr "如果您希望通过设置 ``active = false`` 来关闭流错误计数器，也是可以的。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:576
 msgid ""
 "**Default value:** Stream error counters are not turned on by default, "
 "thus no default value is set."
-msgstr ""
+msgstr "**默认值：** 流错误计数器默认不开启，因此没有设置默认值。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:587
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:97
 msgid "**Available since:** 7.1.0"
-msgstr ""
+msgstr "**从以下版本开始可用：** 7.1.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:590
+#, fuzzy
 msgid "stringprep-processor"
-msgstr ""
+msgstr "stringprep-processor"
 
 #: ../../Tigase_Administration/Properties/_general.inc:592
 msgid ""
@@ -872,17 +1002,22 @@ msgid ""
 "much less stress on the server CPU, hence impact on the performance is "
 "very low."
 msgstr ""
+"**描述：** ``'stringprep-processor'`` "
+"属性为Tigase处理的所有JID设置stringprep处理器。默认的 'simple'实现使用正则表"
+"达式来解析和检查用户JID。虽然它不满足RFC-3920的要求，但它对服务器CPU的压力也"
+"小得多，因此对性能的影响非常小。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:594
 msgid "Other possible values are:"
-msgstr ""
+msgstr "其他可能的值是："
 
 #: ../../Tigase_Administration/Properties/_general.inc:596
 msgid ""
 "``'libidn'`` - provides full stringprep processing exactly as described "
 "in the RFC-3920. It requires lots of CPU power and significantly impacts "
 "performance."
-msgstr ""
+msgstr "``'libidn'`` - 完全按照RFC-"
+"3920中的描述提供完整的stringprep处理。它需要大量的CPU功率并显著影响性能。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:598
 msgid ""
@@ -892,48 +1027,54 @@ msgid ""
 " some algorithm, hence there is no way incorrect JIDs may enter the "
 "system."
 msgstr ""
+"``'empty'`` - 对JIDs没有任何作用。 JIDs以收到的形式被接受。对性能没有影响，不"
+"使用任何CPU。这适用于通过某种算法生成JID的自动化系统，因此不正确的JID不可能进"
+"入系统。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:600
 msgid "**Default value:** ``simple``"
-msgstr ""
+msgstr "**默认值：** ``simple``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:602
 msgid "**Example:** ``'stringprep-processor' = 'libidn'``"
-msgstr ""
+msgstr "** 示例：** ``'stringprep-processor' = 'libidn'``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:604
 msgid "**Possible values:** ``simple|libidn|empty``"
-msgstr ""
+msgstr "**可能的值：** ``simple|libidn|empty``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:609
 msgid "test"
-msgstr ""
+msgstr "测试"
 
 #: ../../Tigase_Administration/Properties/_general.inc:611
 msgid "*Default value:** By default test mode is disabled."
-msgstr ""
+msgstr "**默认值:** 默认测试模式被禁用。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:613
 msgid ""
 "**Description:** This property sets the server for test mode, which means"
 " that all logging is turned off, offline message storage is off, and "
 "possibly some other changes to the system configuration are being made."
-msgstr ""
+msgstr "**描述：** 此属性将服务器设置为测试模式，这意味着所有日志记录已关闭，离线消息"
+"存储已关闭，并且可能正在对系统配置进行一些其他更改。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:615
 msgid ""
 "The idea behind this mode is to test Tigase XMPP Server with minimal "
 "performance impact from environment such as hard drive, database and "
 "others…​"
-msgstr ""
+msgstr "这种模式背后的想法是测试Tigase "
+"XMPP服务器，同时将硬盘，数据库等环境对性能的影响降到最低….."
 
 #: ../../Tigase_Administration/Properties/_general.inc:617
 msgid "Test function has been replaced by the following setting:"
-msgstr ""
+msgstr "测试功能已被以下设置取代："
 
 #: ../../Tigase_Administration/Properties/_general.inc:628
+#, fuzzy
 msgid "tls-jdk-nss-bug-workaround-active"
-msgstr ""
+msgstr "tls-jdk-nss-bug-workaround-active"
 
 #: ../../Tigase_Administration/Properties/_general.inc:630
 #: ../../Tigase_Administration/Properties/_performance.inc:147
@@ -942,11 +1083,11 @@ msgstr ""
 #: ../../Tigase_Administration/Properties/_vhost.inc:24
 #: ../../Tigase_Administration/Properties/_vhost.inc:121
 msgid "**Default value:** ``false``"
-msgstr ""
+msgstr "**默认值：** ``false``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:632
 msgid "**Example:** ``'tls-jdk-nss-bug-workaround-active' = true``"
-msgstr ""
+msgstr "**示例：** ``'tls-jdk-nss-bug-workaround-active' = true``"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:45
 #: ../../Tigase_Administration/Properties/_general.inc:634
@@ -958,14 +1099,15 @@ msgstr ""
 #: ../../Tigase_Administration/Properties/_vhost.inc:104
 #: ../../Tigase_Administration/Properties/_vhost.inc:125
 msgid "**Possible values:** ``true|false``"
-msgstr ""
+msgstr "**可能的值：** ``true|false``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:636
 msgid ""
 "**Description:** This is a workaround for TLS/SSL bug in new JDK7 using "
 "the native library for keys generation and connection encryption used "
 "with new version of nss library."
-msgstr ""
+msgstr "**描述：** 这是新JDK7中TLS/"
+"SSL错误的解决方法，使用本机库生成密钥和与新版本nss库一起使用的连接加密。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:638
 msgid ""
@@ -975,32 +1117,40 @@ msgid ""
 "the problematic native library. Now we have a proper fix/workaround which"
 " allows you to run Tigase with JDK7."
 msgstr ""
+"这导致在安装了JDK7和新库的系统上安装Tigase时出现许多问题，例如连接挂起或SSL/T"
+"LS损坏。我们之前的建议是避免使用JDK7或有问题的本机库。现在我们有了一个适当的"
+"修复/解决方法，它允许您使用JDK7运行Tigase。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:640
+#, fuzzy
 msgid "http://stackoverflow.com/q/10687200/427545"
-msgstr ""
+msgstr "http://stackoverflow.com/q/10687200/427545"
 
 #: ../../Tigase_Administration/Properties/_general.inc:642
+#, fuzzy
 msgid "http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796"
 msgstr ""
+"http://bugs.sun.com/bugdatabase/view_bug."
+"do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796"
 
 #: ../../Tigase_Administration/Properties/_general.inc:644
 msgid ""
 "Note, while this setting is still supported, the issues mentioned above "
 "are fixed in v8 JDK."
-msgstr ""
+msgstr "请注意，虽然仍支持此设置，但上述问题已在v8 JDK中修复。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:649
+#, fuzzy
 msgid "trusted"
-msgstr ""
+msgstr "trusted"
 
 #: ../../Tigase_Administration/Properties/_general.inc:653
 msgid "**Example:** ``trusted = [ 'user@domain.com' , 'user-2@domain2.com' ]``"
-msgstr ""
+msgstr "**例子：** ``trusted = [ 'user@domain.com' , 'user-2@domain2.com' ]``"
 
 #: ../../Tigase_Administration/Properties/_general.inc:655
 msgid "**Possible values:** comma separated list of user bare JIDs."
-msgstr ""
+msgstr "**可能的值：** 逗号分隔的用户裸JID列表。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:657
 msgid ""
@@ -1010,22 +1160,26 @@ msgid ""
 "broadcast message, set MOTD and so on. The configuration is similar to "
 "```admins`` <#admins>`__ setting."
 msgstr ""
+"**描述：** ``trusted`` 属性允许用户指定被认为是受信任的帐户列表，从而可以在服"
+"务器上执行某些特定操作。他们可以执行一些命令，发送广播消息，设置MOTD等等。"
+"配置类似于 :ref:`admins<admins>` 设置。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:2
 msgid "Repository"
-msgstr ""
+msgstr "存储库"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:4
 msgid ""
 "**Description:** Container specifying authentication repository. This "
 "container replaces the old ``auth-db`` property types, and may contain "
 "some other configuration values."
-msgstr ""
+msgstr "**描述：** 容器指定身份验证存储库。这个容器替换了旧的 ``auth-db`` "
+"属性类型，并且可能包含一些其他的配置值。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:6
 #: ../../Tigase_Administration/Properties/_repository.inc:87
 msgid "**Default value:**"
-msgstr ""
+msgstr "**默认值：**"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:14
 msgid ""
@@ -1033,25 +1187,27 @@ msgid ""
 "settings are global for all authentication databases. However, you may "
 "configure multiple databases individually."
 msgstr ""
+"这是 authRepository 的基本设置，其中 <configuration> "
+"设置对于所有身份验证数据库都是全局的。但是，您可以单独配置多个数据库。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:35
 msgid "**Configuration Values:**"
-msgstr ""
+msgstr "**配置值：**"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:37
 msgid "Container has the following options"
-msgstr ""
+msgstr "容器有以下选项"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:40
 #: ../../Tigase_Administration/Properties/_repository.inc:165
 msgid "pool-size"
-msgstr ""
+msgstr "池大小"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:42
 msgid ""
 "This property sets the database connections pool size for the associated "
 "``UserRepository``."
-msgstr ""
+msgstr "此属性设置关联的 ``UserRepository`` 的数据库连接池大小。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:46
 msgid ""
@@ -1060,22 +1216,26 @@ msgid ""
 "defined in ``userRepository``. This depends on the repository "
 "implementation and the way it is initialized."
 msgstr ""
+"在某些情况下，如果 ``userRepository`` 中未定义池大小，则使用 :ref:`data-repo-"
+"pool-size<dataRepoPoolSize>` "
+"的属性设置而不是默认值。这取决于存储库实现及其初始化方式。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:55
 msgid ""
 "This is a global property that may be overridden by individual repository"
 " settings:"
-msgstr ""
+msgstr "这是一个全局属性，可能会被单独的存储库设置覆盖："
 
 #: ../../Tigase_Administration/Properties/_repository.inc:70
+#, fuzzy
 msgid "**cls**"
-msgstr ""
+msgstr "**cls**"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:72
 msgid ""
 "Defines the class used for repository connection. You can use this to "
 "specify specific drivers for different DB types."
-msgstr ""
+msgstr "定义用于存储库连接的类。您可以使用它为不同的数据库类型指定特定的驱动程序。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:74
 msgid ""
@@ -1083,59 +1243,69 @@ msgid ""
 "You may configure individual repositories in the same way. This replaces "
 "the former ``--auth-repo-pool`` property."
 msgstr ""
+"除非指定，否则池类将使用Tigase中包含的类。您可以以相同的方式配置各个存储库。"
+"这取代了以前的 ``--auth-repo-pool`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:78
 msgid ""
 "File conversion will not remove and convert this property, it **MUST BE "
 "DONE MANUALLY**."
-msgstr ""
+msgstr "文件转换不会删除和转换此属性，它 **必须手动完成**。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:83
+#, fuzzy
 msgid "authRepository"
-msgstr ""
+msgstr "authRepository"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:85
 msgid ""
 "**Description:** Container specifying repository URIs. This container "
 "replaces the old ``auth-db-uri`` and ``user-db-uri`` property types."
-msgstr ""
+msgstr "**描述：** 容器指定存储库URIs。此容器替换了旧的 ``auth-db-uri`` 和 ``user-db-"
+"uri`` 属性类型."
 
 #: ../../Tigase_Administration/Properties/_repository.inc:96
 msgid ""
 "Once your configuration is setup, you will see the uri of your user "
 "database here. If other databases need to be defined, they will be listed"
 " in the same dataSource bean."
-msgstr ""
+msgstr "设置好配置后，您将在此处看到用户数据库的uri。如果需要定义其他数据库，"
+"它们将列在同一个dataSource bean中。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:111
 msgid ""
 "**Possible values:** Broken down list of customized names for DB URIs. "
 "Each name must have a defined uri property. DB name can be customized by "
 "the bean name."
-msgstr ""
+msgstr "**可能的值：** "
+"数据库URI的自定义名称的细分列表。每个名称都必须有一个已定义的uri属性。 "
+"数据库名称可以通过bean名称自定义。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:115
 msgid ""
 "URI name may be used as shorthand to define DB location URI in other "
 "containers, so be sure to name them uniquely."
-msgstr ""
+msgstr "URI名称可以用作在其他容器中定义数据库位置URI的简写，因此请确保将它们命名为唯"
+"一。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:119
 msgid ""
 "default () URI setting replaces the ``user-db-uri`` as well as the "
 "``auth-repo-uri`` property."
-msgstr ""
+msgstr "default () URI 设置替换了 ``user-db-uri`` 以及 ``auth-repo-uri`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:122
+#, fuzzy
 msgid "MSSQL"
-msgstr ""
+msgstr "MSSQL"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:124
 msgid ""
 "MSSql support works out of the box, however Tigase provides an open "
 "source driver for the database. We recommend using Microsoft’s own driver"
 " for better functionality."
-msgstr ""
+msgstr "MSSql 支持开箱即用，但是Tigase为数据库提供了一个开源驱动程序。我们建议使用Mic"
+"rosoft自己的驱动程序以获得更好的功能。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:134
 msgid ""
@@ -1146,20 +1316,26 @@ msgid ""
 "recommend modification of schema and onward unless you are explicit in "
 "your changes."
 msgstr ""
+"其中uri划分如下： jdbc:<driver>:sqlserver://<server address>;"
+"databaseName=<database name>;user=<username for db>;password=<password for "
+"db>;schema=dbo;lastUpdateCount=false;cacheMetaData=false "
+"除非您在更改中明确表示，否则我们不建议现在及以后修改架构。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:137
+#, fuzzy
 msgid "MongoDb"
-msgstr ""
+msgstr "MongoDb"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:139
 msgid ""
 "For using mongoDB as the repository, the setting will look slightly "
 "different:"
-msgstr ""
+msgstr "对于使用mongoDB作为存储库，设置看起来会略有不同："
 
 #: ../../Tigase_Administration/Properties/_repository.inc:150
+#, fuzzy
 msgid "MySQL"
-msgstr ""
+msgstr "MySQL"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:152
 msgid ""
@@ -1174,6 +1350,13 @@ msgid ""
 "in database exist and have correct parameter types. To enable this mode "
 "you need to set ``useCallableMysqlWorkaround`` to ``true``."
 msgstr ""
+"MySQL支持开箱即用，但是Tigase使用准备好的调用来调用程序访问存储在数据库中的数"
+"据。虽然这工作得非常快，但在Tigase "
+"XMPP服务器启动期间准备这些准备好的调用需要时间。从版本 8.2.0 "
+"开始，可以启用变通方法，强制Tigase XMPP服务器使用准备好的语句而不是准备好的调"
+"用，这将缩短启动时间，但可能会对执行查询期间的性能产生轻微影响，并且如果数据"
+"库中的存储过程和函数存在并且具有正确的参数类型，则会禁用启动验证检查。要启用"
+"此模式，您需要将 ``useCallableMysqlWorkaround`` 设置为 ``true``。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:167
 msgid ""
@@ -1185,38 +1368,45 @@ msgid ""
 "DB. In this case it is desired to use a specific connection pool on this "
 "level to an avoid excessive number of connections to the database."
 msgstr ""
+"`DataSource`` 是任何更高级别的数据访问存储库（例如 ``userRepository`` 或 "
+"``authRepository``）和更具体的SQL数据库或JDBC驱动程序之间的抽象层。"
+"许多实现使用 ``DataSource`` 进行数据库连接，事实上，在许多安装中，如果它们连"
+"接到同一个数据库，它们也共享同一个DataRepository实例。在这种情况下，希望在此"
+"级别上使用特定的连接池，以避免与数据库的连接数量过多。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:169
 msgid ""
 "To do so, specify the number of number of database connection as an "
 "integer:"
-msgstr ""
+msgstr "为此，请将数据库连接数指定为整数："
 
 #: ../../Tigase_Administration/Properties/_repository.inc:180
 msgid "By default, the number of connections is 10."
-msgstr ""
+msgstr "默认情况下，连接数为 10。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:2
 msgid "Cluster"
-msgstr ""
+msgstr "集群"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:5
+#, fuzzy
 msgid "cl-comp"
-msgstr ""
+msgstr "cl-comp"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:7
 msgid "**Description:** Container specifying cluster component configuration."
-msgstr ""
+msgstr "**描述：** 容器指定集群组件配置。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:9
 msgid ""
 "**Default value:** By default, the cl-comp container is not listed in the"
 " ``config.tdsl`` file."
-msgstr ""
+msgstr "**默认值：** 默认情况下， cl-comp 容器未列在 ``config.tdsl`` 文件中。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:20
+#, fuzzy
 msgid "connect-all"
-msgstr ""
+msgstr "connect-all"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:22
 msgid ""
@@ -1230,18 +1420,24 @@ msgid ""
 " value and you can skip this option if you want to have it switched off "
 "which it is by default."
 msgstr ""
+"``cluster-connect-all`` 属性用于打开在 :ref:`cluster-nodes<clusterNodes>` 配"
+"置属性中列出的所有节点的活动连接。此属性应仅在稍后添加到活动集群的节点上使用"
+"。通常，这个新的集群节点不会在现有集群节点的配置中列出。这就是为什么他们无法"
+"打开新节点的连接。新节点改为打开与所有现有节点的连接。 False "
+"是默认值，如果你想关闭它，你可以跳过这个选项，它是默认的。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:24
 msgid "**Example**"
-msgstr ""
+msgstr "**示例**"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:32
 msgid "This replaces the ``--cluster-connect-all`` property."
-msgstr ""
+msgstr "这替换了 ``--cluster-connect-all`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:37
+#, fuzzy
 msgid "cluster-mode"
-msgstr ""
+msgstr "cluster-mode"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:39
 msgid ""
@@ -1252,35 +1448,41 @@ msgid ""
 "impact is insignificant and you will have the opportunity to connect mode"
 " cluster nodes at any time without restarting the server."
 msgstr ""
+"**描述：** 该属性用于打开启集群模式。默认值为 ``false``，因此如果您不希望服务"
+"器在集群模式下运行，通常可以跳过该参数。即使只有一个节点在运行，您也可以在集"
+"群模式下运行服务器。性能影响微不足道，您将有机会随时连接模式集群节点而无需重"
+"新启动服务器。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:41
 msgid ""
 "**Default value:** ``false`` Tigase by default does not run in clustered "
 "mode."
-msgstr ""
+msgstr "**默认值：** ``false`` Tigase 默认不在集群模式下运行。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:43
 msgid "**Example:** ``'cluster-mode' = 'true'``"
-msgstr ""
+msgstr "**示例：** ``'cluster-mode' = 'true'``"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:50
 msgid "cluster-nodes"
-msgstr ""
+msgstr "集群节点"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:52
 #: ../../Tigase_Administration/Properties/_external.inc:7
 msgid "**Default value:** none"
-msgstr ""
+msgstr "**默认值：** 无"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:54
 msgid ""
 "**Example:** ``'cluster-nodes' = [ 'node1.domain:pass:port' , "
 "'node2.domain:pass:port' , 'node3.domain:pass:port' ]``"
 msgstr ""
+"**示例：** ``'cluster-nodes' = [ 'node1.domain:pass:port' , 'node2."
+"domain:pass:port' , 'node3.domain:pass:port' ]``"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:56
 msgid "**Possible values:** a comma separated list of hostnames."
-msgstr ""
+msgstr "**可能的值：** 以逗号分隔的主机名列表。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:58
 msgid ""
@@ -1292,6 +1494,10 @@ msgid ""
 " be in the same network although good network connectivity is also a "
 "critical element for an effective cluster performance."
 msgstr ""
+"**描述：** 该属性用于指定在您的安装上运行的集群节点列表。节点是运行该节点的机"
+"器的完整DNS名称。请注意，正确的DNS配置对于集群正常工作至关重要。确保 "
+"'hostname' 命令在每个集群节点上返回完整的DNS名称。尽管良好的网络连接性也是有"
+"效集群性能的关键要素，但节点不必位于同一网络中。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:60
 msgid ""
@@ -1309,25 +1515,35 @@ msgid ""
 "they don’t know them. To solve this particular case the next parameter is"
 " used."
 msgstr ""
+"所有集群节点必须相互连接，以保持用户会话同步并在连接到不同节点的用户之间交换"
+"数据包。因此，每个集群节点都会打开一个 'cluster port'，在该端口上它正在侦听来"
+"自不同集群节点的连接。由于每两个节点之间只有一个连接，因此Tigase服务器必须决"
+"定连接到哪些节点以及哪些节点必须接受连接。如果您将相同的集群节点列表放入所有"
+"节点的配置中，这不是问题。 Tigase服务器有一种方法可以找到并取消发现的任何冲突"
+"。但是，如果您稍后想添加一个新节点，而不是重新启动和更改旧节点上的配置，那么"
+"旧节点将无法尝试与他们不认识的新节点建立连接。为了解决这种特殊情况，使用了下"
+"一个参数。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:64
 msgid ""
 "Cluster nodes are not required to be configured, as they can "
 "automatically find/add/remove cluster nodes. This is for installations "
 "where nodes will be limited and static!"
-msgstr ""
+msgstr "不需要配置集群节点，因为它们可以自动查找/添加/删除集群节点。这适用于节点受限"
+"且静态的安装！"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:2
 msgid "User connectivity"
-msgstr ""
+msgstr "用户连接"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:5
+#, fuzzy
 msgid "bosh-close-connection"
-msgstr ""
+msgstr "bosh-close-connection"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:9
 msgid "**Example:** ``'bosh-close-connection' = true``"
-msgstr ""
+msgstr "**示例：** ``'bosh-close-connection' = true``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:13
 msgid ""
@@ -1336,29 +1552,34 @@ msgid ""
 "the HTTP connection each time data is sent to the Bosh client. To "
 "continue communication the client must open a new HTTP connection."
 msgstr ""
+"**描述：** 此属性全局禁用Bosh对Tigase服务器的保持活动支持。每次将数据发送到Bo"
+"sh客户端时，它都会导致Bosh连接管理器强制关闭HTTP连接。要继续通信，客户端必须"
+"打开一个新的HTTP连接。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:15
 msgid ""
 "This setting is rarely required but on installations where the client "
 "cannot control/disable keep-alive Bosh connections and keep-alive does "
 "not work correctly for some reason."
-msgstr ""
+msgstr "此设置很少需要，但在客户端无法控制/禁用保持活动Bosh连接的安装中，由于某种原因"
+"，keep-alive 无法正常工作。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:20
+#, fuzzy
 msgid "bosh-extra-headers-file"
-msgstr ""
+msgstr "bosh-extra-headers-file"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:22
 msgid "*Default value:** ``'etc/bosh-extra-headers.txt'``"
-msgstr ""
+msgstr "**默认值：** ``'etc/bosh-extra-headers.txt'``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:24
 msgid "**Example:** ``'bosh-extra-headers-file' = ''/path/to/file.txt'``"
-msgstr ""
+msgstr "**示例：** ``'bosh-extra-headers-file' = ''/path/to/file.txt'``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:26
 msgid "**Possible values:** 'path to a file on the filesystem.'"
-msgstr ""
+msgstr "**可能的值：** 'path to a file on the filesystem.'"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:28
 msgid ""
@@ -1368,36 +1589,42 @@ msgid ""
 "running on some systems with special requirements for the HTTP headers "
 "and some additional settings."
 msgstr ""
+"**描述：** 此属性允许您指定带有附加HTTP标头的文本文件的路径，这些标头将随每个"
+"请求一起发送到Bosh客户端。这为在某些对HTTP标头和一些附加设置有特殊要求的系统"
+"上运行的Bosh客户端提供了一些额外的灵活性。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:30
 msgid ""
 "By default a file distributed with the installation contains following "
 "content:"
-msgstr ""
+msgstr "默认情况下，随安装分发的文件包含以下内容："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:39
 msgid ""
 "This can be modified, removed or replaced with a different content on "
 "your installation."
-msgstr ""
+msgstr "这可以在您的安装中修改，删除或替换为不同的内容。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:44
+#, fuzzy
 msgid "client-access-policy-file"
-msgstr ""
+msgstr "client-access-policy-file"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:46
 msgid "**Default value:** ``etc/client-access-policy.xml``"
-msgstr ""
+msgstr "**默认值：** ``etc/client-access-policy.xml``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:48
 msgid ""
 "**Example:** ``'client-access-policy-file' = ''/path/to/access-policy-"
 "file.xml'``"
 msgstr ""
+"**示例：** ``'client-access-policy-file' = ''/path/to/access-policy-file."
+"xml'``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:50
 msgid "**Possible values:** path to a file on the filesystem."
-msgstr ""
+msgstr "**可能的值：** 文件系统上文件的路径。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:52
 msgid ""
@@ -1406,6 +1633,8 @@ msgid ""
 "applications. The cross domain policy is controlled via XML file which "
 "contains the policy and rules."
 msgstr ""
+"**描述：** ``client-access-policy-file`` 属性允许控制基于Silverlight的Web应用"
+"程序的跨域访问策略。跨域策略通过包含策略和规则的XML文件进行控制。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:54
 msgid ""
@@ -1415,27 +1644,32 @@ msgid ""
 "through the property and XML files allows for a very easy and flexible "
 "modification of the policy on any installation."
 msgstr ""
+"默认情况下，Tigase与一个示例策略文件一起分发，该文件允许从所有来源完全访问整"
+"个安装。对于大多数Bosh服务器安装来说，这通常是可以的。通过属性和XML文件进行的"
+"配置允许在任何安装上轻松灵活地修改策略。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:59
+#, fuzzy
 msgid "client-port-delay-listening"
-msgstr ""
+msgstr "client-port-delay-listening"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:61
 msgid ""
 "**Description:** The property allows to enabled or disable delaying of "
 "listening for client connections **in cluster mode** until the cluster is"
 " correctly connected."
-msgstr ""
+msgstr "**描述：** 该属性允许 **在集群模式下** 启用或禁用延迟监听客户端连接 "
+"，直到集群正确连接。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:63
 #: ../../Tigase_Administration/Properties/_vhost.inc:7
 #: ../../Tigase_Administration/Properties/_vhost.inc:100
 msgid "**Default value:** ``true``"
-msgstr ""
+msgstr "**默认值：** ``true``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:73
 msgid "**Possible values:** ``true``, ``false``"
-msgstr ""
+msgstr "**可能的值：** ``true``, ``false``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:75
 msgid ""
@@ -1445,12 +1679,15 @@ msgid ""
 "(i.e. either there is only single node or in case of multiple nodes all "
 "nodes connected correctly)."
 msgstr ""
+"在集群模式下，为了确保正确的用户状态广播，我们延迟打开客户端端口（组件：``c2s"
+"``，``ws2s``，``bosh``），并且仅在集群完全正确连接后启用（即要么只有单个节点"
+"，要么在多个节点的情况下所有节点都正确连接）。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:77
 msgid ""
 "It’s possible to enable/disable this on per-component basis with the "
 "following configuration:"
-msgstr ""
+msgstr "可以使用以下配置在每个组件的基础上启用/禁用此功能："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:91
 msgid ""
@@ -1458,67 +1695,78 @@ msgid ""
 "``ConnectionManager`` default connection delay times ``30s`` - in case of"
 " client connection manager this delay equals 60s."
 msgstr ""
+"最大延迟时间取决于组件，它是 ``ConnectionManager`` 默认连接延迟时间和 ``30s``"
+" 的乘积 - 在客户端连接管理器的情况下，此延迟等于 60s。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:95
 msgid "Only applicable if **Cluster Mode** is active!"
-msgstr ""
+msgstr "仅当 **集群模式** 处于活动状态时才适用！"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:100
+#, fuzzy
 msgid "cross-domain-policy-file"
-msgstr ""
+msgstr "cross-domain-policy-file"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:102
 msgid "**Default value:** ``etc/cross-domain-policy.xml``"
-msgstr ""
+msgstr "**默认值：** ``etc/cross-domain-policy.xml``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:104
 msgid ""
 "**Example:** ``'cross-domain-policy-file' = ''/path/to/cross-domain-"
 "policy.xml'``"
 msgstr ""
+"**示例：** ``'cross-domain-policy-file' = ''/path/to/cross-domain-policy."
+"xml'``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:106
 msgid "**Possible values:** path to a file on the file system."
-msgstr ""
+msgstr "**可能的值：** 文件系统上文件的路径。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:108
 msgid ""
 "**Description:** This property allows you to set a path to a file with "
 "cross domain access policy for flash based clients. This is a standard "
 "XML file which is sent to the flash client upon request."
-msgstr ""
+msgstr "**描述：** 此属性允许您为基于闪存的客户端设置具有跨域访问策略的文件的路径。这"
+"是一个标准XML文件，根据请求发送到Flash客户端。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:110
 msgid ""
 "A default file distributed with Tigase installations allows for full "
 "access for all. This is good enough for most use cases but it can be "
 "changed by simply editing the file."
-msgstr ""
+msgstr "随着Tigase安装分发的默认文件允许所有人完全访问。这对于大多数用例来说已经足够"
+"了，但可以通过简单地编辑文件来更改它。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:112
 msgid ""
 "This is a global property that can also be overridden by configuring "
 "connection managers [ c2s, s2s, ws2s, bosh, ext, etc] and they may all "
 "have their own policies."
-msgstr ""
+msgstr "这是一个全局属性，也可以通过配置连接管理器 [c2s，s2s，ws2s，bosh，ext 等] "
+"来覆盖，它们可能都有自己的策略。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:123
+#, fuzzy
 msgid "domain-filter-policy"
-msgstr ""
+msgstr "domain-filter-policy"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:125
 msgid "**Default value:** ``ALL``"
-msgstr ""
+msgstr "**默认值：** ``ALL``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:127
 msgid "**Example:** ``domain-filter-policy' = 'LOCAL``"
-msgstr ""
+msgstr "**示例：** ``domain-filter-policy' = 'LOCAL``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:129
 msgid ""
 "**Possible values:** "
 "``ALL|LOCAL|OWN|BLOCK|LIST=domain1;domain2|BLACKLIST=domain1;domain2``"
 msgstr ""
+"**可能的值：** "
+"``ALL|LOCAL|OWN|BLOCK|LIST=domain1;domain2|BLACKLIST=domain1;domain2``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:131
 msgid ""
@@ -2403,4 +2651,3 @@ msgid ""
 "specified. It allows admins to configure default values for all of them, "
 "instead of having to provide individual configuration for each vhost."
 msgstr ""
-
