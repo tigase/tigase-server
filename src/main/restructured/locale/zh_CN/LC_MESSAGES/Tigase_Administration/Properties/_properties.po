@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-07-16 23:14+0000\n"
+"PO-Revision-Date: 2022-07-18 18:57+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/properties_guide/zh_Hans/>\n"
@@ -1782,19 +1782,26 @@ msgid ""
 "domains) able to communicate with any user on any other domains. Other "
 "possible values are:"
 msgstr ""
+"**描述：** ``domain-filter-policy`` 属性是用于设置虚拟主机通信过滤的全局设置"
+"。此功能是可以在单个用户级别上设置的相同属性的一种扩展。然而，在许多情况下，"
+"希望不是在每个用户级别上而是在域级别上控制用户通信。域过滤（通信过滤）允许您"
+"指定特定域的用户可以与谁通信。它可以限制选定域或整个安装的通信。默认值 "
+"``ALL`` 使域的用户（默认情况下所有域）能够与任何其他域上的任何用户进行通信。"
+"其他可能的值是："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:133
 msgid ""
 "``ALL`` a default value allowing users to communicate with anybody on any"
 " other domain, including external servers."
-msgstr ""
+msgstr "``ALL`` 允许用户与任何其他域上的任何人（包括外部服务器）进行通信的默认值。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:135
 msgid ""
 "``LOCAL`` allows users to communicate with all users on the same "
 "installation on any domain. It only blocks communication with external "
 "servers."
-msgstr ""
+msgstr "``LOCAL`` "
+"允许用户与任何域上相同安装的所有用户进行通信。它只阻止与外部服务器的通信。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:137
 msgid ""
@@ -1802,31 +1809,37 @@ msgid ""
 "domain. Plus it allows users to communicate with subdomains such as "
 "**muc.domain**, **pubsub.domain**, etc…"
 msgstr ""
+"``OWN`` 允许用户与同一域中的所有其他用户进行通信。此外，它还允许用户与 **muc."
+"domain**，**pubsub.domain** 等子域进行通信…"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:139
 msgid ""
 "``BLOCK`` value completely blocks communication for the domain or for the"
 " user with anybody else. This could be used as a means to temporarily "
 "disable account or domain."
-msgstr ""
+msgstr "``BLOCK`` 此值完全阻止域或用户与其他任何人的通信。这可以用作暂时禁用帐户或域"
+"的一种手段。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:141
 msgid ""
 "``LIST`` property allows to set a list of domains (users' JIDs) with "
 "which users on the domain can communicate (i.e. *whitelist*)."
-msgstr ""
+msgstr "``LIST`` 属性允许设置域中的用户可以与之通信的域列表（用户的JID）（即 "
+"*白名单*）。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:143
 msgid ""
 "``BLACKLIST`` - user can communicate with everybody (like ``ALL``), "
 "except contacts on listed domains."
-msgstr ""
+msgstr "``BLACKLIST`` - 用户可以与所有人（如 ``ALL``）通信，除了列出域上的联系人。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:145
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "VHosts (see `??? <#addManageDomain>`__)."
 msgstr ""
+"这是一个全局属性，被特定VHost的设置覆盖（请参阅 :ref:`Add and Manage Domains "
+"(VHosts)<addManageDomain>`）。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:147
 msgid ""
@@ -1837,30 +1850,36 @@ msgid ""
 "servers, instead of having to provide individual configuration for each "
 "vhost."
 msgstr ""
+"未定义配置的所有虚拟主机的默认设置。此设置主要用于具有许多在 init.property 文"
+"件中列出的虚拟主机的安装，这些主机没有指定单独的设置。它允许所有服务器的默认"
+"值，而不必为每个虚拟主机提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:149
 msgid ""
 "``ALL`` is also applied as a default value for all new vhosts added at "
 "run-time."
-msgstr ""
+msgstr "``ALL`` 也可以作为在运行时添加的所有新虚拟主机的默认值。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:154
+#, fuzzy
 msgid "see-other-host"
-msgstr ""
+msgstr "see-other-host"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:156
 msgid ""
 "--cmSeeOtherHost has been replaced with using ``seeOtherHost`` setting, "
 "and can be configured for each connection manager (c2s, s2s, etc..)"
 msgstr ""
+"--cmSeeOtherHost已被替换为使用 ``seeOtherHost`` "
+"设置，并且可以为每个连接管理器（c2s，s2s 等...）配置。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:158
 msgid "**Default value:** ``tigase.server.xmppclient.SeeOtherHostHashed``"
-msgstr ""
+msgstr "**默认值：** ``tigase.server.xmppclient.SeeOtherHostHashed``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:168
 msgid "**Possible values:** 'none' 'or class implementing SeeOtherHostIfc.'"
-msgstr ""
+msgstr "**可能的值：**'none'或实现'SeeOtherHostIfc'的类。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:170
 msgid ""
@@ -1869,24 +1888,26 @@ msgid ""
 "functionality and implementation details can be found in Tigase Load "
 "Balancing documentation."
 msgstr ""
+"**描述：** 允许您通过指定SeeOtherHostIfc实现来指定加载平衡机制。关于功能和实"
+"现细节的更多细节可以在Tigase加载平衡文档中找到。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:175
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:205
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:275
 msgid "watchdog_timeout"
-msgstr ""
+msgstr "监视器超时"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:177
 msgid "**Default value:** ``1740000``"
-msgstr ""
+msgstr "**默认值：** ``1740000``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:179
 msgid "**Example:** ``watchdog_timeout=60000``"
-msgstr ""
+msgstr "**示例：** ``watchdog_timeout=60000``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:181
 msgid "**Possible values:** ``any integer.``"
-msgstr ""
+msgstr "**可能的值：** ``any integer``。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:183
 msgid ""
@@ -1898,25 +1919,29 @@ msgid ""
 "addition to global configuration presented above a per component "
 "configuration is possible:"
 msgstr ""
+"**描述：** ``watchdog_timeout`` 属性允许微调ConnectionManager监视器（这是负责"
+"检测断开连接并关闭它们的服务）。超时属性与时间长短（以毫秒为单位）有关，之后"
+"，在给定连接上缺乏响应/活动将认为这种连接断开并关闭它。除了上面介绍的全局配置"
+"之外，每个组件的配置来实现也是可能的："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:191
 msgid "for example (for C2SConnectionManager):"
-msgstr ""
+msgstr "例如（对于 C2SConnectionManager）："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:199
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:234
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:269
 msgid "All related configuration options:"
-msgstr ""
+msgstr "所有相关的配置选项："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:201
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:236
 msgid "`watchdog_Ping_Type <#watchdogPingType>`__"
-msgstr ""
+msgstr ":ref:`监视器的ping类型<watchdogPingType>`"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:203
 msgid "`watchdog_delay <#watchdogDelay>`__"
-msgstr ""
+msgstr ":ref:`监视器延迟<watchdogDelay>`"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:210
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:238
