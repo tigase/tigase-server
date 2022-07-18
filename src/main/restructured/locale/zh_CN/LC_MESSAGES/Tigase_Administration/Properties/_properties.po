@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-07-18 18:57+0000\n"
+"PO-Revision-Date: 2022-07-18 23:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/properties_guide/zh_Hans/>\n"
@@ -1946,19 +1946,20 @@ msgstr ":ref:`监视器延迟<watchdogDelay>`"
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:210
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:238
 msgid "watchdog_delay"
-msgstr ""
+msgstr "监视器延迟"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:212
 msgid "**Default value:** ``600000``"
-msgstr ""
+msgstr "**默认值：** ``600000``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:214
 msgid "**Example:** ``watchdog_delay = '30000'``"
-msgstr ""
+msgstr "**示例：** ``watchdog_delay = '30000'``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:216
+#, fuzzy
 msgid "**Possible values:** 'any integer.'"
-msgstr ""
+msgstr "**可能的值：** ``any integer``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:218
 msgid ""
@@ -1969,33 +1970,36 @@ msgid ""
 "addition to global configuration presented above a per component "
 "configuration is possible:"
 msgstr ""
+"**描述：** ``watchdog_delay`` 配置属性允许在ConnectionManager监视器（负责检测"
+"断开连接并关闭它们的服务）将用于验证连接的后续检查之间配置延迟（以毫秒为单位"
+"）。除了上面介绍的全局配置之外，每个组件的配置也是可能的："
 
 #: ../../Tigase_Administration/Properties/_performance.inc:55
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:226
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:261
 msgid "for example (for ClusterConnectionManager):"
-msgstr ""
+msgstr "例如（对于 ClusterConnectionManager）："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:240
 msgid "`watchdog_timeout <#watchdogTimeout>`__"
-msgstr ""
+msgstr ":ref:`监视器超时<watchdogTimeout>`"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:245
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:271
 msgid "watchdog_ping_type"
-msgstr ""
+msgstr "监视器ping类型"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:247
 msgid "**Default value:** ``whitespace``"
-msgstr ""
+msgstr "**默认值：** ``whitespace``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:249
 msgid "**Example:** ``watchdog_ping_type = 'XMPP'``"
-msgstr ""
+msgstr "**示例：** ``watchdog_ping_type = 'XMPP'``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:251
 msgid "**Possible values:** ``WHITESPACE``,\\ ``XMPP``"
-msgstr ""
+msgstr "**可能值：** ``WHITESPACE``,\\ ``XMPP``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:253
 msgid ""
@@ -2005,18 +2009,22 @@ msgid ""
 "to check the connection. In addition to global configuration presented "
 "above a per component configuration is possible:"
 msgstr ""
+"**描述：** ``watchdog_ping_type`` 配置属性允许配置ConnectionManager监视器（此"
+"服务负责检测断开连接并关闭它们）将用于检查连接的ping的类型。除了上面介绍的全"
+"局配置之外，每个组件的配置也是可能的："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:273
 msgid "`watchdog_Delay <#watchdogDelay>`__"
-msgstr ""
+msgstr ":ref:`监视器延迟<watchdogDelay>`"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:280
+#, fuzzy
 msgid "ws-allow-unmasked-frames"
-msgstr ""
+msgstr "ws-allow-unmasked-frames"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:284
 msgid "**Example:** ``'ws-allow-unmasked-frames' = true``"
-msgstr ""
+msgstr "**示例：** ``'ws-allow-unmasked-frames' = true``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:288
 msgid ""
@@ -2029,22 +2037,27 @@ msgid ""
 "unmasked to the server, and may operate without Tigase closing that "
 "connection."
 msgstr ""
+"**描述：** RFC 6455指定所有客户端必须屏蔽它通过Websocket连接发送到服务器的帧"
+"。如果发送了未屏蔽的帧，无论任何加密，服务器都必须关闭连接。但是，某些客户端"
+"可能不支持屏蔽帧，或者您可能希望绕过此安全措施以用于开发目的。此设置启用true"
+"时，将允许通过websocket连接到服务器，并且可以在Tigase关闭该连接的情况下运行。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:2
 msgid "External"
-msgstr ""
+msgstr "外部"
 
 #: ../../Tigase_Administration/Properties/_external.inc:5
+#, fuzzy
 msgid "bind-ext-hostnames"
-msgstr ""
+msgstr "bind-ext-hostnames"
 
 #: ../../Tigase_Administration/Properties/_external.inc:9
 msgid "**Example:** ``'bind-ext-hostnames' = [ 'pubsub.host.domain' ]``"
-msgstr ""
+msgstr "**示例：** ``'bind-ext-hostnames' = [ 'pubsub.host.domain' ]``"
 
 #: ../../Tigase_Administration/Properties/_external.inc:11
 msgid "**Possible values:** comma separated list of domains."
-msgstr ""
+msgstr "**可能的值：** 逗号分隔的域列表。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:13
 msgid ""
@@ -2057,6 +2070,11 @@ msgid ""
 "address, connection type, etc…​ This would make one of our components "
 "(MUC) visible on the remote server."
 msgstr ""
+"**描述：** 此属性允许设置要绑定到外部组件连接的域列表。假设我们有一个仅加载了"
+"MUC和PubSub组件的Tigase实例，我们希望通过外部组件协议将此实例连接到主服务器。"
+"使用 :ref:`--external property<external>` 我们可以定义一个域（可能是 muc."
+"devel.tigase.org），密码，TCP/IP 端口，远程主机地址，连接类型等... "
+"这使得我们的组件（MUC）在远程服务器上可见。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:15
 msgid ""
@@ -2069,10 +2087,16 @@ msgid ""
 "bind the second domain to a single connection on top of the domain which "
 "has been authenticated during protocol handshaking."
 msgstr ""
+"为了使第二个组件 (PubSub) 可见，我们需要为另一个组件打开另一个具有域名 "
+"(pubsub.devel.tigase.org) 的连接。当然，第二个连接是多余的，因为所有通信都可"
+"以通过单个连接进行。这就是这个属性的用途。在我们的带有2个组件的示例中，"
+"您可以将 'pubsub.devel.tigase.org' 域作为该属性的值，它会将第二个域绑定到在协"
+"议握手期间已通过身份验证的域顶部的单个连接。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:22
+#, fuzzy
 msgid "default-virtual-host"
-msgstr ""
+msgstr "default-virtual-host"
 
 #: ../../Tigase_Administration/Properties/_external.inc:24
 msgid ""
@@ -2081,6 +2105,8 @@ msgid ""
 "is loaded during startup of the application and stored in the database. "
 "**It may only contain single domain name!**"
 msgstr ""
+"**描述：** ``default-virtual-host`` 属性允许设置安装提供的默认虚拟主机的名称"
+"。它在应用程序启动期间加载并存储在数据库中。 **它可能只包含一个域名！**"
 
 #: ../../Tigase_Administration/Properties/_external.inc:26
 msgid ""
@@ -2090,22 +2116,28 @@ msgid ""
 " the JID of the ``VHostManager`` component of your installation (``vhost-"
 "man@your-server-domain``)."
 msgstr ""
+"任何额外的配置选项或额外的虚拟主机域都应该使用临时命令添加和配置，例如在 "
+"``VHostManager`` 组件安装的JID (``vhost-man@your-server-domain``) "
+"中可用的命令 ``Add new item``, ``Update item configuration`` 和 ``Remove an "
+"item``。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:31
+#, fuzzy
 msgid "ext"
-msgstr ""
+msgstr "ext"
 
 #: ../../Tigase_Administration/Properties/_external.inc:33
 msgid ""
 "**Description:** This property defines parameters for external component "
 "connections."
-msgstr ""
+msgstr "**描述：** 此属性定义外部组件连接的参数。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:35
 msgid ""
 "The component is loaded the same way as all other Tigase components. In "
 "your ``config.tdsl`` file you need to add the external class:"
-msgstr ""
+msgstr "该组件的加载方式与所有其他Tigase组件相同。在您的 ``config.tdsl`` "
+"文件中，您需要添加外部类："
 
 #: ../../Tigase_Administration/Properties/_external.inc:41
 msgid ""
@@ -2113,7 +2145,8 @@ msgid ""
 "practically useless. You have to tell the component on what port to "
 "listen to (or on what port to connect to) and external domains list with "
 "passwords."
-msgstr ""
+msgstr "这将加载具有空配置的组件，实际上是无用的。您必须告诉组件在哪个端口上侦听（或"
+"在哪个端口上连接）以及带有密码的外部域列表。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:43
 msgid ""
@@ -2123,37 +2156,42 @@ msgid ""
 "external component which you have just enabled (``ext@your-server-"
 "domain``)."
 msgstr ""
+"这些值需要在Tigase XMPP服务器运行时使用XMPP ad-hoc命令配置，例如 "
+"在您刚刚启用的外部组件（``ext@your-server-domain``）可用的命令 ``Add new "
+"item``，``Update item configuration`` 和 ``Remove an item``。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:45
 msgid "**Possible values:** external domains parameters list."
-msgstr ""
+msgstr "**可能的值：** 外部域参数列表。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:49
 msgid "**Removed in:** 8.0.0"
-msgstr ""
+msgstr "**以下版本中删除：** 8.0.0"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:2
 msgid "Performance"
-msgstr ""
+msgstr "表现"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:5
+#, fuzzy
 msgid "cm-ht-traffic-throttling"
-msgstr ""
+msgstr "cm-ht-traffic-throttling"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:7
 msgid "**Default value:** ``xmpp:25k:0:disc,bin:200m:0:disc``"
-msgstr ""
+msgstr "**默认值：** ``xmpp:25k:0:disc,bin:200m:0:disc``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:9
 msgid ""
 "**Example:** ``'cm-ht-traffic-throttling' = "
 "'xmpp:25k:0:disc,bin:200m:0:disc'``"
 msgstr ""
+"**示例：** ``'cm-ht-traffic-throttling' = 'xmpp:25k:0:disc,bin:200m:0:disc'``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:11
 #: ../../Tigase_Administration/Properties/_performance.inc:24
 msgid "**Possible values:** comma separated list of traffic limits settings."
-msgstr ""
+msgstr "**可能的值：** 以逗号分隔的流量限制设置列表。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:13
 msgid ""
@@ -2163,20 +2201,25 @@ msgid ""
 "in the same way as for the `cm-traffic-throttling property "
 "<#cmTrafficThrottling>`__."
 msgstr ""
+"**说明：** "
+"该属性用于指定非用户连接的流量限制，即s2s，外部组件等高流量服务器连接。"
+"编码的属性和值的含义与 :ref:`cm-traffic-throttling "
+"property<cmTrafficThrottling>` 的含义相同。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:18
+#, fuzzy
 msgid "cm-traffic-throttling"
-msgstr ""
+msgstr "cm-traffic-throttling"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:20
 msgid "**Default value:** ``xmpp:2500:0:disc,bin:20m:0:disc``"
-msgstr ""
+msgstr "**默认值：** ``xmpp:2500:0:disc,bin:20m:0:disc``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:22
 msgid ""
 "**Example:** ``'cm-traffic-throttling' = "
 "'xmpp:2500:0:disc,bin:20m:0:disc'``"
-msgstr ""
+msgstr "**示例：** ``'cm-traffic-throttling' = 'xmpp:2500:0:disc,bin:20m:0:disc'``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:26
 msgid ""
@@ -2184,6 +2227,8 @@ msgid ""
 "limit traffic on user connections. These limits are applied to each user "
 "connection and if a limit is exceeded then a specified action is applied."
 msgstr ""
+"**描述：** ``cm-traffic-throttling`` 属性允许您限制用户连接上的流量。这些限制"
+"适用于每个用户连接，如果超出限制，则会应用指定的操作。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:28
 msgid ""
@@ -2194,6 +2239,10 @@ msgid ""
 "connection, in case any limit is exceeded the action is to **disconnect**"
 " the user."
 msgstr ""
+"属性值是以逗号分隔的流量限制设置列表。例如第一部分：``xmpp:2500:0:disc`` 将 "
+"XMPP 数据的流量限制指定为在最后一分钟内允许发送给用户或从用户接收的2,500个数"
+"据包，并且用户连接上的总流量不受限制（0），如果超过任何限制，则操作是 "
+"**断开** 用户。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:30
 msgid ""
@@ -2201,32 +2250,36 @@ msgid ""
 " a number of XMPP packets transmitted, bin - binary traffic, that is "
 "limits refer to a number of bytes transmitted."
 msgstr ""
+"**[xmpp|bin]** 流量类型，xmpp - XMPP 流量，即限制是指传输的XMPP数据包的数量，"
+"bin - 二进制流量，即限制是指传输的字节数。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:32
 msgid ""
 "**2500** maximum traffic allowed within 1 minute. 0 means unlimited, or "
 "no limits."
-msgstr ""
+msgstr "**2500** 1 分钟内允许的最大流量。 0 表示无限或没有限制。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:34
 msgid ""
 "**0** maximum traffic allowed for the life span of the connection. 0 "
 "means unlimited or no limits."
-msgstr ""
+msgstr "**0** 连接生命周期内允许的最大流量。 0 表示无限或没有限制。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:36
 msgid ""
 "**[disc|drop]** action performed on the connection if limits are "
 "exceeded. disc - means disconnect, drop - means drop data."
-msgstr ""
+msgstr "**[disc|drop]** 超出限制时对连接执行的操作。 disc - 表示断开连接，drop - "
+"表示丢弃数据。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:38
 msgid "**Available since:** 5.1.3"
-msgstr ""
+msgstr "**从以下时间开始可用：** 5.1.3"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:41
+#, fuzzy
 msgid "elements-number-limit"
-msgstr ""
+msgstr "elements-number-limit"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:43
 msgid "**Default value:** ``1000``"
@@ -2234,7 +2287,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Properties/_performance.inc:45
 msgid "**Possible values:** any integer."
-msgstr ""
+msgstr "**可能的值：** 任何整数。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:47
 msgid ""
@@ -2243,22 +2296,25 @@ msgid ""
 "of elements sent in stanza. It must be configured on a per "
 "ConnectionManager basis:"
 msgstr ""
+"**描述：** ``elements-number-limit`` 配置属性允许配置拒绝服务保护机制，该机制"
+"限制在节中发送的元素数量。它必须基于每个ConnectionManager进行配置："
 
 #: ../../Tigase_Administration/Properties/_performance.inc:65
+#, fuzzy
 msgid "hardened-mode"
-msgstr ""
+msgstr "hardened-mode"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:67
 msgid "**Default value:** ``secure``"
-msgstr ""
+msgstr "**默认值：** ``secure``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:69
 msgid "**Example:** ``'hardened-mode' = secure``"
-msgstr ""
+msgstr "**示例：** ``'hardened-mode' = secure``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:71
 msgid "**Possible values:** ``relaxed|secure|strict``"
-msgstr ""
+msgstr "**可能的值：** ``relaxed|secure|strict``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:73
 msgid ""
@@ -2270,6 +2326,10 @@ msgid ""
 " also disables ``TLSv1`` and ``TLSv1.1`` as well as ciphers that don’t "
 "support Forward secrecy."
 msgstr ""
+"**描述：** 调整强化模式会影响Tigase中安全方面的处理。级别越高，规则越严格： "
+"\\* ``relaxed`` - 使用已安装JVM的默认安全功能； \\* ``secure`` - 禁用旧的 "
+"SSLv2 和 SSLv3，禁用弱密码； \\* ``strict`` - 除了 ``secure`` 级别更改之外，"
+"它还禁用 ``TLSv1`` 和 ``TLSv1.1`` 以及不支持前向保密的密码。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:75
 msgid ""
@@ -2278,23 +2338,27 @@ msgid ""
 " installed. It’s not required with OpenJDK8 and newer an OracleJVM 11 and"
 " newer."
 msgstr ""
+"在较旧的JVM版本上，它需要安装 `UnlimitedJCEPolicyJDK <http://www.oracle.com/"
+"technetwork/java/javase/downloads/jce-7-download-432124.html>`__。 "
+"OpenJDK8和高版本的OracleJVM 11以及更高版本不需要它。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:80
+#, fuzzy
 msgid "max-queue-size"
-msgstr ""
+msgstr "max-queue-size"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:82
 msgid "**Default value:** default queue size is variable depending on RAM size."
-msgstr ""
+msgstr "**默认值：** 默认队列大小取决于RAM大小。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:84
 msgid "**Example:** ``'max-queue-size' = 10000``"
-msgstr ""
+msgstr "**示例：** ``'max-queue-size' = 10000``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:86
 #: ../../Tigase_Administration/Properties/_vhost.inc:43
 msgid "**Possible values:** integer number."
-msgstr ""
+msgstr "**可能的值：** 整数。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:88
 msgid ""
@@ -2308,23 +2372,30 @@ msgid ""
 "packets generated by the component in a single request. Otherwise Tigase "
 "may drop packets that it is unable to process."
 msgstr ""
+"**描述：** ``max-queue-size`` 属性将内部队列的最大大小设置为指定值。默认情况"
+"下，Tigase根据Tigase服务器进程的最大可用内存设置队列大小。对于分配给JVM的每10"
+"0MB内存，它设置为1000。这对于大多数情况来说已经足够了。但是，如果您有一个非常"
+"繁忙的服务，其中Pubsub 或MUC组件生成大量数据包（存在或消息），则此大小应等于"
+"或大于组件在单个请求中生成的最大预期数据包数。否则Tigase可能会丢弃它无法处理"
+"的数据包。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:93
+#, fuzzy
 msgid "net-buff-high-throughput"
-msgstr ""
+msgstr "net-buff-high-throughput"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:95
 msgid "**Default value:** ``64k``"
-msgstr ""
+msgstr "**默认值：** ``64k``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:97
 msgid "**Example:** ``'net-buff-high-throughput' = '256k'``"
-msgstr ""
+msgstr "**示例：** ``'net-buff-high-throughput' = '256k'``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:99
 #: ../../Tigase_Administration/Properties/_performance.inc:112
 msgid "**Possible values:** network buffer size as integer."
-msgstr ""
+msgstr "**可能的值：** 网络缓冲区大小为整数。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:101
 msgid ""
@@ -2334,81 +2405,92 @@ msgid ""
 "traffic websites. If your cluster installation can not cope with traffic "
 "between nodes try to increase this number."
 msgstr ""
+"**描述：** ``net-buff-high-throughput`` 属性为高流量连接（如 "
+"s2s）或集群节点之间的连接设置网络缓冲区。默认值为 ``64k``，最适合中等流量的网"
+"站。如果您的集群安装无法应对节点之间的流量，请尝试增加此数量。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:106
+#, fuzzy
 msgid "net-buff-standard"
-msgstr ""
+msgstr "net-buff-standard"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:108
 #: ../../Tigase_Administration/Properties/_performance.inc:121
 msgid "**Default value:** ``2k``"
-msgstr ""
+msgstr "**默认值：** ``2k``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:110
 msgid "**Example:** ``'net-buff-standard' = '16k'``"
-msgstr ""
+msgstr "**例子：** ``'net-buff-standard' = '16k'``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:114
 msgid ""
 "**Description:** This property sets the network buffer for standard "
 "(usually c2s) connections, default value is 2k and is optimal for most "
 "installations."
-msgstr ""
+msgstr "**描述：** 此属性设置标准（通常是 "
+"c2s）连接的网络缓冲区，默认值为2k，最适合大多数安装。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:119
+#, fuzzy
 msgid "net-buffer"
-msgstr ""
+msgstr "net-buffer"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:123
 msgid "**Example:** ``'net-buffer' = 16 * 1024``"
-msgstr ""
+msgstr "**示例：** ``'net-buffer' = 16 * 1024``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:125
 msgid "**Possible values:** internal network buffer size as integer."
-msgstr ""
+msgstr "**可能的值：** 内部网络缓冲区大小为整数。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:127
 msgid ""
 "**Description:** Sets default size of a internal network buffer used by "
 "``ConnectionManager`` within the context in which it is set."
-msgstr ""
+msgstr "**描述：** 设置 ``ConnectionManager`` "
+"在其设置的上下文中使用的内部网络缓冲区的默认大小。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:132
+#, fuzzy
 msgid "socket-buffer-size"
-msgstr ""
+msgstr "socket-buffer-size"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:134
 msgid ""
 "**Default value:** ``4k`` (for client-to-server connections) and ``64k`` "
 "(for server-to-server connections)"
-msgstr ""
+msgstr "**默认值：** ``4k`` （用于客户端到服务器的连接）和 ``64k`` "
+"（用于服务器到服务器的连接）"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:136
 msgid "**Example:** ``'socket-buffer-size' = 16 * 1024``"
-msgstr ""
+msgstr "**示例：** ``'socket-buffer-size' = 16 * 1024``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:138
 msgid "**Possible values:** socket network buffer size as integer."
-msgstr ""
+msgstr "**可能的值：** 套接字网络缓冲区大小为整数。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:140
 msgid ""
 "**Description:** Sets default size of a socket network buffer used by "
 "``ConnectionManager`` for each connection within the context in which it "
 "is set."
-msgstr ""
+msgstr "**描述：** 设置 ``ConnectionManager`` "
+"使用的套接字网络缓冲区的默认大小，用于设置它的上下文中的每个连接。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:142
 msgid "**Available since:** 8.3.0 (previously value of ``net-buffer`` was used)"
-msgstr ""
+msgstr "**从以下版本开始可用：** 8.3.0（之前使用了 ``net-buffer`` 的值）"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:145
+#, fuzzy
 msgid "nonpriority-queue"
-msgstr ""
+msgstr "nonpriority-queue"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:149
 msgid "**Example:** ``'nonpriority-queue' =  true``"
-msgstr ""
+msgstr "**示例：** ``'nonpriority-queue' =  true``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:153
 msgid ""
@@ -2419,6 +2501,10 @@ msgid ""
 "over packets with lower priority (presence updates) which may result in "
 "packets arriving out of order."
 msgstr ""
+"**描述：** ``nonpriority`` 属性可用于切换到Tigase服务器中的非优先队列使用（"
+"值设置为 'true'）。使用非优先队列可防止数据包重新排序。默认情况下，Tigase使用"
+"优先级队列，这意味着具有最高优先级的数据包可能会接管具有较低优先级的数据包（"
+"存在更新），这可能会导致数据包无序到达。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:155
 msgid ""
@@ -2427,31 +2513,37 @@ msgid ""
 " over another message for the same user. Therefore, out of order packet "
 "delivery is not an issue for the most part."
 msgstr ""
+"然而，这可能只发生在不同类型的数据包中。也就是说，消息可以接管存在数据包。但"
+"是，一条消息永远不会为同一用户接管另一条消息。因此，在大多数情况下，无序数据"
+"包传送不是问题。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:2
 msgid "VHost / domain"
-msgstr ""
+msgstr "虚拟主机/域"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:5
+#, fuzzy
 msgid "vhost-anonymous-enabled"
-msgstr ""
+msgstr "vhost-anonymous-enabled"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:9
 msgid "**Example:** ``'vhost-anonymous-enabled' = 'false'``"
-msgstr ""
+msgstr "**示例：** ``'vhost-anonymous-enabled' = 'false'``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:13
 msgid ""
 "**Description:** The ``vhost-anonymous-enabled`` property specifies "
 "whether anonymous user logins are allowed for the installation for all "
 "vhosts."
-msgstr ""
+msgstr "**描述：** ``vhost-anonymous-enabled`` "
+"属性指定是否允许匿名用户登录所有虚拟主机的安装。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:15
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "VHost (see ` Add and Manage Domains (VHosts)`__)."
-msgstr ""
+msgstr "这是一个全局属性，被特定 VHost 的设置覆盖（请参阅 :ref:`添加和管理域 "
+"(VHosts)<addManageDomain>`）。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:17
 msgid ""
@@ -2462,14 +2554,18 @@ msgid ""
 "values for all of them, instead of having to provide individual "
 "configuration for each VHost."
 msgstr ""
+"如果未定义此属性，则使用所有虚拟主机的默认设置。此设置主要用于在 ``config."
+"tdsl`` 文件中列出的许多虚拟主机的安装，这些主机没有指定单独的设置。它允许为所"
+"有这些配置默认值，而不必为每个VHost提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:22
+#, fuzzy
 msgid "vhost-disable-dns-check"
-msgstr ""
+msgstr "vhost-disable-dns-check"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:26
 msgid "**Example:** ``'vhost-disable-dns-check' = 'true'``"
-msgstr ""
+msgstr "**示例：** ``'vhost-disable-dns-check' = 'true'``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:30
 msgid ""
@@ -2479,6 +2575,9 @@ msgid ""
 "benefit from seeing if proper SRV records are set so other people can "
 "connect to specific vhosts from outside your network."
 msgstr ""
+"**描述：** 在Tigase服务器中添加或编辑虚拟主机时，此属性会禁用DNS验证。这也使"
+"管理帐户免于验证。启用此属性后，可查看是否设置了正确的 SRV "
+"记录，以便其他人可以从您的网络外部连接到特定的虚拟主机， 但你不会从中受益。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:32
 #: ../../Tigase_Administration/Properties/_vhost.inc:53
@@ -2486,31 +2585,34 @@ msgstr ""
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "VHost (see `??? <#addManageDomain>`__)."
-msgstr ""
+msgstr "这是一个全局属性，被特定VHost的设置覆盖 (参见 "
+":ref:`添加和管理域(VHosts)<addManageDomain>`)。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:37
+#, fuzzy
 msgid "vhost-max-users"
-msgstr ""
+msgstr "vhost-max-users"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:39
 msgid "**Default value:** ``0``"
-msgstr ""
+msgstr "**默认值：** ``0``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:41
 msgid "**Example:** ``'vhost-max-users' = '1000'``"
-msgstr ""
+msgstr "**示例：** ``'vhost-max-users' = '1000'``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:45
 msgid ""
 "**Description:** The ``vhost-max-users`` property specifies how many user"
 " accounts can be registered on the installations for all vhosts."
-msgstr ""
+msgstr "**描述：** ``vhost-max-users`` "
+"属性指定可以在所有虚拟主机的安装中注册多少用户帐户。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:47
 msgid ""
 "**0 - zero** means unlimited and this is a default. Otherwise greater "
 "than zero value specifies accounts number limit."
-msgstr ""
+msgstr "**0 - zero** 表示无限制，这是默认设置。否则大于零值指定帐号限制。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:49
 #: ../../Tigase_Administration/Properties/_vhost.inc:87
@@ -2519,7 +2621,7 @@ msgstr ""
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "vhost."
-msgstr ""
+msgstr "这是一个全局属性，被特定虚拟主机的设置覆盖。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:51
 msgid ""
@@ -2530,22 +2632,26 @@ msgid ""
 "ability to use default values for all of them, instead of having to "
 "provide individual configuration for each vhost."
 msgstr ""
+"默认设置用于未定义配置的所有虚拟主机。此设置对于在 ``init.property`` 文件中列"
+"出的没有指定单独设置的许多虚拟主机的安装最有用。它提供了对所有这些都使用默认"
+"值的能力，而不必为每个虚拟主机提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:58
+#, fuzzy
 msgid "vhost-message-forward-jid"
-msgstr ""
+msgstr "vhost-message-forward-jid"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:60
 msgid "**Default value:** <null>"
-msgstr ""
+msgstr "**默认值：** <null>"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:62
 msgid "**Example:** ``'vhost-message-forward-jid' = 'archive@domain.com'``"
-msgstr ""
+msgstr "**示例：** ``'vhost-message-forward-jid' = 'archive@domain.com'``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:64
 msgid "**Possible values:** 'valid JID'"
-msgstr ""
+msgstr "**可能值：** 'valid JID'"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:66
 msgid ""
@@ -2558,6 +2664,10 @@ msgid ""
 "loaded and activated on the installation for the message forwarding to "
 "work."
 msgstr ""
+"**描述：** 这是安装的消息转发的全局属性。此属性通常在vhost配置级别上指定，但"
+"是如果您想转发安装中的所有消息并且您有许多虚拟域，则此属性允许为所有这些域设"
+"置消息转发。必须将有效的JID指定为转发目的地。此外，必须在安装时加载并激活消息"
+"转发插件才能使消息转发工作。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:68
 msgid ""
@@ -2568,6 +2678,9 @@ msgid ""
 "of them, instead of having to provide individual configuration for each "
 "vhost."
 msgstr ""
+"未设置配置时，将使用null值作为默认值。此设置对于在 ``init.property`` 文件中列"
+"出的没有指定单独设置的许多虚拟主机的安装非常有用。它提供了为所有这些配置默认"
+"值的能力，而不必为每个虚拟主机提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:70
 #: ../../Tigase_Administration/Properties/_vhost.inc:91
@@ -2576,25 +2689,27 @@ msgstr ""
 msgid ""
 "It is also applied as a default value for all new vhosts added at run-"
 "time."
-msgstr ""
+msgstr "它也被用作在运行时添加的所有新虚拟主机的默认值。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:77
+#, fuzzy
 msgid "vhost-presence-forward-jid"
-msgstr ""
+msgstr "vhost-presence-forward-jid"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:79
 msgid "**Default value:** ``<null>``"
-msgstr ""
+msgstr "**默认值：** ``<null>``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:81
 msgid ""
 "**Example:** ``'vhost-presence-forward-jid' = 'presence-"
 "collector@domain.com'``"
 msgstr ""
+"**示例：** ``'vhost-presence-forward-jid' = 'presence-collector@domain.com'``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:83
 msgid "**Possible values:** valid JID."
-msgstr ""
+msgstr "**可能的值：** 有效的 JID。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:85
 msgid ""
@@ -2606,6 +2721,10 @@ msgid ""
 "part) or the standard XMPP presence processing would refuse to deliver "
 "presences from users who are not in the contact list."
 msgstr ""
+"**描述：** 这是安装的状态转发功能的全局属性。所有用户状态都将被转发到给定的XM"
+"PP地址，该地址可以是一个组件或任何其他XMPP实体。如果目标实体是通过c2s连接的机"
+"器人，它可能应该通过完整的JID（带有资源部分）来解决，或者标准的XMPP状态处理将"
+"拒绝发送不在联系人列表中的用户的状态。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:89
 msgid ""
@@ -2616,20 +2735,25 @@ msgid ""
 "them, instead of having to provide individual configuration for each "
 "vhost."
 msgstr ""
+"未设置配置时，将使用null值作为默认值。此设置对于在 ``init.property`` 文件中列"
+"出的没有指定单独设置的许多虚拟主机的安装很有用。它可以为所有这些配置默认值，"
+"而不必为每个虚拟主机提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:93
 #: ../../Tigase_Administration/Properties/_vhost.inc:114
 #: ../../Tigase_Administration/Properties/_vhost.inc:135
 msgid "This may be used on a per-VHost (see `??? <#addManageDomain>`__)."
-msgstr ""
+msgstr "这可以在每个 VHost 上使用（请参阅 "
+":ref:`添加和管理域(VHosts)<addManageDomain>`）。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:98
+#, fuzzy
 msgid "vhost-register-enabled"
-msgstr ""
+msgstr "vhost-register-enabled"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:102
 msgid "**Example:** ``'vhost-register-enabled' = false``"
-msgstr ""
+msgstr "**示例：** ``'vhost-register-enabled' = false``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:106
 msgid ""
@@ -2639,6 +2763,9 @@ msgid ""
 "plugin on the server. You can enable registration for selected domains in"
 " the domain configuration settings."
 msgstr ""
+"**描述：** ``vhost-register-enabled`` "
+"是一个全局属性，允许您在安装时打开/关闭用户注册。将此属性设置为 ``false`` "
+"不会禁用服务器上的注册插件。您可以在域配置设置中启用所选域的注册。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:110
 msgid ""
@@ -2648,14 +2775,18 @@ msgid ""
 "specified. It allows admins to configure default values for all of them, "
 "instead of having to provide individual configuration for each vhost."
 msgstr ""
+"当没有设置配置时，``true`` 值用作默认值。此设置对于在 ``init.property`` 文件"
+"中列出的没有指定单独设置的许多虚拟主机的安装很有用。它允许管理员为所有这些配"
+"置默认值，而不必为每个虚拟主机提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:119
+#, fuzzy
 msgid "vhost-tls-required"
-msgstr ""
+msgstr "vhost-tls-required"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:123
 msgid "**Example:** ``'vhost-tls-required' = true``"
-msgstr ""
+msgstr "**示例：** ``'vhost-tls-required' = true``"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:127
 msgid ""
@@ -2667,6 +2798,10 @@ msgid ""
 "user authentication or sending any other user data before TLS handshaking"
 " is completed."
 msgstr ""
+"**描述：** 此属性是在Tigase安装上打开/关闭TLS所需模式的全局设置。"
+"将此属性设置为 ``false`` 不会关闭TLS。 TLS在服务器上仍然可用，但作为一个选项"
+"，这是客户端决定是否使用加密。如果该属性设置为true，则服务器将不允许在 TLS "
+"握手完成之前进行用户身份验证或发送任何其他用户数据。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:131
 msgid ""
@@ -2676,3 +2811,6 @@ msgid ""
 "specified. It allows admins to configure default values for all of them, "
 "instead of having to provide individual configuration for each vhost."
 msgstr ""
+"当没有设置配置时，``false`` 值用作默认值。此设置对于在 ``init.property`` 文件"
+"中列出的没有指定单独设置的许多虚拟主机的安装很有用。它允许管理员为所有这些配"
+"置默认值，而不必为每个虚拟主机提供单独的配置。"
