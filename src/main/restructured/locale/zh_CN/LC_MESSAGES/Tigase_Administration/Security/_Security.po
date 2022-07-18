@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: 2022-06-28 08:53+0000\n"
+"PO-Revision-Date: 2022-07-19 08:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/security/zh_Hans/>\n"
@@ -2188,7 +2188,7 @@ msgstr "``LIST`` - 用户只能在列出的域内发送和接收数据包（即 
 msgid ""
 "``BLACKLIST`` - user can communicate with everybody (like ``ALL``), "
 "except contacts on listed domains."
-msgstr "``BLACKLIST`` - 用户可以与所有人通信（如 ``ALL``），除了列出的域中的联系人。"
+msgstr "``BLACKLIST`` - 用户可以与所有人（如 ``ALL``）通信，除了列出域上的联系人。"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:38
 msgid "``CUSTOM`` - user can communicate only within custom created rules set."
