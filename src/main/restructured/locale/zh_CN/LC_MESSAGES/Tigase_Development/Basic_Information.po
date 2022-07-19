@@ -3,27 +3,30 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-19 21:20+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dpguide_basicinformation/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Basic_Information.rst:2
 msgid "Basic Information"
-msgstr ""
+msgstr "基本信息"
 
 #: ../../Tigase_Development/Basic_Information.rst:5
 msgid "Tigase Architecture"
-msgstr ""
+msgstr "Tigase架构"
 
 #: ../../Tigase_Development/Basic_Information.rst:7
 msgid ""
@@ -33,6 +36,9 @@ msgid ""
 " centre and serves as a, as name suggest, packet router directing packets"
 " to the appropriate components."
 msgstr ""
+"要理解的最重要的事情是Tigase是非常模块化的，您可以在单个实例中运行多个组件。"
+"然而，最重要的组件之一是 MessageRouter，它位于中心，顾名思义，它充当将数据包"
+"引导到适当组件的数据包路由器。"
 
 #: ../../Tigase_Development/Basic_Information.rst:9
 msgid ""
@@ -47,34 +53,47 @@ msgid ""
 "and then, based on the stanza addressing\\` can go to different component"
 " (muc, pubsub) or if it’s addressed to another user it can go through:"
 msgstr ""
+"还有一组专门的组件负责处理用户连接：``ConnectionManagers`` "
+"（``c2s``，``s2s``，``ws2s``，``bosh``）。他们从传入连接接收数据包，"
+"然后将处理后的数据包转发到 "
+"``MessageRouter``。大多数时候，特别是对于来自用户连接的数据包，"
+"数据包被路由到 ``SessionManager`` "
+"组件（在客户端到服务器连接的情况下，会话对象引用适当的用户）。在 "
+"``SessionManager`` 处理后，数据包返回到 ``MessageRouter`` 然后，根据节寻址，"
+"可以转到不同的组件（muc，pubsub），或者如果它被寻址到另一个用户，它可以通过："
 
 #: ../../Tigase_Development/Basic_Information.rst:11
 msgid ""
 "``SessionManager`` (again), ``MessageRouter`` and then (user) "
 "``ConnectionManagers`` or,"
 msgstr ""
+"``SessionManager`` （再次），``MessageRouter`` 然后（用户） "
+"``ConnectionManagers`` 或者，"
 
 #: ../../Tigase_Development/Basic_Information.rst:13
 msgid ""
 "``s2s`` (*server to server connection manager*) if the user or component "
 "is on the different, federated, xmpp server;"
-msgstr ""
+msgstr "``s2s`` "
+"（*服务器到服务器连接管理器*）如果用户或组件在不同的，联合的，xmpp服务器上；"
 
 #: ../../Tigase_Development/Basic_Information.rst:15
 msgid "In a very broad view this can be depicted with a following graph:"
-msgstr ""
+msgstr "从一个非常广泛的角度来看，这可以用下图来描述："
 
 #: ../../Tigase_Development/Basic_Information.rst:17
+#, fuzzy
 msgid "|Tigase architecture|"
-msgstr ""
+msgstr "|Tigase architecture|"
 
 #: ../../Tigase_Development/Basic_Information.rst:90
+#, fuzzy
 msgid "Tigase architecture"
-msgstr ""
+msgstr "Tigase architecture"
 
 #: ../../Tigase_Development/Basic_Information.rst:20
 msgid "Tigase Server Elements"
-msgstr ""
+msgstr "Tigase服务器元素"
 
 #: ../../Tigase_Development/Basic_Information.rst:22
 msgid ""
@@ -84,12 +103,15 @@ msgid ""
 "interfaces and implementations which can be used as example code "
 "reference."
 msgstr ""
+"为了更容易进入下面的代码，定义了Tigase服务器领域的基本术语，并简要说明了服务"
+"器是如何设计和实现的。本文档还为您指出可用作示例代码参考的基本接口和实现。"
 
 #: ../../Tigase_Development/Basic_Information.rst:24
 msgid ""
 "Logically all server code can be divided into 3 kinds of modules: "
 "**components**, **plug-ins** and **connectors**."
-msgstr ""
+msgstr "从逻辑上讲，所有服务器代码都可以分为3种模块：**组件**，**插件** 和 "
+"**连接器**。"
 
 #: ../../Tigase_Development/Basic_Information.rst:26
 msgid ""
@@ -100,6 +122,10 @@ msgid ""
 "*s2s connection manager*, *session manager*, *XEP-0114 - external "
 "component connection manager*, *MUC - multi user char rooms*."
 msgstr ""
+"**组件** 是Tigas 服务器的主要元素。组件是一段更大的代码，它可以有单独的地址，"
+"接收和发送节，并被配置为响应众多事件。为Tigase服务器实现的示例组件有：*c2s "
+"连接管理器*，*s2s 连接管理器*，*会话管理器*，*XEP-0114 - "
+"外部组件连接管理器*，*MUC - 多用户字符室*。"
 
 #: ../../Tigase_Development/Basic_Information.rst:28
 msgid ""
@@ -111,6 +137,11 @@ msgid ""
 "register new user accounts, *presence* stanza processing, and "
 "*jabber:iq:auth* for non-sasl authentication."
 msgstr ""
+"**插件** 通常是一小段代码，负责处理特定的XMPP节。他们没有自己的地址。作为节处"
+"理的结果，他们可以生成新的XMPP节。插件由 *session manager* 组件或 *c2s "
+"connection manager* 组件加载。示例插件是：*vCard* "
+"节处理、*jabber:iq:register* 注册新用户帐户，*presence* 节处理和 "
+"用于非sasl身份验证的 *jabber:iq:auth* 。"
 
 #: ../../Tigase_Development/Basic_Information.rst:30
 msgid ""
@@ -121,6 +152,10 @@ msgid ""
 " connectors are: *JDBC database* connector, *XMLDB - embedded database* "
 "connector, *Drupal database* connector."
 msgstr ""
+"**连接器** 是负责访问数据库或LDAP等数据存储库以存储和检索用户数据的模块。有两"
+"种连接器：身份验证连接器和用户数据连接器。它们都是独立的，可以连接到不同的数"
+"据源。示例连接器是：*JDBC 数据库* 连接器，*XMLDB - 嵌入式数据库* 连接器，*"
+"Drupal 数据库* 连接器。"
 
 #: ../../Tigase_Development/Basic_Information.rst:32
 msgid ""
@@ -130,26 +165,31 @@ msgid ""
 "There is also abstract classes available, implementing these interfaces "
 "to make development easier."
 msgstr ""
+"为上述每种模块定义了一个API，您所要做的就是启用该特定接口的实现。然后可以根据"
+"其配置设置将该模块加载到服务器。还有可用的抽象类，实现这些接口以使开发更容易"
+"。"
 
 #: ../../Tigase_Development/Basic_Information.rst:34
 msgid ""
 "Here is a brief list of all interfaces to look at and for more details "
 "you have to refer to the guide for specific kind of module."
-msgstr ""
+msgstr "以下是要查看的所有接口的简要列表，有关更多详细信息，您须参考特定类型模块的指"
+"南。"
 
 #: ../../Tigase_Development/Basic_Information.rst:37
 msgid "Components"
-msgstr ""
+msgstr "组件"
 
 #: ../../Tigase_Development/Basic_Information.rst:39
 msgid "This is list of interfaces to look at when you work on a new component:"
-msgstr ""
+msgstr "这是处理新组件时要查看的接口列表："
 
 #: ../../Tigase_Development/Basic_Information.rst:41
 msgid ""
 "**tigase.server.ServerComponent** - This is the very basic interface for "
 "component. All components must implement it."
-msgstr ""
+msgstr "**tigase.server.ServerComponent** - "
+"这是组件的非常基本的接口。所有组件都必须实现它。"
 
 #: ../../Tigase_Development/Basic_Information.rst:43
 msgid ""
@@ -158,6 +198,9 @@ msgid ""
 " to receive data packets like *session manager* and *c2s connection "
 "manager*."
 msgstr ""
+"**tigase.server.MessageReceiver** - 该接口扩展了 "
+"``ServerComponent``，并且需要由想要接收数据包的组件实现，例如 *session "
+"manager* 和 *c2s connection manager*。"
 
 #: ../../Tigase_Development/Basic_Information.rst:45
 msgid ""
@@ -167,12 +210,16 @@ msgid ""
 "possible to change configuration at runtime. Be careful to implement this"
 " properly as it can cause issues for modules that cannot be configured."
 msgstr ""
+"**tigase.conf.Configurable** - 需要实现此接口才能使其可配置。对于这种类型的每"
+"个对象，配置会在运行时随时推送给它。这对于在运行时更改配置是必要的。请小心正"
+"确实施，因为它可能会导致无法配置的模块出现问题。"
 
 #: ../../Tigase_Development/Basic_Information.rst:47
 msgid ""
 "**tigase.disco.XMPPService** - Objects using this interface can respond "
 "to \"ServiceDiscovery\" requests."
-msgstr ""
+msgstr "**tigase.disco.XMPPService** - 使用此接口的对象可以响应 \"ServiceDiscovery\" "
+"请求。"
 
 #: ../../Tigase_Development/Basic_Information.rst:49
 msgid ""
@@ -181,6 +228,9 @@ msgid ""
 "implementing this interface guarantees that statistics will be presented "
 "in consisted way to user who wants to see them."
 msgstr ""
+"**tigase.stats.StatisticsContainer** - 使用此接口的对象可以返回运行时统计信息"
+"。任何对象都可以收集作业统计信息，并且实现此接口可确保统计信息以一致的方式呈"
+"现给想要查看它们的用户。"
 
 #: ../../Tigase_Development/Basic_Information.rst:51
 msgid ""
@@ -188,11 +238,12 @@ msgid ""
 "extend one of existing abstract classes which take care of the most of "
 "\"dirty and boring\" stuff. Here is a list the most useful abstract "
 "classes:"
-msgstr ""
+msgstr "建议不要直接实现上述接口，而是扩展现有的抽象类之一，"
+"它可以处理大部分\"又脏又无聊\"的东西。以下是最有用的抽象类列表："
 
 #: ../../Tigase_Development/Basic_Information.rst:53
 msgid "**tigase.server.AbstractMessageReceiver** - Implements 4 basic interfaces:"
-msgstr ""
+msgstr "**tigase.server.AbstractMessageReceiver** - 实现 4 个基本接口："
 
 #: ../../Tigase_Development/Basic_Information.rst:55
 msgid ""
@@ -205,6 +256,12 @@ msgid ""
 "abstract method in your component, if your component wants to send a "
 "packet (in response to data it received for example)."
 msgstr ""
+"``ServerComponent``、``MessageReceiver``、``Configurable`` 和 "
+"``StatisticsContainer``。 AbstractMessageReceiver 还使用它自己的线程来管理内"
+"部数据队列，从而防止资源匮乏导致的死锁。它提供了事件驱动的数据处理，这意味着"
+"每当数据包到达时，都会调用 ``abstract void processPacket(Packet packet);`` 方"
+"法来处理它。如果您的组件想要发送一个数据包（例如响应它收到的数据），您必须在"
+"您的组件中实现这个抽象方法。"
 
 #: ../../Tigase_Development/Basic_Information.rst:61
 msgid ""
@@ -217,6 +274,11 @@ msgid ""
 "networking, I/O, reconnecting, listening on socket, connecting and so on."
 " If you extend this class you have to expect data coming from to sources:"
 msgstr ""
+"**tigase.server.ConnectionManager** - 这是 ``AbstractMessageReceiver`` 抽象类"
+"的扩展。顾名思义，这个类负责所有网络连接管理。如果您的组件需要直接从网络发送"
+"和接收数据（如c2s连接，s2s连接或外部组件），您应该将此实现用作基本类。它负责"
+"与网络，I/O，重新连接，侦听套接字，连接等相关的所有事情。如果你扩展这个类，你"
+"必须期望数据来自以下源："
 
 #: ../../Tigase_Development/Basic_Information.rst:63
 msgid ""
@@ -225,10 +287,13 @@ msgid ""
 " connection and then the ``abstract Queue processSocketData(XMPPIOService"
 " serv);`` method is called."
 msgstr ""
+"从 ``MessageRouter`` ，这是当调用 ``abstract void processPacket(Packet "
+"packet);`` 方法的时候，其次，从网络连接，然后是 ``abstract Queue "
+"processSocketData(XMPPIOService serv);`` 方法被调用。"
 
 #: ../../Tigase_Development/Basic_Information.rst:66
 msgid "Plug-ins"
-msgstr ""
+msgstr "插件"
 
 #: ../../Tigase_Development/Basic_Information.rst:68
 msgid ""
@@ -237,6 +302,9 @@ msgid ""
 "3 types of plug-ins and they are defined in interfaces located in "
 "``tigase.xmpp`` package:"
 msgstr ""
+"当前实现的所有Tigase插件都位于以下包中：tigase.xmpp."
+"impl。您可以将此代码用作示例代码库。有3种类型的插件，它们在位于 ``tigase."
+"xmpp`` 包中的接口中定义："
 
 #: ../../Tigase_Development/Basic_Information.rst:70
 msgid ""
@@ -245,26 +313,29 @@ msgid ""
 "receives packets, processes them on behalf of the user and returns "
 "resulting stanzas."
 msgstr ""
+"**XMPPProcessorIfc** - 最重要和最基本的插件。这是最常见的插件类型，仅在正常模"
+"式下处理节。它接收数据包，代表用户处理它们并返回结果节。"
 
 #: ../../Tigase_Development/Basic_Information.rst:72
 msgid ""
 "**XMPPPreprocessorIfc** - This plugin performs pre-processing of the "
 "packet, intended for the pre-processors to setup for packet blocking."
-msgstr ""
+msgstr "**XMPPPreprocessorIfc** - "
+"此插件执行数据包的预处理，用于预处理器设置数据包阻塞。"
 
 #: ../../Tigase_Development/Basic_Information.rst:74
 msgid ""
 "**XMPPPostprocessorIfc** - This plugin performs processing of packets for"
 " which there was no specific processor."
-msgstr ""
+msgstr "**XMPPPostprocessorIfc** - 该插件对没有特定处理器的数据包进行处理。"
 
 #: ../../Tigase_Development/Basic_Information.rst:77
 msgid "Connector"
-msgstr ""
+msgstr "连接器"
 
 #: ../../Tigase_Development/Basic_Information.rst:80
 msgid "Data, Stanzas, Packets - Data Flow and Processing"
-msgstr ""
+msgstr "数据，节，数据包 - 数据流和处理"
 
 #: ../../Tigase_Development/Basic_Information.rst:82
 msgid ""
@@ -274,6 +345,9 @@ msgid ""
 "are sent to the XML parser (``tigase.xml``) which turns them to XML DOM "
 "structures."
 msgstr ""
+"从网络接收的数据通过 ``tigase.io`` 包中的代码从网络套接字读取为字节。"
+"然后字节被转换为 ``tigase.net`` 包类中的字符，并作为字符发送到 XML "
+"解析器（``tigase.xml``），后者将它们转换为XML DOM结构。"
 
 #: ../../Tigase_Development/Basic_Information.rst:84
 msgid ""
@@ -283,6 +357,10 @@ msgid ""
 "we use `Tigase XML parser and DOM builder <https://github.com/tigase"
 "/tigase-xmltools>`__."
 msgstr ""
+"服务器内部的所有数据都以XML "
+"DOM形式交换，因为这是XMPP协议使用的格式。对于基本的XML数据处理（解析字符流、"
+"构建 DOM、操作 XML 元素和属性），我们使用 `Tigase XML parser and DOM builder "
+"<https://github.com/tigase/tigase-xmltools>`__。"
 
 #: ../../Tigase_Development/Basic_Information.rst:86
 msgid ""
@@ -290,6 +368,8 @@ msgid ""
 " can contain any number of **Child Elements** and any number of "
 "attributes. You can access all these data through the class API."
 msgstr ""
+"每个节都存储在 ``tigase.xml.Element`` 对象中。每个元素可以包含任意数量的 "
+"**子元素** 和任意数量的属性。您可以通过类API访问所有这些数据。"
 
 #: ../../Tigase_Development/Basic_Information.rst:88
 msgid ""
@@ -299,4 +379,6 @@ msgid ""
 "element it contains (swap to/from values, put type=result attribute and "
 "others)."
 msgstr ""
-
+"为了简化一些，最常见的操作元素被包在 ``tigase.server.Packet`` 类中，它为最常"
+"见的操作提供了另一个级别的API，比如基于它包含的元素准备响应节（交换到/从值，"
+"放入 type=result 属性和其他）。"
