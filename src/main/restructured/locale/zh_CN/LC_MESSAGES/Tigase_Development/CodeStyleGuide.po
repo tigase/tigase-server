@@ -3,272 +3,282 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-20 08:15+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/codestyleguide/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:2
 msgid "Tigase Code Style"
-msgstr ""
+msgstr "Tigase代码样式"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:5
 msgid "Introduction"
-msgstr ""
+msgstr "介绍"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:8
 msgid ""
 "This documents defines and describes coding style and standard used in "
 "Tigase projects source code."
-msgstr ""
+msgstr "本文档定义并描述了Tigase项目源代码中使用的编码风格和标准。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:10
 msgid ""
 "Examples should be considered as **non-normative**, that is formatting "
 "choices should not be treated as rules."
-msgstr ""
+msgstr "示例应被视为 **非规范**，即格式选择不应被视为规则。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:13
 msgid "Source file basics"
-msgstr ""
+msgstr "源文件基础"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:16
 msgid "Technicals details"
-msgstr ""
+msgstr "技术细节"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:18
 msgid ""
 "File name consists of the case-sensitive, camel-cased name of the top-"
 "level class it contains plus the ``.java`` extension."
-msgstr ""
+msgstr "文件名由它包含的顶级类的区分大小写的驼峰式名称加上 ``.java`` 扩展名组成。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:20
 msgid "Source files are encoded in **UTF-8**."
-msgstr ""
+msgstr "源文件以 **UTF-8** 编码。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:24
 msgid "Source file structure"
-msgstr ""
+msgstr "源文件结构"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:26
 msgid "A source file consists of, **in order**:"
-msgstr ""
+msgstr "源文件包括， **按顺序**："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:28
 msgid "License or copyright information, if present"
-msgstr ""
+msgstr "许可或版权信息（如果存在）"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:30
 msgid "Package statement"
-msgstr ""
+msgstr "包装声明"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:32
 #: ../../Tigase_Development/CodeStyleGuide.rst:43
 msgid "Import statements"
-msgstr ""
+msgstr "导入语句"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:34
 msgid "Exactly one top-level class"
-msgstr ""
+msgstr "正是一个顶级类"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:36
 msgid "Additionally:"
-msgstr ""
+msgstr "此外："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:38
 msgid "**Exactly one blank line** separates sections 2-4;"
-msgstr ""
+msgstr "**正好一个空行** 分隔第 2-4 节；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:40
 msgid ""
 "The package statement is **not line-wrapped** (column limit does not "
 "apply);"
-msgstr ""
+msgstr "package 声明是 **非自动换行** （列限制不适用）；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:45
 msgid "Wildcard imports can be used for:"
-msgstr ""
+msgstr "通配符导入可用于："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:47
 msgid "more than 5 class imports;"
-msgstr ""
+msgstr "多于5个类导入；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:49
 msgid "more than 3 name imports;"
-msgstr ""
+msgstr "超过3个名称导入；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:51
 msgid "import statements are **not line-wrapped** (column limit does not apply);"
-msgstr ""
+msgstr "import 语句 **不是自动换行** （列限制不适用）；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:53
 msgid "following import ordering applies:"
-msgstr ""
+msgstr "以下导入顺序适用："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:55
 msgid "all imports not pertaining to any of the groups listed below"
-msgstr ""
+msgstr "所有不属于下列任何组的导入"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:57
 #: ../../Tigase_Development/CodeStyleGuide.rst:63
+#, fuzzy
 msgid "``blank line``"
-msgstr ""
+msgstr "``blank line``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:59
 msgid "``javax.*`` classes"
-msgstr ""
+msgstr "``javax.*`` 类"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:61
 msgid "``java.*`` classes"
-msgstr ""
+msgstr "``java.*`` 类"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:65
 msgid "all static imports in single block"
-msgstr ""
+msgstr "单个块中的所有静态导入"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:67
 msgid ""
 "items in each block are ordered by names in ASCII sort order (since ``;``"
 " sorts before ``.``)"
-msgstr ""
+msgstr "每个块中的项目按名称按 ASCII 排序顺序排序（因为 ``;`` 排序在 ``.`` 之前）"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:70
 msgid "Class declaration"
-msgstr ""
+msgstr "类声明"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:72
 msgid "Each top-level class resides in a source file of its own."
-msgstr ""
+msgstr "每个顶层类都驻留在自己的源文件中。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:75
 msgid "Class contents order"
-msgstr ""
+msgstr "类内容顺序"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:77
 msgid "Following order of the elements of the class is mandatory:"
-msgstr ""
+msgstr "以下类元素的顺序是强制性的："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:79
 msgid "``final``, ``static`` fields in following order:"
-msgstr ""
+msgstr "``final``, ``static`` 字段按以下顺序："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:81
 #: ../../Tigase_Development/CodeStyleGuide.rst:93
 #: ../../Tigase_Development/CodeStyleGuide.rst:105
 #: ../../Tigase_Development/CodeStyleGuide.rst:115
+#, fuzzy
 msgid "``public``"
-msgstr ""
+msgstr "``public``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:83
 #: ../../Tigase_Development/CodeStyleGuide.rst:95
 #: ../../Tigase_Development/CodeStyleGuide.rst:107
 #: ../../Tigase_Development/CodeStyleGuide.rst:117
+#, fuzzy
 msgid "``protected``"
-msgstr ""
+msgstr "``protected``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:85
 #: ../../Tigase_Development/CodeStyleGuide.rst:97
 #: ../../Tigase_Development/CodeStyleGuide.rst:109
 #: ../../Tigase_Development/CodeStyleGuide.rst:119
+#, fuzzy
 msgid "``package-private``"
-msgstr ""
+msgstr "``package-private``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:87
 #: ../../Tigase_Development/CodeStyleGuide.rst:99
 #: ../../Tigase_Development/CodeStyleGuide.rst:111
 #: ../../Tigase_Development/CodeStyleGuide.rst:121
+#, fuzzy
 msgid "``private``"
-msgstr ""
+msgstr "``private``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:89
+#, fuzzy
 msgid "``public`` ``enum``"
-msgstr ""
+msgstr "``public`` ``enum``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:91
 msgid "``static`` fields in following order:"
-msgstr ""
+msgstr "``static`` 字段按以下顺序："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:101
 msgid "``static`` initializer block"
-msgstr ""
+msgstr "``static`` 初始化程序块"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:103
 msgid "``final`` fields in following order:"
-msgstr ""
+msgstr "``final`` 字段按以下顺序："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:113
 msgid "fields without modifiers in following order:"
-msgstr ""
+msgstr "没有修饰符的字段按以下顺序："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:123
 msgid "initializer block"
-msgstr ""
+msgstr "初始化程序块"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:125
 msgid "``static`` method(s)"
-msgstr ""
+msgstr "``static`` 方法"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:127
 msgid "constructor(s)"
-msgstr ""
+msgstr "构造函数"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:129
 msgid "methods(s) without modifiers"
-msgstr ""
+msgstr "没有修饰符的方法"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:131
 msgid "enums(s) without modifiers"
-msgstr ""
+msgstr "没有修饰符的枚举"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:133
 msgid "interfaces(s) without modifiers"
-msgstr ""
+msgstr "没有修饰符的接口"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:135
 msgid "inner ``static`` classes"
-msgstr ""
+msgstr "内部 ``static`` 类"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:137
 msgid "inner classes"
-msgstr ""
+msgstr "内部类"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:139
 msgid "In addition:"
-msgstr ""
+msgstr "此外："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:141
 msgid "Getters and Setters are kept together"
-msgstr ""
+msgstr "Getter和Setter保持在一起"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:143
 msgid ""
 "Overloads are never split - multiple constructors or methods with the "
 "same name appear sequentially."
-msgstr ""
+msgstr "超载永远不会拆分 - 具有相同名称的多个构造函数或方法按顺序出现。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:146
 msgid "Formatting"
-msgstr ""
+msgstr "格式化"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:149
 msgid "Braces"
-msgstr ""
+msgstr "大括号"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:151
 msgid ""
 "Braces are mandatory in optional cases - for all syntax where braces use "
 "can be optional, Tigase mandate using braces even if the body is empty or"
 " contains only single statement."
-msgstr ""
+msgstr "在可选情况下大括号是强制性的 - 对于使用大括号的所有语法都是可选的，即使主体为"
+"空或仅包含单个语句，Tigase也要求使用大括号。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:153
 msgid ""
@@ -276,18 +286,20 @@ msgid ""
 "<http://www.codinghorror.com/blog/2012/07/new-programming-"
 "jargon.html>`__):"
 msgstr ""
+"大括号遵循 Kernighan 和 Ritchie 样式 (`Egyptian brackets <http://www."
+"codinghorror.com/blog/2012/07/new-programming-jargon.html>`__):"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:155
 msgid "No line break before the opening brace."
-msgstr ""
+msgstr "在左大括号之前没有换行符。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:157
 msgid "Line break after the opening brace."
-msgstr ""
+msgstr "左大括号后的换行符。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:159
 msgid "Line break before the closing brace."
-msgstr ""
+msgstr "右大括号之前的换行符。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:161
 msgid ""
@@ -296,24 +308,27 @@ msgid ""
 "class. For example, there is *no* line break after the brace if it is "
 "followed by ``else`` or a comma."
 msgstr ""
+"右大括号后的换行符，*仅当* 该大括号用于终止语句或终止方法，构造函数或 *named*"
+" 类的主体。例如，如果大括号后跟 ``else`` 或逗号，则大括号后有 *no* 换行符。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:165
 msgid "Block indentation: tab"
-msgstr ""
+msgstr "块缩进：制表符"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:167
 msgid ""
 "All indentation (opening a new block of block-like construct) must be "
 "made with tabs. After the block, then indent returns to the previous."
-msgstr ""
+msgstr "所有缩进（打开一个新的块状结构块）必须使用制表符进行。在块之后，然后缩进返回"
+"到前一个。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:169
 msgid "Ideal tab-size: 4"
-msgstr ""
+msgstr "理想制表符个数：4"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:172
 msgid "Column limit: 120"
-msgstr ""
+msgstr "列限制：120"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:174
 msgid ""
@@ -322,84 +337,89 @@ msgid ""
 " noted below, any line that would exceed this limit must be line-wrapped,"
 " as explained in section `Line-wrapping <#line-wrapping>`__."
 msgstr ""
+"定义的列限制为 120 个字符，并且必须按如下所述进行换行， Java 代码的列限制为 "
+"100 个字符。除下文所述外，任何超出此限制的行都必须换行，如 `Line-wrapping "
+"<#line-wrapping>`__ 部分所述。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:177
 msgid "Line-wrapping"
-msgstr ""
+msgstr "换行"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:179
 msgid ""
 "*line-wrapping* is a process of dividing long lines that would otherwise "
 "go over the defined Column Limit (above). It’s recommended to wrap lines "
 "whenever it’s possible even if they are not longer than defined limit."
-msgstr ""
+msgstr "*换行* 是一个分割长行的过程，否则会超过定义的列限制（如上所述）。建议尽可能换"
+"行，即使它们不超过定义的限制。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:182
 msgid "Whitespace"
-msgstr ""
+msgstr "空白"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:185
 msgid "Vertical Whitespace"
-msgstr ""
+msgstr "垂直空白"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:187
 msgid "A single blank line appears:"
-msgstr ""
+msgstr "出现一个空行："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:189
 msgid "after package statement;"
-msgstr ""
+msgstr "在包声明后；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:191
 msgid "before imports;"
-msgstr ""
+msgstr "在导入之前；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:193
 msgid "after imports;"
-msgstr ""
+msgstr "导入之后；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:195
 msgid "around class;"
-msgstr ""
+msgstr "围绕类；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:197
 msgid "after class header;"
-msgstr ""
+msgstr "在类标头之后；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:199
 msgid "around field in interface;"
-msgstr ""
+msgstr "围绕接口中的字段；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:201
 msgid "around method in interface;"
-msgstr ""
+msgstr "围绕接口中的方法；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:203
 msgid "around method;"
-msgstr ""
+msgstr "围绕方法；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:205
 msgid "around initializer;"
-msgstr ""
+msgstr "围绕初始化器；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:207
 msgid "as required by other sections of this document."
-msgstr ""
+msgstr "根据本文档其他部分的要求。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:209
 msgid "Multiple blank lines are not permitted."
-msgstr ""
+msgstr "不允许有多个空行。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:212
 msgid "Horizontal whitespace"
-msgstr ""
+msgstr "水平空白"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:214
 msgid ""
 "Beyond where required by the language or other style rules, and apart "
 "from literals, comments and Javadoc, a single ASCII space also appears in"
 " the following places **only**."
-msgstr ""
+msgstr "除了语言或其他样式规则要求的地方，除了文字，注释和 Javadoc，一个 ASCII "
+"空格也 **仅** 出现在以下位置。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:216
 msgid ""
@@ -407,113 +427,119 @@ msgid ""
 "``switch``, ``try``, ``catch`` or ``synchronized``, from an open "
 "parenthesis (``(``) that follows it on that line"
 msgstr ""
+"任何保留字，例如 ``if``, ``for``, ``while``, ``switch``, ``try``, ``catch`` "
+"或 ``synchronized``, 与来自该行后面的左括号 (``(``) 分开"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:218
 msgid ""
 "Separating any reserved word, such as ``else`` or ``catch``, from a "
 "closing curly brace (``}``) that precedes it on that line"
-msgstr ""
+msgstr "将任何保留字，例如 ``else`` 或 ``catch``，与该行之前的右花括号 (``}``) 分开"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:220
 msgid "Before any open curly brace (``{``), with two exceptions:"
-msgstr ""
+msgstr "在任何左大括号（``{``）之前，有两个例外："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:222
 msgid "``@SomeAnnotation({a, b})`` (no space is used)"
-msgstr ""
+msgstr "``@SomeAnnotation({a, b})`` (不使用空格）"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:224
 msgid ""
 "``String[][] x = {{\"foo\"}};`` (no space is required between ``{{``, by "
 "item 8 below)"
-msgstr ""
+msgstr "**``String[][] x = {{\"foo\"}};`` （``{{`` 之间不需要空格，根据下面的第 8 "
+"项）"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:226
 msgid ""
 "On both sides of any binary or ternary operator. This also applies to the"
 " following \"operator-like\" symbols:"
-msgstr ""
+msgstr "在任何二元或三元运算符的两侧。这也适用于以下 ''类似运算'' 的符号："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:228
 msgid "the ampersand in a conjunctive type bound: ``<T extends Foo & Bar>``"
-msgstr ""
+msgstr "合取类型界限中的 & 符号： ``<T extends Foo & Bar>``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:230
 msgid ""
 "the pipe for a catch block that handles multiple exceptions: ``catch "
 "(FooException | BarException e)``"
-msgstr ""
+msgstr "处理多个异常的 catch 块的管线： ``catch (FooException | BarException e)``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:232
 msgid "the colon (``:``) in an enhanced ``for`` (\"foreach\") statement"
-msgstr ""
+msgstr "增强的 ``for`` (\"foreach\") 语句中的冒号 (``:``)"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:234
 msgid "the arrow in a lambda expression: ``(String str) → str.length()``"
-msgstr ""
+msgstr "lambda 表达式中的箭头：``(String str) → str.length()``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:236
 msgid "**but not:**"
-msgstr ""
+msgstr "**但不是：**"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:238
 msgid ""
 "the two colons (``::``) of a method reference, which is written like "
 "``Object::toString``"
-msgstr ""
+msgstr "方法引用的两个冒号（``::``），写成 ``Object::toString``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:240
 msgid "the dot separator (``.``), which is written like ``object.toString()``"
-msgstr ""
+msgstr "点分隔符（``.``），写成 ``object.toString()``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:242
 msgid "After ``,:;`` or the closing parenthesis (``)``) of a cast"
-msgstr ""
+msgstr "在 ``,:;`` 或右括号 (``)``) 之后"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:244
 msgid "Between the type and variable of a declaration: ``List<String> list``"
-msgstr ""
+msgstr "声明的类型和变量之间：``List<String> list``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:247
 msgid "Horizontal alignment: never required"
-msgstr ""
+msgstr "水平对齐：从不需要"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:249
 msgid ""
 "*Horizontal alignment* is the practice of adding a variable number of "
 "additional spaces in your code with the goal of making certain tokens "
 "appear directly below certain other tokens on previous lines."
-msgstr ""
+msgstr "*水平对齐* 是在代码中添加可变数量的附加空格的做法，目的是使某些令牌直接出现在"
+"前几行的某些其他令牌下方。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:251
 msgid ""
 "This practice is permitted, but is **never required**. It is not even "
 "required to *maintain* horizontal alignment in places where it was "
 "already used."
-msgstr ""
+msgstr "这种做法是允许的，但 **从不要求**。甚至不需要在已经使用过的地方 *保持* "
+"水平对齐。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:254
 msgid "Specific constructs"
-msgstr ""
+msgstr "具体构造"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:257
 msgid "Enum classes"
-msgstr ""
+msgstr "枚举类"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:259
 msgid "After each comma that follows an enum constant, a line break is mandatory."
-msgstr ""
+msgstr "在枚举常量后面的每个逗号之后，必须有一个换行符。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:262
 msgid "Variable declarations"
-msgstr ""
+msgstr "变量声明"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:264
 msgid ""
 "One variable per declaration - Every variable declaration (field or "
 "local) declares only one variable: declarations such as ``int a, b;`` are"
 " not used."
-msgstr ""
+msgstr "每个声明一个变量 - 每个变量声明（字段或本地）只声明一个变量：不使用诸如 ``"
+"int a, b;`` 之类的声明。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:266
 msgid ""
@@ -524,25 +550,29 @@ msgid ""
 "typically have initializers, or are initialized immediately after "
 "declaration."
 msgstr ""
+"在需要时声明 - 局部变量 **不** 习惯性地在其包含块或类似块的构造的开头声明。相"
+"反，局部变量在接近它们首次使用的点（在合理范围内）的时候被声明，以最小化它们"
+"的范围。局部变量声明通常具有初始化器，或者在声明后立即初始化。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:269
 msgid "Arrays"
-msgstr ""
+msgstr "数组"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:271
 msgid ""
 "Any array initializer may *optionally* be formatted as if it were a "
 "\"block-like construct.\" (especially when line-wrapping need to be "
 "applied)."
-msgstr ""
+msgstr "任何数组初始值设定项都可以 *可选地* 被格式化，就好像它是一个 \"类似块的构造\""
+" （特别是当需要应用换行时）。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:274
 msgid "Naming"
-msgstr ""
+msgstr "命名"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:277
 msgid "Rules common to all identifiers"
-msgstr ""
+msgstr "所有标识符通用的规则"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:279
 msgid ""
@@ -550,50 +580,52 @@ msgid ""
 "cases noted below, underscores. Thus each valid identifier name is "
 "matched by the regular expression ``\\w+`` ."
 msgstr ""
+"标识符仅使用 ASCII 字母和数字，并且在下面提到的少数情况下，使用下划线。因此，"
+"每个有效的标识符名称都由正则表达式 ``\\w+`` 匹配。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:282
 msgid "Specific Rules by identifier type"
-msgstr ""
+msgstr "标识符类型的特定规则"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:284
 msgid ""
 "Package names are all lowercase, with consecutive words simply "
 "concatenated together (no underscores, not camel-case)."
-msgstr ""
+msgstr "包的名称都是小写的，连续的单词简单地连接在一起（没有下划线，不是驼峰式）。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:286
 msgid "Class names are written in **UpperCamelCase**."
-msgstr ""
+msgstr "类名用 **UpperCamelCase** 书写。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:288
 msgid "Method names are written in **lowerCamelCase**."
-msgstr ""
+msgstr "方法名称以 **lowerCamelCase** 书写。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:290
 msgid ""
 "Constant names use ``CONSTANT_CASE``: all uppercase letters, with words "
 "separated by underscores."
-msgstr ""
+msgstr "常量名称使用 ``CONSTANT_CASE``：全部大写字母，单词之间用下划线分隔。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:292
 msgid ""
 "Non-constant field names (static or otherwise) are written in "
 "**lowerCamelCase**."
-msgstr ""
+msgstr "非常量字段名称（静态或其他）以 **lowerCamelCase** 编写。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:294
 msgid ""
 "Parameter names are written in **lowerCamelCase** (one-character "
 "parameter names in public methods should be avoided)."
-msgstr ""
+msgstr "参数名称以 **lowerCamelCase** 书写（应避免在公共方法中使用单字符参数名称）。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:296
 msgid "Local variable names are written in **lowerCamelCase**."
-msgstr ""
+msgstr "局部变量名称以 **lowerCamelCase** 书写。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:299
 msgid "Programming Practices"
-msgstr ""
+msgstr "编程实践"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:301
 msgid ""
@@ -601,53 +633,58 @@ msgid ""
 "legal. This includes a class method overriding a superclass method, a "
 "class method implementing an interface method, and an interface method "
 "re-specifying a super-interface method."
-msgstr ""
+msgstr "只要合法，方法就会用 ``@Override`` 注释标记。这包括重写超类方法的类方法，实现"
+"接口方法的类方法和重新指定超接口方法的接口方法。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:303
 msgid ""
 "Caught exceptions should not be ignored (and if this is a must then a log"
 " entry is required)."
-msgstr ""
+msgstr "不应忽略抓到的异常（如果这是必须的，则需要日志条目）。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:306
+#, fuzzy
 msgid "Javadoc"
-msgstr ""
+msgstr "Javadoc"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:308
 msgid "blank lines should be inserted after:"
-msgstr ""
+msgstr "空行应插入："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:310
 msgid "description,"
-msgstr ""
+msgstr "描述，"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:312
 msgid "parameter description,"
-msgstr ""
+msgstr "参数说明，"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:314
 msgid "return tag;"
-msgstr ""
+msgstr "返回标签；"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:316
 msgid "empty tag should be included for following tags:"
-msgstr ""
+msgstr "以下标签应包含空标签："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:318
+#, fuzzy
 msgid "``@params``"
-msgstr ""
+msgstr "``@params``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:320
+#, fuzzy
 msgid "``@return``"
-msgstr ""
+msgstr "``@return``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:322
+#, fuzzy
 msgid "``@throws``"
-msgstr ""
+msgstr "``@throws``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:325
 msgid "Usage"
-msgstr ""
+msgstr "用法"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:327
 msgid ""
@@ -655,15 +692,17 @@ msgid ""
 "every ``public`` or ``protected`` member of such a class, with a few "
 "exceptions:"
 msgstr ""
+"在 *最低限度*，Javadoc 存在于每个 ``public`` 类，以及此类的每个 ``public`` "
+"或 ``protected`` 成员，但有一些例外："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:329
 msgid ""
 "is optional for \"simple, obvious\" methods like ``getFoo``, in cases "
 "where there *really and truly* is nothing else worthwhile to say but "
 "\"Returns the foo\"."
-msgstr ""
+msgstr "对于像 ``getFoo`` 这样的 *简单和明显* 的方法是可选的，在这种情况下，*真正的* "
+"除了\"返回 foo\"之外没有什么值得说的。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:331
 msgid "in methods that overrides a supertype method."
-msgstr ""
-
+msgstr "在覆盖超类型方法的方法中。"
