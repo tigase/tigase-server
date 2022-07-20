@@ -3,143 +3,159 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 02:43-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-20 21:56+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dp-server_compilation/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Server_Compilation.rst:2
 msgid "Server Compilation"
-msgstr ""
+msgstr "服务器编译"
 
 #: ../../Tigase_Development/Server_Compilation.rst:4
 msgid ""
 "Tigase XMPP Server Project uses Maven for compilation. For details on "
 "Maven and it’s use, please see the :ref:`Maven Guide.<usingMaven>`"
 msgstr ""
+"Tigase XMPP 服务器项目使用 Maven 进行编译。有关 Maven 及其使用的详细信息，"
+"请参阅 :ref:`Maven 指南<usingMaven>`。"
 
 #: ../../Tigase_Development/Server_Compilation.rst:7
 msgid "Distribution Packages"
-msgstr ""
+msgstr "分发包"
 
 #: ../../Tigase_Development/Server_Compilation.rst:9
 msgid "Once Compiled, Tigase creates two separate distribution archives:"
-msgstr ""
+msgstr "编译后，Tigase 会创建两个独立的分发档案："
 
 #: ../../Tigase_Development/Server_Compilation.rst:11
 msgid ""
 "**-dist** is a minimal version containing only tigase-server, tigase-"
 "xmltools and tigase-utils, MUC, Pubsub, and HTTP."
 msgstr ""
+"**-dist** 是仅包含 tigase-server，tigase-xmltools 和 tigase-utils，MUC，"
+"Pubsub 和 HTTP 的最小版本。"
 
 #: ../../Tigase_Development/Server_Compilation.rst:13
 msgid ""
 "**-dist-max** is a version containing all additional tigase components as"
 " well as dependencies required by those components."
-msgstr ""
+msgstr "**-dist-max** 是一个包含所有其他 tigase 组件以及这些组件所需依赖项的版本。"
 
 #: ../../Tigase_Development/Server_Compilation.rst:15
 msgid "They will be available as both zip and tarball."
-msgstr ""
+msgstr "它们将以 zip 和 tarball 的形式提供。"
 
 #: ../../Tigase_Development/Server_Compilation.rst:18
 msgid "Building Server and Generating Packages"
-msgstr ""
+msgstr "构建服务器和生成包"
 
 #: ../../Tigase_Development/Server_Compilation.rst:21
 msgid "Server binary and it’s documentation"
-msgstr ""
+msgstr "服务器二进制文件及其文档"
 
 #: ../../Tigase_Development/Server_Compilation.rst:23
 msgid "After cloning tigase-server repository:"
-msgstr ""
+msgstr "克隆 tigase-server 存储库后："
 
 #: ../../Tigase_Development/Server_Compilation.rst:30
 msgid "You compile server with maven :"
-msgstr ""
+msgstr "你用 maven 编译服务器："
 
 #: ../../Tigase_Development/Server_Compilation.rst:36
 msgid "This will: - Build Tigase XMPP tigase-server jar in tigase-server/target."
-msgstr ""
+msgstr "这将： - 在 tigase-server/target 中构建 Tigase XMPP tigase-server jar。"
 
 #: ../../Tigase_Development/Server_Compilation.rst:38
 msgid ""
 "If you wish to include compilation of the documentation use "
 "*distribution* profile:"
-msgstr ""
+msgstr "如果您希望包含文档的编译，请使用 *distribution* 配置文件："
 
 #: ../../Tigase_Development/Server_Compilation.rst:44
 msgid ""
 "This will - compile server binaries. - generate javadoc and manual "
 "documentation ``tigase-server/target/_docs`` directory."
-msgstr ""
+msgstr "这将 - 编译服务器二进制文件。 - 生成 javadoc 和手册文档 ``tigase-server/"
+"target/_docs`` 目录。"
 
 #: ../../Tigase_Development/Server_Compilation.rst:47
 msgid "Server distribution packages"
-msgstr ""
+msgstr "服务器分发包"
 
 #: ../../Tigase_Development/Server_Compilation.rst:49
 msgid ""
 "Distribution building is handled by separate project (`Tigase Server "
 "Distribution <https://github.com/tigase/tigase-server-distribution>`__)"
 msgstr ""
+"分发构建由单独的项目处理 (`Tigase 服务器分发 <https://github.com/tigase/"
+"tigase-server-distribution>`__)"
 
 #: ../../Tigase_Development/Server_Compilation.rst:51
 msgid ""
 "In order to build distribution packages \\* clone tigase-server-"
 "distribution repository:"
-msgstr ""
+msgstr "为了构建分发包 \\* 克隆 tigase-server-distribution 存储库："
 
 #: ../../Tigase_Development/Server_Compilation.rst:58
 msgid "and compile it using maven with *distribution* profile:"
-msgstr ""
+msgstr "并使用带有 *distribution* 配置文件的 maven 编译它："
 
 #: ../../Tigase_Development/Server_Compilation.rst:64
 msgid "This will:"
-msgstr ""
+msgstr "这将："
 
 #: ../../Tigase_Development/Server_Compilation.rst:66
 msgid ""
 "compile all documentation sources (including dependencies) and place them"
 " in ``tigase-server-distribution/target/_docs`` directory"
-msgstr ""
+msgstr "编译所有文档源（包括依赖项）并将它们放在 ``tigase-server-distribution/target/"
+"_docs`` 目录中"
 
 #: ../../Tigase_Development/Server_Compilation.rst:68
 msgid ""
 "download all dependencies in defined versions and put them in ``tigase-"
 "server-distribution/target/dist/jars/`` directory."
 msgstr ""
+"下载定义版本中的所有依赖项并将它们放在 ``tigase-server-distribution/target/"
+"dist/jars/`` 目录中。"
 
 #: ../../Tigase_Development/Server_Compilation.rst:70
 msgid ""
 "create both types of distribution packages (-dist and -dist-max) and "
 "place them in ``tigase-server-distribution/target/_dist/`` directory."
 msgstr ""
+"创建两种类型的分发包（-dist 和 -dist-max）并将它们放在 ``tigase-"
+"server-distribution/target/_dist/`` 目录中。"
 
 #: ../../Tigase_Development/Server_Compilation.rst:73
 msgid "Running Server"
-msgstr ""
+msgstr "运行服务器"
 
 #: ../../Tigase_Development/Server_Compilation.rst:75
 msgid ""
 "Afterwards you can run the server with the regular shell script from "
 "within ``server`` module:"
-msgstr ""
+msgstr "之后，您可以在 ``server`` 模块中使用常规的 shell 脚本运行服务器："
 
 #: ../../Tigase_Development/Server_Compilation.rst:82
 msgid ""
 "Please bear in mind, that you need to provide correct setup in "
 "etc/config.tdsl configuration files for the server to work correctly."
-msgstr ""
+msgstr "请记住，您需要在 etc/config.tdsl "
+"配置文件中提供正确的设置，服务器才能正常工作。"
 
 #~ msgid ""
 #~ "Tigase XMPP Server Project uses Maven"
@@ -147,4 +163,3 @@ msgstr ""
 #~ "Maven and it’s use, please see the"
 #~ " `Maven Guide. <#usingMaven>`__"
 #~ msgstr ""
-
