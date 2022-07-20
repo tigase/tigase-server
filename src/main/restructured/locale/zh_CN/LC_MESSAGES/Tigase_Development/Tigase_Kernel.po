@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-21 19:49+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-tigase_kernel/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:2
 msgid "Tigase Kernel"
-msgstr ""
+msgstr "Tigase内核"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:4
 msgid ""
@@ -28,50 +31,54 @@ msgid ""
 "Tigase XMPP Server. It is responsible for maintaining object lifecycle "
 "and provides mechanisms for dependency resolutions between beans."
 msgstr ""
+"Tigas内核是为Tigase XMPP服务器创建的 `IoC <https://en.wikipedia.org/wiki/"
+"Inversion_of_control>`__ "
+"的实现。它负责维护对象生命周期，并为bean之间的依赖关系解析提供机制。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:6
 msgid ""
 "Additionally, as and optional feature, Tigase Kernel is capable of "
 "configuring beans using a provided bean configurator."
-msgstr ""
+msgstr "此外，作为可选功能，Tigase内核能够使用提供的bean配置器来配置bean。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:9
 msgid "Basics"
-msgstr ""
+msgstr "基本"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:12
 msgid "What is kernel?"
-msgstr ""
+msgstr "什么是内核？"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:14
 msgid ""
 "Kernel is an instance of the ``Kernel`` class which is responsible for "
 "managing scope and visibility of beans. Kernel handles bean:"
-msgstr ""
+msgstr "内核是 ``Kernel`` 类的一个实例，它负责管理 bean 的范围和可见性。内核处理 "
+"bean："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:16
 msgid "registration of a bean"
-msgstr ""
+msgstr "一个bean的注册"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:18
 msgid "unregistration of a bean"
-msgstr ""
+msgstr "一个bean的注销"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:20
 msgid "initialization of a bean"
-msgstr ""
+msgstr "一个bean的初始化"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:22
 msgid "deinitialization of a bean"
-msgstr ""
+msgstr "一个bean的去初始化"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:24
 msgid "dependency injection to the bean"
-msgstr ""
+msgstr "bean的依赖注入"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:26
 msgid "handling of bean lifecycle"
-msgstr ""
+msgstr "bean生命周期的处理"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:28
 msgid ""
@@ -79,19 +86,24 @@ msgid ""
 "registered class implementing ``BeanConfigurator`` as "
 "``defaultBeanConfigurator``)*"
 msgstr ""
+"基于注解的附加bean的注册 （*作为* ``defaultBeanConfigurator`` "
+"*可选的使用注册类实现* ``BeanConfigurator`` ）"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:30
 msgid ""
 "configuration of a bean *(optionally thru registered class implementing "
 "``BeanConfigurator`` as ``defaultBeanConfigurator``)*"
 msgstr ""
+"bean的配置 (*作为* ``defaultBeanConfigurator`` *可选的通过注册类实现* "
+"``BeanConfigurator`` )"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:32
 msgid ""
 "Kernel core is responsible for dependency resolution and maintaining "
 "lifecycle of beans. Other features, like proper configuration of beans "
 "are done by additional beans working inside the Kernel."
-msgstr ""
+msgstr "内核负责依赖解性析和维护bean的生命周期。其他功能，比如正确配置bean是由在内核"
+"中工作的附加bean完成的。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:34
 msgid ""
@@ -101,25 +113,31 @@ msgid ""
 "previously registered beans. You may use whatever name you want to name a"
 " bean inside kernel but it cannot:"
 msgstr ""
+"内核通过名称来识别bean，因此每个内核可能只有一个名为 ``abc`` 的bean。如果多个"
+"bean具有相同的名称，那么最后一个注册此名称的将被使用，因为其注册将覆盖以前注"
+"册的bean。您可以使用任何您想在内核中命名的bean名称，但它不能："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:36
 msgid ""
 "be ``service`` as this name is used by Tigase Kernel internally when "
 "\\`RegistrarBean`s are in use (see `RegistrarBean <#registrarBean>`__"
 msgstr ""
+"是 ``service`` 因为这个名称是Tigase内核在使用 ``RegistrarBean`` "
+"时在内部使用的（请参阅 :ref:`RegistrarBean<registrarBean>`)"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:38
 msgid ""
 "end with ``#KERNEL`` as this names are also used by Tigase Kernel "
 "internally"
-msgstr ""
+msgstr "以 ``#KERNEL`` 结尾，因为Tigase内核也在内部使用此名称"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:42
 msgid ""
 "Kernel initializes beans using lazy initialization. This means that if a "
 "bean is not required by any other beans, or not retrieved from the kernel"
 " manually, an instance will not be created."
-msgstr ""
+msgstr "内核使用延迟初始化来初始化bean。这意味着，如果任何其他bean都不需要此bean，或"
+"者没有从内核手动检索此bean，则不会创建实例。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:44
 msgid ""
@@ -127,11 +145,12 @@ msgid ""
 "which requires this newly registered bean and if so, then instance of a "
 "newly registered bean will be created and injected to fields which "
 "require it."
-msgstr ""
+msgstr "在注册bean期间，内核会检查是否有任何bean需要这个新注册的bean，如果是，则将创"
+"建新注册的bean的实例并将其注入到需要它的字段中。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:47
 msgid "What is a kernel scope?"
-msgstr ""
+msgstr "什么是内核范围？"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:49
 msgid ""
@@ -141,40 +160,44 @@ msgid ""
 "direct parent kernel. This way it is possible to have separate beans "
 "named the same in the different kernel scopes."
 msgstr ""
+"每个内核都有自己的范围，可以在其中查找bean。默认情况下，注入依赖项时的内核可"
+"能仅在创建bean的新实例的同一个内核实例中或在直接父内核中查找它们。通过这种方"
+"式，可以在不同的内核范围内拥有相同名称的单独bean。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:53
 msgid ""
 "If bean is marked as ``exportable``, it is also visible in all "
 "descendants kernel scopes."
-msgstr ""
+msgstr "如果 bean 被标记为 ``exportable``，它在所有后代内核范围内也是可见的。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:56
 msgid "What is a bean?"
-msgstr ""
+msgstr "什么是bean?"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:57
 msgid ""
 "A bean is a named instance of the class which has parameterless "
 "constructor and which is registered in the kernel."
-msgstr ""
+msgstr "bean是类的命名实例，它有无参数构造函数并在内核中注册。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:61
 msgid ""
 "Parameterless constructor is a required as it will be used by kernel to "
 "create an instance of the bean, see `bean lifecycle <#beanLifecycle>`__."
-msgstr ""
+msgstr "无参数构造函数是必需的，因为内核将使用它来创建bean的实例，请参阅 "
+":ref:`bean生命周期<beanLifecycle>`。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:64
 msgid "Lifecycle of a bean"
-msgstr ""
+msgstr "bean的生命周期"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:67
 msgid "Creating instance of a bean"
-msgstr ""
+msgstr "创建一个bean的实例"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:70
 msgid "Instantiation of a bean"
-msgstr ""
+msgstr "一个bean的实例化"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:72
 msgid ""
@@ -182,23 +205,25 @@ msgid ""
 "registered for this bean (for more details see **Registration of a "
 "bean**). Instance of a bean is created using paremeterless constructor of"
 " a class."
-msgstr ""
+msgstr "在此步骤中，内核创建该bean注册的类的实例（有关更多详细信息，请参阅 "
+"**注册一个bean**）。使用类的无参数构造函数创建bean的实例。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:76
 msgid ""
 "Bean instance is only created for required beans (i.e. beans that were "
 "injected somewhere)."
-msgstr ""
+msgstr "Bean实例只为所需的bean（即注入某处的bean）创建。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:80
 msgid ""
 "It’s possible to create bean instance without the need to inject it "
 "anywhere - such bean should be annoted with ``@Autostart`` annotation."
-msgstr ""
+msgstr "可以创建bean实例而不需要在任何地方注入它 - 这样的bean应该使用 ``@Autostart`` "
+"进行注释。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:83
 msgid "Configuring a bean *(optional)*"
-msgstr ""
+msgstr "配置一个bean *（可选）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:85
 msgid ""
@@ -213,6 +238,14 @@ msgid ""
 "field type), then configurator will use them instead of accessing a field"
 " via reflection."
 msgstr ""
+"在此步骤中，内核将bean的类实例传递给配置器bean（如果可用，则为 "
+"``BeanConfigurator`` 的实例），以对其进行配置。在此步骤中， "
+"``BeanConfigurator`` 实例，其知道从文件加载的配置，并将此配置注入到带有 "
+"``@ConfigField`` 注释的 "
+"bean字段中。默认情况下，配置器使用反射来访问这些字段。但是，"
+"如果一个bean有一个对应的公共 ``setter``/``getter`` 方法并用于一个用 "
+"``@ConfigField`` 注释的字段（方法参数/返回类型匹配字段类型），那么配置器将使"
+"用它们而不是通过反射访问字段。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:89
 msgid ""
@@ -220,7 +253,8 @@ msgid ""
 "is equal to the current value of the field, then configurator will skip "
 "setting value for this field (It will also not call ``setter`` method "
 "even if it exists)."
-msgstr ""
+msgstr "如果配置中指定的字段没有值或值等于该字段的当前值，则配置器将跳过该字段的设置"
+"值（即使存在也不会调用 ``setter`` 方法） 。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:91
 msgid ""
@@ -231,6 +265,10 @@ msgid ""
 "is useful, if you need to update bean configuration, when you have all "
 "configuration available inside bean."
 msgstr ""
+"在配置步骤结束时，如果bean实现了 ``ConfigurationChangedAware`` 接口，则调用 "
+"``beanConfigurationChanged(Collection<String> changedFields)`` 方法以通知bean"
+"字段名称哪些值已更改。如果您需要更新bean配置，当您在bean中拥有所有可用配置时"
+"，这很有用。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:95
 msgid ""
@@ -239,10 +277,13 @@ msgid ""
 "So please keep in mind that ``getter``/``setter`` may be called multiple "
 "times - even for already configured and initialized bean."
 msgstr ""
+"bean的配置可以在运行时更改，它将以与传递给bean的初始配置相同的方式被应用。所"
+"以请记住，``getter``/``setter`` 可能会被多次调用 - "
+"即使对于已经配置和初始化的bean。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:98
 msgid "Injecting dependencies"
-msgstr ""
+msgstr "注入依赖"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:100
 msgid ""
@@ -251,6 +292,9 @@ msgid ""
 "step, kernel checks list of available beans in this kernel, which matches"
 " field type and additional constraints specified in the annotation."
 msgstr ""
+"此时，内核查找带有 ``@Inject`` 注释的bean类字段，并为每个字段查找一个值。在此"
+"步骤中，内核检查此内核中可用bean的列表，该列表与注释中指定的字段类型和附加约"
+"束相匹配。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:102
 msgid ""
@@ -259,6 +303,8 @@ msgid ""
 "``getter``/``setter`` defined for that field it will be called instead of"
 " reflection."
 msgstr ""
+"当找到所需的值（bean的实例）时，内核会尝试使用反射将其注入。但是，"
+"如果为该字段定义了匹配的 ``getter``/``setter``，它将被调用而不是反射。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:106
 msgid ""
@@ -267,10 +313,13 @@ msgid ""
 "So please keep in mind that ``getter``/``setter`` may be called multiple "
 "times - even for already configured and initialized bean."
 msgstr ""
+"如果依赖关系发生变化，即由于重新配置，依赖字段的值将发生变化，如果存在，"
+"将调用 ``setter`` 。所以请记住，``getter``/``setter`` 可能会被多次调用 - "
+"即使对于已经配置和初始化的bean。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:109
 msgid "Initialization of a bean"
-msgstr ""
+msgstr "一个bean的初始化"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:111
 msgid ""
@@ -279,10 +328,13 @@ msgid ""
 "``Initializable`` interface, kernel calls ``initialize()`` method to "
 "allow bean initialize properly if needed."
 msgstr ""
+"当配置了bean并设置了依赖关系时，一个bean的初始化就差不多完成了。此时，"
+"如果bean实现了 ``Initializable`` 接口，内核会调用 ``initialize()`` "
+"方法来允许bean在需要时正确初始化。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:114
 msgid "Destroying instance of a bean"
-msgstr ""
+msgstr "销毁bean的实例"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:116
 msgid ""
@@ -292,16 +344,19 @@ msgid ""
 "case which bean acquires some resources during initialization and should "
 "release them now."
 msgstr ""
+"当bean被卸载时，对它的实例的引用就被删除了。但是，如果bean类实现了 "
+"``UnregisterAware`` 接口，那么内核会调用 ``beforeUnregister()`` "
+"方法。如果哪个bean在初始化期间获取了一些资源并应该立即释放它们，这非常有用。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:120
 msgid ""
 "This method will not be called if bean was not initialized fully (bean "
 "initialization step was note passed)!"
-msgstr ""
+msgstr "如果bean没有完全初始化（bean初始化步骤已通过），则不会调用此方法！"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:123
 msgid "Reconfiguration of a bean *(optional)*"
-msgstr ""
+msgstr "重新配置一个bean *（可选）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:125
 msgid ""
@@ -310,10 +365,13 @@ msgid ""
 " This will happen in the same way as it described in `Configuring a bean "
 "<#beanConfiguration>`__ in **Creating instace of a bean** section."
 msgstr ""
+"在任何时间点，bean都可能被内核中注册的默认bean配置器（``BeanConfigurator``的"
+"实例）重新配置。这将以与 **创建 bean的实例** 部分中的 "
+":ref:`配置bean<beanConfiguration>` 所描述的相同方式发生。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:128
 msgid "Updating dependencies"
-msgstr ""
+msgstr "更新依赖项"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:130
 msgid ""
@@ -322,67 +380,76 @@ msgid ""
 "will change. As a result, Tigase Kernel will inject new dependencies as "
 "described in `Injecting dependencies <#beanInjectingDependencies>`__"
 msgstr ""
+"由于重新配置或注册/取消注册或激活/停用某些其他bean，bean的依赖关系可能会发生"
+"变化。因此，Tigase内核将注入新的依赖项，如 :ref:`Injecting "
+"dependencies<beanInjectingDependencies>` 中所述"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:133
 msgid "Registration of a bean"
-msgstr ""
+msgstr "一个bean的注册"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:135
 msgid "There are few ways to register a bean."
-msgstr ""
+msgstr "注册bean的方法很少。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:138
 msgid "Using annotation *(recommended but optional)*"
-msgstr ""
+msgstr "使用注释 *（推荐但可选）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:140
 msgid ""
 "To register a bean using annotation you need to annotate it with "
 "``@Bean`` annotation and pass values for following properties:"
-msgstr ""
+msgstr "要使用注解注册bean，您需要使用 ``@Bean`` 对其进行注解，并为以下属性传递值："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:142
 msgid "``name`` - name under which item should be registered"
-msgstr ""
+msgstr "``name`` - 应在哪个项目下注册名称"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:144
 msgid ""
 "``active`` - ``true`` if bean should be enabled without enabling it in "
 "the configuration *(however it is still possible to disable it using "
 "configuration)*"
-msgstr ""
+msgstr "``active`` - ``true`` 如果bean应该被启用而不在配置中启用它 "
+"*（但是仍然可以使用配置禁用它）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:146
 msgid ""
 "``parent`` - class of the parent bean which activation should trigger "
 "registration of your bean. **In most cases parent class should be "
 "implementing ``RegistrarBean``**"
-msgstr ""
+msgstr "``parent`` - 激活应该触发bean注册的父bean的类。 **在大多数情况下，"
+"父类应该实现 `RegistrarBean`**"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:148
 msgid ""
 "``parents`` - array of classes which should be threaten as ``parent`` "
 "classes if more than one parent class is required *(optional)*"
-msgstr ""
+msgstr "``parents`` - 如果需要多个父类，则应作为 ``parent`` 类受到威胁的类数组 "
+"*（可选）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:150
 msgid ""
 "``exportable`` - ``true`` if bean should be visible in all descendant "
 "kernels (in other case default visibility rules will be applied) "
 "*(optional)*"
-msgstr ""
+msgstr "``exportable`` - ``true`` "
+"如果bean应该在所有后代内核中可见（在其他情况下，将应用默认可见性规则） "
+"*（可选）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:152
 msgid ""
 "``selectors`` - array of selector classes which will decide whether class"
 " should be registered or not *(optional)*"
-msgstr ""
+msgstr "``selectors`` - 选择器类的数组，将决定是否应该注册类 *（可选）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:156
 msgid ""
 "If ``parent`` is set to ``Kernel.class`` it tells kernel to register this"
 " bean in the root/main kernel (top-level kernel)."
-msgstr ""
+msgstr "如果 ``parent`` 设置为 ``Kernel.class`` "
+"它告诉内核在根/主内核（顶级内核）中注册这个bean。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:158
 msgid ""
@@ -391,6 +458,9 @@ msgid ""
 "dependency), you may annotate your bean ``SomeDependencyBean`` with "
 "``@Bean`` annotation like this example:"
 msgstr ""
+"如果你希望你的bean ``SomeDependencyBean`` 在另一个 bean ``ParentBean`` "
+"正在注册时被注册（就像一个必需的依赖项），你可以用 ``@Bean`` 注释来注释你的 "
+"bean ``SomeDependencyBean``，正如这个例子："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:169
 msgid ""
@@ -399,10 +469,13 @@ msgid ""
 "which is subclass of ``AbstractBeanConfigurator`` which provides support "
 "for this feature."
 msgstr ""
+"仅当注册为 ``defaultBeanConfigurator`` 的bean支持此功能时才有效。默认情况下，"
+"Tigase XMPP服务器使用 ``DSLBeanConfigurator``，它是 "
+"``AbstractBeanConfigurator`` 的子类，它提供了对这个特性的支持。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:172
 msgid "Setting ``parent`` to class not implementing ``RegistrarBean`` interface"
-msgstr ""
+msgstr "将 ``parent`` 设置为不实现 ``RegistrarBean`` 接口的类"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:174
 msgid ""
@@ -416,11 +489,17 @@ msgid ""
 " ``parent`` to the ``parent`` of annotation of the class to which your "
 "``parent`` point to."
 msgstr ""
+"如果 ``parent`` 设置为没有实现 ``RegistrarBean`` "
+"接口的类，那么你的bean将被注册到父bean注册的同一个内核范围内。如果你这样做，"
+"即通过将parent设置为在 ``kernel1`` 中注册的bean的类，您的bean也将在 "
+"``kernel1`` 中注册。结果，它将暴露给同一内核范围内的其他bean。这也意味着，"
+"你是否将以与 ``parent`` 设置为 ``parent`` 指向的类的注释的 ``parent`` "
+"相同的方式配置它。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:176
 #: ../../Tigase_Development/Tigase_Kernel.rst:377
 msgid "**Example.**"
-msgstr ""
+msgstr "**例子。**"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:194
 msgid ""
@@ -429,6 +508,9 @@ msgid ""
 "root/main kernel as its value of ``parent`` property of annotation points"
 " to class not implementing ``RegistrarBean``."
 msgstr ""
+"在这种情况下，这意味着 ``bean1`` 已在根/主内核实例中注册。同时，``bean2`` "
+"也被注册到根/主内核，因为它的 ``parent`` 注释属性的值指向没有实现 "
+"``RegistrarBean`` 的类。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:196
 msgid ""
@@ -437,65 +519,72 @@ msgid ""
 "please check section ``DSL file format`` of the ``Admin Guide``) you "
 "would need to use following entry in the config file:"
 msgstr ""
+"要在DSL中配置 ``bean1`` 实例中的 ``field1`` 和 ``bean2`` 实例中的 ``field2`` "
+"的值（有 DSL格式的更多信息，请查看 ``DSL file format`` 中的 ``Admin "
+"Guide``），您需要在配置文件中使用以下条目："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:207
 msgid ""
 "As you can see, this resulted in the ``bean2`` configuration being on the"
 " same level as ``bean1`` configuration."
-msgstr ""
+msgstr "如您所见，这导致 ``bean2`` 配置与 ``bean1`` 配置处于同一级别。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:210
 msgid "Calling kernel methods"
-msgstr ""
+msgstr "调用内核方法"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:213
 msgid "As a class"
-msgstr ""
+msgstr "作为一个类"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:215
 msgid ""
 "To register a bean as a class, you need to have an instance of a Tigase "
 "Kernel execute it’s ``registerBean()`` method passing your ``Bean1`` "
 "class."
-msgstr ""
+msgstr "要将bean注册为类，您需要让Tigase内核的实例执行它的 ``registerBean()`` 方法，"
+"并传递您的 ``Bean1`` 类。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:223
 msgid ""
 "To be able to use this method you will need to annotate ``Bean1`` class "
 "with ``@Bean`` annotation and provide a bean name which will be used for "
 "registration of the bean."
-msgstr ""
+msgstr "为了能够使用此方法，您需要使用 ``@Bean`` 注释来注释 ``Bean1`` "
+"类，并提供将用于注册bean的bean名称。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:226
 msgid "As a factory"
-msgstr ""
+msgstr "作为工厂"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:228
 msgid ""
 "To do this you need to have an instance of a Tigase Kernel execute it’s "
 "``registerBean()`` method passing your bean ``Bean5`` class."
-msgstr ""
+msgstr "为此，您需要让Tigase内核的一个实例执行它的 ``registerBean()`` 方法，"
+"并传递您的 bean ``Bean5`` 类。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:235
 msgid "As an instance"
-msgstr ""
+msgstr "作为一个实例"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:237
 msgid ""
 "For this you need to have an instance of a Tigase Kernel execute it’s "
 "``registerBean()`` method passing your bean ``Bean41`` class instance."
-msgstr ""
+msgstr "为此，您需要让Tigase内核的实例执行它的 ``registerBean()`` 方法，并传递您的 "
+"bean ``Bean41`` 类实例。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:246
 msgid ""
 "Beans registered as an instance will not inject dependencies. As well "
 "this bean instances will not be configured by provided bean "
 "configurators."
-msgstr ""
+msgstr "注册为实例的Bean不会注入依赖项。同样，提供的bean配置器也不会配置此bean实例。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:249
 msgid "Using config file *(optional)*"
-msgstr ""
+msgstr "使用配置文件 *（可选）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:251
 msgid ""
@@ -507,13 +596,20 @@ msgid ""
 "Tigase XMPP Server tasks, it is described in explained in the Admin Guide"
 " in subsection ``Defining bean`` of ``DSL file format`` section."
 msgstr ""
+"如果在配置文件中注册了一个支持注册的bean "
+"``defaultBeanConfigurator``，则可以这样做。默认情况下，Tigase XMPP服务器使用 "
+"``DSLBeanConfigurator`` 提供支持，并且可以在DSL的配置文件中注册。"
+"由于使用配置文件注册bean是 Tigase XMPP服务器任务管理的一部分，"
+"因此在管理指南中 ``DSL file format`` 部分的 ``Defining bean`` "
+"小节中进行了说明。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:255
 msgid ""
 "This way allows admin to select different class for a bean. This option "
 "should be used to provide alternative implementations to the default "
 "beans which should be registered using annotations."
-msgstr ""
+msgstr "这种方式允许管理员为bean选择不同的类。此选项应该被用于为应使用注释注册的默认b"
+"ean提供替代实现。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:259
 msgid ""
@@ -521,21 +617,24 @@ msgid ""
 "this feature. By default Tigase XMPP Server uses ``DSLBeanConfigurator`` "
 "which provides support for that."
 msgstr ""
+"仅当注册为 ``defaultBeanConfigurato`` 的bean支持此功能时才有效。默认情况下，"
+"Tigase XMPP服务器使用 ``DSLBeanConfigurator`` 来提供支持。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:262
 msgid "Defining dependencies"
-msgstr ""
+msgstr "定义依赖项"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:264
 msgid "All dependencies are defined with annotations:"
-msgstr ""
+msgstr "所有依赖项都使用注释定义："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:288
 msgid ""
 "Kernel automatically determines type of a required beans based on field "
 "type. As a result, there is no need to specify the type of a bean in case"
 " of ``bean4`` field."
-msgstr ""
+msgstr "内核根据字段类型自动确定所需bean的类型。因此，在 ``bean4`` "
+"字段的情况下，无需指定bean的类型。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:290
 msgid ""
@@ -547,6 +646,10 @@ msgid ""
 "when more that one bean will match field dependency, you may set name of "
 "a required bean as shown in annotation to field ``bean3``."
 msgstr ""
+"当有多个bean实例匹配所需的依赖字段时，类型需要是数组或集合。如果内核无法解析"
+"依赖关系，它将抛出异常，除非 ``@Inject`` 注解将 ``nullAllowed`` 设置为 ``true"
+"``。这对于使某些依赖项可选的很有用。当多个bean匹配字段依赖时，为了帮助内核选"
+"择单个bean实例，您可以将所需bean的名称设置为字段 ``bean3``，如注释中所示。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:292
 msgid ""
@@ -555,6 +658,8 @@ msgid ""
 "setters, it is possible to detect a change of dependency instance and "
 "react as required, i.e. clear internal cache."
 msgstr ""
+"如果存在这些方法，则使用getter/setter插入依赖项，否则将它们直接插入到字段中。"
+"由于使用了设置器，可以检测依赖实例的变化并根据需要做出反应，即清除内部缓存。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:296
 msgid ""
@@ -563,6 +668,9 @@ msgid ""
 "class which is not registered in the same kernel as a bean or not visible"
 " in this kernel scope (see `Scope and visibility <#kernelScope>`__)."
 msgstr ""
+"内核在注入期间仅使用其范围内可见的bean来解决依赖关系。这使得它无法注入未在同"
+"一内核中注册为bean或在此内核范围内不可见的类的实例（请参阅 :ref:`Scope and "
+"visibility<kernelScope>`）。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:300
 msgid ""
@@ -571,10 +679,13 @@ msgid ""
 "In other case it will create circular dependency which cannot be "
 "satisfied and kernel will throw exceptions at runtime."
 msgstr ""
+"如果两个bean具有双向依赖关系，则要求其中至少一个为 ``null`` （使其成为可选依"
+"赖关系）。在其他情况下，它将创建无法满足的循环依赖，并且内核将在运行时抛出异"
+"常。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:303
 msgid "Nested kernels and exported beans"
-msgstr ""
+msgstr "嵌套内核和导出的bean"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:305
 msgid ""
@@ -583,24 +694,26 @@ msgid ""
 " of beans in scopes as each module (subkernel) may work within its own "
 "scope."
 msgstr ""
+"Tigase内核允许使用嵌套内核。这允许您创建复杂的应用程序并在范围内保持适当的bea"
+"n分离和可见性，因为每个模块（子内核）都可以在其自己的范围内工作。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:307
 msgid "Subkernels may be created using one of two ways:"
-msgstr ""
+msgstr "可以使用以下两种方式之一创建子内核："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:310
 msgid "Manual registration of new a new kernel"
-msgstr ""
+msgstr "手动注册新内核"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:312
 msgid ""
 "You can create an instance of a new kernel and register it as a bean "
 "within the parent kernel."
-msgstr ""
+msgstr "您可以创建一个新内核的实例并将其注册为父内核中的bean。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:321
 msgid "Usage of RegistrarBean"
-msgstr ""
+msgstr "RegistrarBean的使用"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:323
 msgid ""
@@ -610,6 +723,11 @@ msgid ""
 "as ``register(Kernel)`` and ``unregister(Kernel)`` methods are called "
 "once the ``RegistrarBean`` instance is created or destroyed."
 msgstr ""
+"你可以创建一个实现 ``RegistrarBean`` "
+"接口的bean。对于所有实现此接口的bean，都会创建子内核。您可以在 "
+"``RegistrarBean`` 类的实例中访问这个新内核，因为一旦 ``RegistrarBean`` "
+"实例被创建或销毁，``register(Kernel)`` 和 ``unregister(Kernel)`` "
+"方法就会被调用。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:325
 msgid ""
@@ -622,13 +740,19 @@ msgid ""
 "should be used for all subbeans defined in configuration for which there "
 "will be no class configured."
 msgstr ""
+"还有一个名为 ``RegistrarBeanWithDefaultBeanClass`` 的接口。如果您想要或需要创"
+"建一个bean，该bean将允许您配置许多具有相同类但名称不同的子bean，并且在设置配"
+"置之前您不知道这些bean的名称，则此接口非常有用。您需要做的就是实现这个接口，"
+"并在方法 ``getDefaultBeanClass()`` "
+"中返回类，该类应该用于配置中定义的所有子bean，不会为其配置类。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:327
 msgid ""
 "As an example of such use case is ``dataSource`` bean, which allows "
 "administrator to easily configure many data sources without passing their"
 " class names, ie."
-msgstr ""
+msgstr "作为这种用例的一个例子是 ``dataSource`` "
+"bean，它允许管理员轻松配置许多数据源而无需传递它们的类名，即。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:337
 msgid ""
@@ -636,10 +760,13 @@ msgid ""
 "and ``domain2``. All of those beans will be instances of a class returned"
 " by a ``getDefaultBeanClass()`` method of ``dataSource`` bean."
 msgstr ""
+"通过这个配置，我们只定义了3个名为 ``default``, ``domain1`` 和 ``domain2`` "
+"的bean。所有这些bean都将是由 ``dataSource`` bean 的 ``getDefaultBeanClass()``"
+" 方法返回的类的实例。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:340
 msgid "Scope and visibility"
-msgstr ""
+msgstr "范围和可见性"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:342
 msgid ""
@@ -649,41 +776,45 @@ msgid ""
 "a parent kernel** with the exception that they are visible to bean that "
 "created the subkernel (an instance of ``RegistrarBean``)."
 msgstr ""
+"在父内核中注册的bean对在第一级子内核中注册的bean可见。但是，**在子内核中注册"
+"的bean对在父内核中注册的bean不可用**，除非它们对创建子内核的bean可见（ "
+"``RegistrarBean`` 的实例）。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:344
 msgid ""
 "It is possible to export beans so they can be visible outside the first "
 "level of child kernels."
-msgstr ""
+msgstr "可以导出beans，以便它们可以在第一级子内核之外可见。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:346
 msgid ""
 "To do so, you need to mark the bean as exportable using annotations or by"
 " calling the ``exportable()`` method."
-msgstr ""
+msgstr "为此，您需要使用注释或调用 ``exportable()`` 方法将bean标记为可导出。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:348
 msgid "**Using annotation.**"
-msgstr ""
+msgstr "**使用注释。**"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:356
 msgid "**Calling ``exportable()``.**"
-msgstr ""
+msgstr "*调用* ``exportable()``。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:363
 msgid "Dependency graph"
-msgstr ""
+msgstr "依赖图"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:365
 msgid ""
 "Kernel allows the creation of a dependency graph. The following lines "
 "will generate it in a format supported by `Graphviz "
 "<http://www.graphviz.org>`__."
-msgstr ""
+msgstr "内核允许创建依赖图。以下行将以 `Graphviz <http://www.graphviz.org>`__ "
+"支持的格式生成它。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:373
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:375
 msgid ""
@@ -692,10 +823,13 @@ msgid ""
 "its instance within configuration and registration of this instances "
 "within kernel."
 msgstr ""
+"内核核心不提供任何方式来配置创建的bean。"
+"这样做你需要通过在配置中提供它的实例并在内核中注册这个实例来使用 "
+"``DSLBeanConfigurator`` 类。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:390
 msgid "DSL and kernel scopes"
-msgstr ""
+msgstr "DSL和内核范围"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:392
 msgid ""
@@ -705,41 +839,45 @@ msgid ""
 " important to know that kernel and beans structure have an impact on what"
 " the configuration in DSL will look like.**"
 msgstr ""
+"DSL是 `Tigase XMPP服务器管理指南：DSL文件格式部分 <http://docs.tigase.org/"
+"tigase-server/snapshot/Administration_Guide/html/#dslConfig>`__ "
+"中解释的基于结构的格式。 **重要的是要知道内核和bean结构会影响DSL中的配置。**"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:394
 msgid "**Example kernel and beans classes.**"
-msgstr ""
+msgstr "**示例内核和bean类。**"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:448
 msgid "Following classes will produce following structure of beans:"
-msgstr ""
+msgstr "以下类将产生以下bean结构："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:450
 msgid "\"bean1\" of class ``Bean1``"
-msgstr ""
+msgstr "类 ``Bean1`` 中的 \"bean1\""
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:452
 msgid "\"bean1_1\" of class ``Bean11``"
-msgstr ""
+msgstr "类 ``Bean11`` 中的 \"bean1_1\""
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:454
 msgid "\"bean1_2\" of class ``Bean12``"
-msgstr ""
+msgstr "类 ``Bean12`` 中的 \"bean1_2\""
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:456
 msgid "\"bean4\" of class ``Bean2``"
-msgstr ""
+msgstr "类 ``Bean2`` 中的 \"bean4\""
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:458
 msgid "\"bean3\" of class ``Bean3``"
-msgstr ""
+msgstr "类 ``Bean3`` 中的 \"bean3\""
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:462
 msgid ""
 "This is a simplified structure, the actual structure is slightly more "
 "complex. However. this version makes it easier to explain structure of "
 "beans and impact on configuration file structure."
-msgstr ""
+msgstr "这是一个简化的结构，实际结构稍微复杂一些。然而，这个版本更容易解释bean的结构"
+"和对配置文件结构的影响。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:466
 msgid ""
@@ -747,16 +885,19 @@ msgid ""
 "registered with name ``bean4`` as this name was passed during "
 "registration of a bean in ``main()`` method."
 msgstr ""
+"尽管 ``Bean2`` 使用名称 ``bean2`` 进行了注解，但它是使用名称 ``bean4`` "
+"注册的，因为该名称是在bean注册过程中在 ``main()`` 方法中传递的。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:470
 msgid ""
 "``Bean12`` was registered under name ``bean1_2`` as subbean of ``Bean1`` "
 "as a result of annotation of ``Bean12``"
-msgstr ""
+msgstr "由于 ``Bean12`` 的注释，``Bean12`` 被注册为 ``Bean1`` 的子bean，名为 "
+"``bean1_2``"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:472
 msgid ""
 "As mentioned DSL file structure depends on structure of beans, a file to "
 "set a config field in each bean to bean name should look like that:"
-msgstr ""
-
+msgstr "如前所述，DSL文件结构取决于bean的结构，将每个bean中的配置字段设置 "
+"bean名称的文件应如下所示："
