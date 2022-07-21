@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-21 22:31+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dp-data_sources_and_repositories/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:2
 msgid "Data Source and Repositories"
-msgstr ""
+msgstr "数据源和存储库"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:4
 msgid ""
@@ -28,22 +31,26 @@ msgid ""
 "maintaining connection to actual data source and classes operating on "
 "this data source."
 msgstr ""
+"在Tigase XMPP Server 8.0.0中引入了数据源的新概念。引入它是为了区分负责维护与"
+"实际数据源的连接的类和在该数据源上运行的类。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:7
 msgid "Data sources"
-msgstr ""
+msgstr "数据源"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:9
+#, fuzzy
 msgid "|Relations between DataSourceBean and DataSources|"
-msgstr ""
+msgstr "|Relations between DataSourceBean and DataSources|"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:68
+#, fuzzy
 msgid "Relations between DataSourceBean and DataSources"
-msgstr ""
+msgstr "Relations between DataSourceBean and DataSources"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:12
 msgid "DataSource"
-msgstr ""
+msgstr "数据源"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:14
 msgid ""
@@ -54,10 +61,15 @@ msgid ""
 "``@Repository.Meta`` annotation on classes implementing ``DataSource`` "
 "interface."
 msgstr ""
+"``DataSource`` 是一个接口，其应该由实现对数据源的访问的所有类来实现，换言之，"
+"使用JDBC连接实现对数据库的访问或对 MongoDB 的访问。 ``DataSource`` "
+"的实现是使用配置中提供的uri和实现 ``DataSource`` 接口的类上的 ``@Repository."
+"Meta`` 注释自动选择的。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:17
+#, fuzzy
 msgid "DataSourcePool"
-msgstr ""
+msgstr "DataSourcePool"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:19
 msgid ""
@@ -74,10 +86,19 @@ msgid ""
 "``@Repository.Meta`` annotation on classes implementing "
 "``DataSourcePool`` interface."
 msgstr ""
+"``DataSourcePool`` 是一个接口，应该由充当单个域的数据源池的类来实现。不需要创"
+"建实现这个接口的类，但是如果 ``DataSource`` "
+"的实现是阻塞的并且不支持并发请求，那么建议创建 ``DataSourcePool``。"
+"这种情况的一个例子是 ``DataRepositoryImpl`` "
+"的实现，它使用单个连接执行所有请求，对于这个类，``DataRepositoryPool`` "
+"实现了 ``DataSourcePool`` 接口并提高了性能。使用配置中提供的uri和实现 "
+"``DataSourcePool`` 接口的类上的 ``@Repository.Meta`` 注解自动选择 "
+"``DataSourcePool`` 的实现。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:22
+#, fuzzy
 msgid "DataSourceBean"
-msgstr ""
+msgstr "DataSourceBean"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:24
 msgid ""
@@ -88,37 +109,46 @@ msgid ""
 "will change during runtime ``DataSourceBean`` is responsible for firing a"
 " ``DataSourceChangedEvent`` to notify other classes about this change."
 msgstr ""
+"该类是一个帮助类，并为处理多个数据源提供支持。您可以将 ``DataSourceBean`` "
+"视为命名 ``DataSource`` 或 ``DataSourcePool`` 实例的映射。该类还负责数据源的"
+"初始化。此外，如果数据源在运行时发生变化，``DataSourceBean`` 负责触发一个 "
+"``DataSourceChangedEvent`` 以通知其他类有关此变化。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:27
 msgid "User and authentication repositories"
-msgstr ""
+msgstr "用户和身份验证存储库"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:29
 msgid ""
 "This repositories may be using existing (configured and initialized) data"
 " sources. However, it is also possible to that they may have their own "
 "connections. Usage of data sources is recommended if possible."
-msgstr ""
+msgstr "此存储库可能正在使用现有的（配置和初始化的）数据源。然而，它们也有可能有自己"
+"的连接源。如果可能，建议使用数据源。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:31
+#, fuzzy
 msgid "|Relations between AuthRepositories and DataSources|"
-msgstr ""
+msgstr "|Relations between AuthRepositories and DataSources|"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:69
+#, fuzzy
 msgid "Relations between AuthRepositories and DataSources"
-msgstr ""
+msgstr "Relations between AuthRepositories and DataSources"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:33
+#, fuzzy
 msgid "|Relations between UserRepositories and DataSources|"
-msgstr ""
+msgstr "|Relations between UserRepositories and DataSources|"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:70
+#, fuzzy
 msgid "Relations between UserRepositories and DataSources"
-msgstr ""
+msgstr "Relations between UserRepositories and DataSources"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:36
 msgid "AuthRepository and UserRepository"
-msgstr ""
+msgstr "AuthRepository和UserRepository"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:38
 msgid ""
@@ -127,10 +157,12 @@ msgid ""
 " (``UserRepository``). Classes implementing this interfaces should be "
 "only responsible for retrieving data from data sources."
 msgstr ""
+"这是一个基本接口，需要由身份验证存储库（``AuthRepository``）和用户存储库（``U"
+"serRepository``）实现。实现此接口的类应该只负责从数据源检索数据。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:41
 msgid "AuthRepositoryPool and UserRepositoryPool"
-msgstr ""
+msgstr "AuthRepositoryPool和UserRepositoryPool"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:43
 msgid ""
@@ -144,10 +176,16 @@ msgid ""
 "implementation within a pool, you need to set ``pool-cls`` property of "
 "configured user or authentication repository in your configuration file."
 msgstr ""
+"如果实现 ``AuthRepositoryPool`` 或 ``UserRepositoryPool`` "
+"的类不使用数据源或包含阻塞或不适合并发访问，则应将其包装在适当的存储库池中。"
+"作为Tigase XMPP Server的一部分提供的大多数实现不需要包装在存储库池中。如果您"
+"的实现阻塞或并发访问（即由于同步）性能不佳，则应将其包装在此池中。要将实现包"
+"装在池中，您需要在配置文件中设置已配置用户或身份验证存储库的 ``pool-cls`` "
+"属性。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:46
 msgid "AuthRepositoryMDPoolBean and UserRepositoryMDPoolBean"
-msgstr ""
+msgstr "AuthRepositoryMDPoolBean和UserRepositoryMDPoolBean"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:48
 msgid ""
@@ -157,10 +195,13 @@ msgid ""
 "or user repositories. They are also responsible for initialization of "
 "classes implementing this repositories."
 msgstr ""
+"这些类用于实现 ``AuthRepository`` 和 ``UserRepository`` 的类，而 "
+"``DataSourceBean`` 用于实现 ``DataSource`` 接口的类。此类包含命名身份验证或用"
+"户存储库的映射。他们还负责初始化实现此存储库的类。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:52
 msgid "Other repositories"
-msgstr ""
+msgstr "其他存储库"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:54
 msgid ""
@@ -168,18 +209,23 @@ msgid ""
 "``AuthRepository`` or ``UserRepository``. Each type of custom repository "
 "should have its own API and its own interface."
 msgstr ""
+"可以实现那些不实现 ``AuthRepository`` 或 ``UserRepository`` "
+"的存储库。每种类型的自定义存储库都应该有自己的API和自己的接口。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:56
+#, fuzzy
 msgid "|Relations between custom repositories and DataSources|"
-msgstr ""
+msgstr "|Relations between custom repositories and DataSources|"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:71
+#, fuzzy
 msgid "Relations between custom repositories and DataSources"
-msgstr ""
+msgstr "Relations between custom repositories and DataSources"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:59
+#, fuzzy
 msgid "DataSourceAware"
-msgstr ""
+msgstr "DataSourceAware"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:61
 msgid ""
@@ -192,10 +238,16 @@ msgid ""
 " implementation to make the automatically selected for proper type of "
 "``DataSource`` implementation."
 msgstr ""
+"自定义存储库应实现它们自己的接口，指定其API。此接口应扩展 ``DataSourceAware``"
+" 接口，该接口是自定义存储库需要实现的基本接口。 ``DataSourceAware`` 有一个 "
+"``setDataSource()`` "
+"方法，它将与数据源实例一起调用以初始化自定义存储库的实例。实现应该用 "
+"``@Repository.Meta`` 实现注释，以自动选择正确类型的 ``DataSource`` 实现。"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:64
+#, fuzzy
 msgid "MDRepositoryBean"
-msgstr ""
+msgstr "MDRepositoryBean"
 
 #: ../../Tigase_Development/Data_Sources_And_Repositories.rst:66
 msgid ""
@@ -205,4 +257,6 @@ msgid ""
 " of custom repository for each domain. Moreover, it will be responsible "
 "for creation and initialization of your custom repository instances."
 msgstr ""
-
+"需要创建一个扩展 ``MDRepositoryBean`` 的类，实现与自定义存储库相同的自定义接"
+"口。此类将是一个多域池，允许您为每个域单独实现自定义存储库。此外，它将负责创"
+"建和初始化您的自定义存储库实例。"
