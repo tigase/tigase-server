@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-07-18 23:14+0000\n"
+"PO-Revision-Date: 2022-07-21 20:22+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/properties_guide/zh_Hans/>\n"
@@ -22,7 +22,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Properties/_properties.rst:2
 msgid "Appendix II - Properties Guide"
-msgstr "Appendix II - 属性指南"
+msgstr "附录 II - 属性指南"
 
 #: ../../Tigase_Administration/Properties/_general.inc:2
 msgid "General"
