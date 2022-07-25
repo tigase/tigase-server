@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: 2022-07-19 08:14+0000\n"
+"PO-Revision-Date: 2022-07-26 09:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/security/zh_Hans/>\n"
@@ -1130,6 +1130,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:101
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:97
+#, fuzzy
 msgid "For example:"
 msgstr "例如："
 
