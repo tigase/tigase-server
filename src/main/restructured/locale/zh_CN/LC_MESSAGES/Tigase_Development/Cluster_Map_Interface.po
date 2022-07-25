@@ -3,34 +3,38 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-25 23:03+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-cluster_map_interface/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:2
 msgid "Cluster Map Interface"
-msgstr ""
+msgstr "集群映射接口"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:4
 msgid ""
 "Starting with v7.1.0, a cluster map interface has been implemented. The "
 "cluster map is aided by use of the distributed event bus system to "
 "communicate between all clusters."
-msgstr ""
+msgstr "从v7.1.0开始，实现了集群映射接口。集群映射通过使用分布式事件总线系统在所有集"
+"群之间进行通信来辅助。"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:7
 msgid "Requirements"
-msgstr ""
+msgstr "要求"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:9
 msgid ""
@@ -39,21 +43,24 @@ msgid ""
 "feature, however since Tigase requires this, you should already have it "
 "installed."
 msgstr ""
+"只要未禁用事件总线组件，任何完整的Tigase发行版都将支持Cluster Map API。"
+"此功能需要JDK v8，但由于Tigase需要此功能，您应该已经安装了它。"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:11
 msgid ""
 "The cluster map is stored in memory and follows the "
 "``map.util.interface`` java standards can be used to improve cluster "
 "connections, and help clustered servers keep track of each other."
-msgstr ""
+msgstr "集群映射存储在内存中并遵循 ``map.util.interface`` "
+"java标准，可用于改善集群连接，并帮助集群服务器相互跟踪。"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:14
 msgid "Map Creation"
-msgstr ""
+msgstr "映射创建"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:16
 msgid "Map must be created with the following command:"
-msgstr ""
+msgstr "必须使用以下命令创建映射："
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:22
 msgid ""
@@ -64,10 +71,14 @@ msgid ""
 "parameters, for example ID of user session. Once received, the "
 "distributed eventbus will create a local map."
 msgstr ""
+"其中\"type\"是映射ID。这会在本地创建映射，然后向所有集群服务器触发事件。每个"
+"集群服务器都有一个事件处理程序等待，在这种情况下，``NewMapCreate`` 事件。 "
+"Map Key类和Map Value类用于类型转换。字符串数组是参数，例如用户会话的ID。一旦"
+"收到，分布式事件总线将创建一个本地映射。"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:32
 msgid "A brief example of a map creation is shown here:"
-msgstr ""
+msgstr "此处显示了映射创建的简短示例："
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:38
 msgid ""
@@ -80,10 +91,17 @@ msgid ""
 "should be used to tell other nodes how to treat the event with a newly "
 "created map, and it should be stored in user session."
 msgstr ""
+"这将在所有其他集群节点上触发事件 ``MapCreatedEvent`` 。字符串 "
+"\"Very_Important_Map_In_User_Session\" 和 \"user-session-identifier-123\" 在 "
+":literal:`onMapCreated()\\`` 方法中作为参数给出。"
+"事件用户代码必须知道如何处理类型为\"Very_Important_Map_In_User_Session"
+"\"的地图。它可能会检索用户会话 \"user-session-identifier-"
+"123\"并将此映射放入此会话中。它应该用于告诉其他节点如何使用新创建的映射处理事"
+"件，并且应该将其存储在用户会话中。"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:41
 msgid "Map Changes"
-msgstr ""
+msgstr "映射更改"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:43
 msgid ""
@@ -91,45 +109,47 @@ msgid ""
 "``RemoveValue`` events in eventbus. Stanzas sent between clusters will "
 "look something like this:"
 msgstr ""
+"对一个集群上的映射的更改将在eventbus中触发 ``AddValue`` 或 ``RemoveValue`` "
+"事件。在集群之间发送的节看起来像这样："
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:59
 msgid "Code to handle adding an item:"
-msgstr ""
+msgstr "处理添加项目的代码："
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:68
 msgid ""
 "Where the element 'event' is the UID, and the name string is the name of "
 "the map key/value pair."
-msgstr ""
+msgstr "其中元素 'event'是UID，名称字符串是映射键/值对的名称。"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:70
 msgid ""
 "This example removes an element from the cluster map. Removal of items "
 "look similar:"
-msgstr ""
+msgstr "此示例从集群映射中删除一个元素。删除项目看起来相似："
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:82
 msgid "with the code also being similar:"
-msgstr ""
+msgstr "代码也相似："
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:93
 msgid "Map Destruction"
-msgstr ""
+msgstr "映射破坏"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:95
 msgid ""
 "Java Garbage Collector will normally remove a local map if it is no "
 "longer used. Clustered maps however are not removed in this manner. These"
 " maps must be destroyed manually if they are no longer used:"
-msgstr ""
+msgstr "如果不再使用本地映射，Java垃圾收集器通常会删除它。然而，集群映射不会以这种方"
+"式被删除。如果不再使用这些映射，则必须手动销毁它们："
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:101
 msgid "Calling this, the map named clmap will be destroyed on each cluster node."
-msgstr ""
+msgstr "调用这个，名为clmap的映射将在每个集群节点上被销毁。"
 
 #: ../../Tigase_Development/Cluster_Map_Interface.rst:103
 msgid ""
 "The event handler will catch event when map is destroyed on another "
 "cluster node:"
-msgstr ""
-
+msgstr "当映射在另一个集群节点上被销毁时，事件处理程序将捕获事件："
