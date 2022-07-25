@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-07-21 19:49+0000\n"
+"PO-Revision-Date: 2022-07-26 08:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/dg-tigase_kernel/zh_Hans/>\n"
@@ -499,7 +499,7 @@ msgstr ""
 #: ../../Tigase_Development/Tigase_Kernel.rst:176
 #: ../../Tigase_Development/Tigase_Kernel.rst:377
 msgid "**Example.**"
-msgstr "**例子。**"
+msgstr "**示例。**"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:194
 msgid ""
