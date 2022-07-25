@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 19:27-0700\n"
-"PO-Revision-Date: 2022-07-01 06:34+0000\n"
+"PO-Revision-Date: 2022-07-26 09:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/database_management/zh_Hans/>\n"
@@ -2427,6 +2427,7 @@ msgstr "``MD5-USERNAME-PASSWORD`` 数据库存储来自连接用户名（localpa
 "哈希码。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:33
+#, fuzzy
 msgid "For example:"
 msgstr "例如："
 
