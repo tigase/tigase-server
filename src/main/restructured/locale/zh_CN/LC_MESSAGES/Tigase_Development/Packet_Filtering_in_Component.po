@@ -3,33 +3,37 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-25 21:34+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-packet_filtering_in_component/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:4
 msgid "Packet Filtering in Components"
-msgstr ""
+msgstr "组件中的包过滤"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:7
 msgid "The Packet Filter API"
-msgstr ""
+msgstr "包过滤器API"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:9
 msgid ""
 "Tigase server offers an API to filter packet traffic inside every "
 "component. You can separately filter incoming and outgoing packets."
-msgstr ""
+msgstr "Tigase服务器提供了一个API来过滤每个组件内的数据包流量。您可以分别过滤传入和传"
+"出的数据包。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:11
 msgid ""
@@ -37,7 +41,8 @@ msgid ""
 "changes to the packet or just blocking the packet completely. By blocking"
 " we mean stopping from any further processing and just dropping the "
 "packet."
-msgstr ""
+msgstr "通过过滤，我们的意思是拦截一个数据包，并可能对数据包进行一些更改，或者只是完"
+"全阻止数据包。阻塞是指停止任何进一步的处理并丢弃数据包。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:13
 msgid ""
@@ -53,6 +58,13 @@ msgid ""
 "otherwise it returns a **Packet** object which is either the same object "
 "it received as a parameter or a modified copy of the original object."
 msgstr ""
+"包过滤基于 `PacketFilterIfc <https://github.com/tigase/tigase-server/blob/"
+"master/src/main/java/tigase/server/PacketFilterIfc.java>`__ "
+"接口。有关所有详细信息，请查看此接口的JavaDoc文档。主要的过滤方法是 ``Packet "
+"filter(Packet packet);`` ，它将数据包作为输入，对其进行处理，可能会警告数据包"
+"内容（可能会添加或删除一些有效负载）并返回一个 **Packet** 以进行进一步处理。"
+"如果它返回 **null** 这意味着数据包被阻止并且不允许进一步处理，否则它返回一个 "
+"**Packet** 对象，该对象是它作为参数接收的相同对象或原始对象的修改副本。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:15
 msgid ""
@@ -62,6 +74,10 @@ msgid ""
 "or threads, therefore modification of the **Packet** may lead to "
 "unpredictable results."
 msgstr ""
+"请注意，虽然 **Packet** "
+"对象不是不可修改的实例，但建议不要对现有对象进行更改。同一个 **Packet** "
+"可能会被其他组件或线程同时处理，因此修改 **Packet** "
+"可能会导致不可预知的结果。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:17
 msgid ""
@@ -74,6 +90,11 @@ msgid ""
 " counters for all types of packets, where they are generated, where they "
 "flow, what component they put the most load on."
 msgstr ""
+"请参考 `PacketCounter <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/server/filters/PacketCounter.java>`__ 中的示例代码，这是"
+"一个非常简单的过滤器计算不同类型的数据包。此过滤器默认加载到所有组件，这可能"
+"对评估新部署安装的流量形状非常有帮助。您可以获得所有类型的数据包的计数器，它"
+"们是在哪里生成的，它们在哪里流动，它们在哪个组件上负载最多。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:19
 msgid ""
@@ -87,10 +108,16 @@ msgid ""
 "server/blob/master/src/main/java/tigase/server/filters/PacketCounter.java>`__"
 " for an example implementation code."
 msgstr ""
+"这是因为数据包过滤器还可以生成和呈现自己的统计信息，这些统计信息可以通过正常"
+"的统计监控机制访问。为了利用统计功能，包过滤器必须实现 ``void getStatistics("
+"StatisticsList list);`` "
+"方法。通常，该方法为空。但是，您可以从过滤器生成统计信息并将其添加到列表中。"
+"示例实现代码请参考 `PacketCounter <https://github.com/tigase/tigase-server/"
+"blob/master/src/main/java/tigase/server/filters/PacketCounter.java>`__。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:22
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:24
 msgid ""
@@ -99,6 +126,8 @@ msgid ""
 "separately and for each traffic direction. This gives you a great "
 "flexibility and control over the data flow inside the Tigase server."
 msgstr ""
+"包过滤器是可配置的，即可以在Tigase服务器的配置中为每个组件和每个流量方向单独"
+"配置包过滤器实例。这为您提供了极大的灵活性和对Tigase服务器内部数据流的控制。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:26
 msgid ""
@@ -108,13 +137,17 @@ msgid ""
 "overall load by removing certain payload from all packets. The "
 "possibilities are endless."
 msgstr ""
+"例如，您可以将特定的数据包过滤器加载到所有连接管理器，以阻止特定流量或特定数"
+"据包源向服务器上的用户发送消息。您还可以通过从所有数据包中删除某些有效负载来"
+"减少服务器的整体负载。这有无限的可能性。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:28
 msgid ""
 "The default configuration is generated in such a way that each component "
 "loads a single packet filter - ``PacketCounter`` for each traffic "
 "direction:"
-msgstr ""
+msgstr "默认配置以这样一种方式生成，即每个组件加载单个数据包过滤器 - 每个流量方向的 "
+"``PacketCounter``："
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:83
 msgid ""
@@ -123,20 +156,24 @@ msgid ""
 " the components leaving it only in the message router component and you "
 "want to install SpamBlocker in all connection managers."
 msgstr ""
+"现在，假设您在类中实现了一个数据包过滤器：**com.company.SpamBlocker**。您希望"
+"在大多数组件上禁用PacketCounter，仅将其留在消息路由器组件中，并且您希望在所有"
+"连接管理器中安装SpamBlocker。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:85
 msgid ""
 "*Please note, in case of the connection managers 'incoming' and "
 "'outgoing' traffic is probably somehow opposite from what you would "
 "normally expect.*"
-msgstr ""
+msgstr "*请注意，连接管理器的'incoming'和 'outgoing'流量可能与您通常的预期相反。*"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:87
 msgid ""
 "**incoming** is traffic which is submitted to a component by message "
 "router and has to be further processed. For connection managers this "
 "further processing means sending it out to the network."
-msgstr ""
+msgstr "**incoming** 是由消息路由器提交给组件的流量，必须进一步处理。对于连接管理器，"
+"此进一步处理意味着将其发送到网络。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:89
 msgid ""
@@ -146,6 +183,9 @@ msgid ""
 "managers **outgoing** traffic is all the packets just received from the "
 "network."
 msgstr ""
+"**outgoing** 是由组件'生成'并流出组件的流量。这样的数据包被提交给消息路由器，"
+"然后由路由器决定将其发送到何处以进行进一步处理。对于连接管理器，**传出** "
+"流量是刚从网络收到的所有数据包。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:91
 msgid ""
@@ -155,12 +195,16 @@ msgid ""
 "connections and standard XMPP c2s connections. So let’s leave packet "
 "counters for this components too."
 msgstr ""
+"据此，我们必须将SpamBlocker过滤器应用于所有连接管理器中的所有'传出‘流量。"
+"您可能还认为比较Bosh连接和标准XMPP c2s连接之间的流量形状实际上可能很有用。因"
+"此，让我们也为这些组件保留数据包计数器。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:93
 msgid ""
 "Here is our new configuration applying SpamBlocker to connection managers"
 " and PacketCounter to a few other components:"
-msgstr ""
+msgstr "这是我们将SpamBlocker应用于连接管理器并将PacketCounter应用于其他一些组件的新"
+"配置："
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:151
 msgid ""
@@ -168,10 +212,12 @@ msgid ""
 "we were able to skip providing ``class`` parameter as those classes are "
 "properly annotated with ``@Bean`` annotation."
 msgstr ""
+"在 ``incomingFilters`` ``outgoingFilters`` 和 ``packetCounter`` 的情况下，"
+"我们能够跳过提供 ``class`` 参数，因为这些类正确地使用了 ``@Bean`` 注释。"
 
 #: ../../Tigase_Development/Packet_Filtering_in_Component.rst:153
 msgid ""
 "The simplest way to apply the new configuration is via the "
 "``config.tdsl`` file which is in details described in the *Admin Guide*."
-msgstr ""
-
+msgstr "应用新配置的最简单方法是通过 *Admin Guide* 中详细描述的 ``config.tdsl`` "
+"文件。"
