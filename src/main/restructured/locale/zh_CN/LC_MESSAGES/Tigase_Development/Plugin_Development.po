@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-26 20:25+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-plugin_development/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Plugin_Development.rst:2
 msgid "Plugin Development"
-msgstr ""
+msgstr "插件开发"
 
 #: ../../Tigase_Development/Plugin_Development.rst:4
 msgid ""
@@ -27,33 +30,34 @@ msgid ""
 "are designed and how they work inside the Tigase server. The last part of"
 " the documentation explains step by step creating the code for a new "
 "plugin."
-msgstr ""
+msgstr "这是一组文档，详细解释了什么是插件、它们是如何设计的以及它们如何在Tigase服务"
+"器中工作。文档的最后一部分逐步解释了如何为新插件创建代码。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:6
 msgid "`Writing Plugin Code <#writePluginCode>`__"
-msgstr ""
+msgstr ":ref:`编写插件代码<writePluginCode>`"
 
 #: ../../Tigase_Development/Plugin_Development.rst:8
 msgid "`Plugin Configuration <#pluginConf>`__"
-msgstr ""
+msgstr ":ref:`插件配置<pluginConf>`"
 
 #: ../../Tigase_Development/Plugin_Development.rst:10
 msgid "`How Packets are Processed by the SM and Plugins <#packetprocess>`__"
-msgstr ""
+msgstr ":ref:`SM和插件如何处理数据包<packetprocess>`"
 
 #: ../../Tigase_Development/Plugin_Development.rst:12
 msgid "`SASL Custom Mechanisms and Configuration <#saslcmac>`__"
-msgstr ""
+msgstr ":ref:`SASL自定义机制和配置<saslcmac>`"
 
 #: ../../Tigase_Development/Plugin_Development.rst:17
 msgid "Writing Plugin Code"
-msgstr ""
+msgstr "编写插件代码"
 
 #: ../../Tigase_Development/Plugin_Development.rst:19
 msgid ""
 "Stanza processing takes place in 4 steps. A different kind of plugin is "
 "responsible for each step of processing:"
-msgstr ""
+msgstr "节处理分4个步骤进行。不同类型的插件负责处理的每个步骤："
 
 #: ../../Tigase_Development/Plugin_Development.rst:21
 msgid ""
@@ -61,6 +65,9 @@ msgid ""
 "server/blob/master/src/main/java/tigase/xmpp/XMPPPreprocessorIfc.java>`__"
 " - is the interface for packets pre-processing plugins."
 msgstr ""
+"`XMPPPreprocessorIfc <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/xmpp/XMPPPreprocessorIfc.java>`__ - "
+"是数据包预处理插件的接口。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:23
 msgid ""
@@ -68,6 +75,8 @@ msgid ""
 "server/blob/master/src/main/java/tigase/xmpp/XMPPProcessor.java>`__ - is "
 "the interface for packets processing plugins."
 msgstr ""
+"`XMPPProcessorIfc <https://github.com/tigase/tigase-server/blob/master/src/"
+"main/java/tigase/xmpp/XMPPProcessor.java>`__ - 是数据包处理插件的接口。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:25
 msgid ""
@@ -75,6 +84,9 @@ msgid ""
 "server/blob/master/src/main/java/tigase/xmpp/XMPPPostprocessorIfc.java>`__"
 " - is the interface for packets post-processing plugins."
 msgstr ""
+"`XMPPPostprocessorIfc <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/xmpp/XMPPPostprocessorIfc.java>`__ - "
+"是数据包后处理插件的接口。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:27
 msgid ""
@@ -82,6 +94,9 @@ msgid ""
 "server/blob/master/src/main/java/tigase/xmpp/XMPPPacketFilterIfc.java>`__"
 " - is the interface for processing results filtering."
 msgstr ""
+"`XMPPPacketFilterIfc <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/xmpp/XMPPPacketFilterIfc.java>`__ - "
+"是处理结果过滤的接口。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:29
 msgid ""
@@ -89,7 +104,8 @@ msgid ""
 "method. This is where all the packet processing takes place. All of them "
 "take a similar set of parameters and below is a description for all of "
 "them:"
-msgstr ""
+msgstr "如果您查看这些接口中的任何一个，您只会发现一个方法。这是所有数据包处理发生的"
+"地方。它们都采用一组相似的参数，下面是对它们的描述："
 
 #: ../../Tigase_Development/Plugin_Development.rst:31
 msgid ""
@@ -98,6 +114,8 @@ msgid ""
 "altered. None of it’s fields or attributes can be changed during "
 "processing."
 msgstr ""
+"**数据包数据包** - 正在处理的数据包。此参数可能永远不会为空。即使这不是一个不"
+"可变的对象，也不能改变它。在处理过程中，它的任何字段或属性都不能更改。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:33
 msgid ""
@@ -107,6 +125,9 @@ msgid ""
 "only during the life of the session. This parameter can be null if there "
 "is no online user session at the time of the packet processing."
 msgstr ""
+"**XMPPResourceConnection session** - 用户会话，它保留所有用户会话数据并提供对"
+"用户数据存储库的访问权限。它允许仅在会话期间将信息存储在永久存储器或内存中。"
+"如果在处理数据包时没有在线用户会话，则该参数可以为空。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:35
 msgid ""
@@ -117,6 +138,10 @@ msgid ""
 "data) like messages for offline users and it also allows for reading user"
 " public data like VCards."
 msgstr ""
+"**NonAuthUserRepository repo** - 这是一个用户数据存储，通常在用户会话（上述参"
+"数）为空时使用。此存储库仅允许非常受限的访问。它允许存储一些用户私有数据（但"
+"不允许覆盖现有数据），例如离线用户的消息，它还允许读取用户公共数据，例如VCard"
+"s。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:37
 msgid ""
@@ -126,6 +151,9 @@ msgid ""
 "it is always required that a copy of the input packet is created and "
 "stored in the **results** queue."
 msgstr ""
+"**Queue<Packet> results** - 这是一个包含作为输入数据包处理结果生成的数据包的"
+"集合。无论发送对用户请求的响应还是将数据包转发到其目的地，"
+"始终需要创建输入数据包的副本并将其存储在 **results** 队列中。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:39
 msgid ""
@@ -134,6 +162,9 @@ msgid ""
 " unused, however if the plugin needs to access an external database that "
 "this is a way to pass the database connection string to the plugin."
 msgstr ""
+"**Map<String, Object> settings** - 此映射保留从Tigase服务器配置加载的插件特定"
+"设置。在大多数情况下，它是未使用的，但是如果插件需要访问外部数据库，这是将数"
+"据库连接字符串传递给插件的一种方式。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:41
 msgid ""
@@ -145,6 +176,11 @@ msgid ""
 "server/snapshot/javadoc/tigase/xmpp/impl/package-summary.html>`__ "
 "documentation for all details."
 msgstr ""
+"仔细查看一些接口后，您会发现它们扩展了另一个接口：`XMPPImplIfc "
+"<https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/"
+"xmpp/XMPPImplIfc .java>`__ 提供有关插件实现的基本元信息。有关所有详细信息，"
+"请参阅 `JavaDoc <http://docs.tigase.org/tigase-server/snapshot/javadoc/"
+"tigase/xmpp/impl/package-summary.html>`__ 文档。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:43
 msgid ""
@@ -158,6 +194,12 @@ msgid ""
 "The code has some comments inside already but this guide goes deeper into"
 " the implementation details."
 msgstr ""
+"出于本指南的目的，我们正在实现一个简单的插件，"
+"用于处理所有将数据包转发到目标地址的 **<message/>** "
+"数据包。传入的数据包被转发到用户连接，而传出的数据包被转发到外部目标地址。"
+"这个 `message plugin <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/xmpp/impl/Message.java>`__ 实际上已经实现并且它可以在我"
+"们的Git存储库。代码里面已经有一些注释，但本指南更深入地介绍了实现细节。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:45
 msgid ""
@@ -171,17 +213,23 @@ msgid ""
 "**XMPPProcessor** or use **AnnotatedXMPPProcessor** for annotation "
 "support."
 msgstr ""
+"首先，您必须选择要实现的插件类型。如果这将是一个数据包处理器，您必须实现 "
+"**XMPPProcessorIfc** 接口，如果这将是一个预处理器，那么您必须实现 "
+"**XMPPPreprocessorIfc** "
+"接口。当然，您的实现可以实现多个接口，甚至是所有接口。还有两个抽象帮助类，"
+"您应该将其中一个用作所有插件的基础 **XMPPProcessor** 或使用 "
+"**AnnotatedXMPPProcessor** 来支持注释。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:48
 msgid "Using annotation support"
-msgstr ""
+msgstr "使用注释支持"
 
 #: ../../Tigase_Development/Plugin_Development.rst:50
 #: ../../Tigase_Development/Plugin_Development.rst:85
 msgid ""
 "The class declaration should look like this (assuming you are "
 "implementing just the packet processor):"
-msgstr ""
+msgstr "类声明应如下所示（假设您只实现数据包处理器）："
 
 #: ../../Tigase_Development/Plugin_Development.rst:57
 msgid ""
@@ -193,12 +241,17 @@ msgid ""
 " As we want to process all messages and don’t want to spend whole day on "
 "thinking about a cool ID, let’s say our ID is: *message*."
 msgstr ""
+"首先要创建插件 **ID**。这是您放入配置文件中的唯一字符串，用于告诉服务器加载和"
+"使用插件。在大多数情况下，如果插件想要包含具有非常特定名称空间的元素的数据包"
+"，您可以使用XMLNS。当然，不能保证这个特定的XML元素也没有其他数据包。由于我们"
+"想处理所有消息并且不想花一整天时间考虑一个很酷的ID，假设我们的ID是：*message*"
+"。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:59
 msgid ""
 "A plugin informs about it’s presence using a static **ID** field and "
 "**@Id** annotation placed on class:"
-msgstr ""
+msgstr "插件使用放置在类上的静态 **ID** 字段和 **@Id** 注释来通知它的存在："
 
 #: ../../Tigase_Development/Plugin_Development.rst:69
 msgid ""
@@ -208,18 +261,21 @@ msgid ""
 "are in the \"**jabber:client**\" namespace. To indicate all supported "
 "elements and namespaces we have to add 2 more annotations:"
 msgstr ""
+"如前所述，这个插件只接收它感兴趣的数据包进行处理。在这个例子中，插件只对带有 "
+"**<message/>** 元素的数据包感兴趣，并且只有它们在\"**jabber:client**"
+"\"命名空间。为了表明所有支持的元素和命名空间，我们必须再添加2个注释："
 
 #: ../../Tigase_Development/Plugin_Development.rst:83
 msgid "Using older non-annotation based implementation"
-msgstr ""
+msgstr "使用较旧的非基于注释的实现"
 
 #: ../../Tigase_Development/Plugin_Development.rst:92
 msgid "The first thing to create is the plugin **ID** like above."
-msgstr ""
+msgstr "首先要创建的是插件 **ID** ，如上所示。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:94
 msgid "A plugin informs about it’s ID using following code:"
-msgstr ""
+msgstr "插件使用以下代码通知它的ID："
 
 #: ../../Tigase_Development/Plugin_Development.rst:101
 msgid ""
@@ -229,10 +285,14 @@ msgid ""
 "are in \"**jabber:client**\" namespace. To indicate all supported "
 "elements and namespaces we have to add 2 more methods:"
 msgstr ""
+"如前所述，这个插件只接收它感兴趣的这种数据包进行处理。在这个例子中，"
+"插件只对带有 **<message/>** 元素的数据包感兴趣，并且只有它们在 \"**jabber "
+":client**\" "
+"命名空间。为了表明所有支持的元素和命名空间，我们必须再添加2个方法："
 
 #: ../../Tigase_Development/Plugin_Development.rst:114
 msgid "Implementation of processing method"
-msgstr ""
+msgstr "处理方法的实现"
 
 #: ../../Tigase_Development/Plugin_Development.rst:116
 msgid ""
@@ -242,14 +302,17 @@ msgid ""
 "might be confusing or add a few more lines of code which might be helpful"
 " in your case."
 msgstr ""
+"现在我们已经准备好在Tigase中加载的插件。下一步是实际的数据包处理方法。完整代"
+"码请参考Git中的插件。我只会在此处对可能令人困惑的元素进行评论或添加更多代码，"
+"这可能对您的情况有所帮助。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:215
 msgid "Plugin Configuration"
-msgstr ""
+msgstr "插件配置"
 
 #: ../../Tigase_Development/Plugin_Development.rst:217
 msgid "Plugin configuration is straightforward."
-msgstr ""
+msgstr "插件配置很简单。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:219
 msgid ""
@@ -257,6 +320,8 @@ msgid ""
 "``config.tdsl`` file. Plugins fall within the ``'sess-man'`` container. "
 "To activate a plugin, simply list it among the sess-man plugins."
 msgstr ""
+"通过 ``config.tdsl`` 文件告诉Tigase服务器加载或不加载插件。插件属于 ``'sess-"
+"man'`` 容器。要激活插件，只需将其列在 sess-man插件中即可。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:221
 msgid ""
@@ -265,16 +330,18 @@ msgid ""
 "is the log file: logs/tigase-console.log. If you look inside you can find"
 " following output:"
 msgstr ""
+"如果您不想使用此方法来找出正在运行的插件，有两种方法可以识别插件是否正在运行"
+"。一是日志文件：logs/tigase-console.log。如果您查看内部，您会发现以下输出："
 
 #: ../../Tigase_Development/Plugin_Development.rst:240
 msgid "and this is a list of plugins which are loaded in your installation."
-msgstr ""
+msgstr "这是在您的安装中加载的插件列表。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:242
 msgid ""
 "Another way is to look inside the session manager source code which has "
 "the default list hardcoded:"
-msgstr ""
+msgstr "另一种方法是查看具有硬编码默认列表的会话管理器源代码："
 
 #: ../../Tigase_Development/Plugin_Development.rst:254
 msgid ""
@@ -282,6 +349,9 @@ msgid ""
 " list and add your plugin IDs as a value to the plugin list under 'sess-"
 "man'. Let’s say our plugin ID is **message** as in our all examples:"
 msgstr ""
+"如果您希望在这些默认值之外加载插件，您必须编辑列表并将您的插件ID作为值添加到"
+"'sess-man'下的插件列表中。假设我们的插件ID是 **message** "
+"其在我们所有的示例中："
 
 #: ../../Tigase_Development/Plugin_Development.rst:264
 msgid ""
@@ -289,12 +359,14 @@ msgid ""
 " at the runtime. You may specify class by adding ``class: "
 "class.implementing.plugin`` within the parenthesis of the plugin."
 msgstr ""
+"假设您的插件类位于类路径中，它将在运行时加载和使用。"
+"您可以通过在插件的括号内添加 ``class: class.implementing.plugin`` 来指定类。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:268
 msgid ""
 "If your plugin name has any special characters (-,:\\|/.) it needs to be "
 "encapsulated in single quotation marks."
-msgstr ""
+msgstr "如果您的插件名称有任何特殊字符（-,:\\|/.），则需要将其封装在单引号中。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:270
 msgid ""
@@ -304,33 +376,37 @@ msgid ""
 "you can set in the configuration file and these setting will be passed to"
 " the plugin at the processing time."
 msgstr ""
+"不过，插件配置还有另一部分。如果您查看了 :ref:`编写插件代码<writePluginCode>`"
+" 指南，您可以记住 **Map settings** 处理参数。这是您可以在配置文件中设置的属性"
+"映射，这些设置将在处理时传递给插件。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:272
 msgid ""
 "Again **config.tdsl** is the place to put the stuff. These kind of "
 "properties start under your **plugin ID** and each key and value will be "
 "a child underneath:"
-msgstr ""
+msgstr "**config.tdsl** 就是放置这些东西的地方。这些属性从您的 **plugin ID** "
+"开始，每个键和值都是下面的子项："
 
 #: ../../Tigase_Development/Plugin_Development.rst:286
 msgid ""
 "From v8.0.0 you will no longer be able to specify one value for multiple "
 "keys, you must set each one individually."
-msgstr ""
+msgstr "从v8.0.0开始，您将不再能够为多个键指定一个值，您必须单独设置每个键。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:288
 msgid "Last but not least - in case you have **omitted plugin ID**:"
-msgstr ""
+msgstr "最后但并非最不重要 - 如果您有 **省略插件ID**："
 
 #: ../../Tigase_Development/Plugin_Development.rst:296
 msgid ""
 "then the configured key-value pair will be a global/common plugin setting"
 " available to all loaded plugins."
-msgstr ""
+msgstr "那么配置的键值对将是一个全局/通用插件设置，可用于所有加载的插件。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:301
 msgid "How Packets are Processed by the SM and Plugins"
-msgstr ""
+msgstr "SM和插件如何处理数据包"
 
 #: ../../Tigase_Development/Plugin_Development.rst:303
 msgid ""
@@ -339,10 +415,12 @@ msgid ""
 "processing packets at different stages of the data flow. Please read the "
 "introduction below before proceeding to the actual coding part."
 msgstr ""
+"对于Tigase服务器插件开发，了解它是如何工作的很重要。有不同类型的插件负责在数"
+"据流的不同阶段处理数据包。在进行实际编码部分之前，请阅读下面的介绍。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:306
 msgid "Introduction"
-msgstr ""
+msgstr "介绍"
 
 #: ../../Tigase_Development/Plugin_Development.rst:308
 msgid ""
@@ -352,13 +430,17 @@ msgid ""
 "presences, a separate plugins responsible for iq roster, and a different "
 "one for iq version and so on."
 msgstr ""
+"在Tigase服务器中，**插件** 是负责处理特定XMPP节的代码片段。一个单独的插件可能"
+"负责处理消息，另一个插件负责处理存在，一个单独的插件负责iq "
+"roster，另一个插件负责iq版本等等。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:310
 msgid ""
 "A plugin provides information about what exact XML element(s) name(s) "
 "with xmlns it is interested in. So you can create a plugin which is "
 "interested in all packets containing caps child."
-msgstr ""
+msgstr "插件提供了有关它感兴趣的带有xmlns的确切XML元素名称的信息。因此，您可以创建一"
+"个插件，该插件对包含caps子项的所有数据包感兴趣。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:312
 msgid ""
@@ -369,26 +451,31 @@ msgid ""
 "simultaneously in separate threads so there is no guarantee on the order "
 "in which the stanza is processed by a different plugins."
 msgstr ""
+"特定节元素可能没有插件，在这种情况下，使用默认操作，即简单地将节转发到目标地"
+"址。一个特定的XML元素可能还有多个插件，然后它们都在不同的线程中同时处理相同的"
+"节，因此不能保证不同插件处理节的顺序。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:314
 msgid ""
 "Each stanza goes through the Session Manager component which processes "
 "packets in a few steps. Have a look at the picture below:"
-msgstr ""
+msgstr "每个节都通过会话管理器组件，该组件通过几个步骤处理数据包。看看下面的图片："
 
 #: ../../Tigase_Development/Plugin_Development.rst:316
+#, fuzzy
 msgid "|Consumer|"
-msgstr ""
+msgstr "|Consumer|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:356
+#, fuzzy
 msgid "Consumer"
-msgstr ""
+msgstr "Consumer"
 
 #: ../../Tigase_Development/Plugin_Development.rst:318
 msgid ""
 "The picture shows that each stanza is processed by the session manager in"
 " 4 steps:"
-msgstr ""
+msgstr "图片显示会话管理器分4步处理每个节："
 
 #: ../../Tigase_Development/Plugin_Development.rst:320
 msgid ""
@@ -401,6 +488,11 @@ msgid ""
 "result is 'true' then the packet is blocked and no further processing is "
 "performed."
 msgstr ""
+"预处理 - 所有加载的预处理器接收数据包进行处理。它们在会话管理器线程中工作，并"
+"且没有用于处理的内部队列。由于它们在会话管理器线程中工作，因此将处理时间限制"
+"在绝对最短非常重要，因为它们可能会影响会话管理器的性能。预处理器的目的是将它"
+"们用于数据包阻塞。如果预处理结果为'true'，则数据包被阻塞并且不执行进一步处理"
+"。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:322
 msgid ""
@@ -410,6 +502,9 @@ msgid ""
 "processor works in a separate thread and has own internal fixed size "
 "processing queue."
 msgstr ""
+"处理 - 如果数据包没有被任何预处理器阻止，这是数据包通过的下一步。它被插入到所"
+"有对该特定XML元素感兴趣的处理器队列中。每个处理器都在一个单独的线程中工作，并"
+"有自己的内部固定大小的处理队列。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:324
 msgid ""
@@ -420,12 +515,16 @@ msgid ""
 " is just forwarding the packet to a destination. Most commonly it is "
 "applied to <message/> packets."
 msgstr ""
+"后处理 - 如果该节没有处理器，则数据包将通过所有后处理器。会话管理器后处理器中"
+"内置的最后一个后处理器尝试对步骤2中未处理的数据包应用默认操作。通常，默认操作"
+"只是将数据包转发到目的地。最常见的是应用于 <message/>数据包。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:326
 msgid ""
 "Finally, if any of above 3 steps produced output/result packets all of "
 "them go through all filters which may or may not block them."
-msgstr ""
+msgstr "最后，如果以上3个步骤中的任何一个产生了输出/结果数据包，它们都会通过所有可能"
+"会或可能不会阻止它们的过滤器。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:328
 msgid ""
@@ -434,6 +533,9 @@ msgid ""
 "processed by the plugin and another place is after processing where "
 "filtering is applied to all results generated by the processor plugins."
 msgstr ""
+"需要注意的重要一点是，我们有两种或两个地方可能会阻止或过滤数据包。一个地方是"
+"在插件处理数据包之前，另一个地方是在处理之后对处理器插件生成的所有结果应用过"
+"滤。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:330
 msgid ""
@@ -446,14 +548,21 @@ msgid ""
 "result. Result packets can be generated in any of above 4 steps of the "
 "processing. Have a look at the picture below:"
 msgstr ""
+"同样重要的是要注意会话管理器和处理器插件充当数据包消费者。数据包被用于处理，"
+"一旦处理完成，数据包就会被销毁。因此，要将数据包转发到目的地，处理器必须创建"
+"数据包的副本，设置所有性能和属性并将其作为处理结果返回。当然，处理器可以生成"
+"任意数量的数据包作为结果。可以在上述4个处理步骤中的任何一个中生成结果包。看看"
+"下面的图片："
 
 #: ../../Tigase_Development/Plugin_Development.rst:332
+#, fuzzy
 msgid "|User Send to Comp|"
-msgstr ""
+msgstr "|User Send to Comp|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:357
+#, fuzzy
 msgid "User Send to Comp"
-msgstr ""
+msgstr "User Send to Comp"
 
 #: ../../Tigase_Development/Plugin_Development.rst:334
 msgid ""
@@ -464,18 +573,24 @@ msgid ""
 "consumed by the session manager during processing and a new packet has "
 "been generated by one of the plugins."
 msgstr ""
+"如果数据包P1是从服务器外部发送的，例如发送到另一台服务器上的用户或某个组件（M"
+"UC、PubSub、传输），则其中一个处理器必须创建数据包的副本 (P2) 并正确设置所有"
+"属性和目标地址。会话管理器在处理期间已使用数据包P1，并且其中一个插件已生成新"
+"数据包。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:336
 msgid "The same of course happens on the way back from the component to the user:"
-msgstr ""
+msgstr "在从组件返回给用户的过程中当然也会发生同样的情况："
 
 #: ../../Tigase_Development/Plugin_Development.rst:338
+#, fuzzy
 msgid "|Comp Sends to User|"
-msgstr ""
+msgstr "|Comp Sends to User|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:358
+#, fuzzy
 msgid "Comp Sends to User"
-msgstr ""
+msgstr "Comp Sends to User"
 
 #: ../../Tigase_Development/Plugin_Development.rst:340
 msgid ""
@@ -483,7 +598,8 @@ msgid ""
 "generate a copy of the packet to deliver it to the user. Of course packet"
 " forwarding is a default action which is applied when there is no plugin "
 "for the particular packet."
-msgstr ""
+msgstr "来自组件的数据包被处理，其中一个插件必须生成数据包的副本以将其交付给用户。当"
+"然，数据包转发是一个默认操作，其在特定数据包没有插件时被应用。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:342
 msgid ""
@@ -491,36 +607,42 @@ msgid ""
 "by many plugins at the same time therefore the packet should be in fact "
 "immutable and must not change once it got to the session manager for "
 "processing."
-msgstr ""
+msgstr "之所以这样实现，是因为输入数据包P1可以被许多插件同时处理，因此数据包实际上应"
+"该是不可变的，并且一旦到达会话管理器进行处理就不能更改。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:344
 msgid ""
 "The most obvious processing work flow is when a user sends request to the"
 " server and expects a response from the server:"
-msgstr ""
+msgstr "最明显的处理工作流程是当用户向服务器发送请求并期望服务器响应时："
 
 #: ../../Tigase_Development/Plugin_Development.rst:346
+#, fuzzy
 msgid "|User Request Response|"
-msgstr ""
+msgstr "|User Request Response|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:359
+#, fuzzy
 msgid "User Request Response"
-msgstr ""
+msgstr "User Request Response"
 
 #: ../../Tigase_Development/Plugin_Development.rst:348
 msgid ""
 "This design has one surprising consequence though. If you look at the "
 "picture below showing communication between 2 users you can see that the "
 "packet is copied twice before it is delivered to a final destination:"
-msgstr ""
+msgstr "不过，这种设计有一个令人惊讶的结果。如果您查看显示2个用户之间通信的下图，您可"
+"以看到数据包在传送到最终目的地之前被复制了两次："
 
 #: ../../Tigase_Development/Plugin_Development.rst:350
+#, fuzzy
 msgid "|User Sends to User|"
-msgstr ""
+msgstr "|User Sends to User|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:360
+#, fuzzy
 msgid "User Sends to User"
-msgstr ""
+msgstr "User Sends to User"
 
 #: ../../Tigase_Development/Plugin_Development.rst:352
 msgid ""
@@ -528,7 +650,8 @@ msgid ""
 "time it is processed on behalf of the User A as an outgoing packet and "
 "the second time it is processed on behalf of the User B as an incoming "
 "packet."
-msgstr ""
+msgstr "数据包必须由会话管理器处理两次。第一次代表用户A处理它作为传出数据包，第二次代"
+"表用户B处理它作为传入数据包。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:354
 msgid ""
@@ -538,85 +661,90 @@ msgid ""
 "for example, the User B is offline there is an offline message processor "
 "which should send the packet to a database instead of User B."
 msgstr ""
+"这是为了确保用户A有权发送数据包并且对数据包应用所有处理，同时确保用户B有权接"
+"收数据包并且应用所有处理。例如，如果用户B离线，则有一个离线消息处理器应该将数"
+"据包发送到数据库而不是用户B。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:365
 msgid "SASL Custom Mechanisms and Configuration"
-msgstr ""
+msgstr "SASL自定义机制和配置"
 
 #: ../../Tigase_Development/Plugin_Development.rst:367
 msgid ""
 "**This API is available from Tigase XMPP Server version 5.2.0 or later on"
 " our current master branch.**"
-msgstr ""
+msgstr "**此API可从Tigase XMPP服务器版本5.2.0或我们当前主分支上的更高版本获得。**"
 
 #: ../../Tigase_Development/Plugin_Development.rst:369
 msgid ""
 "**In version 8.0.0 there was a major change to the API and configuration "
 "of custom SASL mechanisms.**"
-msgstr ""
+msgstr "**在8.0.0版中，API和自定义SASL机制的配置发生了重大变化。**"
 
 #: ../../Tigase_Development/Plugin_Development.rst:371
 msgid ""
 "*Note that API is under active development. This description may be "
 "updated at any time.*"
-msgstr ""
+msgstr "*请注意，API正在积极开发中。此说明可能随时更新。*"
 
 #: ../../Tigase_Development/Plugin_Development.rst:374
 msgid "Basic SASL Configuration"
-msgstr ""
+msgstr "基本SASL配置"
 
 #: ../../Tigase_Development/Plugin_Development.rst:376
 msgid ""
 "SASL implementation in Tigase XMPP Server is compatible with Java API, "
 "the same exact interfaces are used."
-msgstr ""
+msgstr "Tigase XMPP Server中的SASL实现与Java API兼容，使用完全相同的接口。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:378
 msgid "The SASL implementation consists of following parts:"
-msgstr ""
+msgstr "SASL实现由以下部分组成："
 
 #: ../../Tigase_Development/Plugin_Development.rst:380
 msgid "mechanism"
-msgstr ""
+msgstr "机制"
 
 #: ../../Tigase_Development/Plugin_Development.rst:382
 msgid "CallbackHandler"
-msgstr ""
+msgstr "回调处理程序"
 
 #: ../../Tigase_Development/Plugin_Development.rst:385
 msgid "Mechanisms Configuration"
-msgstr ""
+msgstr "机制配置"
 
 #: ../../Tigase_Development/Plugin_Development.rst:387
 msgid ""
 "To add a new mechanism, a new factory for the mechanism has to be "
 "implemented and registered."
-msgstr ""
+msgstr "要添加新机制，必须实现并注册该机制的新工厂。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:389
 msgid ""
 "The simplest way to add register a new factory is to annotate its class "
 "with ``@Bean`` annotation:"
-msgstr ""
+msgstr "添加注册新工厂的最简单方法是使用 ``@Bean`` 注释对其类进行注释："
 
 #: ../../Tigase_Development/Plugin_Development.rst:391
 msgid ""
 "**Example of the registration of a SASL mechanism factory with an "
 "annotation setting id of the factory to ``customSaslFactory``.**"
-msgstr ""
+msgstr "**使用工厂的注解设置id将SASL机制工厂注册到** ``customSaslFactory`` "
+"**的示例。**"
 
 #: ../../Tigase_Development/Plugin_Development.rst:398
 msgid ""
 "It can also be done by specifying the class directly for bean "
 "``customSaslFactory`` in the ``config.tdsl`` file like in the example "
 "below:"
-msgstr ""
+msgstr "也可以通过在 ``config.tdsl`` 文件中直接为bean "
+"``customSaslFactory``指定类来完成，如下例所示："
 
 #: ../../Tigase_Development/Plugin_Development.rst:400
 msgid ""
 "**Example of the registration of a SASL mechanism factory with TDSL "
 "setting id of the factory to ``customSaslFactory``.**"
-msgstr ""
+msgstr "**注册SASL机制工厂的示例，其工厂的TDSL设置id为** ``customSaslFactory``。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:410
 msgid ""
@@ -624,6 +752,8 @@ msgid ""
 "public constructor without any arguments. All mechanisms returned by "
 "``getMechanismNames()`` method will be registered automatically."
 msgstr ""
+"该类必须实现 ``SaslServerFactory`` 接口并具有不带任何参数的公共构造函数。 "
+"``getMechanismNames()`` 方法返回的所有机制都将自动注册。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:412
 msgid ""
@@ -632,17 +762,21 @@ msgid ""
 "``ANONYMOUS``, ``EXTERNAL``, ``SCRAM-SHA-1``, ``SCRAM-SHA-256`` and "
 "``SCRAM-SHA-512`` mechanisms."
 msgstr ""
+"默认情况下可用和注册的默认工厂是 ``tigase.auth.TigaseSaslServerFactory`` ，"
+"它提供 ``PLAIN``, ``ANONYMOUS``, ``EXTERNAL``, ``SCRAM-SHA-1``, ``SCRAM-"
+"SHA-256`` 和 ``SCRAM-SHA-512`` 机制。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:415
 msgid "CallbackHandler Configuration"
-msgstr ""
+msgstr "CallbackHandler配置"
 
 #: ../../Tigase_Development/Plugin_Development.rst:417
 msgid ""
 "The ``CallbackHandler`` is a helper class used for loading/retrieving "
 "authentication data from data repository and providing them to a "
 "mechanism."
-msgstr ""
+msgstr "``CallbackHandler`` "
+"是一个帮助类，用于从数据存储库加载/检索身份验证数据并将它们提供给机制。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:419
 msgid ""
@@ -653,23 +787,29 @@ msgid ""
 "``create()`` method to return an instance of your custom "
 "``CallbackHandler`` when appropriate."
 msgstr ""
+"要注册一个新的回调处理程序，您需要创建一个扩展 ``tigase.auth."
+"CallbackHandlerFactory`` 的新类（如果您希望保留现有的SASL回调处理程序）"
+"或实现 ``tigase.auth.CallbackHandlerFactoryIfc``。您将需要重写 ``create()`` "
+"方法以在适当的时候返回您的自定义 ``CallbackHandler`` 的实例。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:421
 msgid ""
 "Next you need to register new implementation of "
 "``CallbackHandlerFactoryIfc``. The ``config.tdsl`` file should include:"
-msgstr ""
+msgstr "接下来，您需要注册 ``CallbackHandlerFactoryIfc`` 的新实现。 ``config.tdsl`` "
+"文件应包括："
 
 #: ../../Tigase_Development/Plugin_Development.rst:431
 msgid ""
 "During the authentication process, Tigase server always checks for asks "
 "callback handler factory for specific handler to selected mechanisms, and"
 " if there is no specific handler the default one is used."
-msgstr ""
+msgstr "在身份验证过程中，Tigase服务器始终检查请求回调处理程序工厂以获取特定处理程序"
+"到选定机制，如果没有特定处理程序，则使用默认处理程序。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:434
 msgid "Selecting Mechanisms Available in the Stream"
-msgstr ""
+msgstr "选择流中可用的机制"
 
 #: ../../Tigase_Development/Plugin_Development.rst:436
 msgid ""
@@ -677,30 +817,33 @@ msgid ""
 "mechanisms available in a stream. Method ``filterMechanisms()`` should "
 "return a collection with mechanisms available based on:"
 msgstr ""
+"``tigase.auth.MechanismSelector`` 接口用于选择流中可用的机制。方法 "
+"``filterMechanisms()`` 应该返回一个具有可用机制的集合，基于："
 
 #: ../../Tigase_Development/Plugin_Development.rst:438
 msgid "all registered SASL factories"
-msgstr ""
+msgstr "所有注册的SASL工厂"
 
 #: ../../Tigase_Development/Plugin_Development.rst:440
 msgid "XMPP session data (from ``XMPPResourceConnection`` class)"
-msgstr ""
+msgstr "XMPP会话数据（来自 ``XMPPResourceConnection`` 类）"
 
 #: ../../Tigase_Development/Plugin_Development.rst:442
 msgid ""
 "The default selector returns mechanisms from all mechanism factories "
 "registered in ``sasl-provider`` ``(TigaseSaslProvider)``."
-msgstr ""
+msgstr "默认选择器从在 ``sasl-provider`` ``(TigaseSaslProvider)`` "
+"中注册的所有机制工厂返回机制。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:444
 msgid ""
 "It is possible to use a custom selector by specifying it’s class int the "
 "``config.tdsl`` file:"
-msgstr ""
+msgstr "可以通过在 ``config.tdsl`` 文件中指定它的类来使用自定义选择器："
 
 #: ../../Tigase_Development/Plugin_Development.rst:455
 msgid "Logging/Authentication"
-msgstr ""
+msgstr "记录/认证"
 
 #: ../../Tigase_Development/Plugin_Development.rst:457
 msgid ""
@@ -711,6 +854,9 @@ msgid ""
 "``MechanismSelector`` is responsible for choosing mechanisms. List of "
 "allowed mechanisms is stored in the XMPP session object."
 msgstr ""
+"在客户端打开XMPP流后，服务器会检查哪些SASL机制可用于XMPP会话。根据流是否加密"
+"，根据域，服务器可以提供不同的可用身份验证机制。 ``MechanismSelector`` "
+"负责选择机制。允许的机制列表存储在XMPP会话对象中。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:459
 msgid ""
@@ -722,6 +868,10 @@ msgid ""
 " and proceeds with exchanging authentication information. Authentication "
 "data is different depending on the mechanism used."
 msgstr ""
+"当客户端/用户开始认证过程时，它使用一种特定的机制。它必须使用服务器提供的可用"
+"于此会话的机制之一。服务器检查客户端使用的机制是否在允许的机制列表中。如果检"
+"查成功，服务器将创建 ``SaslServer`` "
+"类实例并继续交换身份验证信息。认证数据因使用的机制而异。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:461
 msgid ""
@@ -730,6 +880,9 @@ msgid ""
 "first case, the server automatically builds user’s JID based on the "
 "domain used in the stream opening element in ``to`` attribute."
 msgstr ""
+"当SASL认证完成且没有任何错误时，Tigase服务器应该有授权的用户名或授权的BareJID"
+"。在第一种情况下，服务器会根据 ``to`` "
+"属性中的流打开元素中使用的域自动构建用户的JID。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:463
 msgid ""
@@ -743,20 +896,25 @@ msgid ""
 " but we do not need to load any XMPP specific data for the user’s "
 "session."
 msgstr ""
+"如果在成功验证后，方法调用：``getNegotiatedProperty(\"IS_ANONYMOUS\")`` 返回 "
+"``Boolean.TRUE`` 则用户会话被标记为匿名。对于有效和注册用户，这可用于我们不想"
+"加载任何用户数据（例如名册、vcard、隐私列表等）的情况。这是对性能和资源使用的"
+"影响，可用于支持聊天等用例。授权是基于客户端数据库执行的，但我们不需要为用户"
+"会话加载任何XMPP特定数据。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:465
 msgid ""
 "More details about implementation can be found in the `custom mechanisms "
 "development <#cmd>`__ section."
-msgstr ""
+msgstr "更多关于实现的细节可以在 :ref:`自定义机制开发<cmd>` 部分中找到。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:468
 msgid "Custom Mechanisms Development"
-msgstr ""
+msgstr "自定义机制开发"
 
 #: ../../Tigase_Development/Plugin_Development.rst:471
 msgid "**Mechanism**"
-msgstr ""
+msgstr "**机制**"
 
 #: ../../Tigase_Development/Plugin_Development.rst:473
 msgid ""
@@ -767,6 +925,10 @@ msgid ""
 "the method returns a full, valid BareJID, the server does not change "
 "anything."
 msgstr ""
+"来自 ``SaslServer`` 类的 ``getAuthorizationID()`` 方法 **应该** "
+"返回裸JID授权用户。如果该方法仅返回用户名，例如 "
+"**romeo**，则服务器会自动附加域名以生成有效的BareJID：*romeo@example."
+"com*。如果该方法返回完整、有效的 BareJID，则服务器不会更改任何内容。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:475
 msgid ""
@@ -774,10 +936,12 @@ msgid ""
 "with user’s Bare JID provided by ``getAuthorizationID()`` (or created "
 "later using stream domain name)."
 msgstr ""
+"``SessionManagerHandler`` 的 ``handleLogin()`` 方法将使用 "
+"``getAuthorizationID()`` 提供的用户裸JID（或稍后使用流域名创建）来调用。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:478
 msgid "**CallbackHandler**"
-msgstr ""
+msgstr "**回调处理程序**"
 
 #: ../../Tigase_Development/Plugin_Development.rst:480
 msgid ""
@@ -785,31 +949,32 @@ msgid ""
 "empty handler. Factory which creates handler instance allows to inject "
 "different objects to the handler, depending on interfaces implemented by "
 "the handler class:"
-msgstr ""
+msgstr "对于每个会话授权，服务器都会创建一个新的单独的空处理程序。创建处理程序实例的"
+"工厂允许向处理程序注入不同的对象，具体取决于处理程序类实现的接口："
 
 #: ../../Tigase_Development/Plugin_Development.rst:482
 msgid "``AuthRepositoryAware`` - injects ``AuthRepository;``"
-msgstr ""
+msgstr "``AuthRepositoryAware`` - 注入 ``AuthRepository;``"
 
 #: ../../Tigase_Development/Plugin_Development.rst:484
 msgid ""
 "``DomainAware`` - injects domain name within which the user attempts to "
 "authenticate"
-msgstr ""
+msgstr "``DomainAware`` - 注入用户尝试进行身份验证的域名"
 
 #: ../../Tigase_Development/Plugin_Development.rst:486
 msgid "``NonAuthUserRepositoryAware`` - injects ``NonAuthUserRepository``"
-msgstr ""
+msgstr "``NonAuthUserRepositoryAware`` - 注入 ``NonAuthUserRepository``"
 
 #: ../../Tigase_Development/Plugin_Development.rst:489
 msgid "General Remarks"
-msgstr ""
+msgstr "通用说明"
 
 #: ../../Tigase_Development/Plugin_Development.rst:491
 msgid ""
 "``JabberIqAuth`` used for non-SASL authentication mechanisms uses the "
 "same callback as the SASL mechanisms."
-msgstr ""
+msgstr "``JabberIqAuth`` 用于非SASL身份验证机制使用与SASL机制相同的回调。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:493
 msgid ""
@@ -818,4 +983,6 @@ msgid ""
 "new methods available which will allow for additional login operations on"
 " the database such as last successful login recording."
 msgstr ""
-
+"``Repository`` 接口中的 ``auth`` 方法将被弃用。这些接口将仅被视为用户详细信息"
+"提供者。将有新的可用方法允许对数据库进行额外的登录操作，比如上次成功登录记录"
+"。"
