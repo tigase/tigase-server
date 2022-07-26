@@ -3,31 +3,34 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-26 21:31+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-using_maven/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Using_Maven.rst:2
 msgid "Using Maven"
-msgstr ""
+msgstr "使用Maven"
 
 #: ../../Tigase_Development/Using_Maven.rst:4
 msgid "Documents Describing Maven Use with the Tigase Projects"
-msgstr ""
+msgstr "文档描述Maven在Tigase项目中的使用"
 
 #: ../../Tigase_Development/Using_Maven.rst:7
 msgid "Setting up Maven in Windows"
-msgstr ""
+msgstr "在Windows中设置Maven"
 
 #: ../../Tigase_Development/Using_Maven.rst:9
 msgid ""
@@ -39,10 +42,15 @@ msgid ""
 "install process which might be a bit daunting for the new user, but setup"
 " and use is fairly simple."
 msgstr ""
+"在Tigase，我们使用Apache "
+"Maven下载最新版本，编译导出代码，并在构建期间检查代码中的错误。"
+"本指南将介绍从 Windows操作环境安装和运行Maven。"
+"我们将在本指南中考虑Windows版本 7、8 和 8.1。因为Maven不附带安装程序，所以有"
+"一个手动安装过程，这对新用户来说可能有点令人生畏，但设置和使用相当简单。"
 
 #: ../../Tigase_Development/Using_Maven.rst:12
 msgid "Requirements"
-msgstr ""
+msgstr "要求"
 
 #: ../../Tigase_Development/Using_Maven.rst:14
 msgid ""
@@ -54,6 +62,11 @@ msgid ""
 "**JAVA_HOME** variable entered into Environment Variables so calls to "
 "Java will work from the command line."
 msgstr ""
+"Maven需要Java开发工具包(JDK) 6或更高版本。由于Tigase需要最新的JDK才能运行，这"
+"将满足我们的目的。如果您还没有安装它，请从 `此网站 <http://www.oracle.com/"
+"technetwork/java/javase/downloads/index.html>`__ "
+"下载安装程序。安装JDK并重新启动计算机后，请确保已将 **JAVA_HOME** "
+"变量输入到环境变量中，以便从命令行调用Java。"
 
 #: ../../Tigase_Development/Using_Maven.rst:16
 msgid ""
@@ -61,10 +74,13 @@ msgid ""
 "<https://maven.apache.org/download.cgi>`__ and unpack it into a directory"
 " of your choice. For this guide we will use ``C:\\Maven\\`` ."
 msgstr ""
+"从 `这里 <https://maven.apache.org/download.cgi>`__ "
+"下载Maven包并将其解压到您选择的目录中。对于本指南，我们将使用 ``C:\\Maven\\``"
+" 。"
 
 #: ../../Tigase_Development/Using_Maven.rst:19
 msgid "Setting up Environment Variables"
-msgstr ""
+msgstr "设置环境变量"
 
 #: ../../Tigase_Development/Using_Maven.rst:21
 msgid ""
@@ -73,25 +89,31 @@ msgid ""
 "Settings**. Now click the |Environment Variables| button at the bottom of"
 " the panel and the Environment Variables panel will show."
 msgstr ""
+"通过单击 **System and Security** > **System** > **Advanced System Settings** "
+"从控制面板中调出环境变量面板。现在单击 |Environment Variables| "
+"面板底部的按钮，将显示环境变量面板。"
 
 #: ../../Tigase_Development/Using_Maven.rst:70
 msgid "Environment Variables"
-msgstr ""
+msgstr "环境变量"
 
 #: ../../Tigase_Development/Using_Maven.rst:23
 msgid ""
 "**IMPORTANT NOTICE: CHANGING THESE SETTINGS CAN BREAK OTHER FUNCTIONS IN "
 "THE OPERATING SYSTEM. DO NOT FOLLOW THIS GUIDE IF YOU DO NOT KNOW WHAT "
 "YOU ARE DOING!**"
-msgstr ""
+msgstr "**重要提示：更改这些设置可能会破坏操作系统中的其他功能。如果您不知道自己在做"
+"什么，请勿遵循本指南！**"
 
 #: ../../Tigase_Development/Using_Maven.rst:25
+#, fuzzy
 msgid "|Env Panel|"
-msgstr ""
+msgstr "|Env Panel|"
 
 #: ../../Tigase_Development/Using_Maven.rst:71
+#, fuzzy
 msgid "Env Panel"
-msgstr ""
+msgstr "Env Panel"
 
 #: ../../Tigase_Development/Using_Maven.rst:27
 msgid ""
@@ -100,24 +122,29 @@ msgid ""
 "look for M2_HOME, and others that look for MAVEN_HOME, it’s easier to "
 "just add both and have all the bases covered."
 msgstr ""
+"我们需要首先向系统变量添加两个变量路径，以说明Maven的安装位置。由于有些程序会"
+"查找M2_HOME，而其他程序会查找 "
+"MAVEN_HOME，因此只需添加两者并覆盖所有基础就更容易了。"
 
 #: ../../Tigase_Development/Using_Maven.rst:29
 msgid "Click on New…​"
-msgstr ""
+msgstr "点击新建…​"
 
 #: ../../Tigase_Development/Using_Maven.rst:31
+#, fuzzy
 msgid "|Env New|"
-msgstr ""
+msgstr "|Env New|"
 
 #: ../../Tigase_Development/Using_Maven.rst:72
+#, fuzzy
 msgid "Env New"
-msgstr ""
+msgstr "Env New"
 
 #: ../../Tigase_Development/Using_Maven.rst:33
 msgid ""
 "For the Name, use M2_HOME, and for the variable enter the path to maven, "
 "which in this case is"
-msgstr ""
+msgstr "对于名称，使用M2_HOME，对于变量，输入maven的路径，在本例中为"
 
 #: ../../Tigase_Development/Using_Maven.rst:39
 msgid ""
@@ -125,41 +152,46 @@ msgid ""
 "directory. **These variable values just point to where you have unpacked "
 "maven, so they do not have to be in the C directory.**"
 msgstr ""
+"使用MAVEN_HOME名称创建另一个新变量并添加相同的目录。 "
+"**这些变量值只是指向您解压maven的位置，因此它们不必必须位于C目录中。**"
 
 #: ../../Tigase_Development/Using_Maven.rst:41
 msgid ""
 "Go down to the system variables dialog and select Path, then click on "
 "Edit. The Path variables are separated by semicolons, find the end of the"
 " Variable value string, and add the following after the last entry:"
-msgstr ""
+msgstr "转到系统变量对话框并选择路径，然后单击编辑。 Path变量用分号隔开，"
+"找到Variable value字符串的结尾，在最后一项后添加以下内容："
 
 #: ../../Tigase_Development/Using_Maven.rst:47
 #, python-format
 msgid ""
 "We have added two variables using the %% wildcards surrounding our "
 "Variable names from earlier."
-msgstr ""
+msgstr "我们使用前面的变量名称周围的 %% 通配符添加了两个变量。"
 
 #: ../../Tigase_Development/Using_Maven.rst:50
 msgid "Testing Maven"
-msgstr ""
+msgstr "测试Maven"
 
 #: ../../Tigase_Development/Using_Maven.rst:52
 msgid ""
 "Now we must test the command line to be sure everything installed "
 "correctly. Bring up the command line either by typing ``cmd`` in search, "
 "or navigating the start menu."
-msgstr ""
+msgstr "现在我们必须测试命令行以确保一切都正确安装。通过在搜索中键入 ``cmd`` "
+"或导航开始菜单来调出命令行。"
 
 #: ../../Tigase_Development/Using_Maven.rst:54
 msgid ""
 "From the prompt, you do not need to change directory as setting Path "
 "allows you to reference it. Type the following command: ``mvn -v``"
-msgstr ""
+msgstr "在提示符下，您不需要更改目录，因为设置Path允许您引用它。输入以下命令：``mvn "
+"-v``"
 
 #: ../../Tigase_Development/Using_Maven.rst:56
 msgid "something like this should show up"
-msgstr ""
+msgstr "应该出现这样的信息"
 
 #: ../../Tigase_Development/Using_Maven.rst:68
 msgid ""
@@ -168,78 +200,84 @@ msgid ""
 "is installed, and the JAVA_HOME, M2_HOME, and MAVEN_HOME variables are "
 "set properly."
 msgstr ""
+"如果您看到此消息，则成功！您已完成安装并准备好使用Maven！如果没有，请返回您的"
+"设置并确保已安装JDK，并且正确设置了JAVA_HOME、M2_HOME和MAVEN_HOME变量。"
 
 #: ../../Tigase_Development/Using_Maven.rst:75
 msgid "A Very Short Maven Guide"
-msgstr ""
+msgstr "一个非常简短的Maven指南"
 
 #: ../../Tigase_Development/Using_Maven.rst:77
 msgid ""
 "If you don’t use `Maven <http://maven.apache.org/>`__ at all or use it "
 "once a year you may find the document a useful maven commands reminder:"
 msgstr ""
+"如果你根本不使用 `Maven <http://maven.apache.org/>`__ "
+"或者每年使用一次，你可能会发现文档是一个有用的maven命令提醒："
 
 #: ../../Tigase_Development/Using_Maven.rst:80
 msgid "Snapshot Compilation and Snapshot Package Generation"
-msgstr ""
+msgstr "快照编译和快照包生成"
 
 #: ../../Tigase_Development/Using_Maven.rst:82
 msgid "``mvn compile`` - compilation of the snapshot package"
-msgstr ""
+msgstr "``mvn compile`` - 快照包的编译"
 
 #: ../../Tigase_Development/Using_Maven.rst:84
 msgid "``mvn package`` - create snapshot jar file"
-msgstr ""
+msgstr "``mvn package`` - 创建快照jar文件"
 
 #: ../../Tigase_Development/Using_Maven.rst:86
 msgid "``mvn install`` - install in local repository snapshot jar file"
-msgstr ""
+msgstr "``mvn install`` - 安装在本地存储库快照jar文件中"
 
 #: ../../Tigase_Development/Using_Maven.rst:88
 msgid "``mvn deploy`` - deploy to the remote repository snapshot jar file"
-msgstr ""
+msgstr "``mvn deploy`` - 部署到远程仓库快照jar文件"
 
 #: ../../Tigase_Development/Using_Maven.rst:91
 msgid "Release Compilation, Generation"
-msgstr ""
+msgstr "发布编译，生成"
 
 #: ../../Tigase_Development/Using_Maven.rst:93
 msgid "``mvn release:prepare`` prepare the project for a new version release"
-msgstr ""
+msgstr "``mvn release:prepare`` 为新版本发布准备项目"
 
 #: ../../Tigase_Development/Using_Maven.rst:95
 msgid "``mvn release:perform`` execute new version release generation"
-msgstr ""
+msgstr "``mvn release:perform`` 执行新版本的发布生成"
 
 #: ../../Tigase_Development/Using_Maven.rst:98
 msgid "Generating tar.gz, tar.bz2 File With Sources Only"
-msgstr ""
+msgstr "仅使用源生成tar.gz、tar.bz2文件"
 
 #: ../../Tigase_Development/Using_Maven.rst:100
+#, fuzzy
 msgid "``mvn -DdescriptorId=src assembly:assembly``"
-msgstr ""
+msgstr "``mvn -DdescriptorId=src assembly:assembly``"
 
 #: ../../Tigase_Development/Using_Maven.rst:102
 msgid ""
 "Any of these commands will work when your commandline is in a directory "
 "with a pom.xml file. This file will instruct what Maven will do."
-msgstr ""
+msgstr "当您的命令行位于带有pom.xml文件的目录中时，这些命令中的任何一个都将起作用。该"
+"文件将指示Maven将做什么。"
 
 #: ../../Tigase_Development/Using_Maven.rst:105
 msgid "Profiles"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Development/Using_Maven.rst:107
 msgid ""
 "Maven uses profiles with the -P switch to tell what to compile and build."
 " Tigase uses two different profiles:"
-msgstr ""
+msgstr "Maven使用带有 -P 开关的配置文件来告诉编译和构建什么。 "
+"Tigase使用两种不同的配置文件："
 
 #: ../../Tigase_Development/Using_Maven.rst:109
 msgid "-Pdist - creates distribution archives"
-msgstr ""
+msgstr "-Pdist - 创建分发档案"
 
 #: ../../Tigase_Development/Using_Maven.rst:111
 msgid "-Pdoc - creates documentation"
-msgstr ""
-
+msgstr "-Pdoc - 创建文档"
