@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-27 22:18+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-experimental/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Experimental.rst:2
 msgid "Experimental"
-msgstr ""
+msgstr "实验"
 
 #: ../../Tigase_Development/Experimental.rst:4
 msgid ""
@@ -27,29 +30,30 @@ msgid ""
 "functionality of the server. Some of them are based on never published "
 "extensions, some of them are just test implementation for new ideas or "
 "performance improvements."
-msgstr ""
+msgstr "该指南包含对服务器的非标准或实验性功能的描述。其中一些基于从未发布的扩展，其"
+"中一些只是测试实现以获取新想法或性能改进。"
 
 #: ../../Tigase_Development/Experimental.rst:6
 msgid "`Dynamic Rosters <#dynamicRosters>`__"
-msgstr ""
+msgstr ":ref:`动态名册<dynamicRosters>`"
 
 #: ../../Tigase_Development/Experimental.rst:8
 msgid "`Mobile Optimizations <#mobileoptimizations>`__"
-msgstr ""
+msgstr ":ref:`移动优化<mobileoptimizations>`"
 
 #: ../../Tigase_Development/Experimental.rst:10
 msgid "`Bosh Session Cache <#boshsessioncache>`__"
-msgstr ""
+msgstr ":ref:`Bosh会话缓存<boshsessioncache>`"
 
 #: ../../Tigase_Development/Experimental.rst:16
 msgid "Dynamic Rosters"
-msgstr ""
+msgstr "动态名册"
 
 #: ../../Tigase_Development/Experimental.rst:19
 #: ../../Tigase_Development/Experimental.rst:153
 #: ../../Tigase_Development/Experimental.rst:226
 msgid "Problem Description"
-msgstr ""
+msgstr "问题描述"
 
 #: ../../Tigase_Development/Experimental.rst:21
 msgid ""
@@ -59,6 +63,9 @@ msgid ""
 "by the user and what contacts come from a **dynamic** roster part; "
 "contacts and groups generated dynamically by the server logic."
 msgstr ""
+"作为 **动态花名册部分** 存储和创建的正常花名册联系人透明地交付给最终用户。XMP"
+"P客户端并不真正知道哪些联系人来自用户手动创建的自己的**静态**名册，"
+"哪些联系人来自 **动态** 名册部分；联系人和组由服务器逻辑动态生成的。"
 
 #: ../../Tigase_Development/Experimental.rst:23
 msgid ""
@@ -69,16 +76,20 @@ msgid ""
 " the dynamic roster part and this information must be available to all "
 "users accessing **dynamic** roster part."
 msgstr ""
+"一些专业客户需要存储有关名册联系人的额外信息。对于普通用户，**静态** 名册信息"
+"可以作为私有数据存储，并且仅供该单个用户使用。然而，在某些情况下，客户端需要"
+"存储来自动态名册部分的联系人信息，并且此信息必须可供所有访问 **动态** "
+"名册部分的用户使用。"
 
 #: ../../Tigase_Development/Experimental.rst:25
 msgid ""
 "The protocol defined here allows the exchange of information, saving and "
 "retrieving extra data about the contacts."
-msgstr ""
+msgstr "此处定义的协议允许交换信息、保存和检索有关联系人的额外数据。"
 
 #: ../../Tigase_Development/Experimental.rst:28
 msgid "Syntax and Semantics"
-msgstr ""
+msgstr "句法和语义"
 
 #: ../../Tigase_Development/Experimental.rst:30
 msgid ""
@@ -93,29 +104,36 @@ msgid ""
 "provide a valid XML element with all the required data for requested "
 "**jid**."
 msgstr ""
+"使用IQ节访问额外的联系人数据，特别是通过 **jabber:iq:roster-dynamic** 命名空"
+"间限定的子元素。子元素可以包含一个或多个子元素，每个子元素描述一个独特的联系"
+"人项目。元素的内容未指定，取决于实现。从Tigase的角度来看，它可以包含任何有效"
+"的XML数据。整个元素按原样传递给DynamicRoster实现类，无需任何验证。在检索联系"
+"人额外数据时，DynamicRoster实现应该提供一个有效的XML元素，其中包含请求的 "
+"**jid** 所需的所有数据。"
 
 #: ../../Tigase_Development/Experimental.rst:32
 msgid ""
 "The **jid** attribute specifies the Jabber Identifier (JID) that uniquely"
 " identifies the roster item. Inclusion of the **jid** attribute is "
 "**REQUIRED**."
-msgstr ""
+msgstr "**jid** 属性指定唯一标识名册项目的Jabber标识符 (JID)。包含 **jid** 属性是 "
+"**必需的**。"
 
 #: ../../Tigase_Development/Experimental.rst:34
 msgid "Following actions on the extra contact data are allowed:"
-msgstr ""
+msgstr "允许对额外联系人数据执行以下操作："
 
 #: ../../Tigase_Development/Experimental.rst:36
 msgid "**set** - stores extra information about the contact"
-msgstr ""
+msgstr "**set** - 存储有关联系人的额外信息"
 
 #: ../../Tigase_Development/Experimental.rst:38
 msgid "**get** - retrieves extra information about the contact"
-msgstr ""
+msgstr "**get** - 检索有关联系人的额外信息"
 
 #: ../../Tigase_Development/Experimental.rst:41
 msgid "Retrieving Contact Data"
-msgstr ""
+msgstr "检索联系人数据"
 
 #: ../../Tigase_Development/Experimental.rst:43
 msgid ""
@@ -124,67 +142,71 @@ msgid ""
 "before or after requesting the user roster. The client’s request for the "
 "extra contact data is **OPTIONAL**."
 msgstr ""
+"在连接到服务器并成为活动资源后，客户端可以请求额外的联系人数据。可以在请求用"
+"户名册之前或之后提出此请求。客户对额外联系数据的请求是 **可选的**。"
 
 #: ../../Tigase_Development/Experimental.rst:45
 msgid ""
 "Example: Client requests contact extra data from the server using **get**"
 " request:"
-msgstr ""
+msgstr "示例：客户端使用 **get** 请求从服务器请求联系人额外数据："
 
 #: ../../Tigase_Development/Experimental.rst:55
 msgid ""
 "Example: Client receives contact extra data from the server, but there "
 "was either no extra information for the user, or the user was not found "
 "in the dynamic roster:"
-msgstr ""
+msgstr "示例：客户端从服务器接收到额外的联系人数据，但没有用户的额外信息，或者在动态"
+"名册中找不到用户："
 
 #: ../../Tigase_Development/Experimental.rst:65
 msgid ""
 "Example: Client receives contact extra data from the server, and there "
 "was some extra information found about the contact:"
-msgstr ""
+msgstr "示例：客户端从服务器接收到联系人额外数据，并且发现了一些关于联系人的额外信息"
+"："
 
 #: ../../Tigase_Development/Experimental.rst:80
 msgid "Updating/Saving Extra Information About the Contact"
-msgstr ""
+msgstr "更新/保存有关联系人的额外信息"
 
 #: ../../Tigase_Development/Experimental.rst:82
 msgid ""
 "At any time, a client **MAY** update extra contact information on the "
 "server."
-msgstr ""
+msgstr "在任何时候，客户端 **可以** 更新服务器上的额外联系信息。"
 
 #: ../../Tigase_Development/Experimental.rst:84
 msgid "Example: Client sends contact extra information using **set** request."
-msgstr ""
+msgstr "示例：客户端使用 **set** 请求发送联系人额外信息。"
 
 #: ../../Tigase_Development/Experimental.rst:97
 #: ../../Tigase_Development/Experimental.rst:126
 msgid "Client responds to the server:"
-msgstr ""
+msgstr "客户端响应服务器："
 
 #: ../../Tigase_Development/Experimental.rst:103
 msgid ""
 "A client **MAY** update contact extra information for more than a single "
 "item in one request:"
-msgstr ""
+msgstr "客户 **可以** 在一个请求中更新多个项目的联系人额外信息："
 
 #: ../../Tigase_Development/Experimental.rst:105
 msgid ""
 "Example: Client sends contact extra information using **set** request "
 "with many <item/> elements."
-msgstr ""
+msgstr "示例：客户端使用带有许多<item/>元素的 **set** 请求发送联系人额外信息。"
 
 #: ../../Tigase_Development/Experimental.rst:133
 #: ../../Tigase_Development/Experimental.rst:204
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Tigase_Development/Experimental.rst:135
 msgid ""
 "DynamicRoster implementation class should be configured in the "
 "**config.tdsl** file:"
-msgstr ""
+msgstr "DynamicRoster实现类应该在 **config.tdsl** 文件中配置："
 
 #: ../../Tigase_Development/Experimental.rst:145
 msgid ""
@@ -192,33 +214,36 @@ msgid ""
 "``@ConfigField`` annotation on your variable (see `Component "
 "implementation - Lesson 2 - Configuration <#cil2>`__ for more details)."
 msgstr ""
+"如果您想将配置传递给您的实现，只需在变量上使用 ``@ConfigField`` "
+"注释（有关详细信息，请参阅 :ref:`组件实现 - 第2课 - 配置<cil2>`）。"
 
 #: ../../Tigase_Development/Experimental.rst:150
 msgid "Mobile Optimizations"
-msgstr ""
+msgstr "移动优化"
 
 #: ../../Tigase_Development/Experimental.rst:155
 msgid ""
 "In default configuration stanzas are sent to the client when processing "
 "is finished, but in mobile environment sending or receiving data drains "
 "battery due to use of the radio."
-msgstr ""
+msgstr "在默认配置中，当处理完成时，节会发送到客户端，但在移动环境中，发送或接收数据"
+"会由于使用无线电而消耗电池电量。"
 
 #: ../../Tigase_Development/Experimental.rst:157
 msgid ""
 "To save energy data should be sent to client only if it is important or "
 "client is waiting for it."
-msgstr ""
+msgstr "为节省能源，数据应仅在重要或客户正在等待时才发送给客户。"
 
 #: ../../Tigase_Development/Experimental.rst:160
 msgid "Solution"
-msgstr ""
+msgstr "解决方案"
 
 #: ../../Tigase_Development/Experimental.rst:162
 msgid ""
 "When mobile client is entering inactive state it notifies server about it"
 " by sending following stanza:"
-msgstr ""
+msgstr "当移动客户端进入非活动状态时，它通过发送以下节来通知服务器："
 
 #: ../../Tigase_Development/Experimental.rst:172
 msgid ""
@@ -229,44 +254,48 @@ msgid ""
 "or plain message) is sent immediately to the client and every stanza from"
 " queue is also sent at this time."
 msgstr ""
+"收到节后，服务器开始排队节，其应被发送到移动客户端。什么样的排队节取决于所使"
+"用的插件，如果是 **Mobile v3** 存在节，则排队的节以及作为消息碳的消息节。任何"
+"其他节（例如iq或纯消息）都会立即发送到客户端，此时队列中的每个节都会被发送。"
 
 #: ../../Tigase_Development/Experimental.rst:174
 msgid ""
 "When mobile client is entering active state it notifies server by sending"
 " following stanza:"
-msgstr ""
+msgstr "当移动客户端进入活动状态时，它通过发送以下节来通知服务器："
 
 #: ../../Tigase_Development/Experimental.rst:184
 msgid "After receiving stanza server sends all queued stanzas to the client."
-msgstr ""
+msgstr "收到节后，服务器将所有排队的节发送给客户端。"
 
 #: ../../Tigase_Development/Experimental.rst:186
 msgid ""
 "Also all stanzas from queue will be sent if number of stanzas in queue "
 "will reach queue size limit. By default this limit is set to 50."
-msgstr ""
+msgstr "如果队列中的节数将达到队列大小限制，则队列中的所有节将被发送。默认情况下，此"
+"限制设置为50。"
 
 #: ../../Tigase_Development/Experimental.rst:189
 msgid "Queuing Algorithms"
-msgstr ""
+msgstr "排队算法"
 
 #: ../../Tigase_Development/Experimental.rst:191
 msgid "There are three mobile optimization plugins for Tigase:"
-msgstr ""
+msgstr "Tigase共有三个移动优化插件："
 
 #: ../../Tigase_Development/Experimental.rst:193
 msgid "**Mobile v1** - all presence stanzas are kept in queue"
-msgstr ""
+msgstr "**Mobile v1** - 所有存在节都保留在队列中"
 
 #: ../../Tigase_Development/Experimental.rst:195
 msgid "**Mobile v2** - only last presence from each source is kept in queue"
-msgstr ""
+msgstr "**Mobile v2** - 只有来自每个来源的最后一次出现才保留在队列中"
 
 #: ../../Tigase_Development/Experimental.rst:197
 msgid ""
 "**Mobile v3** - only last presence from each source is kept in queue, "
 "also Message Carbons are queued"
-msgstr ""
+msgstr "**Mobile v3** - 只有来自每个源的最后一次存在保留在队列中，消息碳也排队"
 
 #: ../../Tigase_Development/Experimental.rst:199
 msgid ""
@@ -274,6 +303,8 @@ msgid ""
 "above with xmlns attribute value replaced with "
 "http://tigase.org/protocol/mobile#v1"
 msgstr ""
+"如果您希望激活您的Mobile v1插件，您需要发送上面显示的xmlns属性值替换为 "
+"http://tigase.org/protocol/mobile#v1"
 
 #: ../../Tigase_Development/Experimental.rst:201
 msgid ""
@@ -281,33 +312,37 @@ msgid ""
 "above with xmlns attribute value replaced with "
 "http://tigase.org/protocol/mobile#v2"
 msgstr ""
+"如果您希望激活您的Mobile v2插件，您需要发送上面显示的xmlns属性值替换为 "
+"http://tigase.org/protocol/mobile#v2"
 
 #: ../../Tigase_Development/Experimental.rst:206
 msgid ""
 "Mobile plugins are not activated by default thus additional entry in the "
 "``config.tdsl`` is required:"
-msgstr ""
+msgstr "移动插件默认不激活，因此需要在 ``config.tdsl`` 中添加额外条目："
 
 #: ../../Tigase_Development/Experimental.rst:214
 msgid ""
 "You may substitute ``mobile_v1`` with ``mobile_v2`` or ``mobile_v3`` "
 "depending on which algorithm you wish to use."
-msgstr ""
+msgstr "您可以根据您希望使用的算法将 ``mobile_v1`` 替换为 ``mobile_v2`` 或 "
+"``mobile_v3``。"
 
 #: ../../Tigase_Development/Experimental.rst:218
 msgid "USE ONLY ONE PLUGIN AT A TIME!"
-msgstr ""
+msgstr "一次只能使用一个插件！"
 
 #: ../../Tigase_Development/Experimental.rst:223
 msgid "Bosh Session Cache"
-msgstr ""
+msgstr "Bosh会话缓存"
 
 #: ../../Tigase_Development/Experimental.rst:228
 msgid ""
 "Web clients have no way to store any data locally, on the client side. "
 "Therefore after a web page reload the web clients loses all the context "
 "it was running in before the page reload."
-msgstr ""
+msgstr "Web客户端无法在客户端本地存储任何数据。因此，在重新加载网页后，Web客户端会丢"
+"失在重新加载页面之前运行的所有上下文。"
 
 #: ../../Tigase_Development/Experimental.rst:230
 msgid ""
@@ -317,6 +352,9 @@ msgid ""
 "contents. Even if the roster restoring is possible, this operation is "
 "very expensive in terms of time and resources on the server side."
 msgstr ""
+"可以从服务器检索上下文的某些元素，例如名册和所有联系人的存在信息。但是，其他"
+"一些数据无法轻松恢复，例如打开的聊天窗口和聊天窗口的内容。即使可以进行名册恢"
+"复，该操作在服务器端的时间和资源方面代价也是非常昂贵的。"
 
 #: ../../Tigase_Development/Experimental.rst:232
 msgid ""
@@ -327,6 +365,10 @@ msgid ""
 " the web client) it is possible to reload all the data stored in the Bosh"
 " cache to the client."
 msgstr ""
+"一种可能的解决方案是允许Web客户端在Bosh会话处于活动状态时将一些数据存储在服务"
+"器端的Bosh组件缓存中。页面重新加载后，如果客户端能够以某种方式检索SID（存储在"
+"cookie中或由运行Web客户端的Web应用程序提供），则可以将存储在 "
+"Bosh缓存中的所有数据重新加载到客户端。"
 
 #: ../../Tigase_Development/Experimental.rst:234
 msgid ""
@@ -335,16 +377,19 @@ msgid ""
 "Ideally the web client should be able to store any data in the Bosh "
 "component cache it wants."
 msgstr ""
+"Bosh会话上下文数据是：名册、联系人状态信息、打开的聊天窗口、聊天窗口内容和其"
+"他一些次要数据。理想情况下，Web客户端应该能够将任何数据存储在它想要的Bosh组件"
+"缓存中。"
 
 #: ../../Tigase_Development/Experimental.rst:238
 msgid "Bosh Session Cache Description"
-msgstr ""
+msgstr "Bosh会话缓存说明"
 
 #: ../../Tigase_Development/Experimental.rst:240
 msgid ""
 "The Bosh Session Cache is divided into 2 parts - automatic cache and "
 "dynamic cache."
-msgstr ""
+msgstr "Bosh Session Cache分为两部分 - 自动缓存和动态缓存。"
 
 #: ../../Tigase_Development/Experimental.rst:242
 msgid ""
@@ -354,6 +399,8 @@ msgid ""
 "The best example for such data is the Roster and contacts presence "
 "information."
 msgstr ""
+"将缓存分成两部分的原因是，一些数据可以由Bosh组件自动收集，并且要求客户端将数"
+"据存储在Bosh缓存中，这会非常低效。此类数据的最佳示例是名册和联系人存在信息。"
 
 #: ../../Tigase_Development/Experimental.rst:244
 msgid ""
@@ -367,17 +414,23 @@ msgid ""
 "stored there are accessible in the standard XMPP form. So no extra code "
 "is needed for processing them."
 msgstr ""
+"**自动缓存** - 是由Bosh组件自动创建的缓存部分，无需与客户端进行任何交互。但是"
+"，客户端可以随时访问缓存。我会说这是一个只读缓存，但我不想阻止客户端在需要时"
+"操作缓存。客户端通常只从这部分缓存中检索数据，因为所有更改都应该由Bosh组件自"
+"动更新。自动缓存的总体思路是存储在那里的数据可以以标准的XMPP形式访问。所以不"
+"需要额外的代码来处理它们。"
 
 #: ../../Tigase_Development/Experimental.rst:246
 msgid ""
 "**dynamic cache** - is the cache part which is or can be modified at any "
 "time by the client. Client can store, retrieve, delete and modify data in"
 " this part of the cache."
-msgstr ""
+msgstr "**动态缓存** - 是客户端可以随时修改或可以修改的缓存部分。客户端可以在这部分缓"
+"存中存储、检索、删除和修改数据。"
 
 #: ../../Tigase_Development/Experimental.rst:249
 msgid "Cache Protocol"
-msgstr ""
+msgstr "缓存协议"
 
 #: ../../Tigase_Development/Experimental.rst:251
 msgid ""
@@ -389,6 +442,10 @@ msgid ""
 "one) associated with the elements for which the ``cache-id`` is not "
 "provided."
 msgstr ""
+"所有Bosh会话缓存操作都使用附加的<body/>元素属性执行：``cache`` 和 ``cache-"
+"id``。如果操作属性需要，属性缓存是存储在 Bosh ``cache`` 上执行的操作"
+"，``cache-id`` 属性指的是 ``cache`` 元素。 ``cache-id`` "
+"是可选的。有一个默认的缓存ID（空的）与未提供 ``cache-id`` 的元素相关联。"
 
 #: ../../Tigase_Development/Experimental.rst:253
 msgid ""
@@ -400,10 +457,16 @@ msgid ""
 "element with actions **set** or **add** must contain data to store in the"
 " cache."
 msgstr ""
+"如果 ``<body/>`` 元素包含缓存属性，则意味着 ``<body/>`` "
+"中包含的所有数据都引用缓存操作。这是不允许的，"
+"例如在正文中发送消息并将缓存操作设置为 **get**。具有缓存操作 "
+"**get**、**get_all**、**on**、**off**、**remove** 的 ``<body/>`` "
+"元素必须为空。带有动作 **set** 或 **add** 的 ``<body/>`` "
+"元素必须包含要存储在缓存中的数据。"
 
 #: ../../Tigase_Development/Experimental.rst:256
 msgid "Cache Actions"
-msgstr ""
+msgstr "缓存操作"
 
 #: ../../Tigase_Development/Experimental.rst:258
 msgid ""
@@ -420,6 +483,13 @@ msgid ""
 " consume any extra resources for cache processing and storing as the "
 "cache wouldn’t be used by the client anyway."
 msgstr ""
+"**on** 或 **off** - 客户端可以在会话期间随时打开或关闭缓存。但是，"
+"建议客户端在第一个主体数据包中切换缓存 **on**，否则可能会丢失自动缓存中的某些"
+"信息。自动缓存是从通过Bosh组件的数据流创建的。因此，如果在名册检索完成后打开"
+"缓存，则名册信息将在缓存中丢失。如果缓存设置为 **off** （默认值），所有对缓存"
+"的请求都将被忽略。这是为了确保与原始Bosh规范的向后兼容性，并确保在默认环境中"
+"，Bosh组件不会为缓存处理和存储消耗任何额外资源，因为客户端无论如何都不会使用"
+"缓存。"
 
 #: ../../Tigase_Development/Experimental.rst:260
 msgid ""
@@ -431,6 +501,11 @@ msgid ""
 "cached data are split into a few parts and each part can be sent in a "
 "separate ``<body/>`` element. It may usually happen for the Roster data."
 msgstr ""
+"**get** - 从Bosh缓存中检索由cache-id指向的缓存元素。请注意，没有 **result** "
+"缓存操作。作为响应从服务器发送到客户端的 <body/> 可能包含给定缓存ID的缓存结果"
+"，它还可能包含Bosh组件为客户端接收的其他数据。也可能发生大缓存数据被分成几个"
+"部分，每个部分可以在一个单独的 <body/> "
+"元素中发送。名册数据通常会发生这种情况。"
 
 #: ../../Tigase_Development/Experimental.rst:262
 msgid ""
@@ -444,6 +519,12 @@ msgid ""
 "**``<body/>``** element contain the cache elements as well as the new "
 "requests sent to the user like new messages or presence information."
 msgstr ""
+"**get_all** - 检索保存在Bosh缓存中的所有元素。该操作可以在页面重新加载后执行"
+"。客户端不必逐个请求每个缓存项。它可以一次检索所有缓存项。然而，"
+"这并不意味着整个缓存在单个 <body/> "
+"元素中发送到客户端。缓存内容将被划分为合理大小的较小部分，并在单独的 <body/> "
+"元素中发送到客户端。 ** ``<body/>`` ** "
+"元素也可能包含缓存元素以及发送给用户的新请求，例如新消息或存在信息。"
 
 #: ../../Tigase_Development/Experimental.rst:264
 msgid ""
@@ -455,6 +536,11 @@ msgid ""
 "same form as they were received from the server. The **set** action "
 "replaces any previously stored data under this ID."
 msgstr ""
+"**set** - 将数据发送到Bosh "
+"Session缓存以供以后检索。客户端可以在缓存中存储它想要的任何数据。 Bosh组件将 "
+"<body/> 元素内的所有数据存储在所选ID下的缓存中。唯一的限制是缓存的数据必须是"
+"有效的XML内容。数据以与从服务器接收到的完全相同的形式返回给客户端。 **set** "
+"操作将替换此ID下任何以前存储的数据。"
 
 #: ../../Tigase_Development/Experimental.rst:266
 msgid ""
@@ -463,14 +549,16 @@ msgid ""
 "can add new elements for the chat window, like new messages, icons and so"
 " on…​"
 msgstr ""
+"**add** - 将新元素添加到给定ID下的缓存中。此操作对于为打开的聊天窗口存储数据"
+"可能很有用。客户端可以为聊天窗口添加新元素，比如新消息、图标等等……​"
 
 #: ../../Tigase_Development/Experimental.rst:268
 msgid "**remove** - removes the cached element for the given cache ID."
-msgstr ""
+msgstr "**remove** - 删除给定缓存ID的缓存元素。"
 
 #: ../../Tigase_Development/Experimental.rst:271
 msgid "Cache ID"
-msgstr ""
+msgstr "缓存ID"
 
 #: ../../Tigase_Development/Experimental.rst:273
 msgid ""
@@ -478,21 +566,24 @@ msgid ""
 " for a special cases, like for the Roster content. To avoid any future ID"
 " conflicts reserved ID values starts with: **bosh** - string."
 msgstr ""
+"缓存ID可以是任意字符串。可能会为特殊情况保留一些ID，例如用于名册内容。为避免"
+"将来出现任何ID冲突，保留的ID值以：**bosh** - 字符串开头。"
 
 #: ../../Tigase_Development/Experimental.rst:275
 msgid ""
 "There is a default cache ID - en empty string. Thus cache-id attribute "
 "can be omitted and then the requests refers to data stored under the "
 "default (empty) ID."
-msgstr ""
+msgstr "有一个默认缓存ID - 一个空字符串。因此可以省略cache-"
+"id属性，然后请求引用存储在默认（空）ID下的数据。"
 
 #: ../../Tigase_Development/Experimental.rst:278
 msgid "Reserved Cache ID Names"
-msgstr ""
+msgstr "保留的缓存ID名称"
 
 #: ../../Tigase_Development/Experimental.rst:280
 msgid "Here is a list of reserved Cache IDs:"
-msgstr ""
+msgstr "以下是保留的缓存ID列表："
 
 #: ../../Tigase_Development/Experimental.rst:282
 msgid ""
@@ -512,11 +603,21 @@ msgid ""
 "then all presences or it can send a part of the roster, presences for "
 "sent items, next part of the roster, presences for next items and so on."
 msgstr ""
+"**bosh-roster** - "
+"用户名册以与从核心服务器接收到的完全相同的形式缓存在Bosh组件中。 "
+"Bosh缓存可能会也可能不会对名册进行优化，例如如果名册 **删除** 已收到，则从缓"
+"存的名册中删除元素，或者可能只存储所有名册请求，然后将它们全部发送到客户端。 "
+"Bosh Cache必须执行一项强制优化。它必须记住每个花名册项目的最后一个（也是唯一"
+"的最后一个）存在状态。在从缓存中检索名册后，Bosh 组件必须先发送名册项目，然后"
+"再发送该项目的存在。如果存在缺失，则意味着离线存在。如果名册很小，可以在单个"
+"数据包中发送给客户端，但对于大型名册，建议将联系人列表拆分为最多100个元素的批"
+"次。 Bosh组件可以先发送所有名册联系人，然后发送所有存在信息，或者它可以发送名"
+"册的一部分、已发送项目的存在信息、名册的下一部分、下一个项目的存在信息等等。"
 
 #: ../../Tigase_Development/Experimental.rst:284
 msgid ""
 "**bosh-resource-bind** - The user resource bind is also cached to allow "
 "the client quickly retrieve information about the full JID for the "
 "established Bosh session."
-msgstr ""
-
+msgstr "**bosh-resource-bind** - "
+"用户资源绑定也被缓存，以允许客户端快速检索有关已建立Bosh会话的完整JID的信息。"
