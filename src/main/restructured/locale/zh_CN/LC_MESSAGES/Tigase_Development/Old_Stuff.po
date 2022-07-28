@@ -3,33 +3,37 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-07-28 09:23+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-old_stuff/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Old_Stuff.rst:2
 msgid "Old Stuff"
-msgstr ""
+msgstr "旧东西"
 
 #: ../../Tigase_Development/Old_Stuff.rst:4
 msgid ""
 "This contains sections on old features, or information pertaining to old "
 "builds of Tigase. It is kept here for archival purposes."
-msgstr ""
+msgstr "这包含有关旧功能的部分，或与Tigase旧版本有关的信息。它被保存在这里用于存档目"
+"的。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:7
 msgid "Tigase DB Schema Explained"
-msgstr ""
+msgstr "Tigase DB架构解释"
 
 #: ../../Tigase_Development/Old_Stuff.rst:9
 msgid ""
@@ -41,6 +45,11 @@ msgid ""
 "users' data: **tig_users**, **tig_nodes** and **tig_pairs**. Therefore it"
 " is not clear at first how Tigase’s data is organized."
 msgstr ""
+"架构基础知识、外观和对所有行的简要说明可以在 `架构文件列表 <https://github."
+"com/tigase/tigase-server/tree/master/src/main/database>`__ 中找到。然而，这还"
+"不足以理解它是如何工作的以及如何访问所有数据。只有3个基本表实际上保存了所有Ti"
+"gase服务器用户的数据：**tig_users**、**tig_nodes** 和 "
+"**tig_pairs**。因此，起初并不清楚Tigase的数据是如何组织的。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:11
 msgid ""
@@ -49,14 +58,17 @@ msgid ""
 "it’s development and why it works that way. Let’s start with the API as "
 "this gives you the best introduction."
 msgstr ""
+"在您了解Tigase XMPP服务器数据库架构、它是如何工作以及如何使用它之前，了解它的"
+"开发目标是什么以及为什么它以这种方式工作是必不可少的。让我们从API开始，因为它"
+"为您提供了最好的介绍。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:13
 msgid "Simplified access can be made through methods:"
-msgstr ""
+msgstr "可以通过以下方法进行简化访问："
 
 #: ../../Tigase_Development/Old_Stuff.rst:20
 msgid "And more a complex version:"
-msgstr ""
+msgstr "还有更复杂的版本："
 
 #: ../../Tigase_Development/Old_Stuff.rst:27
 msgid ""
@@ -68,6 +80,10 @@ msgid ""
 "interface. So we are not going into too much detail here except for the "
 "main idea."
 msgstr ""
+"尽管API包含更多方法，但其余的或多或少是上面介绍的变体。 `UserRepository "
+"<https://github.com/tigase/tigase-server/tree/master/src/main/java/tigase/db/"
+"UserRepository.java>`__ 接口中的JavaDoc文档中提供了所有访问方法的完整API描述"
+"接口。因此，除了主要想法之外，我们不会在这里过多地讨论细节。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:29
 msgid ""
@@ -77,6 +93,9 @@ msgid ""
 "require a database schema change, adding new tables, or conversion of the"
 " DB schema to a new version."
 msgstr ""
+"Tigase对单个用户数据的 <*key*, **value**> 对进行操作。这背后的想法是想让API非"
+"常简单，同时也非常灵活，因此添加新插件或组件不需要更改数据库架构、添加新表或"
+"将数据库架构转换为新版本。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:31
 msgid ""
@@ -85,6 +104,9 @@ msgid ""
 "modules). These modules simply call set/get methods to store or access "
 "module specific data."
 msgstr ""
+"结果，**UserRepository** "
+"接口暴露给Tigase的所有代码，主要是组件和插件（我们称它们为模块）。"
+"这些模块只需调用 set/get 方法来存储或访问模块特定的数据。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:33
 msgid ""
@@ -95,6 +117,9 @@ msgid ""
 "provide a subnode part, which in most cases is just XMLNS or some other "
 "unique string."
 msgstr ""
+"由于插件或组件是独立开发的，开发人员很容易选择相同的键名来存储一些信息。为了"
+"避免数据库中的键名冲突，引入了'节点'概念。因此，大多数模块在设置/获取键值时还"
+"提供了一个子节点部分，在大多数情况下，它只是XMLNS或其他一些唯一字符串。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:35
 msgid ""
@@ -104,12 +129,15 @@ msgid ""
 " you use just **/** to separate node levels. In practice you can have the"
 " database organized like this:"
 msgstr ""
+"'节点'有点像文件系统中的目录，它可能包含子节点，这使得Tigase数据库表现得像一"
+"个层次结构。并且符号也类似于文件系统，您只使用 **/** "
+"来分隔节点级别。在实践中，您可以像这样组织数据库："
 
 #: ../../Tigase_Development/Old_Stuff.rst:47
 msgid ""
 "So to access item’s 1 data from the roster you could call method like "
 "this:"
-msgstr ""
+msgstr "因此，要从名册中访问item1的数据，您可以调用如下方法："
 
 #: ../../Tigase_Development/Old_Stuff.rst:53
 msgid ""
@@ -122,17 +150,23 @@ msgid ""
 " more complex API used in some places allowing for more direct access to "
 "the database and store data in any format optimized for the scenario."
 msgstr ""
+"这对开发人员来说是极大的方便，因为他可以专注于模块逻辑，而不用担心数据存储实"
+"现和组织。特别是在原型阶段，它加快了开发速度，并允许使用不同的解决方案进行快"
+"速实验。在实践中，以这种方式访问用户名册的效率非常低，因此名册的存储方式略有"
+"不同，但你已经明白了此方法。此外，在某些地方使用了更复杂的API，允许更直接地访"
+"问数据库并以针对场景优化的任何格式存储数据。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:55
 msgid ""
 "Right now such a hierarchical structure is implemented on top of SQL "
 "databases but initially Tigase’s database was implemented as an XML "
 "structure, so it was natural and simple."
-msgstr ""
+msgstr "现在这种层次结构是在SQL数据库之上实现的，但最初Tigase的数据库是作为XML结构实"
+"现的，所以它自然而简单。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:57
 msgid "In the SQL database we simulate hierarchical structure with three tables:"
-msgstr ""
+msgstr "在SQL数据库中，我们用三个表模拟层次结构："
 
 #: ../../Tigase_Development/Old_Stuff.rst:59
 msgid ""
@@ -142,6 +176,9 @@ msgid ""
 "performance reasons they are in one place to quickly access them with a "
 "single, simple query."
 msgstr ""
+"**tig_users** - 包含主要用户数据、用户ID (JID)、可选密码、活动标志、创建时间"
+"和帐户的一些其他基本属性。所有这些实际上都可以存储在tig_pairs中，但出于性能原"
+"因，它们位于一个位置，可以通过一个简单的查询快速访问它们。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:61
 msgid ""
@@ -152,24 +189,30 @@ msgid ""
 "every user’s entry has something called root node, which is represented "
 "by 'root' string;"
 msgstr ""
+"**tig_nodes** - 是实现层次结构的表。当Tigase在XML数据库中存储数据时，层次结构"
+"非常复杂。但是，在SQL数据库中，它会导致对数据的访问非常缓慢，并且现在大多数组"
+"件都使用更扁平的结构。请注意，每个用户的条目都有一个叫做根节点的东西，它由'ro"
+"ot'字符串表示；"
 
 #: ../../Tigase_Development/Old_Stuff.rst:63
 msgid ""
 "**tig_pairs** - this is the table where all the user’s information is "
 "stored in form of the <key, value> pairs."
-msgstr ""
+msgstr "**tig_pairs** - 这是所有用户信息以<key, value>对的形式存储的表。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:65
 msgid ""
 "So we now know how the data is organized. Now we are going to learn how "
 "to access the data directly in the database using SQL queries."
-msgstr ""
+msgstr "所以我们现在知道数据是如何组织的。现在我们将学习如何使用SQL查询直接访问数据库"
+"中的数据。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:67
 msgid ""
 "Let’s assume we have a user 'admin@test-d' for whom we want to retrieve "
 "the roster. We could simply execute query:"
-msgstr ""
+msgstr "假设我们有一个用户'admin@test-d'，我们要为其检索花名册。我们可以简单地执行查"
+"询："
 
 #: ../../Tigase_Development/Old_Stuff.rst:77
 msgid ""
@@ -179,27 +222,32 @@ msgid ""
 " The main users roster is stored under the 'root' node, so the query "
 "would look like:"
 msgstr ""
+"但是，如果多个模块将数据存储在单个用户的键'roster' 下，我们将收到多个结果。要"
+"访问正确的'roster'，我们还必须知道这个特定键的节点层次结构。"
+"主要用户名册存储在 'root' 节点下，因此查询如下所示："
 
 #: ../../Tigase_Development/Old_Stuff.rst:89
 msgid ""
 "How exactly the information is stored in the **tig_pairs** table depends "
 "on the particular module. For the roster it looks a bit like XML content:"
-msgstr ""
+msgstr "**tig_pairs** "
+"表中信息的准确存储方式取决于特定模块。对于名册，它看起来有点像XML内容："
 
 #: ../../Tigase_Development/Old_Stuff.rst:96
 msgid "Why the most recent JDK?"
-msgstr ""
+msgstr "为什么是最新的JDK？"
 
 #: ../../Tigase_Development/Old_Stuff.rst:98
 msgid ""
 "There are many reasons but the main is that we are a small team working "
 "on source code. So the whole approach is to make life easier for us, make"
 " the project easier to maintain, and development more efficient."
-msgstr ""
+msgstr "原因有很多，但主要原因是我们是一个致力于源代码的小团队。所以整个方法是让我们"
+"的生活更轻松，让项目更容易维护，开发更高效。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:100
 msgid "Here is the list:"
-msgstr ""
+msgstr "这是列表："
 
 #: ../../Tigase_Development/Old_Stuff.rst:102
 msgid ""
@@ -209,12 +257,16 @@ msgid ""
 "unifies coding with a single library package without having to rely on "
 "specific versions that may not be supported."
 msgstr ""
+"**易于维护** - 该项目不使用第三方库，这使得该项目更易于维护。这简化了特定版本"
+"库之间的兼容性问题。这也将编码与单个库包统一起来，而不必依赖可能不受支持的特"
+"定版本。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:104
 msgid ""
 "**Easy to deploy** - Another reason to not use third-party tools is to "
 "make it easier for end-users to install and use the server."
-msgstr ""
+msgstr "**易于部署** - "
+"不使用第三方工具的另一个原因是使终端用户更容易安装和使用服务器。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:106
 msgid ""
@@ -223,13 +275,17 @@ msgid ""
 "possible of JDK functionality. We try to use as much as possible of "
 "existing library provided with JDK and the rest is custom coded."
 msgstr ""
+"**高效开发** - 由于没有使用第三方库，Tigase需要自己实现很多东西，或者尽可能多"
+"地使用JDK功能。我们尝试尽可能多地使用JDK提供的现有库，其余的都是自定义编码的"
+"。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:108
 msgid ""
 "What features of JDKv5 are critical for Tigase development? Why I can’t "
 "simply re-implement some code to make it compatible with earlier JDK "
 "versions?"
-msgstr ""
+msgstr "JDKv5的哪些特性对Tigase开发至关重要？为什么我不能简单地重新实现一些代码以使其"
+"与早期的JDK版本兼容？"
 
 #: ../../Tigase_Development/Old_Stuff.rst:110
 msgid ""
@@ -237,10 +293,13 @@ msgid ""
 "simply re-implemented in JDK-1.4. As the whole server uses NIO it doesn’t"
 " make sense to use blocking I/O for SSL and TLS."
 msgstr ""
+"**SSL/TLS 的非阻塞 I/O** - 这是在JDK-1."
+"4中不能简单地重新实现的功能。由于整个服务器都使用NIO，因此对SSL和TLS使用阻塞"
+"I/O是没有意义的。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:112
 msgid "**SASL** - This could be re-implemented for JDK-1.4 without much effort."
-msgstr ""
+msgstr "**SASL** - 这可以对JDK-1.4重新实现而无需付出太多努力。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:114
 msgid ""
@@ -248,18 +307,21 @@ msgid ""
 "takes a lot of work. This is a critical part of the server as it uses "
 "multi-threading and concurrent processing."
 msgstr ""
+"**Concurrent package** - 这可以为JDK-1.4重新实现，但需要做很多工作。这是服务"
+"器的关键部分，因为它使用多线程和并发处理。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:116
 msgid ""
 "**Security package** - There number of extensions to the security package"
 " which otherwise would not work as easily with earlier versions of JDK."
-msgstr ""
+msgstr "**Security package** - "
+"安全包有许多扩展，否则这些扩展无法与早期版本的JDK一起使用。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:118
 msgid ""
 "**LinkedHashMap** - in JDKv6 is a basement for the Tigase cache "
 "implementation."
-msgstr ""
+msgstr "**LinkedHashMap** - 在JDKv6中是Tigase缓存实现的基础。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:120
 msgid ""
@@ -267,22 +329,25 @@ msgid ""
 "needed to implement HTTP binding (JEP-0124) and HTTP user interface to "
 "monitor server activity and work with the server configuration."
 msgstr ""
+"**Light HTTP server** - JDKv6提供了实现HTTP绑定 (JEP-0124) "
+"和HTTP用户界面以监控服务器活动并使用服务器配置所需的内置轻型HTTP服务器。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:122
 msgid ""
 "As the JDK improves, so does our programming as we gain the ability to "
 "use new methods, efficiencies, and sometimes shortcuts."
-msgstr ""
+msgstr "随着JDK的改进，我们的编程也随之改进，因为我们获得了使用新方法，高效率，有时甚"
+"至是捷径的能力。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:124
 msgid ""
 "Currently Tigase requires **JDKv8** and we recommend updating it as often"
 " as needed!"
-msgstr ""
+msgstr "目前Tigase需要 **JDKv8**，我们建议根据需要经常更新它！"
 
 #: ../../Tigase_Development/Old_Stuff.rst:127
 msgid "API Description for Virtual Domains Management in the Tigase Server"
-msgstr ""
+msgstr "Tigase服务器中虚拟域管理的API说明"
 
 #: ../../Tigase_Development/Old_Stuff.rst:129
 msgid ""
@@ -295,6 +360,11 @@ msgid ""
 "<https://github.com/tigase/tigase-"
 "server/blob/master/src/main/java/tigase/vhosts>`__."
 msgstr ""
+"本指南的目的是介绍Tigase服务器中的虚拟主机管理。有关本指南未涵盖的所有具体细"
+"节，请参阅JavaDoc文档。所有接口都有很好的文档记录，您可以将现有实现用作示例代"
+"码库和参考点。 VHost管理文件位于存储库中，您可以使用 `source viewer "
+"<https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/"
+"vhosts>`__ 浏览它们。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:131
 msgid ""
@@ -308,6 +378,13 @@ msgid ""
 "server/blob/master/src/main/java/tigase/server/MessageRouter.java>`__ "
 "class which controls how XMPP packets flow inside the server."
 msgstr ""
+"Tigase中的虚拟主机管理可以通过灵活的API以多种方式进行调整。"
+"虚拟域管理的核心元素是接口 `VHostManager <https://github.com/tigase/"
+"tigase-server/blob/master/src/main/java/tigase/vhosts/VHostManager."
+"java>`__类。他们负责向其余的Tigase服务器组件提供虚拟主机信息。特别是 `"
+"MessageRouter <https://github.com/tigase/tigase-server/blob/master/src/main/"
+"java/tigase/server/MessageRouter.java>`__ "
+"类，其控制XMPP数据包如何在服务器内部流动。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:133
 msgid ""
@@ -322,6 +399,12 @@ msgid ""
 "This is especially important if you are going to modify the virtual "
 "domains list through systems other than Tigase."
 msgstr ""
+"您最有可能要重新实现的类是 `VHostJDBCRepository <https://github.com/tigase/"
+"tigase-server/blob/master/src/main/java/tigase/vhosts/VHostJDBCRepository."
+"java>`__ 其用作默认虚拟主机存储和实现 `VHostRepository <https://github.com/"
+"tigase/tigase-server/blob/master/src/main/java/tigase/vhosts/VHostRepository."
+"java>`__ 接口。您可能需要拥有自己的实现才能在Tigase自己的数据存储之外存储和访"
+"问虚拟主机。如果您要通过Tigase以外的系统修改虚拟域列表，这一点尤其重要。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:135
 msgid ""
@@ -338,6 +421,14 @@ msgid ""
 "server/blob/master/src/main/java/tigase/vhosts/VHostJDBCRepository.java>`__"
 " file."
 msgstr ""
+"非常基本的虚拟主机存储由 `VHostItem <https://github.com/tigase/tigase-server/"
+"blob/master/src/main/java/tigase/vhosts/VHostItem.java>`__ 类提供。这是只读存"
+"储，当具有虚拟主机的数据库为空或不可访问时，它会在首次启动时为服务器提供引导"
+"虚拟主机数据。因此，建议所有\n"
+"`VHostItem <https://github.com/tigase/tigase-server/blob/master/src/main/"
+"java/tigase/vhosts/VHostItem.java>`__ 实现扩展此类。示例代码在 `"
+"VHostJDBCRepository <https://github.com/tigase/tigase-server/blob/master/src/"
+"main/java/tigase/vhosts/VHostJDBCRepository.java>`__ 文件中提供。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:137
 msgid ""
@@ -348,16 +439,20 @@ msgid ""
 "interface. In some cases implementing this interface is necessary to "
 "receive packets for processing."
 msgstr ""
+"所有可能需要虚拟主机信息或想要与虚拟主机管理子系统交互的组件都应该实现 `"
+"VHostListener <https://github.com/tigase/tigase-server/blob/master/src/main/"
+"java/tigase/vhosts /VHostListener.java>`__ "
+"接口。在某些情况下，实现此接口对于接收数据包进行处理是必要的。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:139
 msgid ""
 "Virtual host information is carried out in 2 forms inside the Tigase "
 "server:"
-msgstr ""
+msgstr "虚拟主机信息在Tigase服务器内部以2种形式执行："
 
 #: ../../Tigase_Development/Old_Stuff.rst:141
 msgid "As a **String** value with the domain name"
-msgstr ""
+msgstr "作为带有域名的 **String** 值"
 
 #: ../../Tigase_Development/Old_Stuff.rst:143
 msgid ""
@@ -368,12 +463,16 @@ msgid ""
 "disabled and so on. The JavaDoc documentation contains all the details "
 "about all available fields and usage."
 msgstr ""
+"作为一个 `VHostItem <https://github.com/tigase/tigase-server/blob/master/src/"
+"main/java/tigase/vhosts/VHostItem.java>`__，它包含了包括域名在内的所有域信息"
+"，此域的最大用户数，域是启用还是禁用等等。 "
+"JavaDoc文档包含有关所有可用字段和用法的所有详细信息。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:145
 msgid ""
 "Here is a complete list of all interfaces and classes with a brief "
 "description for each of them:"
-msgstr ""
+msgstr "以下是所有接口和类的完整列表，以及每个接口和类的简要说明："
 
 #: ../../Tigase_Development/Old_Stuff.rst:147
 msgid ""
@@ -383,6 +482,10 @@ msgid ""
 "server components. There is one default implementation of the interface: "
 "`VHostManager <#vhostMgr>`__."
 msgstr ""
+"`VHostManagerIfc <https://github.com/tigase/tigase-server/blob/master/src/"
+"main/java/tigase/vhosts/VHostManagerIfc.java>`__ - "
+"是用于访问所有其他虚拟主机信息的接口服务器组件。该接口有一个默认实现：`"
+"VHostManager <#vhostMgr>`__。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:149
 msgid ""
@@ -394,6 +497,10 @@ msgid ""
 "components provide some control data required to correctly route packets "
 "to components."
 msgstr ""
+"`VHostListener <https://github.com/tigase/tigase-server/blob/master/src/main/"
+"java/tigase/vhosts/VHostListener.java>`__ - 是一个允许组件与 `VHostManager "
+"<#vhostMgr>`__ 交互的接口。 其交互是双向的。 VHostManager向组件提供虚拟主机信"
+"息，组件提供一些控制数据，以便将数据包正确路由到组件。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:151
 msgid ""
@@ -413,6 +520,17 @@ msgid ""
 " and allows for both - reading and saving virtual domains list. "
 "VHostJDBCRepository is loaded as a default repository by Tigase server."
 msgstr ""
+"`VHostRepository <https://github.com/tigase/tigase-server/blob/master/src/"
+"main/java/tigase/vhosts/VHostRepository.java>`__ - 是一个用于存储和加载虚拟域"
+"列表的接口数据库或任何其他存储介质。此接口有2个实现：`VHostConfigRepository "
+"<https://github.com/tigase/tigase-server/blob/master/src/main/java/tigase/"
+"vhosts/VhostConfigRepository.java>`__ 加载vhosts信息配置文件并提供只读存储- "
+"和 `VHostJDBCRepository <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/vhosts/VHostJDBCRepository.java>`__ 类扩展 `"
+"VHostConfigRepository <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/vhosts/VhostConfigRepository.java>`__ "
+"并允许读取和保存虚拟域列表。 "
+"Tigase服务器将VHostJDBCRepository作为默认存储库加载。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:153
 msgid ""
@@ -424,6 +542,10 @@ msgid ""
 "and so on. Instances of this class keep all the information about the "
 "domain which might be needed by the server components."
 msgstr ""
+"`VHostItem <https://github.com/tigase/tigase-server/blob/master/src/main/"
+"java/tigase/vhosts/VHostItem.java>`__ - 是一个允许访问所有虚拟域属性的接口。"
+"有时域名不足以进行数据处理。该域可能被暂时禁用，可能有有限数量的用户等等。此"
+"类的实例保留有关服务器组件可能需要的域的所有信息。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:155
 msgid ""
@@ -434,6 +556,10 @@ msgid ""
 "hosts list. Processes ad-hoc commands for reloading, updating and "
 "removing domains."
 msgstr ""
+"`VHostManager <https://github.com/tigase/tigase-server/blob/master/src/main/"
+"java/tigase/vhosts/VHostManager.java>`__ - VHostManagerIfc接口的默认实现。它"
+"为组件提供虚拟主机信息并管理虚拟主机列表。处理用于重新加载、更新和删除域的临"
+"时命令。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:157
 msgid ""
@@ -444,6 +570,11 @@ msgid ""
 "server/blob/master/src/main/java/tigase/vhosts/VHostRepository.java>`__ "
 "for loading domains list from the configuration file."
 msgstr ""
+"`VHostConfirRepository <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/vhosts/VhostConfigRepository.java>`__ - `"
+"VHostRepository <https://github.com/tigase/tigase-server/blob/master/src/"
+"main/java/tigase/vhosts/VHostRepository.java>`__ "
+"的一个非常基本的实现，用于从配置中加载域列表文件。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:159
 msgid ""
@@ -455,10 +586,15 @@ msgid ""
 "loaded by Tigase server. It allows to read and store virtual domains list"
 " in the database accessible through UserRepository."
 msgstr ""
+"`VHostJDBCRepository <https://github.com/tigase/tigase-server/blob/master/"
+"src/main/java/tigase/vhosts/VHostJDBCRepository.java>`__ - "
+"Tigase服务器加载的 `VHostRepository <https://github.com/tigase/tigase-server/"
+"blob/master/src/main/java/tigase/vhosts/VHostRepository.java>`__ "
+"的默认实现。它允许在通过UserRepository访问的数据库中读取和存储虚拟域列表。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:162
 msgid "Extending Virtual Domain settings"
-msgstr ""
+msgstr "扩展虚拟域设置"
 
 #: ../../Tigase_Development/Old_Stuff.rst:164
 msgid ""
@@ -466,6 +602,8 @@ msgid ""
 "additional settings. Since version 8.1.0 it is possible with use of "
 "``VHostItemExtension`` and VHostItemExtensionProvider`."
 msgstr ""
+"在某些情况下，需要扩展虚拟域以添加一些额外的设置。从8.1.0版开始，可以使用 "
+"``VHostItemExtension`` 和 ``VHostItemExtensionProvider``。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:166
 msgid ""
@@ -475,12 +613,15 @@ msgid ""
 "``Element``. Moreover, it is required to make values of this class "
 "modifiable by ad-hoc commands."
 msgstr ""
+"为此，您需要创建一个实现 ``VHostItemExtension`` "
+"的类。此类将保存每个虚拟主机的设置值。需要使其可序列化为 ``Element`` "
+"并且可从 ``Element`` 反序列化。此外，需要使该类的值可以通过临时命令进行修改。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:168
 msgid ""
 "It is recommended to provide additional methods allowing you to access "
 "values of this class."
-msgstr ""
+msgstr "建议提供额外的方法允许您访问此类的值。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:170
 msgid ""
@@ -488,66 +629,71 @@ msgid ""
 "interface as a bean and return a class of your implementation of "
 "``VHostItemExtension``."
 msgstr ""
+"此外，您需要将 ``VHostItemExtensionProvider`` 接口作为bean实现并返回 "
+"``VHostItemExtension`` 实现的类。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:172
 msgid ""
 "**Example VHostItemExtensionProvider\\` implementation for "
 "``SeeOtherHostVHostItemExtension``..**"
 msgstr ""
+"*用于* ``SeeOtherHostVHostItemExtension`` *的示例 VHostItemExtensionProvider "
+"实现*。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:191
 msgid "Stanza Limitations"
-msgstr ""
+msgstr "节限制"
 
 #: ../../Tigase_Development/Old_Stuff.rst:193
 msgid ""
 "Although XMPP is robust and can process stanzas of any size in bytes, "
 "there are some limitations to keep in mind for Tigase server."
-msgstr ""
+msgstr "尽管XMPP很强大并且可以处理任意大小的节（以字节为单位），但对于Tigase服务器有"
+"一些限制需要牢记。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:195
 msgid ""
 "Please keep these in mind when using default Tigase settings and creating"
 " custom stanzas."
-msgstr ""
+msgstr "在使用默认Tigase设置和创建自定义节时请记住这些。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:197
 msgid "Limit to number of attributes of single element = 50 attributes"
-msgstr ""
+msgstr "限制单个元素的属性数 = 50个属性"
 
 #: ../../Tigase_Development/Old_Stuff.rst:199
 msgid "Limit to number of elements = 1024 elements"
-msgstr ""
+msgstr "元素数量限制 = 1024个元素"
 
 #: ../../Tigase_Development/Old_Stuff.rst:201
 msgid "Limit to length of element name = 1024 characters"
-msgstr ""
+msgstr "元素名称长度限制 = 1024个字符"
 
 #: ../../Tigase_Development/Old_Stuff.rst:203
 msgid "Limit to length of attribute name = 1024 characters"
-msgstr ""
+msgstr "属性名称长度限制 = 1024个字符"
 
 #: ../../Tigase_Development/Old_Stuff.rst:205
 msgid "Limit to length of attribute value = 10240 characters"
-msgstr ""
+msgstr "属性值长度限制 = 10240个字符"
 
 #: ../../Tigase_Development/Old_Stuff.rst:207
 msgid "Limit to length of content of single element CDATA = 1048576b or 1Mb"
-msgstr ""
+msgstr "单个元素CDATA的内容长度限制 = 1048576b或1Mb"
 
 #: ../../Tigase_Development/Old_Stuff.rst:209
 msgid "These values may be changed."
-msgstr ""
+msgstr "这些值可能会改变。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:211
 msgid ""
 "**Note that these limitations are to elements and attributes that may be "
 "within a stanza, but do not limit the overall stanza length.**"
-msgstr ""
+msgstr "**请注意，这些限制是针对可能在一个节中的元素和属性，但不限制整个节的长度。**"
 
 #: ../../Tigase_Development/Old_Stuff.rst:214
 msgid "Escape Characters"
-msgstr ""
+msgstr "转义字符"
 
 #: ../../Tigase_Development/Old_Stuff.rst:216
 msgid ""
@@ -555,15 +701,16 @@ msgid ""
 " in the stanza to avoid conflicts. The rules are similar to normal XML "
 "escaping. The following is a list of characters that need to be escaped "
 "and what to use to escape them:"
-msgstr ""
+msgstr "如果某些特殊字符包含在节中，则需要对其进行转义以避免冲突。这些规则类似于普通"
+"的XML转义。以下是需要转义的字符列表以及使用什么来转义它们："
 
 #: ../../Tigase_Development/Old_Stuff.rst:227
 msgid "API changes in the Tigase Server 5.x"
-msgstr ""
+msgstr "Tigase Server 5.x中的API更改"
 
 #: ../../Tigase_Development/Old_Stuff.rst:229
 msgid "**THIS INFORMATION IS FOR OLDER VERSIONS OF TIGASE**"
-msgstr ""
+msgstr "**此信息适用于旧版本的TIGASE**"
 
 #: ../../Tigase_Development/Old_Stuff.rst:231
 msgid ""
@@ -571,6 +718,8 @@ msgid ""
 " Tigase server. The changes are not extensive but in some circumstances "
 "may require many simple changes in a few files."
 msgstr ""
+"仅当您开发自己的代码以在Tigase服务器中运行时，API更改才会对您产生影响。这些更"
+"改并不广泛，但在某些情况下可能需要在几个文件中进行许多简单的更改。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:233
 msgid ""
@@ -579,6 +728,8 @@ msgid ""
 "operations performed on the user JID instead of the String class which "
 "was used before changes."
 msgstr ""
+"所有更改都与引入 tigase.xmpp.JID 和 tigase.xmpp.BareJID "
+"类有关。建议将它们用于对用户JID执行的所有操作，而不是更改之前使用的String类。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:235
 msgid ""
@@ -587,6 +738,9 @@ msgid ""
 "processing. Therefore if you use data kept by instance of the JID or "
 "BareJID you can be sure they are valid and correct."
 msgstr ""
+"使用新类有一些优点。首先他们对所有的用户JID进行检查和解析，他们也做stringprep"
+"处理。因此，如果您使用由JID或 "
+"BareJID实例保存的数据，您可以确定它们是有效且正确的。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:237
 msgid ""
@@ -598,6 +752,11 @@ msgid ""
 " these new class are in if, once parsed, JIDs are reused in all further "
 "stanza processing."
 msgstr ""
+"然而，这些并不是所有优点。 "
+"JID解析代码似乎使用了大量大功率的CPU来执行它的操作。 JID和部分JID用于节处理的"
+"许多地方，并且在所有这些地方一遍又一遍地执行解析，浪费了CPU周期、内存和时间。"
+"因此，如果JID在解析后在所有进一步的节处理中被重用，则可以从这些新类中获得巨大"
+"的性能优势。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:239
 msgid ""
@@ -607,10 +766,13 @@ msgid ""
 "addresses among them. As an effect there are all new methods available in"
 " the class:"
 msgstr ""
+"这就是 tigase.server.Packet 类派上用场的地方。 Packet类的实例包含XML节并预解"
+"析一些节中最常用的元素、节源地址和目标地址。作为一种效果，该类中提供了所有新"
+"方法："
 
 #: ../../Tigase_Development/Old_Stuff.rst:250
 msgid "Whereas following methods are still available but have been deprecated:"
-msgstr ""
+msgstr "尽管以下方法仍然可用，但已被弃用："
 
 #: ../../Tigase_Development/Old_Stuff.rst:257
 msgid ""
@@ -619,13 +781,17 @@ msgid ""
 "server/snapshot/javadoc/tigase/server/Packet.html>`__ class and methods "
 "to learn all the details of these methods and difference between them."
 msgstr ""
+"请参考 `Packet <http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/"
+"server/Packet.html>`__ "
+"类和方法的JavaDoc文档来学习所有的这些方法的详细信息以及它们之间的区别。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:259
 msgid ""
 "Another difference is that you can no longer create the ``Packet`` "
 "instance using a constructor. Instead there are a few factory methods "
 "available:"
-msgstr ""
+msgstr "另一个区别是您不能再使用构造函数创建 ``Packet`` "
+"实例。相反，有一些工厂方法可用："
 
 #: ../../Tigase_Development/Old_Stuff.rst:267
 msgid ""
@@ -634,12 +800,14 @@ msgid ""
 "instance of one of the following classes instead of the ``Packet`` class:"
 " ``Iq``, ``Presence`` or ``Message``."
 msgstr ""
+"同样，请参阅JavaDoc文档了解所有详细信息。使用这些方法的要点是它们实际上返回以"
+"下类之一的实例，而不是 ``Packet`` 类：``Iq``、``Presence`` 或 ``Message``。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:269
 msgid ""
 "There is also a number of utility methods helping with creating a copy of"
 " the Packet instance preserving as much pre-parsed data as possible:"
-msgstr ""
+msgstr "还有一些实用方法可以帮助创建Packet实例的副本，以保留尽可能多的预解析数据："
 
 #: ../../Tigase_Development/Old_Stuff.rst:279
 msgid ""
@@ -647,6 +815,8 @@ msgid ""
 "server/snapshot/javadoc/>`__ documentation as complete as possible. "
 "Please contact us if you find missing or incorrect information."
 msgstr ""
+"我们尽量保持 `JavaDoc <http://docs.tigase.org/tigase-server/snapshot/javadoc/"
+">`__ 文档尽可能完整。如果您发现信息缺失或不正确，请与我们联系。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:281
 msgid ""
@@ -654,6 +824,8 @@ msgid ""
 "as much as possible. You never know, your code may run in highly loaded "
 "systems with throughput of 100k XMPP packets per second."
 msgstr ""
+"要点是尽可能地在代码中重用 ``JID`` 或 ``BareJID`` 实例。您永远不会知道，您的"
+"代码可能会在负载为每秒100k的XMPP数据包的高负载系统中运行。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:283
 msgid ""
@@ -666,14 +838,18 @@ msgid ""
 "the same in all places. Right now the policy is: **source address "
 "first**. Therefore in all places where there was a method:"
 msgstr ""
+"另一个变化。这个有点冒险，因为很难找到所有可以使用它的地方。有几个实用程序类"
+"和方法可以接受节的源地址和目标地址并产生一些东西。它们很混乱，因为其中一些是"
+"源地址，而另一些则是目标地址。所有代码都经过重构，以保持所有位置的参数顺序相"
+"同。目前的政策是：**源地址优先**。因此，在所有有以下方法的地方："
 
 #: ../../Tigase_Development/Old_Stuff.rst:289
 msgid "it has been changed to:"
-msgstr ""
+msgstr "它已更改为："
 
 #: ../../Tigase_Development/Old_Stuff.rst:295
 msgid ""
 "As far as I know most of these method were used only by myself so I do "
 "not expect much trouble for other developers."
-msgstr ""
-
+msgstr "据我所知，这些方法中的大部分都是我自己使用的，所以我不希望其他开发人员有太多"
+"麻烦。"
