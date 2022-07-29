@@ -72,7 +72,7 @@ msgid ""
 msgstr ""
 "这是可帮您快速开始使用我们软件的一组文档。每个文档都提供了对单个主题的介绍，"
 "从而使您可以开始使用/开发或开始研究该主题。请查看下面的文档列表以找到您正在寻"
-"找的主题。如果您没有找到所需主题的文档，请`让我们知道 <http://www.tigase.net/"
+"找的主题。如果您没有找到所需主题的文档，请 `让我们知道 <http://www.tigase.net/"
 "contact>`__。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:28
