@@ -134,7 +134,6 @@ msgstr "不要以root用户身份运行!"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:26
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:283
-#, fuzzy
 msgid "Start the Server"
 msgstr "启动服务器"
 
@@ -207,7 +206,6 @@ msgid "Enter the username and password above to gain access."
 msgstr "输入上面的用户名和密码以获得访问权限。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:71
-#, fuzzy
 msgid "Step Through the Installation Process"
 msgstr "逐步完成安装过程"
 
@@ -304,7 +302,6 @@ msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能(例如
 "MAM,推送通知)应该被启用或被禁用。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:103
-#, fuzzy
 msgid "At this step will also be able to enable clustering on your installation"
 msgstr "在这一步也将能够在您的安装上启用集群"
 
@@ -343,7 +340,6 @@ msgstr ""
 "请单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:115
-#, fuzzy
 msgid "**Setup security**"
 msgstr "**设置安全性**"
 
@@ -360,7 +356,6 @@ msgstr ""
 "的JIDs访问。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:119
-#, fuzzy
 msgid "**Saving configuration**"
 msgstr "**保存配置**"
 
@@ -385,7 +380,6 @@ msgid "Click \"Save\" to write the file to disk."
 msgstr "单击\"Save\"将文件写入磁盘。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:127
-#, fuzzy
 msgid "**Finished**"
 msgstr "**已完成**"
 
@@ -396,7 +390,6 @@ msgid ""
 msgstr "现在已经完成安装，继续下一步以重启服务器。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:132
-#, fuzzy
 msgid "Restart the Server"
 msgstr "重启服务器"
 
@@ -439,7 +432,6 @@ msgid "Verify Tigase is Running"
 msgstr "确认Tigase是否正在运行"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:154
-#, fuzzy
 msgid "You should see a list of listening ports."
 msgstr "您应该会看到一个监听端口列表。"
 
