@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-29 14:17-0700\n"
+"POT-Creation-Date: 2022-07-29 14:44-0700\n"
 "PO-Revision-Date: 2022-06-07 18:48+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language: zh_CN\n"
@@ -75,7 +75,7 @@ msgid "XMPP Clients"
 msgstr ""
 
 #: ../../index.rst:21
-msgid "`SiskinIM <../../projects/tigase-siskinim/en/latest/>`__ iOS XMPP Client"
+msgid "`SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client"
 msgstr ""
 
 #: ../../index.rst:24
@@ -99,4 +99,9 @@ msgid ""
 "legacy documentation website which contains documentation for older "
 "versions of componetns and applications"
 msgstr ""
+
+#~ msgid ""
+#~ "`SiskinIM <../../projects/tigase-siskinim/en/latest/>`__"
+#~ " iOS XMPP Client"
+#~ msgstr ""
 
