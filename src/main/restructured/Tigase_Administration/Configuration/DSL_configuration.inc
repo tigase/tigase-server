@@ -109,9 +109,9 @@ where ``beanName`` is name under which you want to configure bean.
 
 Inside block between ``(` and `)`` you can define:
 
-* ``class`` which will be used as a bean, in example above we set class as ``className``. *_(default: if you try to configure bean under name which has default class assigned with it in Tigase framework then this assigned class will be used. In other case you need to pass name of class to use as a bean)_*
-* ``active`` (boolean) whether you want the bean to be active or not (beans with ``active`` set to ``false`` are not loaded). *_(default: true)_*
-* ``exportable`` (boolean) defines if this bean should be exported and available for use for beans in inner scopes. This is advanced option in most cases it is recommended to omit this field in configuration. *_(default: false)_*
+* ``class`` which will be used as a bean, in example above we set class as ``className``. **(default: if you try to configure bean under name which has default class assigned with it in Tigase framework then this assigned class will be used. In other case you need to pass name of class to use as a bean)**
+* ``active`` (boolean) whether you want the bean to be active or not (beans with ``active`` set to ``false`` are not loaded). **(default: true)**
+* ``exportable`` (boolean) defines if this bean should be exported and available for use for beans in inner scopes. This is advanced option in most cases it is recommended to omit this field in configuration. **(default: false)**
 
 Spaces between ``beanName`` and block between ``()`` is optional as well as space between block ``()`` and block ``{}``.
 It is recommended that properties of bean would be placed in separate lines with indentation and first property will be placed in new line.
