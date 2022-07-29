@@ -1,7 +1,7 @@
 JVM settings and recommendations
 ------------------------------------
 
-Tigase configuration file ``tigase.conf`` (described in more detail in `??? <#manualconfig>`__) mentioned a couple of environmental variables which are related to the operation of the JVM. In this guide we would like to expound on those configuration options and provide hints for the optimal settings.
+Tigase configuration file ``tigase.conf`` (described in more detail in `Startup File for tigase.sh-tigase.conf <#manualconfig>`__) mentioned a couple of environmental variables which are related to the operation of the JVM. In this guide we would like to expound on those configuration options and provide hints for the optimal settings.
 
 Settings included in the ``etc/tigase.conf`` are as follows:
 
