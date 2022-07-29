@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-07-29 14:17-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,82 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: ../../index.rst:6
+#: ../../index.rst:33
 msgid "Tigase XMPP Server Distribution Administration Guide"
 msgstr ""
 
-#: ../../index.rst:13
+#: ../../index.rst:40
 msgid "Tigase Development Guide"
 msgstr ""
 
 #: ../../index.rst:4
 msgid "Tigase Documentation"
+msgstr ""
+
+#: ../../index.rst:7
+msgid "Tigase Projects documentations"
+msgstr ""
+
+#: ../../index.rst:10
+msgid "Server Components"
+msgstr ""
+
+#: ../../index.rst:12
+msgid ""
+"`Tigase MIX <../../projects/tigase-tigase-mix/en/latest/>`__ Next "
+"generation groupchat protocol"
+msgstr ""
+
+#: ../../index.rst:13
+msgid ""
+"`Tigase MUC <../../projects/tigase-tigase-muc/en/latest/>`__ Current "
+"generation groupchat protocol"
+msgstr ""
+
+#: ../../index.rst:14
+msgid ""
+"`Tigase Spam <../../projects/tigase-tigase-spam/en/latest/>`__ Project "
+"aiming at fighting spam"
+msgstr ""
+
+#: ../../index.rst:15
+msgid ""
+"`Tigase HTTP API <../../projects/tigase-tigase-http-api/en/latest/>`__ "
+"Operate and manage Tigase via HTTP... and more!"
+msgstr ""
+
+#: ../../index.rst:16
+msgid ""
+"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ "
+"Implementation of XEP-0045: PubSub protocol"
+msgstr ""
+
+#: ../../index.rst:19
+msgid "XMPP Clients"
+msgstr ""
+
+#: ../../index.rst:21
+msgid "`SiskinIM <../../projects/tigase-siskinim/en/latest/>`__ iOS XMPP Client"
+msgstr ""
+
+#: ../../index.rst:24
+msgid "XMPP Libraries"
+msgstr ""
+
+#: ../../index.rst:26
+msgid ""
+"`Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift "
+"Lang XMPP Library"
+msgstr ""
+
+#: ../../index.rst:29
+msgid "Legacy documentation website"
+msgstr ""
+
+#: ../../index.rst:31
+msgid ""
+"`Legacy documentation website <https://docs-legacy.tigase.net/>`__ Our "
+"legacy documentation website which contains documentation for older "
+"versions of componetns and applications"
 msgstr ""
 

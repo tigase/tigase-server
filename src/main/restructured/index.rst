@@ -18,7 +18,7 @@ Server Components
 XMPP Clients
 ^^^^^^^^^^^^^^^^^
 
--  `SiskinIM <../../projects/tigase-siskinim/en/latest/>`__ iOS XMPP Client
+-  `SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client
 
 XMPP Libraries
 ^^^^^^^^^^^^^^^^^
@@ -26,7 +26,7 @@ XMPP Libraries
 -  `Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang XMPP Library
 
 Legacy documentation website
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  `Legacy documentation website <https://docs-legacy.tigase.net/>`__ Our legacy documentation website which contains documentation for older versions of componetns and applications
 
