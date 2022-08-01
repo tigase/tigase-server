@@ -115,7 +115,7 @@ For Tigase server as well as many other servers (Apache 2.x), the order is follo
 
 .. NOTE::
 
-   Tigase requires full certificate chain in PEM file (described above)! Different applications may require pem file with certificates and private key in different order. So the same file may not be necessarily used by other services like Web server or e-mail server. Currently, Tigase can automatically sort certificates in PEM file while loading it.**
+   **Tigase requires full certificate chain in PEM file (described above)! Different applications may require pem file with certificates and private key in different order. So the same file may not be necessarily used by other services like Web server or e-mail server. Currently, Tigase can automatically sort certificates in PEM file while loading it.**
 
 .. _InstallingSSLCertificate:
 
@@ -124,7 +124,7 @@ Installing/Loading Certificate To the Tigase Server
 
 Installing and loading certificates is very easy. The server can load all certificates directly from **pem** files. You just need to create a separate pem file for each of your virtual domains and put the file in a directory accessible by the server. Tigase server can automatically load all **pem** files found in given directory. By default, and to make things easy, we recommend the ``Tigase/certs`` directory.
 
-It’s also possible to use: \* Admin ad-hoc command via XMPP client - you should navigate to Service Discovery of your server and in the list of commands for ``VHost Manager`` component select ``Add SSL Certificate`` and then follow instructions \* Admin WebUI - open ``http://<host>/admin``, navigate to ``Other`` category and in it select ``Add SSL Certificate`` and then follow instructions \* REST API - make a ``POST`` request to ``http://localhost:8080/rest/adhoc/vhost-man@domain.com`` with payload containing your certificate; to get the required form fields make ``GET`` request to the same endpoint
+It’s also possible to use: \* Admin ad-hoc command via XMPP client - you should navigate to Service Discovery of your server and in the list of commands for ``VHost Manager`` component select ``Add SSL Certificate`` and then follow instructions \* Admin WebUI - open ``http://<host>/admin``, navigate to ``Other`` category and in it select ``Add SSL Certificate`` and then follow instructions \* REST API - make a ``POST`` request to http://localhost:8080/rest/adhoc/vhost-man@domain.com with payload containing your certificate; to get the required form fields make ``GET`` request to the same endpoint
 
 .. _OtherSources:
 
@@ -133,7 +133,7 @@ Certificate From Other Providers
 
 There is number of certificate providers offering certificates either for free or for money. You can use any of them, however you have to be aware that sometimes certificates might not be recognized by all XMPP servers, especially if it’s one from a new provider. Here is an example list of providers:
 
--  LetsEncrypt - please see `Installing LetsEncrypt Certificates in Your Linux System<LetsEncryptCertificate>` for details
+-  LetsEncrypt - please see :ref:`Installing LetsEncrypt Certificates in Your Linux System<LetsEncryptCertificate>` for details
 
 -  `CAcert <https://www.cacert.org/>`__ - free certificates with Web GUI. (WARNING: it’s not widely accepted)
 
