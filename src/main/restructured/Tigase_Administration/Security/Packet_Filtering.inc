@@ -107,4 +107,4 @@ For example:
 
 In case of ``LIST`` and ``BLACKLIST`` filtering options, it’s essential to provide list of domains for the whitelisting/blacklisting. ``DomainFilter.ALLOWED_DOMAINS_LIST_KEY`` is a property key: "allowed-domains-list". The user repository MUST return semicolon separated list of domains: ``domain1.com;domain2.com,domain3.org``
 
-The filtering is performed by the ```tigase.xmpp.impl.DomainFilter`` <https://github.com/tigase/tigase-server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter.java>`__ plugin. Please refer to source code for more implementation details.
+The filtering is performed by the `tigase.xmpp.impl.DomainFilter <https://github.com/tigase/tigase-server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter.java>`__ plugin. Please refer to source code for more implementation details.
