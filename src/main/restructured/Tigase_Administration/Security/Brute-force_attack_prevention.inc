@@ -19,7 +19,7 @@ Brute-force Prevention is configured by VHost. There is following lis of configu
 +-------------------------------------+-------------+---------------------------------------------------------------------------+
 | ``brute-force-lock-time``           | ``long``    | Time [sec] of soft ban (first threshold)                                  |
 +-------------------------------------+-------------+---------------------------------------------------------------------------+
-| ``brute-force-mode``                | ``string``  | Working mode (see `Working modes <#bruteForcePrevention_WorkingModes>`__) |
+| ``brute-force-mode``                | ``string``  | Working mode (see :ref:`Working modes<WorkingModes>`)                     |
 +-------------------------------------+-------------+---------------------------------------------------------------------------+
 
 Detailed statistics
@@ -34,6 +34,8 @@ By default, in order not to pollute statistics, Brute-Force locker will only pro
            detailedStatistics = false
        }
    }
+
+.. _WorkingModes:
 
 Working modes
 ~~~~~~~~~~~~~~~~~~~~~~~
