@@ -91,6 +91,8 @@ max-queue-size
 
 **Available since:** 5.1.0
 
+.. _netBuffHighThroughput:
+
 net-buff-high-throughput
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -103,6 +105,8 @@ net-buff-high-throughput
 **Description:** The ``net-buff-high-throughput`` property sets the network buffer for high traffic connections like s2s or connections between cluster nodes. The default is ``64k`` and is optimal for medium traffic websites. If your cluster installation can not cope with traffic between nodes try to increase this number.
 
 **Available since:** 4.3.0
+
+.. _netBuffStandard:
 
 net-buff-standard
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

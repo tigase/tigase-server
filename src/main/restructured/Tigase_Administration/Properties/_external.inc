@@ -1,6 +1,8 @@
 External
 ---------------
 
+.. _bindExtHostnames:
+
 bind-ext-hostnames
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

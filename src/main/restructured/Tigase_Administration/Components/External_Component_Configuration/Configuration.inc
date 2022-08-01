@@ -1,7 +1,9 @@
+.. _External-Component-Configuration:
+
 External Component Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As for all Tigase components you can load and configure external components via the ``config.tdsl`` file described in details in the `DSL configuration <#dslConfig>`__ section. This document describes how to enable the component and set the initial configuration to accept or initiate connections for an external component.
+As for all Tigase components you can load and configure external components via the ``config.tdsl`` file described in details in the :ref:`DSL configuration<dslConfig>` section. This document describes how to enable the component and set the initial configuration to accept or initiate connections for an external component.
 
 First thing to do is to specify the component class and the component name which must be unique within the Tigase installation. The most commonly name used is ``ext`` and the class is ``tigase.server.ext.ComponentProtocol`` (class doesn’t have to be specified when using default name).
 
@@ -13,7 +15,7 @@ The following line in the ``config.tdsl`` will load the component during the ser
 
 While this would load the component, without any additional configurations provided, the component would be practically useless. It is necessary to configure the virtual host domains of the external component during run-time via ad-hoc commands to make use of this component.
 
-You may additionally configure the ```bind-ext-hostnames`` <#bindExtHostnames>`__ property.
+You may additionally configure the :ref:`bind-ext-hostnames<bindExtHostnames>` property.
 
 To configure external component connections using Admin UI you need to open Admin UI web page (if you are logged in the same computer on which Tigase XMPP Server is running by default it should be available at http://localhost:8080/admin/). Then you should click on ``Configuration`` on the left side of the Admin UI web page and then select ``Add new item`` on ``ext`` component or by execution corresponding ad-hoc command on ``ext`` component using ad-hoc capable XMPP client, ie. `Psi <http://psi-im.org>`__.
 

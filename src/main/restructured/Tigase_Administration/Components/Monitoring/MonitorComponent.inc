@@ -39,6 +39,8 @@ So for example, to subscribe to ``<EventName xmlns="tigase:demo">``, node must b
 
    If client is subscribed to ``*|tigase:demo node``, then events will not be sent from node ``*|tigase:demo``, but from the **real** node (in this case: ``EventName|tigase:demo``).
 
+.. _availableTasks:
+
 Available Tasks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -106,7 +108,7 @@ Configuration of the monitor can be done one of two ways; either by lines in ``c
 
 config.tdsl
 
-Tasks can be configured in the ``config.tdsl`` file. See `available tasks <#availableTasks>`__ for the tasks that can be setup.
+Tasks can be configured in the ``config.tdsl`` file. See :ref:`available tasks<availableTasks>` for the tasks that can be setup.
 
 To enable a specific monitor task, use the following line:
 
@@ -118,7 +120,7 @@ To enable a specific monitor task, use the following line:
        }
    }
 
-Where monitor is the component name for ``MonitorComponent``, and ``$TASKNAME`` is one of the `available task names <#availableTasks>`__.
+Where monitor is the component name for ``MonitorComponent``, and ``$TASKNAME`` is one of the :ref:`available task names<availableTasks>`.
 
 This format will be the same for other settings for tasks, and it’s best to group settings under one heading. For example:
 
@@ -228,9 +230,9 @@ Alternatively, you can update specific settings by editing a single field withou
 
 To set any other values, do not forget that certain parts may need to be changed, specifically the ``<field type="boolean" var=x-task#enabled">`` fields:
 
--  | Your field type will be defined by the type of variable specified in the `Available Tasks <#availableTasks>`__ section.
+-  | Your field type will be defined by the type of variable specified in the :ref:`Available Tasks<availableTasks>` section.
 
--  ``var=x task#`` will be followed by the property value taken directly from the `Available Tasks <#availableTasks>`__ section.
+-  ``var=x task#`` will be followed by the property value taken directly from the ref:`Available Tasks<availableTasks>` section.
 
 Getting the Message
 ''''''''''''''''''''
