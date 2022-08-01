@@ -66,7 +66,7 @@ This one changes to 15 minutes.
 
 .. Note::
 
-   see `Period / Duration values <#Period-Duration-values>`__ for format details
+   see :ref:`Period / Duration values<PeriodDurationvalues>` for format details
 
 Using modified database schema
 --------------------------------

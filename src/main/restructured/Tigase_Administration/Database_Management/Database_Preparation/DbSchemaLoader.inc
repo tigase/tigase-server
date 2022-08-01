@@ -110,7 +110,7 @@ Options for schema installation are as follows, required options are in bold
 
 -  ``-F``, ``--file=`` - comma separated list of SQL files that will be processed.
 
--  ``-Q``, ``--query=`` - custom queries to be executed, see `Query function <#queryschema>`__ for details.
+-  ``-Q``, ``--query=`` - custom queries to be executed, see :ref:`Query function<#queryschema>` for details.
 
 -  ``-L``, ``--logLevel=`` - logger level used during loading process (default is ``CONFIG``).
 
@@ -121,6 +121,8 @@ Options for schema installation are as follows, required options are in bold
 -  ``--getURI=`` - generate database URI (default is ``false``).
 
 -  ``--ignoreMissingFiles=`` - force ignoring missing files errors (default is ``false``).
+
+.. _queryschema:
 
 Query function
 
