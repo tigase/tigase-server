@@ -1,3 +1,5 @@
+.. _Load-Balancing-External-Components-in-Cluster-Mode:
+
 Load Balancing External Components in Cluster Mode
 ------------------------------------------------------
 
@@ -61,7 +63,7 @@ This can be simply done by adding following line to the server configuration fil
 
    ext () {}
 
-After this is done we need to add a new external component connection settings using ``Add item`` position for ``ext`` component in ``Configuration`` section of the web page just as it is described in `External Component Configuration <#tigaseExternalComponent>`__ section.
+After this is done we need to add a new external component connection settings using ``Add item`` position for ``ext`` component in ``Configuration`` section of the web page just as it is described in :ref:`External Component Configuration<External-Component-Configuration>` section.
 
 As you can see there is nothing special here. The most interesting part comes on the MUC side, but it is only a very small change from the configuration of the component to use with single node Tigase XMPP Server installation.
 

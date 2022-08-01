@@ -1,3 +1,5 @@
+.. _Tigase-as-an-External-Component:
+
 Tigase as an External Component
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -9,8 +9,8 @@ The implementation also supports a scripting API and new domains with passwords 
 
 Pages in this guide describe in details all the administration aspects of setting up and managing external components.
 
--  `External Component Configuration <#External-Component-Configuration>`__
+-  :ref:`External Component Configuration<External-Component-Configuration>`
 
--  `Tigase as an External Component <#Tigase-as-an-External-Component>`__
+-  :ref:`Tigase as an External Component<Tigase-as-an-External-Component>`
 
--  `Load Balancing External Components in Cluster Mode <#Load-Balancing-External-Components-in-Cluster-Mode>`__
+-  :ref:`Load Balancing External Components in Cluster Mode<Load-Balancing-External-Components-in-Cluster-Mode>`

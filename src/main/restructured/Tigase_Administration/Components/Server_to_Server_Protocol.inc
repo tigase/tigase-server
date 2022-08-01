@@ -52,7 +52,7 @@ Of course everybody wants his server to run with maximum throughput. This comes 
 
 There is one configuration property which allows you to adjust the network buffers for s2s connections to lower your memory usage or increase data throughput for s2s communication.
 
-More details about are available in the `net-buff-high-throughput <#netBuffHighThroughput>`__ or `net-buff-Standard <#netBuffStandard>`__ property descriptions.
+More details about are available in the :ref:`net-buff-high-throughput<netBuffHighThroughput>` or :ref:`net-buff-Standard<netBuffStandard>` property descriptions.
 
 Maximum Packet Waiting Time and Connection Inactivity Time
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
