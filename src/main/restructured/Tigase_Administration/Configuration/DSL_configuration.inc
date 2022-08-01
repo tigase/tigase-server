@@ -277,6 +277,8 @@ With DSL configuration format we introduce support for computable values for pro
 
     For properties which accepts lists it is not allowed to set value using computed values with comma separated values like ``value1,value2`` wrapped in ``[]``, ie. ``property = [ env('some-variable') + ',other-value' ]``. It needs to be set in following way ``property = env('some-variable') + ',other-value'``.
 
+.. _PeriodDurationvalues:
+
 Period / Duration values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

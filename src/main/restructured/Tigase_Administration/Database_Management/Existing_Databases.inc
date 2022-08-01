@@ -6,7 +6,7 @@ Information about importing user data from other databases.
 Connecting the Tigase Server to MySQL Database
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Please before continuing reading of this manual have a look at the `initial MySQL database setup <#prepareMysql>`__. It will help you with database preparation for connecting with Tigase server.
+Please before continuing reading of this manual have a look at the :ref:`initial MySQL database setup<Prepare-the-MySQL-Database-for-the-Tigase-Server>`. It will help you with database preparation for connecting with Tigase server.
 
 This guide describes MySQL database connection parameters.
 
@@ -86,7 +86,7 @@ Typically, you will need to have drupal for authentication, and another for user
        }
    }
 
-In theory you can load Tigase database schema to Drupal database and then both ``db-uris`` would have the same database connection string. More details about setting up and connecting to MySQL database can be found in the `MySQL guide <#prepareMysql>`__.
+In theory you can load Tigase database schema to Drupal database and then both ``db-uris`` would have the same database connection string. More details about setting up and connecting to MySQL database can be found in the :ref:`MySQL guide<Prepare-the-MySQL-Database-for-the-Tigase-Server>`.
 
 Now run the Tigase server.
 

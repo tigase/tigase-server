@@ -227,7 +227,7 @@ Tigase has made changes to its database to include primary keys in the tig_pairs
 
 .. Warning::
 
-    You MUST update your database to be compliant with the new schema. If you do not, Tigase will not function properly.**
+    **You MUST update your database to be compliant with the new schema. If you do not, Tigase will not function properly.**
 
 .. Note::
 
@@ -318,7 +318,7 @@ You can use a utility in Tigase to update the schema using the following command
 
 .. Note::
 
-   **Some variation may be necessary depending on how your java build uses ``-cp`` option**
+   **Some variation may be necessary depending on how your java build uses** ``-cp`` **option**
 
 Use the following options to customize. Options in bold are required.:
 
