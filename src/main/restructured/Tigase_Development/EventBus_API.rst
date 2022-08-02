@@ -153,7 +153,7 @@ To make registering listeners more easy, you can use method ``registerAll()`` fr
 |ss| Handling XML events |se|\
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To handle XML events we have to register listener for specific event package and name. In our example, package is empty because event name has no package declared (see also `Filtering events <#_filtering_events>`__).
+To handle XML events we have to register listener for specific event package and name. In our example, package is empty because event name has no package declared (see also :ref:`Filtering events<filteringEvents>`).
 
 .. code:: java
 
@@ -193,6 +193,7 @@ Because serialized class events, ale transformed to XML elements, we are able to
         <sample_value>1</sample_value>
       </EventName>
 
+.. _filteringEvents:
 
 Filtering events
 ~~~~~~~~~~~~~~~~
