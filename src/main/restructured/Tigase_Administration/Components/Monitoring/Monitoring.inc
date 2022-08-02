@@ -1,3 +1,5 @@
+.. _serverMonitoring:
+
 Server Monitoring
 -----------------------
 

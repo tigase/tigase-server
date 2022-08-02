@@ -43,7 +43,7 @@ This property sets the database connections pool size for the associated ``UserR
 
    **Note**
 
-   in some cases instead of default for this property setting for ```data-repo-pool-size`` <#dataRepoPoolSize>`__ is used if pool-size is not defined in ``userRepository``. This depends on the repository implementation and the way it is initialized.
+   in some cases instead of default for this property setting for :ref:`data-repo-pool-size<dataRepoPoolSize>` is used if pool-size is not defined in ``userRepository``. This depends on the repository implementation and the way it is initialized.
 
 .. code::
 
@@ -162,6 +162,7 @@ MySQL support works out of the box, however Tigase uses prepared calls for calli
        }
    }
 
+.. _dataRepoPoolSize:
 
 pool-size
 ^^^^^^^^^^^^^^^^^^

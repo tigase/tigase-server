@@ -24,7 +24,7 @@ The certificate container houses all configuration related to SSL certificate co
 ssl-certs-location
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This option allows you to specify the location where SSL certificates are stored. The meaning of this property depends on the SSL container `class implementation <#sslContainerClass>`__. By default it just points to the directory where the server SSL certificates are stored in files in PEM format.
+This option allows you to specify the location where SSL certificates are stored. The meaning of this property depends on the SSL container :ref:`class implementation<sslContainerClass>`. By default it just points to the directory where the server SSL certificates are stored in files in PEM format.
 
 Default location is ``/certs`` however it can be changed using the following setting:
 
@@ -90,7 +90,7 @@ In fact, if you are using the default class & name for a component, you don’t 
 
 **Default value:** By default, component configuration runs of default, and does not need to be specified.
 
-There are many many configuration options under each component, which are specified in `component documentation <#loadComponent>`__.
+There are many many configuration options under each component, which are specified in :ref:`component documentation<Components>`.
 
 Ports
 ^^^^^^^^^
@@ -143,6 +143,8 @@ config-type
 
 **Available since:** 2.0.0
 
+.. _debugPackages:
+
 debug-packages
 ^^^^^^^^^^^^^^^^^^
 
@@ -159,7 +161,7 @@ debug-packages
 debug
 ^^^^^^^^^
 
-**Description:** The ``debug`` property is used to turn on the debug log for the specified Tigase package. For example if you want to turn debug logs on for the ``tigase.server`` package, then you have to use the ``server`` parameter. If you have any problems with your server the best way to get help from the Tigase team is to generate configuration with this enabled at a minimum and run the server. Then from the ``logs/tigase-console.log`` log file I can provide the best information for us to provide assistance. More details about server logging and adjusting logging level is described in the Debugging Tigase article in the admin guide. If you wish to debug packages not compiled with Tigase, use the `debug-packages <#debugPackages>`__ setting.
+**Description:** The ``debug`` property is used to turn on the debug log for the specified Tigase package. For example if you want to turn debug logs on for the ``tigase.server`` package, then you have to use the ``server`` parameter. If you have any problems with your server the best way to get help from the Tigase team is to generate configuration with this enabled at a minimum and run the server. Then from the ``logs/tigase-console.log`` log file I can provide the best information for us to provide assistance. More details about server logging and adjusting logging level is described in the Debugging Tigase article in the admin guide. If you wish to debug packages not compiled with Tigase, use the :ref:`debug-packages<debugPackages>` setting.
 
 **Default value:** 'none'
 
@@ -172,7 +174,7 @@ debug
 monitoring
 ^^^^^^^^^^^^^^^^^^
 
-**Description:** This property activates monitoring interfaces through selected protocols on selected TCP/IP port numbers. For more details please refer to the `monitoring guide <#serverMonitoring>`__ in the user guide for details. Each monitoring protocol should be called in it’s own child bean under ``monitoring ()``. If a protocol is not specified, monitoring under that will not be available.
+**Description:** This property activates monitoring interfaces through selected protocols on selected TCP/IP port numbers. For more details please refer to the :ref:`monitoring guide<serverMonitoring>` in the user guide for details. Each monitoring protocol should be called in it’s own child bean under ``monitoring ()``. If a protocol is not specified, monitoring under that will not be available.
 
 **Default value:** By default monitoring is disabled.
 
@@ -332,7 +334,7 @@ s2s-secret
 
 **Description:** This property is a global setting for s2s secrets to generate dialback keys on the Tigase installation. By default it is null, which means the secret is automatically generated for each s2s connection and handshake.
 
-This is a global property which is overridden by settings for each VHost (see `??? <#addManageDomain>`__)
+This is a global property which is overridden by settings for each VHost (see :ref:`Add and Manage Domains (VHosts)<addManageDomain>`)
 
 As in the example provided, 'defaults' settings for all virtual hosts for which the configuration is not defined. This settings is useful mostly for installations with many virtual hosts listed in the init.property file for which there is no individual settings specified. It allows to configure a default values for all of them, instead of having to provide individual configuration for each vhost.
 
@@ -350,6 +352,8 @@ scripts-dir
 **Description:** This property sets the directory where all administrator scripts for ad-hoc commands are stored.
 
 **Available since:** 4.3.0
+
+.. _sslContainerClass:
 
 ssl-container-class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -610,7 +614,7 @@ Other possible values are:
 test
 ^^^^^^^^^^^^^^^^^^^^^
 
-*Default value:** By default test mode is disabled.
+**Default value:** By default test mode is disabled.
 
 **Description:** This property sets the server for test mode, which means that all logging is turned off, offline message storage is off, and possibly some other changes to the system configuration are being made.
 
@@ -656,6 +660,6 @@ trusted
 
 **Possible values:** comma separated list of user bare JIDs.
 
-**Description:** The ``trusted`` property allows users to specify a list of accounts which are considered as trusted, thus whom can perform some specific actions on the server. They can execute some commands, send a broadcast message, set MOTD and so on. The configuration is similar to ```admins`` <#admins>`__ setting.
+**Description:** The ``trusted`` property allows users to specify a list of accounts which are considered as trusted, thus whom can perform some specific actions on the server. They can execute some commands, send a broadcast message, set MOTD and so on. The configuration is similar to :ref:`admins<admins>` setting.
 
 **Available since:** 8.0.0
