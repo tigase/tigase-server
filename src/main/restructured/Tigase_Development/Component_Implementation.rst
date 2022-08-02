@@ -1623,6 +1623,8 @@ The above command will load current configuration, information about all configu
 
 Depending on the type of the database (or specified annotation), how the upgrade procedure is handled internally is slightly different.
 
+.. _relationalDatabases:
+
 Relational databases (external handling)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1630,7 +1632,7 @@ For all relational databases (MySQL, PostgreSQL, MS SQL Server, etc…) we highl
 
 .. Note::
 
-   this can be controlled with ``external`` property of ``Repository.SchemaId`` annotation, which defaults to "true", if set to ``false`` then handling will be done as described in `Relational databases (external handling) <#update-relational>`__
+   this can be controlled with ``external`` property of ``Repository.SchemaId`` annotation, which defaults to "true", if set to ``false`` then handling will be done as described in :ref:`Relational databases (external handling)<relationalDatabases>`
 
 For example:
 
