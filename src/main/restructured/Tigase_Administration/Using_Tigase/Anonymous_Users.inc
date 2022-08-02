@@ -6,7 +6,7 @@ To support anonymous users, you must first enable anonymous authentication on yo
 Anonymous Authentication
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Tigase Server can support anonymous logins via SASL-ANONYMOUS in certain scenarios. This can be enabled on per-VHost basis by adjusting *Anonymous enabled* option as described in ` Add and Manage Domains (VHosts)<#Add-and-Manage-Domains-(VHosts)>`__ This setting is false by default as SASL-ANONYMOUS may not be totally secure as users can connect without prior permission (username and password).
+Tigase Server can support anonymous logins via SASL-ANONYMOUS in certain scenarios. This can be enabled on per-VHost basis by adjusting *Anonymous enabled* option as described in :ref:`Add and Manage Domains (VHosts)<addManageDomain>` This setting is false by default as SASL-ANONYMOUS may not be totally secure as users can connect without prior permission (username and password).
 
 Anonymous User Features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

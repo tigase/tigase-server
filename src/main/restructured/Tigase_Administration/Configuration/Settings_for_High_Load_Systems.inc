@@ -1,3 +1,5 @@
+.. _linuxhighload:
+
 Linux Settings for High Load Systems
 ---------------------------------------
 

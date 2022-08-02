@@ -41,7 +41,7 @@ The simplest possible Python script may look like this one:
 
 ``result = "Hello world!"``
 
-For instructions how to load and execute the script, please refer to the `introductory article <#scriptingintro>`__ for scripting in Tigase server. There were some minor changes in Tigase 4.4.0 and later versions, so please have a look at the `article <#newElements>`__ describing new elements as well.
+For instructions how to load and execute the script, please refer to the :ref:`introductory article<Scripting-Introduction - Hello-World!>` for scripting in Tigase server. There were some minor changes in Tigase 4.4.0 and later versions, so please have a look at the :ref:`article <Tigase-Scripting-Version-4.4.x-Update-for-Administrators>` describing new elements as well.
 
 An example of a more advanced script asks the user for providing required parameters for the actual script execution:
 

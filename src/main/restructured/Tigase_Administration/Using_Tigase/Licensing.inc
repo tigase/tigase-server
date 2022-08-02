@@ -70,7 +70,7 @@ Obtaining license file
 
 Open a new browser and navigate to this address: https://license.tigase.software/retrieve once there, paste the generated code from the last step in the field and click submit. Afterwards you will be prompted to download a license file, place this file in your *etc/* folder and restart your server, your license is now activated and installed on your server.
 
-**If you are provided a manually produced license, you will need to place it in the same ``etc/`` directory with the name ``<component_name>.license`` (e.g.: ``etc/acs.license``)**
+**If you are provided a manually produced license, you will need to place it in the same** ``etc/`` **directory with the name** ``<component_name>.license`` (**e.g.:** ``etc/acs.license``)
 
 What happens if I do not use a license file or it is expired?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

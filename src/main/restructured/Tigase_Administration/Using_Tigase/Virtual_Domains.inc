@@ -133,7 +133,7 @@ If everything went well you have just added a new user and you should get a wind
 SSL Certificate Management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-SSL Certificate Management has been implemented, and certificates can be manipulated when in a .pem form. For more details, see `Creating and Loading the Server Certificate in pem Files <#certspem>`__ section of documentation for more information.
+SSL Certificate Management has been implemented, and certificates can be manipulated when in a .pem form. For more details, see :ref:`Creating and Loading the Server Certificate in pem Files<certspem>` section of documentation for more information.
 
 .. |adminui vhost add item button| image:: /images/admin/adminui_vhost_add_item_button.png
 .. |adminui vhost add item form| image:: /images/admin/adminui_vhost_add_item_form.png

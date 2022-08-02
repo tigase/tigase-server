@@ -106,7 +106,7 @@ The format is as follows: ``{traffic-type}:{maximum-traffic}:{max-lifespan-traff
 
 cm-see-other-host
 
-This allows the specific use of a load balancing mechanism by selecting ``SeeOtherHostIfc`` implementation. For more details, see `Tigase Load Balancing <#loadBalancing>`__ documentation.
+This allows the specific use of a load balancing mechanism by selecting ``SeeOtherHostIfc`` implementation. For more details, see :ref:`Tigase Load Balancing<loadBalancing>` documentation.
 
 Old configuration method
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

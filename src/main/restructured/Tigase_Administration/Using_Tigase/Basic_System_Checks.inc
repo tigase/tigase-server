@@ -3,7 +3,7 @@
 Basic System Checks
 ----------------------
 
-Previously, a configuration article is available about `Linux settings for high load systems <#linuxhighload>`__. This has a description of basic settings which are essential to successfully run XMPP service for hundreds or thousands of online users.
+Previously, a configuration article is available about :ref:`Linux settings for high load systems<linuxhighload>`. This has a description of basic settings which are essential to successfully run XMPP service for hundreds or thousands of online users.
 
 Of course, high load and high traffic systems require much more tuning and adjustments. If you use selinux you have to be careful as it can interfere with the service while it is under a high load. Also some firewall settings may cause problems as the system may decide it is under a DDOS attack and can start blocking incoming connections or throttle the traffic.
 
