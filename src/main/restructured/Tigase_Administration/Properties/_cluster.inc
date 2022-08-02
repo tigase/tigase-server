@@ -19,7 +19,7 @@ cl-comp
 connect-all
 ~~~~~~~~~~~~~~~
 
-The ``cluster-connect-all`` property is used to open active connections to all nodes listed in the `cluster-nodes <#clusterNodes>`__ configuration property. This property should be used only on the node which is added to the live cluster at later time. Normally this new cluster node is not listed in the configuration of the existing cluster nodes. This is why they can not open connections the new node. The new node opens connection to all existing nodes instead. False is the default value and you can skip this option if you want to have it switched off which it is by default.
+The ``cluster-connect-all`` property is used to open active connections to all nodes listed in the :ref:`cluster-nodes<clusterNodes>` configuration property. This property should be used only on the node which is added to the live cluster at later time. Normally this new cluster node is not listed in the configuration of the existing cluster nodes. This is why they can not open connections the new node. The new node opens connection to all existing nodes instead. False is the default value and you can skip this option if you want to have it switched off which it is by default.
 
 **Example**
 
@@ -45,6 +45,8 @@ cluster-mode
 **Possible values:** ``true|false``
 
 **Available since:** 8.0.0
+
+.. _clusterNodes:
 
 cluster-nodes
 ^^^^^^^^^^^^^^^^^^

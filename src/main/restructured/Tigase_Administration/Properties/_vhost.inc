@@ -12,7 +12,7 @@ vhost-anonymous-enabled
 
 **Description:** The ``vhost-anonymous-enabled`` property specifies whether anonymous user logins are allowed for the installation for all vhosts.
 
-This is a global property which is overridden by settings for particular VHost (see ` Add and Manage Domains (VHosts)`__).
+This is a global property which is overridden by settings for particular VHost (see :ref:`Add and Manage Domains (VHosts)<addManageDomain>`).
 
 Default settings for all virtual hosts are used when this property is not defined. This settings is useful mostly for installations with many virtual hosts listed in the ``config.tdsl`` file for which there is no individual settings specified. It allows the configuration of default values for all of them, instead of having to provide individual configuration for each VHost.
 
@@ -29,7 +29,7 @@ vhost-disable-dns-check
 
 **Description:** This property disables DNS validation when adding or editing vhosts in Tigase server. This also exempts administrative accounts from validation. With this property enabled, you will not benefit from seeing if proper SRV records are set so other people can connect to specific vhosts from outside your network.
 
-This is a global property which is overridden by settings for particular VHost (see `??? <#addManageDomain>`__).
+This is a global property which is overridden by settings for particular VHost (see :ref:`Add and Manage Domains (VHosts)<addManageDomain>`).
 
 **Available since:** 8.0.0
 
@@ -50,7 +50,7 @@ This is a global property which is overridden by settings for particular vhost.
 
 The default setting is used for all virtual hosts for which the configuration is not defined. This settings is most useful for installations with many virtual hosts listed in the ``init.property`` file for which there is no individual settings specified. It provides an ability to use default values for all of them, instead of having to provide individual configuration for each vhost.
 
-This is a global property which is overridden by settings for particular VHost (see `??? <#addManageDomain>`__).
+This is a global property which is overridden by settings for particular VHost (see :ref:`Add and Manage Domains (VHosts)<addManageDomain>`).
 
 **Available since:** 8.0.0
 
@@ -69,7 +69,7 @@ The null value is used as a default when no configuration is set. This setting i
 
 It is also applied as a default value for all new vhosts added at run-time.
 
-This is a global property which is overridden by settings for particular VHost (see `??? <#addManageDomain>`__).
+This is a global property which is overridden by settings for particular VHost (see :ref:`Add and Manage Domains (VHosts)<addManageDomain>`).
 
 **Available since:** 8.0.0
 

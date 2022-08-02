@@ -19,7 +19,7 @@ This setting is rarely required but on installations where the client cannot con
 bosh-extra-headers-file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*Default value:** ``'etc/bosh-extra-headers.txt'``
+**Default value:** ``'etc/bosh-extra-headers.txt'``
 
 **Example:** ``'bosh-extra-headers-file' = ''/path/to/file.txt'``
 
@@ -142,7 +142,7 @@ domain-filter-policy
 
 6. ``BLACKLIST`` - user can communicate with everybody (like ``ALL``), except contacts on listed domains.
 
-This is a global property which is overridden by settings for particular VHosts (see `??? <#addManageDomain>`__).
+This is a global property which is overridden by settings for particular VHosts (see :ref:`Add and Manage Domains(VHosts)<addManageDomain>`).
 
 A default settings for all virtual hosts for which the configuration is not defined. This settings is useful mostly for installations with many virtual hosts listed in the init.property file for which there is no individual settings specified. It allows default value for all of servers, instead of having to provide individual configuration for each vhost.
 
@@ -171,6 +171,8 @@ see-other-host
 
 **Available since:** 8.0.0
 
+.. _watchdogTimeout:
+
 watchdog_timeout
 ^^^^^^^^^^^^^^^^^^
 
@@ -198,13 +200,15 @@ for example (for C2SConnectionManager):
 
 All related configuration options:
 
--  `watchdog_Ping_Type <#watchdogPingType>`__
+-  :ref:`watchdog_Ping_Type<watchdogPingType>`
 
--  `watchdog_delay <#watchdogDelay>`__
+-  :ref:`watchdog_delay<watchdogDelay>`
 
 -  watchdog_timeout
 
 **Available since:** 8.0.0
+
+.. _watchdogDelay:
 
 watchdog_delay
 ^^^^^^^^^^^^^^^^^^
@@ -233,13 +237,15 @@ for example (for ClusterConnectionManager):
 
 All related configuration options:
 
--  `watchdog_Ping_Type <#watchdogPingType>`__
+-  :ref:`watchdog_Ping_Type<watchdogPingType>`
 
 -  watchdog_delay
 
--  `watchdog_timeout <#watchdogTimeout>`__
+-  :ref:`watchdog_timeout<watchdogTimeout>`
 
 **Available since:** 8.0.0
+
+.. _watchdogPingType:
 
 watchdog_ping_type
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -270,7 +276,7 @@ All related configuration options:
 
 -  watchdog_ping_type
 
--  `watchdog_Delay <#watchdogDelay>`__
+-  :ref:`watchdog_Delay<watchdogDelay>`
 
 -  watchdog_timeout
 

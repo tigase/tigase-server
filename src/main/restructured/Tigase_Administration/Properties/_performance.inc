@@ -10,9 +10,11 @@ cm-ht-traffic-throttling
 
 **Possible values:** comma separated list of traffic limits settings.
 
-**Description:** This property is used to specify traffic limit of non-user connections, that is s2s, external components and other high traffic server connections. The meaning of the property and values encoded are in the same way as for the `cm-traffic-throttling property <#cmTrafficThrottling>`__.
+**Description:** This property is used to specify traffic limit of non-user connections, that is s2s, external components and other high traffic server connections. The meaning of the property and values encoded are in the same way as for the :ref:`cm-traffic-throttling property<cmTrafficThrottling>`.
 
 **Available since:** 8.0.0
+
+.. _cmTrafficThrottling:
 
 cm-traffic-throttling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
