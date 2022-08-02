@@ -3,13 +3,13 @@ Plugin Development
 
 This is a set of documents explaining details what is a plugin, how they are designed and how they work inside the Tigase server. The last part of the documentation explains step by step creating the code for a new plugin.
 
--  `Writing Plugin Code <#writePluginCode>`__
+-  :ref:`Writing Plugin Code<writePluginCode>`
 
--  `Plugin Configuration <#pluginConf>`__
+-  :ref:`Plugin Configuration<pluginConf>`
 
--  `How Packets are Processed by the SM and Plugins <#packetprocess>`__
+-  :ref:`How Packets are Processed by the SM and Plugins<packetprocess>`
 
--  `SASL Custom Mechanisms and Configuration <#saslcmac>`__
+-  :ref:`SASL Custom Mechanisms and Configuration<saslcmac>`
 
 .. _writePluginCode:
 
