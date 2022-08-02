@@ -8,7 +8,7 @@ Requirements
 
 Eclipse IDE currently requires the use of `Java Development Kit 8 <http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html>`__.
 
-You will also need the M2E plugin for Maven integration, however this can be done inside Eclipse now, so refer to the `Plugin Installation <#m2EPlugin>`__ section for that.
+You will also need the M2E plugin for Maven integration, however this can be done inside Eclipse now, so refer to the :ref:`Plugin Installation<m2EPlugin>` section for that.
 
 Installation
 --------------
@@ -56,6 +56,8 @@ Now select the directory where you wanted to clone the repository to. This was f
 |win git5|
 
 Once you click next Eclipse will download the repository and any branches you selected to that directory. Note you will be unable to import this git directory since there are no git a project specific files downloaded. However, once downloading is complete you may click cancel, and the git repository will remain in the directory you have chosen.
+
+.. _m2EPlugin:
 
 Setup
 ---------
