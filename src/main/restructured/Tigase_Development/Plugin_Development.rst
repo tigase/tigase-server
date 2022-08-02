@@ -267,7 +267,8 @@ Assuming your plugin class is in the classpath it will be loaded and used at the
 
    If your plugin name has any special characters (-,:\|/.) it needs to be encapsulated in single quotation marks.
 
-There is another part of the plugin configuration though. If you looked at the `Writing Plugin Code <#writePluginCode>`__ guide you can remember the **Map settings** processing parameter. This is a map of properties you can set in the configuration file and these setting will be passed to the plugin at the processing time.
+There is another part of the plugin configuration though. If you looked at the :ref:`Writing Plugin Code 
+<writePluginCode>` guide you can remember the **Map settings** processing parameter. This is a map of properties you can set in the configuration file and these setting will be passed to the plugin at the processing time.
 
 Again **config.tdsl** is the place to put the stuff. These kind of properties start under your **plugin ID** and each key and value will be a child underneath:
 
@@ -388,7 +389,7 @@ To add a new mechanism, a new factory for the mechanism has to be implemented an
 
 The simplest way to add register a new factory is to annotate its class with ``@Bean`` annotation:
 
-**Example of the registration of a SASL mechanism factory with an annotation setting id of the factory to ``customSaslFactory``.**
+**Example of the registration of a SASL mechanism factory with an annotation setting id of the factory to** ``customSaslFactory``.
 
 .. code:: java
 
@@ -462,7 +463,9 @@ When the SASL authentication is completed without any error, Tigase server shoul
 
 If, after a successful authentication, method call: ``getNegotiatedProperty("IS_ANONYMOUS")`` returns ``Boolean.TRUE`` then the user session is marked as anonymous. For valid and registered users this can be used for cases when we do not want to load any user data such as roster, vcard, privacy lists and so on. This is a performance and resource usage implication and can be useful for use cases such as support chat. The authorization is performed based on the client database but we do not need to load any XMPP specific data for the user’s session.
 
-More details about implementation can be found in the `custom mechanisms development <#cmd>`__ section.
+More details about implementation can be found in the :ref:`custom mechanisms development<cmd>` section.
+
+.. _cmd:
 
 Custom Mechanisms Development
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
