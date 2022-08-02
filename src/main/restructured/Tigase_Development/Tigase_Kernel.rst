@@ -25,15 +25,15 @@ Kernel is an instance of the ``Kernel`` class which is responsible for managing 
 
 -  handling of bean lifecycle
 
--  registration of additional beans based on annotations *(optionally using registered class implementing ``BeanConfigurator`` as ``defaultBeanConfigurator``)*
+-  registration of additional beans based on annotations (*optionally using registered class implementing* ``BeanConfigurator`` *as* ``defaultBeanConfigurator``)
 
--  configuration of a bean *(optionally thru registered class implementing ``BeanConfigurator`` as ``defaultBeanConfigurator``)*
+-  configuration of a bean (*optionally thru registered class implementing* ``BeanConfigurator`` *as* ``defaultBeanConfigurator``)
 
 Kernel core is responsible for dependency resolution and maintaining lifecycle of beans. Other features, like proper configuration of beans are done by additional beans working inside the Kernel.
 
 Kernel identifies beans by their name, so each kernel may have only one bean named ``abc``. If more than one bean has the same name, then the last one registered will be used as its registration will override previously registered beans. You may use whatever name you want to name a bean inside kernel but it cannot:
 
--  be ``service`` as this name is used by Tigase Kernel internally when \`RegistrarBean`s are in use (see `RegistrarBean <#registrarBean>`__
+-  be ``service`` as this name is used by Tigase Kernel internally when RegistrarBean\`s are in use (see :ref:`RegistrarBean<registrarBean>`)
 
 -  end with ``#KERNEL`` as this names are also used by Tigase Kernel internally
 
@@ -58,7 +58,9 @@ A bean is a named instance of the class which has parameterless constructor and 
 
 .. Warning::
 
-    Parameterless constructor is a required as it will be used by kernel to create an instance of the bean, see `bean lifecycle <#beanLifecycle>`__.
+    Parameterless constructor is a required as it will be used by kernel to create an instance of the bean, see :ref:`bean lifecycle<beanLifecycle>`.
+
+.. _beanLifecycle:
 
 Lifecycle of a bean
 --------------------------
@@ -79,6 +81,8 @@ During this step, kernel creates instance of the class which was registered for 
 
    It’s possible to create bean instance without the need to inject it anywhere - such bean should be annoted with ``@Autostart`` annotation.
 
+.. _beanConfiguration:
+
 Configuring a bean *(optional)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -93,6 +97,8 @@ At the end of the configuration step, if bean implements ``ConfigurationChangedA
 .. Note::
 
    Configuration of the bean may be changed at runtime and it will be applied in the same way as initial configuration is passed to the bean. So please keep in mind that ``getter``/``setter`` may be called multiple times - even for already configured and initialized bean.
+
+.. _beanInjectingDependencies:
 
 Injecting dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -122,12 +128,12 @@ When bean is being unloaded, then reference to its instance is just dropped. How
 Reconfiguration of a bean *(optional)*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-At any point in time bean may be reconfigured by default bean configurator (instance of ``BeanConfigurator``) registered in the kernel. This will happen in the same way as it described in `Configuring a bean <#beanConfiguration>`__ in **Creating instace of a bean** section.
+At any point in time bean may be reconfigured by default bean configurator (instance of ``BeanConfigurator``) registered in the kernel. This will happen in the same way as it described in :ref:`Configuring a bean<beanConfiguration>` in **Creating instace of a bean** section.
 
 Updating dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-It may happen, that due to reconfiguration or registration/unregistration or activation/deactivation of some other beans dependencies of a bean will change. As a result, Tigase Kernel will inject new dependencies as described in `Injecting dependencies <#beanInjectingDependencies>`__
+It may happen, that due to reconfiguration or registration/unregistration or activation/deactivation of some other beans dependencies of a bean will change. As a result, Tigase Kernel will inject new dependencies as described in :ref:`Injecting dependencies<beanInjectingDependencies>`
 
 Registration of a bean
 ---------------------------
@@ -293,7 +299,7 @@ Dependencies are inserted using getters/setters if those methods exist, otherwis
 
 .. Warning::
 
-    Kernel is resolving dependencies during injection only using beans visible in its scope. This makes it unable to inject an instance of a class which is not registered in the same kernel as a bean or not visible in this kernel scope (see `Scope and visibility <#kernelScope>`__).
+    Kernel is resolving dependencies during injection only using beans visible in its scope. This makes it unable to inject an instance of a class which is not registered in the same kernel as a bean or not visible in this kernel scope (see :ref:`Scope and visibility<kernelScope>`).
 
 .. Warning::
 
@@ -317,6 +323,8 @@ You can create an instance of a new kernel and register it as a bean within the 
    Kernel child = new Kernel("child");
    parent.registerBean(child.getName()).asInstance(child).exec();
 
+.. _registrarBean:
+
 Usage of RegistrarBean
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -336,6 +344,8 @@ As an example of such use case is ``dataSource`` bean, which allows administrato
 
 With this config we just defined 3 beans named ``default``, ``domain1`` and ``domain2``. All of those beans will be instances of a class returned by a ``getDefaultBeanClass()`` method of ``dataSource`` bean.
 
+.. _kernelScope:
+
 Scope and visibility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -353,7 +363,7 @@ To do so, you need to mark the bean as exportable using annotations or by callin
    public class Bean1 {
    }
 
-**Calling ``exportable()``.**
+*Calling* ``exportable()``.
 
 .. code:: java
 
