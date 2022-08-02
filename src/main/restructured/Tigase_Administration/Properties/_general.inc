@@ -553,6 +553,8 @@ Example configuration block
 
 **Available since:** 8.0.0
 
+.. _stream-error-counter:
+
 stream-error-counter
 ^^^^^^^^^^^^^^^^^^^^^
 
