@@ -171,7 +171,9 @@ Ideal tab-size: 4
 Column limit: 120
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Defined column limit is 120 characters and must be line-wrapped as described below Java code has a column limit of 100 characters. Except as noted below, any line that would exceed this limit must be line-wrapped, as explained in section `Line-wrapping <#line-wrapping>`__.
+Defined column limit is 120 characters and must be line-wrapped as described below Java code has a column limit of 100 characters. Except as noted below, any line that would exceed this limit must be line-wrapped, as explained in section :ref:`Line-wrapping<linewrapping>`.
+
+.. _linewrapping:
 
 Line-wrapping
 ^^^^^^^^^^^^^^^^
