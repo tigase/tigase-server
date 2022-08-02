@@ -372,7 +372,7 @@ public class JabberIqRegister
 																		  "You are not authorized to change registration settings.\n" +
 																				  e.getMessage(), true));
 		} catch (TigaseDBException e) {
-			log.warning("Database problem: " + e);
+			log.log(Level.WARNING, "Database problem: " + e, e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 																				 "Database access problem, please contact administrator.",
 																				 true));
