@@ -5,9 +5,11 @@ Tips and Tricks
 
 The section contains some short tricks and tips helping in different kinds of issues related to the server administration and maintenance.
 
--  `Runtime Environment Tip <#tigaseTip_RuntimeEnvironment>`__
+-  :ref:`Runtime Environment Tip<tigaseTip_RuntimeEnvironment>`
 
--  `Best Practices for Connecting to Tigase XMPP server From Web Browser <#bestWebPrax>`__
+-  :ref:`Best Practices for Connecting to Tigase XMPP server From Web Browser<Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-Browser>`
+
+.. _tigaseTip_RuntimeEnvironment:
 
 Tigase Tip: Checking the Runtime Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

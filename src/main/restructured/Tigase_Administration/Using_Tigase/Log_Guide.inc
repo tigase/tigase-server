@@ -31,7 +31,7 @@ This file is re-written every time tigase starts.
 logs/tigase.log.#
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The tigase.log files are where the majority of logging will take place. The rules for writing to these longs can be manipulated by editing files in the int.properties file. To see how, see the `Debugging Tigase <#debuggingTigase>`__ section of this manual for more details about how to turn on debug logging, and how to manipulate log settings. Entries to these logs are made in the following format:
+The tigase.log files are where the majority of logging will take place. The rules for writing to these longs can be manipulated by editing files in the int.properties file. To see how, see the :ref:`Debugging Tigase<Debuging-Tigase>` section of this manual for more details about how to turn on debug logging, and how to manipulate log settings. Entries to these logs are made in the following format:
 
 ::
 
