@@ -169,7 +169,7 @@ It is recommended to provide additional methods allowing you to access values of
 
 Additionally, you need to implement ``VHostItemExtensionProvider`` interface as a bean and return a class of your implementation of ``VHostItemExtension``.
 
-**Example VHostItemExtensionProvider\` implementation for ``SeeOtherHostVHostItemExtension``..**
+*Example VHostItemExtensionProvider implementation for* ``SeeOtherHostVHostItemExtension``.
 
 .. code:: java
 
@@ -254,7 +254,7 @@ Whereas following methods are still available but have been deprecated:
    String getStanzaFrom();
    String getStanzaTo();
 
-Please refer to the JavaDoc documentation for the ```Packet`` <http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/server/Packet.html>`__ class and methods to learn all the details of these methods and difference between them.
+Please refer to the JavaDoc documentation for the `Packet <http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/server/Packet.html>`__ class and methods to learn all the details of these methods and difference between them.
 
 Another difference is that you can no longer create the ``Packet`` instance using a constructor. Instead there are a few factory methods available:
 
