@@ -55,5 +55,18 @@ public interface S2SProcessor
 	void streamClosed(S2SIOService serv);
 
 	String streamOpened(S2SIOService serv, Map<String, String> attribs);
+
+	/**
+	 * Method determines whether not delivered packet (due to closed connection) should be skipped and not
+	 * added for re-delivery. We should not re-add certain packets such as stream features or SASL as those are related
+	 * to particular connection and if it got broken then there's no point in trying to re-deliver them.
+	 *
+	 * @param packet which was not delivered and is to be re-delivered
+	 *
+	 * @return {@code true} if the packet should be skipped/ignored or {@code false} if it is to be re-delivered.
+	 */
+	default boolean shouldSkipUndelivered(Packet packet) {
+		return false;
+	}
 }
 

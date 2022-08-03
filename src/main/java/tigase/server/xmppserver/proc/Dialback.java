@@ -435,4 +435,10 @@ public class Dialback
 		requested.add(domain);
 	}
 
+	@Override
+	public boolean shouldSkipUndelivered(Packet packet) {
+		return packet.getElemName() == DB_VERIFY_EL_NAME
+				|| packet.getElemName() == DB_RESULT_EL_NAME;
+	}
+
 }

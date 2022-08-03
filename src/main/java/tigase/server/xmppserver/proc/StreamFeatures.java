@@ -45,6 +45,11 @@ public class StreamFeatures
 		return hasEmptyOrOnlyObligatoryFeatures(p.getElement());
 	}
 
+	@Override
+	public boolean shouldSkipUndelivered(Packet packet) {
+		return packet.getElemName() == STREAM_FEATURES_EL;
+	}
+
 	private static boolean hasEmptyOrOnlyObligatoryFeatures(Element featuresElement) {
 		return featuresElement.getChildren() == null || featuresElement.getChildren().isEmpty() ||
 				featuresElement.findChildren(item -> item.getChild("required") != null).isEmpty();

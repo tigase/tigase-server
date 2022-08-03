@@ -121,4 +121,9 @@ public class StartTLS
 			}
 		}
 	}
+
+	@Override
+	public boolean shouldSkipUndelivered(Packet packet) {
+		return packet.getElemName() == START_TLS_EL || packet.getElemName() == PROCEED_TLS_EL;
+	}
 }

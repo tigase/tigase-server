@@ -32,7 +32,6 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.impl.C2SDeliveryErrorProcessor;
 import tigase.xmpp.jid.JID;
 
 import javax.script.Bindings;
@@ -302,11 +301,12 @@ public class S2SConnectionManager
 		// re-add packet - this may be good as we would retry to send packet
 		// which delivery failed due to IO error
 
-		if (packet.getElemName() == STREAM_FEATURES_EL) {
-			// we should not re-add stream features as those related to particular connection
-			// and if it got broken then there's no point in trying to re-deliver it
-			return false;
+		for (S2SProcessor proc : processors) {
+			if (proc.shouldSkipUndelivered(packet)) {
+				return false;
+			}
 		}
+
 		addPacket(packet);
 		return true;
 	}

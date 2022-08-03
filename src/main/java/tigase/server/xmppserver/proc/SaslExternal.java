@@ -44,9 +44,11 @@ public class SaslExternal
 
 	protected static final String[] FEATURES_SASL_PATH = {FEATURES_EL, "mechanisms"};
 	private static final String METHOD_NAME = "SASL-EXTERNAL";
+	private static final String SASL_SUCCESS_ELEMENT_NAME = "success";
+	private static final String SASL_FAILURE_ELEMENT_NAME = "failure";
 	private final static String XMLNS_SASL = "urn:ietf:params:xml:ns:xmpp-sasl";
 	private static final Logger log = Logger.getLogger(SaslExternal.class.getName());
-	private static Element successElement = new Element("success", new String[]{"xmlns"}, new String[]{XMLNS_SASL});
+	private static Element successElement = new Element(SASL_SUCCESS_ELEMENT_NAME, new String[]{"xmlns"}, new String[]{XMLNS_SASL});
 	@ConfigField(desc = "Enable compatibility with legacy servers", alias = "legacy-compat")
 	private boolean legacyCompat = true;
 	@ConfigField(desc = "Skip SASL-EXTERNAL for defined domains", alias = "skip-for-domains")
@@ -183,13 +185,13 @@ public class SaslExternal
 				}
 				processAuth(p, serv, results);
 				return true;
-			} else if (p.isElement("success", XMLNS_SASL)) {
+			} else if (p.isElement(SASL_SUCCESS_ELEMENT_NAME, XMLNS_SASL)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Received success response: {1} [{0}]", new Object[]{serv, p});
 				}
 				processSuccess(p, serv, results);
 				return true;
-			} else if (p.isElement("failure", XMLNS_SASL)) {
+			} else if (p.isElement(SASL_FAILURE_ELEMENT_NAME, XMLNS_SASL)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Received failure response: {1} [{0}]", new Object[]{serv, p});
 				}
@@ -349,7 +351,7 @@ public class SaslExternal
 	}
 
 	private Packet failurePacket(String description) {
-		Element result = new Element("failure", new Element[]{new Element("invalid-authzid")}, new String[]{"xmlns"},
+		Element result = new Element(SASL_FAILURE_ELEMENT_NAME, new Element[]{new Element("invalid-authzid")}, new String[]{"xmlns"},
 									 new String[]{XMLNS_SASL});
 
 		if (description != null) {
@@ -359,4 +361,9 @@ public class SaslExternal
 		return Packet.packetInstance(result, null, null);
 	}
 
+	@Override
+	public boolean shouldSkipUndelivered(Packet packet) {
+		return packet.getElemName() == SASL_SUCCESS_ELEMENT_NAME
+				|| packet.getXMLNS() == XMLNS_SASL;
+	}
 }

@@ -18,6 +18,7 @@
 package tigase.server.xmppserver.proc;
 
 import tigase.kernel.beans.Bean;
+import tigase.server.Packet;
 import tigase.server.xmppserver.S2SConnectionManager;
 import tigase.server.xmppserver.S2SIOService;
 import tigase.xml.Element;
@@ -35,9 +36,11 @@ public class StartZlib
 		extends S2SAbstractProcessor {
 
 	private static final Logger log = Logger.getLogger(StartZlib.class.getName());
-	private static final Element features = new Element("compression", new Element[]{new Element("method", "zlib")},
+	private static final String START_ZLIB_XMLNS = "http://jabber.org/features/compress";
+	private static final String START_ZLIB_ELEMENT_NAME = "compression";
+	private static final Element features = new Element(START_ZLIB_ELEMENT_NAME, new Element[]{new Element("method", "zlib")},
 														new String[]{"xmlns"},
-														new String[]{"http://jabber.org/features/compress"});
+														new String[]{START_ZLIB_XMLNS});
 
 	@Override
 	public int order() {
@@ -48,5 +51,11 @@ public class StartZlib
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 
 		// results.add(features);
+	}
+
+	@Override
+	public boolean shouldSkipUndelivered(Packet packet) {
+		return packet.getElemName() == START_ZLIB_ELEMENT_NAME
+				|| packet.getXMLNS() == START_ZLIB_XMLNS;
 	}
 }
