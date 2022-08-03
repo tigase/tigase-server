@@ -3,11 +3,11 @@ Experimental
 
 The guide contains description of non-standard or experimental functionality of the server. Some of them are based on never published extensions, some of them are just test implementation for new ideas or performance improvements.
 
--  `Dynamic Rosters <#dynamicRosters>`__
+-  :ref:`Dynamic Rosters<dynamicRosters>`
 
--  `Mobile Optimizations <#mobileoptimizations>`__
+-  :ref:`Mobile Optimizations<mobileoptimizations>`
 
--  `Bosh Session Cache <#boshsessioncache>`__
+-  :ref:`Bosh Session Cache<boshsessioncache>`
 
 
 .. _dynamicRosters:
@@ -142,7 +142,7 @@ DynamicRoster implementation class should be configured in the **config.tdsl** f
        }
    }
 
-If you want to pass configuration to your implementation simply use ``@ConfigField`` annotation on your variable (see `Component implementation - Lesson 2 - Configuration <#cil2>`__ for more details).
+If you want to pass configuration to your implementation simply use ``@ConfigField`` annotation on your variable (see :ref:`Component implementation - Lesson 2 - Configuration<cil2>` for more details).
 
 .. _mobileoptimizations:
 
