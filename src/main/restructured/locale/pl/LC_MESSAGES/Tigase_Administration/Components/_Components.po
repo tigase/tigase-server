@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-29 02:43-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,49 +17,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: ../../Tigase_Administration/Components/Components.inc:2
+#: ../../Tigase_Administration/Components/Components.inc:4
 msgid "Components"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Components.inc:4
+#: ../../Tigase_Administration/Components/Components.inc:6
 msgid ""
 "The only step is to tell the server what components to load, how to name "
 "them and optionally give some extra parameters. To do so open the "
 "``config.tdsl`` file you use in your installation."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Components.inc:6
+#: ../../Tigase_Administration/Components/Components.inc:8
 msgid ""
 "Let’s say you want to just add PubSub for now. All you need to do is add "
 "the following to the properties file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Components.inc:12
+#: ../../Tigase_Administration/Components/Components.inc:14
 msgid ""
 "Normally, this is not necessary since pubsub is loaded by default, "
 "however this is just an example of loading a class with the DSL format."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Components.inc:18
+#: ../../Tigase_Administration/Components/Components.inc:20
 msgid ""
 "As you can see, we can customize the name of a component in the "
 "deceleration, here we are using pubsub-priv."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Components.inc:20
+#: ../../Tigase_Administration/Components/Components.inc:22
 msgid ""
 "Although this may be rare, it allows for wide compatibility and platform "
 "stability."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Components.inc:22
+#: ../../Tigase_Administration/Components/Components.inc:24
 msgid ""
 "Normally, however we want to load few different components like PubSub, "
 "MUC, MSN Transport and so on…​. Therefore instead of the above second "
 "PubSub we can load the MUC component:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Components.inc:29
+#: ../../Tigase_Administration/Components/Components.inc:31
 msgid "Changes to the ``config.tdsl`` file will take effect upon server restart."
 msgstr ""
 
@@ -211,35 +211,35 @@ msgid ""
 "compliance."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:2
+#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:4
 msgid "Server Monitoring"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:4
+#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:6
 msgid ""
 "All the documentation and resources related to the Tigase server "
 "monitoring."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:6
+#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:8
 msgid ""
 ":ref:`Setting up Remote Monitoring in the Server<Setting-Up-Remote-"
 "Monitoring-in-the-Server>`"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:8
+#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:10
 msgid ""
 ":ref:`Statistics Logger Configuration<Configuration-of-statistics-"
 "loggers>`"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:10
+#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:12
 msgid ""
 ":ref:`Retrieving Statistics from the Server<Retrieving-statistics-from-"
 "the-server>`"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:12
+#: ../../Tigase_Administration/Components/Monitoring/Monitoring.inc:14
 msgid ":ref:`Monitor Component<Monitor-Component>`"
 msgstr ""
 
@@ -670,11 +670,11 @@ msgid ""
 "event name: ``*|tigase:demo``."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:43
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:45
 msgid "Available Tasks"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:45
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:47
 msgid ""
 "Monitor Component has several pre-defined tasks that can be monitored and"
 " set to trigger. What follows is the list of tasks with the options "
@@ -689,23 +689,23 @@ msgstr ""
 msgid "Available Options"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:50
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:59
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:68
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:77
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:87
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:94
-msgid "``enabled`` - Enable or disable task, Boolean value."
-msgstr ""
-
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:52
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:61
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:70
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:79
-msgid "``period`` - Period of running check, Integer value."
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:89
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:96
+msgid "``enabled`` - Enable or disable task, Boolean value."
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:54
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:63
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:72
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:81
+msgid "``period`` - Period of running check, Integer value."
+msgstr ""
+
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:56
 msgid "``threshold`` - Percentage of used space on disk, Float value."
 msgstr ""
 
@@ -713,7 +713,7 @@ msgstr ""
 msgid "**cpu-temp-task** - Used to check CPU temperature."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:63
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:65
 msgid "``cpuTempThreshold`` - Temperature threshold of CPU in °C."
 msgstr ""
 
@@ -721,7 +721,7 @@ msgstr ""
 msgid "**load-checker-task** - Used to check system load."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:72
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:74
 msgid "``averageLoadThreshold`` - Average percent load threshold, Long value."
 msgstr ""
 
@@ -729,13 +729,13 @@ msgstr ""
 msgid "**memory-checker-task** - Used to check memory usage."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:81
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:83
 msgid ""
 "``maxHeapMemUsagePercentThreshold`` - Alarm when percent of used Heap "
 "memory is larger than, Integer value."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:83
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:85
 msgid ""
 "``maxNonHeapMemUsagePercentThreshold`` - Alarm when percent of used Non "
 "Heap memory is larger than, Integer value."
@@ -745,7 +745,7 @@ msgstr ""
 msgid "**logger-task** - Used to transmit log entries depending on level entered."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:89
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:91
 msgid ""
 "``levelThreshold`` - Minimal log level that will be the threshold. "
 "Possible values are SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, "
@@ -762,29 +762,29 @@ msgid ""
 "percentage) will be fulfilled.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:96
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:98
 msgid "``period`` - Period of running check in ms, Integer value."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:98
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:100
 msgid ""
 "``thresholdMinimal`` - Minimal amount of disconnected users required to "
 "generate alarm."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:100
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:102
 msgid ""
 "``threshold`` - Minimal percent of disconnected users required to "
 "generate alarm."
 msgstr ""
 
 #: ../../Tigase_Administration/Components/C2S.inc:7
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:103
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:306
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:105
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:308
 msgid "Configuration"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:105
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:107
 msgid ""
 "Configuration of the monitor can be done one of two ways; either by lines"
 " in ``config.tdsl`` file, or by sending XMPP stanzas to the server. You "
@@ -793,61 +793,61 @@ msgid ""
 "restarts."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:107
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:109
 msgid "config.tdsl"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:109
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:111
 msgid ""
-"Tasks can be configured in the ``config.tdsl`` file. See `available tasks"
-" <#availableTasks>`__ for the tasks that can be setup."
+"Tasks can be configured in the ``config.tdsl`` file. See :ref:`available "
+"tasks<availableTasks>` for the tasks that can be setup."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:111
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:113
 msgid "To enable a specific monitor task, use the following line:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:121
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:123
 msgid ""
 "Where monitor is the component name for ``MonitorComponent``, and "
-"``$TASKNAME`` is one of the `available task names <#availableTasks>`__."
+"``$TASKNAME`` is one of the :ref:`available task names<availableTasks>`."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:123
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:125
 msgid ""
 "This format will be the same for other settings for tasks, and it’s best "
 "to group settings under one heading. For example:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:134
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:136
 msgid ""
 "sets the check period to 1000 milliseconds and enables ``connections-"
 "task``."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:138
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:140
 msgid ""
 "Once triggers have been activated, they will become dormant. Think of "
 "these as one-shot settings."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:141
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:143
 msgid "Subscription Limitations"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:143
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:145
 msgid "To define list of JIDs allowed to subscribe for events:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:153
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:155
 msgid "If this is not specified, all users can subscribe."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:155
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:157
 msgid "Configuration via XMPP"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:157
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:159
 msgid ""
 "We can also configure the eventbus monitor component using XMPP stanzas. "
 "This allows us to set and change configurations during server runtime. "
@@ -855,45 +855,45 @@ msgid ""
 "component."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:159
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:161
 msgid ""
 "We can query each component for its current settings using the following "
 "stanza."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:167
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:169
 msgid ""
 "The server will return the component current settings which will make "
 "things easier if you wish to edit them. In this case, the server has "
 "returned the following to us"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:190
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:192
 msgid ""
 "This tells us that the disk-task setting is not active, has a period of "
 "60000ms, and will trigger when disk usage is over 80%."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:192
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:194
 msgid ""
 "To send new settings to the monitor component, we can send a similar "
 "stanza back to the monitor component."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:213
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:215
 msgid ""
 "To which a successful update will give you an XMPP success stanza to let "
 "you know everything is set correctly."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:215
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:217
 msgid ""
 "Alternatively, you can update specific settings by editing a single field"
 " without adding anything else. For example, if we just wanted to turn the"
 " disk-task on we could send the following stanza:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:229
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:231
 msgid ""
 "To set any other values, do not forget that certain parts may need to be "
 "changed, specifically the ``<field type=\"boolean\" "
@@ -903,38 +903,38 @@ msgstr ""
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
 msgid ""
 "Your field type will be defined by the type of variable specified in the "
-"`Available Tasks <#availableTasks>`__ section."
+":ref:`Available Tasks<availableTasks>` section."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:233
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:235
 msgid ""
 "``var=x task#`` will be followed by the property value taken directly "
-"from the `Available Tasks <#availableTasks>`__ section."
-msgstr ""
-
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:236
-msgid "Getting the Message"
+"from the ref:`Available Tasks<availableTasks>` section."
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:238
+msgid "Getting the Message"
+msgstr ""
+
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:240
 msgid ""
 "Without a place to send messages to, monitor will just trigger and shut "
 "down. There are two different methods that monitor can deliver alarm "
 "messages and relevant data; XMPP messages and using the mailer extension."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:240
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:242
 msgid "XMPP notification"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:242
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:244
 msgid ""
 "In order to retrieve notifications, a subscription to the "
 "``eventbus@<VHost>`` user must be made. Keep in mind that subscriptions "
 "are not persistent across server restarts, or triggers."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:243
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:245
 msgid ""
 "The monitor schema is very similar to most XMPP subscription requests but"
 " with a few tweaks to differentiate it if you wanted to subscribe to a "
@@ -947,107 +947,107 @@ msgid ""
 "something like this:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:255
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:257
 msgid ""
 "Don’t forget to replace ``$USER_JID`` with the bare JID of the user you "
 "want to receive those messages. You can even have them sent to a MUC or "
 "any component with a JID."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:257
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:259
 msgid "Available events are as follows:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:259
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:261
 msgid "DiskUsageMonitorEvent for ``disk-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:261
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:263
 msgid "LoggerMonitorEvent for ``logger-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:263
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:265
 msgid "HeapMemoryMonitorEvent for ``memory-checker-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:265
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:267
 msgid "LoadAverageMonitorEvent for ``load-checker-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:267
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:269
 msgid "CPUTempMonitorEvent for ``cpu-temp-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:269
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:271
 msgid "UsersDisconnected for ``connections-task``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:271
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:273
 msgid ""
 "Alternatively, you can also subscribe to all events within the eventbus "
 "by using a wildcard \\* in place of the event XMLNS like this example:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:283
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:285
 msgid "Sample notification from Monitor"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:300
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:302
 msgid "Mailer Extension"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:302
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:304
 msgid ""
 "*Tigase Server Monitor Mailer Extension* (TSMME) can send messages from "
 "the monitor component to a specified E-mail address so system "
 "administrators who are not logged into the XMPP server."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:304
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:306
 msgid ""
 "For v7.1.0 versions and later, TSMME is already included in your "
 "distribution package and no extra installation is needed."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:308
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:310
 msgid ""
 "Tigase Mailer Extension may be configured via the ``config.tdsl`` file in"
 " the following manner:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:321
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:323
 msgid "Here is an explanation of those variables."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:323
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:325
 msgid "``mailer-smtp-host`` - SMTP Server hostname."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:325
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:327
 msgid "``mailer-smtp-port`` - SMTP Server port."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:327
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:329
 msgid "``mailer-smtp-usernam`` - name of sender account."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:329
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:331
 msgid "``mailer-smtp-password`` - password of sender account."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:331
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:333
 msgid ""
 "``mailer-from-address`` - sender email address. It will be set in field "
 "from in email."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:333
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:335
 msgid ""
 "``mailer-to-addresses`` - comma separated notification receivers email "
 "addresses."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:335
+#: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:337
 msgid ""
 "It is recommended to create a specific e-mail address in your mail server"
 " for this purpose only, as the account settings are stored in plaintext "
@@ -1229,9 +1229,9 @@ msgstr ""
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:55
 msgid ""
-"More details about are available in the `net-buff-high-throughput "
-"<#netBuffHighThroughput>`__ or `net-buff-Standard <#netBuffStandard>`__ "
-"property descriptions."
+"More details about are available in the :ref:`net-buff-high-"
+"throughput<netBuffHighThroughput>` or :ref:`net-buff-"
+"Standard<netBuffStandard>` property descriptions."
 msgstr ""
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:58
@@ -1330,11 +1330,11 @@ msgstr ""
 msgid "This replaces the old ``--s2s-ejabberd-bug-workaround-active`` property."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:2
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:4
 msgid "Tigase Load Balancing"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:4
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:6
 msgid ""
 "Tigase includes load balancing functionality allowing users to be "
 "redirected to the most suitable cluster node. Functionality relies on a "
@@ -1345,28 +1345,28 @@ msgid ""
 " to work correctly."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:7
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:9
 msgid "Available Implementations"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:9
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:11
 msgid ""
 "Tigase implementation is, as usual, extensible and allows for different, "
 "pluggable redirection strategies that implement the ``SeeOtherHostIfc`` "
 "interface."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:11
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:13
 msgid "Currently there are three strategies available:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:13
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:15
 msgid ""
 "``SeeOtherHost`` - most basic implementation returning either single host"
 " configured in ``config.tdsl`` file or name of the current host;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:15
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:17
 msgid ""
 "``SeeOtherHostHashed`` (default) - default implementation for cluster "
 "environment of SeeOtherHostIfc returning redirect host based on the hash "
@@ -1375,119 +1375,119 @@ msgid ""
 " nodes, alternatively hosts list can be configured in the config.tdsl;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:17
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:19
 msgid ""
 "``SeeOtherHostDB`` - extended implementation of SeeOtherHost using "
 "redirect information from database in the form of pairs ``user_id`` and "
 "``node_id`` to which given user should be redirected."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:19
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:21
 msgid ""
 "``SeeOtherHostDualIP`` - matches internal Tigase cluster nodes against "
 "the lookup table to provide relevant redirection hostname/IP (by default "
 "internal Tigase tig_cluster_nodes table will be used)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:22
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:24
 msgid "Configuration Options"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:24
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:26
 msgid ""
 "The most basic configuration is related to the choice of actual "
 "redirection implementation by declaring class for each connector:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:38
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:40
 msgid "Possible values are:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:40
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:42
 msgid "``tigase.server.xmppclient.SeeOtherHost``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:42
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:44
 msgid "``tigase.server.xmppclient.SeeOtherHostHashed``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:44
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:46
 msgid "``tigase.server.xmppclient.SeeOtherHostDB``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:46
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:48
 msgid "``tigase.server.xmppclient.SeeOtherHostDualIP``"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:48
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:50
 msgid "``none`` - disables redirection"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:50
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:52
 msgid ""
 "All options are configured on a per-connection-manager basis, thus all "
 "options need to be prefixed with the corresponding connection manager ID,"
 " i.e. c2s, bosh or ws; we will use c2s in the examples:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:61
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:63
 msgid ""
 "``'default-host' = 'host1;host2;host3'`` - a semicolon separated list of "
 "hosts to be used for redirection."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:63
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:65
 msgid ""
 "``'phases' = []`` - an array of phases in which redirection should be "
 "active, currently possible values are:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:65
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:67
 msgid "``OPEN`` which enables redirection during opening of the XMPP stream;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:67
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:69
 msgid "``LOGIN`` which enables redirection upon authenticating user session;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:69
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:71
 msgid "By default redirection is currently enabled only in the ``OPEN`` phase."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:72
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:74
 msgid "SeeOtherHostDB"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:74
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:76
 msgid "For ``SeeOtherHostDB`` implementation there are additional options:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:85
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:87
 msgid ""
 "``db-url`` - a JDBC connection URI which should be used to query redirect"
 " information; if not configured the default ``dataSource`` will be used;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:87
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:89
 msgid "``get-host-query`` - a SQL query which should return redirection hostname;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:89
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:118
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:91
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:120
 msgid ""
 "``get-all-data-query`` - a SQL helper query which should return all "
 "redirection data from database;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:91
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:93
 msgid "``get-all-query-timeout`` - allows to set timeout for executed queries."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:94
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:96
 msgid "SeeOtherHostDualIP"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:96
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:98
 msgid ""
 "This mechanisms matches internal Tigase cluster nodes against the lookup "
 "table to provide matching and relevant redirection hostname/IP. By "
@@ -1495,7 +1495,7 @@ msgid ""
 "appropriate repository implementation will be used)."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:98
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:100
 msgid ""
 "To enable this redirection mechanism following configuration / class "
 "should be used. Note that for global use, all connection managers must "
@@ -1503,11 +1503,11 @@ msgid ""
 "individually."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:112
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:114
 msgid "It offers following configuration options:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:114
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:116
 msgid ""
 "``data-source`` - configuration of the source of redirection information "
 "- by default internal Tigase ``tig_cluster_nodes`` table will be used "
@@ -1515,17 +1515,17 @@ msgid ""
 "it’s possible to use ``eventbus`` source;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:116
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:118
 msgid ""
 "``db-url`` - a JDBC connection URI which should be used to query redirect"
 " information; if not configured ``user-db-uri`` will be used;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:120
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:122
 msgid "``get-all-query-timeout`` - allows to set timeout for executed queries;"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:122
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:124
 msgid ""
 "``fallback-redirection-host`` - if there is no redirection information "
 "present (i.e. secondary hostname is not configured for the particular "
@@ -1533,37 +1533,37 @@ msgid ""
 "configure fallback redirection address."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:124
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:126
 msgid "All options are configured or on per-component basis:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:138
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:140
 msgid "EventBus as a source of information"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:140
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:142
 msgid ""
 "It’s possible to utilize EventBus and internal Tigase events as a source "
 "of redirection data. In order to do that ``eventbus-repository-"
 "notifications`` needs to be enabled in ClusterConnectionManager:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:150
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:152
 msgid "Auxiliary setup options"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:153
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:155
 msgid "Enforcing redirection"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:155
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:157
 msgid ""
 "It’s possible to enforce redirection of connections on the particular "
 "port of connection manager with ``force-redirect-to`` set to Integer with"
 " the following general setting option:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:167
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:169
 msgid ""
 "for example, enable additional port ``5322`` for ``c2s`` connection "
 "manager and enforce all connections to be redirected to port ``5222`` (it"
@@ -1571,11 +1571,11 @@ msgid ""
 " will be only used when such value is returned):"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:184
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:186
 msgid "Configuring hostnames"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:186
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:188
 msgid ""
 "To fully utilize ``SeeOtherHostDualIP`` setup in automated fashion it’s "
 "now possible to provide both primary (*internal*) and secondary "
@@ -1589,11 +1589,11 @@ msgid ""
 "(uncommenting following lines, or manually exposing in environment):"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/Load_Balancing.inc:195
+#: ../../Tigase_Administration/Components/Load_Balancing.inc:197
 msgid "or in the ``etc/config.tdsl`` (they will be converted to JVM properties):"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:2
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:4
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:2
 msgid "External Component Configuration"
 msgstr ""
@@ -1629,29 +1629,29 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:12
-msgid "`External Component Configuration <#External-Component-Configuration>`__"
+msgid ":ref:`External Component Configuration<External-Component-Configuration>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:14
-msgid "`Tigase as an External Component <#Tigase-as-an-External-Component>`__"
+msgid ":ref:`Tigase as an External Component<Tigase-as-an-External-Component>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:16
 msgid ""
-"`Load Balancing External Components in Cluster Mode <#Load-Balancing-"
-"External-Components-in-Cluster-Mode>`__"
-msgstr ""
-
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:4
-msgid ""
-"As for all Tigase components you can load and configure external "
-"components via the ``config.tdsl`` file described in details in the `DSL "
-"configuration <#dslConfig>`__ section. This document describes how to "
-"enable the component and set the initial configuration to accept or "
-"initiate connections for an external component."
+":ref:`Load Balancing External Components in Cluster Mode<Load-Balancing-"
+"External-Components-in-Cluster-Mode>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:6
+msgid ""
+"As for all Tigase components you can load and configure external "
+"components via the ``config.tdsl`` file described in details in the "
+":ref:`DSL configuration<dslConfig>` section. This document describes how "
+"to enable the component and set the initial configuration to accept or "
+"initiate connections for an external component."
+msgstr ""
+
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:8
 msgid ""
 "First thing to do is to specify the component class and the component "
 "name which must be unique within the Tigase installation. The most "
@@ -1660,13 +1660,13 @@ msgid ""
 "specified when using default name)."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:8
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:10
 msgid ""
 "The following line in the ``config.tdsl`` will load the component during "
 "the server startup time:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:14
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:16
 msgid ""
 "While this would load the component, without any additional "
 "configurations provided, the component would be practically useless. It "
@@ -1675,13 +1675,13 @@ msgid ""
 "component."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:16
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:18
 msgid ""
-"You may additionally configure the ```bind-ext-hostnames`` "
-"<#bindExtHostnames>`__ property."
+"You may additionally configure the :ref:`bind-ext-"
+"hostnames<bindExtHostnames>` property."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:18
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:20
 msgid ""
 "To configure external component connections using Admin UI you need to "
 "open Admin UI web page (if you are logged in the same computer on which "
@@ -1693,94 +1693,94 @@ msgid ""
 "://psi-im.org>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:20
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:22
 msgid "|adminui ext add item button|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:56
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:58
 msgid "adminui ext add item button"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:22
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:24
 msgid ""
 "You will be presented with a form which you should fill to configure "
 "external component connection details:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:24
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:26
 msgid "|adminui ext add item form|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:57
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:59
 msgid "adminui ext add item form"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:26
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:28
 msgid "*Domain name* - external component domain name (``muc.devel.tigase.org``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:28
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:30
 msgid ""
 "*Domain password* - password for authentication of the external component"
 " connection (``muc-pass``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:30
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:32
 msgid ""
 "*Connection type* - ``accept`` to make component wait for connection or "
 "``connect`` force component to connect to the server (``connect``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:32
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:34
 msgid ""
 "*Port number* - port on which component should wait for connection or on "
 "which it try to connect (``5270``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:34
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:36
 msgid ""
 "*Remote host* - host to connect to (``devel.tigase.org``) *(may be left "
 "blank if component will only accept connections)*"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:36
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:38
 msgid "*Protocol* - id of protocol used for establishing connection"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:38
-msgid "if connection type is ``connect``:"
-msgstr ""
-
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:40
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:48
-msgid ""
-"``XEP-0114: Jabber Component Protocol (accept)`` - for `XEP-0114: Jabber "
-"Component Protocol <https://xmpp.org/extensions/xep-0114.html>`__"
+msgid "if connection type is ``connect``:"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:42
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:50
 msgid ""
+"``XEP-0114: Jabber Component Protocol (accept)`` - for `XEP-0114: Jabber "
+"Component Protocol <https://xmpp.org/extensions/xep-0114.html>`__"
+msgstr ""
+
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:44
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:52
+msgid ""
 "``XEP-0225: Component Connections`` - for `XEP-0225: Component "
 "Connections <https://xmpp.org/extensions/xep-0225.html>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:44
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:46
 msgid "if connection type is ``accept``:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:46
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:48
 msgid ""
 "``Autodetect`` - for automatic detection of protocol used by incoming "
 "connection *(recommended)*"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:52
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:92
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:54
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:94
 msgid "Additional options may be left with defaults."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:54
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:56
 msgid ""
 "Later on if you would like to modify this values, you can do that using "
 "Admin UI by clicking on ``Configuration`` and ``Remove an item`` or "
@@ -1789,11 +1789,11 @@ msgid ""
 "XMPP client, ie. `Psi <http://psi-im.org>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:2
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:4
 msgid "Tigase as an External Component"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:4
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:6
 msgid ""
 "There are cases when you want to deploy one or more Tigase components "
 "separately from the main server, or perhaps you want to run some Tigase "
@@ -1802,7 +1802,7 @@ msgid ""
 " make a change."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:6
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:8
 msgid ""
 "There is a way to run the Tigase server in *external component mode*. In "
 "fact you can run any of Tigase’s components as an external component and "
@@ -1811,15 +1811,15 @@ msgid ""
 "<http://xmpp.org/extensions/xep-0225.html>`__ connection."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:8
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:10
 msgid "Let’s look at the examples…​"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:11
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:13
 msgid "Usage with shared database (since version 8.0.0)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:13
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:15
 msgid ""
 "When you are using Tigase server 8.0.0 or newer in the \"external "
 "component mode\" while using shared default \"user repository\" and you "
@@ -1830,79 +1830,79 @@ msgid ""
 " the config file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:20
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:22
 msgid ""
 "With that in place you can use Admin UI or ad-hoc commands available at "
 "``ext-man`` component of the main server to configure connection details "
 "of the servers running in the ``component`` mode."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:22
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:24
 msgid ""
 "In Admin UI you click on ``Configuration`` section and select ``Add new "
 "item`` at the ``ext-man`` component, which will present you with a "
 "following form to fill in external component connectivity details:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:24
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:26
 msgid "|adminui extman add item form|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:283
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:285
 msgid "adminui extman add item form"
-msgstr ""
-
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:27
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:159
-msgid "A Simple Case - MUC as an External Component"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:29
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:161
-msgid "A few assumptions:"
+msgid "A Simple Case - MUC as an External Component"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:31
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:163
-msgid ""
-"We want to run a MUC component for a domain: ``muc.devel.tigase.org`` and"
-" password ``muc-pass``"
+msgid "A few assumptions:"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:33
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:165
 msgid ""
-"The main server works at an address: devel.tigase.org and for the same "
-"virtual domain"
+"We want to run a MUC component for a domain: ``muc.devel.tigase.org`` and"
+" password ``muc-pass``"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:35
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:167
 msgid ""
-"We want to connect to the server using `XEP-0114 "
-"<http://xmpp.org/extensions/xep-0114.html>`__ protocol and port ``5270``."
+"The main server works at an address: devel.tigase.org and for the same "
+"virtual domain"
 msgstr ""
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:37
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:169
 msgid ""
+"We want to connect to the server using `XEP-0114 "
+"<http://xmpp.org/extensions/xep-0114.html>`__ protocol and port ``5270``."
+msgstr ""
+
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:39
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:171
+msgid ""
 "There is a special configuration type for this case which simplifies "
 "setting needed to run Tigase as an external component:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:43
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:45
 msgid ""
 "Knowing that we can now create simple configuration file for Tigase XMPP "
 "Server:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:66
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:68
 msgid ""
 "where ``master_server_default_database_url`` is the same URL as the one "
 "used on the main server for default data source."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:68
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:70
 msgid ""
 "With that in place we can use ad-hoc commands or Admin UI on the main "
 "server to configure Tigase XMPP Server to accept external component "
@@ -1910,88 +1910,88 @@ msgid ""
 "server."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:70
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:72
 msgid ""
 "**Adding external component connection settings to the manager (ext-man) "
 "using Admin UI.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:72
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:74
 msgid "|adminui extman add item form external muc|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:284
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:286
 msgid "adminui extman add item form external muc"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:74
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:76
 msgid "You need to pass:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:76
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:78
 msgid "Domain name - external component domain name (``muc.devel.tigase.org``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:78
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:80
 msgid ""
 "Domain password - password for authentication of the external component "
 "connection (``muc-pass``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:80
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:82
 msgid ""
 "Connection type - ``accept`` to make component wait for connection or "
 "``connect`` force component to connect to the server (``connect``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:82
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:84
 msgid ""
 "Port number - port on which component should wait for connection or on "
 "which it try to connect (``5270``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:84
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:86
 msgid "Remote host - host to connect to (``devel.tigase.org``)"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:86
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:88
 msgid "Protocol - id of protocol used for establishing connection"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:88
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:90
 msgid ""
 "``XEP-0114: Jabber Component Protocol (accept)`` - establish connection "
 "using `XEP-0114: Jabber Component Protocol "
 "<https://xmpp.org/extensions/xep-0114.html>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:90
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:92
 msgid ""
 "``XEP-0225: Component Connections`` - establish connection using "
 "`XEP-0225: Component Connections "
 "<https://xmpp.org/extensions/xep-0225.html>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:94
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:209
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:96
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:211
 msgid "More Components"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:96
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:211
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:98
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:213
 msgid ""
 "Suppose you want to run more than one component as an external components"
 " within one Tigase instance. Let’s add another - PubSub component to the "
 "configuration above and see how to set it up."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:98
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:100
 msgid ""
 "The most straightforward way is just to add another component to the "
 "server running in the component mode for the component domain"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:121
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:123
 msgid ""
 "and then to add new connection domain to the main server external "
 "component settings and to the external component manager settings. You "
@@ -1999,8 +1999,8 @@ msgid ""
 " the external component."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:123
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:246
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:125
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:248
 msgid ""
 "Please note however that we are opening two connections to the same "
 "server. This can waste resources and over-complicate the system. For "
@@ -2008,8 +2008,8 @@ msgid ""
 "connection for each component is a tad overkill."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:125
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:248
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:127
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:250
 msgid ""
 "In fact there is a way to reuse the same connection for all component "
 "domains running as an external component. The property ``bind-ext-"
@@ -2017,8 +2017,8 @@ msgid ""
 "domains) which should reuse the existing connection."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:127
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:250
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:129
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:252
 msgid ""
 "There is one catch however. Since you are reusing connections (hostname "
 "binding is defined in `XEP-0225 "
@@ -2026,26 +2026,26 @@ msgid ""
 "protocol for the functionality."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:129
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:252
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:131
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:254
 msgid ""
 "Here is an example configuration with a single connection over the "
 "`XEP-0225 <http://xmpp.org/extensions/xep-0225.html>`__ protocol used by "
 "both external domains:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:154
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:156
 msgid ""
 "With this configuration you do not need to configure entries in ``ext-"
 "man`` for PubSub component, only for MUC component but you need to user "
 "``client`` as the value for protocol field."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:157
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:159
 msgid "Usage with a separate database"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:175
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:177
 msgid ""
 "This generates a configuration for Tigase with only one component loaded "
 "by default - the component used for external component connection. If you"
@@ -2053,7 +2053,7 @@ msgid ""
 "this:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:198
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:200
 msgid ""
 "To make this new instance connect to the Tigase XMPP Server, you need to "
 "create one more file with external connection configuration at "
@@ -2061,87 +2061,87 @@ msgid ""
 " and then removed."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:206
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:208
 msgid ""
 "While loading configuration from ``etc/externalComponentItems`` file is "
 "supported, we recommend usage of shared database if possible. In future "
 "this method may be deprecated."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:213
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:215
 msgid ""
 "The most straightforward way is just to add another external component "
 "connection to the main server for the component domain using Admin UI or "
 "ad-hoc command on the main server."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:215
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:217
 msgid ""
 "Then we can use following configuration on the server running in the "
 "``component`` mode:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:239
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:241
 msgid ""
 "and we need to create a file with configuration for external component "
 "connection which will be loaded to the internal database:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:277
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:279
 msgid "and example of the external connections configuration file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:2
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:4
 msgid "Load Balancing External Components in Cluster Mode"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:4
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:6
 msgid ""
 "This document describes how to load balance any external components using"
 " Tigase XMPP Server and how to make Tigase’s components work as external "
 "components in a cluster mode."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:6
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:8
 msgid ""
 "*Please note, all configuration options described here apply to Tigase "
 "XMPP Server version 8.0.0 or later.*"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:8
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:10
 msgid "These are actually 2 separate topics:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:10
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:12
 msgid ""
 "One is to distribute load over many instances of a single component to "
 "handle larger traffic, or perhaps for high availability."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:12
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:14
 msgid ""
 "The second is to make Tigase’s components work as an external component "
 "and make it work in a cluster mode, even if the component itself does not"
 " support cluster mode."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:14
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:16
 msgid ""
 "Here are step by step instructions and configuration examples teaching "
 "how to achieve both goals."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:17
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:19
 msgid "Load Balancing External Component"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:19
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:21
 msgid ""
 "The first, and most simple scenario is to connect multiple instances of "
 "an external component to a single Tigase XMPP Server to distribute load."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:21
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:23
 msgid ""
 "There are at least 2 reasons why this would be an optimal solution: one "
 "would be to spread load over more instances/machines and the second is to"
@@ -2149,31 +2149,31 @@ msgid ""
 "over the work."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:23
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:25
 msgid "So here is a simple picture showing the use case."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:25
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:27
 msgid "|ExternalCompClustering002|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:80
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:82
 msgid "ExternalCompClustering002"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:27
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:29
 msgid ""
 "We have a single machine running Tigase XMPP Server and 2 instances of "
 "the MUC component connecting to Tigase."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:29
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:31
 msgid ""
 "On the server side we will enable ``ComponentProtocol`` component as we "
 "need to do to enable external component without clustering support."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:31
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:33
 msgid ""
 "Then using Admin UI we will add a new external component connection "
 "settings using ``Add item`` position for ``ext`` component in "
@@ -2181,35 +2181,35 @@ msgid ""
 "`External Component Configuration <#tigaseExternalComponent>`__ section."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:33
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:35
 msgid "|adminui ext add item form_1|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:81
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:83
 msgid "adminui ext add item form_1"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:35
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:37
 msgid ""
 "The only change here is that we will specify value for field ``Load "
 "balancer class`` and we will use ``ReceiverBareJidLB`` as a value."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:37
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:39
 msgid ""
 "The configuration for both instances of the MUC component (identical for "
 "both of them) can be done in the same way as it is done for a single "
 "instance of the MUC component. There is nothing to change here."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:39
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:41
 msgid ""
 "The difference is one small element in the server configuration. At the "
 "value of ``Load balancer class`` field in ``Add item`` form is set to "
 "**ReceiverBareJidLB**."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:41
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:43
 msgid ""
 "This is the load balancing plugin class. Load balancing plugin decides "
 "how the traffic is distributed among different component connections that"
@@ -2219,7 +2219,7 @@ msgid ""
 "over different MUC component instances."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:43
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:45
 msgid ""
 "This distribution strategy does not always work for all possible "
 "components however. For transports for example this would not work at "
@@ -2228,7 +2228,7 @@ msgid ""
 "**SenderBareJidLB**."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:45
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:47
 msgid ""
 "This are two basic load distribution strategies available now. For some "
 "use cases none of them is good enough. If you have PubSub, then you "
@@ -2237,11 +2237,11 @@ msgid ""
 "name in configuration."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:48
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:50
 msgid "External Component and Cluster"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:50
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:52
 msgid ""
 "If you want to use Tigase’s component in a cluster mode which does not "
 "have clustering implemented yet there is a way to make it kind of "
@@ -2250,22 +2250,22 @@ msgid ""
 " many Tigase servers (or many Tigase cluster nodes)."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:52
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:54
 msgid ""
 "Let’s say we have Tigase XMPP Server working for domain: **xmpp-"
 "test.org** and the server is installed on three cluster nodes: **red"
 ".xmpp-test.org,** **green.xmpp-test.org** and **blue.xmpp-test.org.**"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:54
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:56
 msgid "|ExternalCompClustering003 0|"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:82
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:84
 msgid "ExternalCompClustering003 0"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:56
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:58
 msgid ""
 "We want to make it possible to connect the MUC component to all nodes. To"
 " do so, we are configuring Tigase XMPP Server to run in the cluster mode "
@@ -2273,21 +2273,22 @@ msgid ""
 "component."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:58
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:60
 msgid ""
 "This can be simply done by adding following line to the server "
 "configuration file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:64
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:66
 msgid ""
 "After this is done we need to add a new external component connection "
 "settings using ``Add item`` position for ``ext`` component in "
 "``Configuration`` section of the web page just as it is described in "
-"`External Component Configuration <#tigaseExternalComponent>`__ section."
+":ref:`External Component Configuration<External-Component-Configuration>`"
+" section."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:66
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:68
 msgid ""
 "As you can see there is nothing special here. The most interesting part "
 "comes on the MUC side, but it is only a very small change from the "
@@ -2295,7 +2296,7 @@ msgid ""
 " installation."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:68
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:70
 msgid ""
 "When you are adding/configuring external component settings using Admin "
 "UI (``Add item`` or ``Update item configuration`` for ``ext-man`` "
@@ -2305,11 +2306,11 @@ msgid ""
 "external component should connect."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:70
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:72
 msgid "In our case it would be:"
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:76
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:78
 msgid ""
 "As you can see remote host name is not a simple domain but a character "
 "string with a few comma separated parts. The first part is our remote "
@@ -2317,7 +2318,7 @@ msgid ""
 "a list of domain names or IP addresses."
 msgstr ""
 
-#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:78
+#: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:80
 msgid ""
 "Of course it is possible to connect multiple external component to all "
 "cluster nodes, this way the whole installation would be really working in"
@@ -2529,5 +2530,84 @@ msgstr ""
 #~ "not be sent from node ``*|tigase:demo``,"
 #~ " but from the **real** node (in "
 #~ "this case: ``EventName|tigase:demo``)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tasks can be configured in the "
+#~ "``config.tdsl`` file. See `available tasks "
+#~ "<#availableTasks>`__ for the tasks that "
+#~ "can be setup."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Where monitor is the component name "
+#~ "for ``MonitorComponent``, and ``$TASKNAME`` is"
+#~ " one of the `available task names "
+#~ "<#availableTasks>`__."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Your field type will be defined by"
+#~ " the type of variable specified in"
+#~ " the `Available Tasks <#availableTasks>`__ "
+#~ "section."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "``var=x task#`` will be followed by "
+#~ "the property value taken directly from"
+#~ " the `Available Tasks <#availableTasks>`__ "
+#~ "section."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "More details about are available in "
+#~ "the `net-buff-high-throughput "
+#~ "<#netBuffHighThroughput>`__ or `net-buff-"
+#~ "Standard <#netBuffStandard>`__ property "
+#~ "descriptions."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`External Component Configuration <#External-"
+#~ "Component-Configuration>`__"
+#~ msgstr ""
+
+#~ msgid "`Tigase as an External Component <#Tigase-as-an-External-Component>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Load Balancing External Components in "
+#~ "Cluster Mode <#Load-Balancing-External-"
+#~ "Components-in-Cluster-Mode>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "As for all Tigase components you "
+#~ "can load and configure external "
+#~ "components via the ``config.tdsl`` file "
+#~ "described in details in the `DSL "
+#~ "configuration <#dslConfig>`__ section. This "
+#~ "document describes how to enable the "
+#~ "component and set the initial "
+#~ "configuration to accept or initiate "
+#~ "connections for an external component."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You may additionally configure the "
+#~ "```bind-ext-hostnames`` <#bindExtHostnames>`__ "
+#~ "property."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "After this is done we need to "
+#~ "add a new external component connection"
+#~ " settings using ``Add item`` position "
+#~ "for ``ext`` component in ``Configuration`` "
+#~ "section of the web page just as"
+#~ " it is described in `External "
+#~ "Component Configuration <#tigaseExternalComponent>`__ "
+#~ "section."
 #~ msgstr ""
 

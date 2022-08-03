@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 19:27-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -254,16 +254,16 @@ msgstr ""
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:112
 msgid ""
 "``class`` which will be used as a bean, in example above we set class as "
-"``className``. *_(default: if you try to configure bean under name which "
+"``className``. **(default: if you try to configure bean under name which "
 "has default class assigned with it in Tigase framework then this assigned"
 " class will be used. In other case you need to pass name of class to use "
-"as a bean)_*"
+"as a bean)**"
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:113
 msgid ""
 "``active`` (boolean) whether you want the bean to be active or not (beans"
-" with ``active`` set to ``false`` are not loaded). *_(default: true)_*"
+" with ``active`` set to ``false`` are not loaded). **(default: true)**"
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:114
@@ -271,7 +271,7 @@ msgid ""
 "``exportable`` (boolean) defines if this bean should be exported and "
 "available for use for beans in inner scopes. This is advanced option in "
 "most cases it is recommended to omit this field in configuration. "
-"*_(default: false)_*"
+"**(default: false)**"
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:116
@@ -559,11 +559,11 @@ msgid ""
 "variable') + ',other-value'``."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:281
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:283
 msgid "Period / Duration values"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:283
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:285
 msgid ""
 "Some configuration options allow control of execution of tasks with "
 "particular period or within certain duration. DSL file format accepts "
@@ -575,78 +575,78 @@ msgid ""
 "java.lang.CharSequence->`__ for detailed explanation)."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:285
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:287
 msgid ""
 "``Duration`` formats accepted are based on the ISO-8601 duration format "
 "``PnDTnHnMn.nS`` with days considered to be exactly 24 hours, for "
 "example:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:287
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:289
 msgid "``PT20.345S`` - 20.345 seconds"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:289
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:291
 msgid "``PT15M`` - 15 minutes (where a minute is 60 seconds)"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:291
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:293
 msgid "``PT10H`` - 10 hours (where an hour is 3600 seconds)"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:293
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:295
 msgid "``P2D`` - 2 days (where a day is 24 hours or 86400 seconds)"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:295
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:297
 msgid "``P2DT3H4M`` - 2 days, 3 hours and 4 minutes"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:297
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:299
 msgid ""
 "``Period`` format is based on the ISO-8601 period formats PnYnMnD and "
 "PnW, for example, the following are valid inputs:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:299
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:301
 msgid "``P2Y`` - 2 years"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:301
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:303
 msgid "``P3M`` - 3 months"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:303
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:305
 msgid "``P4W`` - 4 weeks"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:305
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:307
 msgid "``P5D`` - 5 days"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:307
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:309
 msgid "``P1Y2M3D`` - 1 year, 2 months, 3 days"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:309
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:311
 msgid "``P1Y2M3W4D`` - 1 year, 2 months, 3 weeks, 4 days"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:313
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:315
 msgid "Example configuration file in DSL"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:391
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:393
 msgid "Default configuration"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:393
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:395
 msgid ""
 "Tigase XMPP Server is packaged with a basic ``config.tdsl`` file that "
 "tells the server to start up in setup mode."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:406
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:408
 msgid ""
 "This tells Tigase to operate in a setup mode, and tells the http "
 "component to allow login with the username and password admin/tigase. "
@@ -654,7 +654,7 @@ msgid ""
 "section <#webinstall>`__."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:408
+#: ../../Tigase_Administration/Configuration/DSL_configuration.inc:410
 msgid ""
 "There are other options for config-type: ``default``, ``session-"
 "manager``, ``connection-managers``, and ``component``. For more "
@@ -745,18 +745,18 @@ msgid ""
 "and high system loads."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:2
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:4
 msgid "Linux Settings for High Load Systems"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:4
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:6
 msgid ""
 "There are a few basic settings you have to adjust for high load systems "
 "to make sure the server has enough resources to handle a big number of "
 "network connections."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:6
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:8
 msgid ""
 "The main parameter is a maximum number of opened files allowed for the "
 "process to keep at the same time. Each network connection uses a file "
@@ -764,13 +764,13 @@ msgid ""
 "handlers and the server can not accept any more connections."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:8
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:10
 msgid ""
 "This limit is set on 2 levels - on the kernel level (``fs.file-max``) and"
 " on the system level (``nofile``)."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:10
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:12
 msgid ""
 "Another kernel property which can be important in certain configurations "
 "(like transports installations or when you use proxy for Bosh "
@@ -778,17 +778,17 @@ msgid ""
 "set the same way as the ``fs.file-max`` property."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:13
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:15
 msgid "fs.file-max"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:15
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:17
 msgid ""
 "The ``fs.file-max`` kernel property is set via sysctl command. You can "
 "see current settings by executing the command:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:22
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:24
 msgid ""
 "If you plan to run high load service with large number of server "
 "connections, then this parameter should be at least as twice big as the "
@@ -796,23 +796,23 @@ msgid ""
 "setting by executing the command:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:30
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:32
 msgid "net.ipv4.ip_local_port_range"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:32
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:34
 msgid "You can see current settings by executing the command:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:39
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:41
 msgid "You can change this setting by executing the command:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:47
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:49
 msgid "TCP_keepalive"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:49
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:51
 msgid ""
 "According to `Using TCP keepalive to Detect Network Errors "
 "<http://www.gnugk.org/keepalive.html>`__ and `TCP Keepalive HOWTO "
@@ -823,11 +823,11 @@ msgid ""
 "detection of broken connections faster."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:64
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:66
 msgid "/etc/sysctl.conf"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:66
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:68
 msgid ""
 "The above commands let the system remember new settings until the next "
 "system restart. If you want to make the change permanent you have to edit"
@@ -835,32 +835,32 @@ msgid ""
 "file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:77
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:79
 msgid "It will be automatically loaded next time you start the server."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:79
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:81
 msgid "Command:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:85
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:87
 msgid ""
 "Causes the ``/etc/systcl.conf`` to be reloaded which is useful when you "
 "have added more parameters to the file and don’t want to restart the "
 "server."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:88
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:90
 msgid "nofile"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:90
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:92
 msgid ""
 "This is the property used by the system limits. For example running the "
 "command ``ulimit -a`` shows you all limits set for the current user:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:110
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:112
 msgid ""
 "To make it even more interesting and more complex, there are 2 types of "
 "system limits: **soft limit** which can be temporarily exceeded by the "
@@ -868,37 +868,37 @@ msgid ""
 "limit** execute command:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:130
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:132
 msgid ""
 "The hard limits are usually bigger then the soft limits or sometimes the "
 "same."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:132
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:134
 msgid ""
 "For us the most important parameter is: **open files**. You can change "
 "the property in file: ``/etc/security/limits.conf``. You have to append 2"
 " following lines to the end of the file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:139
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:141
 msgid ""
 "Where the ``jabber`` is the user name of the account running you IM "
 "service. You can also set the limits for all users on the machine in a "
 "following way:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:146
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:148
 msgid ""
 "For those changes to make an effect you have to logout from the modified "
 "account and login again. New limits should be applied."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:150
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:152
 msgid "su and init script"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:152
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:154
 msgid ""
 "If one intends to use init scripts for startup purposes (or simply wants "
 "to be able to start the server utilizing su command) it’s necessary to "
@@ -906,7 +906,7 @@ msgid ""
 "following line:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:158
+#: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:160
 msgid "Afterwards the init scripts will respect configured limits."
 msgstr ""
 
@@ -917,10 +917,10 @@ msgstr ""
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:4
 msgid ""
 "Tigase configuration file ``tigase.conf`` (described in more detail in "
-"`??? <#manualconfig>`__) mentioned a couple of environmental variables "
-"which are related to the operation of the JVM. In this guide we would "
-"like to expound on those configuration options and provide hints for the "
-"optimal settings."
+"`Startup File for tigase.sh-tigase.conf <#manualconfig>`__) mentioned a "
+"couple of environmental variables which are related to the operation of "
+"the JVM. In this guide we would like to expound on those configuration "
+"options and provide hints for the optimal settings."
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:6
@@ -1591,8 +1591,8 @@ msgstr ""
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:10
 msgid ""
-"The `'default-virtual-host' <#virtHosts>`_ property allows to define name"
-" of the single vhost domain which will be considered a default vhost "
+"The :ref:`'default-virtual-host'<virtHosts>` property allows to define "
+"name of the single vhost domain which will be considered a default vhost "
 "domain for this installation. It allows you just to configure the domain "
 "name. Any additional configuration needs to be configured using ad-hoc "
 "commands."
@@ -1601,25 +1601,25 @@ msgstr ""
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:12
 msgid ""
 "Virtual hosts should be managed using ad-hoc commands or admin ui, visit "
-"`Add and Manage Domains <#addManageDomain>` for description of vhosts "
+":ref:`Add and Manage Domains<addManageDomain>` for description of vhosts "
 "management process or visit `Specification for ad-hoc Commands Used to "
-"Manage Virtual Domains <#adhocCommands>` for more information about ad-"
-"hoc commands."
+"Manage Virtual Domains<adhocCommands>` for more information about ad-hoc "
+"commands."
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:14
 msgid ""
 "If you have components that may not be able to handle multiple vhosts or "
 "cluster mode, we have developed a virtual component solution as well, "
-"details in the `Virtual Components for the Tigase Cluster "
-"<#virtualComponents>`__ section."
+"details in the :ref:`Virtual Components for the Tigase "
+"Cluster<virtualComponents>` section."
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:16
 msgid ""
 "You may also want to reference the Vhosts API for additional information:"
-" - `API Description for Virtual Domains Management in Tigase Server "
-"<#addManageDomain>`."
+" - :ref:`API Description for Virtual Domains Management in Tigase "
+"Server<addManageDomain>`."
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:24
@@ -1639,15 +1639,15 @@ msgid ""
 "After initial definition of default configuration or after first startup "
 "of Tigase XMPP Server it is possible to configure Virtual Host defaults "
 "using ad-hoc commands by modifying values for ``default`` using ad-hoc as"
-" described in `Specification for ad-hoc Commands Used to Manage Virtual "
-"Domains <#adhocCommands>`__."
+" described in :ref:`Specification for ad-hoc Commands Used to Manage "
+"Virtual Domains<adhocCommands>`."
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:46
 msgid ""
 "Alternatively, you may edit default Virtual Host configuration "
 "(configuration for domain ``default``) using Admin UI which by default is"
-" available at ``http://localhost:8080/admin/``."
+" available at http://localhost:8080/admin/."
 msgstr ""
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:51
@@ -2422,5 +2422,108 @@ msgstr ""
 #~ " scans the operating system environment "
 #~ "for Java VM and other tools "
 #~ "needed."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "``class`` which will be used as a"
+#~ " bean, in example above we set "
+#~ "class as ``className``. *_(default: if "
+#~ "you try to configure bean under "
+#~ "name which has default class assigned"
+#~ " with it in Tigase framework then "
+#~ "this assigned class will be used. "
+#~ "In other case you need to pass "
+#~ "name of class to use as a "
+#~ "bean)_*"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "``active`` (boolean) whether you want "
+#~ "the bean to be active or not "
+#~ "(beans with ``active`` set to ``false``"
+#~ " are not loaded). *_(default: true)_*"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "``exportable`` (boolean) defines if this "
+#~ "bean should be exported and available"
+#~ " for use for beans in inner "
+#~ "scopes. This is advanced option in "
+#~ "most cases it is recommended to "
+#~ "omit this field in configuration. "
+#~ "*_(default: false)_*"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tigase configuration file ``tigase.conf`` "
+#~ "(described in more detail in `??? "
+#~ "<#manualconfig>`__) mentioned a couple of "
+#~ "environmental variables which are related "
+#~ "to the operation of the JVM. In"
+#~ " this guide we would like to "
+#~ "expound on those configuration options "
+#~ "and provide hints for the optimal "
+#~ "settings."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The `'default-virtual-host' <#virtHosts>`_ "
+#~ "property allows to define name of "
+#~ "the single vhost domain which will "
+#~ "be considered a default vhost domain "
+#~ "for this installation. It allows you "
+#~ "just to configure the domain name. "
+#~ "Any additional configuration needs to be"
+#~ " configured using ad-hoc commands."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Virtual hosts should be managed using"
+#~ " ad-hoc commands or admin ui, "
+#~ "visit `Add and Manage Domains "
+#~ "<#addManageDomain>` for description of vhosts"
+#~ " management process or visit `Specification"
+#~ " for ad-hoc Commands Used to "
+#~ "Manage Virtual Domains <#adhocCommands>` for"
+#~ " more information about ad-hoc "
+#~ "commands."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If you have components that may "
+#~ "not be able to handle multiple "
+#~ "vhosts or cluster mode, we have "
+#~ "developed a virtual component solution "
+#~ "as well, details in the `Virtual "
+#~ "Components for the Tigase Cluster "
+#~ "<#virtualComponents>`__ section."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You may also want to reference the"
+#~ " Vhosts API for additional information: "
+#~ "- `API Description for Virtual Domains"
+#~ " Management in Tigase Server "
+#~ "<#addManageDomain>`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "After initial definition of default "
+#~ "configuration or after first startup of"
+#~ " Tigase XMPP Server it is possible"
+#~ " to configure Virtual Host defaults "
+#~ "using ad-hoc commands by modifying "
+#~ "values for ``default`` using ad-hoc "
+#~ "as described in `Specification for "
+#~ "ad-hoc Commands Used to Manage "
+#~ "Virtual Domains <#adhocCommands>`__."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Alternatively, you may edit default "
+#~ "Virtual Host configuration (configuration for"
+#~ " domain ``default``) using Admin UI "
+#~ "which by default is available at "
+#~ "``http://localhost:8080/admin/``."
 #~ msgstr ""
 

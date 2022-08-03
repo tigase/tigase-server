@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -173,8 +173,7 @@ msgstr ""
 msgid ""
 "To handle XML events we have to register listener for specific event "
 "package and name. In our example, package is empty because event name has"
-" no package declared (see also `Filtering events "
-"<#_filtering_events>`__)."
+" no package declared (see also :ref:`Filtering events<filteringEvents>`)."
 msgstr ""
 
 #: ../../Tigase_Development/EventBus_API.rst:173
@@ -194,37 +193,46 @@ msgid ""
 " set to ``true`` and attribute ``source`` set to event creator node name:"
 msgstr ""
 
-#: ../../Tigase_Development/EventBus_API.rst:198
+#: ../../Tigase_Development/EventBus_API.rst:199
 msgid "Filtering events"
 msgstr ""
 
-#: ../../Tigase_Development/EventBus_API.rst:200
+#: ../../Tigase_Development/EventBus_API.rst:201
 msgid ""
 "Sometimes you may want to receive many kinds of events with the same "
 "handler. EventBus has very simple mechanism to generalization:"
 msgstr ""
 
-#: ../../Tigase_Development/EventBus_API.rst:207
+#: ../../Tigase_Development/EventBus_API.rst:208
 msgid ""
 "This listener will be called for each event with given package name (XML "
 "based, or serialized class based)."
 msgstr ""
 
-#: ../../Tigase_Development/EventBus_API.rst:209
+#: ../../Tigase_Development/EventBus_API.rst:210
 msgid ""
 "This listener will be called for ALL events (XML based, or serialized "
 "class based)."
 msgstr ""
 
-#: ../../Tigase_Development/EventBus_API.rst:211
+#: ../../Tigase_Development/EventBus_API.rst:212
 msgid "In case of class based events, EventBus is checking class inheritance."
 msgstr ""
 
-#: ../../Tigase_Development/EventBus_API.rst:223
+#: ../../Tigase_Development/EventBus_API.rst:224
 msgid "Will be called, because this is listener stricte for ``SpecificEvent``."
 msgstr ""
 
-#: ../../Tigase_Development/EventBus_API.rst:225
+#: ../../Tigase_Development/EventBus_API.rst:226
 msgid "Will be called, because ``SpecificEvent`` extends ``MainEvent``."
 msgstr ""
+
+#~ msgid ""
+#~ "To handle XML events we have to"
+#~ " register listener for specific event "
+#~ "package and name. In our example, "
+#~ "package is empty because event name "
+#~ "has no package declared (see also "
+#~ "`Filtering events <#_filtering_events>`__)."
+#~ msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 19:27-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -181,7 +181,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:69
 msgid ""
-"see `Period / Duration values <#Period-Duration-values>`__ for format "
+"see :ref:`Period / Duration values<PeriodDurationvalues>` for format "
 "details"
 msgstr ""
 
@@ -943,8 +943,8 @@ msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:113
 msgid ""
-"``-Q``, ``--query=`` - custom queries to be executed, see `Query function"
-" <#queryschema>`__ for details."
+"``-Q``, ``--query=`` - custom queries to be executed, see :ref:`Query "
+"function<queryschema>` for details."
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:115
@@ -973,67 +973,67 @@ msgid ""
 "is ``false``)."
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:125
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:127
 msgid "Query function"
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:127
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:129
 msgid ""
 "Should you decide to customize your own functions, or have specific "
 "information you want to put into the database, you can use the -query "
 "function to perform a single query step."
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:133
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:135
 msgid ""
 "Of course this would break the schema for tigasedb by adding an "
 "unexpected table, you will receive the following message:"
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:139
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:141
 msgid ""
 "But this is a demonstration how you may run a query through the database "
 "without the need to use another tool. Note that you will need to select "
 "the specific database for each query."
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:141
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:143
 msgid "destroy-schema"
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:144
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:146
 msgid "This will destroy the database specified in the configuration file."
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:148
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:150
 msgid "**THIS ACTION IS NOT REVERSIBLE**"
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:154
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:156
 msgid ""
 "Only use this if you wish to destroy a database and not have the "
 "information recoverable."
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:156
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:158
 msgid "Windows users will need to call the method directly:"
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:163
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:165
 msgid "A note about MySQL"
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:165
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:167
 msgid "If you are using these commands, you may result in the following error:"
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:171
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:173
 msgid ""
 "If this occurs, you will need to upgrade your version of MySQL using the "
 "following command:"
 msgstr ""
 
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:177
+#: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:179
 msgid ""
 "After entering the password and upgrading MySQL the schema error should "
 "no longer show when working with Tigase databases."
@@ -2442,8 +2442,9 @@ msgstr ""
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:9
 msgid ""
 "Please before continuing reading of this manual have a look at the "
-"`initial MySQL database setup <#prepareMysql>`__. It will help you with "
-"database preparation for connecting with Tigase server."
+":ref:`initial MySQL database setup<Prepare-the-MySQL-Database-for-the-"
+"Tigase-Server>`. It will help you with database preparation for "
+"connecting with Tigase server."
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:11
@@ -2519,7 +2520,8 @@ msgid ""
 "In theory you can load Tigase database schema to Drupal database and then"
 " both ``db-uris`` would have the same database connection string. More "
 "details about setting up and connecting to MySQL database can be found in"
-" the `MySQL guide <#prepareMysql>`__."
+" the :ref:`MySQL guide<Prepare-the-MySQL-Database-for-the-Tigase-"
+"Server>`."
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:91
@@ -3021,8 +3023,8 @@ msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:230
 msgid ""
-"You MUST update your database to be compliant with the new schema. If you"
-" do not, Tigase will not function properly.**"
+"**You MUST update your database to be compliant with the new schema. If "
+"you do not, Tigase will not function properly.**"
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:234
@@ -3189,8 +3191,8 @@ msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:321
 msgid ""
-"**Some variation may be necessary depending on how your java build uses "
-"``-cp`` option**"
+"**Some variation may be necessary depending on how your java build uses**"
+" ``-cp`` **option**"
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:323
@@ -3309,5 +3311,50 @@ msgstr ""
 #~ "`Manual installtion for PostGRESQL "
 #~ "<#Prepare-the-PostgreSQL-Database-for-"
 #~ "the-Tigase-Server>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "see `Period / Duration values "
+#~ "<#Period-Duration-values>`__ for format "
+#~ "details"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "``-Q``, ``--query=`` - custom queries to"
+#~ " be executed, see `Query function "
+#~ "<#queryschema>`__ for details."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Please before continuing reading of this"
+#~ " manual have a look at the "
+#~ "`initial MySQL database setup "
+#~ "<#prepareMysql>`__. It will help you "
+#~ "with database preparation for connecting "
+#~ "with Tigase server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In theory you can load Tigase "
+#~ "database schema to Drupal database and"
+#~ " then both ``db-uris`` would have "
+#~ "the same database connection string. "
+#~ "More details about setting up and "
+#~ "connecting to MySQL database can be "
+#~ "found in the `MySQL guide "
+#~ "<#prepareMysql>`__."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "You MUST update your database to "
+#~ "be compliant with the new schema. "
+#~ "If you do not, Tigase will not "
+#~ "function properly.**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Some variation may be necessary "
+#~ "depending on how your java build "
+#~ "uses ``-cp`` option**"
 #~ msgstr ""
 

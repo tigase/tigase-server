@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -320,202 +320,202 @@ msgid ""
 "Defined column limit is 120 characters and must be line-wrapped as "
 "described below Java code has a column limit of 100 characters. Except as"
 " noted below, any line that would exceed this limit must be line-wrapped,"
-" as explained in section `Line-wrapping <#line-wrapping>`__."
-msgstr ""
-
-#: ../../Tigase_Development/CodeStyleGuide.rst:177
-msgid "Line-wrapping"
+" as explained in section :ref:`Line-wrapping<linewrapping>`."
 msgstr ""
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:179
+msgid "Line-wrapping"
+msgstr ""
+
+#: ../../Tigase_Development/CodeStyleGuide.rst:181
 msgid ""
 "*line-wrapping* is a process of dividing long lines that would otherwise "
 "go over the defined Column Limit (above). It’s recommended to wrap lines "
 "whenever it’s possible even if they are not longer than defined limit."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:182
+#: ../../Tigase_Development/CodeStyleGuide.rst:184
 msgid "Whitespace"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:185
+#: ../../Tigase_Development/CodeStyleGuide.rst:187
 msgid "Vertical Whitespace"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:187
+#: ../../Tigase_Development/CodeStyleGuide.rst:189
 msgid "A single blank line appears:"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:189
+#: ../../Tigase_Development/CodeStyleGuide.rst:191
 msgid "after package statement;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:191
+#: ../../Tigase_Development/CodeStyleGuide.rst:193
 msgid "before imports;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:193
+#: ../../Tigase_Development/CodeStyleGuide.rst:195
 msgid "after imports;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:195
+#: ../../Tigase_Development/CodeStyleGuide.rst:197
 msgid "around class;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:197
+#: ../../Tigase_Development/CodeStyleGuide.rst:199
 msgid "after class header;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:199
+#: ../../Tigase_Development/CodeStyleGuide.rst:201
 msgid "around field in interface;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:201
+#: ../../Tigase_Development/CodeStyleGuide.rst:203
 msgid "around method in interface;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:203
+#: ../../Tigase_Development/CodeStyleGuide.rst:205
 msgid "around method;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:205
+#: ../../Tigase_Development/CodeStyleGuide.rst:207
 msgid "around initializer;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:207
+#: ../../Tigase_Development/CodeStyleGuide.rst:209
 msgid "as required by other sections of this document."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:209
+#: ../../Tigase_Development/CodeStyleGuide.rst:211
 msgid "Multiple blank lines are not permitted."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:212
+#: ../../Tigase_Development/CodeStyleGuide.rst:214
 msgid "Horizontal whitespace"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:214
+#: ../../Tigase_Development/CodeStyleGuide.rst:216
 msgid ""
 "Beyond where required by the language or other style rules, and apart "
 "from literals, comments and Javadoc, a single ASCII space also appears in"
 " the following places **only**."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:216
+#: ../../Tigase_Development/CodeStyleGuide.rst:218
 msgid ""
 "Separating any reserved word, such as ``if``, ``for``, ``while``, "
 "``switch``, ``try``, ``catch`` or ``synchronized``, from an open "
 "parenthesis (``(``) that follows it on that line"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:218
+#: ../../Tigase_Development/CodeStyleGuide.rst:220
 msgid ""
 "Separating any reserved word, such as ``else`` or ``catch``, from a "
 "closing curly brace (``}``) that precedes it on that line"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:220
+#: ../../Tigase_Development/CodeStyleGuide.rst:222
 msgid "Before any open curly brace (``{``), with two exceptions:"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:222
+#: ../../Tigase_Development/CodeStyleGuide.rst:224
 msgid "``@SomeAnnotation({a, b})`` (no space is used)"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:224
+#: ../../Tigase_Development/CodeStyleGuide.rst:226
 msgid ""
 "``String[][] x = {{\"foo\"}};`` (no space is required between ``{{``, by "
 "item 8 below)"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:226
+#: ../../Tigase_Development/CodeStyleGuide.rst:228
 msgid ""
 "On both sides of any binary or ternary operator. This also applies to the"
 " following \"operator-like\" symbols:"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:228
+#: ../../Tigase_Development/CodeStyleGuide.rst:230
 msgid "the ampersand in a conjunctive type bound: ``<T extends Foo & Bar>``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:230
+#: ../../Tigase_Development/CodeStyleGuide.rst:232
 msgid ""
 "the pipe for a catch block that handles multiple exceptions: ``catch "
 "(FooException | BarException e)``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:232
+#: ../../Tigase_Development/CodeStyleGuide.rst:234
 msgid "the colon (``:``) in an enhanced ``for`` (\"foreach\") statement"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:234
+#: ../../Tigase_Development/CodeStyleGuide.rst:236
 msgid "the arrow in a lambda expression: ``(String str) → str.length()``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:236
+#: ../../Tigase_Development/CodeStyleGuide.rst:238
 msgid "**but not:**"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:238
+#: ../../Tigase_Development/CodeStyleGuide.rst:240
 msgid ""
 "the two colons (``::``) of a method reference, which is written like "
 "``Object::toString``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:240
+#: ../../Tigase_Development/CodeStyleGuide.rst:242
 msgid "the dot separator (``.``), which is written like ``object.toString()``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:242
+#: ../../Tigase_Development/CodeStyleGuide.rst:244
 msgid "After ``,:;`` or the closing parenthesis (``)``) of a cast"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:244
+#: ../../Tigase_Development/CodeStyleGuide.rst:246
 msgid "Between the type and variable of a declaration: ``List<String> list``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:247
+#: ../../Tigase_Development/CodeStyleGuide.rst:249
 msgid "Horizontal alignment: never required"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:249
+#: ../../Tigase_Development/CodeStyleGuide.rst:251
 msgid ""
 "*Horizontal alignment* is the practice of adding a variable number of "
 "additional spaces in your code with the goal of making certain tokens "
 "appear directly below certain other tokens on previous lines."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:251
+#: ../../Tigase_Development/CodeStyleGuide.rst:253
 msgid ""
 "This practice is permitted, but is **never required**. It is not even "
 "required to *maintain* horizontal alignment in places where it was "
 "already used."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:254
+#: ../../Tigase_Development/CodeStyleGuide.rst:256
 msgid "Specific constructs"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:257
+#: ../../Tigase_Development/CodeStyleGuide.rst:259
 msgid "Enum classes"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:259
+#: ../../Tigase_Development/CodeStyleGuide.rst:261
 msgid "After each comma that follows an enum constant, a line break is mandatory."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:262
+#: ../../Tigase_Development/CodeStyleGuide.rst:264
 msgid "Variable declarations"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:264
+#: ../../Tigase_Development/CodeStyleGuide.rst:266
 msgid ""
 "One variable per declaration - Every variable declaration (field or "
 "local) declares only one variable: declarations such as ``int a, b;`` are"
 " not used."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:266
+#: ../../Tigase_Development/CodeStyleGuide.rst:268
 msgid ""
 "Declared when needed -Local variables are **not** habitually declared at "
 "the start of their containing block or block-like construct. Instead, "
@@ -525,77 +525,77 @@ msgid ""
 "declaration."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:269
+#: ../../Tigase_Development/CodeStyleGuide.rst:271
 msgid "Arrays"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:271
+#: ../../Tigase_Development/CodeStyleGuide.rst:273
 msgid ""
 "Any array initializer may *optionally* be formatted as if it were a "
 "\"block-like construct.\" (especially when line-wrapping need to be "
 "applied)."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:274
+#: ../../Tigase_Development/CodeStyleGuide.rst:276
 msgid "Naming"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:277
+#: ../../Tigase_Development/CodeStyleGuide.rst:279
 msgid "Rules common to all identifiers"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:279
+#: ../../Tigase_Development/CodeStyleGuide.rst:281
 msgid ""
 "Identifiers use only ASCII letters and digits, and, in a small number of "
 "cases noted below, underscores. Thus each valid identifier name is "
 "matched by the regular expression ``\\w+`` ."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:282
+#: ../../Tigase_Development/CodeStyleGuide.rst:284
 msgid "Specific Rules by identifier type"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:284
+#: ../../Tigase_Development/CodeStyleGuide.rst:286
 msgid ""
 "Package names are all lowercase, with consecutive words simply "
 "concatenated together (no underscores, not camel-case)."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:286
+#: ../../Tigase_Development/CodeStyleGuide.rst:288
 msgid "Class names are written in **UpperCamelCase**."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:288
+#: ../../Tigase_Development/CodeStyleGuide.rst:290
 msgid "Method names are written in **lowerCamelCase**."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:290
+#: ../../Tigase_Development/CodeStyleGuide.rst:292
 msgid ""
 "Constant names use ``CONSTANT_CASE``: all uppercase letters, with words "
 "separated by underscores."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:292
+#: ../../Tigase_Development/CodeStyleGuide.rst:294
 msgid ""
 "Non-constant field names (static or otherwise) are written in "
 "**lowerCamelCase**."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:294
+#: ../../Tigase_Development/CodeStyleGuide.rst:296
 msgid ""
 "Parameter names are written in **lowerCamelCase** (one-character "
 "parameter names in public methods should be avoided)."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:296
+#: ../../Tigase_Development/CodeStyleGuide.rst:298
 msgid "Local variable names are written in **lowerCamelCase**."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:299
+#: ../../Tigase_Development/CodeStyleGuide.rst:301
 msgid "Programming Practices"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:301
+#: ../../Tigase_Development/CodeStyleGuide.rst:303
 msgid ""
 "A method is marked with the ``@Override`` annotation whenever it is "
 "legal. This includes a class method overriding a superclass method, a "
@@ -603,67 +603,78 @@ msgid ""
 "re-specifying a super-interface method."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:303
+#: ../../Tigase_Development/CodeStyleGuide.rst:305
 msgid ""
 "Caught exceptions should not be ignored (and if this is a must then a log"
 " entry is required)."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:306
+#: ../../Tigase_Development/CodeStyleGuide.rst:308
 msgid "Javadoc"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:308
+#: ../../Tigase_Development/CodeStyleGuide.rst:310
 msgid "blank lines should be inserted after:"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:310
+#: ../../Tigase_Development/CodeStyleGuide.rst:312
 msgid "description,"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:312
+#: ../../Tigase_Development/CodeStyleGuide.rst:314
 msgid "parameter description,"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:314
+#: ../../Tigase_Development/CodeStyleGuide.rst:316
 msgid "return tag;"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:316
+#: ../../Tigase_Development/CodeStyleGuide.rst:318
 msgid "empty tag should be included for following tags:"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:318
+#: ../../Tigase_Development/CodeStyleGuide.rst:320
 msgid "``@params``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:320
+#: ../../Tigase_Development/CodeStyleGuide.rst:322
 msgid "``@return``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:322
+#: ../../Tigase_Development/CodeStyleGuide.rst:324
 msgid "``@throws``"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:325
+#: ../../Tigase_Development/CodeStyleGuide.rst:327
 msgid "Usage"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:327
+#: ../../Tigase_Development/CodeStyleGuide.rst:329
 msgid ""
 "At the *minimum*, Javadoc is present for every ``public`` class, and "
 "every ``public`` or ``protected`` member of such a class, with a few "
 "exceptions:"
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:329
+#: ../../Tigase_Development/CodeStyleGuide.rst:331
 msgid ""
 "is optional for \"simple, obvious\" methods like ``getFoo``, in cases "
 "where there *really and truly* is nothing else worthwhile to say but "
 "\"Returns the foo\"."
 msgstr ""
 
-#: ../../Tigase_Development/CodeStyleGuide.rst:331
+#: ../../Tigase_Development/CodeStyleGuide.rst:333
 msgid "in methods that overrides a supertype method."
 msgstr ""
+
+#~ msgid ""
+#~ "Defined column limit is 120 characters"
+#~ " and must be line-wrapped as "
+#~ "described below Java code has a "
+#~ "column limit of 100 characters. Except"
+#~ " as noted below, any line that "
+#~ "would exceed this limit must be "
+#~ "line-wrapped, as explained in section "
+#~ "`Line-wrapping <#line-wrapping>`__."
+#~ msgstr ""
 

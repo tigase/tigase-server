@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -491,8 +491,8 @@ msgstr ""
 
 #: ../../Tigase_Development/Old_Stuff.rst:172
 msgid ""
-"**Example VHostItemExtensionProvider\\` implementation for "
-"``SeeOtherHostVHostItemExtension``..**"
+"*Example VHostItemExtensionProvider implementation for* "
+"``SeeOtherHostVHostItemExtension``."
 msgstr ""
 
 #: ../../Tigase_Development/Old_Stuff.rst:191
@@ -614,7 +614,7 @@ msgstr ""
 
 #: ../../Tigase_Development/Old_Stuff.rst:257
 msgid ""
-"Please refer to the JavaDoc documentation for the ```Packet`` "
+"Please refer to the JavaDoc documentation for the `Packet "
 "<http://docs.tigase.org/tigase-"
 "server/snapshot/javadoc/tigase/server/Packet.html>`__ class and methods "
 "to learn all the details of these methods and difference between them."
@@ -676,4 +676,19 @@ msgid ""
 "As far as I know most of these method were used only by myself so I do "
 "not expect much trouble for other developers."
 msgstr ""
+
+#~ msgid ""
+#~ "**Example VHostItemExtensionProvider\\` implementation "
+#~ "for ``SeeOtherHostVHostItemExtension``..**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Please refer to the JavaDoc "
+#~ "documentation for the ```Packet`` "
+#~ "<http://docs.tigase.org/tigase-"
+#~ "server/snapshot/javadoc/tigase/server/Packet.html>`__ class "
+#~ "and methods to learn all the "
+#~ "details of these methods and difference"
+#~ " between them."
+#~ msgstr ""
 

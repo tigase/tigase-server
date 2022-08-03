@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,19 +30,19 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Development/Plugin_Development.rst:6
-msgid "`Writing Plugin Code <#writePluginCode>`__"
+msgid ":ref:`Writing Plugin Code<writePluginCode>`"
 msgstr ""
 
 #: ../../Tigase_Development/Plugin_Development.rst:8
-msgid "`Plugin Configuration <#pluginConf>`__"
+msgid ":ref:`Plugin Configuration<pluginConf>`"
 msgstr ""
 
 #: ../../Tigase_Development/Plugin_Development.rst:10
-msgid "`How Packets are Processed by the SM and Plugins <#packetprocess>`__"
+msgid ":ref:`How Packets are Processed by the SM and Plugins<packetprocess>`"
 msgstr ""
 
 #: ../../Tigase_Development/Plugin_Development.rst:12
-msgid "`SASL Custom Mechanisms and Configuration <#saslcmac>`__"
+msgid ":ref:`SASL Custom Mechanisms and Configuration<saslcmac>`"
 msgstr ""
 
 #: ../../Tigase_Development/Plugin_Development.rst:17
@@ -299,40 +299,40 @@ msgstr ""
 #: ../../Tigase_Development/Plugin_Development.rst:270
 msgid ""
 "There is another part of the plugin configuration though. If you looked "
-"at the `Writing Plugin Code <#writePluginCode>`__ guide you can remember "
-"the **Map settings** processing parameter. This is a map of properties "
-"you can set in the configuration file and these setting will be passed to"
-" the plugin at the processing time."
+"at the :ref:`Writing Plugin Code <writePluginCode>` guide you can "
+"remember the **Map settings** processing parameter. This is a map of "
+"properties you can set in the configuration file and these setting will "
+"be passed to the plugin at the processing time."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:272
+#: ../../Tigase_Development/Plugin_Development.rst:273
 msgid ""
 "Again **config.tdsl** is the place to put the stuff. These kind of "
 "properties start under your **plugin ID** and each key and value will be "
 "a child underneath:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:286
+#: ../../Tigase_Development/Plugin_Development.rst:287
 msgid ""
 "From v8.0.0 you will no longer be able to specify one value for multiple "
 "keys, you must set each one individually."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:288
+#: ../../Tigase_Development/Plugin_Development.rst:289
 msgid "Last but not least - in case you have **omitted plugin ID**:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:296
+#: ../../Tigase_Development/Plugin_Development.rst:297
 msgid ""
 "then the configured key-value pair will be a global/common plugin setting"
 " available to all loaded plugins."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:301
+#: ../../Tigase_Development/Plugin_Development.rst:302
 msgid "How Packets are Processed by the SM and Plugins"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:303
+#: ../../Tigase_Development/Plugin_Development.rst:304
 msgid ""
 "For Tigase server plugin development it is important to understand how it"
 " all works. There are different kind of plugins responsible for "
@@ -340,11 +340,11 @@ msgid ""
 "introduction below before proceeding to the actual coding part."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:306
+#: ../../Tigase_Development/Plugin_Development.rst:307
 msgid "Introduction"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:308
+#: ../../Tigase_Development/Plugin_Development.rst:309
 msgid ""
 "In Tigase server **plugins** are pieces of code responsible for "
 "processing particular XMPP stanzas. A separate plugin might be "
@@ -353,14 +353,14 @@ msgid ""
 "one for iq version and so on."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:310
+#: ../../Tigase_Development/Plugin_Development.rst:311
 msgid ""
 "A plugin provides information about what exact XML element(s) name(s) "
 "with xmlns it is interested in. So you can create a plugin which is "
 "interested in all packets containing caps child."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:312
+#: ../../Tigase_Development/Plugin_Development.rst:313
 msgid ""
 "There might be no plugin for a particular stanza element, in this case "
 "the default action is used which is simple forwarding stanza to a "
@@ -370,27 +370,27 @@ msgid ""
 "in which the stanza is processed by a different plugins."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:314
+#: ../../Tigase_Development/Plugin_Development.rst:315
 msgid ""
 "Each stanza goes through the Session Manager component which processes "
 "packets in a few steps. Have a look at the picture below:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:316
+#: ../../Tigase_Development/Plugin_Development.rst:317
 msgid "|Consumer|"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:356
+#: ../../Tigase_Development/Plugin_Development.rst:357
 msgid "Consumer"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:318
+#: ../../Tigase_Development/Plugin_Development.rst:319
 msgid ""
 "The picture shows that each stanza is processed by the session manager in"
 " 4 steps:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:320
+#: ../../Tigase_Development/Plugin_Development.rst:321
 msgid ""
 "Pre-processing - All loaded pre-processors receive the packet for "
 "processing. They work within session manager thread and they have no "
@@ -402,7 +402,7 @@ msgid ""
 "performed."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:322
+#: ../../Tigase_Development/Plugin_Development.rst:323
 msgid ""
 "Processing - This is the next step the packet gets through if it wasn’t "
 "blocked by any of the pre-processors. It gets inserted to all processors "
@@ -411,7 +411,7 @@ msgid ""
 "processing queue."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:324
+#: ../../Tigase_Development/Plugin_Development.rst:325
 msgid ""
 "Post-processing - If there is no processor for the stanza then the packet"
 " goes through all post-processors. The last post-processor that is built "
@@ -421,13 +421,13 @@ msgid ""
 "applied to <message/> packets."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:326
+#: ../../Tigase_Development/Plugin_Development.rst:327
 msgid ""
 "Finally, if any of above 3 steps produced output/result packets all of "
 "them go through all filters which may or may not block them."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:328
+#: ../../Tigase_Development/Plugin_Development.rst:329
 msgid ""
 "An important thing to note is that we have two kinds or two places where "
 "packets may be blocked or filtered out. One place is before packet is "
@@ -435,7 +435,7 @@ msgid ""
 "filtering is applied to all results generated by the processor plugins."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:330
+#: ../../Tigase_Development/Plugin_Development.rst:331
 msgid ""
 "It is also important to note that session manager and processor plugins "
 "act as packet consumers. The packet is taken for processing and once "
@@ -447,15 +447,15 @@ msgid ""
 "processing. Have a look at the picture below:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:332
+#: ../../Tigase_Development/Plugin_Development.rst:333
 msgid "|User Send to Comp|"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:357
+#: ../../Tigase_Development/Plugin_Development.rst:358
 msgid "User Send to Comp"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:334
+#: ../../Tigase_Development/Plugin_Development.rst:335
 msgid ""
 "If the packet P1 is sent from outside of the server, for example to a "
 "user on another server or to some component (MUC, PubSub, transport), "
@@ -465,19 +465,19 @@ msgid ""
 "been generated by one of the plugins."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:336
+#: ../../Tigase_Development/Plugin_Development.rst:337
 msgid "The same of course happens on the way back from the component to the user:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:338
+#: ../../Tigase_Development/Plugin_Development.rst:339
 msgid "|Comp Sends to User|"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:358
+#: ../../Tigase_Development/Plugin_Development.rst:359
 msgid "Comp Sends to User"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:340
+#: ../../Tigase_Development/Plugin_Development.rst:341
 msgid ""
 "The packet from the component is processed and one of the plugins must "
 "generate a copy of the packet to deliver it to the user. Of course packet"
@@ -485,7 +485,7 @@ msgid ""
 "for the particular packet."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:342
+#: ../../Tigase_Development/Plugin_Development.rst:343
 msgid ""
 "It is implemented this way because the input packet P1 can be processed "
 "by many plugins at the same time therefore the packet should be in fact "
@@ -493,36 +493,36 @@ msgid ""
 "processing."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:344
+#: ../../Tigase_Development/Plugin_Development.rst:345
 msgid ""
 "The most obvious processing work flow is when a user sends request to the"
 " server and expects a response from the server:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:346
+#: ../../Tigase_Development/Plugin_Development.rst:347
 msgid "|User Request Response|"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:359
+#: ../../Tigase_Development/Plugin_Development.rst:360
 msgid "User Request Response"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:348
+#: ../../Tigase_Development/Plugin_Development.rst:349
 msgid ""
 "This design has one surprising consequence though. If you look at the "
 "picture below showing communication between 2 users you can see that the "
 "packet is copied twice before it is delivered to a final destination:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:350
+#: ../../Tigase_Development/Plugin_Development.rst:351
 msgid "|User Sends to User|"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:360
+#: ../../Tigase_Development/Plugin_Development.rst:361
 msgid "User Sends to User"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:352
+#: ../../Tigase_Development/Plugin_Development.rst:353
 msgid ""
 "The packet has to be processed twice by the session manager. The first "
 "time it is processed on behalf of the User A as an outgoing packet and "
@@ -530,7 +530,7 @@ msgid ""
 "packet."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:354
+#: ../../Tigase_Development/Plugin_Development.rst:355
 msgid ""
 "This is to make sure the User A has permission to send a packet out and "
 "all processing is applied to the packet and also to make sure that User B"
@@ -539,93 +539,93 @@ msgid ""
 "which should send the packet to a database instead of User B."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:365
+#: ../../Tigase_Development/Plugin_Development.rst:366
 msgid "SASL Custom Mechanisms and Configuration"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:367
+#: ../../Tigase_Development/Plugin_Development.rst:368
 msgid ""
 "**This API is available from Tigase XMPP Server version 5.2.0 or later on"
 " our current master branch.**"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:369
+#: ../../Tigase_Development/Plugin_Development.rst:370
 msgid ""
 "**In version 8.0.0 there was a major change to the API and configuration "
 "of custom SASL mechanisms.**"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:371
+#: ../../Tigase_Development/Plugin_Development.rst:372
 msgid ""
 "*Note that API is under active development. This description may be "
 "updated at any time.*"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:374
+#: ../../Tigase_Development/Plugin_Development.rst:375
 msgid "Basic SASL Configuration"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:376
+#: ../../Tigase_Development/Plugin_Development.rst:377
 msgid ""
 "SASL implementation in Tigase XMPP Server is compatible with Java API, "
 "the same exact interfaces are used."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:378
+#: ../../Tigase_Development/Plugin_Development.rst:379
 msgid "The SASL implementation consists of following parts:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:380
+#: ../../Tigase_Development/Plugin_Development.rst:381
 msgid "mechanism"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:382
+#: ../../Tigase_Development/Plugin_Development.rst:383
 msgid "CallbackHandler"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:385
+#: ../../Tigase_Development/Plugin_Development.rst:386
 msgid "Mechanisms Configuration"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:387
+#: ../../Tigase_Development/Plugin_Development.rst:388
 msgid ""
 "To add a new mechanism, a new factory for the mechanism has to be "
 "implemented and registered."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:389
+#: ../../Tigase_Development/Plugin_Development.rst:390
 msgid ""
 "The simplest way to add register a new factory is to annotate its class "
 "with ``@Bean`` annotation:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:391
+#: ../../Tigase_Development/Plugin_Development.rst:392
 msgid ""
 "**Example of the registration of a SASL mechanism factory with an "
-"annotation setting id of the factory to ``customSaslFactory``.**"
+"annotation setting id of the factory to** ``customSaslFactory``."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:398
+#: ../../Tigase_Development/Plugin_Development.rst:399
 msgid ""
 "It can also be done by specifying the class directly for bean "
 "``customSaslFactory`` in the ``config.tdsl`` file like in the example "
 "below:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:400
+#: ../../Tigase_Development/Plugin_Development.rst:401
 msgid ""
 "**Example of the registration of a SASL mechanism factory with TDSL "
 "setting id of the factory to ``customSaslFactory``.**"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:410
+#: ../../Tigase_Development/Plugin_Development.rst:411
 msgid ""
 "The class must implement the ``SaslServerFactory`` interface and has "
 "public constructor without any arguments. All mechanisms returned by "
 "``getMechanismNames()`` method will be registered automatically."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:412
+#: ../../Tigase_Development/Plugin_Development.rst:413
 msgid ""
 "The default factory that is available and registered by default is "
 "``tigase.auth.TigaseSaslServerFactory`` which provides ``PLAIN``, "
@@ -633,18 +633,18 @@ msgid ""
 "``SCRAM-SHA-512`` mechanisms."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:415
+#: ../../Tigase_Development/Plugin_Development.rst:416
 msgid "CallbackHandler Configuration"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:417
+#: ../../Tigase_Development/Plugin_Development.rst:418
 msgid ""
 "The ``CallbackHandler`` is a helper class used for loading/retrieving "
 "authentication data from data repository and providing them to a "
 "mechanism."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:419
+#: ../../Tigase_Development/Plugin_Development.rst:420
 msgid ""
 "To register a new callback handler you need to create a new class "
 "extending ``tigase.auth.CallbackHandlerFactory`` (if you wish to keep "
@@ -654,55 +654,55 @@ msgid ""
 "``CallbackHandler`` when appropriate."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:421
+#: ../../Tigase_Development/Plugin_Development.rst:422
 msgid ""
 "Next you need to register new implementation of "
 "``CallbackHandlerFactoryIfc``. The ``config.tdsl`` file should include:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:431
+#: ../../Tigase_Development/Plugin_Development.rst:432
 msgid ""
 "During the authentication process, Tigase server always checks for asks "
 "callback handler factory for specific handler to selected mechanisms, and"
 " if there is no specific handler the default one is used."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:434
+#: ../../Tigase_Development/Plugin_Development.rst:435
 msgid "Selecting Mechanisms Available in the Stream"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:436
+#: ../../Tigase_Development/Plugin_Development.rst:437
 msgid ""
 "The ``tigase.auth.MechanismSelector`` interface is used for selecting "
 "mechanisms available in a stream. Method ``filterMechanisms()`` should "
 "return a collection with mechanisms available based on:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:438
+#: ../../Tigase_Development/Plugin_Development.rst:439
 msgid "all registered SASL factories"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:440
+#: ../../Tigase_Development/Plugin_Development.rst:441
 msgid "XMPP session data (from ``XMPPResourceConnection`` class)"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:442
+#: ../../Tigase_Development/Plugin_Development.rst:443
 msgid ""
 "The default selector returns mechanisms from all mechanism factories "
 "registered in ``sasl-provider`` ``(TigaseSaslProvider)``."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:444
+#: ../../Tigase_Development/Plugin_Development.rst:445
 msgid ""
 "It is possible to use a custom selector by specifying it’s class int the "
 "``config.tdsl`` file:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:455
+#: ../../Tigase_Development/Plugin_Development.rst:456
 msgid "Logging/Authentication"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:457
+#: ../../Tigase_Development/Plugin_Development.rst:458
 msgid ""
 "After the XMPP stream is opened by a client, the server checks which SASL"
 " mechanisms are available for the XMPP session. Depending on whether the "
@@ -712,7 +712,7 @@ msgid ""
 "allowed mechanisms is stored in the XMPP session object."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:459
+#: ../../Tigase_Development/Plugin_Development.rst:460
 msgid ""
 "When the client/user begins the authentication procedure it uses one "
 "particular mechanism. It must use one of the mechanisms provided by the "
@@ -723,7 +723,7 @@ msgid ""
 "data is different depending on the mechanism used."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:461
+#: ../../Tigase_Development/Plugin_Development.rst:462
 msgid ""
 "When the SASL authentication is completed without any error, Tigase "
 "server should have authorized user name or authorized BareJID. In the "
@@ -731,7 +731,7 @@ msgid ""
 "domain used in the stream opening element in ``to`` attribute."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:463
+#: ../../Tigase_Development/Plugin_Development.rst:464
 msgid ""
 "If, after a successful authentication, method call: "
 "``getNegotiatedProperty(\"IS_ANONYMOUS\")`` returns ``Boolean.TRUE`` then"
@@ -744,21 +744,21 @@ msgid ""
 "session."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:465
+#: ../../Tigase_Development/Plugin_Development.rst:466
 msgid ""
-"More details about implementation can be found in the `custom mechanisms "
-"development <#cmd>`__ section."
-msgstr ""
-
-#: ../../Tigase_Development/Plugin_Development.rst:468
-msgid "Custom Mechanisms Development"
+"More details about implementation can be found in the :ref:`custom "
+"mechanisms development<cmd>` section."
 msgstr ""
 
 #: ../../Tigase_Development/Plugin_Development.rst:471
+msgid "Custom Mechanisms Development"
+msgstr ""
+
+#: ../../Tigase_Development/Plugin_Development.rst:474
 msgid "**Mechanism**"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:473
+#: ../../Tigase_Development/Plugin_Development.rst:476
 msgid ""
 "``getAuthorizationID()`` method from ``SaslServer`` class **should** "
 "return bare JID authorized user. In case that the method returns only "
@@ -768,18 +768,18 @@ msgid ""
 "anything."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:475
+#: ../../Tigase_Development/Plugin_Development.rst:478
 msgid ""
 "``handleLogin()`` method from ``SessionManagerHandler`` will be called "
 "with user’s Bare JID provided by ``getAuthorizationID()`` (or created "
 "later using stream domain name)."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:478
+#: ../../Tigase_Development/Plugin_Development.rst:481
 msgid "**CallbackHandler**"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:480
+#: ../../Tigase_Development/Plugin_Development.rst:483
 msgid ""
 "For each session authorization, the server creates a new and separate "
 "empty handler. Factory which creates handler instance allows to inject "
@@ -787,35 +787,73 @@ msgid ""
 "the handler class:"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:482
+#: ../../Tigase_Development/Plugin_Development.rst:485
 msgid "``AuthRepositoryAware`` - injects ``AuthRepository;``"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:484
+#: ../../Tigase_Development/Plugin_Development.rst:487
 msgid ""
 "``DomainAware`` - injects domain name within which the user attempts to "
 "authenticate"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:486
+#: ../../Tigase_Development/Plugin_Development.rst:489
 msgid "``NonAuthUserRepositoryAware`` - injects ``NonAuthUserRepository``"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:489
+#: ../../Tigase_Development/Plugin_Development.rst:492
 msgid "General Remarks"
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:491
+#: ../../Tigase_Development/Plugin_Development.rst:494
 msgid ""
 "``JabberIqAuth`` used for non-SASL authentication mechanisms uses the "
 "same callback as the SASL mechanisms."
 msgstr ""
 
-#: ../../Tigase_Development/Plugin_Development.rst:493
+#: ../../Tigase_Development/Plugin_Development.rst:496
 msgid ""
 "Methods ``auth`` in ``Repository`` interfaces will be deprecated. These "
 "interfaces will be treated as user details providers only. There will be "
 "new methods available which will allow for additional login operations on"
 " the database such as last successful login recording."
 msgstr ""
+
+#~ msgid "`Writing Plugin Code <#writePluginCode>`__"
+#~ msgstr ""
+
+#~ msgid "`Plugin Configuration <#pluginConf>`__"
+#~ msgstr ""
+
+#~ msgid "`How Packets are Processed by the SM and Plugins <#packetprocess>`__"
+#~ msgstr ""
+
+#~ msgid "`SASL Custom Mechanisms and Configuration <#saslcmac>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "There is another part of the "
+#~ "plugin configuration though. If you "
+#~ "looked at the `Writing Plugin Code "
+#~ "<#writePluginCode>`__ guide you can remember"
+#~ " the **Map settings** processing parameter."
+#~ " This is a map of properties "
+#~ "you can set in the configuration "
+#~ "file and these setting will be "
+#~ "passed to the plugin at the "
+#~ "processing time."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Example of the registration of a "
+#~ "SASL mechanism factory with an "
+#~ "annotation setting id of the factory "
+#~ "to ``customSaslFactory``.**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "More details about implementation can be"
+#~ " found in the `custom mechanisms "
+#~ "development <#cmd>`__ section."
+#~ msgstr ""
 

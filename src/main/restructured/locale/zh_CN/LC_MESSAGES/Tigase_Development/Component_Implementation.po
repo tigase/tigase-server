@@ -5,19 +5,18 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc\n"
+"Project-Id-Version:  TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-29 02:43-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: 2022-07-25 08:51+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
-"tigase-xmpp-server/dp-component_implementation/zh_Hans/>\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
+"/tigase-xmpp-server/dp-component_implementation/zh_Hans/>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Component_Implementation.rst:2
@@ -28,8 +27,7 @@ msgstr "组件开发"
 msgid ""
 "A component in the Tigase is an entity with its own JID address. It can "
 "receive packets, process them, and can also generate packets."
-msgstr "Tigase中的组件是具有自己的JID地址的实体。它可以接收数据包，处理它们，也可以生"
-"成数据包。"
+msgstr "Tigase中的组件是具有自己的JID地址的实体。它可以接收数据包，处理它们，也可以生成数据包。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:6
 msgid ""
@@ -40,10 +38,8 @@ msgid ""
 "run-time. You can easily replace a component implementation and the only "
 "change to make is a class name in the configuration entry."
 msgstr ""
-"最著名的组件的一个示例是MUC或PubSub。然而，在Tigase中，几乎所有东西实际上都是"
-"一个组件：会话管理器、s2s 连接管理器、消息路由器等……组件是根据服务器配置加载"
-"的，新组件可以在运行时加载和激活。您可以轻松替换组件实现，唯一需要更改的是配"
-"置条目中的类名。"
+"最著名的组件的一个示例是MUC或PubSub。然而，在Tigase中，几乎所有东西实际上都是一个组件：会话管理器、s2s "
+"连接管理器、消息路由器等……组件是根据服务器配置加载的，新组件可以在运行时加载和激活。您可以轻松替换组件实现，唯一需要更改的是配置条目中的类名。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:8
 msgid ""
@@ -52,8 +48,8 @@ msgid ""
 "available. This guide should help you to get familiar with the API and "
 "how to quickly and efficiently create your own component implementations."
 msgstr ""
-"为Tigase服务器创建组件是服务器开发的重要组成部分，因此有很多有用的API和现成可"
-"用的代码。本指南将帮助您熟悉API 以及如何快速有效地创建自己的组件实现。"
+"为Tigase服务器创建组件是服务器开发的重要组成部分，因此有很多有用的API和现成可用的代码。本指南将帮助您熟悉API "
+"以及如何快速有效地创建自己的组件实现。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:10
 msgid ":ref:`Component implementation - Lesson 1 - Basics<cil1>`"
@@ -103,9 +99,8 @@ msgid ""
 "presents hands on lessons with code examples, teaching how to get desired"
 " results in the simplest possible code using existing Tigase API."
 msgstr ""
-"创建Tigase组件实际上非常简单，并且可以使用广泛的API，您只需几行代码即可创建功"
-"能强大的组件。您可以在其他地方找到详细的API描述。本系列通过代码示例提供实践课"
-"程，教授如何使用现有的Tigase API以最简单的代码获得所需的结果。"
+"创建Tigase组件实际上非常简单，并且可以使用广泛的API，您只需几行代码即可创建功能强大的组件。您可以在其他地方找到详细的API描述。本系列通过代码示例提供实践课程，教授如何使用现有的Tigase"
+" API以最简单的代码获得所需的结果。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:35
 msgid ""
@@ -116,9 +111,8 @@ msgid ""
 "you how to make use of what is already there, ready to use with a minimal"
 " coding effort."
 msgstr ""
-"即使所有Tigase组件只是 **ServerComponent** 接口的实现，我也会将这种低级别信息"
-"保持在必要的最低限度。仅基于接口创建新组件虽然很有可能，但不是很有效。本指南"
-"旨在教您如何利用已有的内容，只需最少的编码工作即可使用。"
+"即使所有Tigase组件只是 **ServerComponent** "
+"接口的实现，我也会将这种低级别信息保持在必要的最低限度。仅基于接口创建新组件虽然很有可能，但不是很有效。本指南旨在教您如何利用已有的内容，只需最少的编码工作即可使用。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:37
 msgid ""
@@ -152,8 +146,7 @@ msgstr "**boolean isDiscoNonAdmin()** 决定组件是否对服务器管理员以
 msgid ""
 "**void registerModules(Kernel kernel)** which allows you to register "
 "component modules responsible for actual processing of packets"
-msgstr "**void registerModules(Kernel kernel)** "
-"允许您注册负责实际处理数据包的组件模块"
+msgstr "**void registerModules(Kernel kernel)** 允许您注册负责实际处理数据包的组件模块"
 
 #: ../../Tigase_Development/Component_Implementation.rst:79
 msgid ""
@@ -164,10 +157,9 @@ msgid ""
 " to a component. This method is actually logical as the main task for "
 "your component is processing packets."
 msgstr ""
-"如果您决定不想使用模块来处理数据包（尽管我们强烈建议使用它们，因为模块组件易"
-"于扩展）您可以实现另一种方法 **void processPacket(Packet packet)** 这将为每个"
-"发送到组件的数据包调用。这种方法实际上是合乎逻辑的，因为您的组件的主要任务是"
-"处理数据包。"
+"如果您决定不想使用模块来处理数据包（尽管我们强烈建议使用它们，因为模块组件易于扩展）您可以实现另一种方法 **void "
+"processPacket(Packet packet)** "
+"这将为每个发送到组件的数据包调用。这种方法实际上是合乎逻辑的，因为您的组件的主要任务是处理数据包。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:81
 msgid ""
@@ -175,8 +167,8 @@ msgid ""
 "initialized a separated logger for this class. Doing This is very useful "
 "as it allows us to easily find log entries created by our class."
 msgstr ""
-"我们的新组件的类名是 **TestComponent**，我们还为这个类初始化了一个单独的记录"
-"器。这样做非常有用，因为它可以让我们轻松找到我们的类创建的日志条目。"
+"我们的新组件的类名是 "
+"**TestComponent**，我们还为这个类初始化了一个单独的记录器。这样做非常有用，因为它可以让我们轻松找到我们的类创建的日志条目。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:83
 msgid ""
@@ -186,19 +178,14 @@ msgid ""
 "administrators only), responds to administrator ad-hoc commands, supports"
 " scripting, generates statistics, can be deployed as an external "
 "component, and a few other things."
-msgstr ""
-"使用这几行代码，您就拥有了一个功能齐全的Tigase组件，可以将其加载到Tigase服务"
-"器；它可以接收和处理数据包，显示为服务发现列表中的一个元素（仅适用于管理员）"
-"，响应管理员临时命令，支持脚本，生成统计信息，可以部署为外部组件，以及其他一"
-"些事情。"
+msgstr "使用这几行代码，您就拥有了一个功能齐全的Tigase组件，可以将其加载到Tigase服务器；它可以接收和处理数据包，显示为服务发现列表中的一个元素（仅适用于管理员），响应管理员临时命令，支持脚本，生成统计信息，可以部署为外部组件，以及其他一些事情。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:85
 msgid ""
 "Next important step is to create modules responsible for processing "
 "packets. For now let’s create module responsible for handling messages by"
 " appending them to log file:"
-msgstr "下一个重要步骤是创建负责处理数据包的模块。现在让我们通过将消息附加到日志文件"
-"来创建负责处理消息的模块："
+msgstr "下一个重要步骤是创建负责处理数据包的模块。现在让我们通过将消息附加到日志文件来创建负责处理消息的模块："
 
 #: ../../Tigase_Development/Component_Implementation.rst:107
 msgid ""
@@ -208,8 +195,7 @@ msgid ""
 "instance which matches any packet which is a **message**."
 msgstr ""
 "``Criteria getModuleCriteria()`` 返回的 ``Criteria`` "
-"类的实例被组件类用来决定包是否应该被这个模块处理。在这种情况下，"
-"我们返回的实例匹配任何作为 **消息** 的数据包。"
+"类的实例被组件类用来决定包是否应该被这个模块处理。在这种情况下，我们返回的实例匹配任何作为 **消息** 的数据包。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:109
 msgid ""
@@ -219,8 +205,7 @@ msgid ""
 "method will be called."
 msgstr ""
 "最后我们有一个非常重要的方法 ``void process(Packet "
-"packet)``，它是组件的主要处理方法。"
-"如果组件将接收到与模块返回的标准匹配的数据包 - 将调用此方法。"
+"packet)``，它是组件的主要处理方法。如果组件将接收到与模块返回的标准匹配的数据包 - 将调用此方法。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:111
 msgid ""
@@ -228,17 +213,15 @@ msgid ""
 "method **void write(Packet packet)** which you can use to send packets "
 "from a component."
 msgstr ""
-"但是我们如何从模块发送数据包呢？ **AbstractModule** 包含方法 **void write("
-"Packet packet)**，您可以使用该方法从组件发送数据包。"
+"但是我们如何从模块发送数据包呢？ **AbstractModule** 包含方法 **void write(Packet "
+"packet)**，您可以使用该方法从组件发送数据包。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:113
 msgid ""
 "Before we go any further with the implementation let’s configure the "
 "component in Tigase server so it is loaded next time the server starts. "
 "Assuming our **init.tdsl** file looks like this one:"
-msgstr ""
-"在我们进一步实现之前，让我们在Tigase服务器中配置组件，以便在下次服务器启动时"
-"加载它。假设我们的 **init.tdsl** 文件看起来像这样："
+msgstr "在我们进一步实现之前，让我们在Tigase服务器中配置组件，以便在下次服务器启动时加载它。假设我们的 **init.tdsl** 文件看起来像这样："
 
 #: ../../Tigase_Development/Component_Implementation.rst:129
 msgid ""
@@ -247,8 +230,8 @@ msgid ""
 "configuration file by appending the following line in the properties "
 "file:"
 msgstr ""
-"我们可以看到它已经配置为加载另外两个组件：**MUC** 和 **PubSub**。"
-"让我们通过在属性文件中附加以下行来添加第三个 - 我们的新组件到配置文件："
+"我们可以看到它已经配置为加载另外两个组件：**MUC** 和 **PubSub**。让我们通过在属性文件中附加以下行来添加第三个 - "
+"我们的新组件到配置文件："
 
 #: ../../Tigase_Development/Component_Implementation.rst:135
 msgid "Now we have to restart the server."
@@ -259,8 +242,7 @@ msgid ""
 "There are a few ways to check whether our component has been loaded to "
 "the server. Probably the easiest is to connect to the server from an "
 "administrator account and look at the service discovery list."
-msgstr "有几种方法可以检查我们的组件是否已加载到服务器。可能最简单的方法是从管理员帐"
-"户连接到服务器并查看服务发现列表。"
+msgstr "有几种方法可以检查我们的组件是否已加载到服务器。可能最简单的方法是从管理员帐户连接到服务器并查看服务发现列表。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:139
 #, fuzzy
@@ -281,10 +263,9 @@ msgid ""
 "**test@devel.tigase.org**, where **devel.tigase.org** is the server "
 "domain and test is the component name."
 msgstr ""
-"如果一切顺利，您应该会在列表中看到与屏幕截图中突出显示的条目类似的条目。组件"
-"描述是''*Undefined description*''，这是一个默认描述，我们可以稍后更改它，组件"
-"默认JID是：**test@devel.tigase.org**，其中 **devel.tigase.org** "
-"是服务器域，test是组件名称。"
+"如果一切顺利，您应该会在列表中看到与屏幕截图中突出显示的条目类似的条目。组件描述是''*Undefined "
+"description*''，这是一个默认描述，我们可以稍后更改它，组件默认JID是：**test@devel.tigase.org**，其中 "
+"**devel.tigase.org** 是服务器域，test是组件名称。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:143
 msgid ""
@@ -294,9 +275,8 @@ msgid ""
 "look at the log file **logs/tigase.log.0**, if the component has been "
 "loaded you should find following lines in the log:"
 msgstr ""
-"确定组件是否已加载的另一种方法是查看日志文件。如果您计划开发Tigase组件，那么"
-"熟悉Tigase日志文件将非常有用。因此，让我们查看日志文件 **logs/tigase.log."
-"0**，如果组件已加载，您应该在日志中找到以下行："
+"确定组件是否已加载的另一种方法是查看日志文件。如果您计划开发Tigase组件，那么熟悉Tigase日志文件将非常有用。因此，让我们查看日志文件 "
+"**logs/tigase.log.0**，如果组件已加载，您应该在日志中找到以下行："
 
 #: ../../Tigase_Development/Component_Implementation.rst:151
 msgid ""
@@ -305,9 +285,8 @@ msgid ""
 "sure your class is in **CLASSPATH** or copy a JAR file with your class to"
 " Tigase **jars/** directory."
 msgstr ""
-"如果您的组件没有加载，您应该首先检查配置文件。也许Tigase在启动时找不到您的类"
-"。确保您的类位于 **CLASSPATH** 中，或者将您的课程的JAR文件复制到Tigase **"
-"jars/** 目录。"
+"如果您的组件没有加载，您应该首先检查配置文件。也许Tigase在启动时找不到您的类。确保您的类位于 **CLASSPATH** "
+"中，或者将您的课程的JAR文件复制到Tigase **jars/** 目录。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:153
 msgid ""
@@ -317,9 +296,8 @@ msgid ""
 "administrator scripts. A window on the screenshot shows only two basic "
 "commands for adding and removing script which is a good start."
 msgstr ""
-"假设一切顺利并且您的组件已被服务器加载并且它显示在服务发现列表中，如上面的屏"
-"幕截图所示，您可以双击它以获取一个包含临时命令列表的窗口 - 管理员脚本。屏幕截"
-"图上的一个窗口仅显示了用于添加和删除脚本的两个基本命令，这是一个好的开始。"
+"假设一切顺利并且您的组件已被服务器加载并且它显示在服务发现列表中，如上面的屏幕截图所示，您可以双击它以获取一个包含临时命令列表的窗口 - "
+"管理员脚本。屏幕截图上的一个窗口仅显示了用于添加和删除脚本的两个基本命令，这是一个好的开始。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:155
 #, fuzzy
@@ -337,10 +315,7 @@ msgid ""
 "window to find your new test component on the list. If you click on the "
 "component it shows you a window with component statistics, very basic "
 "packets counters."
-msgstr ""
-"此外，您可以在服务发现窗口中浏览服务器统计信息，以在列表中找到您的新测试组件"
-"。如果您单击组件，它会显示一个包含组件统计信息的窗口，非常基本的数据包计数器"
-"。"
+msgstr "此外，您可以在服务发现窗口中浏览服务器统计信息，以在列表中找到您的新测试组件。如果您单击组件，它会显示一个包含组件统计信息的窗口，非常基本的数据包计数器。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:159
 #, fuzzy
@@ -357,16 +332,14 @@ msgid ""
 "As we can see with just a few lines of code our new component is quite "
 "mighty and can do a lot of things without much effort from the developer "
 "side."
-msgstr "正如我们只需要几行代码就可以看到的，我们的新组件非常强大，可以在开发人员方面"
-"不付出太多努力的情况下做很多事情。"
+msgstr "正如我们只需要几行代码就可以看到的，我们的新组件非常强大，可以在开发人员方面不付出太多努力的情况下做很多事情。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:163
 msgid ""
 "Now, the time has come to the most important question. Can our new "
 "component do something useful, that is can it receive and process XMPP "
 "packets?"
-msgstr "现在，到了最重要的问题的时候了。我们的新组件能否做一些有用的事情，即它可以接"
-"收和处理XMPP数据包吗？"
+msgstr "现在，到了最重要的问题的时候了。我们的新组件能否做一些有用的事情，即它可以接收和处理XMPP数据包吗？"
 
 #: ../../Tigase_Development/Component_Implementation.rst:165
 msgid ""
@@ -378,19 +351,17 @@ msgid ""
 " test I have sent a message with subject: \"*test message*\" and body: "
 "\"*this is a test*\". The log file should contain following entry:"
 msgstr ""
-"让我们试试看。使用您最喜欢的客户端向JID发送消息：**test@devel.tigase.org** （"
-"假设您的服务器配置为 **devel.tigase.org** 域）。您可以在客户端中使用某种XML控"
-"制台，也可以只向组件JID发送一条简单的消息。根据我们在 **process(...​)** "
-"方法中的代码，它应该记录我们的消息。对于这个测试，我发送了一条主题为：\"*"
-"test message*\"和正文：\"*this is a test*\"的消息。日志文件应包含以下条目："
+"让我们试试看。使用您最喜欢的客户端向JID发送消息：**test@devel.tigase.org** （假设您的服务器配置为 "
+"**devel.tigase.org** 域）。您可以在客户端中使用某种XML控制台，也可以只向组件JID发送一条简单的消息。根据我们在 "
+"**process(...​)** 方法中的代码，它应该记录我们的消息。对于这个测试，我发送了一条主题为：\"*test "
+"message*\"和正文：\"*this is a test*\"的消息。日志文件应包含以下条目："
 
 #: ../../Tigase_Development/Component_Implementation.rst:176
 msgid ""
 "If this is a case we can be sure that everything works as expected and "
 "all we now have to do is to fill the **process(…​)** method with some "
 "useful code."
-msgstr "如果是这种情况，我们可以确定一切都按预期工作，"
-"我们现在要做的就是用一些有用的代码填充 **process(...​)** 方法。"
+msgstr "如果是这种情况，我们可以确定一切都按预期工作，我们现在要做的就是用一些有用的代码填充 **process(...​)** 方法。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:185
 msgid "Component Implementation - Lesson 2 - Configuration"
@@ -403,10 +374,7 @@ msgid ""
 "different view on this. It seems to me however that it is always a good "
 "idea to give to your component a way to configure it and provide some "
 "runtime settings."
-msgstr ""
-"可能很难说出您应该对新组件实现做的第一件事是什么。不同的开发者可能对此有不同"
-"的看法。然而，在我看来，为您的组件提供一种配置它并提供一些运行时设置的方法总"
-"是一个好主意。"
+msgstr "可能很难说出您应该对新组件实现做的第一件事是什么。不同的开发者可能对此有不同的看法。然而，在我看来，为您的组件提供一种配置它并提供一些运行时设置的方法总是一个好主意。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:189
 msgid "This guide describes how to add configuration handling to your component."
@@ -423,11 +391,9 @@ msgid ""
 "login. (Secure logging replaces all packet CData with text: *CData size: "
 "NN* to protect user privacy.)"
 msgstr ""
-"为了演示如何实现组件配置，假设我们要配置组件将记录哪些类型的数据包。有三种可"
-"能的数据包类型：**message**、**presence** 和 **iq**，我们希望能够配置这三者的"
-"任意组合的日志记录。此外，我们还希望能够配置附加到记录消息的文本，并可选择切"
-"换安全登录。 （安全日志将所有数据包CData替换为文本：*CData 大小：NN* "
-"以保护用户隐私。）"
+"为了演示如何实现组件配置，假设我们要配置组件将记录哪些类型的数据包。有三种可能的数据包类型：**message**、**presence** 和 "
+"**iq**，我们希望能够配置这三者的任意组合的日志记录。此外，我们还希望能够配置附加到记录消息的文本，并可选择切换安全登录。 "
+"（安全日志将所有数据包CData替换为文本：*CData 大小：NN* 以保护用户隐私。）"
 
 #: ../../Tigase_Development/Component_Implementation.rst:193
 msgid ""
@@ -447,12 +413,10 @@ msgid ""
 "changes), ``Password`` (complete value will be obfuscated) and "
 "``JdbcUrl`` (only password part will be obfuscated from the URL)"
 msgstr ""
-"为了使它们可配置，我们必须使用 ``@ConfigField`` 注释来注释它们。它需要 "
-"``desc`` 字段（描述配置选项）并具有以下可选属性： \\* ``alias`` - "
-"变量的替代名称 \\* ``allowAliasFromParent`` - "
-"指定来自父bean的别名的值是否应该是allowed \\* ``type`` - "
-"指定字段的一般类型，这会影响日志/\"config-dump\"文件中值的可能混淆"
-"；可能的值： ``Plain`` （不更改）、``Password`` （完整的值将被混淆）和 "
+"为了使它们可配置，我们必须使用 ``@ConfigField`` 注释来注释它们。它需要 ``desc`` "
+"字段（描述配置选项）并具有以下可选属性： \\* ``alias`` - 变量的替代名称 \\* ``allowAliasFromParent``"
+" - 指定来自父bean的别名的值是否应该是allowed \\* ``type`` - 指定字段的一般类型，这会影响日志/\"config-"
+"dump\"文件中值的可能混淆；可能的值： ``Plain`` （不更改）、``Password`` （完整的值将被混淆）和 "
 "``JdbcUrl`` （只有密码部分将从URL中混淆）"
 
 #: ../../Tigase_Development/Component_Implementation.rst:212
@@ -468,8 +432,7 @@ msgid ""
 " in ``config.tdsl`` file you have to append following lines to the file "
 "inside test component configuration block:"
 msgstr ""
-"``config.tdsl`` 文件中的语法非常简单，在 *Admin Guide* 中有详细描述。要在 "
-"``config.tdsl`` "
+"``config.tdsl`` 文件中的语法非常简单，在 *Admin Guide* 中有详细描述。要在 ``config.tdsl`` "
 "文件中为您的组件设置配置，您必须将以下行附加到测试组件配置块内的文件中："
 
 #: ../../Tigase_Development/Component_Implementation.rst:224
@@ -477,8 +440,7 @@ msgid ""
 "The square brackets are used to mark that we set a list consisting of a "
 "few elements, have a look at the *Admin Guide* documentation for more "
 "details."
-msgstr "方括号用于标记我们设置了一个由几个元素组成的列表，请查看 *Admin Guide* "
-"文档以获取更多详细信息。"
+msgstr "方括号用于标记我们设置了一个由几个元素组成的列表，请查看 *Admin Guide* 文档以获取更多详细信息。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:226
 msgid ""
@@ -490,8 +452,7 @@ msgstr "这是新组件模块的完整代码，它利用配置设置修改了 ``
 msgid ""
 "Of course we can do much more useful packet processing in the "
 "``process(…​)`` method. This is just an example code."
-msgstr "当然，我们可以在 ``process(...​)`` "
-"方法中进行更有用的数据包处理。这只是一个示例代码。"
+msgstr "当然，我们可以在 ``process(...​)`` 方法中进行更有用的数据包处理。这只是一个示例代码。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:268
 msgid ""
@@ -502,12 +463,10 @@ msgid ""
 "**CRITERIA** field which will result in change of packet types which for "
 "which method **void process(…​)** will be called."
 msgstr ""
-"这里我们使用了一个setter **setPacketType(String[] packetTypes)**， "
-"它是一个字段 **packetTypes** 的setter。 "
-"Tigase内核将使用它而不是直接将值分配给一个字段，"
-"这放弃了将值转换为不同类型并更新其他字段的机会 - 在我们的例子中，我们更新了 "
-"**CRITERIA** 字段，这将导致数据包类型发生变化方法 **void process(...​)** "
-"将被调用。"
+"这里我们使用了一个setter **setPacketType(String[] packetTypes)**， 它是一个字段 "
+"**packetTypes** 的setter。 "
+"Tigase内核将使用它而不是直接将值分配给一个字段，这放弃了将值转换为不同类型并更新其他字段的机会 - 在我们的例子中，我们更新了 "
+"**CRITERIA** 字段，这将导致数据包类型发生变化方法 **void process(...​)** 将被调用。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:273
 msgid "Component Implementation - Lesson 3 - Multi-Threading"
@@ -517,8 +476,7 @@ msgstr "组件实现 - 第 3 课 - 多线程"
 msgid ""
 "Multi core and multi CPU machines are very common nowadays. Your new "
 "custom component however, processes all packets in a single thread."
-msgstr "如今，多核和多CPU机器非常普遍。但是，您的新自定义组件在单个线程中处理所有数据"
-"包。"
+msgstr "如今，多核和多CPU机器非常普遍。但是，您的新自定义组件在单个线程中处理所有数据包。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:277
 msgid ""
@@ -526,10 +484,7 @@ msgid ""
 "like, for example, SPAM checking. In such a case you could experience "
 "single Core/CPU usage at 100% while other Cores/CPUs are idling. Ideally,"
 " you want your component to use all available CPUs."
-msgstr ""
-"如果数据包处理占用大量CPU资源（例如垃圾邮件检查），这一点尤其重要。在这种情况"
-"下，您可能会遇到100%的单个核心/CPU使用率，而其他核心/CPU处于空闲状态。理想情"
-"况下，您希望您的组件使用所有可用的CPU。"
+msgstr "如果数据包处理占用大量CPU资源（例如垃圾邮件检查），这一点尤其重要。在这种情况下，您可能会遇到100%的单个核心/CPU使用率，而其他核心/CPU处于空闲状态。理想情况下，您希望您的组件使用所有可用的CPU。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:279
 msgid ""
@@ -548,15 +503,10 @@ msgid ""
 "receive packets while other only send, therefore assigning an equal "
 "number of threads for both that could be a waste of resources."
 msgstr ""
-"Tigase API提供了一种非常简单的方法来在多个线程中执行组件的 ``processPacket("
-"Packet packet)`` 方法。方法 ``int processingOutThreads()`` 和 ``int "
-"processingInThreads()`` 返回分配给组件的线程数。默认情况下，它只返回 '1'，因"
-"为并非所有组件实现都准备好同时处理数据包。通过覆盖该方法，您可以返回您认为适"
-"合实现的任何值。请注意，有两种方法，一种是用于将数据包传入组件的多个线程，另"
-"一种是用于从组件传出的数据包。它曾经是一种单一的方法，但不同的组件有不同的需"
-"求，当传出队列与传入队列有一个单独的线程池时，可以实现最佳性能。此外，一些组"
-"件只接收数据包，而其他组件只发送，因此为两者分配相同数量的线程可能会浪费资源"
-"。"
+"Tigase API提供了一种非常简单的方法来在多个线程中执行组件的 ``processPacket(Packet packet)`` 方法。方法"
+" ``int processingOutThreads()`` 和 ``int processingInThreads()`` "
+"返回分配给组件的线程数。默认情况下，它只返回 "
+"'1'，因为并非所有组件实现都准备好同时处理数据包。通过覆盖该方法，您可以返回您认为适合实现的任何值。请注意，有两种方法，一种是用于将数据包传入组件的多个线程，另一种是用于从组件传出的数据包。它曾经是一种单一的方法，但不同的组件有不同的需求，当传出队列与传入队列有一个单独的线程池时，可以实现最佳性能。此外，一些组件只接收数据包，而其他组件只发送，因此为两者分配相同数量的线程可能会浪费资源。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:283
 msgid ""
@@ -565,9 +515,8 @@ msgid ""
 "simply set ``processing-in-threads`` and ``processing-out-threads`` in "
 "your component’s bean configuration."
 msgstr ""
-"由于内核的工作方式，您必须避免在这些方法中使用变量。如果你想在启动时进行配置"
-"，你可以简单地在组件的bean配置中设置 ``processing-in-threads`` 和 "
-"``processing-out-threads``。"
+"由于内核的工作方式，您必须避免在这些方法中使用变量。如果你想在启动时进行配置，你可以简单地在组件的bean配置中设置 ``processing-"
+"in-threads`` 和 ``processing-out-threads``。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:285
 msgid ""
@@ -582,10 +531,7 @@ msgid ""
 "number of threads right on the first try. Instead you should run a few "
 "tests to see how many threads is best for implementation of the "
 "component."
-msgstr ""
-"如果处理受I/O限制（网络或数据库），您可能希望有更多线程来处理请求。在第一次尝"
-"试时很难猜出理想的线程数。相反，您应该运行一些测试来查看有多少线程最适合组件"
-"的实现。"
+msgstr "如果处理受I/O限制（网络或数据库），您可能希望有更多线程来处理请求。在第一次尝试时很难猜出理想的线程数。相反，您应该运行一些测试来查看有多少线程最适合组件的实现。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:300
 msgid ""
@@ -597,10 +543,9 @@ msgid ""
 "was small. We can prevent this by adjusting the method responsible for "
 "packet distribution among threads."
 msgstr ""
-"现在你有很多线程来处理你的数据包，但是这有一个小问题。在许多情况下，数据包顺"
-"序是必不可少的。如果我们的 ``processPacket(...​)`` 方法由几个线程并发执行，那"
-"么发送给用户的消息很可能会接管之前发送的消息。特别是如果第一条消息很大而第二"
-"条消息很小。我们可以通过调整负责在线程之间分配数据包的方法来防止这种情况。"
+"现在你有很多线程来处理你的数据包，但是这有一个小问题。在许多情况下，数据包顺序是必不可少的。如果我们的 "
+"``processPacket(...​)`` "
+"方法由几个线程并发执行，那么发送给用户的消息很可能会接管之前发送的消息。特别是如果第一条消息很大而第二条消息很小。我们可以通过调整负责在线程之间分配数据包的方法来防止这种情况。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:302
 msgid "The algorithm for packets distribution among threads is very simple:"
@@ -612,8 +557,8 @@ msgid ""
 "overwriting it we can make sure that all packets addressed to the same "
 "user will always be processed by the same thread:"
 msgstr ""
-"所以这里的关键是使用 ``hashCodeForPacket(...​)`` 方法。通过覆盖它，我们可以确"
-"保发送给同一用户的所有数据包将始终由同一线程处理："
+"所以这里的关键是使用 ``hashCodeForPacket(...​)`` "
+"方法。通过覆盖它，我们可以确保发送给同一用户的所有数据包将始终由同一线程处理："
 
 #: ../../Tigase_Development/Component_Implementation.rst:329
 msgid ""
@@ -621,8 +566,7 @@ msgid ""
 " the packets processing in your component and to the packet distribution "
 "among threads. This is not all Tigase API has to offer in terms of multi-"
 "threading."
-msgstr "上述两种方法可以控制分配给组件中数据包处理的线程数以及线程之间的数据包分配。"
-"这并不是Tigase API在多线程方面必须提供的全部。"
+msgstr "上述两种方法可以控制分配给组件中数据包处理的线程数以及线程之间的数据包分配。这并不是Tigase API在多线程方面必须提供的全部。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:331
 msgid ""
@@ -633,10 +577,8 @@ msgid ""
 "resources. There are a few methods which allow you to reuse common Timer "
 "object to perform all sorts of actions."
 msgstr ""
-"有时你想执行一些周期性的动作。您当然可以创建Timer实例并使用TimerTasks加载它。"
-"由于可能需要这样做，因此类层次结构的每一级都可能以多个 "
-"Timer（实际上是线程）对象完成类似的工作并使用资源而告终。"
-"有一些方法允许您重用通用 Timer对象来执行各种操作。"
+"有时你想执行一些周期性的动作。您当然可以创建Timer实例并使用TimerTasks加载它。由于可能需要这样做，因此类层次结构的每一级都可能以多个"
+" Timer（实际上是线程）对象完成类似的工作并使用资源而告终。有一些方法允许您重用通用 Timer对象来执行各种操作。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:333
 msgid ""
@@ -660,10 +602,8 @@ msgid ""
 "overwrite ``everySecond()`` method."
 msgstr ""
 "此方法每 **notificationFrequency** 分钟向 **abuseAddress** "
-"发送一条消息，报告在最后一段时间内检测到多少垃圾邮件。请注意，您必须调用 "
-"``super.everyMinute()`` "
-"以确保其他操作也被执行，并且您还必须记住将此方法中的处理保持在最低限度，"
-"特别是如果您覆盖 ``everySecond()`` 方法。"
+"发送一条消息，报告在最后一段时间内检测到多少垃圾邮件。请注意，您必须调用 ``super.everyMinute()`` "
+"以确保其他操作也被执行，并且您还必须记住将此方法中的处理保持在最低限度，特别是如果您覆盖 ``everySecond()`` 方法。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:359
 msgid ""
@@ -674,10 +614,8 @@ msgid ""
 "is a separate ``ScheduledExecutorService`` for each Class instance "
 "though, to avoid interferences between separate components:"
 msgstr ""
-"还有一种方法可以让您安排在特定时间执行的任务，它与 ``java.util.Timer API`` "
-"非常相似。唯一的区别是我们使用 **ScheduledExecutorService** "
-"作为后端，它在类层次结构的所有级别中被重用。但是，"
-"每个Class实例都有一个单独的 "
+"还有一种方法可以让您安排在特定时间执行的任务，它与 ``java.util.Timer API`` 非常相似。唯一的区别是我们使用 "
+"**ScheduledExecutorService** 作为后端，它在类层次结构的所有级别中被重用。但是，每个Class实例都有一个单独的 "
 "``ScheduledExecutorService``，以避免不同组件之间的干扰："
 
 #: ../../Tigase_Development/Component_Implementation.rst:365
@@ -709,8 +647,7 @@ msgid ""
 "You component still shows in the service discovery list as an element "
 "with \"*Undefined description*\". It also doesn’t provide any interesting"
 " features or sub-nodes."
-msgstr "您的组件仍然在服务发现列表中显示为带有 \"*Undefined description*\" "
-"的元素。它也没有提供任何有趣的功能或子节点。"
+msgstr "您的组件仍然在服务发现列表中显示为带有 \"*Undefined description*\" 的元素。它也没有提供任何有趣的功能或子节点。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:518
 msgid ""
@@ -719,10 +656,7 @@ msgid ""
 "add some service disco features. As a bit more advanced feature the guide"
 " will teach you about adding/removing service discovery nodes at run-time"
 " and about updating existing elements."
-msgstr ""
-"在本文中，我将展示如何以简单的方式更改服务发现列表中显示的基本组件信息，以及"
-"如何添加一些服务disco功能。作为一个更高级的功能，该指南将教您在运行时添加/删"
-"除服务发现节点以及更新现有元素。"
+msgstr "在本文中，我将展示如何以简单的方式更改服务发现列表中显示的基本组件信息，以及如何添加一些服务disco功能。作为一个更高级的功能，该指南将教您在运行时添加/删除服务发现节点以及更新现有元素。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:520
 msgid ""
@@ -730,8 +664,8 @@ msgid ""
 "``disco#items`` request you should register ``DiscoveryModule`` in your "
 "component:"
 msgstr ""
-"为了让组件正确响应 ``disco#info`` 和 ``disco#items`` 请求，"
-"你应该在你的组件中注册 ``DiscoveryModule``："
+"为了让组件正确响应 ``disco#info`` 和 ``disco#items`` 请求，你应该在你的组件中注册 "
+"``DiscoveryModule``："
 
 #: ../../Tigase_Development/Component_Implementation.rst:529
 msgid ""
@@ -753,18 +687,16 @@ msgid ""
 "Please refer to the Service Discovery Identities registry document for a "
 "list of categories and types and pick the one most suitable for you."
 msgstr ""
-"请注意，`Service Discovery Identities registry <http://xmpp.org/registrar/"
-"disco-categories.html>`__ 中没有定义这样的 **'spam'** "
-"类别类型。此处仅用作演示。请参阅Service Discovery "
-"Identities注册表文档以获取类别和类型的列表，然后选择最适合您的。"
+"请注意，`Service Discovery Identities registry <http://xmpp.org/registrar"
+"/disco-categories.html>`__ 中没有定义这样的 **'spam'** 类别类型。此处仅用作演示。请参阅Service "
+"Discovery Identities注册表文档以获取类别和类型的列表，然后选择最适合您的。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:547
 msgid ""
 "After you have added the two above methods and restarted the server with "
 "updated code, have a look at the service discovery window. You should see"
 " something like on the screenshot."
-msgstr "添加上述两种方法并使用更新的代码重新启动服务器后，请查看服务发现窗口。您应该"
-"会在屏幕截图上看到类似的内容。"
+msgstr "添加上述两种方法并使用更新的代码重新启动服务器后，请查看服务发现窗口。您应该会在屏幕截图上看到类似的内容。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:549
 #, fuzzy
@@ -786,17 +718,15 @@ msgid ""
 "component."
 msgstr ""
 "现在让我们添加允许我们的模块 ``TestModule`` "
-"返回支持的功能的方法。这样，我们的组件将自动报告其所有模块支持的功能。为此，"
-"我们需要实现一个方法 **String[] getFeatures()**，它返回 ``String`` "
-"项的数组。此项用于生成组件支持的功能列表。"
+"返回支持的功能的方法。这样，我们的组件将自动报告其所有模块支持的功能。为此，我们需要实现一个方法 **String[] "
+"getFeatures()**，它返回 ``String`` 项的数组。此项用于生成组件支持的功能列表。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:553
 msgid ""
 "Although this was easy, this particular change doesn’t affect anything "
 "apart from just a visual appearance. Let’s get then to more advanced and "
 "more useful changes."
-msgstr "虽然这很容易，但这种特殊的变化除了视觉外观之外不会影响任何东西。然后让我们进"
-"行更高级和更有用的更改。"
+msgstr "虽然这很容易，但这种特殊的变化除了视觉外观之外不会影响任何东西。然后让我们进行更高级和更有用的更改。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:555
 msgid ""
@@ -806,18 +736,14 @@ msgid ""
 "service discovery information is created and prepared for later use. "
 "Sometimes, however it is useful to be able to change the service "
 "discovery during run-time."
-msgstr ""
-"上述方法的限制之一是您无法使用这些方法在运行时更新或更改组件信息。它们在组件"
-"初始化期间仅在创建组件服务发现信息并准备以后使用时调用一次。但是，有时能够在"
-"运行时更改服务发现很有用。"
+msgstr "上述方法的限制之一是您无法使用这些方法在运行时更新或更改组件信息。它们在组件初始化期间仅在创建组件服务发现信息并准备以后使用时调用一次。但是，有时能够在运行时更改服务发现很有用。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:557
 msgid ""
 "In our simple spam filtering component let’s show how many messages have "
 "been checked out as part of the service discovery description string. "
 "Every time we receive a message we can to call:"
-msgstr "在我们简单的垃圾邮件过滤组件中，让我们显示有多少消息已作为服务发现描述字符串"
-"的一部分被检出。每次我们收到消息时，我们都可以调用："
+msgstr "在我们简单的垃圾邮件过滤组件中，让我们显示有多少消息已作为服务发现描述字符串的一部分被检出。每次我们收到消息时，我们都可以调用："
 
 #: ../../Tigase_Development/Component_Implementation.rst:563
 msgid ""
@@ -826,9 +752,8 @@ msgid ""
 "probably a better idea would be to call the method not every time we "
 "receive a message but maybe every 100 times or so.*"
 msgstr ""
-"*一个小的性能说明，在某些情况下调用* ``updateServiceDiscoveryItem(...​)`` *可"
-"能是一个昂贵的操作，所以一个更好的主意可能不是每次我们收到消息时调用该方法，"
-"而是每100次左右调用一次。*"
+"*一个小的性能说明，在某些情况下调用* ``updateServiceDiscoveryItem(...​)`` "
+"*可能是一个昂贵的操作，所以一个更好的主意可能不是每次我们收到消息时调用该方法，而是每100次左右调用一次。*"
 
 #: ../../Tigase_Development/Component_Implementation.rst:565
 msgid ""
@@ -841,10 +766,9 @@ msgid ""
 "disco specification). The last parameter specifies if the element is "
 "visible to administrators only."
 msgstr ""
-"第一个参数是服务发现列表上显示的组件 JID。但是，Tigase服务器可能适用于许多虚"
-"拟主机，因此主机名部分由较低级别的函数添加，我们在这里只提供组件名称。第二个"
-"参数是服务发现节点，对于顶级disco元素，它通常是'**null**' 。第三是项目描述（"
-"在disco规范中实际上称为 'name'）。最后一个参数指定元素是否仅对管理员可见。"
+"第一个参数是服务发现列表上显示的组件 "
+"JID。但是，Tigase服务器可能适用于许多虚拟主机，因此主机名部分由较低级别的函数添加，我们在这里只提供组件名称。第二个参数是服务发现节点，对于顶级disco元素，它通常是'**null**'"
+" 。第三是项目描述（在disco规范中实际上称为 'name'）。最后一个参数指定元素是否仅对管理员可见。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:567
 #, fuzzy
@@ -861,8 +785,7 @@ msgid ""
 "The complete method code is presented below and the screenshot above "
 "shows how the element of the service discovery for our component can "
 "change if we apply our code and send a few messages to the component."
-msgstr "完整的方法代码如下所示，上面的屏幕截图显示了如果我们应用我们的代码并向组件发"
-"送一些消息，我们的组件的服务发现元素会如何变化。"
+msgstr "完整的方法代码如下所示，上面的屏幕截图显示了如果我们应用我们的代码并向组件发送一些消息，我们的组件的服务发现元素会如何变化。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:571
 msgid ""
@@ -873,10 +796,9 @@ msgid ""
 " This time, instead of using 'null' as a node we put some meaningful "
 "texts as in example below:"
 msgstr ""
-"使用该方法，我们还可以将子模式添加到我们的组件元素中。 XMPP服务发现确实不是用"
-"于显示应用程序计数器，但本例足以演示Tigase中可用的API，因此我们继续通过服务发"
-"现显示我们的计数器。这一次，我们不使用 "
-"'null'作为节点，而是放置一些有意义的文本，如下例所示："
+"使用该方法，我们还可以将子模式添加到我们的组件元素中。 "
+"XMPP服务发现确实不是用于显示应用程序计数器，但本例足以演示Tigase中可用的API，因此我们继续通过服务发现显示我们的计数器。这一次，我们不使用"
+" 'null'作为节点，而是放置一些有意义的文本，如下例所示："
 
 #: ../../Tigase_Development/Component_Implementation.rst:584
 msgid ""
@@ -885,10 +807,7 @@ msgid ""
 "are spam (contain words recognized as spam) we can browse the service "
 "discovery of the server. Your service discovery should show a list "
 "similar to the one presented on the screenshot on the left."
-msgstr ""
-"同样，请查看下面的完整方法主体以获取完整的代码示例。现在，如果我们向组件发送"
-"一些消息，其中一些是垃圾邮件（包含被识别为垃圾邮件的单词），我们可以浏览服务"
-"器的服务发现。您的服务发现应该显示一个类似于左侧屏幕截图中的列表。"
+msgstr "同样，请查看下面的完整方法主体以获取完整的代码示例。现在，如果我们向组件发送一些消息，其中一些是垃圾邮件（包含被识别为垃圾邮件的单词），我们可以浏览服务器的服务发现。您的服务发现应该显示一个类似于左侧屏幕截图中的列表。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:586
 msgid ""
@@ -899,10 +818,9 @@ msgid ""
 "very beginning you can call them in ``setProperties(…​)`` for the first "
 "time to populate the service discovery with initial sub-nodes."
 msgstr ""
-"当然，取决于实现，如果我们仅在处理消息时调用 "
-"``updateServiceDiscoveryItem(…​)`` 方法，最初可能在我们的组件元素下没有子节点"
-"。为了确保我们组件的子节点从一开始就显示出来，您可以第一次在 "
-"``setProperties(…​)`` 中调用它们，以使用初始子节点填充服务发现。"
+"当然，取决于实现，如果我们仅在处理消息时调用 ``updateServiceDiscoveryItem(…​)`` "
+"方法，最初可能在我们的组件元素下没有子节点。为了确保我们组件的子节点从一开始就显示出来，您可以第一次在 ``setProperties(…​)``"
+" 中调用它们，以使用初始子节点填充服务发现。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:588
 msgid ""
@@ -918,16 +836,14 @@ msgid ""
 "Actually only two first parameters are important: the **jid** and the "
 "**node** which must correspond to the existing, previously created "
 "service discovery item."
-msgstr "实际上只有两个第一个参数很重要：**jid** 和 **node** "
-"必须对应于现有的、先前创建的服务发现项。"
+msgstr "实际上只有两个第一个参数很重要：**jid** 和 **node** 必须对应于现有的、先前创建的服务发现项。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:597
 msgid ""
 "There are two additional variants of the *update* method which give you "
 "more control over the service discovery item created. Items can be of "
 "different categories and types and can also present a set of features."
-msgstr "*update* 方法有两个额外的变体，可以让您更好地控制所创建的服务发现项。项目可以"
-"是不同的类别和类型，也可以呈现一组特征。"
+msgstr "*update* 方法有两个额外的变体，可以让您更好地控制所创建的服务发现项。项目可以是不同的类别和类型，也可以呈现一组特征。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:599
 msgid ""
@@ -939,11 +855,10 @@ msgid ""
 "can invent two feature identification strings and set it for our "
 "component. Let’s call ``update`` method with following parameters:"
 msgstr ""
-"更简单的是为更新的服务发现项设置一组特征的变体。有一个 `文档 <http://xmpp."
-"org/registrar/disco-features.html>`__ 描述了现有的注册功能。我们正在创建一个"
-"将成为垃圾邮件过滤器的示例，并且没有预定义的垃圾邮件过滤功能，但出于本指南的"
-"目的，我们可以发明两个特征识别字符串并将其设置为我们的组件。"
-"让我们使用以下参数调用 ``update`` 方法："
+"更简单的是为更新的服务发现项设置一组特征的变体。有一个 `文档 <http://xmpp.org/registrar/disco-"
+"features.html>`__ "
+"描述了现有的注册功能。我们正在创建一个将成为垃圾邮件过滤器的示例，并且没有预定义的垃圾邮件过滤功能，但出于本指南的目的，我们可以发明两个特征识别字符串并将其设置为我们的组件。让我们使用以下参数调用"
+" ``update`` 方法："
 
 #: ../../Tigase_Development/Component_Implementation.rst:606
 msgid ""
@@ -954,10 +869,11 @@ msgid ""
 "arguments so we can pass to it as many features as we need or following "
 "Java spec we can just pass an array of **Strings**."
 msgstr ""
-"调用此方法的最佳位置是 ``setProperties(...​)`` 方法，以便我们的组件在启动时获"
-"得正确的服务发现设置。我们为组件disco设置了两个功能：*tigase:x:spam-filter* "
-"和 *tigase:x:spam-reporting*。此方法接受一组可变参数，所以我们可以根据需要传"
-"递给它尽可能多的特性，或者按照Java规范，我们可以只传递一个 **Strings** 数组。"
+"调用此方法的最佳位置是 ``setProperties(...​)`` "
+"方法，以便我们的组件在启动时获得正确的服务发现设置。我们为组件disco设置了两个功能：*tigase:x:spam-filter* 和 "
+"*tigase:x:spam-"
+"reporting*。此方法接受一组可变参数，所以我们可以根据需要传递给它尽可能多的特性，或者按照Java规范，我们可以只传递一个 "
+"**Strings** 数组。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:608
 msgid ""
@@ -975,18 +891,15 @@ msgid ""
 " for spam filtering. Let’s use the *automation* category and *spam-"
 "filter* type and set it for our component:"
 msgstr ""
-"最后一个功能对于我们的垃圾邮件过滤组件的情况可能不是很有用，但对于许多其他情"
-"况，例如MUC或PubSub，它正在为服务发现项设置适当的类别和类型。有一个文档列出了"
-"所有当前注册的服务发现身份（类别和类型）。还有垃圾邮件过滤条目。让我们使用 "
-"*automation* 类别和 *spam-filter* 类型并为我们的组件设置它："
+"最后一个功能对于我们的垃圾邮件过滤组件的情况可能不是很有用，但对于许多其他情况，例如MUC或PubSub，它正在为服务发现项设置适当的类别和类型。有一个文档列出了所有当前注册的服务发现身份（类别和类型）。还有垃圾邮件过滤条目。让我们使用"
+" *automation* 类别和 *spam-filter* 类型并为我们的组件设置它："
 
 #: ../../Tigase_Development/Component_Implementation.rst:618
 msgid ""
 "Of course all these setting can be applied to any service discovery "
 "create or update, including sub-nodes. And here is a complete code of the"
 " component:"
-msgstr "当然，所有这些设置都可以应用于任何服务发现创建或更新，包括子节点。这是组件的"
-"完整代码："
+msgstr "当然，所有这些设置都可以应用于任何服务发现创建或更新，包括子节点。这是组件的完整代码："
 
 #: ../../Tigase_Development/Component_Implementation.rst:794
 msgid "Component Implementation - Lesson 5 - Statistics"
@@ -1003,19 +916,16 @@ msgid ""
 " have to provide your statistics and the admin will be able to access "
 "them any way he wants."
 msgstr ""
-"在大多数情况下，您会希望从组件中收集一些运行时统计信息，以了解它是如何工作的"
-"，检测可能的性能问题或拥塞问题。所有服务器统计信息都公开并可通过XMPP 使用ad-h"
-"oc命令访问，HTTP、JMX和一些选定的统计信息也可通过SNMP获得。作为组件开发人员，"
-"您不必做任何事情来通过任何这些协议公开您的统计信息，您只需要提供您的统计信息"
-"，管理员就可以按照他想要的任何方式访问它们。"
+"在大多数情况下，您会希望从组件中收集一些运行时统计信息，以了解它是如何工作的，检测可能的性能问题或拥塞问题。所有服务器统计信息都公开并可通过XMPP"
+" 使用ad-"
+"hoc命令访问，HTTP、JMX和一些选定的统计信息也可通过SNMP获得。作为组件开发人员，您不必做任何事情来通过任何这些协议公开您的统计信息，您只需要提供您的统计信息，管理员就可以按照他想要的任何方式访问它们。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:798
 msgid ""
 "This lesson will teach you how to add your own statistics and how to make"
 " sure that the statistics generation doesn’t affect application "
 "performance."
-msgstr "本课将教您如何添加自己的统计信息以及如何确保生成的统计信息不会影响应用程序性"
-"能。"
+msgstr "本课将教您如何添加自己的统计信息以及如何确保生成的统计信息不会影响应用程序性能。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:800
 #, fuzzy
@@ -1032,8 +942,7 @@ msgid ""
 "Your component from the very beginning generates some statistics by "
 "classes it inherits. Let’s add a few statistics to our spam filtering "
 "component:"
-msgstr "您的组件从一开始就通过它继承的类生成一些统计信息。让我们向垃圾邮件过滤组件添"
-"加一些统计信息："
+msgstr "您的组件从一开始就通过它继承的类生成一些统计信息。让我们向垃圾邮件过滤组件添加一些统计信息："
 
 #: ../../Tigase_Development/Component_Implementation.rst:816
 msgid "The code should be pretty much self-explanatory."
@@ -1048,10 +957,8 @@ msgid ""
 " are interested please refer to the source code and JavaDoc "
 "documentation."
 msgstr ""
-"你必须调用 ``super.getStatistics(...​)`` 来更新父类的统计信息。 "
-"``StatisticsList`` 是一个集合，它以一种易于更新、搜索和检索它们的方式保存所有"
-"统计信息。您实际上不需要了解所有实现细节，但如果您有兴趣，请参阅源代码和JavaD"
-"oc文档。"
+"你必须调用 ``super.getStatistics(...​)`` 来更新父类的统计信息。 ``StatisticsList`` "
+"是一个集合，它以一种易于更新、搜索和检索它们的方式保存所有统计信息。您实际上不需要了解所有实现细节，但如果您有兴趣，请参阅源代码和JavaDoc文档。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:820
 msgid ""
@@ -1061,9 +968,8 @@ msgid ""
 "The third parameter is the element value which can be any number or "
 "string."
 msgstr ""
-"``add(...​)`` 方法的第一个参数是组件名称。所有统计信息都按组件名称分组，以便"
-"更轻松地查看特定组件数据。接下来是元素的描述。第三个参数是元素值，可以是任意"
-"数字或字符串。"
+"``add(...​)`` "
+"方法的第一个参数是组件名称。所有统计信息都按组件名称分组，以便更轻松地查看特定组件数据。接下来是元素的描述。第三个参数是元素值，可以是任意数字或字符串。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:822
 msgid ""
@@ -1078,12 +984,10 @@ msgid ""
 "bandwidth, improves statistics retrieving speed and is also more clear to"
 " present to the end-user."
 msgstr ""
-"最后一个参数可能是最有趣的。这个想法是从日志框架中借来的。每个统计项目都有重"
-"要性级别。级别与 **SEVERE** 最关键和 **FINEST** "
-"最不重要的日志记录方法完全相同。添加了此参数以提高性能和统计信息检索。创建 "
-"**StatisticsList** 对象时，它会被分配用户请求的级别。如果 ``add(...​)`` 方法"
-"以较低的优先级调用，则该元素甚至不会添加到列表中。这节省了网络带宽，提高了统"
-"计检索速度，也更清晰地呈现给最终用户。"
+"最后一个参数可能是最有趣的。这个想法是从日志框架中借来的。每个统计项目都有重要性级别。级别与 **SEVERE** 最关键和 **FINEST**"
+" 最不重要的日志记录方法完全相同。添加了此参数以提高性能和统计信息检索。创建 **StatisticsList** "
+"对象时，它会被分配用户请求的级别。如果 ``add(...​)`` "
+"方法以较低的优先级调用，则该元素甚至不会添加到列表中。这节省了网络带宽，提高了统计检索速度，也更清晰地呈现给最终用户。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:824
 msgid ""
@@ -1094,10 +998,8 @@ msgid ""
 "intentionally request the lowest level statistics he won’t see elements "
 "with **zeros**."
 msgstr ""
-"一开始可能有点令人困惑的是，如果有一个数字元素添加到具有 **0** "
-"值的统计数据中，则级别总是被强制为 **FINEST**。假设管理员通常对 **零值** "
-"统计信息不感兴趣，因此除非他有意请求最低级别的统计信息，否则他不会看到带有 "
-"**零值** 的元素。"
+"一开始可能有点令人困惑的是，如果有一个数字元素添加到具有 **0** 值的统计数据中，则级别总是被强制为 **FINEST**。假设管理员通常对 "
+"**零值** 统计信息不感兴趣，因此除非他有意请求最低级别的统计信息，否则他不会看到带有 **零值** 的元素。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:826
 msgid ""
@@ -1112,11 +1014,8 @@ msgid ""
 " level will be accepted by the collection and if not skip the whole "
 "processing altogether."
 msgstr ""
-"**if** 语句也需要一些解释。通常添加一个新的统计元素并不是一个非常昂贵的操作，"
-"因此在适当的级别使用 ``add(...​)`` 方法传递它就足够了。但是，有时准备统计数据"
-"可能会非常昂贵，例如从数据库中读取/计算一些记录。统计数据可以非常频繁地收集，"
-"因此如果不使用，那么收集统计数据根本没有意义，因为当前级别高于​​我们通过的项"
-"目。在这种情况下，建议测试元素级别是否会被集合接受，如果不完全跳过整个处理。"
+"**if** 语句也需要一些解释。通常添加一个新的统计元素并不是一个非常昂贵的操作，因此在适当的级别使用 ``add(...​)`` "
+"方法传递它就足够了。但是，有时准备统计数据可能会非常昂贵，例如从数据库中读取/计算一些记录。统计数据可以非常频繁地收集，因此如果不使用，那么收集统计数据根本没有意义，因为当前级别高于​​我们通过的项目。在这种情况下，建议测试元素级别是否会被集合接受，如果不完全跳过整个处理。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:828
 msgid ""
@@ -1124,8 +1023,7 @@ msgid ""
 "statistics is very simple and straightforward. Just one method to "
 "overwrite and a simple way to pass your own counters. Below is the whole "
 "code of the example component:"
-msgstr "如您所见，用于生成和呈现组件统计信息的API非常简单明了。只有一种覆盖方法和一种"
-"简单的方法来传递您自己的计数器。下面是示例组件的完整代码："
+msgstr "如您所见，用于生成和呈现组件统计信息的API非常简单明了。只有一种覆盖方法和一种简单的方法来传递您自己的计数器。下面是示例组件的完整代码："
 
 #: ../../Tigase_Development/Component_Implementation.rst:1020
 msgid "Component Implementation - Lesson 6 - Scripting Support"
@@ -1139,10 +1037,7 @@ msgid ""
 "are inherited by your code from parent classes. It can not access any "
 "data or any structures you added in your component. A little effort is "
 "needed to expose some of your data to the scripting API."
-msgstr ""
-"脚本支持是Tigase服务器内置的基本API，可自动用于任何组件，无需额外资源成本。但"
-"是，此框架只能访问由您的代码从父类继承的现有组件变量。它无法访问您在组件中添"
-"加的任何数据或任何结构。将您的一些数据暴露给脚本API需要一点努力。"
+msgstr "脚本支持是Tigase服务器内置的基本API，可自动用于任何组件，无需额外资源成本。但是，此框架只能访问由您的代码从父类继承的现有组件变量。它无法访问您在组件中添加的任何数据或任何结构。将您的一些数据暴露给脚本API需要一点努力。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1024
 msgid ""
@@ -1164,9 +1059,8 @@ msgid ""
 "good idea to keep things straightforward, hence we use the same variable "
 "names in the component and in the script."
 msgstr ""
-"这样，您可以将两个组件变量：``badWords`` 和 ``whiteList`` "
-"以相同的名称暴露给脚本 - 两个已定义的常量。您当然可以使用不同的名称，但保持简"
-"单明了总是一个好主意，因此我们在组件和脚本中使用相同的变量名称。"
+"这样，您可以将两个组件变量：``badWords`` 和 ``whiteList`` 以相同的名称暴露给脚本 - "
+"两个已定义的常量。您当然可以使用不同的名称，但保持简单明了总是一个好主意，因此我们在组件和脚本中使用相同的变量名称。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1042
 msgid ""
@@ -1178,19 +1072,16 @@ msgid ""
 "component code to keep bad words and whitelist in ``java.util.Set`` "
 "collection. This gives us enough flexibility to manipulate data."
 msgstr ""
-"几乎完成了，几乎……​在我们的旧实现中，这两个变量是 ``String`` 的Java数组。因此"
-"，我们只能更改它们的元素，但不能在脚本内的这些结构中添加或删除元素。这不是很"
-"实用，它对脚本的代码施加了一些严重的限制。为了克服这个问题，"
-"我更改了测试组件代码以在 ``java.util.Set`` "
-"集合中保留坏词和白名单。这给了我们足够的灵活性来操作数据。"
+"几乎完成了，几乎……​在我们的旧实现中，这两个变量是 ``String`` "
+"的Java数组。因此，我们只能更改它们的元素，但不能在脚本内的这些结构中添加或删除元素。这不是很实用，它对脚本的代码施加了一些严重的限制。为了克服这个问题，我更改了测试组件代码以在"
+" ``java.util.Set`` 集合中保留坏词和白名单。这给了我们足够的灵活性来操作数据。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1044
 msgid ""
 "As our component is now ready to cooperate with the scripting API, I will"
 " demonstrate now how to add remove or change elements of these "
 "collections using a script and ad-hoc commands."
-msgstr "由于我们的组件现在已准备好与脚本API合作，我现在将演示如何使用脚本和临时命令添"
-"加删除或更改这些集合的元素。"
+msgstr "由于我们的组件现在已准备好与脚本API合作，我现在将演示如何使用脚本和临时命令添加删除或更改这些集合的元素。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1046
 #, fuzzy
@@ -1209,17 +1100,15 @@ msgid ""
 "bring to you a new window with ad-hoc commands list. Other clients may "
 "present available ad-hoc commands differently."
 msgstr ""
-"首先，浏览服务器服务发现并双击测试组件。如果您使用 `Psi <http://psi-im.org/>`"
-"__ 客户端，这应该会为您带来一个带有临时命令列表的新窗口。其他客户端可能会以不"
-"同的方式呈现可用的临时命令。"
+"首先，浏览服务器服务发现并双击测试组件。如果您使用 `Psi <http://psi-im.org/>`__ "
+"客户端，这应该会为您带来一个带有临时命令列表的新窗口。其他客户端可能会以不同的方式呈现可用的临时命令。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1050
 msgid ""
 "The screenshot below shows how this may look. You have to provide some "
 "description for the script and an ID string. We use Groovy in this guide "
 "but you can as well use any different scripting language."
-msgstr "下面的屏幕截图显示了它的外观。您必须为脚本和ID字符串提供一些描述。我们在本指"
-"南中使用Groovy，但您也可以使用任何不同的脚本语言。"
+msgstr "下面的屏幕截图显示了它的外观。您必须为脚本和ID字符串提供一些描述。我们在本指南中使用Groovy，但您也可以使用任何不同的脚本语言。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1052
 #, fuzzy
@@ -1240,9 +1129,8 @@ msgid ""
 "is not on the list, it means it is not installed properly and Tigase is "
 "unable to detect it."
 msgstr ""
-"有关如何添加对更多语言的支持的所有详细信息，请参阅Tigase脚本文档。从Tigase AP"
-"I的角度来看，一切看起来都一样。您必须从右侧显示的窗口的下拉列表中选择适当的语"
-"言。如果您的首选语言不在列表中，则表示它没有正确安装并且Tigase无法检测到它。"
+"有关如何添加对更多语言的支持的所有详细信息，请参阅Tigase脚本文档。从Tigase "
+"API的角度来看，一切看起来都一样。您必须从右侧显示的窗口的下拉列表中选择适当的语言。如果您的首选语言不在列表中，则表示它没有正确安装并且Tigase无法检测到它。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1056
 msgid ""
@@ -1255,15 +1143,13 @@ msgid ""
 "As you see from the code, you have to reference your component variables "
 "to a variables in your script to make sure a correct type is used. The "
 "rest is very simple and is a pure scripting language stuff."
-msgstr "正如您从代码中看到的，您必须将组件变量引用到脚本中的变量，以确保使用正确的类"
-"型。剩下的就很简单了，是纯脚本语言的东西。"
+msgstr "正如您从代码中看到的，您必须将组件变量引用到脚本中的变量，以确保使用正确的类型。剩下的就很简单了，是纯脚本语言的东西。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1067
 msgid ""
 "Load the script on to the server and execute it. You should receive a new"
 " window with a list of all bad words currently used by the spam filter."
-msgstr "将脚本加载到服务器并执行它。您应该会收到一个新窗口，其中列出了垃圾邮件过滤器"
-"当前使用的所有坏词。"
+msgstr "将脚本加载到服务器并执行它。您应该会收到一个新窗口，其中列出了垃圾邮件过滤器当前使用的所有坏词。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1069
 msgid ""
@@ -1280,11 +1166,7 @@ msgid ""
 "modifying functionality as you need. No need to restart the server, no "
 "need to recompile the code and you can use whatever scripting language "
 "you like."
-msgstr ""
-"这两个脚本只是开始。可能性是无穷无尽的，只需在测试组件中添加几行简单的代码，"
-"您就可以在运行时通过执行各种操作的脚本来扩展您的应用程序；您可以重新加载脚本"
-"，添加和删除它们，根据需要扩展和修改功能。无需重新启动服务器，无需重新编译代"
-"码，您可以使用任何您喜欢的脚本语言。"
+msgstr "这两个脚本只是开始。可能性是无穷无尽的，只需在测试组件中添加几行简单的代码，您就可以在运行时通过执行各种操作的脚本来扩展您的应用程序；您可以重新加载脚本，添加和删除它们，根据需要扩展和修改功能。无需重新启动服务器，无需重新编译代码，您可以使用任何您喜欢的脚本语言。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1113
 msgid ""
@@ -1297,8 +1179,7 @@ msgid ""
 "Here is a complete code of the test component with the new method "
 "described at the beginning and data structures changed from array of "
 "**String*s to Java \\*Set**:"
-msgstr "这是测试组件的完整代码，其中包含开头描述的新方法，数据结构从 **String*s "
-"数组更改为 Java \\*Set**："
+msgstr "这是测试组件的完整代码，其中包含开头描述的新方法，数据结构从 **String*s 数组更改为 Java \\*Set**："
 
 #: ../../Tigase_Development/Component_Implementation.rst:1318
 msgid "Component Implementation - Lesson 7 - Data Repository"
@@ -1320,9 +1201,7 @@ msgid ""
 "command interface straight away so you can manipulate your component data"
 " using an XMPP client."
 msgstr ""
-"在某些情况下，您希望组件永久存储一些数据。您当然可以使用组件配置来提供一些数"
-"据库连接设置，实现自己的数据库连接器并存储您需要的记录。但是，有一个非常简单"
-"且有用的框架，它允许您在数据库或磁盘文件中透明地读取和存储一些数据"
+"在某些情况下，您希望组件永久存储一些数据。您当然可以使用组件配置来提供一些数据库连接设置，实现自己的数据库连接器并存储您需要的记录。但是，有一个非常简单且有用的框架，它允许您在数据库或磁盘文件中透明地读取和存储一些数据"
 "。该框架还直接支持ad-hoc命令接口，因此您可以使用XMPP客户端操作组件数据。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1325
@@ -1343,9 +1222,8 @@ msgid ""
 "class annotated with **@Bean** annotation. For that classes proper "
 "instances of repositories will be injected by dependency injection."
 msgstr ""
-"要使用 **AuthRepository** 或 **UserRepository**，您只需正确声明字段并使用 "
-"**@Inject** 注释它们。该字段必须是由Tigase Kernel管理的类的一部分 - "
-"组件的类或使用 **@Bean** "
+"要使用 **AuthRepository** 或 **UserRepository**，您只需正确声明字段并使用 **@Inject** "
+"注释它们。该字段必须是由Tigase Kernel管理的类的一部分 - 组件的类或使用 **@Bean** "
 "注释的任何类。对于该类，将通过依赖注入来注入适当的存储库实例。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1332
@@ -1361,8 +1239,7 @@ msgid ""
 "In order to have more freedom while accessing repositories it’s possible "
 "to create and use custom repository implementation which implements "
 "**DataSourceAware** interface."
-msgstr "为了在访问存储库时拥有更多自由，可以创建和使用实现 **DataSourceAware** "
-"接口的自定义存储库实现。"
+msgstr "为了在访问存储库时拥有更多自由，可以创建和使用实现 **DataSourceAware** 接口的自定义存储库实现。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1346
 msgid ""
@@ -1374,8 +1251,7 @@ msgid ""
 "internals to initialize custom repository classes based on "
 "``TestRepositoryIfc``."
 msgstr ""
-"对于我们的示例，假设它将是实现 **TestRepositoryIfc** "
-"的类，并且我们的实现将使用JDBC。为了使其工作，我们需要将 "
+"对于我们的示例，假设它将是实现 **TestRepositoryIfc** 的类，并且我们的实现将使用JDBC。为了使其工作，我们需要将 "
 "``TestRepositoryIfc`` 定义为扩展 ``DataSourceAware`` 接口的通用接口。 "
 "``DataSourceAware`` 接口将为Tigase XMPP服务器内部所需的方法提供定义，以基于 "
 "``TestRepositoryIfc`` 初始化自定义存储库类。"
@@ -1397,12 +1273,11 @@ msgid ""
 "to find this class whenever class implementing ``TestRepositoryIfc`` and "
 "with support for data source with jdbc URI."
 msgstr ""
-"接下来我们需要准备存储库的实际实现 - 负责执行SQL语句的类。在这个类中，"
-"我们需要实现我们的接口和方法 **void setDataSource(DataSource dataSource)** "
-"中的所有方法，该方法来自 **DataSourceAware** "
-"接口。在这个方法中，我们需要初始化数据源，即创建准备好的语句。我们应该使用 "
-"``@Repository.Meta`` 注释来注释我们的新类，这将允许Tigase XMPP服务器在类实现 "
-"``TestRepositoryIfc`` 并支持带有jdbc URI的数据源时找到这个类。"
+"接下来我们需要准备存储库的实际实现 - 负责执行SQL语句的类。在这个类中，我们需要实现我们的接口和方法 **void "
+"setDataSource(DataSource dataSource)** 中的所有方法，该方法来自 **DataSourceAware** "
+"接口。在这个方法中，我们需要初始化数据源，即创建准备好的语句。我们应该使用 ``@Repository.Meta`` "
+"注释来注释我们的新类，这将允许Tigase XMPP服务器在类实现 ``TestRepositoryIfc`` 并支持带有jdbc "
+"URI的数据源时找到这个类。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1392
 msgid ""
@@ -1412,9 +1287,8 @@ msgid ""
 "thanks to that we do not need to cast provided instance of ``DataSource``"
 " to this interface before any access to data source."
 msgstr ""
-"如您所见，我们为接口 ``TestRepositoryIfc`` "
-"定义了数据源通用参数的类型。有了这个，我们确保只提供实现 ``DataRepository`` "
-"接口的实例，并且幸亏如此我们不需要在访问数据源之前将提供的 ``DataSource`` "
+"如您所见，我们为接口 ``TestRepositoryIfc`` 定义了数据源通用参数的类型。有了这个，我们确保只提供实现 "
+"``DataRepository`` 接口的实例，并且幸亏如此我们不需要在访问数据源之前将提供的 ``DataSource`` "
 "实例转换为这个接口。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1394
@@ -1428,11 +1302,11 @@ msgid ""
 "will be done by ``MDRepositoryBean`` which is extended by "
 "``TestRepositoryMDBean``."
 msgstr ""
-"有了这些，我们需要创建一个类来增加对多数据库设置的支持。在我们的例子中，"
-"它将是 **TestRepositoryMDBean**，它将负责发现存储库类、初始化和重新注入数据源"
-"。必须这样做，因为刚才提到我们的 ``TestRepositoryMDBean`` 将负责\n"
-"``JDBCTestRepository`` 的初始化（实际上这将由 ``TestRepositoryMDBean`` "
-"扩展的 ``MDRepositoryBean`` 完成）。"
+"有了这些，我们需要创建一个类来增加对多数据库设置的支持。在我们的例子中，它将是 "
+"**TestRepositoryMDBean**，它将负责发现存储库类、初始化和重新注入数据源。必须这样做，因为刚才提到我们的 "
+"``TestRepositoryMDBean`` 将负责\n"
+"``JDBCTestRepository`` 的初始化（实际上这将由 ``TestRepositoryMDBean`` 扩展的 "
+"``MDRepositoryBean`` 完成）。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1431
 msgid ""
@@ -1444,9 +1318,8 @@ msgid ""
 "method of ``TestRepositoryIfc``."
 msgstr ""
 "在所有基于 ``MDRepositoryBeanWithStatistics`` "
-"的实现中，大部分代码都是相同的。在我们的例子中，唯一的自定义方法是 **void "
-"addItem(...​)** 它使用 **getRepository(String domain)** "
-"方法来检索域的正确存储库。需要为 ``TestRepositoryIfc`` "
+"的实现中，大部分代码都是相同的。在我们的例子中，唯一的自定义方法是 **void addItem(...​)** 它使用 "
+"**getRepository(String domain)** 方法来检索域的正确存储库。需要为 ``TestRepositoryIfc`` "
 "的每个自定义方法完成对域的实际存储库实例的检索。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1435
@@ -1460,9 +1333,8 @@ msgid ""
 "not needed."
 msgstr ""
 "也可以扩展 ``MDRepositoryBean`` 或 ``SDRepositoryBean`` 而不是 "
-"``MDRepositoryBeanWithStatistics``。但是，如果您决定扩展没有 "
-"``withStatistics`` 后缀的抽象存储库bean类，则不会收集与该存储库的使用相关的统"
-"计数据。唯一的变化是您不需要将接口类传递给超类的构造函数，因为它不需要。"
+"``MDRepositoryBeanWithStatistics``。但是，如果您决定扩展没有 ``withStatistics`` "
+"后缀的抽象存储库bean类，则不会收集与该存储库的使用相关的统计数据。唯一的变化是您不需要将接口类传递给超类的构造函数，因为它不需要。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1439
 msgid ""
@@ -1479,23 +1351,21 @@ msgid ""
 "gives better flexibility and due to that usage of ``SDRepositoryBean`` "
 "and ``SDRepositoryBeanWithStatistics`` is discouraged."
 msgstr ""
-"如上所述，也可以扩展 ``SDRepostioryBean`` 和 "
-"``SDRepositoryBeanWithStatistics``。在扩展 ``MDRepositoryBeanWithStatistics``"
-" 的情况下，您需要实现的方法是相同的，但是在内部，``SDRepositoryBean`` 将不支"
-"持为不同的域使用不同的存储库。事实上，``SDRepositoryBeanWithStatistics`` "
-"只有一个存储库实例，所有域只使用一个数据源。如果只配置了一个 ``default`` "
-"存储库实例，则 ``MDRepositoryBeanWithStatistics`` "
-"会呈现相同的行为。然而，``MDRepositoryBeanWithStatistics`` "
-"提供了更好的灵活性，因此不鼓励使用 ``SDRepositoryBean`` 和 "
-"``SDRepositoryBeanWithStatistics``。"
+"如上所述，也可以扩展 ``SDRepostioryBean`` 和 ``SDRepositoryBeanWithStatistics``。在扩展 "
+"``MDRepositoryBeanWithStatistics`` "
+"的情况下，您需要实现的方法是相同的，但是在内部，``SDRepositoryBean`` "
+"将不支持为不同的域使用不同的存储库。事实上，``SDRepositoryBeanWithStatistics`` "
+"只有一个存储库实例，所有域只使用一个数据源。如果只配置了一个 ``default`` 存储库实例，则 "
+"``MDRepositoryBeanWithStatistics`` "
+"会呈现相同的行为。然而，``MDRepositoryBeanWithStatistics`` 提供了更好的灵活性，因此不鼓励使用 "
+"``SDRepositoryBean`` 和 ``SDRepositoryBeanWithStatistics``。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1441
 msgid ""
 "While this is more difficult to implement than in previous version, it "
 "gives you support for multi database setup and provides you with "
 "statistics of database query times which may be used for diagnosis."
-msgstr "虽然这比以前的版本更难实现，但它为您提供了对多数据库设置的支持，并为您提供了"
-"可用于诊断的数据库查询时间的统计信息。"
+msgstr "虽然这比以前的版本更难实现，但它为您提供了对多数据库设置的支持，并为您提供了可用于诊断的数据库查询时间的统计信息。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1443
 msgid ""
@@ -1507,9 +1377,8 @@ msgid ""
 "it:"
 msgstr ""
 "正如您还可以看到的，我们使用 **@Bean** 注释对 **TestRepositoryMDBean** "
-"进行了注释，这将强制Tigase内核在每次加载 **TestComponent** 时加载它。这样，只"
-"需创建一个字段并对其进行注释，就可以将此类的实例作为对该组件（即组件、模块等"
-"）使用的任何bean的依赖项注入："
+"进行了注释，这将强制Tigase内核在每次加载 **TestComponent** "
+"时加载它。这样，只需创建一个字段并对其进行注释，就可以将此类的实例作为对该组件（即组件、模块等）使用的任何bean的依赖项注入："
 
 #: ../../Tigase_Development/Component_Implementation.rst:1452
 msgid ""
@@ -1524,9 +1393,8 @@ msgid ""
 "versioning we have to implement ``tigase.kernel.beans.RegistrarBean`` in "
 "our class!"
 msgstr ""
-"如果我们打算使用我们的存储库的类深深嵌套在内核依赖项中，并且我们想要利用自动"
-"模式版本控制，我们必须在我们的类中实现 ``tigase.kernel.beans.RegistrarBean`` "
-"！"
+"如果我们打算使用我们的存储库的类深深嵌套在内核依赖项中，并且我们想要利用自动模式版本控制，我们必须在我们的类中实现 "
+"``tigase.kernel.beans.RegistrarBean`` ！"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1459
 msgid "Configuration"
@@ -1541,11 +1409,9 @@ msgid ""
 "related to our repositories should be placed in ``repository`` section "
 "placed inside ``test`` section."
 msgstr ""
-"我们的类 ``TestRepositoryMDBean`` 用 ``@Bean`` 注释，将其名称设置为 "
-"``repository`` 并将parent 设置为 ``TestComponent``。"
-"该组件的实例是通过在Tigase XMPP服务器配置文件中的 ``test`` "
-"名称下使用来配置的。因此，与我们的存储库相关的所有配置都应该放在 ``test`` "
-"部分的 ``repository`` 部分中。"
+"我们的类 ``TestRepositoryMDBean`` 用 ``@Bean`` 注释，将其名称设置为 ``repository`` "
+"并将parent 设置为 ``TestComponent``。该组件的实例是通过在Tigase XMPP服务器配置文件中的 ``test`` "
+"名称下使用来配置的。因此，与我们的存储库相关的所有配置都应该放在 ``test`` 部分的 ``repository`` 部分中。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1463
 msgid "**Example.**"
@@ -1567,11 +1433,10 @@ msgid ""
 "equal to following configuration entered in the config file:"
 msgstr ""
 "如上所述，如果我们使用 ``MDRepositoryBeanWithStatistics`` 作为 "
-"``TestRepositoryMDBean`` 的基类，那么我们可能有不同的数据源用于不同的域。默认"
-"情况下，如果我们不配置它，``MDRepositoryBeanWithStatistics`` "
-"将只创建一个名为``default`` 的存储库实例。它将用于所有域，默认情况下，"
-"它将使用与存储库实例命名相同的数据源 - 它将使用名为 ``default`` "
-"的数据源。此默认值等于在配置文件中输入的以下配置："
+"``TestRepositoryMDBean`` "
+"的基类，那么我们可能有不同的数据源用于不同的域。默认情况下，如果我们不配置它，``MDRepositoryBeanWithStatistics``"
+" 将只创建一个名为``default`` 的存储库实例。它将用于所有域，默认情况下，它将使用与存储库实例命名相同的数据源 - 它将使用名为 "
+"``default`` 的数据源。此默认值等于在配置文件中输入的以下配置："
 
 #: ../../Tigase_Development/Component_Implementation.rst:1489
 msgid "Changing data source used by repository"
@@ -1584,8 +1449,7 @@ msgid ""
 "you need to set ``dataSourceName`` property of repository instance to the"
 " name of data source which it should use."
 msgstr ""
-"可以使任何存储库使用与以与存储库实例相同的名称配置的数据源不同的数据源。为此"
-"，您需要将存储库实例的 ``dataSourceName`` "
+"可以使任何存储库使用与以与存储库实例相同的名称配置的数据源不同的数据源。为此，您需要将存储库实例的 ``dataSourceName`` "
 "属性设置为它应该使用的数据源的名称。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1493
@@ -1604,8 +1468,7 @@ msgid ""
 "need to define repository with the same name as domain for which it "
 "should be used. It will, by default, use data source with name equal "
 "domain name."
-msgstr "要配置要用于特定域的存储库实例，您需要定义与应该使用它的域同名的存储库。默认"
-"情况下，它将使用名称与域名相同的数据源。"
+msgstr "要配置要用于特定域的存储库实例，您需要定义与应该使用它的域同名的存储库。默认情况下，它将使用名称与域名相同的数据源。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1510
 msgid ""
@@ -1625,8 +1488,8 @@ msgid ""
 " repository instance named ``default`` will be used and it will use data "
 "source named ``default``."
 msgstr ""
-"在上面介绍的两个示例中，对于 ``example.com`` 以外的域，将使用名为 ``default``"
-" 的存储库实例，并将使用名为 ``default`` 的数据源。"
+"在上面介绍的两个示例中，对于 ``example.com`` 以外的域，将使用名为 ``default`` 的存储库实例，并将使用名为 "
+"``default`` 的数据源。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1562
 msgid "Repository Versioning"
@@ -1637,8 +1500,7 @@ msgid ""
 "It’s also possible to enable repository versioning capabilities when "
 "creating custom implementation. There are a couple of parts/steps to "
 "fully take advantage of this mechanism."
-msgstr "在创建自定义实现时，还可以启用存储库版本控制功能。有几个部分/步骤可以充分利用"
-"这种机制。"
+msgstr "在创建自定义实现时，还可以启用存储库版本控制功能。有几个部分/步骤可以充分利用这种机制。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1566
 msgid ""
@@ -1662,9 +1524,8 @@ msgid ""
 "``SchemaId`` and implementing ``RepositoryVersionAware``"
 msgstr ""
 "首先，存储库实现应该实现 ``tigase.db.util.RepositoryVersionAware`` "
-"接口（它的所有方法都是默认定义的）并用 ``tigase.db.Repository.SchemaId`` "
-"注释它。例如 .Repository 用 ``SchemaId`` 注释并实现 "
-"``RepositoryVersionAware``"
+"接口（它的所有方法都是默认定义的）并用 ``tigase.db.Repository.SchemaId`` 注释它。例如 .Repository "
+"用 ``SchemaId`` 注释并实现 ``RepositoryVersionAware``"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1580
 msgid ""
@@ -1676,10 +1537,9 @@ msgid ""
 "``java.lang.Package.getImplementationVersion()``), however it’s possible "
 "to specify required version manually, either:"
 msgstr ""
-"仅此操作将导致在Tigase XMPP服务器启动和存储库初始化期间执行检查表、索引、存储"
-"过程和其他元素是否存在于所需版本的配置数据源中。默认情况下，所需版本与实现版"
-"本匹配（通过调用 ``java.lang.Package.getImplementationVersion()`` "
-"获得），但是可以手动指定所需版本，或者："
+"仅此操作将导致在Tigase "
+"XMPP服务器启动和存储库初始化期间执行检查表、索引、存储过程和其他元素是否存在于所需版本的配置数据源中。默认情况下，所需版本与实现版本匹配（通过调用"
+" ``java.lang.Package.getImplementationVersion()`` 获得），但是可以手动指定所需版本，或者："
 
 #: ../../Tigase_Development/Component_Implementation.rst:1582
 msgid ""
@@ -1709,8 +1569,8 @@ msgid ""
 "stopped completely prompting to install the schema (either via ``update-"
 "schema`` or ``install-schema`` depending on user preference);"
 msgstr ""
-"如果数据库中没有版本信息，则服务将完全停止，提示安装模式（根据用户偏好通过 "
-"``update-schema`` 或 ``install-schema``）；"
+"如果数据库中没有版本信息，则服务将完全停止，提示安装模式（根据用户偏好通过 ``update-schema`` 或 ``install-"
+"schema``）；"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1610
 msgid ""
@@ -1719,8 +1579,8 @@ msgid ""
 "into account only *major.minor.bugfix* part) is different from the one "
 "present in the repository then:"
 msgstr ""
-"如果存储库中有关于加载的组件模式版本的信息，并且所需模式版本的基本部分（"
-"即仅考虑 *major.minor.bugfix* 部分）与存储库中存在的不同，则："
+"如果存储库中有关于加载的组件模式版本的信息，并且所需模式版本的基本部分（即仅考虑 *major.minor.bugfix* "
+"部分）与存储库中存在的不同，则："
 
 #: ../../Tigase_Development/Component_Implementation.rst:1612
 msgid ""
@@ -1729,9 +1589,8 @@ msgid ""
 "``logs/tigase-console.log``) terminal error forcing the user to upgrade "
 "the schema;"
 msgstr ""
-"如果所需的组件模式版本是 *final* （即非 "
-"``SNAPSHOT``），服务器将关闭并在日志文件（即 ``logs/tigase-console."
-"log``）中打印强制用户的终端错误升级架构；"
+"如果所需的组件模式版本是 *final* （即非 ``SNAPSHOT``），服务器将关闭并在日志文件（即 ``logs/tigase-"
+"console.log``）中打印强制用户的终端错误升级架构；"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1614
 msgid ""
@@ -1741,10 +1600,8 @@ msgid ""
 "upgrade procedure due to possible changes in the schema but the "
 "*server*\\ **will not**\\ *stop*;"
 msgstr ""
-"如果所需的组件模式版本是 *非最终版本* （即具有 ``SNAPSHOT`` "
-"部分），那么将在日志文件（即 ``logs/tigase-console."
-"log``）中打印警告提示由于架构可能发生变化，用户运行升级过程，但 *server*\\ "
-"**不会**\\ *stop*;"
+"如果所需的组件模式版本是 *非最终版本* （即具有 ``SNAPSHOT`` 部分），那么将在日志文件（即 ``logs/tigase-"
+"console.log``）中打印警告提示由于架构可能发生变化，用户运行升级过程，但 *server*\\ **不会**\\ *stop*;"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1616
 msgid ""
@@ -1758,8 +1615,7 @@ msgid ""
 "configured data sources and enabled components, and then perform upgrade "
 "of the schema of each configured component in the appropriate data "
 "source."
-msgstr "上述命令将加载当前配置、所有已配置数据源和已启用组件的信息，然后在相应数据源"
-"中对每个已配置组件的架构进行升级。"
+msgstr "上述命令将加载当前配置、所有已配置数据源和已启用组件的信息，然后在相应数据源中对每个已配置组件的架构进行升级。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1624
 msgid ""
@@ -1767,11 +1623,11 @@ msgid ""
 "upgrade procedure is handled internally is slightly different."
 msgstr "根据数据库的类型（或指定的注释），内部处理升级过程的方式略有不同。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1627
+#: ../../Tigase_Development/Component_Implementation.rst:1629
 msgid "Relational databases (external handling)"
 msgstr "关系数据库（外部处理）"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1629
+#: ../../Tigase_Development/Component_Implementation.rst:1631
 msgid ""
 "For all relational databases (MySQL, PostgreSQL, MS SQL Server, etc…) we "
 "highly recommend storing complete database schema in external files with "
@@ -1782,63 +1638,60 @@ msgid ""
 " must be stored under ``database/`` subdirectory in Tigase XMPP Server "
 "installation directory."
 msgstr ""
-"对于所有关系数据库（MySQL、PostgreSQL、MS SQL Server 等），我们强烈建议使用以"
-"下命名约定将完整的数据库模式存储在外部文件中：``<database_type>-<component_na"
-"me>-<version>.sql``，"
-"对于用于MySQL的测试组件版本0.0.5的示例完整模式将存储在名为 ``mysql-test-0.0.5"
-".sql`` 的文件中。更重要的是 - 架构文件必须存储在Tigase XMPP Server安装目录的 "
+"对于所有关系数据库（MySQL、PostgreSQL、MS SQL Server "
+"等），我们强烈建议使用以下命名约定将完整的数据库模式存储在外部文件中：``<database_type>-<component_name>-<version>.sql``，对于用于MySQL的测试组件版本0.0.5的示例完整模式将存储在名为"
+" ``mysql-test-0.0.5.sql`` 的文件中。更重要的是 - 架构文件必须存储在Tigase XMPP Server安装目录的 "
 "``database/`` 子目录下。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1633
+#: ../../Tigase_Development/Component_Implementation.rst:1635
+#, fuzzy
 msgid ""
 "this can be controlled with ``external`` property of "
 "``Repository.SchemaId`` annotation, which defaults to \"true\", if set to"
-" ``false`` then handling will be done as described in `Relational "
-"databases (external handling) <#update-relational>`__"
+" ``false`` then handling will be done as described in :ref:`Relational "
+"databases (external handling)<relationalDatabases>`"
 msgstr ""
-"这可以通过 ``Repository.SchemaId`` 注释的 ``external`` 属性来控制，"
-"默认为\"true\"，如果设置为 ``false``，那么处理将按照 "
-":ref:`关系数据库(外部处理)<update-relational>` 中的描述进行"
+"这可以通过 ``Repository.SchemaId`` 注释的 ``external`` 属性来控制，默认为\"true\"，如果设置为 "
+"``false``，那么处理将按照 :ref:`关系数据库(外部处理)<update-relational>` 中的描述进行"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1635
+#: ../../Tigase_Development/Component_Implementation.rst:1637
 #, fuzzy
 msgid "For example:"
 msgstr "例如："
 
-#: ../../Tigase_Development/Component_Implementation.rst:1637
+#: ../../Tigase_Development/Component_Implementation.rst:1639
 #, fuzzy
 msgid "``database/mysql-test-0.0.1.sql``"
 msgstr "``database/mysql-test-0.0.1.sql``"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1639
+#: ../../Tigase_Development/Component_Implementation.rst:1641
 #, fuzzy
 msgid "``database/mysql-test-0.0.2.sql``"
 msgstr "``database/mysql-test-0.0.2.sql``"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1641
+#: ../../Tigase_Development/Component_Implementation.rst:1643
 #, fuzzy
 msgid "``database/mysql-test-0.0.3.sql``"
 msgstr "``database/mysql-test-0.0.3.sql``"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1643
+#: ../../Tigase_Development/Component_Implementation.rst:1645
 #, fuzzy
 msgid "``database/mysql-test-0.0.4.sql``"
 msgstr "``database/mysql-test-0.0.4.sql``"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1645
+#: ../../Tigase_Development/Component_Implementation.rst:1647
 #, fuzzy
 msgid "``database/mysql-test-0.0.5.sql``"
 msgstr "``database/mysql-test-0.0.5.sql``"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1647
+#: ../../Tigase_Development/Component_Implementation.rst:1649
 msgid ""
 "During the upgrade process all required schema files will be loaded in "
 "the ascending version order. Version range will depend on the conditions "
 "and will follow simple rules:"
-msgstr "在升级过程中，所有必需的模式文件都将按版本升序加载。版本范围将取决于条件并遵"
-"循简单的规则："
+msgstr "在升级过程中，所有必需的模式文件都将按版本升序加载。版本范围将取决于条件并遵循简单的规则："
 
-#: ../../Tigase_Development/Component_Implementation.rst:1649
+#: ../../Tigase_Development/Component_Implementation.rst:1651
 msgid ""
 "Start of the range will start at the next version to the one currently "
 "loaded in the database (e.g. if the current version loaded to the "
@@ -1846,12 +1699,10 @@ msgid ""
 "then SchemaLoader will try to load schema from files: ``database/mysql-"
 "test-0.0.4.sql`` and ``database/mysql-test-0.0.5.sql``)"
 msgstr ""
-"范围的开始将从数据库中当前加载的版本的下一个版本开始（例如，如果加载到数据库"
-"的当前版本是0.0.3并且我们正在部署组件版本0.0."
-"5那么SchemaLoader将尝试从文件加载模式：``database/mysql-test-0.0.4.sql`` 和 "
-"``database/mysql-test-0.0.5.sql``）"
+"范围的开始将从数据库中当前加载的版本的下一个版本开始（例如，如果加载到数据库的当前版本是0.0.3并且我们正在部署组件版本0.0.5那么SchemaLoader将尝试从文件加载模式：``database"
+"/mysql-test-0.0.4.sql`` 和 ``database/mysql-test-0.0.5.sql``）"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1651
+#: ../../Tigase_Development/Component_Implementation.rst:1653
 msgid ""
 "If we are trying to deploy a *SNAPSTHOT* version of the component then "
 "schema file matching that version will always be included in the list of "
@@ -1860,39 +1711,36 @@ msgid ""
 "in the database is ``0.0.5`` then SchemaLoader will include ``database"
 "/mysql-test-0.0.5.sql`` in the list of files to be loaded)"
 msgstr ""
-"如果我们尝试部署组件的 *SNAPSTHOT* 版本，则与该版本匹配的模式文件将始终包含在"
-"要加载的文件列表中（例如，如果我们尝试部署组件版本为0.0.0的夜间构建。 ``0.0."
-"5-SNAPSHOT`` 并且当前在数据库中加载的模式版本是 ``0.0.5`` "
-"那么SchemaLoader将在要加载的文件列表中包含数据库 ``database/mysql-test-0.0.5."
-"sql`` ）"
+"如果我们尝试部署组件的 *SNAPSTHOT* "
+"版本，则与该版本匹配的模式文件将始终包含在要加载的文件列表中（例如，如果我们尝试部署组件版本为0.0.0的夜间构建。 "
+"``0.0.5-SNAPSHOT`` 并且当前在数据库中加载的模式版本是 ``0.0.5`` "
+"那么SchemaLoader将在要加载的文件列表中包含数据库 ``database/mysql-test-0.0.5.sql`` ）"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1653
+#: ../../Tigase_Development/Component_Implementation.rst:1655
 msgid ""
 "It’s also possible to skip above filtering logic and force loading all "
 "schema files for particular component/database from ``database/`` "
 "directory by appending ``--forceReloadAllSchemaFiles=true`` parameter to "
 "the ``upgrade-schema``/``install-schema`` command."
 msgstr ""
-"也可以跳过上面的过滤逻辑并通过将 ``--forceReloadAllSchemaFiles=true`` "
-"参数附加到 ``upgrade-schema``/``install-schema``来强制从``database/`` "
-"目录加载特定组件/数据库的所有架构文件。"
+"也可以跳过上面的过滤逻辑并通过将 ``--forceReloadAllSchemaFiles=true`` 参数附加到 ``upgrade-"
+"schema``/``install-schema``来强制从``database/`` 目录加载特定组件/数据库的所有架构文件。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1656
+#: ../../Tigase_Development/Component_Implementation.rst:1658
 msgid "Non-relational databases (internal handling)"
 msgstr "非关系数据库（内部处理）"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1658
+#: ../../Tigase_Development/Component_Implementation.rst:1660
 msgid ""
 "If there is a need to handle database schema internally (for example for "
 "cases like NoSQL databases or simply there is such preference) then it’s "
 "possible to do so by setting ``external`` attribute of "
 "``Repository.SchemaId`` annotation to ``false``:"
 msgstr ""
-"如果需要在内部处理数据库模式（例如对于像NoSQL数据库这样的情况，或者只是有这样"
-"的偏好），那么可以通过将 ``Repository.SchemaId`` 注释的 ``external`` "
-"属性设置为 ``false``："
+"如果需要在内部处理数据库模式（例如对于像NoSQL数据库这样的情况，或者只是有这样的偏好），那么可以通过将 "
+"``Repository.SchemaId`` 注释的 ``external`` 属性设置为 ``false``："
 
-#: ../../Tigase_Development/Component_Implementation.rst:1664
+#: ../../Tigase_Development/Component_Implementation.rst:1666
 msgid ""
 "In such case, ``updateSchema`` method from "
 "``tigase.db.util.RepositoryVersionAware`` interface should be implemented"
@@ -1901,52 +1749,50 @@ msgstr ""
 "在这种情况下，应该实现来自 ``tigase.db.util.RepositoryVersionAware`` 接口的 "
 "``updateSchema`` 方法来处理架构的安装/更新。它需要两个参数："
 
-#: ../../Tigase_Development/Component_Implementation.rst:1666
+#: ../../Tigase_Development/Component_Implementation.rst:1668
 msgid ""
 "``Optional<Version> oldVersion`` - indicating current version of the "
 "schema loaded to the database (if it’s present)"
-msgstr "``Optional<Version> oldVersion`` - "
-"指示加载到数据库的架构的当前版本（如果存在）"
+msgstr "``Optional<Version> oldVersion`` - 指示加载到数据库的架构的当前版本（如果存在）"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1668
+#: ../../Tigase_Development/Component_Implementation.rst:1670
 msgid ""
 "``Version newVersion`` - indicating required version (either version of "
 "component or specific version of the repository)"
 msgstr "``Version newVersion`` - 表明所需的版本（组件的版本或存储库的特定版本）"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1671
+#: ../../Tigase_Development/Component_Implementation.rst:1673
 msgid "Setting required repository version in database"
 msgstr "在数据库中设置所需的存储库版本"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1673
+#: ../../Tigase_Development/Component_Implementation.rst:1675
 msgid ""
 "Each versioned schema file should consist at the end code responsible for"
 " setting appropriate version of the loaded schema in the form of Stored "
 "Procedure call with the name of the component and the version as "
 "parameters:"
-msgstr "每个版本化的架构文件应在末尾包含负责以存储过程调用的形式设置加载架构的适当版"
-"本的代码，其中组件的名称和版本作为参数："
+msgstr "每个版本化的架构文件应在末尾包含负责以存储过程调用的形式设置加载架构的适当版本的代码，其中组件的名称和版本作为参数："
 
-#: ../../Tigase_Development/Component_Implementation.rst:1675
+#: ../../Tigase_Development/Component_Implementation.rst:1677
 #, fuzzy
 msgid "Postgresql"
 msgstr "Postgresql"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1683
+#: ../../Tigase_Development/Component_Implementation.rst:1685
 msgid "MsSQL Server"
 msgstr "MsSQL服务器"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1692
+#: ../../Tigase_Development/Component_Implementation.rst:1694
 #, fuzzy
 msgid "MySQL"
 msgstr "MySQL"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1700
+#: ../../Tigase_Development/Component_Implementation.rst:1702
 #, fuzzy
 msgid "Derby"
 msgstr "Derby"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1708
+#: ../../Tigase_Development/Component_Implementation.rst:1710
 msgid ""
 "In case of schema handled internally, after successful load (i.e. "
 "execution of the implemented "
@@ -1954,69 +1800,62 @@ msgid ""
 "``tigase.db.util.SchemaLoader.Result.ok``) the version in the database "
 "will be set to the current version of the component."
 msgstr ""
-"在内部处理架构的情况下，成功加载后（即执行已实现的 ``tigase.db.util."
-"RepositoryVersionAware.updateSchema`` 方法返回 ``tigase.db.util.SchemaLoader."
-"Result.ok`` ）数据库中的版本将设置为组件的当前版本。"
+"在内部处理架构的情况下，成功加载后（即执行已实现的 "
+"``tigase.db.util.RepositoryVersionAware.updateSchema`` 方法返回 "
+"``tigase.db.util.SchemaLoader.Result.ok`` ）数据库中的版本将设置为组件的当前版本。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1710
+#: ../../Tigase_Development/Component_Implementation.rst:1712
 msgid ""
 "This allows (in case of schema handled externally) to load it by hand by "
 "directly importing ``.sql`` files into database."
-msgstr "这允许（在外部处理模式的情况下）通过直接将 ``.sql`` "
-"文件导入数据库来手动加载它。"
+msgstr "这允许（在外部处理模式的情况下）通过直接将 ``.sql`` 文件导入数据库来手动加载它。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1715
+#: ../../Tigase_Development/Component_Implementation.rst:1717
 msgid "Component Implementation - Lesson 8 - Lifecycle of a component"
 msgstr "组件实现 - 第8课 - 组件的生命周期"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1718
+#: ../../Tigase_Development/Component_Implementation.rst:1720
 msgid "Initialization of a component"
 msgstr "组件的初始化"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1720
+#: ../../Tigase_Development/Component_Implementation.rst:1722
 msgid "A startup hook in the Tigase is different from the shutdown hook."
 msgstr "Tigase中的启动挂钩与关闭挂钩不同。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1722
+#: ../../Tigase_Development/Component_Implementation.rst:1724
 msgid ""
 "This is because you cannot really tell when exactly the startup time is. "
 "Is it when the application started, is it when configuration is loaded, "
 "is it when all objects are initialized. And this might be even different "
 "for each component. Therefore, in fact, there is no startup hook in "
 "Tigase in the same sense as the shutdown hook."
-msgstr ""
-"这是因为您无法真正确定启动时间的确切时间。是在应用程序启动时，是在加载配置时"
-"，还是在初始化所有对象时。对于每个组件，这甚至可能有所不同。因此，实际上Tigas"
-"e中并没有与关闭挂钩相同意义的启动挂钩。"
+msgstr "这是因为您无法真正确定启动时间的确切时间。是在应用程序启动时，是在加载配置时，还是在初始化所有对象时。对于每个组件，这甚至可能有所不同。因此，实际上Tigase中并没有与关闭挂钩相同意义的启动挂钩。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1724
+#: ../../Tigase_Development/Component_Implementation.rst:1726
 msgid ""
 "There are a few methods which are called at startup time of a component "
 "in the following order:"
 msgstr "有几个方法在组件启动时按以下顺序调用："
 
-#: ../../Tigase_Development/Component_Implementation.rst:1726
+#: ../../Tigase_Development/Component_Implementation.rst:1728
 msgid ""
 "**Constructor** - there is of course constructor which has no parameters."
 " However it does not guarantee that this instance of the component will "
 "be used at all. The object could be created just to get default values of"
 " a config fields and may be destroyed afterwards."
-msgstr ""
-"**构造函数** - 当然有没有参数的构造函数。但是，它不保证组件的这个实例将被使用"
-"。可以创建该对象只是为了获取配置字段的默认值，然后可能会被销毁。"
+msgstr "**构造函数** - 当然有没有参数的构造函数。但是，它不保证组件的这个实例将被使用。可以创建该对象只是为了获取配置字段的默认值，然后可能会被销毁。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1728
+#: ../../Tigase_Development/Component_Implementation.rst:1730
 msgid ""
 "**Getters/Setters** - at second step of initialization of a component, "
 "Kernel configures component by reading and setting values of fields "
 "annotated with ``@ConfigField()`` annotation. If there is a public getter"
 " or setter for the same name as an annotated field - it will be used."
 msgstr ""
-"**Getters/Setters** - 在组件初始化的第二步，内核通过读取和设置带有 "
-"``@ConfigField()`` 注释的字段的值来配置组件。"
-"如果有一个与注释字段同名的公共getter或setter - 它将被使用。"
+"**Getters/Setters** - 在组件初始化的第二步，内核通过读取和设置带有 ``@ConfigField()`` "
+"注释的字段的值来配置组件。如果有一个与注释字段同名的公共getter或setter - 它将被使用。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1730
+#: ../../Tigase_Development/Component_Implementation.rst:1732
 msgid ""
 "**void beanConfigurationChanged(Collection<String> changedFields)** "
 "*(optional)* - if component implements ``ConfigurationChangedAware`` "
@@ -2026,29 +1865,28 @@ msgid ""
 "allows you to reconfigure component internals only once."
 msgstr ""
 "**void beanConfigurationChanged(Collection<String> changedFields)** "
-"*（可选）* - 如果组件实现了 ``ConfigurationChangedAware`` 接口，将调用此方法"
-"来通知组件哪些字段的值已更改。如果组件内部依赖于存储在多个字段中的配置，这很"
-"有用，因为它只允许您重新配置组件内部一次。"
+"*（可选）* - 如果组件实现了 ``ConfigurationChangedAware`` "
+"接口，将调用此方法来通知组件哪些字段的值已更改。如果组件内部依赖于存储在多个字段中的配置，这很有用，因为它只允许您重新配置组件内部一次。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1732
+#: ../../Tigase_Development/Component_Implementation.rst:1734
 msgid ""
 "**void register(Kernel kernel)** *(optional)* - if component implements "
 "``RegistrarBean`` interface this method is called to allow registration "
 "of component private beans."
 msgstr ""
-"**void register(Kernel kernel)** *(optional)* - 如果组件实现 "
-"``RegistrarBean`` 接口，则调用此方法以允许注册组件私有bean。"
+"**void register(Kernel kernel)** *(optional)* - 如果组件实现 ``RegistrarBean`` "
+"接口，则调用此方法以允许注册组件私有bean。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1734
+#: ../../Tigase_Development/Component_Implementation.rst:1736
 msgid ""
 "**Dependency Injection** - during this time Kernel injects beans to "
 "component fields annotated with ``@Inject``. If public getters or setters"
 " for this fields exist - kernel will use them."
 msgstr ""
-"**依赖注入** - 在此期间，内核将bean注入到带有 ``@Inject`` 注释的组件字段中。"
-"如果此字段的公共getter或setter存在 - 内核将使用它们。"
+"**依赖注入** - 在此期间，内核将bean注入到带有 ``@Inject`` 注释的组件字段中。如果此字段的公共getter或setter存在"
+" - 内核将使用它们。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1736
+#: ../../Tigase_Development/Component_Implementation.rst:1738
 msgid ""
 "**void initialized()** *(optional)* - called if component implements "
 "``Initializable`` interface to notify it that configuration is set and "
@@ -2057,36 +1895,34 @@ msgstr ""
 "**void initialized()** *(optional)* - 如果组件实现了 ``Initializable`` "
 "接口以通知它配置已设置并注入依赖项，则调用它。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1738
+#: ../../Tigase_Development/Component_Implementation.rst:1740
 msgid ""
 "**void start()** - during this call component starts it’s internal jobs "
 "or worker threads or whatever it needs for future activity. Component’s "
 "queues and threads are initialized at this point. **(after this method "
 "returns the component is ready)**"
 msgstr ""
-"**void start()** - 在此调用组件启动期间，它是内部作业或工作线程或未来活动所需"
-"的任何东西。组件的队列和线程此时被初始化。 **（此方法返回后组件就绪）**"
+"**void start()** - 在此调用组件启动期间，它是内部作业或工作线程或未来活动所需的任何东西。组件的队列和线程此时被初始化。 "
+"**（此方法返回后组件就绪）**"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1740
+#: ../../Tigase_Development/Component_Implementation.rst:1742
 msgid ""
 "Therefore, the ``start()`` hook is the best point if you want to be sure "
 "that component is fully loaded, initialized and functional."
-msgstr "因此，如果您想确保组件已完全加载、初始化并正常运行，那么 ``start()`` "
-"钩子是最佳点。"
+msgstr "因此，如果您想确保组件已完全加载、初始化并正常运行，那么 ``start()`` 钩子是最佳点。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1744
+#: ../../Tigase_Development/Component_Implementation.rst:1746
 msgid ""
 "Component instance may be started and stopped only once, however new "
 "instances of the same component with the same name may be created during "
 "Tigase XMPP Server uptime, ie. as a result of a server reconfiguration."
-msgstr "组件实例只能启动和停止一次，但是可以在Tigase XMPP服务器正常运行期间创建具有相"
-"同名称的相同组件的新实例，即作为服务器重新配置的结果。"
+msgstr "组件实例只能启动和停止一次，但是可以在Tigase XMPP服务器正常运行期间创建具有相同名称的相同组件的新实例，即作为服务器重新配置的结果。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1747
+#: ../../Tigase_Development/Component_Implementation.rst:1749
 msgid "Reconfiguration"
 msgstr "重新配置"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1749
+#: ../../Tigase_Development/Component_Implementation.rst:1751
 msgid ""
 "During lifecycle of a component instance it may happen that Tigase XMPP "
 "Server will be reconfigured. If change in configuration of this component"
@@ -2094,11 +1930,10 @@ msgid ""
 "changes fields annotated with ``@ConfigField()``. In this case public "
 "field setters may be used."
 msgstr ""
-"在组件实例的生命周期中，可能会重新配置Tigase "
-"XMPP服务器。如果此组件的配置更改与其活动无关，则内核将设置带有 "
+"在组件实例的生命周期中，可能会重新配置Tigase XMPP服务器。如果此组件的配置更改与其活动无关，则内核将设置带有 "
 "``@ConfigField()`` 注释的更改字段的值。在这种情况下，可以使用公共字段设置器。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1753
+#: ../../Tigase_Development/Component_Implementation.rst:1755
 msgid ""
 "If component implements ``ConfigurationChangedAware`` interface, then "
 "method **void beanConfigurationChanged(Collection<String> "
@@ -2108,15 +1943,14 @@ msgid ""
 "reconfigure this internal once."
 msgstr ""
 "如果组件实现了 ``ConfigurationChangedAware`` 接口，则将调用方法 **void "
-"beanConfigurationChanged(Collection<String> changedFields)** 来通知组件哪些字"
-"段的值已更改。如果同一组件内部依赖于存储在多个字段中的配置，这很有用，因为它"
-"允许您重新配置此内部一次。"
+"beanConfigurationChanged(Collection<String> changedFields)** "
+"来通知组件哪些字段的值已更改。如果同一组件内部依赖于存储在多个字段中的配置，这很有用，因为它允许您重新配置此内部一次。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1756
+#: ../../Tigase_Development/Component_Implementation.rst:1758
 msgid "Update of injected dependencies"
 msgstr "更新注入的依赖项"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1758
+#: ../../Tigase_Development/Component_Implementation.rst:1760
 msgid ""
 "During lifecycle of a component instance it may happen that due to "
 "reconfiguration of a server other bean needs to be injected as a "
@@ -2124,30 +1958,28 @@ msgid ""
 "dependencies to fields annotated with ``@Inject`` which value needs to be"
 " updated."
 msgstr ""
-"在组件实例的生命周期中，可能会发生由于重新配置服务器而需要注入其他bean作为组"
-"件的依赖项。在这种情况下，Tigase内核会将依赖项注入到带有 ``@Inject`` "
-"注释的字段中，该字段的值需要更新。"
+"在组件实例的生命周期中，可能会发生由于重新配置服务器而需要注入其他bean作为组件的依赖项。在这种情况下，Tigase内核会将依赖项注入到带有 "
+"``@Inject`` 注释的字段中，该字段的值需要更新。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1761
+#: ../../Tigase_Development/Component_Implementation.rst:1763
 msgid "Stopping a component"
 msgstr "停止组件"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1763
+#: ../../Tigase_Development/Component_Implementation.rst:1765
 msgid ""
 "Component instance may be stopped at any point of Tigase XMPP Server "
 "runtime, ie. due to reconfiguration, or due to server graceful shutdown."
-msgstr "组件实例可以在Tigase "
-"XMPP服务器运行时的任何时候停止，即由于重新配置，或由于服务器正常关闭。"
+msgstr "组件实例可以在Tigase XMPP服务器运行时的任何时候停止，即由于重新配置，或由于服务器正常关闭。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1765
+#: ../../Tigase_Development/Component_Implementation.rst:1767
 msgid "In both cases following methods of a component will be called:"
 msgstr "在这两种情况下，将调用组件的以下方法："
 
-#: ../../Tigase_Development/Component_Implementation.rst:1767
+#: ../../Tigase_Development/Component_Implementation.rst:1769
 msgid "**void stop()** - first method stops component internal processing queues."
 msgstr "**void stop()** - 第一种方法停止组件内部处理队列。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1769
+#: ../../Tigase_Development/Component_Implementation.rst:1771
 msgid ""
 "**void beforeUnregister()** *(optional)* - if component implements "
 "@UnregisterAware@ interface this method is called to notify instance of a"
@@ -2156,7 +1988,7 @@ msgstr ""
 "**void beforeUnregister()** *（可选）* - 如果组件实现了@UnregisterAware@ "
 "接口，则调用此方法来通知组件实例它正在被卸载。"
 
-#: ../../Tigase_Development/Component_Implementation.rst:1771
+#: ../../Tigase_Development/Component_Implementation.rst:1773
 msgid ""
 "**void unregister(Kernel kernel)** *(optional)* - if component implements"
 " ``RegistrarBean`` called to give component a way to unregister beans (if"
@@ -2209,3 +2041,4 @@ msgstr ""
 
 #~ msgid ": _cil6:"
 #~ msgstr ""
+

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 19:27-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -210,7 +210,7 @@ msgid "``string``"
 msgstr ""
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:22
-msgid "Working mode (see `Working modes <#bruteForcePrevention_WorkingModes>`__)"
+msgid "Working mode (see :ref:`Working modes<WorkingModes>`)"
 msgstr ""
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:26
@@ -226,37 +226,37 @@ msgid ""
 "configuration:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:39
+#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:41
 msgid "Working modes"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:41
+#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:43
 msgid "There are three working modes:"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:43
+#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:45
 msgid ""
 "``Ip`` - it counts invalid login tries from IP, and locks login ability "
 "(soft ban) for IP what reach the threshold"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:45
+#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:47
 msgid ""
 "``IpJid`` - it counts tries from IP to specific user account. Soft ban "
 "locks ability of login to specific JID from specific IP."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:47
+#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:49
 msgid ""
 "``Jid``- similar to ``IpJid`` but checks only JID. Soft ban locks ability"
 " of login to specific JID from all IPs."
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:54
+#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:56
 msgid "Permanent ban"
 msgstr ""
 
-#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:56
+#: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:58
 msgid ""
 "In modes ``Jid`` and ``IpJid``, when invalid login counter reach "
 "threshold ``brute-force-disable-after-fails``, account status will be set"
@@ -430,7 +430,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:118
 msgid ""
-"Tigase requires full certificate chain in PEM file (described above)! "
+"**Tigase requires full certificate chain in PEM file (described above)! "
 "Different applications may require pem file with certificates and private"
 " key in different order. So the same file may not be necessarily used by "
 "other services like Web server or e-mail server. Currently, Tigase can "
@@ -459,8 +459,8 @@ msgid ""
 "and then follow instructions \\* Admin WebUI - open "
 "``http://<host>/admin``, navigate to ``Other`` category and in it select "
 "``Add SSL Certificate`` and then follow instructions \\* REST API - make "
-"a ``POST`` request to ``http://localhost:8080/rest/adhoc/vhost-"
-"man@domain.com`` with payload containing your certificate; to get the "
+"a ``POST`` request to http://localhost:8080/rest/adhoc/vhost-"
+"man@domain.com with payload containing your certificate; to get the "
 "required form fields make ``GET`` request to the same endpoint"
 msgstr ""
 
@@ -479,8 +479,8 @@ msgstr ""
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:136
 msgid ""
-"LetsEncrypt - please see `Installing LetsEncrypt Certificates in Your "
-"Linux System<LetsEncryptCertificate>` for details"
+"LetsEncrypt - please see :ref:`Installing LetsEncrypt Certificates in "
+"Your Linux System<LetsEncryptCertificate>` for details"
 msgstr ""
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:138
@@ -1972,7 +1972,7 @@ msgstr ""
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:110
 msgid ""
-"The filtering is performed by the ```tigase.xmpp.impl.DomainFilter`` "
+"The filtering is performed by the `tigase.xmpp.impl.DomainFilter "
 "<https://github.com/tigase/tigase-"
 "server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter.java>`__ "
 "plugin. Please refer to source code for more implementation details."
@@ -2291,5 +2291,59 @@ msgstr ""
 #~ "file (either on ``root`` level or "
 #~ "for ``sslContextContainer`` for particular "
 #~ "connection managers) or on VHost level."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Working mode (see `Working modes "
+#~ "<#bruteForcePrevention_WorkingModes>`__)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tigase requires full certificate chain "
+#~ "in PEM file (described above)! Different"
+#~ " applications may require pem file "
+#~ "with certificates and private key in "
+#~ "different order. So the same file "
+#~ "may not be necessarily used by "
+#~ "other services like Web server or "
+#~ "e-mail server. Currently, Tigase can "
+#~ "automatically sort certificates in PEM "
+#~ "file while loading it.**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "It’s also possible to use: \\* "
+#~ "Admin ad-hoc command via XMPP "
+#~ "client - you should navigate to "
+#~ "Service Discovery of your server and "
+#~ "in the list of commands for "
+#~ "``VHost Manager`` component select ``Add "
+#~ "SSL Certificate`` and then follow "
+#~ "instructions \\* Admin WebUI - open "
+#~ "``http://<host>/admin``, navigate to ``Other`` "
+#~ "category and in it select ``Add "
+#~ "SSL Certificate`` and then follow "
+#~ "instructions \\* REST API - make a"
+#~ " ``POST`` request to "
+#~ "``http://localhost:8080/rest/adhoc/vhost-man@domain.com`` "
+#~ "with payload containing your certificate; "
+#~ "to get the required form fields "
+#~ "make ``GET`` request to the same "
+#~ "endpoint"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "LetsEncrypt - please see `Installing "
+#~ "LetsEncrypt Certificates in Your Linux "
+#~ "System<LetsEncryptCertificate>` for details"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The filtering is performed by the "
+#~ "```tigase.xmpp.impl.DomainFilter`` <https://github.com/tigase"
+#~ "/tigase-"
+#~ "server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter.java>`__"
+#~ " plugin. Please refer to source code"
+#~ " for more implementation details."
 #~ msgstr ""
 

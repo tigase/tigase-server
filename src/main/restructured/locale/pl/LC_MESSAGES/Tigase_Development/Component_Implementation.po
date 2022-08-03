@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-29 02:43-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1410,11 +1410,11 @@ msgid ""
 "upgrade procedure is handled internally is slightly different."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1627
+#: ../../Tigase_Development/Component_Implementation.rst:1629
 msgid "Relational databases (external handling)"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1629
+#: ../../Tigase_Development/Component_Implementation.rst:1631
 msgid ""
 "For all relational databases (MySQL, PostgreSQL, MS SQL Server, etc…) we "
 "highly recommend storing complete database schema in external files with "
@@ -1426,46 +1426,46 @@ msgid ""
 "installation directory."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1633
+#: ../../Tigase_Development/Component_Implementation.rst:1635
 msgid ""
 "this can be controlled with ``external`` property of "
 "``Repository.SchemaId`` annotation, which defaults to \"true\", if set to"
-" ``false`` then handling will be done as described in `Relational "
-"databases (external handling) <#update-relational>`__"
-msgstr ""
-
-#: ../../Tigase_Development/Component_Implementation.rst:1635
-msgid "For example:"
+" ``false`` then handling will be done as described in :ref:`Relational "
+"databases (external handling)<relationalDatabases>`"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1637
-msgid "``database/mysql-test-0.0.1.sql``"
+msgid "For example:"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1639
-msgid "``database/mysql-test-0.0.2.sql``"
+msgid "``database/mysql-test-0.0.1.sql``"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1641
-msgid "``database/mysql-test-0.0.3.sql``"
+msgid "``database/mysql-test-0.0.2.sql``"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1643
-msgid "``database/mysql-test-0.0.4.sql``"
+msgid "``database/mysql-test-0.0.3.sql``"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1645
-msgid "``database/mysql-test-0.0.5.sql``"
+msgid "``database/mysql-test-0.0.4.sql``"
 msgstr ""
 
 #: ../../Tigase_Development/Component_Implementation.rst:1647
+msgid "``database/mysql-test-0.0.5.sql``"
+msgstr ""
+
+#: ../../Tigase_Development/Component_Implementation.rst:1649
 msgid ""
 "During the upgrade process all required schema files will be loaded in "
 "the ascending version order. Version range will depend on the conditions "
 "and will follow simple rules:"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1649
+#: ../../Tigase_Development/Component_Implementation.rst:1651
 msgid ""
 "Start of the range will start at the next version to the one currently "
 "loaded in the database (e.g. if the current version loaded to the "
@@ -1474,7 +1474,7 @@ msgid ""
 "test-0.0.4.sql`` and ``database/mysql-test-0.0.5.sql``)"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1651
+#: ../../Tigase_Development/Component_Implementation.rst:1653
 msgid ""
 "If we are trying to deploy a *SNAPSTHOT* version of the component then "
 "schema file matching that version will always be included in the list of "
@@ -1484,7 +1484,7 @@ msgid ""
 "/mysql-test-0.0.5.sql`` in the list of files to be loaded)"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1653
+#: ../../Tigase_Development/Component_Implementation.rst:1655
 msgid ""
 "It’s also possible to skip above filtering logic and force loading all "
 "schema files for particular component/database from ``database/`` "
@@ -1492,11 +1492,11 @@ msgid ""
 "the ``upgrade-schema``/``install-schema`` command."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1656
+#: ../../Tigase_Development/Component_Implementation.rst:1658
 msgid "Non-relational databases (internal handling)"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1658
+#: ../../Tigase_Development/Component_Implementation.rst:1660
 msgid ""
 "If there is a need to handle database schema internally (for example for "
 "cases like NoSQL databases or simply there is such preference) then it’s "
@@ -1504,30 +1504,30 @@ msgid ""
 "``Repository.SchemaId`` annotation to ``false``:"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1664
+#: ../../Tigase_Development/Component_Implementation.rst:1666
 msgid ""
 "In such case, ``updateSchema`` method from "
 "``tigase.db.util.RepositoryVersionAware`` interface should be implemented"
 " to handle installation/updating of the schema. It takes two arguments:"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1666
+#: ../../Tigase_Development/Component_Implementation.rst:1668
 msgid ""
 "``Optional<Version> oldVersion`` - indicating current version of the "
 "schema loaded to the database (if it’s present)"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1668
+#: ../../Tigase_Development/Component_Implementation.rst:1670
 msgid ""
 "``Version newVersion`` - indicating required version (either version of "
 "component or specific version of the repository)"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1671
+#: ../../Tigase_Development/Component_Implementation.rst:1673
 msgid "Setting required repository version in database"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1673
+#: ../../Tigase_Development/Component_Implementation.rst:1675
 msgid ""
 "Each versioned schema file should consist at the end code responsible for"
 " setting appropriate version of the loaded schema in the form of Stored "
@@ -1535,23 +1535,23 @@ msgid ""
 "parameters:"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1675
+#: ../../Tigase_Development/Component_Implementation.rst:1677
 msgid "Postgresql"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1683
+#: ../../Tigase_Development/Component_Implementation.rst:1685
 msgid "MsSQL Server"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1692
+#: ../../Tigase_Development/Component_Implementation.rst:1694
 msgid "MySQL"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1700
+#: ../../Tigase_Development/Component_Implementation.rst:1702
 msgid "Derby"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1708
+#: ../../Tigase_Development/Component_Implementation.rst:1710
 msgid ""
 "In case of schema handled internally, after successful load (i.e. "
 "execution of the implemented "
@@ -1560,25 +1560,25 @@ msgid ""
 "will be set to the current version of the component."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1710
+#: ../../Tigase_Development/Component_Implementation.rst:1712
 msgid ""
 "This allows (in case of schema handled externally) to load it by hand by "
 "directly importing ``.sql`` files into database."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1715
+#: ../../Tigase_Development/Component_Implementation.rst:1717
 msgid "Component Implementation - Lesson 8 - Lifecycle of a component"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1718
+#: ../../Tigase_Development/Component_Implementation.rst:1720
 msgid "Initialization of a component"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1720
+#: ../../Tigase_Development/Component_Implementation.rst:1722
 msgid "A startup hook in the Tigase is different from the shutdown hook."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1722
+#: ../../Tigase_Development/Component_Implementation.rst:1724
 msgid ""
 "This is because you cannot really tell when exactly the startup time is. "
 "Is it when the application started, is it when configuration is loaded, "
@@ -1587,13 +1587,13 @@ msgid ""
 "Tigase in the same sense as the shutdown hook."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1724
+#: ../../Tigase_Development/Component_Implementation.rst:1726
 msgid ""
 "There are a few methods which are called at startup time of a component "
 "in the following order:"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1726
+#: ../../Tigase_Development/Component_Implementation.rst:1728
 msgid ""
 "**Constructor** - there is of course constructor which has no parameters."
 " However it does not guarantee that this instance of the component will "
@@ -1601,7 +1601,7 @@ msgid ""
 " a config fields and may be destroyed afterwards."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1728
+#: ../../Tigase_Development/Component_Implementation.rst:1730
 msgid ""
 "**Getters/Setters** - at second step of initialization of a component, "
 "Kernel configures component by reading and setting values of fields "
@@ -1609,7 +1609,7 @@ msgid ""
 " or setter for the same name as an annotated field - it will be used."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1730
+#: ../../Tigase_Development/Component_Implementation.rst:1732
 msgid ""
 "**void beanConfigurationChanged(Collection<String> changedFields)** "
 "*(optional)* - if component implements ``ConfigurationChangedAware`` "
@@ -1619,28 +1619,28 @@ msgid ""
 "allows you to reconfigure component internals only once."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1732
+#: ../../Tigase_Development/Component_Implementation.rst:1734
 msgid ""
 "**void register(Kernel kernel)** *(optional)* - if component implements "
 "``RegistrarBean`` interface this method is called to allow registration "
 "of component private beans."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1734
+#: ../../Tigase_Development/Component_Implementation.rst:1736
 msgid ""
 "**Dependency Injection** - during this time Kernel injects beans to "
 "component fields annotated with ``@Inject``. If public getters or setters"
 " for this fields exist - kernel will use them."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1736
+#: ../../Tigase_Development/Component_Implementation.rst:1738
 msgid ""
 "**void initialized()** *(optional)* - called if component implements "
 "``Initializable`` interface to notify it that configuration is set and "
 "dependencies are injected."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1738
+#: ../../Tigase_Development/Component_Implementation.rst:1740
 msgid ""
 "**void start()** - during this call component starts it’s internal jobs "
 "or worker threads or whatever it needs for future activity. Component’s "
@@ -1648,24 +1648,24 @@ msgid ""
 "returns the component is ready)**"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1740
+#: ../../Tigase_Development/Component_Implementation.rst:1742
 msgid ""
 "Therefore, the ``start()`` hook is the best point if you want to be sure "
 "that component is fully loaded, initialized and functional."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1744
+#: ../../Tigase_Development/Component_Implementation.rst:1746
 msgid ""
 "Component instance may be started and stopped only once, however new "
 "instances of the same component with the same name may be created during "
 "Tigase XMPP Server uptime, ie. as a result of a server reconfiguration."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1747
+#: ../../Tigase_Development/Component_Implementation.rst:1749
 msgid "Reconfiguration"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1749
+#: ../../Tigase_Development/Component_Implementation.rst:1751
 msgid ""
 "During lifecycle of a component instance it may happen that Tigase XMPP "
 "Server will be reconfigured. If change in configuration of this component"
@@ -1674,7 +1674,7 @@ msgid ""
 "field setters may be used."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1753
+#: ../../Tigase_Development/Component_Implementation.rst:1755
 msgid ""
 "If component implements ``ConfigurationChangedAware`` interface, then "
 "method **void beanConfigurationChanged(Collection<String> "
@@ -1684,11 +1684,11 @@ msgid ""
 "reconfigure this internal once."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1756
+#: ../../Tigase_Development/Component_Implementation.rst:1758
 msgid "Update of injected dependencies"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1758
+#: ../../Tigase_Development/Component_Implementation.rst:1760
 msgid ""
 "During lifecycle of a component instance it may happen that due to "
 "reconfiguration of a server other bean needs to be injected as a "
@@ -1697,32 +1697,32 @@ msgid ""
 " updated."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1761
+#: ../../Tigase_Development/Component_Implementation.rst:1763
 msgid "Stopping a component"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1763
+#: ../../Tigase_Development/Component_Implementation.rst:1765
 msgid ""
 "Component instance may be stopped at any point of Tigase XMPP Server "
 "runtime, ie. due to reconfiguration, or due to server graceful shutdown."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1765
+#: ../../Tigase_Development/Component_Implementation.rst:1767
 msgid "In both cases following methods of a component will be called:"
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1767
+#: ../../Tigase_Development/Component_Implementation.rst:1769
 msgid "**void stop()** - first method stops component internal processing queues."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1769
+#: ../../Tigase_Development/Component_Implementation.rst:1771
 msgid ""
 "**void beforeUnregister()** *(optional)* - if component implements "
 "@UnregisterAware@ interface this method is called to notify instance of a"
 " component that it is being unloaded."
 msgstr ""
 
-#: ../../Tigase_Development/Component_Implementation.rst:1771
+#: ../../Tigase_Development/Component_Implementation.rst:1773
 msgid ""
 "**void unregister(Kernel kernel)** *(optional)* - if component implements"
 " ``RegistrarBean`` called to give component a way to unregister beans (if"
@@ -1772,5 +1772,15 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ": _cil6:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "this can be controlled with ``external``"
+#~ " property of ``Repository.SchemaId`` annotation,"
+#~ " which defaults to \"true\", if set"
+#~ " to ``false`` then handling will be"
+#~ " done as described in `Relational "
+#~ "databases (external handling) <#update-"
+#~ "relational>`__"
 #~ msgstr ""
 

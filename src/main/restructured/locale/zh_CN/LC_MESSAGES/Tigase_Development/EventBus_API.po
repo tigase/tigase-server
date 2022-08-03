@@ -5,19 +5,18 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc\n"
+"Project-Id-Version:  TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: 2022-07-25 22:40+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
-"tigase-xmpp-server/dg-eventbus_api/zh_Hans/>\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
+"/tigase-xmpp-server/dg-eventbus_api/zh_Hans/>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/EventBus_API.rst:3
@@ -32,9 +31,9 @@ msgid ""
 "<http://docs.tigase.org/tigase-"
 "server/snapshot/Administration_Guide/html/#eventBus>`__."
 msgstr ""
-"EventBus是一种自定义发布-订阅机制，它允许在Tigase服务器中使用事件监听器。有关"
-"EventBus及其功能的更详细概述，请访问 `管理指南 <http://docs.tigase.org/"
-"tigase-server/snapshot/Administration_Guide/html/#eventBus>`__。"
+"EventBus是一种自定义发布-订阅机制，它允许在Tigase服务器中使用事件监听器。有关EventBus及其功能的更详细概述，请访问 "
+"`管理指南 <http://docs.tigase.org/tigase-"
+"server/snapshot/Administration_Guide/html/#eventBus>`__。"
 
 #: ../../Tigase_Development/EventBus_API.rst:8
 #, fuzzy
@@ -49,8 +48,7 @@ msgstr "要创建EventBus的实例，请使用以下代码："
 msgid ""
 "Remember, that EventBus is asynchronous. All handlers are called in a "
 "different thread than the thread that initially fired the event."
-msgstr "请记住，EventBus是异步的。所有处理程序都在与最初触发事件的线程不同的线程中调"
-"用。"
+msgstr "请记住，EventBus是异步的。所有处理程序都在与最初触发事件的线程不同的线程中调用。"
 
 #: ../../Tigase_Development/EventBus_API.rst:21
 msgid "Events"
@@ -62,8 +60,8 @@ msgid ""
 "element(XML/Element based events are deprecated since version 8.2 and "
 "will be removed in version 9.0)\\. |se|\\"
 msgstr ""
-"事件可以用两种方式定义：作为一个类 |ss| 或作为XML元素（自8.2版起已弃用基于"
-"XML/元素的事件，并将在9.0 版中删除）\\. |se|\\"
+"事件可以用两种方式定义：作为一个类 |ss| 或作为XML元素（自8.2版起已弃用基于XML/元素的事件，并将在9.0 版中删除）\\. "
+"|se|\\"
 
 #: ../../Tigase_Development/EventBus_API.rst:25
 msgid "**Serialized event class.**"
@@ -84,8 +82,7 @@ msgid ""
 "``SampleEvent`` will be broadcast only in the same instance what fired "
 "the event."
 msgstr ""
-"定义为XML元素和实现 ``Serializable`` "
-"接口的类的事件将分发到集群中的所有服务器。事件 ``SampleEvent`` "
+"定义为XML元素和实现 ``Serializable`` 接口的类的事件将分发到集群中的所有服务器。事件 ``SampleEvent`` "
 "将仅在触发事件的同一实例中广播。"
 
 #: ../../Tigase_Development/EventBus_API.rst:66
@@ -100,8 +97,7 @@ msgstr "默认的、显式的、公共的、无参数的构造函数是强制性
 msgid ""
 "If the event should be delivered to all cluster nodes then it **MUST** "
 "implement ``Serializable`` interface."
-msgstr "如果事件应该被传递到所有集群节点，那么它 **必须** 实现 ``Serializable`` "
-"接口。"
+msgstr "如果事件应该被传递到所有集群节点，那么它 **必须** 实现 ``Serializable`` 接口。"
 
 #: ../../Tigase_Development/EventBus_API.rst:72
 msgid ""
@@ -109,9 +105,8 @@ msgid ""
 "that ``final``, ``static`` nor ``transient`` fields will be skipped. "
 "What’s more, fields with ``null`` value will not be serialised neither."
 msgstr ""
-"变量序列化遵循 ``Serializable`` 语义，这意味着 ``final``、``static`` 和 "
-"``transient`` 字段将被跳过。更重要的是，具有 ``null`` "
-"值的字段也不会被序列化。"
+"变量序列化遵循 ``Serializable`` 语义，这意味着 ``final``、``static`` 和 ``transient`` "
+"字段将被跳过。更重要的是，具有 ``null`` 值的字段也不会被序列化。"
 
 #: ../../Tigase_Development/EventBus_API.rst:75
 msgid "Serialisation of class-based events"
@@ -121,8 +116,7 @@ msgstr "基于类的事件的序列化"
 msgid ""
 "Class based events are serialized (if it is required and possible) to XML"
 " element. Name of XML element is taken from full name of class:"
-msgstr "基于类的事件被序列化（如果需要并且可能的话）到XML元素。 "
-"XML元素的名称取自类的全名："
+msgstr "基于类的事件被序列化（如果需要并且可能的话）到XML元素。 XML元素的名称取自类的全名："
 
 #: ../../Tigase_Development/EventBus_API.rst:79
 msgid "**Class based event serialized to XML.**"
@@ -157,8 +151,7 @@ msgid ""
 "To handle fired event, we have to register listener in EventBus. When "
 "listener is registered, EventBus automatically subscribes for this type "
 "of event in all instances in cluster."
-msgstr "要处理触发的事件，我们必须在EventBus中注册监听器。注册监听器后，EventBus会自"
-"动在集群中的所有实例中订阅此类事件。"
+msgstr "要处理触发的事件，我们必须在EventBus中注册监听器。注册监听器后，EventBus会自动在集群中的所有实例中订阅此类事件。"
 
 #: ../../Tigase_Development/EventBus_API.rst:121
 msgid ""
@@ -183,31 +176,29 @@ msgid ""
 "class, annotated by ``@HandleEvent`` as listeners for event declared as "
 "the method argument."
 msgstr ""
-"为了使注册监听器更容易，您可以使用EventBus中的方法 "
-"``registerAll()``。此方法注册给定类的所有方法，由 ``@HandleEvent`` "
-"注释为声明为方法参数的事件的侦听器。"
+"为了使注册监听器更容易，您可以使用EventBus中的方法 ``registerAll()``。此方法注册给定类的所有方法，由 "
+"``@HandleEvent`` 注释为声明为方法参数的事件的侦听器。"
 
 #: ../../Tigase_Development/EventBus_API.rst:154
 msgid "|ss| Handling XML events |se|\\"
 msgstr "|ss| 处理XML事件 |se|\\"
 
 #: ../../Tigase_Development/EventBus_API.rst:156
+#, fuzzy
 msgid ""
 "To handle XML events we have to register listener for specific event "
 "package and name. In our example, package is empty because event name has"
-" no package declared (see also `Filtering events "
-"<#_filtering_events>`__)."
+" no package declared (see also :ref:`Filtering events<filteringEvents>`)."
 msgstr ""
-"要处理XML事件，我们必须为特定事件包和名称注册侦听器。在我们的示例中，包是空的"
-"，因为事件名称没有声明包（另请参阅 :ref:`过滤事件<filtering_events>`）。"
+"要处理XML事件，我们必须为特定事件包和名称注册侦听器。在我们的示例中，包是空的，因为事件名称没有声明包（另请参阅 "
+":ref:`过滤事件<filtering_events>`）。"
 
 #: ../../Tigase_Development/EventBus_API.rst:173
 msgid ""
 "Because serialized class events, ale transformed to XML elements, we are "
 "able to listen for XML representation of class based event. To do that, "
 "we have to register listener for specific package and class name:"
-msgstr "因为序列化的类事件，ale转换为XML元素，所以我们能够侦听基于类的事件的XML表示。"
-"为此，我们必须为特定的包和类名注册监听器："
+msgstr "因为序列化的类事件，ale转换为XML元素，所以我们能够侦听基于类的事件的XML表示。为此，我们必须为特定的包和类名注册监听器："
 
 #: ../../Tigase_Development/EventBus_API.rst:186
 msgid "**Important**"
@@ -217,40 +208,39 @@ msgstr "**重要**"
 msgid ""
 "XML events created on others cluster node, will have attribute ``remote``"
 " set to ``true`` and attribute ``source`` set to event creator node name:"
-msgstr ""
-"在其他集群节点上创建的XML事件，将属性 ``remote`` 设置为 ``true``，属性 "
-"``source`` 设置为事件创建者节点名称："
+msgstr "在其他集群节点上创建的XML事件，将属性 ``remote`` 设置为 ``true``，属性 ``source`` 设置为事件创建者节点名称："
 
-#: ../../Tigase_Development/EventBus_API.rst:198
+#: ../../Tigase_Development/EventBus_API.rst:199
 msgid "Filtering events"
 msgstr "过滤事件"
 
-#: ../../Tigase_Development/EventBus_API.rst:200
+#: ../../Tigase_Development/EventBus_API.rst:201
 msgid ""
 "Sometimes you may want to receive many kinds of events with the same "
 "handler. EventBus has very simple mechanism to generalization:"
 msgstr "有时您可能希望使用同一个处理程序接收多种事件。 EventBus有非常简单的泛化机制："
 
-#: ../../Tigase_Development/EventBus_API.rst:207
+#: ../../Tigase_Development/EventBus_API.rst:208
 msgid ""
 "This listener will be called for each event with given package name (XML "
 "based, or serialized class based)."
 msgstr "将为具有给定包名称（基于XML或基于序列化类）的每个事件调用此侦听器。"
 
-#: ../../Tigase_Development/EventBus_API.rst:209
+#: ../../Tigase_Development/EventBus_API.rst:210
 msgid ""
 "This listener will be called for ALL events (XML based, or serialized "
 "class based)."
 msgstr "将为所有事件（基于XML或基于序列化类）调用此侦听器。"
 
-#: ../../Tigase_Development/EventBus_API.rst:211
+#: ../../Tigase_Development/EventBus_API.rst:212
 msgid "In case of class based events, EventBus is checking class inheritance."
 msgstr "对于基于类的事件，EventBus正在检查类继承。"
 
-#: ../../Tigase_Development/EventBus_API.rst:223
+#: ../../Tigase_Development/EventBus_API.rst:224
 msgid "Will be called, because this is listener stricte for ``SpecificEvent``."
 msgstr "将被调用，因为这是 ``SpecificEvent`` 的严格监听器。"
 
-#: ../../Tigase_Development/EventBus_API.rst:225
+#: ../../Tigase_Development/EventBus_API.rst:226
 msgid "Will be called, because ``SpecificEvent`` extends ``MainEvent``."
 msgstr "将被调用，因为 ``SpecificEvent`` 扩展了 ``MainEvent``。"
+
