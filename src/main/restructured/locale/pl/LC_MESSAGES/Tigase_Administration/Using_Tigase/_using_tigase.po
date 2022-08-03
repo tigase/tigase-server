@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 19:27-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,61 +33,65 @@ msgid ":ref:`Tigase Log Guide<Tigase-Log-Guide>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:8
-msgid "ref:`Debugging Tigase<Debuging-Tigase>`"
+msgid ":ref:`Debugging Tigase<Debuging-Tigase>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:10
-msgid "ref:`Basic System Checks<Basic-System-Checks>`"
+msgid ":ref:`Basic System Checks<Basic-System-Checks>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:12
-msgid "ref:`Add and Manage Domains<addManageDomain>`"
+msgid ":ref:`Add and Manage Domains<addManageDomain>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:14
-msgid "ref:`Presence Forwarding<Presence-Forwarding>`"
+msgid ":ref:`Presence Forwarding<Presence-Forwarding>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:16
-msgid "ref:`Watchdog<Watchdog>`"
+msgid ":ref:`Watchdog<Watchdog>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:18
-msgid "ref:`Runtime Environment Tip<Tigase-Tip-Checking-the-Runtime-Environment>`"
+msgid ""
+":ref:`Runtime Environment Tip<Tigase-Tip-Checking-the-Runtime-"
+"Environment>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:20
-msgid "ref:`Checking Cluster Connections<Checking-Cluster-Connections>`"
+msgid ":ref:`Checking Cluster Connections<Checking-Cluster-Connections>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:22
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:10
 msgid ""
-"ref:`Best Practices for Connecting to Tigase XMPP server From Web Browser"
-"<Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-Browser>`"
+":ref:`Best Practices for Connecting to Tigase XMPP server From Web "
+"Browser<Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-"
+"Browser>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:24
-msgid "`Scripting Support in Tigase<Scripting-support-in-Tigase>`"
+msgid ":ref:`Scripting Support in Tigase<Scripting-support-in-Tigase>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:26
 msgid ""
-"ref:`Scripting Introduction - Hello World!<Scripting-Introduction - "
+":ref:`Scripting Introduction - Hello World!<Scripting-Introduction - "
 "Hello-World!>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:28
 msgid ""
-"ref:`Tigase Scripting Version 4.4.x Update for Administrators<Tigase-"
+":ref:`Tigase Scripting Version 4.4.x Update for Administrators<Tigase-"
 "Scripting-Version-4.4.x-Update-for-Administrators>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:30
-msgid "ref:`Tigase and Python Scripting<Tigase-and-Python>`"
+msgid ":ref:`Tigase and Python Scripting<Tigase-and-Python>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:32
-msgid "ref:`Configuration Wizards<tigase3xconfiguration>`"
+msgid ":ref:`Configuration Wizards<tigase3xconfiguration>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:2
@@ -480,9 +484,9 @@ msgstr ""
 msgid ""
 "The tigase.log files are where the majority of logging will take place. "
 "The rules for writing to these longs can be manipulated by editing files "
-"in the int.properties file. To see how, see the `Debugging Tigase "
-"<#debuggingTigase>`__ section of this manual for more details about how "
-"to turn on debug logging, and how to manipulate log settings. Entries to "
+"in the int.properties file. To see how, see the :ref:`Debugging Tigase"
+"<Debuging-Tigase>` section of this manual for more details about how to "
+"turn on debug logging, and how to manipulate log settings. Entries to "
 "these logs are made in the following format:"
 msgstr ""
 
@@ -728,9 +732,9 @@ msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:6
 msgid ""
-"Previously, a configuration article is available about `Linux settings "
-"for high load systems <#linuxhighload>`__. This has a description of "
-"basic settings which are essential to successfully run XMPP service for "
+"Previously, a configuration article is available about :ref:`Linux "
+"settings for high load systems<linuxhighload>`. This has a description of"
+" basic settings which are essential to successfully run XMPP service for "
 "hundreds or thousands of online users."
 msgstr ""
 
@@ -1208,8 +1212,8 @@ msgstr ""
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:136
 msgid ""
 "SSL Certificate Management has been implemented, and certificates can be "
-"manipulated when in a .pem form. For more details, see `Creating and "
-"Loading the Server Certificate in pem Files <#certspem>`__ section of "
+"manipulated when in a .pem form. For more details, see :ref:`Creating and"
+" Loading the Server Certificate in pem Files<certspem>` section of "
 "documentation for more information."
 msgstr ""
 
@@ -1567,20 +1571,14 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:8
-msgid "`Runtime Environment Tip <#tigaseTip_RuntimeEnvironment>`__"
-msgstr ""
-
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:10
-msgid ""
-"`Best Practices for Connecting to Tigase XMPP server From Web Browser "
-"<#bestWebPrax>`__"
-msgstr ""
-
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:13
-msgid "Tigase Tip: Checking the Runtime Environment"
+msgid ":ref:`Runtime Environment Tip<tigaseTip_RuntimeEnvironment>`"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:15
+msgid "Tigase Tip: Checking the Runtime Environment"
+msgstr ""
+
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:17
 msgid ""
 "It has happened recently that we have tried very hard to fix a few "
 "annoying problems on one of the Tigase installations. Whatever we did, "
@@ -1589,7 +1587,7 @@ msgid ""
 "didn’t on the target system."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:17
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:19
 msgid ""
 "It turned out that due to specific environment settings on the target "
 "system, an old version of Tigase server was always started regardless of "
@@ -1598,48 +1596,48 @@ msgid ""
 " finding the issue: improper environment settings."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:19
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:21
 msgid ""
 "The best way to check all the environment settings used to start the "
 "Tigase server is to use… ``check`` command line parameter:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:51
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:53
 msgid ""
 "In our case ``TIGASE_HOME`` was set to a fixed location pointing to an "
 "old version of the server files. The quick ``check`` command may be a "
 "real time saver."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:56
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:58
 msgid "Best Practices for Connecting to Tigase XMPP server From Web Browser"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:58
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:60
 msgid ""
 "Currently we have 2 ways to connect to Tigase XMPP Server from web "
 "browsers:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:60
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:62
 msgid "BOSH (Bidirectional-streams Over Synchronous HTTP)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:62
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:64
 msgid "WebSocket (XMPP over WebSocket)"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:64
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:66
 msgid ""
 "You will find more information about these ways for connecting to Tigase "
 "XMPP Server with some useful tips below."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:67
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:69
 msgid "BOSH"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:69
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:71
 msgid ""
 "BOSH protocol specified in `XEP-0124 "
 "<http://xmpp.org/extensions/xep-0124.html>`__ is one of first protocols "
@@ -1649,7 +1647,7 @@ msgid ""
 "XMPP Server and available at port 5280."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:71
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:73
 msgid ""
 "In clustered mode we can deploy it with load balancer deployed with "
 "guarantees that each BOSH connection from web browser will be forwarded "
@@ -1661,11 +1659,11 @@ msgid ""
 "be forwarded always to node ``t1``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:74
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:76
 msgid "Tip #1 - BOSH in Cluster Mode Without Load Balancer"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:76
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:78
 msgid ""
 "There is also a way to use BOSH without load balancer enabled. In this "
 "case the XMPP client needs to have more logic and knowledge about all "
@@ -1677,11 +1675,11 @@ msgid ""
 " randomly pick other node from list of rest of available nodes."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:78
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:80
 msgid "*Solution:*"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:80
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:82
 msgid ""
 "Tigase XMPP Server by default provides server side solution for this "
 "issue by sending additional ``host`` attribute in ``body`` element of "
@@ -1692,12 +1690,12 @@ msgid ""
 "``etc/config.tdsl`` config file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:88
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:128
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:90
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:130
 msgid "*Example:*"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:90
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:92
 msgid ""
 "We have servers ``t1.example.com`` and ``t2.example.com`` which are nodes"
 " of a cluster hosting domain ``example.com``. Web client retrieves list "
@@ -1709,11 +1707,11 @@ msgid ""
 " attribute of XMPP stream)."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:93
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:95
 msgid "WebSocket"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:95
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:97
 msgid ""
 "WebSocket protocol is newly standardized protocol which is supported by "
 "many of current versions of browsers. Currently there is a draft of "
@@ -1726,18 +1724,18 @@ msgid ""
 "you need to use library which supports XMPP-over-WebSocket protocol."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:98
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:100
 msgid "Tip #1 - Encrypted WebSocket Connection"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:100
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:102
 msgid ""
 "It is possible to enable encrypted WebSocket connection in Tigase XMPP "
 "Server. To do this you need to add following lines to ``etc/config.tdsl``"
 " config file:"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:118
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:120
 msgid ""
 "In this example we enabled WebSocket endpoint on port 5290 allowing "
 "unencrypted connections, and encrypted WebSocket endpoint on port 5291. "
@@ -1746,17 +1744,17 @@ msgid ""
 "``certs/default.pem``."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:122
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:124
 msgid ""
 "There is no default configuration for non-default ports. All ports "
 "outside 443 MUST be configured."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:124
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:126
 msgid "Tip #2 - Encrypted WebSocket Connection - Dealing With Multiple VHosts"
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:126
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:128
 msgid ""
 "As mentioned in Tip #1 WebSocket endpoint is plain TLS/SSL port, so it "
 "always serves default certificate for Tigase XMPP Server instance. That "
@@ -1775,7 +1773,7 @@ msgid ""
 "which it can be identified from internet."
 msgstr ""
 
-#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:130
+#: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:132
 msgid ""
 "We have servers ``t1.example1.com`` and ``t2.example1.com`` which are "
 "nodes of a cluster in hosting domain ``example2.com``. Each of our nodes "
@@ -1957,8 +1955,8 @@ msgstr ""
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:73
 msgid ""
 "**If you are provided a manually produced license, you will need to place"
-" it in the same ``etc/`` directory with the name "
-"``<component_name>.license`` (e.g.: ``etc/acs.license``)**"
+" it in the same** ``etc/`` **directory with the name** "
+"``<component_name>.license`` (**e.g.:** ``etc/acs.license``)"
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:76
@@ -2240,8 +2238,8 @@ msgstr ""
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:109
 msgid ""
 "This allows the specific use of a load balancing mechanism by selecting "
-"``SeeOtherHostIfc`` implementation. For more details, see `Tigase Load "
-"Balancing <#loadBalancing>`__ documentation."
+"``SeeOtherHostIfc`` implementation. For more details, see :ref:`Tigase "
+"Load Balancing<loadBalancing>` documentation."
 msgstr ""
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:112
@@ -2387,8 +2385,8 @@ msgstr ""
 msgid ""
 "Tigase Server can support anonymous logins via SASL-ANONYMOUS in certain "
 "scenarios. This can be enabled on per-VHost basis by adjusting *Anonymous"
-" enabled* option as described in ` Add and Manage Domains (VHosts)<#Add-"
-"and-Manage-Domains-(VHosts)>`__ This setting is false by default as SASL-"
+" enabled* option as described in :ref:`Add and Manage Domains "
+"(VHosts)<addManageDomain>` This setting is false by default as SASL-"
 "ANONYMOUS may not be totally secure as users can connect without prior "
 "permission (username and password)."
 msgstr ""
@@ -3249,9 +3247,10 @@ msgstr ""
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:44
 msgid ""
 "For instructions how to load and execute the script, please refer to the "
-"`introductory article <#scriptingintro>`__ for scripting in Tigase "
-"server. There were some minor changes in Tigase 4.4.0 and later versions,"
-" so please have a look at the `article <#newElements>`__ describing new "
+":ref:`introductory article<Scripting-Introduction - Hello-World!>` for "
+"scripting in Tigase server. There were some minor changes in Tigase 4.4.0"
+" and later versions, so please have a look at the :ref:`article <Tigase-"
+"Scripting-Version-4.4.x-Update-for-Administrators>` describing new "
 "elements as well."
 msgstr ""
 
@@ -3350,5 +3349,141 @@ msgstr ""
 #~ " extreme cases when `Automatic Registration"
 #~ " (recommended) <#AutomaticLicenceRegistration>`__ can’t"
 #~ " be used."
+#~ msgstr ""
+
+#~ msgid "ref:`Debugging Tigase<Debuging-Tigase>`"
+#~ msgstr ""
+
+#~ msgid "ref:`Basic System Checks<Basic-System-Checks>`"
+#~ msgstr ""
+
+#~ msgid "ref:`Add and Manage Domains<addManageDomain>`"
+#~ msgstr ""
+
+#~ msgid "ref:`Presence Forwarding<Presence-Forwarding>`"
+#~ msgstr ""
+
+#~ msgid "ref:`Watchdog<Watchdog>`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "ref:`Runtime Environment Tip<Tigase-Tip-"
+#~ "Checking-the-Runtime-Environment>`"
+#~ msgstr ""
+
+#~ msgid "ref:`Checking Cluster Connections<Checking-Cluster-Connections>`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "ref:`Best Practices for Connecting to "
+#~ "Tigase XMPP server From Web Browser"
+#~ "<Best-Practices-for-Connecting-to-"
+#~ "Tigase-XMPP-server-From-Web-Browser>`"
+#~ msgstr ""
+
+#~ msgid "`Scripting Support in Tigase<Scripting-support-in-Tigase>`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "ref:`Scripting Introduction - Hello World"
+#~ "!<Scripting-Introduction - Hello-World!>`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "ref:`Tigase Scripting Version 4.4.x Update "
+#~ "for Administrators<Tigase-Scripting-Version-4.4.x"
+#~ "-Update-for-Administrators>`"
+#~ msgstr ""
+
+#~ msgid "ref:`Tigase and Python Scripting<Tigase-and-Python>`"
+#~ msgstr ""
+
+#~ msgid "ref:`Configuration Wizards<tigase3xconfiguration>`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The tigase.log files are where the "
+#~ "majority of logging will take place. "
+#~ "The rules for writing to these "
+#~ "longs can be manipulated by editing "
+#~ "files in the int.properties file. To "
+#~ "see how, see the `Debugging Tigase "
+#~ "<#debuggingTigase>`__ section of this manual"
+#~ " for more details about how to "
+#~ "turn on debug logging, and how to"
+#~ " manipulate log settings. Entries to "
+#~ "these logs are made in the "
+#~ "following format:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Previously, a configuration article is "
+#~ "available about `Linux settings for high"
+#~ " load systems <#linuxhighload>`__. This has"
+#~ " a description of basic settings "
+#~ "which are essential to successfully run"
+#~ " XMPP service for hundreds or "
+#~ "thousands of online users."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "SSL Certificate Management has been "
+#~ "implemented, and certificates can be "
+#~ "manipulated when in a .pem form. "
+#~ "For more details, see `Creating and "
+#~ "Loading the Server Certificate in pem"
+#~ " Files <#certspem>`__ section of "
+#~ "documentation for more information."
+#~ msgstr ""
+
+#~ msgid "`Runtime Environment Tip <#tigaseTip_RuntimeEnvironment>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Best Practices for Connecting to Tigase"
+#~ " XMPP server From Web Browser "
+#~ "<#bestWebPrax>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**If you are provided a manually "
+#~ "produced license, you will need to "
+#~ "place it in the same ``etc/`` "
+#~ "directory with the name "
+#~ "``<component_name>.license`` (e.g.: ``etc/acs.license``)**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This allows the specific use of a"
+#~ " load balancing mechanism by selecting "
+#~ "``SeeOtherHostIfc`` implementation. For more "
+#~ "details, see `Tigase Load Balancing "
+#~ "<#loadBalancing>`__ documentation."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tigase Server can support anonymous "
+#~ "logins via SASL-ANONYMOUS in certain "
+#~ "scenarios. This can be enabled on "
+#~ "per-VHost basis by adjusting *Anonymous "
+#~ "enabled* option as described in ` "
+#~ "Add and Manage Domains (VHosts)<#Add-"
+#~ "and-Manage-Domains-(VHosts)>`__ This setting "
+#~ "is false by default as SASL-"
+#~ "ANONYMOUS may not be totally secure "
+#~ "as users can connect without prior "
+#~ "permission (username and password)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "For instructions how to load and "
+#~ "execute the script, please refer to "
+#~ "the `introductory article <#scriptingintro>`__ "
+#~ "for scripting in Tigase server. There"
+#~ " were some minor changes in Tigase"
+#~ " 4.4.0 and later versions, so please"
+#~ " have a look at the `article "
+#~ "<#newElements>`__ describing new elements as"
+#~ " well."
 #~ msgstr ""
 

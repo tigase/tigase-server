@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,15 +30,15 @@ msgid ""
 msgstr ""
 
 #: ../../Tigase_Development/Experimental.rst:6
-msgid "`Dynamic Rosters <#dynamicRosters>`__"
+msgid ":ref:`Dynamic Rosters<dynamicRosters>`"
 msgstr ""
 
 #: ../../Tigase_Development/Experimental.rst:8
-msgid "`Mobile Optimizations <#mobileoptimizations>`__"
+msgid ":ref:`Mobile Optimizations<mobileoptimizations>`"
 msgstr ""
 
 #: ../../Tigase_Development/Experimental.rst:10
-msgid "`Bosh Session Cache <#boshsessioncache>`__"
+msgid ":ref:`Bosh Session Cache<boshsessioncache>`"
 msgstr ""
 
 #: ../../Tigase_Development/Experimental.rst:16
@@ -189,8 +189,8 @@ msgstr ""
 #: ../../Tigase_Development/Experimental.rst:145
 msgid ""
 "If you want to pass configuration to your implementation simply use "
-"``@ConfigField`` annotation on your variable (see `Component "
-"implementation - Lesson 2 - Configuration <#cil2>`__ for more details)."
+"``@ConfigField`` annotation on your variable (see :ref:`Component "
+"implementation - Lesson 2 - Configuration<cil2>` for more details)."
 msgstr ""
 
 #: ../../Tigase_Development/Experimental.rst:150
@@ -519,4 +519,22 @@ msgid ""
 "the client quickly retrieve information about the full JID for the "
 "established Bosh session."
 msgstr ""
+
+#~ msgid "`Dynamic Rosters <#dynamicRosters>`__"
+#~ msgstr ""
+
+#~ msgid "`Mobile Optimizations <#mobileoptimizations>`__"
+#~ msgstr ""
+
+#~ msgid "`Bosh Session Cache <#boshsessioncache>`__"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If you want to pass configuration "
+#~ "to your implementation simply use "
+#~ "``@ConfigField`` annotation on your variable"
+#~ " (see `Component implementation - Lesson"
+#~ " 2 - Configuration <#cil2>`__ for "
+#~ "more details)."
+#~ msgstr ""
 

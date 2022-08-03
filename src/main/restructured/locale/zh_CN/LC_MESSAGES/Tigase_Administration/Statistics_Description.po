@@ -5,19 +5,18 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc\n"
+"Project-Id-Version:  TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-27 12:30-0700\n"
+"POT-Creation-Date: 2022-08-03 03:02-0700\n"
 "PO-Revision-Date: 2022-07-13 21:49+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
-"tigase-xmpp-server/statistics_description/zh_Hans/>\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
+"/tigase-xmpp-server/statistics_description/zh_Hans/>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:4
@@ -33,10 +32,9 @@ msgid ""
 "pubsub, you would look for pubsub/Max queue size. Statistics will not be "
 "provided by components that are not enabled."
 msgstr ""
-"统计数据分为数据源，组件和处理器。您可能会看到为公共组件部分中定义的多个组件"
-"收集的相同统计信息。请注意，统计信息由 {$component}/statistic 定义，"
-"因此如果您想要 pubsub 上的 Max queue size，您将查找 pubsub/Max queue "
-"size。未启用的组件不会提供统计信息。"
+"统计数据分为数据源，组件和处理器。您可能会看到为公共组件部分中定义的多个组件收集的相同统计信息。请注意，统计信息由 "
+"{$component}/statistic 定义，因此如果您想要 pubsub 上的 Max queue size，您将查找 "
+"pubsub/Max queue size。未启用的组件不会提供统计信息。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:9
 msgid "Data source statistics"
@@ -47,8 +45,7 @@ msgid ""
 "Data sources used to access data storages such as JDBC (databases) or "
 "MongoDB provide statistics related to stability of connections to data "
 "storage and number of open connections."
-msgstr "用于访问JDBC（数据库）或MongoDB等数据存储的数据源提供与数据存储连接稳定性和打"
-"开连接数相关的统计信息。"
+msgstr "用于访问JDBC（数据库）或MongoDB等数据存储的数据源提供与数据存储连接稳定性和打开连接数相关的统计信息。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:14
 #: ../../Tigase_Administration/Statistics_Description.rst:33
@@ -159,8 +156,7 @@ msgid ""
 "Number of defined and active data sources (i.e. connection pools). This "
 "is not a number of connections to data sources as it varies and is listed"
 " separately for every defined data source."
-msgstr "已定义和活动数据源（即连接池）的数量。这不是与数据源的连接数，因为它会有所不"
-"同，并且针对每个定义的数据源单独列出。"
+msgstr "已定义和活动数据源（即连接池）的数量。这不是与数据源的连接数，因为它会有所不同，并且针对每个定义的数据源单独列出。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:16
 #: ../../Tigase_Administration/Statistics_Description.rst:18
@@ -503,9 +499,7 @@ msgid ""
 "For every {method} declared in ``UserRepository`` we gather execution "
 "statistics. This statistics are collected separately for every data "
 "source for which user repository is defined."
-msgstr ""
-"对于 ``UserRepository`` 中声明的每个{method}，我们都会收集执行统计信息。为定"
-"义用户存储库的每个数据源单独收集此统计信息。"
+msgstr "对于 ``UserRepository`` 中声明的每个{method}，我们都会收集执行统计信息。为定义用户存储库的每个数据源单独收集此统计信息。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:35
 #: ../../Tigase_Administration/Statistics_Description.rst:52
@@ -518,8 +512,7 @@ msgid ""
 "Average time taken by call of {method} for this data source since "
 "creation of data source (most likely from server startup). It includes "
 "time taken by calls which thrown exception, etc."
-msgstr "自创建数据源以来，为此数据源调用 {method} 所用的平均时间（很可能从服务器启动"
-"开始）。它包括引发异常的调用所花费的时间等。"
+msgstr "自创建数据源以来，为此数据源调用 {method} 所用的平均时间（很可能从服务器启动开始）。它包括引发异常的调用所花费的时间等。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:35
 #, fuzzy
@@ -771,8 +764,8 @@ msgid ""
 "statistics. This statistics are collected separately for every data "
 "source for which authentication repository is defined."
 msgstr ""
-"对于 ``AuthRepository`` 中声明的每个 {method}，我们都会收集执行统计信息。为定"
-"义了身份验证存储库的每个数据源单独收集此统计信息。"
+"对于 ``AuthRepository`` 中声明的每个 "
+"{method}，我们都会收集执行统计信息。为定义了身份验证存储库的每个数据源单独收集此统计信息。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:52
 #: ../../Tigase_Administration/Statistics_Description.rst:86
@@ -835,8 +828,7 @@ msgid ""
 "These statistics may be found in many components which are using "
 "repository implementations created just for them. An example of such "
 "components may be:"
-msgstr "这些统计信息可以在许多使用仅为它们创建的存储库实现的组件中找到。此类组件的示"
-"例可能是："
+msgstr "这些统计信息可以在许多使用仅为它们创建的存储库实现的组件中找到。此类组件的示例可能是："
 
 #: ../../Tigase_Administration/Statistics_Description.rst:67
 #, fuzzy
@@ -889,9 +881,8 @@ msgid ""
 "on per {method} basis separately for every data source ({dataSourceName})"
 " for which repository is defined."
 msgstr ""
-"对于自定义组件存储库，我们以与用户和授权存储库相同的方式收集统计信息。"
-"针对定义了存储库的每个数据源 ({dataSourceName})，按 {method} "
-"分别收集统计信息。"
+"对于自定义组件存储库，我们以与用户和授权存储库相同的方式收集统计信息。针对定义了存储库的每个数据源 ({dataSourceName})，按 "
+"{method} 分别收集统计信息。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:86
 #, fuzzy
@@ -908,7 +899,8 @@ msgid ""
 "``{compname}/{repo}/{dataSourceName}/{method}/Exceptions during "
 "execution``"
 msgstr ""
-"``{compname}/{repo}/{dataSourceName}/{method}/Exceptions during execution``"
+"``{compname}/{repo}/{dataSourceName}/{method}/Exceptions during "
+"execution``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:90
 #, fuzzy
@@ -924,8 +916,7 @@ msgid ""
 "These statistics may be found in multiple components and may be seen "
 "multiple times. For example both s2s and c2s will have Bytes received "
 "statistic, so each can be found the following way:"
-msgstr "这些统计数据可以在多个组件中找到，并且可以多次看到。例如s2s和c2s都会有接收字"
-"节数统计，所以每个都可以通过以下方式找到："
+msgstr "这些统计数据可以在多个组件中找到，并且可以多次看到。例如s2s和c2s都会有接收字节数统计，所以每个都可以通过以下方式找到："
 
 #: ../../Tigase_Administration/Statistics_Description.rst:104
 #: ../../Tigase_Administration/Statistics_Description.rst:188
@@ -1026,8 +1017,9 @@ msgid ""
 "command/add-script last minute`` ``{compname}/adhoc-command/add-script "
 "last second``"
 msgstr ""
-"``{compname}/adhoc-command/add-script last hour`` ``{compname}/adhoc-command/"
-"add-script last minute`` ``{compname}/adhoc-command/add-script last second``"
+"``{compname}/adhoc-command/add-script last hour`` ``{compname}/adhoc-"
+"command/add-script last minute`` ``{compname}/adhoc-command/add-script "
+"last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:108
 msgid "add-script/Average processing time"
@@ -1055,9 +1047,8 @@ msgid ""
 "instances. This statistic will reset every time the server shuts down or "
 "restarts."
 msgstr ""
-"在过去100次组件调用中，此组件的所有命令和脚本的平均处理时间（以毫秒为单位）。"
-"此数字将填充少于 100 次运行，并将继续平均，直到发生100次运行，此时，"
-"它是最近的 100 个实例。每次服务器关闭或重新启动时，此统计信息都会重置。"
+"在过去100次组件调用中，此组件的所有命令和脚本的平均处理时间（以毫秒为单位）。此数字将填充少于 100 "
+"次运行，并将继续平均，直到发生100次运行，此时，它是最近的 100 个实例。每次服务器关闭或重新启动时，此统计信息都会重置。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:110
 #, fuzzy
@@ -1073,8 +1064,7 @@ msgid ""
 "The total number of bytes that the component has received during the "
 "current server instance. This statistic resets at server shutdown or "
 "restart."
-msgstr "组件在当前服务器实例期间收到的总字节数。此统计信息在服务器关闭或重新启动时重"
-"置。"
+msgstr "组件在当前服务器实例期间收到的总字节数。此统计信息在服务器关闭或重新启动时重置。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:112
 #: ../../Tigase_Administration/Statistics_Description.rst:114
@@ -1094,8 +1084,7 @@ msgstr "发送的字节数"
 msgid ""
 "The total number of bytes that the component has sent during the current "
 "server instance. This statistic resets at server shutdown or restart."
-msgstr "组件在当前服务器实例期间发送的总字节数。此统计信息在服务器关闭或重新启动时重"
-"置。"
+msgstr "组件在当前服务器实例期间发送的总字节数。此统计信息在服务器关闭或重新启动时重置。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:114
 #, fuzzy
@@ -1119,8 +1108,9 @@ msgid ""
 "command/del-script last minute`` ``{compname}/adhoc-command/del-script "
 "last second``"
 msgstr ""
-"``{compname}/adhoc-command/del-script last hour`` ``{compname}/adhoc-command/"
-"del-script last minute`` ``{compname}/adhoc-command/del-script last second``"
+"``{compname}/adhoc-command/del-script last hour`` ``{compname}/adhoc-"
+"command/del-script last minute`` ``{compname}/adhoc-command/del-script "
+"last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:118
 msgid "del-script Average processing time"
@@ -1183,8 +1173,7 @@ msgstr "列表命令平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``list-"
 "commands`` to execute on this component."
-msgstr "以毫秒为单位的平均时间，以整数形式返回，``list-commands`` "
-"在此组件上执行所需的时间。"
+msgstr "以毫秒为单位的平均时间，以整数形式返回，``list-commands`` 在此组件上执行所需的时间。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:124
 #, fuzzy
@@ -1200,8 +1189,7 @@ msgid ""
 "The number of times the in or out queue has overflown for this component."
 " That is there are more packets queues than the max queue size. A total "
 "statistic is also available that combines both results."
-msgstr "此组件的进出队列溢出的次数。即有比最大队列的大小更多的数据包队列。还提供了结"
-"合这两个结果的总体统计数据。"
+msgstr "此组件的进出队列溢出的次数。即有比最大队列的大小更多的数据包队列。还提供了结合这两个结果的总体统计数据。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:126
 #, fuzzy
@@ -1238,13 +1226,14 @@ msgid ""
 " queue wait: LOW`` ``{compname}/Out queue wait: PRESENCE`` "
 "``{compname}/Out queue wait: LOWEST``"
 msgstr ""
-"``{compname}/In queue wait: SYSTEM`` ``{compname}/In queue wait: CLUSTER`` "
-"``{compname}/In queue wait: HIGH`` ``{compname}/In queue wait: NORMAL`` "
-"``{compname}/In queue wait: LOW`` ``{compname}/In queue wait: PRESENCE`` "
-"``{compname}/In queue wait: LOWEST`` ``{compname}/Out queue wait: SYSTEM`` "
-"``{compname}/Out queue wait: CLUSTER`` ``{compname}/Out queue wait: HIGH`` "
-"``{compname}/Out queue wait: NORMAL`` ``{compname}/Out queue wait: LOW`` "
-"``{compname}/Out queue wait: PRESENCE`` ``{compname}/Out queue wait: LOWEST``"
+"``{compname}/In queue wait: SYSTEM`` ``{compname}/In queue wait: "
+"CLUSTER`` ``{compname}/In queue wait: HIGH`` ``{compname}/In queue wait: "
+"NORMAL`` ``{compname}/In queue wait: LOW`` ``{compname}/In queue wait: "
+"PRESENCE`` ``{compname}/In queue wait: LOWEST`` ``{compname}/Out queue "
+"wait: SYSTEM`` ``{compname}/Out queue wait: CLUSTER`` ``{compname}/Out "
+"queue wait: HIGH`` ``{compname}/Out queue wait: NORMAL`` ``{compname}/Out"
+" queue wait: LOW`` ``{compname}/Out queue wait: PRESENCE`` "
+"``{compname}/Out queue wait: LOWEST``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:130
 msgid "{IN/OUT}_QUEUE processed {type}"
@@ -1256,8 +1245,7 @@ msgid ""
 " In or Out Queue of this component. This number will reset at the end of "
 "the server instance. Each component will have a list of the different "
 "types of stanzas it can process."
-msgstr "通过此组件的In或Out Queue处理的不同类型的节数。此数字将在服务器实例结束时重置"
-"。每个组件都有一个它可以处理的不同类型节的列表。"
+msgstr "通过此组件的In或Out Queue处理的不同类型的节数。此数字将在服务器实例结束时重置。每个组件都有一个它可以处理的不同类型节的列表。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:130
 #: ../../Tigase_Administration/Statistics_Description.rst:151
@@ -1280,9 +1268,10 @@ msgid ""
 "session IQ vCard IQ command IQ jabber:iq:private IQ "
 "http://jabber.org/protocol/disco#info total IQ"
 msgstr ""
-"# messages presences cluster other IQ no XMLNS IQ http://jabber.org/protocol/"
-"disco#items IQ bind IQ jabber:iq:roster IQ session IQ vCard IQ command IQ "
-"jabber:iq:private IQ http://jabber.org/protocol/disco#info total IQ"
+"# messages presences cluster other IQ no XMLNS IQ "
+"http://jabber.org/protocol/disco#items IQ bind IQ jabber:iq:roster IQ "
+"session IQ vCard IQ command IQ jabber:iq:private IQ "
+"http://jabber.org/protocol/disco#info total IQ"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:130
 #, fuzzy
@@ -1311,34 +1300,36 @@ msgid ""
 "``{compname}/OUT_QUEUE processed IQ vCard`` ``{compname}/OUT_QUEUE "
 "processed IQ command`` ``{compname}/OUT_QUEUE processed total IQ``"
 msgstr ""
-"``{compname}/IN_QUEUE processed`` ``{compname}/IN_QUEUE processed messages`` "
-"``{compname}/IN_QUEUE processed presences`` ``{compname}/IN_QUEUE processed "
-"cluster`` ``{compname}/IN_QUEUE processed other`` ``{compname}/IN_QUEUE "
-"processed IQ no XMLNS`` ``{compname}/IN_QUEUE processed IQ http://jabber.org/"
-"protocol/disco#items`` ``{compname}/IN_QUEUE processed IQ http://jabber.org/"
-"protocol/disco#info`` ``{compname}/IN_QUEUE processed IQ bind`` ``{compname}/"
-"IN_QUEUE processed IQ jabber:iq:roster`` ``{compname}/IN_QUEUE processed IQ "
-"jabber:iq:private`` ``{compname}/IN_QUEUE processed IQ session`` "
-"``{compname}/IN_QUEUE processed IQ vCard`` ``{compname}/IN_QUEUE processed "
-"IQ command`` ``{compname}/IN_QUEUE processed total IQ`` ``{compname}/"
-"OUT_QUEUE processed messages`` ``{compname}/OUT_QUEUE processed presences`` "
-"``{compname}/OUT_QUEUE processed cluster`` ``{compname}/OUT_QUEUE processed "
-"other`` ``{compname}/OUT_QUEUE processed IQ no XMLNS`` ``{compname}/"
-"OUT_QUEUE processed IQ http://jabber.org/protocol/disco#items`` ``{compname}/"
-"OUT_QUEUE processed IQ http://jabber.org/protocol/disco#info`` ``{compname}/"
-"OUT_QUEUE processed IQ bind`` ``{compname}/OUT_QUEUE processed IQ "
-"jabber:iq:roster`` ``{compname}/OUT_QUEUE processed IQ jabber:iq:private`` "
-"``{compname}/OUT_QUEUE processed IQ session`` ``{compname}/OUT_QUEUE "
-"processed IQ vCard`` ``{compname}/OUT_QUEUE processed IQ command`` "
-"``{compname}/OUT_QUEUE processed total IQ``"
+"``{compname}/IN_QUEUE processed`` ``{compname}/IN_QUEUE processed "
+"messages`` ``{compname}/IN_QUEUE processed presences`` "
+"``{compname}/IN_QUEUE processed cluster`` ``{compname}/IN_QUEUE processed"
+" other`` ``{compname}/IN_QUEUE processed IQ no XMLNS`` "
+"``{compname}/IN_QUEUE processed IQ "
+"http://jabber.org/protocol/disco#items`` ``{compname}/IN_QUEUE processed "
+"IQ http://jabber.org/protocol/disco#info`` ``{compname}/IN_QUEUE "
+"processed IQ bind`` ``{compname}/IN_QUEUE processed IQ jabber:iq:roster``"
+" ``{compname}/IN_QUEUE processed IQ jabber:iq:private`` "
+"``{compname}/IN_QUEUE processed IQ session`` ``{compname}/IN_QUEUE "
+"processed IQ vCard`` ``{compname}/IN_QUEUE processed IQ command`` "
+"``{compname}/IN_QUEUE processed total IQ`` ``{compname}/OUT_QUEUE "
+"processed messages`` ``{compname}/OUT_QUEUE processed presences`` "
+"``{compname}/OUT_QUEUE processed cluster`` ``{compname}/OUT_QUEUE "
+"processed other`` ``{compname}/OUT_QUEUE processed IQ no XMLNS`` "
+"``{compname}/OUT_QUEUE processed IQ "
+"http://jabber.org/protocol/disco#items`` ``{compname}/OUT_QUEUE processed"
+" IQ http://jabber.org/protocol/disco#info`` ``{compname}/OUT_QUEUE "
+"processed IQ bind`` ``{compname}/OUT_QUEUE processed IQ "
+"jabber:iq:roster`` ``{compname}/OUT_QUEUE processed IQ "
+"jabber:iq:private`` ``{compname}/OUT_QUEUE processed IQ session`` "
+"``{compname}/OUT_QUEUE processed IQ vCard`` ``{compname}/OUT_QUEUE "
+"processed IQ command`` ``{compname}/OUT_QUEUE processed total IQ``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:132
 msgid ""
 "NOTE: Several statistics are only available from statistics component, "
 "shutdown thread will ONLY print the following: messages, presences, "
 "cluster, other, IQ no XLMNS, total IQ."
-msgstr "注意：一些统计信息仅可从统计组件获得，关闭线程将仅打印以下内容：消息，存在，"
-"集群，其他，IQ无XLMNS，总IQ。"
+msgstr "注意：一些统计信息仅可从统计组件获得，关闭线程将仅打印以下内容：消息，存在，集群，其他，IQ无XLMNS，总IQ。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:134
 msgid "max queue size"
@@ -1419,17 +1410,16 @@ msgid ""
 "packets thread: OUT`` ``{compname}/Processed packets thread (outliers) "
 "IN`` ``{compname}/Processed packets thread (outliers) OUT``"
 msgstr ""
-"``{compname}/Processed packets thread: IN`` ``{compname}/Processed packets "
-"thread: OUT`` ``{compname}/Processed packets thread (outliers) IN`` "
-"``{compname}/Processed packets thread (outliers) OUT``"
+"``{compname}/Processed packets thread: IN`` ``{compname}/Processed "
+"packets thread: OUT`` ``{compname}/Processed packets thread (outliers) "
+"IN`` ``{compname}/Processed packets thread (outliers) OUT``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst
 msgid ""
 "Statistics will provide an array for each processor, listed from 0, 1, 2,"
 " 3 etc.. Let’s say that we have 4 threads set for ws2s, a list will be "
 "seen like this:"
-msgstr "统计信息将为每个处理器提供一个数组，从 0，1，2，3 "
-"等开始列出。假设我们为ws2s设置了4个线程，一个列表将如下所示："
+msgstr "统计信息将为每个处理器提供一个数组，从 0，1，2，3 等开始列出。假设我们为ws2s设置了4个线程，一个列表将如下所示："
 
 #: ../../Tigase_Administration/Statistics_Description.rst
 #, fuzzy
@@ -1447,8 +1437,8 @@ msgid ""
 "``ws2s/Processed packets thread (outliers) IN=mean: 79.0, deviation: 441,"
 " outliers: [in_10-ws2s: 2359]``"
 msgstr ""
-"``ws2s/Processed packets thread (outliers) IN=mean: 79.0, deviation: 441, "
-"outliers: [in_10-ws2s: 2359]``"
+"``ws2s/Processed packets thread (outliers) IN=mean: 79.0, deviation: 441,"
+" outliers: [in_10-ws2s: 2359]``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst
 #, fuzzy
@@ -1463,8 +1453,7 @@ msgstr ""
 msgid ""
 "Note that the processor arrray will only have as many threads as the "
 "component has as defined in {compname}/Processing threads."
-msgstr "请注意，处理器阵列将仅具有与 {compname}/Processing "
-"线程中定义的组件一样多的线程。"
+msgstr "请注意，处理器阵列将仅具有与 {compname}/Processing 线程中定义的组件一样多的线程。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:151
 msgid "processing threads"
@@ -1484,13 +1473,14 @@ msgid "stream-error-counter"
 msgstr "流错误计数器"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:153
+#, fuzzy
 msgid ""
 "The number of errors counted during the operation of the server for this "
-"component. Will only be available if `stream-error-counter <#stream-"
-"error-counter>`__ is enabled in config.tdsl, otherwise will be 0."
+"component. Will only be available if :ref:`stream-error-counter<stream-"
+"error-counter>` is enabled in config.tdsl, otherwise will be 0."
 msgstr ""
-"在此组件的服务器操作期间计数的错误数。只有在config.tdsl中启用了 :ref:`stream-"
-"error-counter<stream-error-counter>` 时才可用，否则为0。"
+"在此组件的服务器操作期间计数的错误数。只有在config.tdsl中启用了 :ref:`stream-error-counter<stream-"
+"error-counter>` 时才可用，否则为0。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:153
 #, fuzzy
@@ -1509,10 +1499,7 @@ msgid ""
 "enough or if the network connection too slow to the amount of data which "
 "needs to be sent. If the queue will over flow that will be counted. This "
 "does not include the number of dropped packets."
-msgstr ""
-"此组件经历套接字队列溢出并不得不丢弃数据包的次数。如果接收方无法足够快地读取"
-"数据包或网络连接速度太慢而无法满足需要发送的数据量，XMPP服务器会将通过连接发"
-"送的数据包排队。如果队列将溢出将被计算在内。这不包括丢弃数据包的数量。"
+msgstr "此组件经历套接字队列溢出并不得不丢弃数据包的次数。如果接收方无法足够快地读取数据包或网络连接速度太慢而无法满足需要发送的数据量，XMPP服务器会将通过连接发送的数据包排队。如果队列将溢出将被计算在内。这不包括丢弃数据包的数量。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:155
 #, fuzzy
@@ -1529,15 +1516,12 @@ msgid ""
 " waiting to be sent. This includes packets of all types. This is an "
 "instant statistics, in that the number in queue is only as many in the "
 "queue the moment statistics are gathered."
-msgstr ""
-"当前等待发送的入站或出站队列中的数据包数。这包括所有类型的数据包。这也是一个"
-"即时统计信息，因为队列中的人数仅与收集统计信息时队列中的人数一样多。"
+msgstr "当前等待发送的入站或出站队列中的数据包数。这包括所有类型的数据包。这也是一个即时统计信息，因为队列中的人数仅与收集统计信息时队列中的人数一样多。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:157
 #, fuzzy
 msgid "``{compname}/Total in queues wait`` ``{compname}/Total out queues wait``"
-msgstr ""
-"``{compname}/Total in queues wait`` ``{compname}/Total out queues wait``"
+msgstr "``{compname}/Total in queues wait`` ``{compname}/Total out queues wait``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:159
 msgid "Total queue wait"
@@ -1576,8 +1560,7 @@ msgid ""
 "The number of times the component packet wait queue has overflown and had"
 " to drop packets. This statistic does not keep track of the number of "
 "dropped packets."
-msgstr "组件数据包等待队列溢出并不得不丢弃数据包的次数。此统计信息不跟踪丢弃数据包的"
-"数量。"
+msgstr "组件数据包等待队列溢出并不得不丢弃数据包的次数。此统计信息不跟踪丢弃数据包的数量。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:163
 #, fuzzy
@@ -1607,8 +1590,7 @@ msgid ""
 "sent. This number will usually be 0 however it will grow if a large "
 "number of packets are jamming up your system, or your queue sizes are set"
 " too low."
-msgstr "组件队列中等待发送的数据包数量。这个数字通常为0，但是如果大量数据包阻塞了您的"
-"系统，或者您的队列大小设置得太低，它会增加。"
+msgstr "组件队列中等待发送的数据包数量。这个数字通常为0，但是如果大量数据包阻塞了您的系统，或者您的队列大小设置得太低，它会增加。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:167
 #, fuzzy
@@ -1635,12 +1617,12 @@ msgid "Watchdog stopped"
 msgstr "监视器停止"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:171
+#, fuzzy
 msgid ""
 "The number of times watchdog identified and closed a connection it has "
 "found to be stale according to the settings in ``config.tdsl`` or by the "
-"defaults defined `in this section <#watchdog>`__."
-msgstr "根据 ``config.tdsl`` 中的设置或 :ref:`此小节<watchdog>` "
-"中定义的默认值，监视器识别并关闭过时连接的次数。"
+"defaults defined :ref:`in this section<watchdog>`."
+msgstr "根据 ``config.tdsl`` 中的设置或 :ref:`此小节<watchdog>` 中定义的默认值，监视器识别并关闭过时连接的次数。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:171
 #, fuzzy
@@ -1656,8 +1638,7 @@ msgid ""
 "The number of times watchdog has found a potential stale connection and "
 "has conducted a test to determine whether or not to close the connection."
 " This is per component in the current server instance."
-msgstr "监视器发现潜在陈旧的连接并已经进行了测试以确定是否关闭连接。这是当前服务器实"
-"例中的每个组件。"
+msgstr "监视器发现潜在陈旧的连接并已经进行了测试以确定是否关闭连接。这是当前服务器实例中的每个组件。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:173
 #, fuzzy
@@ -1712,9 +1693,9 @@ msgid ""
 "/pre-bind-session last minute`` ``bosh/adhoc-command/pre-bind-session "
 "last second``"
 msgstr ""
-"``bosh/adhoc-command/pre-bind-session last hour`` ``bosh/adhoc-command/pre-"
-"bind-session last minute`` ``bosh/adhoc-command/pre-bind-session last "
-"second``"
+"``bosh/adhoc-command/pre-bind-session last hour`` ``bosh/adhoc-command"
+"/pre-bind-session last minute`` ``bosh/adhoc-command/pre-bind-session "
+"last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:194
 msgid "pre-bind-sessions/Average processing time"
@@ -1762,9 +1743,9 @@ msgid ""
 "command/cluster-nodes-list last minute`` ``cl-comp/adhoc-command/cluster-"
 "nodes-list last second``"
 msgstr ""
-"``cl-comp/adhoc-command/cluster-nodes-list last hour`` ``cl-comp/"
-"adhoc-command/cluster-nodes-list last minute`` ``cl-comp/adhoc-command/"
-"cluster-nodes-list last second``"
+"``cl-comp/adhoc-command/cluster-nodes-list last hour`` ``cl-comp/adhoc-"
+"command/cluster-nodes-list last minute`` ``cl-comp/adhoc-command/cluster-"
+"nodes-list last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:210
 msgid "adhoc-command/cluster-nodes-list/Average processing time"
@@ -1774,8 +1755,7 @@ msgstr "adhoc-command/cluster-nodes-list/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``cluster-"
 "nodes-list`` to execute."
-msgstr "以 ms 为单位的平均时间，以整数形式返回，执行 ``cluster-nodes-list`` "
-"所需的时间。"
+msgstr "以 ms 为单位的平均时间，以整数形式返回，执行 ``cluster-nodes-list`` 所需的时间。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:210
 #, fuzzy
@@ -1799,8 +1779,8 @@ msgid ""
 "command/force-stop-service last minute`` ``cl-comp/adhoc-command/force-"
 "stop-service last second``"
 msgstr ""
-"``cl-comp/adhoc-command/force-stop-service last hour`` ``cl-comp/"
-"adhoc-command/force-stop-service last minute`` ``cl-comp/adhoc-command/force-"
+"``cl-comp/adhoc-command/force-stop-service last hour`` ``cl-comp/adhoc-"
+"command/force-stop-service last minute`` ``cl-comp/adhoc-command/force-"
 "stop-service last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:214
@@ -1835,8 +1815,9 @@ msgid ""
 "/service-keys last minute`` ``cl-comp/adhoc-command/service-keys last "
 "second``"
 msgstr ""
-"``cl-comp/adhoc-command/service-keys last hour`` ``cl-comp/adhoc-command/"
-"service-keys last minute`` ``cl-comp/adhoc-command/service-keys last second``"
+"``cl-comp/adhoc-command/service-keys last hour`` ``cl-comp/adhoc-command"
+"/service-keys last minute`` ``cl-comp/adhoc-command/service-keys last "
+"second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:218
 msgid "Adhoc-command/service-keys/Average processing time"
@@ -1871,9 +1852,9 @@ msgid ""
 "command/sim-serv-stopped last minute`` ``cl-comp/adhoc-command/sim-serv-"
 "stopped last second``"
 msgstr ""
-"``cl-comp/adhoc-command/sim-serv-stopped last hour`` ``cl-comp/adhoc-command/"
-"sim-serv-stopped last minute`` ``cl-comp/adhoc-command/sim-serv-stopped last "
-"second``"
+"``cl-comp/adhoc-command/sim-serv-stopped last hour`` ``cl-comp/adhoc-"
+"command/sim-serv-stopped last minute`` ``cl-comp/adhoc-command/sim-serv-"
+"stopped last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:222
 msgid "Adhoc-command/sim-serv-stopped/Average processing time"
@@ -1980,8 +1961,7 @@ msgid ""
 "For day, each array is the number of disconnections each hour, most "
 "recent first. For hour each array is the number of disconnections each "
 "minute, most recent first."
-msgstr "对于一天，每个数组是每小时的断开连接数，最近的在前面。对于小时，每个数组是每"
-"分钟的断开连接数，最近的在前面。"
+msgstr "对于一天，每个数组是每小时的断开连接数，最近的在前面。对于小时，每个数组是每分钟的断开连接数，最近的在前面。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:234
 msgid "Service connected time-outs"
@@ -2030,8 +2010,7 @@ msgid ""
 "The average amount of time in milliseconds it takes to remove expired "
 "messages from the repository. This includes manual and automatic removal "
 "of messages."
-msgstr "从存储库中删除过期消息所需的平均时间（以毫秒为单位）。这包括手动和自动删除消"
-"息。"
+msgstr "从存储库中删除过期消息所需的平均时间（以毫秒为单位）。这包括手动和自动删除消息。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:250
 #, fuzzy
@@ -2082,8 +2061,8 @@ msgid ""
 "a long decimal available from CPU Usage [%], and a string which provides "
 "a rounded number with a % sign from CPU usage."
 msgstr ""
-"CPU使用率有两种可用格式：一个浮点整数，表示 CPU 使用率 [%] "
-"中可用的长小数，以及一个字符串，它提供CPU使用率带有 % 符号的四舍五入数字。"
+"CPU使用率有两种可用格式：一个浮点整数，表示 CPU 使用率 [%] 中可用的长小数，以及一个字符串，它提供CPU使用率带有 % "
+"符号的四舍五入数字。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:265
 msgid "Free Heap"
@@ -2146,8 +2125,7 @@ msgid ""
 "The average system load for the previous minute. The way in which the "
 "load average is calculated is operating system specific but is typically "
 "a damped time-dependent average."
-msgstr "前一分钟的平均系统负载。计算负载平均值的方式是特定于操作系统的，但通常是阻尼"
-"的时间相关平均值。"
+msgstr "前一分钟的平均系统负载。计算负载平均值的方式是特定于操作系统的，但通常是阻尼的时间相关平均值。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:273
 #, fuzzy
@@ -2271,8 +2249,9 @@ msgid ""
 "/load-errors last minute`` ``monitor/adhoc-command/load-errors last "
 "second``"
 msgstr ""
-"``monitor/adhoc-command/load-errors last hour`` ``monitor/adhoc-command/load-"
-"errors last minute`` ``monitor/adhoc-command/load-errors last second``"
+"``monitor/adhoc-command/load-errors last hour`` ``monitor/adhoc-command"
+"/load-errors last minute`` ``monitor/adhoc-command/load-errors last "
+"second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:299
 msgid "Adhoc-command/load-errors/Average processing time"
@@ -2312,8 +2291,9 @@ msgid ""
 "/remove-room last minute`` ``monitor/adhoc-command/remove-room last "
 "second``"
 msgstr ""
-"``monitor/adhoc-command/remove-room last hour`` ``monitor/adhoc-command/"
-"remove-room last minute`` ``monitor/adhoc-command/remove-room last second``"
+"``monitor/adhoc-command/remove-room last hour`` ``monitor/adhoc-command"
+"/remove-room last minute`` ``monitor/adhoc-command/remove-room last "
+"second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:310
 msgid "Adhoc-command/remove-room/Average processing time"
@@ -2348,9 +2328,9 @@ msgid ""
 "/default-room-config last minute`` ``muc/adhoc-command/default-room-"
 "config last second``"
 msgstr ""
-"``muc/adhoc-command/default-room-config last hour`` ``muc/adhoc-command/"
-"default-room-config last minute`` ``muc/adhoc-command/default-room-config "
-"last second``"
+"``muc/adhoc-command/default-room-config last hour`` ``muc/adhoc-command"
+"/default-room-config last minute`` ``muc/adhoc-command/default-room-"
+"config last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:314
 msgid "Adhoc-command/default-room-config/Average processing time"
@@ -2360,8 +2340,7 @@ msgstr "即席命令/default-room-config/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``default-"
 "room-config`` to execute."
-msgstr "执行 ``default-room-config`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``default-room-config`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:314
 #, fuzzy
@@ -2463,8 +2442,9 @@ msgid ""
 "/delete-item last minute`` ``pubsub/adhoc-command/delete-item last "
 "second``"
 msgstr ""
-"``pubsub/adhoc-command/delete-item last hour`` ``pubsub/adhoc-command/delete-"
-"item last minute`` ``pubsub/adhoc-command/delete-item last second``"
+"``pubsub/adhoc-command/delete-item last hour`` ``pubsub/adhoc-command"
+"/delete-item last minute`` ``pubsub/adhoc-command/delete-item last "
+"second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:342
 msgid "adhoc-command/delete-item/Average processing time"
@@ -2498,8 +2478,9 @@ msgid ""
 "/delete-node last minute`` ``pubsub/adhoc-command/delete-node last "
 "second``"
 msgstr ""
-"``pubsub/adhoc-command/delete-node last hour`` ``pubsub/adhoc-command/delete-"
-"node last minute`` ``pubsub/adhoc-command/delete-node last second``"
+"``pubsub/adhoc-command/delete-node last hour`` ``pubsub/adhoc-command"
+"/delete-node last minute`` ``pubsub/adhoc-command/delete-node last "
+"second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:346
 msgid "adhoc-command/delete-node/Average processing time"
@@ -2532,8 +2513,8 @@ msgid ""
 "``pubsub/adhoc-command/list-items last hour`` ``pubsub/adhoc-command"
 "/list-items last minute`` ``pubsub/adhoc-command/list-items last second``"
 msgstr ""
-"``pubsub/adhoc-command/list-items last hour`` ``pubsub/adhoc-command/list-"
-"items last minute`` ``pubsub/adhoc-command/list-items last second``"
+"``pubsub/adhoc-command/list-items last hour`` ``pubsub/adhoc-command"
+"/list-items last minute`` ``pubsub/adhoc-command/list-items last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:350
 msgid "adhoc-command/list-items/Average processing time"
@@ -2566,8 +2547,8 @@ msgid ""
 "``pubsub/adhoc-command/list-nodes last hour`` ``pubsub/adhoc-command"
 "/list-nodes last minute`` ``pubsub/adhoc-command/list-nodes last second``"
 msgstr ""
-"``pubsub/adhoc-command/list-nodes last hour`` ``pubsub/adhoc-command/list-"
-"nodes last minute`` ``pubsub/adhoc-command/list-nodes last second``"
+"``pubsub/adhoc-command/list-nodes last hour`` ``pubsub/adhoc-command"
+"/list-nodes last minute`` ``pubsub/adhoc-command/list-nodes last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:354
 msgid "adhoc-command/list-nodes/Average processing time"
@@ -2601,8 +2582,9 @@ msgid ""
 "/publish-item last minute`` ``pubsub/adhoc-command/publish-item last "
 "second``"
 msgstr ""
-"``pubsub/adhoc-command/publish-item last hour`` ``pubsub/adhoc-command/"
-"publish-item last minute`` ``pubsub/adhoc-command/publish-item last second``"
+"``pubsub/adhoc-command/publish-item last hour`` ``pubsub/adhoc-command"
+"/publish-item last minute`` ``pubsub/adhoc-command/publish-item last "
+"second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:358
 msgid "adhoc-command/publish-item/Average processing time"
@@ -2636,8 +2618,8 @@ msgid ""
 "/retrieve-item last minute`` ``pubsub/adhoc-command/retrieve-item last "
 "second``"
 msgstr ""
-"``pubsub/adhoc-command/retrieve-item last hour`` ``pubsub/adhoc-command/"
-"retrieve-item last minute`` ``pubsub/adhoc-command/retrieve-item last "
+"``pubsub/adhoc-command/retrieve-item last hour`` ``pubsub/adhoc-command"
+"/retrieve-item last minute`` ``pubsub/adhoc-command/retrieve-item last "
 "second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:362
@@ -2672,9 +2654,9 @@ msgid ""
 "``pubsub/AdHocConfigCommandModule last minute`` "
 "``pubsub/AdHocConfigCommandModule last second``"
 msgstr ""
-"``pubsub/AdHocConfigCommandModule last hour`` ``pubsub/"
-"AdHocConfigCommandModule last minute`` ``pubsub/AdHocConfigCommandModule "
-"last second``"
+"``pubsub/AdHocConfigCommandModule last hour`` "
+"``pubsub/AdHocConfigCommandModule last minute`` "
+"``pubsub/AdHocConfigCommandModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:366
 msgid "AdHocConfigCommandModule/Average processing time"
@@ -2684,8 +2666,7 @@ msgstr "AdHocConfigCommandModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``AdHocConfigCommandModule`` to execute."
-msgstr "执行 ``AdHocConfigCommandModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``AdHocConfigCommandModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:366
 #, fuzzy
@@ -2702,9 +2683,7 @@ msgid ""
 "memory. Affiliations include JIDs that are one of the following; Owner, "
 "Publisher, Publish-Only, Member, None, Outcast. This may not reflect "
 "total pubsub affiliations in repository."
-msgstr ""
-"驻留在高速缓存内存中的pubsub关联的总数。隶属关系包括属于以下之一的JID；所有者"
-"，发布者，仅发布，成员，无，弃儿。这可能无法反映存储库中的总pubsub隶属关系。"
+msgstr "驻留在高速缓存内存中的pubsub关联的总数。隶属关系包括属于以下之一的JID；所有者，发布者，仅发布，成员，无，弃儿。这可能无法反映存储库中的总pubsub隶属关系。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:368
 #, fuzzy
@@ -2720,8 +2699,7 @@ msgid ""
 "The average time of all DB writes from PubSub component. Average is "
 "calculated using two other statistics: (Total writing time / Database "
 "writes)"
-msgstr "来自PubSub组件的所有数据库写入的平均时间。使用其他两个统计数据计算平均值：（"
-"总写入时间/数据库写入时间）"
+msgstr "来自PubSub组件的所有数据库写入的平均时间。使用其他两个统计数据计算平均值：（总写入时间/数据库写入时间）"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:370
 #, fuzzy
@@ -2737,8 +2715,7 @@ msgid ""
 "The number of times the cache has achieved a hit within the last "
 "interval. A hit is when a request for information is matched to data that"
 " is inside the cache memory."
-msgstr "缓存在最后一个时间间隔内达到命中的次数。当信息请求与高速缓存内存中的数据相匹"
-"配时，就会发生命中。"
+msgstr "缓存在最后一个时间间隔内达到命中的次数。当信息请求与高速缓存内存中的数据相匹配时，就会发生命中。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:372
 #, fuzzy
@@ -2746,8 +2723,8 @@ msgid ""
 "``pubsub/cache/hits last hour`` ``pubsub/cache/hits last minute`` "
 "``pubsub/cache/hits last second``"
 msgstr ""
-"``pubsub/cache/hits last hour`` ``pubsub/cache/hits last minute`` ``pubsub/"
-"cache/hits last second``"
+"``pubsub/cache/hits last hour`` ``pubsub/cache/hits last minute`` "
+"``pubsub/cache/hits last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:374
 msgid "cache/hit-miss ratio per {interval}"
@@ -2760,10 +2737,7 @@ msgid ""
 "with information in the cache. A miss is when that information request "
 "cannot find a match in cache. A miss only indicates that that information"
 " was not found in the cache, not that it is not in the repository."
-msgstr ""
-"指定时间段内缓存命中与缓存未命中的比率。缓存命中是指从缓存中获取信息的请求与"
-"缓存中的信息相匹配。未命中是指该信息请求在缓存中找不到匹配项。未命中仅表示在"
-"缓存中未找到该信息，而不是不在存储库中。"
+msgstr "指定时间段内缓存命中与缓存未命中的比率。缓存命中是指从缓存中获取信息的请求与缓存中的信息相匹配。未命中是指该信息请求在缓存中找不到匹配项。未命中仅表示在缓存中未找到该信息，而不是不在存储库中。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:374
 msgid "hour minute"
@@ -2775,8 +2749,8 @@ msgid ""
 "``pubsub/cache/hit-miss ratio per hour`` ``pubsub/cache/hit-miss ratio "
 "per minute``"
 msgstr ""
-"``pubsub/cache/hit-miss ratio per hour`` ``pubsub/cache/hit-miss ratio per "
-"minute``"
+"``pubsub/cache/hit-miss ratio per hour`` ``pubsub/cache/hit-miss ratio "
+"per minute``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:376
 msgid "cache/requests last {interval}"
@@ -2792,8 +2766,8 @@ msgid ""
 "``pubsub/cache/Requests last hour`` ``pubsub/cache/Requests last minute``"
 " ``pubsub/cache/Requests last second``"
 msgstr ""
-"``pubsub/cache/Requests last hour`` ``pubsub/cache/Requests last minute`` ``"
-"pubsub/cache/Requests last second``"
+"``pubsub/cache/Requests last hour`` ``pubsub/cache/Requests last minute``"
+" ``pubsub/cache/Requests last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:378
 msgid "Cached nodes"
@@ -2825,8 +2799,8 @@ msgid ""
 "``pubsub/CapsModule last hour`` ``pubsub/CapsModule last minute`` "
 "``pubsub/CapsModule last second``"
 msgstr ""
-"``pubsub/CapsModule last hour`` ``pubsub/CapsModule last minute`` ``pubsub/"
-"CapsModule last second``"
+"``pubsub/CapsModule last hour`` ``pubsub/CapsModule last minute`` "
+"``pubsub/CapsModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:382
 msgid "CapsModule/Average processing time"
@@ -2859,8 +2833,8 @@ msgid ""
 "``pubsub/db/GetNodeItems last hour`` ``pubsub/db/GetNodeItems last "
 "minute`` ``pubsub/db/GetNodeItems last second``"
 msgstr ""
-"``pubsub/db/GetNodeItems last hour`` ``pubsub/db/GetNodeItems last minute`` "
-"``pubsub/db/GetNodeItems last second``"
+"``pubsub/db/GetNodeItems last hour`` ``pubsub/db/GetNodeItems last "
+"minute`` ``pubsub/db/GetNodeItems last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:386
 msgid "db/GetNodeItems/Average processing time"
@@ -2893,8 +2867,8 @@ msgid ""
 "``pubsub/DefaultConfigModule last hour`` ``pubsub/DefaultConfigModule "
 "last minute`` ``pubsub/DefaultConfigModule last second``"
 msgstr ""
-"``pubsub/DefaultConfigModule last hour`` ``pubsub/DefaultConfigModule last "
-"minute`` ``pubsub/DefaultConfigModule last second``"
+"``pubsub/DefaultConfigModule last hour`` ``pubsub/DefaultConfigModule "
+"last minute`` ``pubsub/DefaultConfigModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:390
 msgid "DefaultConfigModule/Average processing time"
@@ -2904,8 +2878,7 @@ msgstr "DefaultConfigModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``DefaultConfigModule`` to execute."
-msgstr "执行 ``DefaultConfigModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``DefaultConfigModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:390
 #, fuzzy
@@ -2939,8 +2912,7 @@ msgstr "DiscoverInfoModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``DiscoverInfoModule`` to execute."
-msgstr "执行 ``DiscoverInfoModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``DiscoverInfoModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:394
 #, fuzzy
@@ -2963,8 +2935,8 @@ msgid ""
 "``pubsub/DiscoverItemsModule last hour`` ``pubsub/DiscoverItemsModule "
 "last minute`` ``pubsub/DiscoverItemsModule last second``"
 msgstr ""
-"``pubsub/DiscoverItemsModule last hour`` ``pubsub/DiscoverItemsModule last "
-"minute`` ``pubsub/DiscoverItemsModule last second``"
+"``pubsub/DiscoverItemsModule last hour`` ``pubsub/DiscoverItemsModule "
+"last minute`` ``pubsub/DiscoverItemsModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:398
 msgid "DiscoverItemsModule/Average processing time"
@@ -2974,8 +2946,7 @@ msgstr "DiscoverItemsModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``DiscoverItemsModule`` to execute."
-msgstr "执行 ``DiscoverItemsModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``DiscoverItemsModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:398
 #, fuzzy
@@ -2998,8 +2969,8 @@ msgid ""
 "``pubsub/JabberVersionModule last hour`` ``pubsub/JabberVersionModule "
 "last minute`` ``pubsub/JabberVersionModule last second``"
 msgstr ""
-"``pubsub/JabberVersionModule last hour`` ``pubsub/JabberVersionModule last "
-"minute`` ``pubsub/JabberVersionModule last second``"
+"``pubsub/JabberVersionModule last hour`` ``pubsub/JabberVersionModule "
+"last minute`` ``pubsub/JabberVersionModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:402
 msgid "JabberVersionModule/Average processing time"
@@ -3009,8 +2980,7 @@ msgstr "JabberVersionModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``JabberVersionModule`` to execute."
-msgstr "执行 ``JabberVersionModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``JabberVersionModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:402
 #, fuzzy
@@ -3034,9 +3004,9 @@ msgid ""
 "``pubsub/ManageAffiliationsModule last minute`` "
 "``pubsub/ManageAffiliationsModule last second``"
 msgstr ""
-"``pubsub/ManageAffiliationsModule last hour`` ``pubsub/"
-"ManageAffiliationsModule last minute`` ``pubsub/ManageAffiliationsModule "
-"last second``"
+"``pubsub/ManageAffiliationsModule last hour`` "
+"``pubsub/ManageAffiliationsModule last minute`` "
+"``pubsub/ManageAffiliationsModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:406
 msgid "ManageAffiliationsModule/Average processing time"
@@ -3046,8 +3016,7 @@ msgstr "ManageAffiliationsModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``ManageAffiliationsModule`` to execute."
-msgstr "执行 ``ManageAffiliationsModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``ManageAffiliationsModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:406
 #, fuzzy
@@ -3071,9 +3040,9 @@ msgid ""
 "``pubsub/ManageSubscriptionModule last minute`` "
 "``pubsub/ManageSubscriptionModule last second``"
 msgstr ""
-"``pubsub/ManageSubscriptionModule last hour`` ``pubsub/"
-"ManageSubscriptionModule last minute`` ``pubsub/ManageSubscriptionModule "
-"last second``"
+"``pubsub/ManageSubscriptionModule last hour`` "
+"``pubsub/ManageSubscriptionModule last minute`` "
+"``pubsub/ManageSubscriptionModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:410
 msgid "ManageSubscriptionModule/Average processing time"
@@ -3083,8 +3052,7 @@ msgstr "ManageSubscriptionModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``ManageSubscriptionModule`` to execute."
-msgstr "执行 ``ManageSubscriptionModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``ManageSubscriptionModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:410
 #, fuzzy
@@ -3107,8 +3075,8 @@ msgid ""
 "``pubsub/NodeConfigModule last hour`` ``pubsub/NodeConfigModule last "
 "minute`` ``pubsub/NodeConfigModule last second``"
 msgstr ""
-"``pubsub/NodeConfigModule last hour`` ``pubsub/NodeConfigModule last minute``"
-" ``pubsub/NodeConfigModule last second``"
+"``pubsub/NodeConfigModule last hour`` ``pubsub/NodeConfigModule last "
+"minute`` ``pubsub/NodeConfigModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:414
 msgid "NodeConfigModule/Average processing time"
@@ -3118,8 +3086,7 @@ msgstr "NodeConfigModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``NodeConfigModule`` to execute."
-msgstr "执行 ``NodeConfigModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``NodeConfigModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:414
 #, fuzzy
@@ -3142,8 +3109,8 @@ msgid ""
 "``pubsub/NodeCreateModule last hour`` ``pubsub/NodeCreateModule last "
 "minute`` ``pubsub/NodeCreateModule last second``"
 msgstr ""
-"``pubsub/NodeCreateModule last hour`` ``pubsub/NodeCreateModule last minute``"
-" ``pubsub/NodeCreateModule last second``"
+"``pubsub/NodeCreateModule last hour`` ``pubsub/NodeCreateModule last "
+"minute`` ``pubsub/NodeCreateModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:418
 msgid "NodeCreateModule/Average processing time"
@@ -3153,8 +3120,7 @@ msgstr "NodeCreateModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``NodeCreateModule`` to execute."
-msgstr "执行 ``NodeCreateModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``NodeCreateModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:418
 #, fuzzy
@@ -3177,8 +3143,8 @@ msgid ""
 "``pubsub/NodeDeleteModule last hour`` ``pubsub/NodeDeleteModule last "
 "minute`` ``pubsub/NodeDeleteModule last second``"
 msgstr ""
-"``pubsub/NodeDeleteModule last hour`` ``pubsub/NodeDeleteModule last minute``"
-" ``pubsub/NodeDeleteModule last second``"
+"``pubsub/NodeDeleteModule last hour`` ``pubsub/NodeDeleteModule last "
+"minute`` ``pubsub/NodeDeleteModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:422
 msgid "NodeDeleteModule/Average processing time"
@@ -3188,8 +3154,7 @@ msgstr "NodeDeleteModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``NodeDeleteModule`` to execute."
-msgstr "执行 ``NodeDeleteModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``NodeDeleteModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:422
 #, fuzzy
@@ -3213,9 +3178,9 @@ msgid ""
 "``pubsub/PresenceCollectorModule last minute`` "
 "``pubsub/PresenceCollectorModule last second``"
 msgstr ""
-"``pubsub/PresenceCollectorModule last hour`` ``pubsub/"
-"PresenceCollectorModule last minute`` ``pubsub/PresenceCollectorModule last "
-"second``"
+"``pubsub/PresenceCollectorModule last hour`` "
+"``pubsub/PresenceCollectorModule last minute`` "
+"``pubsub/PresenceCollectorModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:426
 msgid "PresenceCollectorModule/Average processing time"
@@ -3225,8 +3190,7 @@ msgstr "PresenceCollectorModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``PresenceCollectorModule`` to execute."
-msgstr "执行 ``PresenceCollectorModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``PresenceCollectorModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:426
 #, fuzzy
@@ -3250,9 +3214,9 @@ msgid ""
 "``pubsub/PendingSubscriptionModule last minute`` "
 "``pubsub/PendingSubscriptionModule last second``"
 msgstr ""
-"``pubsub/PendingSubscriptionModule last hour`` ``pubsub/"
-"PendingSubscriptionModule last minute`` ``pubsub/PendingSubscriptionModule "
-"last second``"
+"``pubsub/PendingSubscriptionModule last hour`` "
+"``pubsub/PendingSubscriptionModule last minute`` "
+"``pubsub/PendingSubscriptionModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:430
 msgid "PendingSubscriptionModule/Average processing time"
@@ -3262,8 +3226,7 @@ msgstr "PendingSubscriptionModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``PendingSubscriptionModule`` to execute."
-msgstr "执行 ``PendingSubscriptionModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``PendingSubscriptionModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:430
 #, fuzzy
@@ -3287,8 +3250,9 @@ msgid ""
 "``pubsub/PresenceNotifierModule last minute`` "
 "``pubsub/PresenceNotifierModule last second``"
 msgstr ""
-"``pubsub/PresenceNotifierModule last hour`` ``pubsub/PresenceNotifierModule "
-"last minute`` ``pubsub/PresenceNotifierModule last second``"
+"``pubsub/PresenceNotifierModule last hour`` "
+"``pubsub/PresenceNotifierModule last minute`` "
+"``pubsub/PresenceNotifierModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:434
 msgid "PresenceNotifierModule/Average processing time"
@@ -3298,8 +3262,7 @@ msgstr "PresenceNotifierModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``PresenceNotifierModule`` to execute."
-msgstr "执行 ``PresenceNotifierModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``PresenceNotifierModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:434
 #, fuzzy
@@ -3333,8 +3296,7 @@ msgstr "PublishItemModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``PublishItemModule`` to execute."
-msgstr "执行 ``PublishItemModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``PublishItemModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:438
 #, fuzzy
@@ -3357,8 +3319,8 @@ msgid ""
 "``pubsub/PurgeItemsModule last hour`` ``pubsub/PurgeItemsModule last "
 "minute`` ``pubsub/PurgeItemsModule last second``"
 msgstr ""
-"``pubsub/PurgeItemsModule last hour`` ``pubsub/PurgeItemsModule last minute``"
-" ``pubsub/PurgeItemsModule last second``"
+"``pubsub/PurgeItemsModule last hour`` ``pubsub/PurgeItemsModule last "
+"minute`` ``pubsub/PurgeItemsModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:442
 msgid "PurgeItemsModule/Average processing time"
@@ -3368,8 +3330,7 @@ msgstr "PurgeItemsModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``PurgeItemsModule`` to execute."
-msgstr "执行 ``PurgeItemsModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``PurgeItemsModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:442
 #, fuzzy
@@ -3418,8 +3379,7 @@ msgstr "RetractItemModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``RetractItemModule`` to execute."
-msgstr "执行 ``RetractItemModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``RetractItemModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:448
 #, fuzzy
@@ -3443,9 +3403,9 @@ msgid ""
 "``pubsub/RetrieveAffiliationsModule last minute`` "
 "``pubsub/RetrieveAffiliationsModule last second``"
 msgstr ""
-"``pubsub/RetrieveAffiliationsModule last hour`` ``pubsub/"
-"RetrieveAffiliationsModule last minute`` ``pubsub/RetrieveAffiliationsModule "
-"last second``"
+"``pubsub/RetrieveAffiliationsModule last hour`` "
+"``pubsub/RetrieveAffiliationsModule last minute`` "
+"``pubsub/RetrieveAffiliationsModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:452
 msgid "RetrieveAffiliationsModule/Average processing time"
@@ -3455,8 +3415,7 @@ msgstr "RetrieveAffiliationsModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``RetrieveAffiliationsModule`` to execute."
-msgstr "执行 ``RetrieveAffiliationsModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``RetrieveAffiliationsModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:452
 #, fuzzy
@@ -3479,8 +3438,8 @@ msgid ""
 "``pubsub/RetrieveItemsModule last hour`` ``pubsub/RetrieveItemsModule "
 "last minute`` ``pubsub/RetrieveItemsModule last second``"
 msgstr ""
-"``pubsub/RetrieveItemsModule last hour`` ``pubsub/RetrieveItemsModule last "
-"minute`` ``pubsub/RetrieveItemsModule last second``"
+"``pubsub/RetrieveItemsModule last hour`` ``pubsub/RetrieveItemsModule "
+"last minute`` ``pubsub/RetrieveItemsModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:456
 msgid "RetrieveItemsModule/Average processing time"
@@ -3490,8 +3449,7 @@ msgstr "RetrieveItemsModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``RetrieveItemsModule`` to execute."
-msgstr "执行 ``RetrieveItemsModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``RetrieveItemsModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:456
 #, fuzzy
@@ -3515,9 +3473,9 @@ msgid ""
 "``pubsub/RetrieveSubscriptionsModule last minute`` "
 "``pubsub/RetrieveSubscriptionsModule last second``"
 msgstr ""
-"``pubsub/RetrieveSubscriptionsModule last hour`` ``pubsub/"
-"RetrieveSubscriptionsModule last minute`` ``pubsub/"
-"RetrieveSubscriptionsModule last second``"
+"``pubsub/RetrieveSubscriptionsModule last hour`` "
+"``pubsub/RetrieveSubscriptionsModule last minute`` "
+"``pubsub/RetrieveSubscriptionsModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:460
 msgid "RetrieveSubscriptionsModule/Average processing time"
@@ -3527,8 +3485,7 @@ msgstr "RetrieveSubscriptionsModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``RetrieveSubscriptionsModule`` to execute."
-msgstr "执行 ``RetrieveSubscriptionsModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``RetrieveSubscriptionsModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:460
 #, fuzzy
@@ -3551,8 +3508,8 @@ msgid ""
 "``pubsub/SubscribeNodeModule last hour`` ``pubsub/SubscribeNodeModule "
 "last minute`` ``pubsub/SubscribeNodeModule last second``"
 msgstr ""
-"``pubsub/SubscribeNodeModule last hour`` ``pubsub/SubscribeNodeModule last "
-"minute`` ``pubsub/SubscribeNodeModule last second``"
+"``pubsub/SubscribeNodeModule last hour`` ``pubsub/SubscribeNodeModule "
+"last minute`` ``pubsub/SubscribeNodeModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:464
 msgid "SubscribeNodeModule/Average processing time"
@@ -3562,8 +3519,7 @@ msgstr "SubscribeNodeModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``SubscribeNodeModule`` to execute."
-msgstr "执行 ``SubscribeNodeModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``SubscribeNodeModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:464
 #, fuzzy
@@ -3578,8 +3534,7 @@ msgstr "订阅计数（在缓存中）"
 msgid ""
 "The total number of pubsub subscriptions that are resident in cache "
 "memory. This may not reflect total pubsub subscriptions in repository."
-msgstr "驻留在高速缓存内存中的 pubsub 订阅总数。这可能无法反映存储库中的总 pubsub "
-"订阅数。"
+msgstr "驻留在高速缓存内存中的 pubsub 订阅总数。这可能无法反映存储库中的总 pubsub 订阅数。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:466
 #, fuzzy
@@ -3621,8 +3576,8 @@ msgid ""
 "``pubsub/UnsubscribeNodeModule last hour`` ``pubsub/UnsubscribeNodeModule"
 " last minute`` ``pubsub/UnsubscribeNodeModule last second``"
 msgstr ""
-"``pubsub/UnsubscribeNodeModule last hour`` ``pubsub/UnsubscribeNodeModule "
-"last minute`` ``pubsub/UnsubscribeNodeModule last second``"
+"``pubsub/UnsubscribeNodeModule last hour`` ``pubsub/UnsubscribeNodeModule"
+" last minute`` ``pubsub/UnsubscribeNodeModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:472
 msgid "UnsubscribeNodeModule/Average processing time"
@@ -3632,8 +3587,7 @@ msgstr "UnsubscribeNodeModule/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for "
 "``UnsubscribeNodeModule`` to execute."
-msgstr "执行 ``UnsubscribeNodeModule`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``UnsubscribeNodeModule`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:472
 #, fuzzy
@@ -3671,8 +3625,8 @@ msgid ""
 "``pubsub/XmppPingModule last hour`` ``pubsub/XmppPingModule last minute``"
 " ``pubsub/XmppPingModule last second``"
 msgstr ""
-"``pubsub/XmppPingModule last hour`` ``pubsub/XmppPingModule last minute`` ``"
-"pubsub/XmppPingModule last second``"
+"``pubsub/XmppPingModule last hour`` ``pubsub/XmppPingModule last minute``"
+" ``pubsub/XmppPingModule last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:478
 msgid "XmppPingModule/Average processing time"
@@ -3792,9 +3746,9 @@ msgid ""
 "/get-cid-connection last minute`` ``s2s/adhoc-command/get-cid-connection "
 "last second``"
 msgstr ""
-"``s2s/adhoc-command/get-cid-connection last hour`` ``s2s/adhoc-command/get-"
-"cid-connection last minute`` ``s2s/adhoc-command/get-cid-connection last "
-"second``"
+"``s2s/adhoc-command/get-cid-connection last hour`` ``s2s/adhoc-command"
+"/get-cid-connection last minute`` ``s2s/adhoc-command/get-cid-connection "
+"last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:512
 msgid "get-cid-connection/Average processing time"
@@ -3828,9 +3782,9 @@ msgid ""
 "/s2s-bad-state-conns last minute`` ``s2s/adhoc-command/s2s-bad-state-"
 "conns last second``"
 msgstr ""
-"``s2s/adhoc-command/s2s-bad-state-conns last hour`` ``s2s/adhoc-command/s2s-"
-"bad-state-conns last minute`` ``s2s/adhoc-command/s2s-bad-state-conns last "
-"second``"
+"``s2s/adhoc-command/s2s-bad-state-conns last hour`` ``s2s/adhoc-command"
+"/s2s-bad-state-conns last minute`` ``s2s/adhoc-command/s2s-bad-state-"
+"conns last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:516
 msgid "s2s-bad-state-conns/Average processing time"
@@ -3864,8 +3818,8 @@ msgid ""
 "/reset-bad-state-conns last minute`` ``s2s/adhoc-command/reset-bad-state-"
 "conns last second``"
 msgstr ""
-"``s2s/adhoc-command/reset-bad-state-conns last hour`` ``s2s/adhoc-command/"
-"reset-bad-state-conns last minute`` ``s2s/adhoc-command/reset-bad-state-"
+"``s2s/adhoc-command/reset-bad-state-conns last hour`` ``s2s/adhoc-command"
+"/reset-bad-state-conns last minute`` ``s2s/adhoc-command/reset-bad-state-"
 "conns last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:520
@@ -3876,8 +3830,7 @@ msgstr "reset-bad-state-conns/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``reset-bad-"
 "state-conns`` to execute."
-msgstr "执行 ``reset-bad-state-conns`` "
-"所需的平均时间（以毫秒为单位），以整数形式返回。"
+msgstr "执行 ``reset-bad-state-conns`` 所需的平均时间（以毫秒为单位），以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:520
 #, fuzzy
@@ -3906,8 +3859,7 @@ msgid ""
 "The total number of server-to-server connections, outgoing is local "
 "server connecting to other servers, and incoming is connections from "
 "other servers. The results may or may not be the same."
-msgstr "服务器到服务器的连接总数，传出是本地服务器连接到其他服务器，传入是来自其他服"
-"务器的连接。结果可能相同也可能不同。"
+msgstr "服务器到服务器的连接总数，传出是本地服务器连接到其他服务器，传入是来自其他服务器的连接。结果可能相同也可能不同。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:524
 #, fuzzy
@@ -3923,8 +3875,7 @@ msgid ""
 "The total number of server-to-server connections using TLS, outgoing is "
 "local server connecting to other servers, and incoming is connections "
 "from other servers. The results may or may not be the same."
-msgstr "使用 TLS 的服务器到服务器连接的总数，传出是本地服务器连接到其他服务器，传入是"
-"来自其他服务器的连接。结果可能相同也可能不同。"
+msgstr "使用 TLS 的服务器到服务器连接的总数，传出是本地服务器连接到其他服务器，传入是来自其他服务器的连接。结果可能相同也可能不同。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:526
 #, fuzzy
@@ -3988,8 +3939,7 @@ msgid ""
 "Number of user connections that are considered active. An active user is "
 "a user that has sent stanzas to the server or through the server within "
 "the last 5 minutes."
-msgstr "被视为活动的用户连接数。活跃用户是在过去 5 "
-"分钟内向服务器或通过服务器发送节的用户。"
+msgstr "被视为活动的用户连接数。活跃用户是在过去 5 分钟内向服务器或通过服务器发送节的用户。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:541
 #, fuzzy
@@ -4013,9 +3963,9 @@ msgid ""
 "command/connection-time last minute`` ``sess-man/adhoc-command"
 "/connection-time last second``"
 msgstr ""
-"``sess-man/adhoc-command/connection-time last hour`` ``sess-man/"
-"adhoc-command/connection-time last minute`` ``sess-man/adhoc-command/"
-"connection-time last second``"
+"``sess-man/adhoc-command/connection-time last hour`` ``sess-man/adhoc-"
+"command/connection-time last minute`` ``sess-man/adhoc-command"
+"/connection-time last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:545
 msgid "adhoc-command/connection-time/Average processing time"
@@ -4052,9 +4002,9 @@ msgid ""
 "#add-user last second``"
 msgstr ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user last "
-"hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user "
-"last minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-"
-"user last second``"
+"hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user"
+" last minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
+"#add-user last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:549
 msgid ""
@@ -4074,8 +4024,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-"
 "user/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user/Average "
-"processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-"
+"user/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:551
 #, fuzzy
@@ -4101,10 +4051,11 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-"
 "tracker last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-tracker "
-"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-"
-"user-tracker last minute`` ``sess-man/adhoc-command/http://jabber.org/"
-"protocol/admin#add-user-tracker last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-"
+"tracker last hour`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#add-user-tracker last minute`` "
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-"
+"tracker last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:553
 msgid ""
@@ -4116,8 +4067,7 @@ msgstr "adhoc-command/http://jabber.org/protocol/admin#add-user-tracker/平均�
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#add-"
 "user-tracker`` to execute."
-msgstr "执行 ``admin#add-user-tracker`` "
-"所需的平均时间（以毫秒为单位），以整数形式返回。"
+msgstr "执行 ``admin#add-user-tracker`` 所需的平均时间（以毫秒为单位），以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:553
 #, fuzzy
@@ -4125,8 +4075,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-"
 "tracker/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-tracker/"
-"Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#add-user-"
+"tracker/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:555
 #, fuzzy
@@ -4148,9 +4098,9 @@ msgid ""
 "command/http://jabber.org/protocol/admin#announce last second``"
 msgstr ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#announce last "
-"hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#announce "
-"last minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#"
-"announce last second``"
+"hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#announce"
+" last minute`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#announce last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:557
 msgid ""
@@ -4171,8 +4121,9 @@ msgid ""
 "command/http://jabber.org/protocol/admin#announce/Average processing "
 "time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#announce/Average "
-"processing time``"
+"``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#announce/Average processing "
+"time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:559
 #, fuzzy
@@ -4199,24 +4150,22 @@ msgid ""
 "#change-user-password last second``"
 msgstr ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#change-user-"
-"password last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/"
-"admin#change-user-password last minute`` ``sess-man/adhoc-command/"
-"http://jabber.org/protocol/admin#change-user-password last second``"
+"password last hour`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#change-user-password last "
+"minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
+"#change-user-password last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:561
 msgid ""
 "adhoc-command/http://jabber.org/protocol/admin#change-user-"
 "password/Average processing time"
-msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#change-user-password/"
-"平均处理时间"
+msgstr "adhoc-command/http://jabber.org/protocol/admin#change-user-password/平均处理时间"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:561
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin"
 "#change-user-password`` to execute."
-msgstr "执行 ``admin#change-user-password`` "
-"所需的平均时间（以毫秒为单位），以整数形式返回。"
+msgstr "执行 ``admin#change-user-password`` 所需的平均时间（以毫秒为单位），以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:561
 #, fuzzy
@@ -4224,14 +4173,13 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#change-user-"
 "password/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#change-"
-"user-password/Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#change-user-"
+"password/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:563
 #, fuzzy
 msgid "adhoc-command/http://jabber.org/protocol/admin#delete-user last {interval}"
-msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#delete-user last {interval}"
+msgstr "adhoc-command/http://jabber.org/protocol/admin#delete-user last {interval}"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:563
 msgid ""
@@ -4247,10 +4195,10 @@ msgid ""
 "#delete-user last minute`` ``sess-man/adhoc-"
 "command/http://jabber.org/protocol/admin#delete-user last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-user last "
-"hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-user "
-"last minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
-"#delete-user last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-user "
+"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
+"#delete-user last minute`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#delete-user last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:565
 msgid ""
@@ -4262,8 +4210,7 @@ msgstr "adhoc-command/http://jabber.org/protocol/admin#delete-user/平均处理�
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin"
 "#delete-user`` to execute."
-msgstr "执行 ``admin#delete-user`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#delete-user`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:565
 #, fuzzy
@@ -4271,8 +4218,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-"
 "user/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-user/"
-"Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#delete-"
+"user/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:567
 #, fuzzy
@@ -4298,10 +4245,11 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-"
 "session last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-session "
-"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#end-"
-"user-session last minute`` ``sess-man/adhoc-command/http://jabber.org/"
-"protocol/admin#end-user-session last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-"
+"session last hour`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#end-user-session last minute`` "
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-"
+"session last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:569
 msgid ""
@@ -4313,8 +4261,7 @@ msgstr "adhoc-command/http://jabber.org/protocol/admin#end-user-session/平均�
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#end-"
 "user-session`` to execute."
-msgstr "执行 ``admin#end-user-session`` "
-"所需的平均时间（以毫秒为单位），以整数形式返回。"
+msgstr "执行 ``admin#end-user-session`` 所需的平均时间（以毫秒为单位），以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:569
 #, fuzzy
@@ -4322,8 +4269,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-"
 "session/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-session/"
-"Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#end-user-"
+"session/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:571
 #, fuzzy
@@ -4349,10 +4296,11 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-"
 "users last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-users "
-"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
-"active-users last minute`` ``sess-man/adhoc-command/http://jabber.org/"
-"protocol/admin#get-active-users last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-"
+"users last hour`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#get-active-users last minute`` "
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-"
+"users last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:573
 msgid ""
@@ -4364,8 +4312,7 @@ msgstr "adhoc-command/http://jabber.org/protocol/admin#get-active-users/平均�
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#get-"
 "active-users`` to execute."
-msgstr "执行 ``admin#get-active-users`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#get-active-users`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:573
 #, fuzzy
@@ -4373,8 +4320,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-"
 "users/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-users/"
-"Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-"
+"users/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:575
 #, fuzzy
@@ -4400,25 +4347,23 @@ msgid ""
 "minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
 "active-user-num last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-user-"
-"num last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
-"#get-active-user-num last minute`` ``sess-man/adhoc-command/http://jabber."
-"org/protocol/admin#get-active-user-num last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-"
+"user-num last hour`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#get-active-user-num last "
+"minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
+"active-user-num last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:577
 msgid ""
 "adhoc-command/http://jabber.org/protocol/admin#get-active-user-"
 "num/Average processing time"
-msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#get-active-user-num/"
-"平均处理时间"
+msgstr "adhoc-command/http://jabber.org/protocol/admin#get-active-user-num/平均处理时间"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:577
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#get-"
 "active-user-num`` to execute."
-msgstr "执行 ``admin#get-active-user-num`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#get-active-user-num`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:577
 #, fuzzy
@@ -4426,8 +4371,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-"
 "user-num/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
-"active-user-num/Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-active-"
+"user-num/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:579
 #, fuzzy
@@ -4435,7 +4380,8 @@ msgid ""
 "adhoc-command/http://jabber.org/protocol/admin#get-idle-users last "
 "{interval}"
 msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#get-idle-users last {interval}"
+"adhoc-command/http://jabber.org/protocol/admin#get-idle-users last "
+"{interval}"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:579
 msgid ""
@@ -4452,9 +4398,9 @@ msgid ""
 "command/http://jabber.org/protocol/admin#get-idle-users last second``"
 msgstr ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users "
-"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
-"idle-users last minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/"
-"admin#get-idle-users last second``"
+"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
+"#get-idle-users last minute`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#get-idle-users last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:581
 msgid ""
@@ -4466,8 +4412,7 @@ msgstr "adhoc-command/http://jabber.org/protocol/admin#get-idle-users/平均处�
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#get-"
 "idle-users`` to execute."
-msgstr "执行 ``admin#get-idle-users`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#get-idle-users`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:581
 #, fuzzy
@@ -4475,8 +4420,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-"
 "users/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users/"
-"Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-"
+"users/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:583
 #, fuzzy
@@ -4501,25 +4446,22 @@ msgid ""
 "#get-idle-users-num last minute`` ``sess-man/adhoc-"
 "command/http://jabber.org/protocol/admin#get-idle-users-num last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num "
-"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
-"idle-users-num last minute`` ``sess-man/adhoc-command/http://jabber.org/"
-"protocol/admin#get-idle-users-num last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-"
+"num last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
+"#get-idle-users-num last minute`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#get-idle-users-num last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:585
 msgid ""
 "adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num/Average"
 " processing time"
-msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num/"
-"平均处理时间"
+msgstr "adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num/平均处理时间"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:585
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#get-"
 "idle-users-num`` to execute."
-msgstr "执行 ``admin#get-idle-users-num`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#get-idle-users-num`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:585
 #, fuzzy
@@ -4527,8 +4469,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-"
 "num/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-num/"
-"Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-idle-users-"
+"num/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:587
 #, fuzzy
@@ -4536,8 +4478,8 @@ msgid ""
 "adhoc-command/http://jabber.org/protocol/admin#get-online-users-list last"
 " {interval}"
 msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#get-online-users-list last "
-"{interval}"
+"adhoc-command/http://jabber.org/protocol/admin#get-online-users-list last"
+" {interval}"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:587
 msgid ""
@@ -4554,25 +4496,25 @@ msgid ""
 "minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
 "online-users-list last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-online-users-"
-"list last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
-"#get-online-users-list last minute`` ``sess-man/adhoc-command/http://jabber."
-"org/protocol/admin#get-online-users-list last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-online-"
+"users-list last hour`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#get-online-users-list last "
+"minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
+"online-users-list last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:589
 msgid ""
 "adhoc-command/http://jabber.org/protocol/admin#get-online-users-"
 "list/Average processing time"
 msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#get-online-users-list/"
-"平均处理时间"
+"adhoc-command/http://jabber.org/protocol/admin#get-online-users-"
+"list/平均处理时间"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:589
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#get-"
 "online-users-list`` to execute."
-msgstr "执行 ``admin#get-online-users-list`` "
-"所需的平均时间（以毫秒为单位），以整数形式返回。"
+msgstr "执行 ``admin#get-online-users-list`` 所需的平均时间（以毫秒为单位），以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:589
 #, fuzzy
@@ -4580,8 +4522,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-online-"
 "users-list/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
-"online-users-list/Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-online-"
+"users-list/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:591
 #, fuzzy
@@ -4608,24 +4550,22 @@ msgid ""
 "top-active-users last second``"
 msgstr ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-top-active-"
-"users last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
-"#get-top-active-users last minute`` ``sess-man/adhoc-command/http://jabber."
-"org/protocol/admin#get-top-active-users last second``"
+"users last hour`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#get-top-active-users last "
+"minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
+"top-active-users last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:593
 msgid ""
 "adhoc-command/http://jabber.org/protocol/admin#get-top-active-"
 "users/Average processing time"
-msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#get-top-active-users/"
-"平均处理时间"
+msgstr "adhoc-command/http://jabber.org/protocol/admin#get-top-active-users/平均处理时间"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:593
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#get-"
 "top-active-users`` to execute."
-msgstr "执行 ``admin#get-top-active-users`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#get-top-active-users`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:593
 #, fuzzy
@@ -4633,8 +4573,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-top-active-"
 "users/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
-"top-active-users/Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-top-active-"
+"users/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:595
 #, fuzzy
@@ -4661,24 +4601,24 @@ msgid ""
 "registered-users-list last second``"
 msgstr ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-registered-"
-"users-list last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/"
-"admin#get-registered-users-list last minute`` ``sess-man/adhoc-command/"
-"http://jabber.org/protocol/admin#get-registered-users-list last second``"
+"users-list last hour`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#get-registered-users-list last "
+"minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
+"registered-users-list last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:597
 msgid ""
 "adhoc-command/http://jabber.org/protocol/admin#get-registered-users-"
 "list/Average processing time"
 msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#get-registered-users-list/"
-"平均处理时间"
+"adhoc-command/http://jabber.org/protocol/admin#get-registered-users-"
+"list/平均处理时间"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:597
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#get-"
 "registered-users-list`` to execute."
-msgstr "执行 ``admin#get-registered-users-list`` "
-"所需的平均时间（以毫秒为单位），以整数形式返回。"
+msgstr "执行 ``admin#get-registered-users-list`` 所需的平均时间（以毫秒为单位），以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:597
 #, fuzzy
@@ -4686,8 +4626,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-registered-"
 "users-list/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
-"registered-users-list/Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-registered-"
+"users-list/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:599
 #, fuzzy
@@ -4712,10 +4652,10 @@ msgid ""
 "#get-user-roster last minute`` ``sess-man/adhoc-"
 "command/http://jabber.org/protocol/admin#get-user-roster last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-roster "
-"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-"
-"user-roster last minute`` ``sess-man/adhoc-command/http://jabber.org/"
-"protocol/admin#get-user-roster last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-roster"
+" last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
+"#get-user-roster last minute`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#get-user-roster last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:601
 msgid ""
@@ -4727,8 +4667,7 @@ msgstr "adhoc-command/http://jabber.org/protocol/admin#get-user-roster/平均处
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin#get-"
 "user-roster`` to execute."
-msgstr "执行 ``admin#get-user-roster`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#get-user-roster`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:601
 #, fuzzy
@@ -4736,14 +4675,13 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-"
 "roster/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-roster/"
-"Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#get-user-"
+"roster/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:603
 #, fuzzy
 msgid "adhoc-command/http://jabber.org/protocol/admin#remove-user last {interval}"
-msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#remove-user last {interval}"
+msgstr "adhoc-command/http://jabber.org/protocol/admin#remove-user last {interval}"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:603
 msgid ""
@@ -4759,10 +4697,10 @@ msgid ""
 "#remove-user last minute`` ``sess-man/adhoc-"
 "command/http://jabber.org/protocol/admin#remove-user last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-user last "
-"hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-user "
-"last minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
-"#remove-user last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-user "
+"last hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin"
+"#remove-user last minute`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#remove-user last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:605
 msgid ""
@@ -4774,8 +4712,7 @@ msgstr "adhoc-command/http://jabber.org/protocol/admin#remove-user/平均处理�
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin"
 "#remove-user`` to execute."
-msgstr "执行 ``admin#remove-user`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#remove-user`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:605
 #, fuzzy
@@ -4783,14 +4720,13 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-"
 "user/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-user/"
-"Average processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#remove-"
+"user/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:607
 #, fuzzy
 msgid "adhoc-command/http://jabber.org/protocol/admin#user-stats last {interval}"
-msgstr ""
-"adhoc-command/http://jabber.org/protocol/admin#user-stats last {interval}"
+msgstr "adhoc-command/http://jabber.org/protocol/admin#user-stats last {interval}"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:607
 msgid ""
@@ -4806,10 +4742,10 @@ msgid ""
 "stats last minute`` ``sess-man/adhoc-"
 "command/http://jabber.org/protocol/admin#user-stats last second``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#user-stats last "
-"hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#user-stats "
-"last minute`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#user-"
-"stats last second``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#user-stats last"
+" hour`` ``sess-man/adhoc-command/http://jabber.org/protocol/admin#user-"
+"stats last minute`` ``sess-man/adhoc-"
+"command/http://jabber.org/protocol/admin#user-stats last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:609
 msgid ""
@@ -4821,8 +4757,7 @@ msgstr "adhoc-command/http://jabber.org/protocol/admin#user-stats/平均处理�
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``admin"
 "#user-stats`` to execute."
-msgstr "执行 ``admin#user-stats`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``admin#user-stats`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:609
 #, fuzzy
@@ -4830,8 +4765,8 @@ msgid ""
 "``sess-man/adhoc-command/http://jabber.org/protocol/admin#user-"
 "stats/Average processing time``"
 msgstr ""
-"``sess-man/adhoc-command/http://jabber.org/protocol/admin#user-stats/Average "
-"processing time``"
+"``sess-man/adhoc-command/http://jabber.org/protocol/admin#user-"
+"stats/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:611
 msgid "adhoc-command/get-user-info last {interval}"
@@ -4850,9 +4785,9 @@ msgid ""
 "command/get-user-info last minute`` ``sess-man/adhoc-command/get-user-"
 "info last second``"
 msgstr ""
-"``sess-man/adhoc-command/get-user-info last hour`` ``sess-man/adhoc-command/"
-"get-user-info last minute`` ``sess-man/adhoc-command/get-user-info last "
-"second``"
+"``sess-man/adhoc-command/get-user-info last hour`` ``sess-man/adhoc-"
+"command/get-user-info last minute`` ``sess-man/adhoc-command/get-user-"
+"info last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:613
 msgid "adhoc-command/get-user-info/Average processing time"
@@ -4886,8 +4821,9 @@ msgid ""
 "/modify-user last minute`` ``sess-man/adhoc-command/modify-user last "
 "second``"
 msgstr ""
-"``sess-man/adhoc-command/modify-user last hour`` ``sess-man/adhoc-command/"
-"modify-user last minute`` ``sess-man/adhoc-command/modify-user last second``"
+"``sess-man/adhoc-command/modify-user last hour`` ``sess-man/adhoc-command"
+"/modify-user last minute`` ``sess-man/adhoc-command/modify-user last "
+"second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:617
 msgid "adhoc-command/modify-user/Average processing time"
@@ -4922,8 +4858,8 @@ msgid ""
 "command/oauth-credentials last minute`` ``sess-man/adhoc-command/oauth-"
 "credentials last second``"
 msgstr ""
-"``sess-man/adhoc-command/oauth-credentials last hour`` ``sess-man/"
-"adhoc-command/oauth-credentials last minute`` ``sess-man/adhoc-command/oauth-"
+"``sess-man/adhoc-command/oauth-credentials last hour`` ``sess-man/adhoc-"
+"command/oauth-credentials last minute`` ``sess-man/adhoc-command/oauth-"
 "credentials last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:621
@@ -4934,8 +4870,7 @@ msgstr "即席命令/oauth凭证/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``oauth-"
 "credentials`` to execute."
-msgstr "执行 ``oauth-credentials`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``oauth-credentials`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:621
 #, fuzzy
@@ -4959,9 +4894,9 @@ msgid ""
 "command/roster-fixer last minute`` ``sess-man/adhoc-command/roster-fixer "
 "last second``"
 msgstr ""
-"``sess-man/adhoc-command/roster-fixer last hour`` ``sess-man/adhoc-command/"
-"roster-fixer last minute`` ``sess-man/adhoc-command/roster-fixer last "
-"second``"
+"``sess-man/adhoc-command/roster-fixer last hour`` ``sess-man/adhoc-"
+"command/roster-fixer last minute`` ``sess-man/adhoc-command/roster-fixer "
+"last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:625
 msgid "adhoc-command/roster-fixer/Average processing time"
@@ -4995,9 +4930,9 @@ msgid ""
 "/adhoc-command/roster-fixer-cluster last minute`` ``sess-man/adhoc-"
 "command/roster-fixer-cluster last second``"
 msgstr ""
-"``sess-man/adhoc-command/roster-fixer-cluster last hour`` ``sess-man/"
-"adhoc-command/roster-fixer-cluster last minute`` ``sess-man/adhoc-command/"
-"roster-fixer-cluster last second``"
+"``sess-man/adhoc-command/roster-fixer-cluster last hour`` ``sess-man"
+"/adhoc-command/roster-fixer-cluster last minute`` ``sess-man/adhoc-"
+"command/roster-fixer-cluster last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:629
 msgid "adhoc-command/roster-fixer-cluster/Average processing time"
@@ -5007,8 +4942,7 @@ msgstr "即席命令/roster-fixer-cluster/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``roster-"
 "fixer-cluster`` to execute."
-msgstr "执行 ``roster-fixer-cluster`` "
-"所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
+msgstr "执行 ``roster-fixer-cluster`` 所需的时间，以毫秒为单位的平均时间，以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:629
 #, fuzzy
@@ -5032,8 +4966,8 @@ msgid ""
 "command/user-domain-perm last minute`` ``sess-man/adhoc-command/user-"
 "domain-perm last second``"
 msgstr ""
-"``sess-man/adhoc-command/user-domain-perm last hour`` ``sess-man/"
-"adhoc-command/user-domain-perm last minute`` ``sess-man/adhoc-command/user-"
+"``sess-man/adhoc-command/user-domain-perm last hour`` ``sess-man/adhoc-"
+"command/user-domain-perm last minute`` ``sess-man/adhoc-command/user-"
 "domain-perm last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:633
@@ -5068,9 +5002,9 @@ msgid ""
 "/adhoc-command/user-roster-management last minute`` ``sess-man/adhoc-"
 "command/user-roster-management last second``"
 msgstr ""
-"``sess-man/adhoc-command/user-roster-management last hour`` ``sess-man/"
-"adhoc-command/user-roster-management last minute`` ``sess-man/adhoc-command/"
-"user-roster-management last second``"
+"``sess-man/adhoc-command/user-roster-management last hour`` ``sess-man"
+"/adhoc-command/user-roster-management last minute`` ``sess-man/adhoc-"
+"command/user-roster-management last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:637
 msgid "adhoc-command/user-roster-management/Average processing time"
@@ -5080,14 +5014,12 @@ msgstr "即席命令/用户名册管理/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``user-"
 "roster-management`` to execute."
-msgstr "执行 ``user-roster-management`` "
-"所需的平均时间（以毫秒为单位），以整数形式返回。"
+msgstr "执行 ``user-roster-management`` 所需的平均时间（以毫秒为单位），以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:637
 #, fuzzy
 msgid "``sess-man/adhoc-command/user-roster-management/Average processing time``"
-msgstr ""
-"``sess-man/adhoc-command/user-roster-management/Average processing time``"
+msgstr "``sess-man/adhoc-command/user-roster-management/Average processing time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:639
 msgid "adhoc-command/user-roster-management-ext last {interval}"
@@ -5106,9 +5038,9 @@ msgid ""
 "man/adhoc-command/user-roster-management-ext last minute`` ``sess-man"
 "/adhoc-command/user-roster-management-ext last second``"
 msgstr ""
-"``sess-man/adhoc-command/user-roster-management-ext last hour`` ``sess-man/"
-"adhoc-command/user-roster-management-ext last minute`` ``sess-man/"
-"adhoc-command/user-roster-management-ext last second``"
+"``sess-man/adhoc-command/user-roster-management-ext last hour`` ``sess-"
+"man/adhoc-command/user-roster-management-ext last minute`` ``sess-man"
+"/adhoc-command/user-roster-management-ext last second``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:641
 msgid "adhoc-command/user-roster-management-ext/Average processing time"
@@ -5118,8 +5050,7 @@ msgstr "即席命令/user-roster-management-ext/平均处理时间"
 msgid ""
 "The average time in ms, returned as an integer, it takes for ``user-"
 "roster-management-ext`` to execute."
-msgstr "执行 ``user-roster-management-ext`` "
-"所需的平均时间（以毫秒为单位），以整数形式返回。"
+msgstr "执行 ``user-roster-management-ext`` 所需的平均时间（以毫秒为单位），以整数形式返回。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:641
 #, fuzzy
@@ -5127,7 +5058,8 @@ msgid ""
 "``sess-man/adhoc-command/user-roster-management-ext/Average processing "
 "time``"
 msgstr ""
-"``sess-man/adhoc-command/user-roster-management-ext/Average processing time``"
+"``sess-man/adhoc-command/user-roster-management-ext/Average processing "
+"time``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:643
 msgid "Authentication timeouts"
@@ -5209,8 +5141,7 @@ msgid ""
 "The number of most simultaneous sessions within the specified interval. "
 "Today = previous 24 hours, Yesterday = 24 hours after previous 24 hours "
 "(does not go by calendar date)."
-msgstr "指定时间间隔内最多同时会话的数量。今天 = 前 24 小时，昨天 = "
-"前24小时后的24小时（不按日历日期计算）。"
+msgstr "指定时间间隔内最多同时会话的数量。今天 = 前 24 小时，昨天 = 前24小时后的24小时（不按日历日期计算）。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:653
 #, fuzzy
@@ -5218,8 +5149,8 @@ msgid ""
 "``sess-man/Maximum user sessions today`` ``sess-man/Maximum user sessions"
 " yesterday``"
 msgstr ""
-"``sess-man/Maximum user sessions today`` ``sess-man/Maximum user sessions "
-"yesterday``"
+"``sess-man/Maximum user sessions today`` ``sess-man/Maximum user sessions"
+" yesterday``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:655
 msgid "Registered accounts"
@@ -5243,8 +5174,7 @@ msgid ""
 "The current number of open user connections. This may be interpreted as "
 "number of connections from users, however a user can have more than one "
 "connection (connection from mobile and PC for example)."
-msgstr "当前打开的用户连接数。这可以解释为来自用户的连接数，但是一个用户可以拥有多个"
-"连接（例如来自移动设备和 PC 的连接）。"
+msgstr "当前打开的用户连接数。这可以解释为来自用户的连接数，但是一个用户可以拥有多个连接（例如来自移动设备和 PC 的连接）。"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:657
 #, fuzzy
@@ -5310,8 +5240,8 @@ msgid ""
 "``sess-man/presence/Users status changes`` ``sess-man/presence-"
 "state/Users status changes``"
 msgstr ""
-"``sess-man/presence/Users status changes`` ``sess-man/presence-state/Users "
-"status changes``"
+"``sess-man/presence/Users status changes`` ``sess-man/presence-"
+"state/Users status changes``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst:667
 msgid "sess-man/Processor"
@@ -5351,24 +5281,26 @@ msgid ""
 "jabber:iq:private`` ``sess-man/Processor: Average amp on last 100 runs "
 "[ms]`` ``sess-man/Processor: Average msgoffline on last 100 runs[ms]``"
 msgstr ""
-"``sess-man/Processor: message carbons`` ``sess-man/Processor: http://jabber."
-"org/protocol/stats`` ``sess-man/Processor: jabber:iq:auth`` ``sess-man/"
-"Processor: vcard-temp`` ``sess-man/Processor: amp`` ``sess-man/Processor: "
-"presence-subscription`` ``sess-man/Processor: disco`` ``sess-man/Processor: "
-"msgoffline`` ``sess-man/Processor: urn:xmpp:blocking`` ``sess-man/Processor: "
-"urn:xmpp:ping`` ``sess-man/Processor: jabber:iq:register`` ``sess-man/"
-"Processor: urn:ietf:params:xml:ns:xmpp-sasl`` ``sess-man/Processor: prp`` "
-"``sess-man/Processor: presence`` ``sess-man/Processor: message-archive-"
+"``sess-man/Processor: message carbons`` ``sess-man/Processor: "
+"http://jabber.org/protocol/stats`` ``sess-man/Processor: jabber:iq:auth``"
+" ``sess-man/Processor: vcard-temp`` ``sess-man/Processor: amp`` ``sess-"
+"man/Processor: presence-subscription`` ``sess-man/Processor: disco`` "
+"``sess-man/Processor: msgoffline`` ``sess-man/Processor: "
+"urn:xmpp:blocking`` ``sess-man/Processor: urn:xmpp:ping`` ``sess-"
+"man/Processor: jabber:iq:register`` ``sess-man/Processor: "
+"urn:ietf:params:xml:ns:xmpp-sasl`` ``sess-man/Processor: prp`` ``sess-"
+"man/Processor: presence`` ``sess-man/Processor: message-archive-"
 "xep-0136`` ``sess-man/Processor: default-handler`` ``sess-man/Processor: "
-"jabber:iq:roster`` ``sess-man/Processor: starttls`` ``sess-man/Processor: "
-"presence-state`` ``sess-man/Processor: jabber:iq:version`` ``sess-man/"
-"Processor: urn:xmpp:time`` ``sess-man/Processor: session-open`` ``sess-man/"
-"Processor: jabber:iq:privacy`` ``sess-man/Processor: urn:ietf:params:xml:ns"
-":xmpp-bind`` ``sess-man/Processor: http://jabber.org/protocol/commands`` "
-"``sess-man/Processor: vcard-xep0292`` ``sess-man/Processor: session-close`` "
-"``sess-man/Processor: urn:ietf:params:xml:ns:xmpp-session`` ``sess-man/"
-"Processor: jabber:iq:private`` ``sess-man/Processor: Average amp on last 100 "
-"runs [ms]`` ``sess-man/Processor: Average msgoffline on last 100 runs[ms]``"
+"jabber:iq:roster`` ``sess-man/Processor: starttls`` ``sess-man/Processor:"
+" presence-state`` ``sess-man/Processor: jabber:iq:version`` ``sess-"
+"man/Processor: urn:xmpp:time`` ``sess-man/Processor: session-open`` "
+"``sess-man/Processor: jabber:iq:privacy`` ``sess-man/Processor: "
+"urn:ietf:params:xml:ns:xmpp-bind`` ``sess-man/Processor: "
+"http://jabber.org/protocol/commands`` ``sess-man/Processor: vcard-"
+"xep0292`` ``sess-man/Processor: session-close`` ``sess-man/Processor: "
+"urn:ietf:params:xml:ns:xmpp-session`` ``sess-man/Processor: "
+"jabber:iq:private`` ``sess-man/Processor: Average amp on last 100 runs "
+"[ms]`` ``sess-man/Processor: Average msgoffline on last 100 runs[ms]``"
 
 #: ../../Tigase_Administration/Statistics_Description.rst
 msgid "The field shows as follows:"
@@ -5477,3 +5409,4 @@ msgstr "ws2s"
 #: ../../Tigase_Administration/Statistics_Description.rst:698
 msgid "No exclusive ws2s specific statistics."
 msgstr "没有专有的 ws2s 特定统计信息。"
+
