@@ -96,3 +96,5 @@ locale_dirs = ["locale/"]
 gettext_compact = False 
 language = "pl"
 locale_dirs = ["locale/"]
+
+gettext_allow_fuzzy_translations = True
