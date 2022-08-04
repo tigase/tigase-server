@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-03 03:02-0700\n"
+"POT-Creation-Date: 2022-08-04 11:04-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1553,34 +1553,19 @@ msgid "Example:"
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:152
-msgid "JDBC: jTDS vs MS JDBC driver"
+msgid "JDBC: jTDS vs MS JDBC driver (obsolete)"
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:154
 msgid ""
-"Tigase XMPP Server supports two JDBC drivers intended to be used with "
-"Microsoft SQL Server - one created and provided by Microsoft itself and "
-"the alternative implementation - jTDS. Tigase is shipped with the latter "
-"in the distribution packages. Starting with the version 7.1.0 we "
-"recommend using jDTS driver that is shipped with Tigase as JDBC driver "
-"created by Microsoft can cause problems with some components in cluster "
-"installations. MS driver can be downloaded form the website: `JDBC "
-"Drivers 4.0, 4.1 for SQL Server <http://www.microsoft.com/en-"
-"us/download/details.aspx?displaylang=en&id=11774>`__ then unpack the "
-"archive. Copy sqljdbc_4.0/enu/sqljdbc4.jar file to ${tigase-server}/jars "
-"directory."
+"Previously Tigase XMPP Server was shipped with the jTDS open source "
+"driver however since 8.3.0 we switched to the FOSS driver provided by the"
+" Microsoft itself. Previous jdbc url will fallback to the Microsoft "
+"driver automatically."
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:156
-msgid "Depending on the driver used ``uri`` needs to be configured accordingly."
-msgstr ""
-
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:158
 msgid "Microsoft driver:"
-msgstr ""
-
-#: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:168
-msgid "jDTS driver"
 msgstr ""
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/PostGRE.inc:4
@@ -3356,5 +3341,38 @@ msgstr ""
 #~ "**Some variation may be necessary "
 #~ "depending on how your java build "
 #~ "uses ``-cp`` option**"
+#~ msgstr ""
+
+#~ msgid "JDBC: jTDS vs MS JDBC driver"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tigase XMPP Server supports two JDBC "
+#~ "drivers intended to be used with "
+#~ "Microsoft SQL Server - one created "
+#~ "and provided by Microsoft itself and "
+#~ "the alternative implementation - jTDS. "
+#~ "Tigase is shipped with the latter "
+#~ "in the distribution packages. Starting "
+#~ "with the version 7.1.0 we recommend "
+#~ "using jDTS driver that is shipped "
+#~ "with Tigase as JDBC driver created "
+#~ "by Microsoft can cause problems with "
+#~ "some components in cluster installations. "
+#~ "MS driver can be downloaded form "
+#~ "the website: `JDBC Drivers 4.0, 4.1 "
+#~ "for SQL Server <http://www.microsoft.com/en-"
+#~ "us/download/details.aspx?displaylang=en&id=11774>`__ then "
+#~ "unpack the archive. Copy "
+#~ "sqljdbc_4.0/enu/sqljdbc4.jar file to ${tigase-"
+#~ "server}/jars directory."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Depending on the driver used ``uri`` "
+#~ "needs to be configured accordingly."
+#~ msgstr ""
+
+#~ msgid "jDTS driver"
 #~ msgstr ""
 
