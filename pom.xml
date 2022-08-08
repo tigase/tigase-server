@@ -319,8 +319,6 @@
                 <configuration>
                     <instructions combine.inherited="append">
                         <Bundle-Activator>tigase.osgi.Activator</Bundle-Activator>
-                        <Implementation-Version>${project.version}-b${gitVersion}/${buildNumber}
-                        </Implementation-Version>
                         <Export-Package>
                             tigase.auth.*;version=${project.version},tigase.cluster.*;version=${project.version},tigase.component.*;version=${project.version},tigase.conf.*;version=${project.version},tigase.db.*;version=${project.version},tigase.disco.*;version=${project.version},tigase.disteventbus.*;version=${project.version},tigase.eventbus.*;version=${project.version},tigase.io.*;version=${project.version},tigase.kernel.*;version=${project.version},tigase.map.*;version=${project.version},tigase.monitor.*;version=${project.version},tigase.net.*;version=${project.version},tigase.osgi.*;version=${project.version},tigase.server.*;version=${project.version},tigase.stats.*;version=${project.version},tigase.sys.*;version=${project.version},tigase.util.common.*;version=${project.version},tigase.util.historyCache.*;version=${project.version},tigase.util.log.*;version=${project.version},tigase.util.processing.*;version=${project.version},tigase.util.reflection.*;version=${project.version},tigase.util.routing.*;version=${project.version},tigase.util.setup.*;version=${project.version},tigase.util.updater.*;version=${project.version},tigase.util.workqueue.*;version=${project.version},tigase.vhosts.*;version=${project.version},!tigase.xmpp.jid,!tigase.xmpp.rsm,tigase.xmpp.*;version=${project.version}
                         </Export-Package>

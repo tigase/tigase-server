@@ -50,28 +50,24 @@ public class JabberIqVersion
 	protected static final String ID = XMLNS;
 	private static final String[][] ELEMENTS = {Iq.IQ_QUERY_PATH};
 	private static final String[] XMLNSS = {XMLNS};
-	private static final Element SERVER_VERSION = new Element("query",
-															  new Element[]{new Element("name", XMPPServer.NAME),
-																			new Element("version",
-																						XMPPServer.getImplementationVersion()),
-																			new Element("os",
-																						System.getProperty("os.name") +
-																								"-" +
-																								System.getProperty(
-																										"os.arch") +
-																								"-" +
-																								System.getProperty(
-																										"os.version") +
-																								", " +
-																								System.getProperty(
-																										"java.vm.name") +
-																								"-" +
-																								System.getProperty(
-																										"java.vm.version") +
-																								"-" +
-																								System.getProperty(
-																										"java.vm.vendor"))},
-															  new String[]{"xmlns"}, new String[]{XMLNS});
+	private static final Element SERVER_VERSION;
+
+	static {
+		// @formatter:off
+		SERVER_VERSION = new Element("query", new Element[]{
+				new Element("name", XMPPServer.NAME),
+				new Element("version", XMPPServer.getImplementationVersion()),
+				new Element("build", XMPPServer.getImplementationVersion()),
+				new Element("os", System.getProperty("os.name") + "-" +
+						System.getProperty("os.arch") + "-" +
+						System.getProperty("os.version") + ", " +
+						System.getProperty("java.vm.name") + "-" +
+						System.getProperty("java.vm.version") + "-" +
+						System.getProperty("java.vm.vendor"))},
+	 new String[]{"xmlns"}, new String[]{XMLNS});
+		// @formatter:onn
+	}
+
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
 
 	@Override
