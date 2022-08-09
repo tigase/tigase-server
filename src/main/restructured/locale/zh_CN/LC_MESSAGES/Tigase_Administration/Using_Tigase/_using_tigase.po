@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-26 08:14+0000\n"
+"PO-Revision-Date: 2022-08-09 23:33+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/using_tigasse/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/using_tigasse/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:2
@@ -542,7 +543,6 @@ msgid "logs/tigase.log.#"
 msgstr "logs/tigase.log.#"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:34
-#, fuzzy
 msgid ""
 "The tigase.log files are where the majority of logging will take place. "
 "The rules for writing to these longs can be manipulated by editing files "
@@ -551,9 +551,10 @@ msgid ""
 "turn on debug logging, and how to manipulate log settings. Entries to "
 "these logs are made in the following format:"
 msgstr ""
-"tigase.log 文件是进行大部分日志记录的地方。可以通过编辑 int.properties 文件中的文件来操作写入这些 long "
-"的规则。要了解如何操作，请参阅本手册的 :ref:`调试Tigase<debuggingTigase>` "
-"部分，了解有关如何打开调试日志记录以及如何操作日志设置的更多详细信息。这些日志的条目采用以下格式："
+"tigase.log 文件是进行大部分日志记录的地方。可以通过编辑 int.properties "
+"文件中的文件来操作写入这些 long 的规则。要了解如何操作，请参阅本手册的 "
+":ref:`调试Tigase<Debuging-Tigase>` 部分，了解有关如何打开调试日志记录以及如何"
+"操作日志设置的更多详细信息。这些日志的条目采用以下格式："
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:40
 msgid ""
@@ -825,15 +826,14 @@ msgid "Basic System Checks"
 msgstr "基本系统检查"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:6
-#, fuzzy
 msgid ""
 "Previously, a configuration article is available about :ref:`Linux "
 "settings for high load systems<linuxhighload>`. This has a description of"
 " basic settings which are essential to successfully run XMPP service for "
 "hundreds or thousands of online users."
 msgstr ""
-"以前，有一篇关于 :ref:`Linux settings for high load systems<linuxhighload>` "
-"的配置文章。这描述了为成百上千的在线用户成功运行 XMPP 服务所必需的基本设置。"
+"以前，有一篇关于 :ref:`高负载系统的 Linux 设置<linuxhighload>` 的配置文章。"
+"其描述了为成百上千的在线用户成功运行 XMPP 服务所必需的基本设置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Basic_System_Checks.inc:8
 msgid ""
@@ -2708,7 +2708,6 @@ msgid "Anonymous Authentication"
 msgstr "匿名认证"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:9
-#, fuzzy
 msgid ""
 "Tigase Server can support anonymous logins via SASL-ANONYMOUS in certain "
 "scenarios. This can be enabled on per-VHost basis by adjusting *Anonymous"
@@ -2717,9 +2716,11 @@ msgid ""
 "ANONYMOUS may not be totally secure as users can connect without prior "
 "permission (username and password)."
 msgstr ""
-"Tigase Server在某些场景下可以通过SASL-ANONYMOUS支持匿名登录。这可以通过调整 *Anonymous enabled* "
-"选项在每个VHost基础上启用，如 :ref:`添加和管理域(VHosts)<Add-and-Manage-Domains-(VHosts)>` "
-"中所述，默认情况下此设置为false SASL-ANONYMOUS可能并不完全安全，因为用户无需事先许可（用户名和密码）即可连接。"
+"Tigase Server在某些场景下可以通过SASL-ANONYMOUS支持匿名登录。这可以通过调整 *"
+"Anonymous enabled* 选项在每个VHost基础上启用，正如 "
+":ref:`添加和管理域(VHosts)<addManageDomain>` "
+"中所述，默认情况下此设置为false，因为 SASL-"
+"ANONYMOUS可能并不完全安全，因为用户无需事先许可（用户名和密码）即可连接。"
 
 #: ../../Tigase_Administration/Using_Tigase/Anonymous_Users.inc:12
 msgid "Anonymous User Features"
@@ -3675,7 +3676,6 @@ msgid "``result = \"Hello world!\"``"
 msgstr "``result = \"Hello world!\"``"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:44
-#, fuzzy
 msgid ""
 "For instructions how to load and execute the script, please refer to the "
 ":ref:`introductory article<Scripting-Introduction - Hello-World!>` for "
@@ -3684,8 +3684,10 @@ msgid ""
 "Scripting-Version-4.4.x-Update-for-Administrators>` describing new "
 "elements as well."
 msgstr ""
-"有关如何加载和执行脚本的说明，请参阅在Tigase服务器中编写脚本的 :ref:`介绍性文章<scriptingintro>`。 Tigase "
-"4.4.0及更高版本有一些小的变化，所以请查看描述新元素的 :ref:`文章<newElements>`。"
+"有关如何加载和执行脚本的说明，请参阅在Tigase服务器中编写脚本的 "
+":ref:`介绍性文章<Scripting-Introduction - Hello-World!>`。 Tigase 4.4."
+"0及更高版本有一些小的变化，所以请查看描述新元素的 :ref:`文章<Tigase-"
+"Scripting-Version-4.4.x-Update-for-Administrators>`。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:46
 msgid ""
@@ -3794,4 +3796,3 @@ msgstr ""
 #~ ":ref:`从Web 浏览器连接到Tigase XMPP服务器的最佳实践<Best-"
 #~ "Practices-for-Connecting-to-Tigase-XMPP-"
 #~ "server-From-Web-Browser>`"
-
