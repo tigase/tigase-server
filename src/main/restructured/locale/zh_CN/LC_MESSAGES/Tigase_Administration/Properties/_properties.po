@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-21 20:22+0000\n"
+"PO-Revision-Date: 2022-08-09 23:47+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/properties_guide/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/properties_guide/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Properties/_properties.rst:2
@@ -73,7 +74,6 @@ msgid "ssl-certs-location"
 msgstr "ssl-certs-location"
 
 #: ../../Tigase_Administration/Properties/_general.inc:27
-#, fuzzy
 msgid ""
 "This option allows you to specify the location where SSL certificates are"
 " stored. The meaning of this property depends on the SSL container "
@@ -81,8 +81,9 @@ msgid ""
 " to the directory where the server SSL certificates are stored in files "
 "in PEM format."
 msgstr ""
-"此选项允许您指定存储SSL证书的位置。该属性的含义取决于SSL容器 :ref:`class "
-"implementation<sslContainerClass>`。默认情况下，它只指向服务器 SSL证书存储在PEM格式文件中的目录。"
+"此选项允许您指定存储SSL证书的位置。该属性的含义取决于SSL容器 "
+":ref:`类实现<sslContainerClass>`。默认情况下，它只指向服务器 "
+"SSL证书存储在PEM格式文件中的目录。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:29
 msgid ""
@@ -160,11 +161,10 @@ msgid ""
 msgstr "**默认值：** 默认情况下，组件配置默认运行，无需指定。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:93
-#, fuzzy
 msgid ""
 "There are many many configuration options under each component, which are"
 " specified in :ref:`component documentation<Components>`."
-msgstr "每个组件下有很多很多配置选项，具体在 :ref:`组件文档<loadComponent>` 中指定。"
+msgstr "每个组件下有很多很多配置选项，具体在 :ref:`组件文档<Components>` 中指定。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:96
 msgid "Ports"
@@ -1094,7 +1094,6 @@ msgid "**Possible values:** comma separated list of user bare JIDs."
 msgstr "**可能的值：** 逗号分隔的用户裸JID列表。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:663
-#, fuzzy
 msgid ""
 "**Description:** The ``trusted`` property allows users to specify a list "
 "of accounts which are considered as trusted, thus whom can perform some "
@@ -1102,9 +1101,9 @@ msgid ""
 "broadcast message, set MOTD and so on. The configuration is similar to "
 ":ref:`admins<admins>` setting."
 msgstr ""
-"**描述：** ``trusted`` "
-"属性允许用户指定被认为是受信任的帐户列表，从而可以在服务器上执行某些特定操作。他们可以执行一些命令，发送广播消息，设置MOTD等等。配置类似于 "
-":ref:`admins<admins>` 设置。"
+"**描述：** ``trusted`` 属性允许用户指定被认为是受信任的帐户列表，从而可以在服"
+"务器上执行某些特定操作。他们可以执行一些命令，发送广播消息，设置MOTD等等。"
+"配置和 :ref:`admins<admins>` 设置类似。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:2
 msgid "Repository"
@@ -2170,7 +2169,7 @@ msgstr "elements-number-limit"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:45
 msgid "**Default value:** ``1000``"
-msgstr ""
+msgstr "**默认值：** ``1000``"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:47
 msgid "**Possible values:** any integer."
@@ -2690,4 +2689,3 @@ msgstr ""
 #~ " overridden by settings for particular "
 #~ "VHost (see `??? <#addManageDomain>`__)."
 #~ msgstr "这是一个全局属性，被特定VHost的设置覆盖 (参见 :ref:`添加和管理域(VHosts)<addManageDomain>`)。"
-
