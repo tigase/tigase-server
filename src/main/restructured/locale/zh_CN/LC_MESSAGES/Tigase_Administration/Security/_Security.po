@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-26 09:14+0000\n"
+"PO-Revision-Date: 2022-08-09 21:11+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/security/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/security/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Security/_Security.rst:2
@@ -231,9 +232,8 @@ msgid "``string``"
 msgstr "``string``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:22
-#, fuzzy
 msgid "Working mode (see :ref:`Working modes<WorkingModes>`)"
-msgstr "工作模式（参见 :ref:`工作模式<bruteForcePrevention_WorkingModes>`）"
+msgstr "工作模式（参见 :ref:`工作模式<WorkingModes>`）"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:26
 msgid "Detailed statistics"
@@ -494,7 +494,6 @@ msgstr ""
 "文件。默认情况下，为了方便起见，我们推荐使用 ``Tigase/certs`` 目录。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:127
-#, fuzzy
 msgid ""
 "It’s also possible to use: \\* Admin ad-hoc command via XMPP client - you"
 " should navigate to Service Discovery of your server and in the list of "
@@ -506,11 +505,12 @@ msgid ""
 "man@domain.com with payload containing your certificate; to get the "
 "required form fields make ``GET`` request to the same endpoint"
 msgstr ""
-"也可以使用：\\* Admin ad-hoc 命令通过 XMPP 客户端 - 您应该访问到服务器的服务发现并在 ``VHost Manager``"
-" 组件的命令列表中选择 ``Add SSL Certificate``，然后按照说明\\* Admin WebUI - 打开 "
+"也可以使用：\\* Admin ad-hoc 命令通过 XMPP 客户端 - "
+"您应该访问到服务器的服务发现并在 ``VHost Manager`` 组件的命令列表中选择 ``"
+"Add SSL Certificate``，然后按照说明\\* Admin WebUI - 打开 "
 "``http://<host>/admin``，访问 ``Other``类别并在其中选择 ``Add SSL "
 "Certificate``，然后按照说明\\* REST API -使用包含您的证书的有效负载向 "
-"``http://localhost:8080/rest/adhoc/vhost-man@domain.com`` 发出 ``POST`` "
+"http://localhost:8080/rest/adhoc/vhost-man@domain.com 发出 ``POST`` "
 "请求；为获取所需的表单字段，请向同一端点发出 ``GET`` 请求"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:132
@@ -2615,4 +2615,3 @@ msgstr ""
 #~ "for ``sslContextContainer`` for particular "
 #~ "connection managers) or on VHost level."
 #~ msgstr ""
-
