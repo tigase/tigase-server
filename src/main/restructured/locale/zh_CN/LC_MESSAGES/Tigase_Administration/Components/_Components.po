@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-26 08:14+0000\n"
+"PO-Revision-Date: 2022-08-09 21:33+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/components/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/components/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Components/Components.inc:4
@@ -892,26 +893,23 @@ msgid "config.tdsl"
 msgstr "config.tdsl"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:111
-#, fuzzy
 msgid ""
 "Tasks can be configured in the ``config.tdsl`` file. See :ref:`available "
 "tasks<availableTasks>` for the tasks that can be setup."
-msgstr ""
-"可以在 ``config.tdsl`` 文件中配置任务。有关可以设置的任务，请参阅 :ref:`available "
-"tasks<availableTasks>`。"
+msgstr "可以在 ``config.tdsl`` 文件中配置任务。有关可以设置的任务，请参阅 "
+":ref:`可用任务<availableTasks>`。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:113
 msgid "To enable a specific monitor task, use the following line:"
 msgstr "要启用特定的监控任务，请使用以下行："
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:123
-#, fuzzy
 msgid ""
 "Where monitor is the component name for ``MonitorComponent``, and "
 "``$TASKNAME`` is one of the :ref:`available task names<availableTasks>`."
 msgstr ""
-"其中 monitor 是 ``MonitorComponent`` 的组件名称，而 ``$TASKNAME`` 是 :ref:`available"
-" task<availableTasks>` 之一。"
+"其中 monitor 是 ``MonitorComponent`` 的组件名称，而 ``$TASKNAME`` 是 "
+":ref:`可用任务<availableTasks>` 之一。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:125
 msgid ""
@@ -1005,18 +1003,16 @@ msgstr ""
 "var=x-task#enabled\">`` 字段:"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc
-#, fuzzy
 msgid ""
 "Your field type will be defined by the type of variable specified in the "
 ":ref:`Available Tasks<availableTasks>` section."
-msgstr "您的字段类型将由 :ref:`Available Tasks<availableTasks>` 部分中指定的变量类型定义。"
+msgstr "您的字段类型将由 :ref:`可用任务<availableTasks>` 部分中指定的变量类型定义。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:235
-#, fuzzy
 msgid ""
 "``var=x task#`` will be followed by the property value taken directly "
 "from the ref:`Available Tasks<availableTasks>` section."
-msgstr "``var=x task#`` 后跟直接取自 :ref:`Available Tasks<availableTasks>` 部分的属性值。"
+msgstr "``var=x task#`` 后跟直接取自 :ref:`可用任务<availableTasks>` 部分的属性值。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:238
 msgid "Getting the Message"
@@ -2837,4 +2833,3 @@ msgstr ""
 #~ " but from the **real** node (in "
 #~ "this case: ``EventName|tigase:demo``)."
 #~ msgstr ""
-
