@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-25 08:51+0000\n"
+"PO-Revision-Date: 2022-08-10 00:18+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dp-component_implementation/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/dp-component_implementation/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Component_Implementation.rst:2
@@ -1644,15 +1645,15 @@ msgstr ""
 "``database/`` 子目录下。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1635
-#, fuzzy
 msgid ""
 "this can be controlled with ``external`` property of "
 "``Repository.SchemaId`` annotation, which defaults to \"true\", if set to"
 " ``false`` then handling will be done as described in :ref:`Relational "
 "databases (external handling)<relationalDatabases>`"
 msgstr ""
-"这可以通过 ``Repository.SchemaId`` 注释的 ``external`` 属性来控制，默认为\"true\"，如果设置为 "
-"``false``，那么处理将按照 :ref:`关系数据库(外部处理)<update-relational>` 中的描述进行"
+"这可以通过 ``Repository.SchemaId`` 注释的 ``external`` 属性来控制，"
+"默认为\"true\"，如果设置为 ``false``，那么处理将按照 "
+":ref:`关系数据库(外部处理)<relationalDatabases>` 中的描述进行"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1637
 #, fuzzy
@@ -2041,4 +2042,3 @@ msgstr ""
 
 #~ msgid ": _cil6:"
 #~ msgstr ""
-
