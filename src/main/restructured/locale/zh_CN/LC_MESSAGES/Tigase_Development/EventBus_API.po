@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-25 22:40+0000\n"
+"PO-Revision-Date: 2022-08-10 00:19+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-eventbus_api/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/dg-eventbus_api/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/EventBus_API.rst:3
@@ -184,14 +185,13 @@ msgid "|ss| Handling XML events |se|\\"
 msgstr "|ss| 处理XML事件 |se|\\"
 
 #: ../../Tigase_Development/EventBus_API.rst:156
-#, fuzzy
 msgid ""
 "To handle XML events we have to register listener for specific event "
 "package and name. In our example, package is empty because event name has"
 " no package declared (see also :ref:`Filtering events<filteringEvents>`)."
 msgstr ""
-"要处理XML事件，我们必须为特定事件包和名称注册侦听器。在我们的示例中，包是空的，因为事件名称没有声明包（另请参阅 "
-":ref:`过滤事件<filtering_events>`）。"
+"要处理XML事件，我们必须为特定事件包和名称注册侦听器。在我们的示例中，包是空的"
+"，因为事件名称没有声明包（另请参阅 :ref:`过滤事件<filteringEvents>`）。"
 
 #: ../../Tigase_Development/EventBus_API.rst:173
 msgid ""
@@ -243,4 +243,3 @@ msgstr "将被调用，因为这是 ``SpecificEvent`` 的严格监听器。"
 #: ../../Tigase_Development/EventBus_API.rst:226
 msgid "Will be called, because ``SpecificEvent`` extends ``MainEvent``."
 msgstr "将被调用，因为 ``SpecificEvent`` 扩展了 ``MainEvent``。"
-
