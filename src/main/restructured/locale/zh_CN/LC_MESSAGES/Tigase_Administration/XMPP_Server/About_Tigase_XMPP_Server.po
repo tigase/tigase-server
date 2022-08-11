@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-07-08 00:14+0000\n"
+"PO-Revision-Date: 2022-08-12 06:30+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/about_tigase_xmpp_server/zh_Hans/>\n"
@@ -33,29 +33,24 @@ msgstr "*Tigase XMPP 服务器** 是一个基于 Java的**开源和免费 (AGPLv
 "。其服务器设计和背后实施的目标是："
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:6
-#, fuzzy
 msgid "Make the server robust and reliable."
 msgstr "使服务器稳健可靠。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:8
-#, fuzzy
 msgid "Make the server a secure communication platform."
 msgstr "使服务器成为一个安全的交流平台。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:10
-#, fuzzy
 msgid "Make a flexible server which can be applied to different use cases."
 msgstr "做一个可以应用于不同场景的灵活的服务器。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:12
-#, fuzzy
 msgid ""
 "Make an extensible server which takes full advantage of XMPP protocol "
 "extensibility."
 msgstr "做一个可以充分利用 XMPP 可扩展性协议的可扩展服务器。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:14
-#, fuzzy
 msgid "Make the server easy to setup and maintain."
 msgstr "使服务器易于设置和维护。"
 
@@ -64,7 +59,6 @@ msgid "Robust and reliable"
 msgstr "稳固可靠"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:19
-#, fuzzy
 msgid ""
 "This means that the server can handle many concurrent "
 "requests/connections and can run for a long time reliably. The server is "
@@ -73,7 +67,6 @@ msgstr "这意味着服务器可以同时处理许多请求/连接，并且可�
 "计和实现是为了同时处理数百万个连接。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:21
-#, fuzzy
 msgid ""
 "It is not enough however to design and implement a high load server and "
 "hope it will run well. The main focus of the project is put in into "
@@ -87,12 +80,10 @@ msgstr ""
 "功能只有在通过严格的测试周期后才被视之为已实现。测试周期包括 3 个基本测试："
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:23
-#, fuzzy
 msgid "**Functional tests** - Checking whether the function works at all."
 msgstr "**功能测试** - 检查功能是否有效。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:25
-#, fuzzy
 msgid ""
 "**Performance tests** - Checking whether the function performs well "
 "enough."
@@ -2518,11 +2509,9 @@ msgstr "与 Drupal CMS 紧密集成，Tigase 可以向订阅用户发送相关�
 "还可以通过 XMPP 发布短消息"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:76
-#, fuzzy
 msgid "LDAP-Auth"
 msgstr "LDAP认证"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:76
-#, fuzzy
 msgid "LDAP Authentication Connector Supported"
 msgstr "支持 LDAP 身份验证连接器"
