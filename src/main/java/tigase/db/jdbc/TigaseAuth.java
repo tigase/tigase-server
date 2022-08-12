@@ -24,10 +24,8 @@ import tigase.util.Base64;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xmpp.jid.BareJID;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.*;
+import java.time.Duration;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,6 +58,7 @@ public class TigaseAuth
 	private static final String USER_LOGOUT_QUERY = "{ call TigUserLogout(?) }";
 	private static final String USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
 	private static final String USERS_DOMAIN_COUNT_QUERY = "select count(*) from tig_users where user_id like ?";
+	private static final String ACTIVE_USERS_COUNT_QUERY = "select count(*) from tig_users where last_used >= now() - ?";
 	private static final String DEF_UPDATELOGINTIME_QUERY = "{ call TigUpdateLoginTime(?) }";
 
 	private DataRepository data_repo = null;
@@ -91,6 +90,39 @@ public class TigaseAuth
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
 	}
+
+
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		ResultSet rs = null;
+
+		try {
+			long users = -1;
+			PreparedStatement active_users_count_st = data_repo.getPreparedStatement(null, USERS_DOMAIN_COUNT_QUERY);
+
+			synchronized (active_users_count_st) {
+				try {
+					// Load all user count from database
+					active_users_count_st.setTime(1, Time.valueOf("0"));
+					rs = active_users_count_st.executeQuery();
+
+					if (rs.next()) {
+						users = rs.getLong(1);
+					}    // end of while (rs.next())
+				} finally {
+					data_repo.release(null, rs);
+					rs = null;
+				}
+			}
+
+			return users;
+		} catch (SQLException e) {
+			return -1;
+
+			// throw new TigaseDBException("Problem loading user list from repository", e);
+		}
+	}
+
 
 	/**
 	 * <code>getUsersCount</code> method is thread safe. It uses local variable for storing <code>Statement</code>.

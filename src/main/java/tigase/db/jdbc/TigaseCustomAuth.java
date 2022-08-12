@@ -32,10 +32,10 @@ import javax.security.auth.callback.*;
 import javax.security.sasl.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -186,6 +186,7 @@ public class TigaseCustomAuth
 	public static final String DEF_USERLOGOUT_KEY = "user-logout-query";
 	public static final String DEF_UPDATELOGINTIME_KEY = "update-login-time-query";
 	public static final String DEF_USERS_COUNT_KEY = "users-count-query";
+	public static final String DEF_ACTIVE_USERS_COUNT_KEY = "active-users-count-query";
 	public static final String DEF_USERS_DOMAIN_COUNT_KEY = "" + "users-domain-count-query";
 	public static final String DEF_LISTDISABLEDACCOUNTS_KEY = "users-list-disabled-accounts-query";
 	@Deprecated
@@ -216,8 +217,8 @@ public class TigaseCustomAuth
 	public static final String DEF_DELUSER_QUERY = "{ call TigRemoveUser(?) }";
 	public static final String DEF_GETPASSWORD_QUERY = "{ call TigGetPassword(?) }";
 	public static final String DEF_USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
-	public static final String DEF_USERS_DOMAIN_COUNT_QUERY =
-			"" + "select count(*) from tig_users where user_id like ?";
+	public static final String DEF_ACTIVE_USERS_COUNT_QUERY = "select count(*) from tig_users where last_used > ?";
+	public static final String DEF_USERS_DOMAIN_COUNT_QUERY = "select count(*) from tig_users where user_id like ?";
 	public static final String DEF_LISTDISABLEDACCOUNTS_QUERY = "{ call TigDisabledAccounts() }";
 	public static final String DEF_UPDATEACCOUNTSTATUS_QUERY = "{ call TigUpdateAccountStatus(?, ?) }";
 	public static final String DEF_ACCOUNTSTATUS_QUERY = "{ call TigAccountStatus(?) }";
@@ -268,6 +269,8 @@ public class TigaseCustomAuth
 	private String userlogout_query = null;
 	@ConfigField(desc = "Counts users", alias = DEF_USERS_COUNT_KEY)
 	private String userscount_query = DEF_USERS_COUNT_QUERY;
+	@ConfigField(desc = "Counts active users in defined period of time", alias = DEF_ACTIVE_USERS_COUNT_KEY)
+	private String active_users_count_query = DEF_ACTIVE_USERS_COUNT_QUERY;
 
 	@Override
 	public void addUser(BareJID user, final String password) throws TigaseDBException {
@@ -490,6 +493,39 @@ public class TigaseCustomAuth
 		}
 	}
 
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		if (active_users_count_query == null) {
+			return -1;
+		}
+
+		try {
+			long users = -1;
+			ResultSet rs = null;
+			PreparedStatement active_users_count = data_repo.getPreparedStatement(null, active_users_count_query);
+
+			synchronized (active_users_count) {
+				try {
+					// Load all user count from database
+					final Instant instant = Instant.now().minus(duration);
+					active_users_count.setTimestamp(1, Timestamp.from(instant));
+					rs = active_users_count.executeQuery();
+
+					if (rs.next()) {
+						users = rs.getLong(1);
+					} // end of while (rs.next())
+				} finally {
+					data_repo.release(null, rs);
+					rs = null;
+				}
+			}
+
+			return users;
+		} catch (SQLException e) {
+			return -1;
+		}
+	}
+
 	/**
 	 * <code>getUsersCount</code> method is thread safe. It uses local variable for storing <code>Statement</code>.
 	 *
@@ -592,6 +628,7 @@ public class TigaseCustomAuth
 			updatelastlogin_query = getParamWithDef(params, DEF_UPDATELOGINTIME_KEY, DEF_UPDATELOGINTIME_QUERY);
 
 			userscount_query = getParamWithDef(params, DEF_USERS_COUNT_KEY, DEF_USERS_COUNT_QUERY);
+			active_users_count_query = getParamWithDef(params, DEF_ACTIVE_USERS_COUNT_KEY, DEF_ACTIVE_USERS_COUNT_QUERY);
 
 			userdomaincount_query = getParamWithDef(params, DEF_USERS_DOMAIN_COUNT_KEY, DEF_USERS_DOMAIN_COUNT_QUERY);
 
@@ -891,6 +928,9 @@ public class TigaseCustomAuth
 			}
 			if ((userscount_query != null)) {
 				data_repo.initPreparedStatement(userscount_query, userscount_query);
+			}
+			if ((active_users_count_query != null)) {
+				data_repo.initPreparedStatement(active_users_count_query, active_users_count_query);
 			}
 			if ((userdomaincount_query != null)) {
 				data_repo.initPreparedStatement(userdomaincount_query, userdomaincount_query);

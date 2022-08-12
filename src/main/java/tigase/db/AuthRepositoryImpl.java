@@ -26,6 +26,7 @@ import javax.security.auth.callback.*;
 import javax.security.sasl.*;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -85,6 +86,11 @@ public class AuthRepositoryImpl
 	@Override
 	public String getResourceUri() {
 		return repo.getResourceUri();
+	}
+
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		return -1;
 	}
 
 	@Override

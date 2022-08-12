@@ -20,6 +20,7 @@ package tigase.db;
 import tigase.auth.credentials.Credentials;
 import tigase.xmpp.jid.BareJID;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -125,6 +126,23 @@ public class AuthRepositoryPool
 		}
 
 		return null;
+	}
+
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getActiveUsersCountIn(duration);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+
+		return -1;
 	}
 
 	@Override

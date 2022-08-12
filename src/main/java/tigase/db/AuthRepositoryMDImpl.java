@@ -24,6 +24,7 @@ import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
 import tigase.xmpp.jid.BareJID;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
@@ -113,6 +114,19 @@ public abstract class AuthRepositoryMDImpl
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
 			return null;
 		}
+	}
+
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		AuthRepository repo = getRepo(null);
+
+		if (repo != null) {
+			return repo.getActiveUsersCountIn(duration);
+		} else {
+			log.log(Level.WARNING, "Couldn't obtain user repository, not even default one!");
+		}
+
+		return -1;
 	}
 
 	@Override

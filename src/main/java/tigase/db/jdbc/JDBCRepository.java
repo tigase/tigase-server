@@ -26,6 +26,8 @@ import tigase.xmpp.jid.BareJID;
 
 import java.io.StringReader;
 import java.sql.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -70,6 +72,7 @@ public class JDBCRepository
 	private static final String ADD_NODE_QUERY = "{ call TigAddNode(?, ?, ?) }";
 	private static final String ADD_USER_PLAIN_PW_QUERY = "{ call TigAddUserPlainPw(?, ?) }";
 	private static final String COUNT_USERS_FOR_DOMAIN_QUERY = "select count(*) from tig_users where user_id like ?";
+	private static final String COUNT_ACTIVE_USERS_QUERY = "select count(*) from tig_users where last_used > ?";
 	private static final String DEF_GET_USERS_QUERY = "{ call TigAllUsers() }";
 	private static final String GET_USER_DB_UID_QUERY = "{ call TigGetUserDBUid(?) }";
 	private static final String GET_USERS_COUNT_QUERY = "{ call TigAllUsersCount() }";
@@ -411,6 +414,35 @@ public class JDBCRepository
 	}
 
 	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		try {
+			long users = -1;
+			ResultSet rs = null;
+			PreparedStatement active_users_count = data_repo.getPreparedStatement(null, COUNT_ACTIVE_USERS_QUERY);
+
+			synchronized (active_users_count) {
+				try {
+					// Load all user count from database
+					final Instant instant = Instant.now().minus(duration);
+					active_users_count.setTimestamp(1, Timestamp.from(instant));
+					rs = active_users_count.executeQuery();
+
+					if (rs.next()) {
+						users = rs.getLong(1);
+					} // end of while (rs.next())
+				} finally {
+					data_repo.release(null, rs);
+					rs = null;
+				}
+			}
+
+			return users;
+		} catch (SQLException e) {
+			return -1;
+		}
+	}
+
+	@Override
 	public long getUsersCount() {
 		try {
 			ResultSet rs = null;
@@ -498,6 +530,7 @@ public class JDBCRepository
 			data_repo.initPreparedStatement(REMOVE_USER_QUERY, REMOVE_USER_QUERY);
 			data_repo.initPreparedStatement(ADD_NODE_QUERY, ADD_NODE_QUERY);
 			data_repo.initPreparedStatement(COUNT_USERS_FOR_DOMAIN_QUERY, COUNT_USERS_FOR_DOMAIN_QUERY);
+			data_repo.initPreparedStatement(COUNT_ACTIVE_USERS_QUERY, COUNT_ACTIVE_USERS_QUERY);
 			data_repo.initPreparedStatement(DATA_FOR_NODE_QUERY, DATA_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(KEYS_FOR_NODE_QUERY, KEYS_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(KEYS_DATA_FOR_NODE_QUERY, KEYS_DATA_FOR_NODE_QUERY);

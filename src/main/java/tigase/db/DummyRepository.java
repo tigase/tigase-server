@@ -22,6 +22,7 @@ import tigase.component.exceptions.RepositoryException;
 import tigase.util.Version;
 import tigase.xmpp.jid.BareJID;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +46,11 @@ public class DummyRepository
 
 	@Override
 	public void addUser(BareJID user) {
+	}
+
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		return 0;
 	}
 
 	@Override

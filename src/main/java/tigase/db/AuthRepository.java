@@ -25,6 +25,7 @@ import tigase.auth.credentials.entries.PlainCredentialsEntry;
 import tigase.xmpp.jid.BareJID;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -184,6 +185,13 @@ public interface AuthRepository
 	default Collection<String> getUsernames(BareJID user) throws TigaseDBException {
 		return getCredentialIds(user);
 	}
+
+	/**
+	 * @param duration Time range within which active users should be counted. Method is only used by statistics.
+	 *
+	 * @return number of active users in required range
+	 */
+	long getActiveUsersCountIn(Duration duration);
 
 	/**
 	 * This method is only used by the server statistics component to report number of registered users.

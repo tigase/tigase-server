@@ -70,6 +70,7 @@ import java.io.ByteArrayInputStream;
 import java.lang.reflect.Method;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -149,6 +150,9 @@ public class SessionManager
 	private int maxUserSessions = 0;
 	private int maxUserSessionsDaily = 0;
 	private int maxUserSessionsYesterday = 0;
+	private Long activeUsersLastDay = null;
+	private Long activeUsersLastWeek = null;
+	private Long activeUsersLast30Days = null;
 	@Inject
 	private NonAuthUserRepository naUserRepository;
 	private NodeShutdownTask nodeShutdownTask = new NodeShutdownTask();
@@ -732,6 +736,21 @@ public class SessionManager
 		list.add(getName(), "Max daily users sessions count last month", maxDailyUsersSessions, Level.INFO);
 		list.add(getName(), "Max users sessions within last week", maxDailyUsersConnectionsWithinLastWeek, Level.INFO);
 
+		if (list.checkLevel(Level.FINE)) {
+			if (activeUsersLastDay == null || activeUsersLastWeek == null || activeUsersLast30Days == null) {
+				updateActiveUsersStatistics();
+			}
+			if (activeUsersLastDay != null) {
+				list.add(getName(), "Active users within last 24h", activeUsersLastDay, Level.FINE);
+			}
+			if (activeUsersLastWeek != null) {
+				list.add(getName(), "Active users within last 7 days", activeUsersLastWeek, Level.FINE);
+			}
+			if (activeUsersLast30Days != null) {
+				list.add(getName(), "Active users within last 30 days", activeUsersLast30Days, Level.FINE);
+			}
+		}
+
 		for (XMPPImplIfc plugin : allPlugins) {
 			plugin.getStatistics(list);
 		}
@@ -874,6 +893,18 @@ public class SessionManager
 
 		maxDailyUsersSessions.add(maxUserSessionsDaily - 1);
 		maxDailyUsersConnectionsWithinLastWeek = maxDailyUsersSessions.getMaxValueInRange(7).orElse(-1);
+	}
+
+	@Override
+	public synchronized void everyHour() {
+		super.everyHour();
+		updateActiveUsersStatistics();
+	}
+
+	private void updateActiveUsersStatistics() {
+		activeUsersLastDay = auth_repository.getActiveUsersCountIn(Duration.ofDays(1));
+		activeUsersLastWeek = auth_repository.getActiveUsersCountIn(Duration.ofDays(7));
+		activeUsersLast30Days = auth_repository.getActiveUsersCountIn(Duration.ofDays(30));
 	}
 
 	@Override

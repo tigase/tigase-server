@@ -24,6 +24,7 @@ import tigase.xml.db.NodeNotFoundException;
 import tigase.xml.db.XMLDB;
 import tigase.xmpp.jid.BareJID;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -237,6 +238,11 @@ public class XMLRepository
 		}
 
 		return res;
+	}
+
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		return -1;
 	}
 
 	@Override

@@ -33,6 +33,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -96,6 +97,11 @@ public class DrupalWPAuth
 	@Override
 	public String getResourceUri() {
 		return data_repo.getResourceUri();
+	}
+
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		return -1;
 	}
 
 	@Override

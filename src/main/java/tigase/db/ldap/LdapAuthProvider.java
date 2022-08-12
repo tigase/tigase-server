@@ -28,6 +28,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
+import java.time.Duration;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Level;
@@ -79,6 +80,11 @@ public class LdapAuthProvider
 	@Override
 	public String getResourceUri() {
 		return providerUrl;
+	}
+
+	@Override
+	public long getActiveUsersCountIn(Duration duration) {
+		return -1;
 	}
 
 	@Override
