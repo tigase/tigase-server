@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-08-10 20:25+0000\n"
+"PO-Revision-Date: 2022-08-13 09:29+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/release_notes/zh_Hans/>\n"
@@ -279,7 +279,6 @@ msgstr ""
 "无限循环，同时删减加密推送通知的主体以适应推送通知限制"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:66
-#, fuzzy
 msgid ""
 "`#server-1199 <https://projects.tigase.net/issue/server-1199>`__: Don’t "
 "send any packets until s2s stream negotiation is finished"
@@ -296,7 +295,6 @@ msgstr ""
 "对高通量的连接使用适当大小的网络缓冲区"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:70
-#, fuzzy
 msgid ""
 "`#server-1203 <https://projects.tigase.net/issue/server-1203>`__: Handing"
 " error packets in CIDConnections.sendPacketsBack"
@@ -305,7 +303,6 @@ msgstr ""
 "CIDConnections.sendPacketsBack 中处理错误数据包"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:72
-#, fuzzy
 msgid ""
 "`#server-1217 <https://projects.tigase.net/issue/server-1217>`__: Prevent"
 " performing schema upgrade concurrently"
@@ -314,7 +311,6 @@ msgstr ""
 "防止同时执行架构升级"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:74
-#, fuzzy
 msgid ""
 "`#server-1219 <https://projects.tigase.net/issue/server-1219>`__: Use all"
 " JDBC URI parameters from config.tdsl when performing database upgrade."
@@ -332,7 +328,6 @@ msgstr ""
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:78
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:80
-#, fuzzy
 msgid ""
 "`#server-1229 <https://projects.tigase.net/issue/server-1229>`__: "
 "Enabling CAPTCHA or e-mail for JabberIqRegister breaks password changing "
@@ -342,7 +337,6 @@ msgstr ""
 "JabberIqRegister 启用 CAPTCHA 或电子邮件会损害密码更改功能。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:82
-#, fuzzy
 msgid ""
 "`#server-1233 <https://projects.tigase.net/issue/server-1233>`__: Add "
 "option to CertificateRepository to load certificates from the filesystem"
