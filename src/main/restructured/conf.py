@@ -90,11 +90,13 @@ html_theme_options = {'collapse_navigation': True,
     'display_version': True,
 }
 
-gettext_compact = False 
+gettext_compact = "mix_translation"
 language = "zh_CN"
 locale_dirs = ["locale/"]
 
 
-gettext_compact = False 
+gettext_compact = "mix_translation"
 language = "pl"
 locale_dirs = ["locale/"]
+
+gettext_allow_fuzzy_translations = True
