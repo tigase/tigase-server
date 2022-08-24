@@ -71,7 +71,7 @@ public class SchemaVersionCheckerLogger {
 			sb.append("\n\t(this warning is printed each time SNAPSHOT version is started, you can ignore this");
 			sb.append("\n\tmessage if you've just run above command)").append("\n");
 
-			log.log(Level.WARNING, sb.toString());
+			log.log(Level.INFO, sb.toString());
 		}
 	}
 
