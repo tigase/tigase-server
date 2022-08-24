@@ -810,7 +810,7 @@ public class S2SConnectionManager
 						return 1;
 					}
 				}
-				int val = (pattern.split(".").length - o.pattern.split(".").length) * -1;
+				int val = (pattern.split("\\.").length - o.pattern.split("\\.").length) * -1;
 				if (val != 0) {
 					return val;
 				}
