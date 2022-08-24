@@ -486,7 +486,7 @@ public class ClusterConnectionManager
 		}
 
 		super.serviceStarted(serv);
-		log.log(Level.INFO, "Cluster connection opened: {0}, type: {1}, id={2}",
+		log.log(Level.CONFIG, "Cluster connection opened: {0}, type: {1}, id={2}",
 				new Object[]{serv.getRemoteAddress(), serv.connectionType().toString(), serv.getUniqueId()});
 		if (compress_stream) {
 			log.log(Level.CONFIG, "Starting stream compression for: {0}", serv.getUniqueId());
@@ -623,7 +623,7 @@ public class ClusterConnectionManager
 
 	@Override
 	public String[] xmppStreamOpened(XMPPIOService<Object> service, Map<String, String> attribs) {
-		log.log(Level.INFO, "Stream opened: {0}, service: {1}", new Object[]{attribs, service});
+		log.log(Level.CONFIG, "Stream opened: {0}, service: {1}", new Object[]{attribs, service});
 		switch (service.connectionType()) {
 			case connect: {
 				String id = attribs.get("id");
