@@ -3,23 +3,26 @@
 # This file is distributed under the same license as the TigaseDoc package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc \n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-24 09:27-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-08-25 07:25+0000\n"
+"Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-mix-documentation/tigase-mix-documentation/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Configuration.rst:2
 msgid "Configuration"
-msgstr ""
+msgstr "配置"
 
 #: ../../Configuration.rst:4
 msgid ""
@@ -27,114 +30,117 @@ msgid ""
 "configuration. We will not describe here configuration of PubSub "
 "component as it already available in PubSub component documentation."
 msgstr ""
+"MIX 组件的配置是 PubSub 组件配置的扩展版本。我们不会在这里描述 PubSub "
+"组件的配置，因为它已经在 PubSub 组件文档中可用。"
 
 #: ../../Configuration.rst:7
 msgid "Setting ACL"
-msgstr ""
+msgstr "设置 ACL"
 
 #: ../../Configuration.rst:9
 msgid ""
 "With ACL you can control who can create publicly visible channels and "
 "also ad-hoc channels. ACL properties accept following values:"
-msgstr ""
+msgstr "使用 ACL，您可以控制谁可以创建公开可见的频道以及临时频道。 ACL "
+"属性接受以下值："
 
 #: ../../Configuration.rst:12
 msgid "**ALL**"
-msgstr ""
+msgstr "**ALL**"
 
 #: ../../Configuration.rst:12
 msgid "Anyone can create channel"
-msgstr ""
+msgstr "任何人都可以创建频道"
 
 #: ../../Configuration.rst:15
 msgid "**LOCAL**"
-msgstr ""
+msgstr "**LOCAL**"
 
 #: ../../Configuration.rst:15
 msgid ""
 "Only local users can create channels (from all local domains on all local"
 " domains)"
-msgstr ""
+msgstr "只有本地用户可以创建频道（来自所有本地域上的所有本地域）"
 
 #: ../../Configuration.rst:18
 msgid "**ADMIN**"
-msgstr ""
+msgstr "**ADMIN**"
 
 #: ../../Configuration.rst:18
 msgid "Only installation administrator can create channels"
-msgstr ""
+msgstr "只有安装管理员可以创建频道"
 
 #: ../../Configuration.rst:21
 msgid "**DOMAIN_OWNER**"
-msgstr ""
+msgstr "**DOMAIN_OWNER**"
 
 #: ../../Configuration.rst:21
 msgid ""
 "Only domain owner of the domain as the domain under which MIX component "
 "is running can create channels"
-msgstr ""
+msgstr "只有作为运行 MIX 组件域的域所有者才能创建通道"
 
 #: ../../Configuration.rst:24
 msgid "**DOMAIN_ADMIN**"
-msgstr ""
+msgstr "**DOMAIN_ADMIN**"
 
 #: ../../Configuration.rst:24
 msgid ""
 "Only domain administrator of the domain as the domain under which MIX "
 "component is running can create channels"
-msgstr ""
+msgstr "只有运行 MIX 组件的域的域管理员才能创建频道"
 
 #: ../../Configuration.rst:27
 msgid "**DOMAIN**"
-msgstr ""
+msgstr "**DOMAIN**"
 
 #: ../../Configuration.rst:27
 msgid ""
 "Only users from the same domain as the domain under which MIX component "
 "is running can create channels"
-msgstr ""
+msgstr "只有来自与运行 MIX 组件的域相同的域的用户才能创建通道"
 
 #: ../../Configuration.rst:30
 msgid "Setting ACL for creation of public channels"
-msgstr ""
+msgstr "为创建公共频道设置 ACL"
 
 #: ../../Configuration.rst:32
 msgid "**Property name: ``publicChannelCreationAcl``**"
-msgstr ""
+msgstr "**属性名称：** ``publicChannelCreationAcl``"
 
 #: ../../Configuration.rst:34
 msgid "**Default value: ``DOMAIN_ADMIN``**"
-msgstr ""
+msgstr "**默认值:** ``DOMAIN_ADMIN``"
 
 #: ../../Configuration.rst:36
 msgid ""
 "By default we allow only local domain owners or admins to create publicly"
 " browsable channels."
-msgstr ""
+msgstr "默认情况下，我们只允许本地域所有者或管理员创建可公开浏览的频道。"
 
 #: ../../Configuration.rst:38
 msgid "**Allowing domain users to create public channels.**"
-msgstr ""
+msgstr "**允许域用户创建公共频道。**"
 
 #: ../../Configuration.rst:50
 msgid "Setting ACL for creation of ad-hoc (private) channels"
-msgstr ""
+msgstr "设置 ACL 以创建临时（专用）通道"
 
 #: ../../Configuration.rst:52
 msgid "**Property nmae: ``adhocChannelCreationAcl``**"
-msgstr ""
+msgstr "**属性名称:** ``adhocChannelCreationAcl``"
 
 #: ../../Configuration.rst:54
 msgid "**Default value: ``DOMAIN``**"
-msgstr ""
+msgstr "**默认值：** ``DOMAIN``"
 
 #: ../../Configuration.rst:56
 msgid "**Allowing all local users to create public channels.**"
-msgstr ""
+msgstr "**允许所有本地用户创建公共频道。**"
 
 #: ../../Configuration.rst:67
 msgid "Disabling support for MUC"
-msgstr ""
+msgstr "禁用对 MUC 的支持"
 
 #: ../../Configuration.rst:69
 msgid ""
@@ -142,23 +148,24 @@ msgid ""
 " doesn’t support MIX yet, so they would still be able to participate in "
 "the MIX channel conversation. It’s possible to disable it with the "
 "following option."
-msgstr ""
+msgstr "默认情况下，MIX 组件为尚不支持 MIX 的客户端公开 MUC 兼容层，"
+"因此它们仍然能够参与 MIX 频道对话。可以使用以下选项禁用它。"
 
 #: ../../Configuration.rst:71
 msgid "**Disabling support for MUC.**"
-msgstr ""
+msgstr "**禁用对 MUC 的支持。**"
 
 #: ../../Configuration.rst:81
 msgid "Setting limit of cached channels"
-msgstr ""
+msgstr "设置缓存通道的限制"
 
 #: ../../Configuration.rst:83
 msgid "**Property name: ``maxCacheSize``**"
-msgstr ""
+msgstr "**属性名称：** ``maxCacheSize``"
 
 #: ../../Configuration.rst:85
 msgid "**Default value: ``2000``**"
-msgstr ""
+msgstr "**默认值:** ``2000``"
 
 #: ../../Configuration.rst:87
 msgid ""
@@ -166,28 +173,31 @@ msgid ""
 " while it is processing request for the particular channel. To make that "
 "more efficient it is using cache to keep the most often used channels "
 "configuration in memory instead of loading it every time."
-msgstr ""
+msgstr "MIX 组件在处理特定通道的请求时将通道配置和关联缓存在内存中。为了提高效率，它"
+"使用缓存将最常用的通道配置保存在内存中，而不是每次都加载它。"
 
 #: ../../Configuration.rst:89
 msgid ""
 "You can increase this value by setting ``maxCacheSize`` property in the "
 "``config`` scope of the MIX component:"
-msgstr ""
+msgstr "您可以通过在 MIX 组件的 ``config`` 范围内设置 ``maxCacheSize`` "
+"属性来增加此值："
 
 #: ../../Configuration.rst:91
 msgid "**Setting limit of cached channels.**"
-msgstr ""
+msgstr "**设置缓存频道的限制。**"
 
 #: ../../Overview.rst:1
 msgid ""
 "Welcome to Tigase Mediated Information eXchange (MIX) component guide. "
 "The MIX component allows you to have multi user group chats (channels), "
 "which are better suited for multi device usage."
-msgstr ""
+msgstr "欢迎使用 Tigase 中介信息交换 (MIX) 组件指南。 MIX "
+"组件允许您拥有多用户群聊（频道），这更适合多设备使用。"
 
 #: ../../Overview.rst:4
 msgid "Overview"
-msgstr ""
+msgstr "概述"
 
 #: ../../Overview.rst:6
 msgid ""
@@ -197,6 +207,9 @@ msgid ""
 "part of `MIX specification family "
 "<https://xmpp.org/extensions/xep-0369.html#family>`__."
 msgstr ""
+"Tigase MIX 组件是一个扩展 Tigase PubSub 组件的组件，并为 `XEP-0369: MIX "
+"<https://xmpp.org/extensions/xep-0369.html>`__ 协议扩展提供支持，属于 `MIX "
+"规范系列 <https ://xmpp.org/extensions/xep-0369.html#family>`__。"
 
 #: ../../Overview.rst:8
 msgid ""
@@ -204,6 +217,8 @@ msgid ""
 "<https://xmpp.org/extensions/xep-0045.html>`__ to provide support and "
 "interoperability with older software not supporting MIX,"
 msgstr ""
+"此外，它还为 `MUC 协议 <https://xmpp.org/extensions/xep-0045.html>`__ "
+"提供基本支持，以 为与不支持 MIX 的旧软件的提供支持和互操作性，"
 
 #: ../../Overview.rst:10
 msgid ""
@@ -211,10 +226,12 @@ msgid ""
 "of Tigase XMPP Server (>= 8.2.0) run this component enabled by default "
 "under the same name even if not explicitly enabled/configured."
 msgstr ""
+"默认情况下，它被配置为以 ``mix`` 的名称运行。 Tigase XMPP 服务器 (>= 8.2.0) "
+"的安装会以相同的名称默认启用此组件，即使未明确启用/配置也是如此。"
 
 #: ../../Overview.rst:13
 msgid "What is MIX?"
-msgstr ""
+msgstr "什么是 MIX?"
 
 #: ../../Overview.rst:15
 msgid ""
@@ -222,6 +239,9 @@ msgid ""
 "defined in `XEP-0369: Mediated Information eXchange (MIX) "
 "<https://xmpp.org/extensions/xep-0369.html>`__:"
 msgstr ""
+"MIX 代表 Mediated Information eXchange (MIX)，它的基础定义在 `XEP-0369: "
+"Mediated Information eXchange (MIX) <https://xmpp.org/extensions/xep-0369."
+"html>`__ 中："
 
 #: ../../Overview.rst:17
 msgid ""
@@ -234,6 +254,11 @@ msgid ""
 "publication, and uses Message Archive Management (MAM) to provide storage"
 " and archiving.\""
 msgstr ""
+"\"XMPP 协议扩展，用于通过中介服务在多个用户之间交换信息。该协议可用于提供人类"
+"群组通信和非人类实体之间使用通道的通信，尽管通道比现有的群聊技术，"
+"例如多用户聊天 (MUC)，具有更大的灵活性和可扩展性。MIX "
+"使用发布-订阅提供灵活的访问和发布，并使用消息归档管理 (MAM) 提供存储和归档。"
+"\""
 
 #: ../../Overview.rst:19
 msgid ""
@@ -241,25 +266,28 @@ msgid ""
 "<https://xmpp.org/extensions/xep-0369.html#reqs>`__ of which those seems "
 "to be the most interesting:"
 msgstr ""
+"规范概述了几个 `要求 <https://xmpp.org/extensions/xep-0369."
+"html#reqs>`__，其中以下似乎是最有趣的："
 
 #: ../../Overview.rst:21
 msgid ""
 "\"A user’s participation in a channel persists and is not modified by the"
 " user’s client going online and offline.\""
-msgstr ""
+msgstr "\"用户对频道的参与是持续存在的，不会被用户的客户端在线和离线修改。\""
 
 #: ../../Overview.rst:23
 msgid ""
 "\"Multiple devices associated with the same account can share the same "
 "nick in the channel, with well-defined rules making each client "
 "individually addressable.\""
-msgstr ""
+msgstr "\"与同一帐户关联的多个设备可以在频道中共享同一个昵称"
+"，并通过明确定义的规则使每个客户端都可以单独寻址。\""
 
 #: ../../Overview.rst:25
 msgid ""
 "\"A reconnecting client can quickly resync with respect to messages and "
 "presence.\""
-msgstr ""
+msgstr "\"重新连接的客户端可以快速重新同步消息和状态。\""
 
 #: ../../Overview.rst:27
 msgid ""
@@ -267,6 +295,8 @@ msgid ""
 "that specify the exact protocol. Two of them are required for the "
 "implementation to be considered as MIX compliant:"
 msgstr ""
+"MIX 本身充当了一组与 MIX 相关的 XMPP 扩展的保护伞，这些扩展指定了确切的协议。"
+"要使实现被视为符合 MIX 标准，其中两个是必需的："
 
 #: ../../Overview.rst:29
 msgid ""
@@ -277,6 +307,10 @@ msgid ""
 "discovery and sharing of MIX channels and information about them. It "
 "defines use of MIX to share messages with channel participants.\""
 msgstr ""
+"`XEP-0369: Mediated Information eXchange (MIX) <https://xmpp.org/extensions/"
+"xep-0369.html>`__ 中定义的 MIX-CORE - \"规定了 MIX 和一般 MIX "
+"概念和框架解决的要求。它定义了加入频道和相关的参与者管理。它还定义了 MIX "
+"频道和有关它们的信息的发现和共享。它定义了使用 MIX 来与频道参与者共享消息。\""
 
 #: ../../Overview.rst:31
 msgid ""
@@ -286,12 +320,16 @@ msgid ""
 "supporting MIX clients behaves, to support servers implementing MIX-CORE "
 "and MIX-PRESENCE.\""
 msgstr ""
+"MIX-PAM 在 `XEP-0405: Mediated Information eXchange (MIX): Participant "
+"Server Requirements <https://xmpp.org/extensions/xep-0405.html>`__ 中定义 - "
+"\"定义了支持 MIX 客户端的服务器如何运行支持实现 MIX-CORE 和 MIX-PRESENCE "
+"的服务器。\""
 
 #: ../../Overview.rst:33
 msgid ""
 "In addition to the above extensions, there are several other that are "
 "optional:"
-msgstr ""
+msgstr "除了上述扩展之外，还有其他几个可选的："
 
 #: ../../Overview.rst:35
 msgid ""
@@ -301,6 +339,10 @@ msgid ""
 " seen by other MIX clients. It also specifies relay of IQ stanzas through"
 " a channel. **(Not supported fully)**"
 msgstr ""
+"`XEP-0403: Mediated Information eXchange (MIX): Presence Support "
+"<https://xmpp.org/extensions/xep-0403.html>`__ 中定义的 MIX-PRESENCE - "
+"添加了 MIX 在线客户端共享状态的功能，以便其他 MIX 客户端可以看到。"
+"它还指定通过通道中继 IQ 节。 **（不完全支持）**"
 
 #: ../../Overview.rst:37
 msgid ""
@@ -308,6 +350,9 @@ msgid ""
 "Administration <https://xmpp.org/extensions/xep-0406.html>`__ - specifies"
 " MIX configuration and administration of MIX."
 msgstr ""
+"MIX-ADMIN 在 `XEP-0406: Mediated Information eXchange (MIX): MIX "
+"Administration <https://xmpp.org/extensions/xep-0406.html>`__ 中定义- 指定 "
+"MIX 的 MIX 配置和管理。"
 
 #: ../../Overview.rst:39
 msgid ""
@@ -317,6 +362,10 @@ msgid ""
 "privacy controls. It also specifies private messages. **(Not supported "
 "fully)**"
 msgstr ""
+"`XEP-0404: Mediated Information eXchange (MIX): JID Hidden Channels "
+"<https://xmpp.org/extensions/xep-0404.html>`__ 中定义的 MIX-ANON - "
+"指定一种机制来隐藏来自 MIX 客户端的真实 "
+"JID和相关的隐私控制。它还指定私人消息。 **（不完全支持）**"
 
 #: ../../Overview.rst:41
 msgid ""
@@ -328,6 +377,11 @@ msgid ""
 "inviting people, converting simple chat to a channel. **(Not supported "
 "fully)**"
 msgstr ""
+"`XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities "
+"<https://xmpp.org/extensions/xep-0407.html>`__ 中定义的 MIX-MISC - "
+"指定了一些有用但不需要成为 MIX-CORE的 一部分的小型 MIX 功能：处理头像、注册昵"
+"称、撤回消息、共享有关频道和邀请人的信息、转换简单的聊天频道。 "
+"**（不完全支持）**"
 
 #: ../../Overview.rst:43
 msgid ""
@@ -335,10 +389,13 @@ msgid ""
 "<https://xmpp.org/extensions/xep-0408.html>`__: Co-existence with MUC - "
 "defines how MIX and MUC can be used tog"
 msgstr ""
+"在 `XEP-0408: Mediated Information eXchange (MIX) <https://xmpp.org/"
+"extensions/xep-0408.html>`__ 中定义的 MIX-MUC: 与 MUC 共存 - 定义如何把 MIX "
+"和 MUC 用于 tog"
 
 #: ../../Overview.rst:46
 msgid "How does it work?"
-msgstr ""
+msgstr "它是如何工作的？"
 
 #: ../../Overview.rst:48
 msgid ""
@@ -370,10 +427,25 @@ msgid ""
 "between client, client’s server and mix server is also reduced and "
 "unnecessary traffic is eliminated."
 msgstr ""
+"与 MUC 最明显的区别是 MIX 需要托管频道的服务器和用户服务器的支持。这样做是为"
+"了促进用户（而不是特定连接或客户端应用程序）加入组的概念，并在消息传递方面允"
+"许更大的灵活性（可以发送到一个或多个连接，甚至通过 PUSH 生成通知）。另一个重"
+"要的区别是可以灵活地选择用户想要从频道接收哪些通知（可以是消息、状态、参与者"
+"或节点信息）。在最基本的方法中，当用户决定加入一个频道时，"
+"它会向它自己的本地服务器发送一个 IQ 节，指示所需频道的地址和它想要订阅的 MIX "
+"节点列表。用户的服务器然后将订阅请求转发到目标 MIX 服务器。因此，用户会收到订"
+"阅确认，并且从此时起将收到来自频道的通知，与当前的网络连接无关。 MIX "
+"的另一个重要部分是依赖于 `XEP-0313: Message Archive Management <https://xmpp."
+"org/extensions/xep-0313.html>`__ 来控制消息历史以及 MIX "
+"服务器和用户服务器之间的互补交互。主频道历史记录由 MIX 服务器处理，但加入频道"
+"的用户将检索并同步查询其本地服务器的消息历史记录，这将维护用户加入频道的完整"
+"历史记录（基于收到的通知）。这也意味着即使频道被删除，用户仍然可以通过本地 "
+"MAM 存档访问它的历史记录（仅限于用户是频道成员的时间）。结果，客户端、客户端"
+"服务器和混合服务器之间的聊天也减少了，并且消除了不必要的流量。"
 
 #: ../../Overview.rst:51
 msgid "Benefits for mobile-first applications relying on push"
-msgstr ""
+msgstr "依赖推送的移动优先应用程序的好处"
 
 #: ../../Overview.rst:53
 msgid ""
@@ -388,6 +460,11 @@ msgid ""
 "relaying on workarounds (that most of the time are not reliable or impact"
 " resource usage)."
 msgstr ""
+"所有这些都有助于在受限环境中进行中继的客户端 - 无论是不可靠的网络连接或限制应"
+"用程序运行时间的操作系统。因为不依赖于用户存在/连接的动态状态，所以消除了居住"
+"者离开和（重新）加入房间的问题 - 用户总是会收到通知。更重要的是，由于 MIX "
+"和用户服务器之间的共同责任，后者从 MIX 通道获取所有通知，可以在不中继解决方法"
+"的情况下生成通知（大多数情况下不可靠或影响资源使用）。"
 
 #: ../../Overview.rst:55
 msgid ""
@@ -397,10 +474,13 @@ msgid ""
 "when to receive PUSH notifications from group chats (always, only when "
 "mentioned or never)"
 msgstr ""
+"在 Tigase XMPP 服务器的情况下，由于我们的实验性 `过滤群聊通知 <https://xeps."
+"tigase.net/docs/push-notifications/filters/groupchat/>`__ 功能，它变得更好，"
+"它允许用户控制何时接收来自群聊的推送通知（始终，仅在提及或从未提及时）"
 
 #: ../../Overview.rst:58
 msgid "Is MUC obsolete?"
-msgstr ""
+msgstr "MUC过时了吗？"
 
 #: ../../Overview.rst:60
 msgid ""
@@ -411,86 +491,105 @@ msgid ""
 "<https://xmpp.org/extensions/xep-0408.html>`__ to allow all non-MIX "
 "client to participate in MIX channel discussions using MUC protocol."
 msgstr ""
+"我们认为 MIX 是前进的方向，但我们也知道这不会在一夜之间发生。因此，"
+"我们所有的应用程序仍然支持 MUC，并且 Tigase XMPP 服务器实现了 "
+"`XEP-0408：中介信息交换（MIX）：与 MUC 共存 <https://xmpp.org/extensions/"
+"xep-0408.html>`__ 并允许所有非 MIX 客户端使用 MUC 协议参与 MIX 频道讨论。"
 
 #: ../../tigase-mix-release-notes.inc:2
 msgid "Tigase MIX Release Notes"
-msgstr ""
+msgstr "Tigase MIX 发行说明"
 
 #: ../../tigase-mix-release-notes.inc:4
 msgid ""
 "Welcome to Tigase MIX 1.0.0! This is a feature release for with a number "
 "of fixes and updates."
-msgstr ""
+msgstr "欢迎来到 Tigase MIX 1.0.0！这是一个包含许多修复和更新的功能版本。"
 
 #: ../../tigase-mix-release-notes.inc:7
 msgid "Tigase MIX 1.0.0 Release Notes"
-msgstr ""
+msgstr "Tigase MIX 1.0.0 发行说明"
 
 #: ../../tigase-mix-release-notes.inc:10
 msgid "Major Changes"
-msgstr ""
+msgstr "主要变化"
 
 #: ../../tigase-mix-release-notes.inc:12
 msgid ""
 "This is the introductory version of `MIX specification family "
 "<https://xmpp.org/extensions/xep-0369.html#family>`__"
-msgstr ""
+msgstr "这是 `MIX规范系列 <https://xmpp.org/extensions/xep-0369.html#family>`__ "
+"的介绍版"
 
 #: ../../tigase-mix-release-notes.inc:15
 msgid "All Changes"
-msgstr ""
+msgstr "所有更改"
 
 #: ../../tigase-mix-release-notes.inc:17
 msgid ""
 "`#mix-2 <https://projects.tigase.net/issue/mix-2>`__:Implement XEP-0369: "
 "Mediated Information eXchange (MIX)"
 msgstr ""
+"`#mix-2 <https://projects.tigase.net/issue/mix-2>`__:实施 XEP-0369："
+"中介信息交换 (MIX)"
 
 #: ../../tigase-mix-release-notes.inc:19
 msgid ""
 "`#mix-3 <https://projects.tigase.net/issue/mix-3>`__:Implement XEP-0406: "
 "Mediated Information eXchange (MIX): MIX Administration"
 msgstr ""
+"`#mix-3 <https://projects.tigase.net/issue/mix-3>`__:实施 XEP-0406："
+"中介信息交换 (MIX)：MIX 管理"
 
 #: ../../tigase-mix-release-notes.inc:21
 msgid ""
 "`#mix-6 <https://projects.tigase.net/issue/mix-6>`__:Create tests for MIX"
 " CORE & Participants Server Requirements"
 msgstr ""
+"`#mix-6 <https://projects.tigase.net/issue/mix-6>`__:为 MIX CORE "
+"和参与者服务器要求创建测试"
 
 #: ../../tigase-mix-release-notes.inc:23
 msgid "`#mix-8 <https://projects.tigase.net/issue/mix-8>`__:Improve caching"
-msgstr ""
+msgstr "`#mix-8 <https://projects.tigase.net/issue/mix-8>`__:改进缓存"
 
 #: ../../tigase-mix-release-notes.inc:25
 msgid ""
 "`#mix-9 <https://projects.tigase.net/issue/mix-9>`__:Add support for MIX-"
 "MUC integration"
-msgstr ""
+msgstr "`#mix-9 <https://projects.tigase.net/issue/mix-9>`__: 添加对 MIX-MUC "
+"集成的支持"
 
 #: ../../tigase-mix-release-notes.inc:27
 msgid ""
 "`#mix-10 <https://projects.tigase.net/issue/mix-10>`__:Invalid response "
 "for disco#items"
 msgstr ""
+"`#mix-10 <https://projects.tigase.net/issue/mix-10>`__: disco#items的无效响应"
 
 #: ../../tigase-mix-release-notes.inc:29
 msgid ""
 "`#mix-14 <https://projects.tigase.net/issue/mix-14>`__:Add configuration "
 "to limit who can create channels in component"
 msgstr ""
+"`#mix-14 <https://projects.tigase.net/issue/"
+"mix-14>`__:添加配置以限制谁可以在组件中创建频道"
 
 #: ../../tigase-mix-release-notes.inc:31
 msgid ""
 "`#mix-15 <https://projects.tigase.net/issue/mix-15>`__:NPE in "
 "MAMItemHandler"
 msgstr ""
+"`#mix-15 <https://projects.tigase.net/issue/mix-15>`__:MAMItemHandler 中的 "
+"NPE"
 
 #: ../../tigase-mix-release-notes.inc:33
 msgid ""
 "`#mix-16 <https://projects.tigase.net/issue/mix-16>`__:Add MIX to "
 "installer as option."
 msgstr ""
+"`#mix-16 <https://projects.tigase.net/issue/mix-16>`__:将 MIX "
+"作为选项添加到安装程序。"
 
 #: ../../tigase-mix-release-notes.inc:35
 msgid ""
@@ -498,82 +597,98 @@ msgid ""
 "new configuration of channel: PubSubException: Only participants and "
 "information nodes are supported!"
 msgstr ""
+"`#mix-17 <https://projects.tigase.net/issue/"
+"mix-17>`__:无法解析频道的新配置：PubSubException：仅支持参与者和信息节点！"
 
 #: ../../tigase-mix-release-notes.inc:37
 msgid ""
 "`#mix-18 <https://projects.tigase.net/issue/mix-18>`__:NPE when sending "
 "requests to removed channel nodes"
 msgstr ""
+"`#mix-18 <https://projects.tigase.net/issue/mix-18>`__:"
+"向已移除的通道节点发送请求时的 NPE"
 
 #: ../../tigase-mix-release-notes.inc:39
 msgid ""
 "`#mix-19 <https://projects.tigase.net/issue/mix-19>`__:MAM:2 is not "
 "advertised"
-msgstr ""
+msgstr "`#mix-19 <https://projects.tigase.net/issue/mix-19>`__:MAM:2 未做广告"
 
 #: ../../tigase-mix-release-notes.inc:41
 msgid ""
 "`#mix-20 <https://projects.tigase.net/issue/mix-20>`__:MIX component is "
 "broadcasting messages with bare JID"
 msgstr ""
+"`#mix-20 <https://projects.tigase.net/issue/mix-20>`__:MIX "
+"组件正在广播带有裸 JID 的消息"
 
 #: ../../tigase-mix-release-notes.inc:43
 msgid ""
 "`#mix-21 <https://projects.tigase.net/issue/mix-21>`__:Possibility of "
 "duplicated subscription of a node"
-msgstr ""
+msgstr "`#mix-21 <https://projects.tigase.net/issue/mix-21>`__:节点重复订阅的可能性"
 
 #: ../../tigase-mix-release-notes.inc:45
 msgid ""
 "`#mix-22 <https://projects.tigase.net/issue/mix-22>`__:Nickname not "
 "returned in response after being set"
-msgstr ""
+msgstr "`#mix-22 <https://projects.tigase.net/issue/mix-22>`__: "
+"昵称设置后未在响应中返回"
 
 #: ../../tigase-mix-release-notes.inc:47
 msgid ""
 "`#mix-23 <https://projects.tigase.net/issue/mix-23>`__:Remove banned "
 "participants from participants list and subscriptions"
 msgstr ""
+"`#mix-23 <https://projects.tigase.net/issue/"
+"mix-23>`__:从参与者列表和订阅中删除被禁止的参与者"
 
 #: ../../tigase-mix-release-notes.inc:49
 msgid "`#mix-24 <https://projects.tigase.net/issue/mix-24>`__:NPE in MIXProcessor"
 msgstr ""
+"`#mix-24 <https://projects.tigase.net/issue/mix-24>`__:MIXProcessor 中的 NPE"
 
 #: ../../tigase-mix-release-notes.inc:51
 msgid ""
 "`#mix-25 <https://projects.tigase.net/issue/mix-25>`__:Create MIX "
 "component documentation and publish it"
-msgstr ""
+msgstr "`#mix-25 <https://projects.tigase.net/issue/mix-25>`__:创建 MIX "
+"组件文档并发布"
 
 #: ../../tigase-mix-release-notes.inc:53
 msgid ""
 "`#mix-26 <https://projects.tigase.net/issue/mix-26>`__:Allow installation"
 " admins to manager MIX channels if domain admins are allowed"
 msgstr ""
+"`#mix-26 <https://projects.tigase.net/issue/mix-26>`__:如果允许域管理员，"
+"则允许安装管理员管理 MIX 频道"
 
 #: ../../tigase-mix-release-notes.inc:55
 msgid ""
 "`#mix-27 <https://projects.tigase.net/issue/mix-27>`__:MIX-MUC message "
 "duplication"
-msgstr ""
+msgstr "`#mix-27 <https://projects.tigase.net/issue/mix-27>`__:MIX-MUC 消息复制"
 
 #: ../../tigase-mix-release-notes.inc:57
 msgid ""
 "`#mix-28 <https://projects.tigase.net/issue/mix-28>`__:NPE in "
 "``Affiliations.getSubscriberAffiliation``"
 msgstr ""
+"`#mix-28 <https://projects.tigase.net/issue/mix-28>`__: ``Affiliations."
+"getSubscriberAffiliation`` 中的 NPE"
 
 #: ../../tigase-mix-release-notes.inc:59
 msgid ""
 "`#mix-29 <https://projects.tigase.net/issue/mix-29>`__:Weird \"open "
 "channel\" behaviour"
 msgstr ""
+"`#mix-29 <https://projects.tigase.net/issue/mix-29>`__:奇怪的 \"open "
+"channel\" 行为"
 
 #: ../../index.rst:6
 msgid "Tigase Mix Component"
-msgstr ""
+msgstr "Tigase Mix 组件"
 
 #: ../../index.rst:4
 msgid "Tigase IoT Documentation - Version 1.0"
-msgstr ""
-
+msgstr "Tigase IoT 文档 - 1.0 版"
