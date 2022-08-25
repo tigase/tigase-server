@@ -155,15 +155,15 @@ public class VCardTemp
 
 				// This should not happen unless somebody sends a result vcard packet
 				// to the server itself
-				log.warning("This should not happen, unless this is a vcard result packet " +
+				log.log(Level.FINE, "This should not happen, unless this is a vcard result packet " +
 									"sent to the server, which should not happen: " + packet);
 			} catch (NotAuthorizedException ex) {
-				log.warning("Received vCard request but user session is not authorized yet: " + packet);
+				log.log(Level.FINE, "Received vCard request but user session is not authorized yet: " + packet);
 				results.offer(
 						Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.",
 																		true));
 			} catch (TigaseDBException ex) {
-				log.warning("Database problem, please contact admin: " + ex);
+				log.log(Level.WARNING, "Database problem, please contact admin: " + ex);
 				results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 																					 "Database access problem, please contact administrator.",
 																					 true));
@@ -231,7 +231,7 @@ public class VCardTemp
 
 				// This should not happen unless somebody sends a result vcard packet
 				// to the server itself
-				log.warning("This should not happen, unless this is a vcard result packet " +
+				log.log(Level.WARNING,"This should not happen, unless this is a vcard result packet " +
 									"sent to the server, which should not happen: " + packet);
 			}
 		}
