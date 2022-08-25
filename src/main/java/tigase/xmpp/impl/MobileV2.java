@@ -225,8 +225,8 @@ public class MobileV2
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("sending packets from queue (OVERFLOW)");
 					}
-					for (Packet p : queue.values()) {
-						results.offer(res);
+					for (Packet queuePacket : queue.values()) {
+						results.offer(queuePacket);
 					}
 					queue.clear();
 
