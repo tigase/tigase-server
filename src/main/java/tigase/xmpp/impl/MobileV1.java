@@ -174,10 +174,10 @@ public class MobileV1
 			return;
 		}
 		for (Iterator<Packet> it = results.iterator(); it.hasNext(); ) {
-			Packet res = it.next();
+			Packet currentlyFilteredResultPacket = it.next();
 
 			// check if packet contains destination
-			if ((res == null) || (res.getPacketTo() == null)) {
+			if ((currentlyFilteredResultPacket == null) || (currentlyFilteredResultPacket.getPacketTo() == null)) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("packet without destination");
 				}
@@ -190,18 +190,18 @@ public class MobileV1
 			if (parentSession == null) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "no session for destination {0} for packet {1} - missing parent session",
-							new Object[]{res.getPacketTo().toString(), res.toString()});
+							new Object[]{currentlyFilteredResultPacket.getPacketTo().toString(), currentlyFilteredResultPacket.toString()});
 				}
 				continue;
 			}
 
 			// get resource connection for destination
-			XMPPResourceConnection session = parentSession.getResourceForConnectionId(res.getPacketTo());
+			XMPPResourceConnection session = parentSession.getResourceForConnectionId(currentlyFilteredResultPacket.getPacketTo());
 
 			if (session == null) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "no session for destination {0} for packet {1}",
-							new Object[]{res.getPacketTo().toString(), res.toString()});
+							new Object[]{currentlyFilteredResultPacket.getPacketTo().toString(), currentlyFilteredResultPacket.toString()});
 				}
 
 				// if there is no session we should not queue
@@ -222,10 +222,11 @@ public class MobileV1
 			Queue<Packet> queue = (Queue<Packet>) session.getSessionData(QUEUE_KEY);
 
 			// lets check if packet should be queued
-			if (filter(session, res, queue)) {
+			if (shouldBeQueued(session, currentlyFilteredResultPacket, queue)) {
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "queuing packet = {0}", res.toString());
+					log.log(Level.FINEST, "queuing packet = {0}", currentlyFilteredResultPacket.toString());
 				}
+				queue.offer(currentlyFilteredResultPacket);
 				it.remove();
 				if (queue.size() > maxQueueSize) {
 					if (log.isLoggable(Level.FINEST)) {
@@ -249,27 +250,26 @@ public class MobileV1
 		}
 	}
 
-	public boolean filter(XMPPResourceConnection session, Packet res, Queue<Packet> queue) {
+	protected boolean shouldBeQueued(XMPPResourceConnection session, Packet currentlyFilteredResultPacket, Queue<Packet> queue) {
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "checking if packet should be queued {0}", res.toString());
+			log.log(Level.FINEST, "checking if packet should be queued {0}", currentlyFilteredResultPacket.toString());
 		}
-		if (res.getElemName() != Presence.ELEM_NAME) {
+		if (currentlyFilteredResultPacket.getElemName() != Presence.ELEM_NAME) {
 			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "ignoring packet, packet is not presence:  {0}", res.toString());
+				log.log(Level.FINEST, "ignoring packet, packet is not presence:  {0}", currentlyFilteredResultPacket.toString());
 			}
 
 			return false;
 		}
 
-		StanzaType type = res.getType();
+		StanzaType type = currentlyFilteredResultPacket.getType();
 
 		if ((type != null) && (type != StanzaType.unavailable) && (type != StanzaType.available)) {
 			return false;
 		}
 		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "queuing packet {0}", res.toString());
+			log.log(Level.FINEST, "queuing packet {0}", currentlyFilteredResultPacket.toString());
 		}
-		queue.offer(res);
 
 		return true;
 	}
