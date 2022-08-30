@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-26 20:25+0000\n"
+"PO-Revision-Date: 2022-08-31 22:29+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-plugin_development/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/dg-plugin_development/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Plugin_Development.rst:2
@@ -32,22 +33,18 @@ msgid ""
 msgstr "这是一组文档，详细解释了什么是插件、它们是如何设计的以及它们如何在Tigase服务器中工作。文档的最后一部分逐步解释了如何为新插件创建代码。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:6
-#, fuzzy
 msgid ":ref:`Writing Plugin Code<writePluginCode>`"
 msgstr ":ref:`编写插件代码<writePluginCode>`"
 
 #: ../../Tigase_Development/Plugin_Development.rst:8
-#, fuzzy
 msgid ":ref:`Plugin Configuration<pluginConf>`"
 msgstr ":ref:`插件配置<pluginConf>`"
 
 #: ../../Tigase_Development/Plugin_Development.rst:10
-#, fuzzy
 msgid ":ref:`How Packets are Processed by the SM and Plugins<packetprocess>`"
 msgstr ":ref:`SM和插件如何处理数据包<packetprocess>`"
 
 #: ../../Tigase_Development/Plugin_Development.rst:12
-#, fuzzy
 msgid ":ref:`SASL Custom Mechanisms and Configuration<saslcmac>`"
 msgstr ":ref:`SASL自定义机制和配置<saslcmac>`"
 
@@ -353,7 +350,6 @@ msgid ""
 msgstr "如果您的插件名称有任何特殊字符（-,:\\|/.），则需要将其封装在单引号中。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:270
-#, fuzzy
 msgid ""
 "There is another part of the plugin configuration though. If you looked "
 "at the :ref:`Writing Plugin Code <writePluginCode>` guide you can "
@@ -361,8 +357,9 @@ msgid ""
 "properties you can set in the configuration file and these setting will "
 "be passed to the plugin at the processing time."
 msgstr ""
-"不过，插件配置还有另一部分。如果您查看了 :ref:`编写插件代码<writePluginCode>` 指南，您可以记住 **Map "
-"settings** 处理参数。这是您可以在配置文件中设置的属性映射，这些设置将在处理时传递给插件。"
+"不过，插件配置还有另一部分。如果您查看了 :ref:`编写插件代码<writePluginCode>`"
+" 指南，您可以记住 **Map settings** 处理参数。这是您可以在配置文件中设置的属性"
+"映射，这些设置将在处理时传递给插件。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:273
 msgid ""
@@ -439,12 +436,10 @@ msgid ""
 msgstr "每个节都通过会话管理器组件，该组件通过几个步骤处理数据包。看看下面的图片："
 
 #: ../../Tigase_Development/Plugin_Development.rst:317
-#, fuzzy
 msgid "|Consumer|"
 msgstr "|Consumer|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:357
-#, fuzzy
 msgid "Consumer"
 msgstr "Consumer"
 
@@ -519,12 +514,10 @@ msgid ""
 msgstr "同样重要的是要注意会话管理器和处理器插件充当数据包消费者。数据包被用于处理，一旦处理完成，数据包就会被销毁。因此，要将数据包转发到目的地，处理器必须创建数据包的副本，设置所有性能和属性并将其作为处理结果返回。当然，处理器可以生成任意数量的数据包作为结果。可以在上述4个处理步骤中的任何一个中生成结果包。看看下面的图片："
 
 #: ../../Tigase_Development/Plugin_Development.rst:333
-#, fuzzy
 msgid "|User Send to Comp|"
 msgstr "|User Send to Comp|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:358
-#, fuzzy
 msgid "User Send to Comp"
 msgstr "User Send to Comp"
 
@@ -545,12 +538,10 @@ msgid "The same of course happens on the way back from the component to the user
 msgstr "在从组件返回给用户的过程中当然也会发生同样的情况："
 
 #: ../../Tigase_Development/Plugin_Development.rst:339
-#, fuzzy
 msgid "|Comp Sends to User|"
 msgstr "|Comp Sends to User|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:359
-#, fuzzy
 msgid "Comp Sends to User"
 msgstr "Comp Sends to User"
 
@@ -577,12 +568,10 @@ msgid ""
 msgstr "最明显的处理工作流程是当用户向服务器发送请求并期望服务器响应时："
 
 #: ../../Tigase_Development/Plugin_Development.rst:347
-#, fuzzy
 msgid "|User Request Response|"
 msgstr "|User Request Response|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:360
-#, fuzzy
 msgid "User Request Response"
 msgstr "User Request Response"
 
@@ -594,12 +583,10 @@ msgid ""
 msgstr "不过，这种设计有一个令人惊讶的结果。如果您查看显示2个用户之间通信的下图，您可以看到数据包在传送到最终目的地之前被复制了两次："
 
 #: ../../Tigase_Development/Plugin_Development.rst:351
-#, fuzzy
 msgid "|User Sends to User|"
 msgstr "|User Sends to User|"
 
 #: ../../Tigase_Development/Plugin_Development.rst:361
-#, fuzzy
 msgid "User Sends to User"
 msgstr "User Sends to User"
 
@@ -681,11 +668,11 @@ msgid ""
 msgstr "添加注册新工厂的最简单方法是使用 ``@Bean`` 注释对其类进行注释："
 
 #: ../../Tigase_Development/Plugin_Development.rst:392
-#, fuzzy
 msgid ""
 "**Example of the registration of a SASL mechanism factory with an "
 "annotation setting id of the factory to** ``customSaslFactory``."
-msgstr "**使用工厂的注解设置id将SASL机制工厂注册到** ``customSaslFactory`` **的示例。**"
+msgstr "**使用工厂的注解设置id将SASL机制工厂注册到** ``customSaslFactory`` "
+"**的示例。**"
 
 #: ../../Tigase_Development/Plugin_Development.rst:399
 msgid ""
@@ -847,7 +834,6 @@ msgstr ""
 "则用户会话被标记为匿名。对于有效和注册用户，这可用于我们不想加载任何用户数据（例如名册、vcard、隐私列表等）的情况。这是对性能和资源使用的影响，可用于支持聊天等用例。授权是基于客户端数据库执行的，但我们不需要为用户会话加载任何XMPP特定数据。"
 
 #: ../../Tigase_Development/Plugin_Development.rst:466
-#, fuzzy
 msgid ""
 "More details about implementation can be found in the :ref:`custom "
 "mechanisms development<cmd>` section."
@@ -929,4 +915,3 @@ msgid ""
 msgstr ""
 "``Repository`` 接口中的 ``auth`` "
 "方法将被弃用。这些接口将仅被视为用户详细信息提供者。将有新的可用方法允许对数据库进行额外的登录操作，比如上次成功登录记录。"
-
