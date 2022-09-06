@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-08-10 00:18+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/dp-component_implementation/zh_Hans/>\n"
@@ -246,12 +246,10 @@ msgid ""
 msgstr "有几种方法可以检查我们的组件是否已加载到服务器。可能最简单的方法是从管理员帐户连接到服务器并查看服务发现列表。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:139
-#, fuzzy
 msgid "|service disco test comp admin 300|"
 msgstr "|service disco test comp admin 300|"
 
 #: ../../Tigase_Development/Component_Implementation.rst:178
-#, fuzzy
 msgid "service disco test comp admin 300"
 msgstr "service disco test comp admin 300"
 
@@ -301,12 +299,10 @@ msgstr ""
 "管理员脚本。屏幕截图上的一个窗口仅显示了用于添加和删除脚本的两个基本命令，这是一个好的开始。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:155
-#, fuzzy
 msgid "|commands list test 200|"
 msgstr "|commands list test 200|"
 
 #: ../../Tigase_Development/Component_Implementation.rst:179
-#, fuzzy
 msgid "commands list test 200"
 msgstr "commands list test 200"
 
@@ -319,12 +315,10 @@ msgid ""
 msgstr "此外，您可以在服务发现窗口中浏览服务器统计信息，以在列表中找到您的新测试组件。如果您单击组件，它会显示一个包含组件统计信息的窗口，非常基本的数据包计数器。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:159
-#, fuzzy
 msgid "|service disco stats 200|"
 msgstr "|service disco stats 200|"
 
 #: ../../Tigase_Development/Component_Implementation.rst:180
-#, fuzzy
 msgid "service disco stats 200"
 msgstr "service disco stats 200"
 
@@ -700,12 +694,10 @@ msgid ""
 msgstr "添加上述两种方法并使用更新的代码重新启动服务器后，请查看服务发现窗口。您应该会在屏幕截图上看到类似的内容。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:549
-#, fuzzy
 msgid "|spam filtering disco small|"
 msgstr "|spam filtering disco small|"
 
 #: ../../Tigase_Development/Component_Implementation.rst:788
-#, fuzzy
 msgid "spam filtering disco small"
 msgstr "spam filtering disco small"
 
@@ -772,12 +764,10 @@ msgstr ""
 " 。第三是项目描述（在disco规范中实际上称为 'name'）。最后一个参数指定元素是否仅对管理员可见。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:567
-#, fuzzy
 msgid "|spam filter counter small|"
 msgstr "|spam filter counter small|"
 
 #: ../../Tigase_Development/Component_Implementation.rst:789
-#, fuzzy
 msgid "spam filter counter small"
 msgstr "spam filter counter small"
 
@@ -929,12 +919,10 @@ msgid ""
 msgstr "本课将教您如何添加自己的统计信息以及如何确保生成的统计信息不会影响应用程序性能。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:800
-#, fuzzy
 msgid "|spam statitics small|"
 msgstr "|spam statitics small|"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1015
-#, fuzzy
 msgid "spam statitics small"
 msgstr "spam statitics small"
 
@@ -1085,12 +1073,10 @@ msgid ""
 msgstr "由于我们的组件现在已准备好与脚本API合作，我现在将演示如何使用脚本和临时命令添加删除或更改这些集合的元素。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1046
-#, fuzzy
 msgid "|test comp newscript|"
 msgstr "|test comp newscript|"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1312
-#, fuzzy
 msgid "test comp newscript"
 msgstr "test comp newscript"
 
@@ -1112,12 +1098,10 @@ msgid ""
 msgstr "下面的屏幕截图显示了它的外观。您必须为脚本和ID字符串提供一些描述。我们在本指南中使用Groovy，但您也可以使用任何不同的脚本语言。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1052
-#, fuzzy
 msgid "|badwords list script|"
 msgstr "|badwords list script|"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1313
-#, fuzzy
 msgid "badwords list script"
 msgstr "badwords list script"
 
@@ -1187,7 +1171,6 @@ msgid "Component Implementation - Lesson 7 - Data Repository"
 msgstr "组件实现 - 第7课 - 数据存储库"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1321
-#, fuzzy
 msgid "ConfigRepository"
 msgstr "ConfigRepository"
 
@@ -1258,7 +1241,6 @@ msgstr ""
 "``TestRepositoryIfc`` 初始化自定义存储库类。"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1348
-#, fuzzy
 msgid "**TestRepositoryIfc.**"
 msgstr "**TestRepositoryIfc.**"
 
@@ -1656,32 +1638,26 @@ msgstr ""
 ":ref:`关系数据库(外部处理)<relationalDatabases>` 中的描述进行"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1637
-#, fuzzy
 msgid "For example:"
 msgstr "例如："
 
 #: ../../Tigase_Development/Component_Implementation.rst:1639
-#, fuzzy
 msgid "``database/mysql-test-0.0.1.sql``"
 msgstr "``database/mysql-test-0.0.1.sql``"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1641
-#, fuzzy
 msgid "``database/mysql-test-0.0.2.sql``"
 msgstr "``database/mysql-test-0.0.2.sql``"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1643
-#, fuzzy
 msgid "``database/mysql-test-0.0.3.sql``"
 msgstr "``database/mysql-test-0.0.3.sql``"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1645
-#, fuzzy
 msgid "``database/mysql-test-0.0.4.sql``"
 msgstr "``database/mysql-test-0.0.4.sql``"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1647
-#, fuzzy
 msgid "``database/mysql-test-0.0.5.sql``"
 msgstr "``database/mysql-test-0.0.5.sql``"
 
@@ -1775,7 +1751,6 @@ msgid ""
 msgstr "每个版本化的架构文件应在末尾包含负责以存储过程调用的形式设置加载架构的适当版本的代码，其中组件的名称和版本作为参数："
 
 #: ../../Tigase_Development/Component_Implementation.rst:1677
-#, fuzzy
 msgid "Postgresql"
 msgstr "Postgresql"
 
@@ -1784,12 +1759,10 @@ msgid "MsSQL Server"
 msgstr "MsSQL服务器"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1694
-#, fuzzy
 msgid "MySQL"
 msgstr "MySQL"
 
 #: ../../Tigase_Development/Component_Implementation.rst:1702
-#, fuzzy
 msgid "Derby"
 msgstr "Derby"
 
