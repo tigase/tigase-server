@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-08-10 00:23+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/dg-old_stuff/zh_Hans/>\n"
@@ -595,7 +595,6 @@ msgstr ""
 "``VHostItemExtension`` 实现的类。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:172
-#, fuzzy
 msgid ""
 "*Example VHostItemExtensionProvider implementation for* "
 "``SeeOtherHostVHostItemExtension``."
@@ -729,15 +728,14 @@ msgid "Whereas following methods are still available but have been deprecated:"
 msgstr "尽管以下方法仍然可用，但已被弃用："
 
 #: ../../Tigase_Development/Old_Stuff.rst:257
-#, fuzzy
 msgid ""
 "Please refer to the JavaDoc documentation for the `Packet "
 "<http://docs.tigase.org/tigase-"
 "server/snapshot/javadoc/tigase/server/Packet.html>`__ class and methods "
 "to learn all the details of these methods and difference between them."
 msgstr ""
-"请参考 `Packet <http://docs.tigase.org/tigase-"
-"server/snapshot/javadoc/tigase/server/Packet.html>`__ "
+"请参考 `Packet <http://docs.tigase.org/tigase-server/snapshot/javadoc/tigase/"
+"server/Packet.html>`__ "
 "类和方法的JavaDoc文档来学习所有的这些方法的详细信息以及它们之间的区别。"
 
 #: ../../Tigase_Development/Old_Stuff.rst:259
