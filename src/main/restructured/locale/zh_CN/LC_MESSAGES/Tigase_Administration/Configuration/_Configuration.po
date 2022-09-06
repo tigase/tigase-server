@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-25 17:52+0000\n"
+"PO-Revision-Date: 2022-09-06 18:49+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/configuration/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/configuration/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:2
@@ -292,7 +293,6 @@ msgid "Inside block between ``(` and `)`` you can define:"
 msgstr "``(`and`)`` 之间的块内你可以定义："
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:112
-#, fuzzy
 msgid ""
 "``class`` which will be used as a bean, in example above we set class as "
 "``className``. **(default: if you try to configure bean under name which "
@@ -300,27 +300,27 @@ msgid ""
 " class will be used. In other case you need to pass name of class to use "
 "as a bean)**"
 msgstr ""
-"``class`` 将被用作 bean，在上面的示例中，我们将 class 设置为 ``className``。 **(默认值：如果您尝试在 "
-"Tigase 框架中配置默认类的名称下配置 bean，则将使用此分配的类。在其他情况下，您需要传递类的名称以用作 bean)**"
+"``class`` 将被用作 bean，在上面的示例中，我们将 class 设置为 ``className``。 "
+"**(默认值：如果您尝试在 Tigase 框架中配置默认类的名称下配置 "
+"bean，则将使用此分配的类。在其他情况下，您需要传递类的名称以用作 bean)**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:113
-#, fuzzy
 msgid ""
 "``active`` (boolean) whether you want the bean to be active or not (beans"
 " with ``active`` set to ``false`` are not loaded). **(default: true)**"
 msgstr ""
-"``active`` (布尔值）是否希望 bean 处于活动状态（不加载 ``active`` 设置为 ``false`` 的 "
-"bean)。**(默认：true)**"
+"``active`` (布尔值）是否希望 bean 处于活动状态（不加载 ``active`` 设置为 "
+"``false`` 的 bean)。**(默认：true)**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:114
-#, fuzzy
 msgid ""
 "``exportable`` (boolean) defines if this bean should be exported and "
 "available for use for beans in inner scopes. This is advanced option in "
 "most cases it is recommended to omit this field in configuration. "
 "**(default: false)**"
 msgstr ""
-"``exportable`` (boolean) 定义这个 bean 是否应该被导出并且可用于内部范围以内的 "
+"``exportable`` (boolean) 定义这个 bean "
+"是否应该被导出并且可用于内部范围以内的 "
 "bean。这是大多数情况下的高级选项，建议在配置中忽略此字段。**(默认：false)**"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:116
@@ -559,7 +559,6 @@ msgid "environment variable"
 msgstr "环境变量"
 
 #: ../../Tigase_Administration/Configuration/DSL_configuration.inc:232
-#, fuzzy
 msgid "``env('variable-name')``"
 msgstr "``env('variable-name')``"
 
@@ -872,7 +871,6 @@ msgstr ""
 "连接时）是：``net.ipv4.ip_local_port_range``。此参数的设置方式与 ``fs.file-max`` 属性相同。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:15
-#, fuzzy
 msgid "fs.file-max"
 msgstr "fs.file-max"
 
@@ -891,7 +889,6 @@ msgid ""
 msgstr "如果您计划运行具有大量服务器连接的高负载服务，则此参数应至少是您希望支持的网络连接数的两倍。您可以通过执行以下命令来更改此设置："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:32
-#, fuzzy
 msgid "net.ipv4.ip_local_port_range"
 msgstr "net.ipv4.ip_local_port_range"
 
@@ -904,7 +901,6 @@ msgid "You can change this setting by executing the command:"
 msgstr "您可以通过执行以下命令来更改此设置："
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:49
-#, fuzzy
 msgid "TCP_keepalive"
 msgstr "TCP_keepalive"
 
@@ -925,7 +921,6 @@ msgstr ""
 " 将更快地检测断开的连接。"
 
 #: ../../Tigase_Administration/Configuration/Settings_for_High_Load_Systems.inc:66
-#, fuzzy
 msgid "/etc/sysctl.conf"
 msgstr "/etc/sysctl.conf"
 
@@ -1025,7 +1020,6 @@ msgid "JVM settings and recommendations"
 msgstr "JVM 设置和建议"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:4
-#, fuzzy
 msgid ""
 "Tigase configuration file ``tigase.conf`` (described in more detail in "
 "`Startup File for tigase.sh-tigase.conf <#manualconfig>`__) mentioned a "
@@ -1033,8 +1027,9 @@ msgid ""
 "the JVM. In this guide we would like to expound on those configuration "
 "options and provide hints for the optimal settings."
 msgstr ""
-"Tigase 配置文件 ``tigase.conf`` (在 `??? <#manualconfig>`__ 中有更详细的描述）提到了几个与 "
-"JVM 的操作相关的环境变量。在本指南中，我们将阐述这些配置选项并提供最佳设置提示。"
+"Tigase 配置文件 ``tigase.conf`` (在 `Startup File for tigase.sh-tigase.conf "
+"<#manualconfig>`__ 中有更详细的描述）提到了几个与 JVM "
+"的操作相关的环境变量。在本指南中，我们将阐述这些配置选项并提供最佳设置提示。"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:6
 msgid "Settings included in the ``etc/tigase.conf`` are as follows:"
@@ -1300,17 +1295,15 @@ msgid ""
 msgstr "考虑到上述所有因素，使用以下选项应该是进一步优化垃圾收集的良好起点："
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:109
-#, fuzzy
 msgid ""
 "``GC=\"-XX:+UseBiasedLocking -XX:+UseConcMarkSweepGC -XX:+UseParNewGC "
 "-XX:+CMSIncrementalMode -XX:-ReduceInitialCardMarks "
 "-XX:CMSInitiatingOccupancyFraction=70 "
 "-XX:+UseCMSInitiatingOccupancyOnly\"``"
 msgstr ""
-"``GC=\"-XX:+UseBiasedLocking -XX:+UseConcMarkSweepGC -XX:+UseParNewGC "
-"-XX:+CMSIncrementalMode -XX:-ReduceInitialCardMarks "
-"-XX:CMSInitiatingOccupancyFraction=70 "
-"-XX:+UseCMSInitiatingOccupancyOnly\"``"
+"``GC=\"-XX:+UseBiasedLocking -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+"
+"CMSIncrementalMode -XX:-ReduceInitialCardMarks -XX:"
+"CMSInitiatingOccupancyFraction=70 -XX:+UseCMSInitiatingOccupancyOnly\"``"
 
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:112
 msgid "GC settings worth considering"
@@ -1637,7 +1630,6 @@ msgid "Logic Options are:"
 msgstr "逻辑选项是："
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:27
-#, fuzzy
 msgid "MobileV1"
 msgstr "MobileV1"
 
@@ -1646,7 +1638,6 @@ msgid "Keeps all presence stanzas in queue until client is active."
 msgstr "将所有存在节保持在队列中直到客户端处于活动状态为止。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:37
-#, fuzzy
 msgid "MobileV2"
 msgstr "MobileV2"
 
@@ -1658,7 +1649,6 @@ msgid ""
 msgstr "当客户端处于非活动状态时，此设置会延迟呈现状态的传递，但仅保留每个完整 jid 的最后呈现状态。 **这是 CSI 逻辑的默认设置**。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:47
-#, fuzzy
 msgid "MobileV3"
 msgstr "MobileV3"
 
@@ -1754,7 +1744,6 @@ msgid "In this case, the global thread pools is increased by a factor or 3."
 msgstr "在这种情况下，全局线程池增加了 3 倍。"
 
 #: ../../Tigase_Administration/Configuration/Session_Manager.inc:114
-#, fuzzy
 msgid "Strategy"
 msgstr "Strategy"
 
@@ -1798,7 +1787,6 @@ msgid ""
 msgstr "本文档描述了虚拟主机在 Tigase 服务器中的工作方式以及如何在您的安装中充分利用此功能。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:10
-#, fuzzy
 msgid ""
 "The :ref:`'default-virtual-host'<virtHosts>` property allows to define "
 "name of the single vhost domain which will be considered a default vhost "
@@ -1806,8 +1794,9 @@ msgid ""
 "name. Any additional configuration needs to be configured using ad-hoc "
 "commands."
 msgstr ""
-"`'default-virtual-host' <#virtHosts>`_ "
-"属性允许定义单个虚拟主机域的名称，该域将被视为此安装的默认虚拟主机域。它只允许您配置域名。任何额外的配置都需要使用 ad-hoc 命令进行配置。"
+":ref:`'default-virtual-host'<virtHosts>` 属性允许定义单个虚拟主机域的名称，该"
+"域将被视为此安装的默认虚拟主机域。它只允许您配置域名。"
+"任何额外的配置都需要使用 ad-hoc 命令进行配置。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:12
 #, fuzzy
@@ -2744,4 +2733,3 @@ msgstr ""
 #~ "hoc 命令配置虚拟主机默认值，方法是使用 ad-hoc 修改 "
 #~ "``default`` 的值，就如 `用于管理虚拟域的临时命令规范 "
 #~ "<#adhocCommands>`__ 中所描述。"
-
