@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-07-27 09:38+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/dg-tests/zh_Hans/>\n"
@@ -121,19 +121,16 @@ msgstr "版本"
 
 #: ../../Tigase_Development/Tests.rst:32 ../../Tigase_Development/Tests.rst:73
 #: ../../Tigase_Development/Tests.rst:114
-#, fuzzy
 msgid "XMLDB"
 msgstr "XMLDB"
 
 #: ../../Tigase_Development/Tests.rst:32 ../../Tigase_Development/Tests.rst:73
 #: ../../Tigase_Development/Tests.rst:114
-#, fuzzy
 msgid "MySQL"
 msgstr "MySQL"
 
 #: ../../Tigase_Development/Tests.rst:32 ../../Tigase_Development/Tests.rst:73
 #: ../../Tigase_Development/Tests.rst:114
-#, fuzzy
 msgid "PGSQL"
 msgstr "PGSQL"
 
@@ -143,22 +140,18 @@ msgid "Distributed"
 msgstr "发布"
 
 #: ../../Tigase_Development/Tests.rst:34 ../../Tigase_Development/Tests.rst:75
-#, fuzzy
 msgid "3.3.2-b889"
 msgstr "3.3.2-b889"
 
 #: ../../Tigase_Development/Tests.rst:34
-#, fuzzy
 msgid "`00:00:12 <tests/3.3.2-b889/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:12 <tests/3.3.2-b889/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:34
-#, fuzzy
 msgid "`00:00:17 <tests/3.3.2-b889/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:17 <tests/3.3.2-b889/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:34
-#, fuzzy
 msgid "`00:00:17 <tests/3.3.2-b889/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:17 <tests/3.3.2-b889/func/pgsql/functional-tests.html>`__"
 
@@ -167,22 +160,18 @@ msgid "none"
 msgstr "无"
 
 #: ../../Tigase_Development/Tests.rst:36 ../../Tigase_Development/Tests.rst:77
-#, fuzzy
 msgid "3.3.2-b880"
 msgstr "3.3.2-b880"
 
 #: ../../Tigase_Development/Tests.rst:36
-#, fuzzy
 msgid "`00:00:13 <tests/3.3.2-b880/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:13 <tests/3.3.2-b880/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:36
-#, fuzzy
 msgid "`00:00:15 <tests/3.3.2-b880/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:15 <tests/3.3.2-b880/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:36
-#, fuzzy
 msgid "`00:00:15 <tests/3.3.2-b880/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:15 <tests/3.3.2-b880/func/pgsql/functional-tests.html>`__"
 
@@ -193,338 +182,271 @@ msgid "None"
 msgstr "无"
 
 #: ../../Tigase_Development/Tests.rst:38 ../../Tigase_Development/Tests.rst:79
-#, fuzzy
 msgid "3.0.2-b700"
 msgstr "3.0.2-b700"
 
 #: ../../Tigase_Development/Tests.rst:38
-#, fuzzy
 msgid "`00:00:22 <tests/3.0.2-b700/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:22 <tests/3.0.2-b700/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:38
-#, fuzzy
 msgid "`00:00:24 <tests/3.0.2-b700/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/3.0.2-b700/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:38
-#, fuzzy
 msgid "`00:00:25 <tests/3.0.2-b700/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:25 <tests/3.0.2-b700/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:38
-#, fuzzy
 msgid "`00:00:25 <tests/3.0.2-b700/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:25 <tests/3.0.2-b700/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:40 ../../Tigase_Development/Tests.rst:81
-#, fuzzy
 msgid "2.9.5-b606"
 msgstr "2.9.5-b606"
 
 #: ../../Tigase_Development/Tests.rst:40
-#, fuzzy
 msgid "`00:00:22 <tests/2.9.5-b606/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:22 <tests/2.9.5-b606/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:40
-#, fuzzy
 msgid "`00:00:24 <tests/2.9.5-b606/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/2.9.5-b606/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:40
-#, fuzzy
 msgid "`00:00:24 <tests/2.9.5-b606/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/2.9.5-b606/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:40
-#, fuzzy
 msgid "`00:00:24 <tests/2.9.5-b606/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/2.9.5-b606/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:42 ../../Tigase_Development/Tests.rst:83
-#, fuzzy
 msgid "2.9.3-b548"
 msgstr "2.9.3-b548"
 
 #: ../../Tigase_Development/Tests.rst:42
-#, fuzzy
 msgid "`00:00:22 <tests/2.9.3-b548/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:22 <tests/2.9.3-b548/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:42
-#, fuzzy
 msgid "`00:00:23 <tests/2.9.3-b548/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:23 <tests/2.9.3-b548/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:42
-#, fuzzy
 msgid "`00:00:25 <tests/2.9.3-b548/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:25 <tests/2.9.3-b548/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:42
-#, fuzzy
 msgid "`00:00:25 <tests/2.9.3-b548/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:25 <tests/2.9.3-b548/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:44 ../../Tigase_Development/Tests.rst:85
-#, fuzzy
 msgid "2.9.1-b528"
 msgstr "2.9.1-b528"
 
 #: ../../Tigase_Development/Tests.rst:44
-#, fuzzy
 msgid "`00:00:21 <tests/2.9.1-b528/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:21 <tests/2.9.1-b528/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:44
-#, fuzzy
 msgid "`00:00:23 <tests/2.9.1-b528/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:23 <tests/2.9.1-b528/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:44
-#, fuzzy
 msgid "`00:00:24 <tests/2.9.1-b528/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/2.9.1-b528/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:44
-#, fuzzy
 msgid "`00:00:25 <tests/2.9.1-b528/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:25 <tests/2.9.1-b528/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:46 ../../Tigase_Development/Tests.rst:87
-#, fuzzy
 msgid "2.8.6-b434"
 msgstr "2.8.6-b434"
 
 #: ../../Tigase_Development/Tests.rst:46
-#, fuzzy
 msgid "`00:00:21 <tests/2.8.6-b434/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:21 <tests/2.8.6-b434/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:46
-#, fuzzy
 msgid "`00:00:24 <tests/2.8.6-b434/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/2.8.6-b434/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:46
-#, fuzzy
 msgid "`00:00:24 <tests/2.8.6-b434/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/2.8.6-b434/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:46
-#, fuzzy
 msgid "`00:00:25 <tests/2.8.6-b434/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:25 <tests/2.8.6-b434/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:48 ../../Tigase_Development/Tests.rst:89
-#, fuzzy
 msgid "2.8.5-b422"
 msgstr "2.8.5-b422"
 
 #: ../../Tigase_Development/Tests.rst:48
-#, fuzzy
 msgid "`00:00:21 <tests/2.8.5-b422/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:21 <tests/2.8.5-b422/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:48
-#, fuzzy
 msgid "`00:00:24 <tests/2.8.5-b422/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/2.8.5-b422/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:48
-#, fuzzy
 msgid "`00:00:24 <tests/2.8.5-b422/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:24 <tests/2.8.5-b422/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:48
-#, fuzzy
 msgid "`00:00:26 <tests/2.8.5-b422/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:26 <tests/2.8.5-b422/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:50 ../../Tigase_Development/Tests.rst:91
-#, fuzzy
 msgid "2.8.3-b409"
 msgstr "2.8.3-b409"
 
 #: ../../Tigase_Development/Tests.rst:50
-#, fuzzy
 msgid "`00:00:27 <tests/2.8.3-b409/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:27 <tests/2.8.3-b409/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:50
-#, fuzzy
 msgid "`00:00:29 <tests/2.8.3-b409/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:29 <tests/2.8.3-b409/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:50
-#, fuzzy
 msgid "`00:00:29 <tests/2.8.3-b409/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:29 <tests/2.8.3-b409/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:50
-#, fuzzy
 msgid "`00:00:32 <tests/2.8.3-b409/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:32 <tests/2.8.3-b409/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:52 ../../Tigase_Development/Tests.rst:93
-#, fuzzy
 msgid "2.7.2-b378"
 msgstr "2.7.2-b378"
 
 #: ../../Tigase_Development/Tests.rst:52
-#, fuzzy
 msgid "`00:00:30 <tests/2.7.2-b378/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:30 <tests/2.7.2-b378/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:52
-#, fuzzy
 msgid "`00:00:34 <tests/2.7.2-b378/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:34 <tests/2.7.2-b378/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:52
-#, fuzzy
 msgid "`00:00:33 <tests/2.7.2-b378/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:33 <tests/2.7.2-b378/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:52
-#, fuzzy
 msgid "`00:00:35 <tests/2.7.2-b378/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:35 <tests/2.7.2-b378/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:54 ../../Tigase_Development/Tests.rst:95
-#, fuzzy
 msgid "2.6.4-b300"
 msgstr "2.6.4-b300"
 
 #: ../../Tigase_Development/Tests.rst:54
-#, fuzzy
 msgid "`00:00:30 <tests/2.6.4-b300/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:30 <tests/2.6.4-b300/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:54
-#, fuzzy
 msgid "`00:00:32 <tests/2.6.4-b300/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:32 <tests/2.6.4-b300/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:54
-#, fuzzy
 msgid "`00:00:35 <tests/2.6.4-b300/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:35 <tests/2.6.4-b300/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:54
-#, fuzzy
 msgid "`00:00:39 <tests/2.6.4-b300/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:39 <tests/2.6.4-b300/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:56 ../../Tigase_Development/Tests.rst:97
-#, fuzzy
 msgid "2.6.4-b295"
 msgstr "2.6.4-b295"
 
 #: ../../Tigase_Development/Tests.rst:56
-#, fuzzy
 msgid "`00:00:29 <tests/2.6.4-b295/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:29 <tests/2.6.4-b295/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:56
-#, fuzzy
 msgid "`00:00:32 <tests/2.6.4-b295/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:32 <tests/2.6.4-b295/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:56
-#, fuzzy
 msgid "`00:00:45 <tests/2.6.4-b295/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:45 <tests/2.6.4-b295/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:56
-#, fuzzy
 msgid "`00:00:36 <tests/2.6.4-b295/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:36 <tests/2.6.4-b295/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:58 ../../Tigase_Development/Tests.rst:99
-#, fuzzy
 msgid "2.6.0-b287"
 msgstr "2.6.0-b287"
 
 #: ../../Tigase_Development/Tests.rst:58
-#, fuzzy
 msgid "`00:00:31 <tests/2.6.0-b287/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:31 <tests/2.6.0-b287/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:58
-#, fuzzy
 msgid "`00:00:34 <tests/2.6.0-b287/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:34 <tests/2.6.0-b287/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:58
-#, fuzzy
 msgid "`00:00:47 <tests/2.6.0-b287/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:47 <tests/2.6.0-b287/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:58
-#, fuzzy
 msgid "`00:00:43 <tests/2.6.0-b287/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:43 <tests/2.6.0-b287/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:60 ../../Tigase_Development/Tests.rst:101
-#, fuzzy
 msgid "2.5.0-b279"
 msgstr "2.5.0-b279"
 
 #: ../../Tigase_Development/Tests.rst:60
-#, fuzzy
 msgid "`00:00:30 <tests/2.5.0-b279/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:30 <tests/2.5.0-b279/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:60
-#, fuzzy
 msgid "`00:00:34 <tests/2.5.0-b279/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:34 <tests/2.5.0-b279/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:60
-#, fuzzy
 msgid "`00:00:45 <tests/2.5.0-b279/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:45 <tests/2.5.0-b279/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:60
-#, fuzzy
 msgid "`00:00:43 <tests/2.5.0-b279/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:43 <tests/2.5.0-b279/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:62 ../../Tigase_Development/Tests.rst:103
-#, fuzzy
 msgid "2.4.0-b263"
 msgstr "2.4.0-b263"
 
 #: ../../Tigase_Development/Tests.rst:62
-#, fuzzy
 msgid "`00:00:29 <tests/2.4.0-b263/func/xmldb/functional-tests.html>`__"
 msgstr "`00:00:29 <tests/2.4.0-b263/func/xmldb/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:62
-#, fuzzy
 msgid "`00:00:33 <tests/2.4.0-b263/func/mysql/functional-tests.html>`__"
 msgstr "`00:00:33 <tests/2.4.0-b263/func/mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:62
-#, fuzzy
 msgid "`00:00:45 <tests/2.4.0-b263/func/pgsql/functional-tests.html>`__"
 msgstr "`00:00:45 <tests/2.4.0-b263/func/pgsql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:62
-#, fuzzy
 msgid "`00:00:44 <tests/2.4.0-b263/func/sm-mysql/functional-tests.html>`__"
 msgstr "`00:00:44 <tests/2.4.0-b263/func/sm-mysql/functional-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:64 ../../Tigase_Development/Tests.rst:105
 #: ../../Tigase_Development/Tests.rst:116
-#, fuzzy
 msgid "2.3.4-b226"
 msgstr "2.3.4-b226"
 
 #: ../../Tigase_Development/Tests.rst:64
-#, fuzzy
 msgid "`00:00:48 <tests/functional-tests.html>`__"
 msgstr "`00:00:48 <tests/functional-tests.html>`__"
 
@@ -537,297 +459,238 @@ msgid "Checking to see whether the function performs well enough."
 msgstr "检查函数是否执行得足够好。"
 
 #: ../../Tigase_Development/Tests.rst:75
-#, fuzzy
 msgid "`00:12:17 <tests/3.3.2-b889/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:12:17 <tests/3.3.2-b889/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:75
-#, fuzzy
 msgid "`00:13:42 <tests/3.3.2-b889/perf/mysql/performance-tests.html>`__"
 msgstr "`00:13:42 <tests/3.3.2-b889/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:75
-#, fuzzy
 msgid "`00:17:10 <tests/3.3.2-b889/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:17:10 <tests/3.3.2-b889/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:77
-#, fuzzy
 msgid "`00:13:39 <tests/3.3.2-b880/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:13:39 <tests/3.3.2-b880/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:77
-#, fuzzy
 msgid "`00:14:09 <tests/3.3.2-b880/perf/mysql/performance-tests.html>`__"
 msgstr "`00:14:09 <tests/3.3.2-b880/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:77
-#, fuzzy
 msgid "`00:17:39 <tests/3.3.2-b880/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:17:39 <tests/3.3.2-b880/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:79
-#, fuzzy
 msgid "`00:10:26 <tests/3.0.2-b700/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:10:26 <tests/3.0.2-b700/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:79
-#, fuzzy
 msgid "`00:11:00 <tests/3.0.2-b700/perf/mysql/performance-tests.html>`__"
 msgstr "`00:11:00 <tests/3.0.2-b700/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:79
-#, fuzzy
 msgid "`00:12:08 <tests/3.0.2-b700/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:12:08 <tests/3.0.2-b700/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:79
-#, fuzzy
 msgid "`00:24:05 <tests/3.0.2-b700/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:24:05 <tests/3.0.2-b700/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:81
-#, fuzzy
 msgid "`00:09:54 <tests/2.9.5-b606/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:09:54 <tests/2.9.5-b606/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:81
-#, fuzzy
 msgid "`00:11:18 <tests/2.9.5-b606/perf/mysql/performance-tests.html>`__"
 msgstr "`00:11:18 <tests/2.9.5-b606/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:81
-#, fuzzy
 msgid "`00:37:08 <tests/2.9.5-b606/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:37:08 <tests/2.9.5-b606/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:81
-#, fuzzy
 msgid "`00:16:20 <tests/2.9.5-b606/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:16:20 <tests/2.9.5-b606/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:83
-#, fuzzy
 msgid "`00:10:00 <tests/2.9.3-b548/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:10:00 <tests/2.9.3-b548/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:83
-#, fuzzy
 msgid "`00:11:29 <tests/2.9.3-b548/perf/mysql/performance-tests.html>`__"
 msgstr "`00:11:29 <tests/2.9.3-b548/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:83
-#, fuzzy
 msgid "`00:36:43 <tests/2.9.3-b548/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:36:43 <tests/2.9.3-b548/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:83
-#, fuzzy
 msgid "`00:16:47 <tests/2.9.3-b548/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:16:47 <tests/2.9.3-b548/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:85
-#, fuzzy
 msgid "`00:09:46 <tests/2.9.1-b528/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:09:46 <tests/2.9.1-b528/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:85
-#, fuzzy
 msgid "`00:11:15 <tests/2.9.1-b528/perf/mysql/performance-tests.html>`__"
 msgstr "`00:11:15 <tests/2.9.1-b528/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:85
-#, fuzzy
 msgid "`00:36:12 <tests/2.9.1-b528/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:36:12 <tests/2.9.1-b528/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:85
-#, fuzzy
 msgid "`00:16:36 <tests/2.9.1-b528/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:16:36 <tests/2.9.1-b528/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:87
-#, fuzzy
 msgid "`00:10:02 <tests/2.8.6-b434/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:10:02 <tests/2.8.6-b434/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:87
-#, fuzzy
 msgid "`00:11:45 <tests/2.8.6-b434/perf/mysql/performance-tests.html>`__"
 msgstr "`00:11:45 <tests/2.8.6-b434/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:87
-#, fuzzy
 msgid "`00:36:36 <tests/2.8.6-b434/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:36:36 <tests/2.8.6-b434/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:87
-#, fuzzy
 msgid "`00:17:36 <tests/2.8.6-b434/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:17:36 <tests/2.8.6-b434/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:89
-#, fuzzy
 msgid "`00:12:37 <tests/2.8.5-b422/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:12:37 <tests/2.8.5-b422/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:89
-#, fuzzy
 msgid "`00:14:40 <tests/2.8.5-b422/perf/mysql/performance-tests.html>`__"
 msgstr "`00:14:40 <tests/2.8.5-b422/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:89
-#, fuzzy
 msgid "`00:38:59 <tests/2.8.5-b422/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:38:59 <tests/2.8.5-b422/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:89
-#, fuzzy
 msgid "`00:21:40 <tests/2.8.5-b422/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:21:40 <tests/2.8.5-b422/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:91
-#, fuzzy
 msgid "`00:12:32 <tests/2.8.3-b409/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:12:32 <tests/2.8.3-b409/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:91
-#, fuzzy
 msgid "`00:14:26 <tests/2.8.3-b409/perf/mysql/performance-tests.html>`__"
 msgstr "`00:14:26 <tests/2.8.3-b409/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:91
-#, fuzzy
 msgid "`00:37:57 <tests/2.8.3-b409/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:37:57 <tests/2.8.3-b409/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:91
-#, fuzzy
 msgid "`00:21:26 <tests/2.8.3-b409/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:21:26 <tests/2.8.3-b409/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:93
-#, fuzzy
 msgid "`00:12:28 <tests/2.7.2-b378/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:12:28 <tests/2.7.2-b378/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:93
-#, fuzzy
 msgid "`00:14:57 <tests/2.7.2-b378/perf/mysql/performance-tests.html>`__"
 msgstr "`00:14:57 <tests/2.7.2-b378/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:93
-#, fuzzy
 msgid "`00:37:09 <tests/2.7.2-b378/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:37:09 <tests/2.7.2-b378/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:93
-#, fuzzy
 msgid "`00:22:20 <tests/2.7.2-b378/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:22:20 <tests/2.7.2-b378/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:95
-#, fuzzy
 msgid "`00:12:46 <tests/2.6.4-b300/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:12:46 <tests/2.6.4-b300/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:95
-#, fuzzy
 msgid "`00:14:59 <tests/2.6.4-b300/perf/mysql/performance-tests.html>`__"
 msgstr "`00:14:59 <tests/2.6.4-b300/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:95
-#, fuzzy
 msgid "`00:36:56 <tests/2.6.4-b300/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:36:56 <tests/2.6.4-b300/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:95
-#, fuzzy
 msgid "`00:35:00 <tests/2.6.4-b300/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:35:00 <tests/2.6.4-b300/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:97
-#, fuzzy
 msgid "`00:12:23 <tests/2.6.4-b295/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:12:23 <tests/2.6.4-b295/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:97
-#, fuzzy
 msgid "`00:14:59 <tests/2.6.4-b295/perf/mysql/performance-tests.html>`__"
 msgstr "`00:14:59 <tests/2.6.4-b295/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:97
-#, fuzzy
 msgid "`00:42:24 <tests/2.6.4-b295/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:42:24 <tests/2.6.4-b295/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:97
-#, fuzzy
 msgid "`00:30:18 <tests/2.6.4-b295/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:30:18 <tests/2.6.4-b295/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:99
-#, fuzzy
 msgid "`00:13:50 <tests/2.6.0-b287/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:13:50 <tests/2.6.0-b287/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:99
-#, fuzzy
 msgid "`00:16:53 <tests/2.6.0-b287/perf/mysql/performance-tests.html>`__"
 msgstr "`00:16:53 <tests/2.6.0-b287/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:99
-#, fuzzy
 msgid "`00:48:17 <tests/2.6.0-b287/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:48:17 <tests/2.6.0-b287/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:99
-#, fuzzy
 msgid "`00:49:06 <tests/2.6.0-b287/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:49:06 <tests/2.6.0-b287/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:101
-#, fuzzy
 msgid "`00:13:29 <tests/2.5.0-b279/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:13:29 <tests/2.5.0-b279/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:101
-#, fuzzy
 msgid "`00:16:58 <tests/2.5.0-b279/perf/mysql/performance-tests.html>`__"
 msgstr "`00:16:58 <tests/2.5.0-b279/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:101
-#, fuzzy
 msgid "`00:47:15 <tests/2.5.0-b279/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:47:15 <tests/2.5.0-b279/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:101
-#, fuzzy
 msgid "`00:41:52 <tests/2.5.0-b279/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:41:52 <tests/2.5.0-b279/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:103
-#, fuzzy
 msgid "`00:13:20 <tests/2.4.0-b263/perf/xmldb/performance-tests.html>`__"
 msgstr "`00:13:20 <tests/2.4.0-b263/perf/xmldb/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:103
-#, fuzzy
 msgid "`00:16:21 <tests/2.4.0-b263/perf/mysql/performance-tests.html>`__"
 msgstr "`00:16:21 <tests/2.4.0-b263/perf/mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:103
-#, fuzzy
 msgid "`00:43:56 <tests/2.4.0-b263/perf/pgsql/performance-tests.html>`__"
 msgstr "`00:43:56 <tests/2.4.0-b263/perf/pgsql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:103
-#, fuzzy
 msgid "`00:42:08 <tests/2.4.0-b263/perf/sm-mysql/performance-tests.html>`__"
 msgstr "`00:42:08 <tests/2.4.0-b263/perf/sm-mysql/performance-tests.html>`__"
 
 #: ../../Tigase_Development/Tests.rst:105
-#, fuzzy
 msgid "`01:23:30 <tests/performance-tests.html>`__"
 msgstr "`01:23:30 <tests/performance-tests.html>`__"
 
@@ -843,7 +706,6 @@ msgstr "检查该功能在长期运行中是否表现良好。它必须在几个
 "百个请求。"
 
 #: ../../Tigase_Development/Tests.rst:116
-#, fuzzy
 msgid "`16:06:31 <tests/stability-tests.html>`__"
 msgstr "`16:06:31 <tests/stability-tests.html>`__"
 
@@ -1038,7 +900,6 @@ msgstr "对于左大括号 { 和右大括号 } "
 "之间的测试脚本，您可以放置您想要的所有测试用例参数。它的格式是："
 
 #: ../../Tigase_Development/Tests.rst:260
-#, fuzzy
 msgid "**-parameter-name = value**"
 msgstr "**-parameter-name = value**"
 
@@ -1051,7 +912,6 @@ msgstr "参数名称始终以 **-** "
 "开头。请注意，某些参数不需要任何值。它们可以独立存在而无需分配任何值："
 
 #: ../../Tigase_Development/Tests.rst:264
-#, fuzzy
 msgid "**-debug-on-error**"
 msgstr "**-debug-on-error**"
 
@@ -1068,7 +928,6 @@ msgstr "脚本语言还包括对可以分配任何值并在以后多次使用的
 "方式与将其分配给参数的方式相同："
 
 #: ../../Tigase_Development/Tests.rst:270
-#, fuzzy
 msgid "**$(variable-name) = value**"
 msgstr "**$(variable-name) = value**"
 
