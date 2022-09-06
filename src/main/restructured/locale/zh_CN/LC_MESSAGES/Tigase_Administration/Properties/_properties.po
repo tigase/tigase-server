@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-08-09 23:47+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/properties_guide/zh_Hans/>\n"
@@ -69,7 +69,6 @@ msgid ""
 msgstr "证书容器包含与 SSL 证书配置相关的所有配置。这个容器取代了许多以前的 — 属性。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:25
-#, fuzzy
 msgid "ssl-certs-location"
 msgstr "ssl-certs-location"
 
@@ -96,7 +95,6 @@ msgid "This replaces the former ``--ssl-certs-location`` property."
 msgstr "这取代了以前的 ``--ssl-certs-location`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:41
-#, fuzzy
 msgid "ssl-def-cert-domain"
 msgstr "ssl-def-cert-domain"
 
@@ -346,7 +344,6 @@ msgid "debug"
 msgstr "调试"
 
 #: ../../Tigase_Administration/Properties/_general.inc:164
-#, fuzzy
 msgid ""
 "**Description:** The ``debug`` property is used to turn on the debug log "
 "for the specified Tigase package. For example if you want to turn debug "
@@ -360,11 +357,14 @@ msgid ""
 "guide. If you wish to debug packages not compiled with Tigase, use the "
 ":ref:`debug-packages<debugPackages>` setting."
 msgstr ""
-"**描述：** ``debug`` 属性用于打开指定 Tigase 包的调试日志。例如，如果你想为 tigase.server "
-"包打开调试日志，那么你必须使用 server 参数。如果您的服务器有任何问题，从 Tigase "
-"团队获得帮助的最佳方式是生成至少启用此功能的配置并运行服务器。然后从 ``logs/tigase-console.log`` "
-"日志文件中，可以为我们提供最好的信息来提供帮助。有关服务器日志记录和调整日志记录级别的更多详细信息，请参阅管理员指南中的调试 Tigase "
-"文章。如果您希望调试未使用 Tigase 编译的包，请使用 :ref:`调试包<debugPackages>` 设置。"
+"**描述：** ``debug`` 属性用于打开指定 Tigase 包的调试日志。例如，如果你想为 "
+"tigase.server 包打开调试日志，那么你必须使用 server "
+"参数。如果您的服务器有任何问题，从 Tigase "
+"团队获得帮助的最佳方式是生成至少启用此功能的配置并运行服务器。然后从 ``logs/"
+"tigase-console.log`` 日志文件中，可以为我们提供最好的信息来提供帮助。有关服务"
+"器日志记录和调整日志记录级别的更多详细信息，请参阅管理员指南中的调试 Tigase "
+"文章。如果您希望调试未使用 Tigase 编译的包，请使用 "
+":ref:`调试包<debugPackages>` 设置。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:166
 #: ../../Tigase_Administration/Properties/_general.inc:236
@@ -384,7 +384,6 @@ msgid "monitoring"
 msgstr "监控"
 
 #: ../../Tigase_Administration/Properties/_general.inc:177
-#, fuzzy
 msgid ""
 "**Description:** This property activates monitoring interfaces through "
 "selected protocols on selected TCP/IP port numbers. For more details "
@@ -393,9 +392,10 @@ msgid ""
 " child bean under ``monitoring ()``. If a protocol is not specified, "
 "monitoring under that will not be available."
 msgstr ""
-"**描述：** 此属性通过选定 TCP/IP 端口号上的选定协议激活监视接口。有关详细信息，请参阅用户指南中的 "
-":ref:`监控指南<serverMonitoring>`。每个监控协议都应该在 ``monitoring ()`` 下的它自己的子 bean "
-"中调用。如果未指定协议，则无法进行该协议下的监控。"
+"**描述：** 此属性通过选定 TCP/IP "
+"端口号上的选定协议激活监视接口。有关详细信息，请参阅用户指南中的 "
+":ref:`监控指南<serverMonitoring>`。每个监控协议都应该在 ``monitoring ()`` "
+"下的它自己的子 bean 中调用。如果未指定协议，则无法进行该协议下的监控。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:179
 msgid "**Default value:** By default monitoring is disabled."
@@ -598,7 +598,6 @@ msgid "**Available since:** 5.2.0"
 msgstr "**从以下版本可用：** 5.2.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:319
-#, fuzzy
 msgid "s2s-secret"
 msgstr "s2s-secret"
 
@@ -622,11 +621,11 @@ msgstr ""
 "安装上生成回拨密钥。默认为null，表示每次s2s连接和握手都会自动生成secret。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:337
-#, fuzzy
 msgid ""
 "This is a global property which is overridden by settings for each VHost "
 "(see :ref:`Add and Manage Domains (VHosts)<addManageDomain>`)"
-msgstr "这是一个全局属性，被特定 VHost 的设置覆盖（请参阅 :ref:`添加和管理域 (VHosts)<addManageDomain>`）。"
+msgstr "这是一个全局属性，被特定 VHost 的设置覆盖（请参阅 :ref:`添加和管理域 "
+"(VHosts)<addManageDomain>`）。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:339
 msgid ""
@@ -941,7 +940,6 @@ msgid "**Available since:** 7.1.0"
 msgstr "**从以下版本开始可用：** 7.1.0"
 
 #: ../../Tigase_Administration/Properties/_general.inc:596
-#, fuzzy
 msgid "stringprep-processor"
 msgstr "stringprep-processor"
 
@@ -996,7 +994,6 @@ msgid "test"
 msgstr "测试"
 
 #: ../../Tigase_Administration/Properties/_general.inc:617
-#, fuzzy
 msgid "**Default value:** By default test mode is disabled."
 msgstr "**默认值:** 默认测试模式被禁用。"
 
@@ -1019,7 +1016,6 @@ msgid "Test function has been replaced by the following setting:"
 msgstr "测试功能已被以下设置取代："
 
 #: ../../Tigase_Administration/Properties/_general.inc:634
-#, fuzzy
 msgid "tls-jdk-nss-bug-workaround-active"
 msgstr "tls-jdk-nss-bug-workaround-active"
 
@@ -1065,14 +1061,14 @@ msgid ""
 msgstr "这导致在安装了JDK7和新库的系统上安装Tigase时出现许多问题，例如连接挂起或SSL/TLS损坏。我们之前的建议是避免使用JDK7或有问题的本机库。现在我们有了一个适当的修复/解决方法，它允许您使用JDK7运行Tigase。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:646
-#, fuzzy
 msgid "http://stackoverflow.com/q/10687200/427545"
 msgstr "http://stackoverflow.com/q/10687200/427545"
 
 #: ../../Tigase_Administration/Properties/_general.inc:648
-#, fuzzy
 msgid "http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796"
-msgstr "http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796"
+msgstr ""
+"http://bugs.sun.com/bugdatabase/view_bug."
+"do;jsessionid=b509d9cb5d8164d90e6731f5fc44?bug_id=6928796"
 
 #: ../../Tigase_Administration/Properties/_general.inc:650
 msgid ""
@@ -1081,7 +1077,6 @@ msgid ""
 msgstr "请注意，虽然仍支持此设置，但上述问题已在v8 JDK中修复。"
 
 #: ../../Tigase_Administration/Properties/_general.inc:655
-#, fuzzy
 msgid "trusted"
 msgstr "trusted"
 
@@ -1150,15 +1145,15 @@ msgid ""
 msgstr "此属性设置关联的 ``UserRepository`` 的数据库连接池大小。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:46
-#, fuzzy
 msgid ""
 "in some cases instead of default for this property setting for :ref"
 ":`data-repo-pool-size<dataRepoPoolSize>` is used if pool-size is not "
 "defined in ``userRepository``. This depends on the repository "
 "implementation and the way it is initialized."
 msgstr ""
-"在某些情况下，如果 ``userRepository`` 中未定义池大小，则使用 :ref:`data-repo-pool-"
-"size<dataRepoPoolSize>` 的属性设置而不是默认值。这取决于存储库实现及其初始化方式。"
+"在某些情况下，如果 ``userRepository`` 中未定义池大小，则使用 :ref:`data-repo-"
+"pool-size<dataRepoPoolSize>` "
+"的属性设置而不是默认值。这取决于存储库实现及其初始化方式。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:55
 msgid ""
@@ -1167,7 +1162,6 @@ msgid ""
 msgstr "这是一个全局属性，可能会被单独的存储库设置覆盖："
 
 #: ../../Tigase_Administration/Properties/_repository.inc:70
-#, fuzzy
 msgid "**cls**"
 msgstr "**cls**"
 
@@ -1191,7 +1185,6 @@ msgid ""
 msgstr "文件转换不会删除和转换此属性，它 **必须手动完成**。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:85
-#, fuzzy
 msgid "authRepository"
 msgstr "authRepository"
 
@@ -1228,7 +1221,6 @@ msgid ""
 msgstr "default () URI 设置替换了 ``user-db-uri`` 以及 ``auth-repo-uri`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:124
-#, fuzzy
 msgid "MSSQL"
 msgstr "MSSQL"
 
@@ -1255,7 +1247,6 @@ msgstr ""
 "除非您在更改中明确表示，否则我们不建议现在及以后修改架构。"
 
 #: ../../Tigase_Administration/Properties/_repository.inc:139
-#, fuzzy
 msgid "MongoDb"
 msgstr "MongoDb"
 
@@ -1266,7 +1257,6 @@ msgid ""
 msgstr "对于使用mongoDB作为存储库，设置看起来会略有不同："
 
 #: ../../Tigase_Administration/Properties/_repository.inc:152
-#, fuzzy
 msgid "MySQL"
 msgstr "MySQL"
 
@@ -1317,7 +1307,6 @@ msgid "Cluster"
 msgstr "集群"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:5
-#, fuzzy
 msgid "cl-comp"
 msgstr "cl-comp"
 
@@ -1332,12 +1321,10 @@ msgid ""
 msgstr "**默认值：** 默认情况下， cl-comp 容器未列在 ``config.tdsl`` 文件中。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:20
-#, fuzzy
 msgid "connect-all"
 msgstr "connect-all"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:22
-#, fuzzy
 msgid ""
 "The ``cluster-connect-all`` property is used to open active connections "
 "to all nodes listed in the :ref:`cluster-nodes<clusterNodes>` "
@@ -1349,9 +1336,11 @@ msgid ""
 " value and you can skip this option if you want to have it switched off "
 "which it is by default."
 msgstr ""
-"``cluster-connect-all`` 属性用于打开在 :ref:`cluster-nodes<clusterNodes>` "
-"配置属性中列出的所有节点的活动连接。此属性应仅在稍后添加到活动集群的节点上使用。通常，这个新的集群节点不会在现有集群节点的配置中列出。这就是为什么他们无法打开新节点的连接。新节点改为打开与所有现有节点的连接。"
-" False 是默认值，如果你想关闭它，你可以跳过这个选项，它是默认的。"
+"``cluster-connect-all`` 属性用于打开在 :ref:`cluster-nodes<clusterNodes>` 配"
+"置属性中列出的所有节点的活动连接。此属性应仅在稍后添加到活动集群的节点上使用"
+"。通常，这个新的集群节点不会在现有集群节点的配置中列出。这就是为什么他们无法"
+"打开新节点的连接。新节点改为打开与所有现有节点的连接。 False "
+"是默认值，如果你想关闭它，你可以跳过这个选项，它是默认的。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:24
 msgid "**Example**"
@@ -1362,7 +1351,6 @@ msgid "This replaces the ``--cluster-connect-all`` property."
 msgstr "这替换了 ``--cluster-connect-all`` 属性。"
 
 #: ../../Tigase_Administration/Properties/_cluster.inc:37
-#, fuzzy
 msgid "cluster-mode"
 msgstr "cluster-mode"
 
@@ -1456,7 +1444,6 @@ msgid "User connectivity"
 msgstr "用户连接"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:5
-#, fuzzy
 msgid "bosh-close-connection"
 msgstr "bosh-close-connection"
 
@@ -1482,12 +1469,10 @@ msgid ""
 msgstr "此设置很少需要，但在客户端无法控制/禁用保持活动Bosh连接的安装中，由于某种原因，keep-alive 无法正常工作。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:20
-#, fuzzy
 msgid "bosh-extra-headers-file"
 msgstr "bosh-extra-headers-file"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:22
-#, fuzzy
 msgid "**Default value:** ``'etc/bosh-extra-headers.txt'``"
 msgstr "**默认值：** ``'etc/bosh-extra-headers.txt'``"
 
@@ -1523,7 +1508,6 @@ msgid ""
 msgstr "这可以在您的安装中修改，删除或替换为不同的内容。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:44
-#, fuzzy
 msgid "client-access-policy-file"
 msgstr "client-access-policy-file"
 
@@ -1563,7 +1547,6 @@ msgid ""
 msgstr "默认情况下，Tigase与一个示例策略文件一起分发，该文件允许从所有来源完全访问整个安装。对于大多数Bosh服务器安装来说，这通常是可以的。通过属性和XML文件进行的配置允许在任何安装上轻松灵活地修改策略。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:59
-#, fuzzy
 msgid "client-port-delay-listening"
 msgstr "client-port-delay-listening"
 
@@ -1613,7 +1596,6 @@ msgid "Only applicable if **Cluster Mode** is active!"
 msgstr "仅当 **集群模式** 处于活动状态时才适用！"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:100
-#, fuzzy
 msgid "cross-domain-policy-file"
 msgstr "cross-domain-policy-file"
 
@@ -1655,7 +1637,6 @@ msgid ""
 msgstr "这是一个全局属性，也可以通过配置连接管理器 [c2s，s2s，ws2s，bosh，ext 等] 来覆盖，它们可能都有自己的策略。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:123
-#, fuzzy
 msgid "domain-filter-policy"
 msgstr "domain-filter-policy"
 
@@ -1735,11 +1716,11 @@ msgid ""
 msgstr "``BLACKLIST`` - 用户可以与所有人（如 ``ALL``）通信，除了列出域上的联系人。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:145
-#, fuzzy
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "VHosts (see :ref:`Add and Manage Domains(VHosts)<addManageDomain>`)."
-msgstr "这是一个全局属性，被特定 VHost 的设置覆盖（请参阅 :ref:`添加和管理域 (VHosts)<addManageDomain>`）。"
+msgstr "这是一个全局属性，被特定 VHost 的设置覆盖（请参阅 :ref:`添加和管理域 "
+"(VHosts)<addManageDomain>`）。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:147
 msgid ""
@@ -1760,7 +1741,6 @@ msgid ""
 msgstr "``ALL`` 也可以作为在运行时添加的所有新虚拟主机的默认值。"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:154
-#, fuzzy
 msgid "see-other-host"
 msgstr "see-other-host"
 
@@ -1831,12 +1811,10 @@ msgstr "所有相关的配置选项："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:203
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:240
-#, fuzzy
 msgid ":ref:`watchdog_Ping_Type<watchdogPingType>`"
 msgstr ":ref:`监视器的ping类型<watchdogPingType>`"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:205
-#, fuzzy
 msgid ":ref:`watchdog_delay<watchdogDelay>`"
 msgstr ":ref:`监视器延迟<watchdogDelay>`"
 
@@ -1854,7 +1832,6 @@ msgid "**Example:** ``watchdog_delay = '30000'``"
 msgstr "**示例：** ``watchdog_delay = '30000'``"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:220
-#, fuzzy
 msgid "**Possible values:** 'any integer.'"
 msgstr "**可能的值：** ``any integer``"
 
@@ -1877,7 +1854,6 @@ msgid "for example (for ClusterConnectionManager):"
 msgstr "例如（对于 ClusterConnectionManager）："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:244
-#, fuzzy
 msgid ":ref:`watchdog_timeout<watchdogTimeout>`"
 msgstr ":ref:`监视器超时<watchdogTimeout>`"
 
@@ -1910,12 +1886,10 @@ msgstr ""
 "配置属性允许配置ConnectionManager监视器（此服务负责检测断开连接并关闭它们）将用于检查连接的ping的类型。除了上面介绍的全局配置之外，每个组件的配置也是可能的："
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:279
-#, fuzzy
 msgid ":ref:`watchdog_Delay<watchdogDelay>`"
 msgstr ":ref:`监视器延迟<watchdogDelay>`"
 
 #: ../../Tigase_Administration/Properties/_user_connectivity.inc:286
-#, fuzzy
 msgid "ws-allow-unmasked-frames"
 msgstr "ws-allow-unmasked-frames"
 
@@ -1942,7 +1916,6 @@ msgid "External"
 msgstr "外部"
 
 #: ../../Tigase_Administration/Properties/_external.inc:7
-#, fuzzy
 msgid "bind-ext-hostnames"
 msgstr "bind-ext-hostnames"
 
@@ -1987,7 +1960,6 @@ msgstr ""
 "'pubsub.devel.tigase.org' 域作为该属性的值，它会将第二个域绑定到在协议握手期间已通过身份验证的域顶部的单个连接。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:24
-#, fuzzy
 msgid "default-virtual-host"
 msgstr "default-virtual-host"
 
@@ -2014,7 +1986,6 @@ msgstr ""
 "configuration`` 和 ``Remove an item``。"
 
 #: ../../Tigase_Administration/Properties/_external.inc:33
-#, fuzzy
 msgid "ext"
 msgstr "ext"
 
@@ -2063,7 +2034,6 @@ msgid "Performance"
 msgstr "表现"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:5
-#, fuzzy
 msgid "cm-ht-traffic-throttling"
 msgstr "cm-ht-traffic-throttling"
 
@@ -2083,7 +2053,6 @@ msgid "**Possible values:** comma separated list of traffic limits settings."
 msgstr "**可能的值：** 以逗号分隔的流量限制设置列表。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:13
-#, fuzzy
 msgid ""
 "**Description:** This property is used to specify traffic limit of non-"
 "user connections, that is s2s, external components and other high traffic"
@@ -2091,11 +2060,12 @@ msgid ""
 "in the same way as for the :ref:`cm-traffic-throttling "
 "property<cmTrafficThrottling>`."
 msgstr ""
-"**说明：** 该属性用于指定非用户连接的流量限制，即s2s，外部组件等高流量服务器连接。编码的属性和值的含义与 :ref:`cm-"
-"traffic-throttling property<cmTrafficThrottling>` 的含义相同。"
+"**说明：** "
+"该属性用于指定非用户连接的流量限制，即s2s，外部组件等高流量服务器连接。"
+"编码的属性和值的含义与 :ref:`cm-traffic-throttling "
+"property<cmTrafficThrottling>` 的含义相同。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:20
-#, fuzzy
 msgid "cm-traffic-throttling"
 msgstr "cm-traffic-throttling"
 
@@ -2163,7 +2133,6 @@ msgid "**Available since:** 5.1.3"
 msgstr "**从以下时间开始可用：** 5.1.3"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:43
-#, fuzzy
 msgid "elements-number-limit"
 msgstr "elements-number-limit"
 
@@ -2186,7 +2155,6 @@ msgstr ""
 "配置属性允许配置拒绝服务保护机制，该机制限制在节中发送的元素数量。它必须基于每个ConnectionManager进行配置："
 
 #: ../../Tigase_Administration/Properties/_performance.inc:69
-#, fuzzy
 msgid "hardened-mode"
 msgstr "hardened-mode"
 
@@ -2229,7 +2197,6 @@ msgstr ""
 " OpenJDK8和高版本的OracleJVM 11以及更高版本不需要它。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:84
-#, fuzzy
 msgid "max-queue-size"
 msgstr "max-queue-size"
 
@@ -2264,7 +2231,6 @@ msgstr ""
 "或MUC组件生成大量数据包（存在或消息），则此大小应等于或大于组件在单个请求中生成的最大预期数据包数。否则Tigase可能会丢弃它无法处理的数据包。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:99
-#, fuzzy
 msgid "net-buff-high-throughput"
 msgstr "net-buff-high-throughput"
 
@@ -2294,7 +2260,6 @@ msgstr ""
 "``64k``，最适合中等流量的网站。如果您的集群安装无法应对节点之间的流量，请尝试增加此数量。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:114
-#, fuzzy
 msgid "net-buff-standard"
 msgstr "net-buff-standard"
 
@@ -2315,7 +2280,6 @@ msgid ""
 msgstr "**描述：** 此属性设置标准（通常是 c2s）连接的网络缓冲区，默认值为2k，最适合大多数安装。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:127
-#, fuzzy
 msgid "net-buffer"
 msgstr "net-buffer"
 
@@ -2334,7 +2298,6 @@ msgid ""
 msgstr "**描述：** 设置 ``ConnectionManager`` 在其设置的上下文中使用的内部网络缓冲区的默认大小。"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:140
-#, fuzzy
 msgid "socket-buffer-size"
 msgstr "socket-buffer-size"
 
@@ -2364,7 +2327,6 @@ msgid "**Available since:** 8.3.0 (previously value of ``net-buffer`` was used)"
 msgstr "**从以下版本开始可用：** 8.3.0（之前使用了 ``net-buffer`` 的值）"
 
 #: ../../Tigase_Administration/Properties/_performance.inc:153
-#, fuzzy
 msgid "nonpriority-queue"
 msgstr "nonpriority-queue"
 
@@ -2397,7 +2359,6 @@ msgid "VHost / domain"
 msgstr "虚拟主机/域"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:5
-#, fuzzy
 msgid "vhost-anonymous-enabled"
 msgstr "vhost-anonymous-enabled"
 
@@ -2416,11 +2377,11 @@ msgstr "**描述：** ``vhost-anonymous-enabled`` 属性指定是否允许匿名
 #: ../../Tigase_Administration/Properties/_vhost.inc:32
 #: ../../Tigase_Administration/Properties/_vhost.inc:53
 #: ../../Tigase_Administration/Properties/_vhost.inc:72
-#, fuzzy
 msgid ""
 "This is a global property which is overridden by settings for particular "
 "VHost (see :ref:`Add and Manage Domains (VHosts)<addManageDomain>`)."
-msgstr "这是一个全局属性，被特定 VHost 的设置覆盖（请参阅 :ref:`添加和管理域 (VHosts)<addManageDomain>`）。"
+msgstr "这是一个全局属性，被特定 VHost 的设置覆盖（请参阅 :ref:`添加和管理域 "
+"(VHosts)<addManageDomain>`）。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:17
 msgid ""
@@ -2435,7 +2396,6 @@ msgstr ""
 "文件中列出的许多虚拟主机的安装，这些主机没有指定单独的设置。它允许为所有这些配置默认值，而不必为每个VHost提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:22
-#, fuzzy
 msgid "vhost-disable-dns-check"
 msgstr "vhost-disable-dns-check"
 
@@ -2455,7 +2415,6 @@ msgstr ""
 "SRV 记录，以便其他人可以从您的网络外部连接到特定的虚拟主机， 但你不会从中受益。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:37
-#, fuzzy
 msgid "vhost-max-users"
 msgstr "vhost-max-users"
 
@@ -2501,7 +2460,6 @@ msgstr ""
 "文件中列出的没有指定单独设置的许多虚拟主机的安装最有用。它提供了对所有这些都使用默认值的能力，而不必为每个虚拟主机提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:58
-#, fuzzy
 msgid "vhost-message-forward-jid"
 msgstr "vhost-message-forward-jid"
 
@@ -2553,7 +2511,6 @@ msgid ""
 msgstr "它也被用作在运行时添加的所有新虚拟主机的默认值。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:77
-#, fuzzy
 msgid "vhost-presence-forward-jid"
 msgstr "vhost-presence-forward-jid"
 
@@ -2603,7 +2560,6 @@ msgid "This may be used on a per-VHost (see `??? <#addManageDomain>`__)."
 msgstr "这可以在每个 VHost 上使用（请参阅 :ref:`添加和管理域(VHosts)<addManageDomain>`）。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:98
-#, fuzzy
 msgid "vhost-register-enabled"
 msgstr "vhost-register-enabled"
 
@@ -2634,7 +2590,6 @@ msgstr ""
 "文件中列出的没有指定单独设置的许多虚拟主机的安装很有用。它允许管理员为所有这些配置默认值，而不必为每个虚拟主机提供单独的配置。"
 
 #: ../../Tigase_Administration/Properties/_vhost.inc:119
-#, fuzzy
 msgid "vhost-tls-required"
 msgstr "vhost-tls-required"
 
