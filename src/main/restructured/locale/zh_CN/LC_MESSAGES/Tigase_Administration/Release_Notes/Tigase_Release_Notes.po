@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-08-13 09:29+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/release_notes/zh_Hans/>\n"
@@ -345,7 +345,6 @@ msgstr ""
 "CertificateRepository 添加选项以从文件系统加载证书"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:84
-#, fuzzy
 msgid ""
 "`#server-1234 <https://projects.tigase.net/issue/server-1234>`__: Roster "
 "API improvements"
@@ -354,7 +353,6 @@ msgstr ""
 "改进"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:86
-#, fuzzy
 msgid ""
 "`#server-1237 <https://projects.tigase.net/issue/server-1237>`__: Rework "
 "CertificateRepository so items are stored individually"
@@ -363,7 +361,6 @@ msgstr ""
 "CertificateRepository，以便单独存储项目"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:88
-#, fuzzy
 msgid ""
 "`#server-1238 <https://projects.tigase.net/issue/server-1238>`__: Can’t "
 "set MOTD via ad-hoc."
@@ -372,7 +369,6 @@ msgstr ""
 "ad-hoc 设置 MOTD。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:90
-#, fuzzy
 msgid ""
 "`#server-1243 <https://projects.tigase.net/issue/server-1243>`__: Include"
 " wait-for-it.sh script in base distribution"
@@ -381,7 +377,6 @@ msgstr ""
 "在基本发行版中包含 wait-for-it.sh 脚本"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:92
-#, fuzzy
 msgid ""
 "`#server-1245 <https://projects.tigase.net/issue/server-1245>`__: "
 "MethodStatistics doesn’t work well for interfaces with overloaded methods"
@@ -415,7 +410,6 @@ msgstr ""
 "processor' 疑似不会定期删除过期的消息"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:100
-#, fuzzy
 msgid ""
 "`#server-1254 <https://projects.tigase.net/issue/server-1254>`__: Fix "
 "slow startup and shutdown"
@@ -424,7 +418,6 @@ msgstr ""
 "修复启动和关闭缓慢的问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:102
-#, fuzzy
 msgid ""
 "`#server-1258 <https://projects.tigase.net/issue/server-1258>`__: Allow "
 "beans to be instantiated without the requirement to reference/inject them"
@@ -433,7 +426,6 @@ msgstr ""
 "无需引用/注入bean,但是允许实例化它们"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:104
-#, fuzzy
 msgid ""
 "`#server-1260 <https://projects.tigase.net/issue/server-1260>`__: "
 "UserConnectedEvent should be a cluster event"
@@ -442,7 +434,6 @@ msgstr ""
 "UserConnectedEvent 应该是一个集群事件"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:106
-#, fuzzy
 msgid ""
 "`#server-1261 <https://projects.tigase.net/issue/server-1261>`__: Revise "
 "and improve EventBus developer guide"
@@ -467,7 +458,6 @@ msgstr ""
 "添加选项以限制并发连接的资源数量"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:112
-#, fuzzy
 msgid ""
 "`#server-1277 <https://projects.tigase.net/issue/server-1277>`__: Fix "
 "HUGE out queue in StreamManagementIOProcessor"
@@ -493,7 +483,6 @@ msgstr ""
 "XMPPProcessorAbstract.processToUserPacket() 以错误结果响应 IQ"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:118
-#, fuzzy
 msgid ""
 "`#server-1284 <https://projects.tigase.net/issue/server-1284>`__: Add "
 "validation to JabberIqAuth"
@@ -518,7 +507,6 @@ msgstr ""
 "rfc7622 改进 StringPrep 以禁止 localpart/domain 中的空间"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:124
-#, fuzzy
 msgid ""
 "`#server-1292 <https://projects.tigase.net/issue/server-1292>`__: TLS "
 "connectivity issue with search.jabber.network"
@@ -527,7 +515,6 @@ msgstr ""
 "search.jabber.network 的 TLS 连接问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:126
-#, fuzzy
 msgid ""
 "`#server-1297 <https://projects.tigase.net/issue/server-1297>`__: Add "
 "option to push plugin that would allow to overwrite unencrypted part in "
@@ -537,14 +524,13 @@ msgstr ""
 "添加选项以推送插件，从而允许覆盖（OMEMO）加密消息中的未加密部分"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:128
-#, fuzzy
 msgid ""
 "`#server-1303 <https://projects.tigase.net/issue/server-1303>`__: Better "
 "handling of \"The target is unavailable at this time.\" / "
 "PacketInvalidTypeException"
 msgstr ""
-"`#server-1303 <https://projects.tigase.net/issue/server-1303>`__: "
-"更好地处理“此时目标不可用。” / PacketInvalidTypeException"
+"`#server-1303 <https://projects.tigase.net/issue/server-1303>`__: 更好地处理 "
+"\"The target is unavailable at this time.\" / PacketInvalidTypeException"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:130
 msgid ""
@@ -563,7 +549,6 @@ msgstr ""
 "修复正在使用的大量直接内存。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:134
-#, fuzzy
 msgid ""
 "`#server-1307 <https://projects.tigase.net/issue/server-1307>`__: Fix "
 "disconnection on MAM sync"
@@ -572,7 +557,6 @@ msgstr ""
 "同步断开连接问题"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:136
-#, fuzzy
 msgid ""
 "`#extras-3 <https://projects.tigase.net/issue/extras-3>`__: Add AWS "
 "logback and documentation how to use it"
@@ -581,7 +565,6 @@ msgstr ""
 "和如何使用它的文档"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:138
-#, fuzzy
 msgid ""
 "`#extras-4 <https://projects.tigase.net/issue/extras-4>`__: Unescape and "
 "normalise logs in mail notifications before sending them"
@@ -605,7 +588,6 @@ msgid ""
 msgstr "`#extras-9 <https://projects.tigase.net/issue/extras-9>`__: 弃用 mDNS 实施"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:144
-#, fuzzy
 msgid ""
 "`#serverdist-8 <https://projects.tigase.net/issue/serverdist-8>`__: "
 "Remove DNS resolution part from XEP-0156 implementation"
@@ -1232,7 +1214,6 @@ msgstr ""
 "解析器中可能存在的漏洞"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:179
-#, fuzzy
 msgid ""
 "`server-1130 <https://projects.tigase.net/issue/server-1130>`__: NPE i "
 "JabberIqAuth"
@@ -3459,7 +3440,6 @@ msgid "Component Changes"
 msgstr "组件更改"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:579
-#, fuzzy
 msgid "AMP"
 msgstr "AMP"
 
@@ -3472,7 +3452,6 @@ msgstr ""
 "AMP 组件现在使用多个处理线程。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:586
-#, fuzzy
 msgid "PubSub"
 msgstr "PubSub"
 
@@ -3527,7 +3506,6 @@ msgstr ""
 "PubSub 中潜在的 NPE。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:603
-#, fuzzy
 msgid "http-api"
 msgstr "http-api"
 
@@ -3737,7 +3715,6 @@ msgstr ""
 "``feature-not-implemented``对删除存储的消息时不再发生响应。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:661
-#, fuzzy
 msgid "MUC"
 msgstr "MUC"
 
@@ -3921,7 +3898,6 @@ msgstr ""
 "版本更改为 tigase-stun v2.0.0。"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:721
-#, fuzzy
 msgid "WebSocket"
 msgstr "WebSocket"
 
