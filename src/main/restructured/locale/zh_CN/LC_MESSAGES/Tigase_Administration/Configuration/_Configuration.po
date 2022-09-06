@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-09-06 18:49+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/configuration/zh_Hans/>\n"
@@ -1799,7 +1799,6 @@ msgstr ""
 "任何额外的配置都需要使用 ad-hoc 命令进行配置。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:12
-#, fuzzy
 msgid ""
 "Virtual hosts should be managed using ad-hoc commands or admin ui, visit "
 ":ref:`Add and Manage Domains<addManageDomain>` for description of vhosts "
@@ -1807,29 +1806,28 @@ msgid ""
 "Manage Virtual Domains<adhocCommands>` for more information about ad-hoc "
 "commands."
 msgstr ""
-"虚拟主机应使用 ad-hoc 命令或管理 ui 进行管理，请访问 `添加和管理域 <#addManageDomain>`__ "
-"以了解虚拟主机管理过程的说明或访问 `用于管理虚拟域的临时命令规范 <#adhocCommands>`__ 有关临时命令的更多信息。"
+"虚拟主机应使用 ad-hoc 命令或管理 ui 进行管理，请访问 "
+":ref:`添加和管理域<addManageDomain>` 以了解虚拟主机管理过程的说明或访问 "
+":ref:`用于管理虚拟域的临时命令规范<adhocCommands>` 有关临时命令的更多信息。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:14
-#, fuzzy
 msgid ""
 "If you have components that may not be able to handle multiple vhosts or "
 "cluster mode, we have developed a virtual component solution as well, "
 "details in the :ref:`Virtual Components for the Tigase "
 "Cluster<virtualComponents>` section."
 msgstr ""
-"如果您的组件可能无法处理多个虚拟主机或集群模式，我们也开发了一个虚拟组件解决方案，详细信息请参见 `Tigase 集群的虚拟组件 "
-"<#virtualComponents>`__ 部分。"
+"如果您的组件可能无法处理多个虚拟主机或集群模式，我们也开发了一个虚拟组件解决"
+"方案，详细信息请参见 :ref:`Tigase 集群的虚拟组件<virtualComponents>` 部分。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:16
-#, fuzzy
 msgid ""
 "You may also want to reference the Vhosts API for additional information:"
 " - :ref:`API Description for Virtual Domains Management in Tigase "
 "Server<addManageDomain>`."
 msgstr ""
-"您可能还想参考 Vhosts API 以获取更多信息: - `Tigase 服务器中虚拟域管理的 API 描述 "
-"<#addManageDomain>`__。"
+"您可能还想参考 Vhosts API 以获取更多信息: - :ref:`Tigase "
+"服务器中虚拟域管理的 API 描述<addManageDomain>`。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:24
 msgid "Default VHost configuration"
@@ -1853,16 +1851,19 @@ msgid ""
 " described in :ref:`Specification for ad-hoc Commands Used to Manage "
 "Virtual Domains<adhocCommands>`."
 msgstr ""
+"初始定义默认配置或首次启动 Tigase XMPP 服务器后，可以使用 ad-hoc "
+"命令配置虚拟主机默认值，方法是使用 ad-hoc 修改 ``default`` 的值，如 "
+":ref:`用于管理虚拟域的临时命令规范<adhocCommands>` 中所述。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:46
-#, fuzzy
 msgid ""
 "Alternatively, you may edit default Virtual Host configuration "
 "(configuration for domain ``default``) using Admin UI which by default is"
 " available at http://localhost:8080/admin/."
 msgstr ""
-"或者，您可以使用管理 UI 编辑默认虚拟主机配置（域 ``default`` 的配置），这些在默认情况下可通过\n"
-"``http://localhost:8080/admin/`` 获得。"
+"或者，您可以使用管理 UI 编辑默认虚拟主机配置（域 ``default`` 的配置），"
+"这些在默认情况下可通过\n"
+"http://localhost:8080/admin/ 获得。"
 
 #: ../../Tigase_Administration/Configuration/Vhosts.inc:51
 msgid "Specification for ad-hoc Commands Used to Manage Virtual Domains"
