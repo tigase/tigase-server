@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-26 08:14+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-tigase_kernel/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/dg-tigase_kernel/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:2
@@ -79,17 +80,15 @@ msgid "handling of bean lifecycle"
 msgstr "bean生命周期的处理"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:28
-#, fuzzy
 msgid ""
 "registration of additional beans based on annotations (*optionally using "
 "registered class implementing* ``BeanConfigurator`` *as* "
 "``defaultBeanConfigurator``)"
 msgstr ""
-"基于注解的附加bean的注册 （*作为* ``defaultBeanConfigurator`` *可选的使用注册类实现* "
-"``BeanConfigurator`` ）"
+"基于注解的附加bean的注册 （*作为* ``defaultBeanConfigurator`` "
+"*可选的使用注册类实现* ``BeanConfigurator`` ）"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:30
-#, fuzzy
 msgid ""
 "configuration of a bean (*optionally thru registered class implementing* "
 "``BeanConfigurator`` *as* ``defaultBeanConfigurator``)"
@@ -116,13 +115,12 @@ msgstr ""
 "的bean。如果多个bean具有相同的名称，那么最后一个注册此名称的将被使用，因为其注册将覆盖以前注册的bean。您可以使用任何您想在内核中命名的bean名称，但它不能："
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:36
-#, fuzzy
 msgid ""
 "be ``service`` as this name is used by Tigase Kernel internally when "
 "RegistrarBean\\`s are in use (see :ref:`RegistrarBean<registrarBean>`)"
 msgstr ""
-"是 ``service`` 因为这个名称是Tigase内核在使用 ``RegistrarBean`` 时在内部使用的（请参阅 "
-":ref:`RegistrarBean<registrarBean>`)"
+"是 ``service`` 因为这个名称是Tigase内核在使用 ``RegistrarBean`` "
+"时在内部使用的（请参阅 :ref:`RegistrarBean<registrarBean>`)"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:38
 msgid ""
@@ -175,11 +173,11 @@ msgid ""
 msgstr "bean是类的命名实例，它有无参数构造函数并在内核中注册。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:61
-#, fuzzy
 msgid ""
 "Parameterless constructor is a required as it will be used by kernel to "
 "create an instance of the bean, see :ref:`bean lifecycle<beanLifecycle>`."
-msgstr "无参数构造函数是必需的，因为内核将使用它来创建bean的实例，请参阅 :ref:`bean生命周期<beanLifecycle>`。"
+msgstr "无参数构造函数是必需的，因为内核将使用它来创建bean的实例，请参阅 "
+":ref:`bean生命周期<beanLifecycle>`。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:66
 msgid "Lifecycle of a bean"
@@ -341,30 +339,30 @@ msgid "Reconfiguration of a bean *(optional)*"
 msgstr "重新配置一个bean *（可选）*"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:131
-#, fuzzy
 msgid ""
 "At any point in time bean may be reconfigured by default bean "
 "configurator (instance of ``BeanConfigurator``) registered in the kernel."
 " This will happen in the same way as it described in :ref:`Configuring a "
 "bean<beanConfiguration>` in **Creating instace of a bean** section."
 msgstr ""
-"在任何时间点，bean都可能被内核中注册的默认bean配置器（``BeanConfigurator``的实例）重新配置。这将以与 **创建 "
-"bean的实例** 部分中的 :ref:`配置bean<beanConfiguration>` 所描述的相同方式发生。"
+"在任何时间点，bean都可能被内核中注册的默认bean配置器（ ``BeanConfigurator`` "
+"的实例）重新配置。这将以与 **创建 bean的实例** 部分中的 "
+":ref:`配置bean<beanConfiguration>` 所描述的相同方式发生。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:134
 msgid "Updating dependencies"
 msgstr "更新依赖项"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:136
-#, fuzzy
 msgid ""
 "It may happen, that due to reconfiguration or registration/unregistration"
 " or activation/deactivation of some other beans dependencies of a bean "
 "will change. As a result, Tigase Kernel will inject new dependencies as "
 "described in :ref:`Injecting dependencies<beanInjectingDependencies>`"
 msgstr ""
-"由于重新配置或注册/取消注册或激活/停用某些其他bean，bean的依赖关系可能会发生变化。因此，Tigase内核将注入新的依赖项，如 "
-":ref:`Injecting dependencies<beanInjectingDependencies>` 中所述"
+"由于重新配置或注册/取消注册或激活/停用某些其他bean，bean的依赖关系可能会发生"
+"变化。因此，Tigase内核将注入新的依赖项，如 :ref:`Injecting "
+"dependencies<beanInjectingDependencies>` 中所述"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:139
 msgid "Registration of a bean"
@@ -623,15 +621,15 @@ msgid ""
 msgstr "如果存在这些方法，则使用getter/setter插入依赖项，否则将它们直接插入到字段中。由于使用了设置器，可以检测依赖实例的变化并根据需要做出反应，即清除内部缓存。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:302
-#, fuzzy
 msgid ""
 "Kernel is resolving dependencies during injection only using beans "
 "visible in its scope. This makes it unable to inject an instance of a "
 "class which is not registered in the same kernel as a bean or not visible"
 " in this kernel scope (see :ref:`Scope and visibility<kernelScope>`)."
 msgstr ""
-"内核在注入期间仅使用其范围内可见的bean来解决依赖关系。这使得它无法注入未在同一内核中注册为bean或在此内核范围内不可见的类的实例（请参阅 "
-":ref:`Scope and visibility<kernelScope>`）。"
+"内核在注入期间仅使用其范围内可见的bean来解决依赖关系。这使得它无法注入未在同"
+"一内核中注册为bean或在此内核范围内不可见的类的实例（请参阅 :ref:`Scope and "
+"visibility<kernelScope>`）。"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:306
 msgid ""
@@ -749,7 +747,6 @@ msgid "**Using annotation.**"
 msgstr "**使用注释。**"
 
 #: ../../Tigase_Development/Tigase_Kernel.rst:366
-#, fuzzy
 msgid "*Calling* ``exportable()``."
 msgstr "*调用* ``exportable()``。"
 
@@ -849,4 +846,3 @@ msgid ""
 "As mentioned DSL file structure depends on structure of beans, a file to "
 "set a config field in each bean to bean name should look like that:"
 msgstr "如前所述，DSL文件结构取决于bean的结构，将每个bean中的配置字段设置 bean名称的文件应如下所示："
-
