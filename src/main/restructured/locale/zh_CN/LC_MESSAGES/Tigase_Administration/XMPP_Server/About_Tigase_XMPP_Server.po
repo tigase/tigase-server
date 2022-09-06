@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-08-12 06:30+0000\n"
+"PO-Revision-Date: 2022-09-07 17:13+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/about_tigase_xmpp_server/zh_Hans/>\n"
@@ -90,7 +90,6 @@ msgid ""
 msgstr "**性能测试** - 检查功能是否足够好。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:27
-#, fuzzy
 msgid ""
 "**Stability tests** - Checking whether the function behaves well in long "
 "term run. It must handle hundreds of requests a second in a several hour "
@@ -103,7 +102,6 @@ msgid "Security"
 msgstr "安全"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:33
-#, fuzzy
 msgid ""
 "There are a few elements of the security related to XMPP servers: secure "
 "data transmissions which is met by the implementation of **SSL** or "
@@ -116,7 +114,6 @@ msgstr ""
 "用户授权和组件架构实现的安全部署。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:35
-#, fuzzy
 msgid ""
 "**Secure deployment** Tigase software installation does not impact "
 "network security. Companies usually have their networks divided into 2 "
@@ -128,7 +125,6 @@ msgstr ""
 "部分对外界开放，**私有网络** 对外界关闭。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:37
-#, fuzzy
 msgid ""
 "If the XMPP server is to provide an effective way of communication "
 "between company employees regardless if they are in a secure company "
@@ -147,7 +143,6 @@ msgstr ""
 "之外以保护内部安全，那么如何保持安装的便利性和系统的安全性呢？"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:39
-#, fuzzy
 msgid ""
 "**Tigase server** offers a solution for such a case. With it’s component "
 "structure, Tigase can be easily deployed on any number machines and from "
@@ -163,12 +158,11 @@ msgstr ""
 "中安装一个带有服务连接管理器的客户端连接管理器。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:41
-#, fuzzy
 msgid ""
 "Session Manager connects to **DMZ** and receives all packets from "
 "external users. Thus is can securely realize users authorization based on"
 " company authorization mechanisms."
-msgstr "会话管理器连接到**DMZ** 并接收来自外部用户的所有数据包。从而可以安全地实现基"
+msgstr "会话管理器连接到 **DMZ** 并接收来自外部用户的所有数据包。从而可以安全地实现基"
 "于公司授权机制的用户授权。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:45
@@ -176,14 +170,12 @@ msgid "Flexibility"
 msgstr "灵活性"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:46
-#, fuzzy
 msgid ""
 "There are many different XMPP server implementations. The most prevalent "
 "are:"
 msgstr "有许多不同 XMPP的 服务器实现。最流行的如下："
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:48
-#, fuzzy
 msgid ""
 "Used as a business communication platform in small and medium companies "
 "where the server is not under a heavy load. For such deployments security"
@@ -192,7 +184,6 @@ msgstr "用于服务器负载不重的中小型公司的业务交流平台。对
 "特性。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:50
-#, fuzzy
 msgid ""
 "For huge community websites or internet portal servers is, on the other "
 "hand, usually under very heavy load and has to support thousands or "
@@ -204,14 +195,12 @@ msgstr ""
 "所以我们需要不同级别的安全性。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:52
-#, fuzzy
 msgid ""
 "For very small community deployments or for small home networks the key "
 "factor is ease to deploy and maintain."
 msgstr "对于非常小的社区部署或小型家庭网络，关键因素是易于部署和维护。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:54
-#, fuzzy
 msgid ""
 "Architecture based on components provides the ability to run selected "
 "modules on separate machines so the server can be easily applied in any "
@@ -220,7 +209,6 @@ msgstr "基于组件的架构让服务器在不同机器上可以运行选定模
 "场景。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:56
-#, fuzzy
 msgid ""
 "For simple installation the server generates a config file which can be "
 "used straight away with very few modifications or none at all. For "
@@ -270,7 +258,6 @@ msgid "Ease of Use"
 msgstr "使用方便"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:68
-#, fuzzy
 msgid ""
 "Complex computer networks consisting of many servers with different "
 "services are hard to maintain. This requires employing professional staff"
@@ -279,7 +266,6 @@ msgstr "由许多具有不同服务的服务器组成的复杂计算机网络很
 "来操作和维护网络。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:70
-#, fuzzy
 msgid ""
 "Not all networks are so complex however, most small companies have just a"
 " few servers for their needs with services like e-mail and a HTTP server."
@@ -297,7 +283,6 @@ msgstr ""
 "应该会自动获取正确的主机名并准备好立即运行。"
 
 #: ../../Tigase_Administration/XMPP_Server/About_Tigase_XMPP_Server.rst:72
-#, fuzzy
 msgid ""
 "Tigase server is designed and implemented to allow dynamic "
 "reconfiguration during runtime so there is no need to restart the server "
@@ -316,21 +301,18 @@ msgid "XMPP Supported Extensions"
 msgstr "XMPP 支持的扩展"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:4
-#, fuzzy
 msgid ""
 "Based on `XEP-0387: XMPP Compliance Suites 2018 "
 "<https://xmpp.org/extensions/xep-0387.html>`__"
 msgstr ""
-"基于`XEP-0387: XMPP Compliance Suites 2018 <https://xmpp.org/extensions/"
+"基于 `XEP-0387: XMPP Compliance Suites 2018 <https://xmpp.org/extensions/"
 "xep-0387.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:8
-#, fuzzy
 msgid "Core Compliance Suite"
 msgstr "核心合规套件"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:10
-#, fuzzy
 msgid "Table 1.Core Compliance Suite"
 msgstr "Table 1.核心合规套件"
 
@@ -342,7 +324,6 @@ msgstr "Table 1.核心合规套件"
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:89
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:106
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:301
-#, fuzzy
 msgid "Support"
 msgstr "支持"
 
@@ -352,7 +333,6 @@ msgstr "支持"
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:89
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:106
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:301
-#, fuzzy
 msgid "Specification"
 msgstr "规格"
 
@@ -645,7 +625,6 @@ msgstr "评论"
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:539
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:541
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:543
-#, fuzzy
 msgid "✓"
 msgstr "✓"
 
@@ -653,49 +632,41 @@ msgstr "✓"
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:56
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:303
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:305
-#, fuzzy
 msgid "`RFC6120 <https://tools.ietf.org/html/rfc6120>`__"
 msgstr "`RFC6120 <https://tools.ietf.org/html/rfc6120>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:16
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:303
-#, fuzzy
 msgid "Extensible Messaging and Presence Protocol (XMPP): Core"
 msgstr "可扩展消息传递和存在协议 (XMPP)：核心"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:18
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:307
-#, fuzzy
 msgid "⍻"
 msgstr "⍻"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:18
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:307
-#, fuzzy
 msgid "`RFC7622 <https://tools.ietf.org/html/rfc7622>`__"
 msgstr "`RFC7622 <https://tools.ietf.org/html/rfc7622>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:18
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:307
-#, fuzzy
 msgid "Extensible Messaging and Presence Protocol (XMPP): Address Format"
 msgstr "可扩展消息传递和存在协议 (XMPP)：地址格式"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:18
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:307
-#, fuzzy
 msgid "We support previous version of the specification: RFC6122"
 msgstr "我们支持旧版本的规范：RFC6122"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:20
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:313
-#, fuzzy
 msgid "`RFC7590 <https://tools.ietf.org/html/rfc7590>`__"
 msgstr "`RFC7590 <https://tools.ietf.org/html/rfc7590>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:20
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:313
-#, fuzzy
 msgid ""
 "Use of Transport Layer Security (TLS) in the Extensible Messaging and "
 "Presence Protocol (XMPP)"
@@ -703,77 +674,64 @@ msgstr "在可扩展消息传递和存在协议 (XMPP) 中使用传输层安全�
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:22
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:541
-#, fuzzy
 msgid "`XEP-0368 <https://xmpp.org/extensions/xep-0368.html>`__"
 msgstr "`XEP-0368 <https://xmpp.org/extensions/xep-0368.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:22
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:541
-#, fuzzy
 msgid "SRV records for XMPP over TLS"
 msgstr "XMPP在TLS 上的 SRV 记录"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:22
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:541
-#, fuzzy
 msgid "Requires adding DNS entries pointing to port 5223"
 msgstr "要求添加指向端口 5223 的 DNS 条目"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:24
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:329
-#, fuzzy
 msgid "`XEP-0030 <https://xmpp.org/extensions/xep-0030.html>`__"
 msgstr "`XEP-0030 <https://xmpp.org/extensions/xep-0030.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:24
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:329
-#, fuzzy
 msgid "Service Discovery"
 msgstr "服务发现"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:26
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:391
-#, fuzzy
 msgid "`XEP-0115 <https://xmpp.org/extensions/xep-0115.html>`__"
 msgstr "`XEP-0115 <https://xmpp.org/extensions/xep-0115.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:26
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:391
-#, fuzzy
 msgid "Entity Capabilities"
 msgstr "实体能力"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:28
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:389
-#, fuzzy
 msgid "`XEP-0114 <https://xmpp.org/extensions/xep-0114.html>`__"
 msgstr "`XEP-0114 <https://xmpp.org/extensions/xep-0114.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:28
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:389
-#, fuzzy
 msgid "Jabber Component Protocol"
 msgstr "Jabber 组件协议"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:30
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:429
-#, fuzzy
 msgid "`XEP-0163 <https://xmpp.org/extensions/xep-0163.html>`__"
 msgstr "`XEP-0163 <https://xmpp.org/extensions/xep-0163.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:30
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:429
-#, fuzzy
 msgid "Personal Eventing Protocol"
 msgstr "个人事件协议"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:34
-#, fuzzy
 msgid "Web Compliance Suite"
 msgstr "网络合规套件"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:36
-#, fuzzy
 msgid "Table 2.Web Compliance Suite"
 msgstr "Table 2.网络合规套件"
 
@@ -781,7 +739,6 @@ msgstr "Table 2.网络合规套件"
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:91
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:309
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:311
-#, fuzzy
 msgid "`RFC7395 <https://tools.ietf.org/html/rfc7395>`__"
 msgstr "`RFC7395 <https://tools.ietf.org/html/rfc7395>`__"
 
@@ -789,7 +746,6 @@ msgstr "`RFC7395 <https://tools.ietf.org/html/rfc7395>`__"
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:91
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:309
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:311
-#, fuzzy
 msgid ""
 "An Extensible Messaging and Presence Protocol (XMPP) Subprotocol for "
 "WebSocket"
@@ -797,41 +753,34 @@ msgstr "WebSocket 的可扩展消息传递和存在协议 (XMPP) 子协议"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:43
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:477
-#, fuzzy
 msgid "`XEP-0206 <https://xmpp.org/extensions/xep-0206.html>`__"
 msgstr "`XEP-0206 <https://xmpp.org/extensions/xep-0206.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:43
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:477
-#, fuzzy
 msgid "XMPP Over BOSH"
 msgstr "BOSH 上的 XMPP"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:45
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:395
-#, fuzzy
 msgid "`XEP-0124 <https://xmpp.org/extensions/xep-0124.html>`__"
 msgstr "`XEP-0124 <https://xmpp.org/extensions/xep-0124.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:45
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:395
-#, fuzzy
 msgid "Bidirectional-streams Over Synchronous HTTP (BOSH)"
 msgstr "同步 HTTP (BOSH)上的双向流"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:49
-#, fuzzy
 msgid "IM Compliance Suite"
 msgstr "IM 合规套件"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:51
-#, fuzzy
 msgid "Table 3.Web Compliance Suite"
 msgstr "Table 3.网络合规套件"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:56
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:305
-#, fuzzy
 msgid ""
 "Extensible Messaging and Presence Protocol (XMPP): Instant Messaging and "
 "Presence"
@@ -839,55 +788,46 @@ msgstr "可扩展消息传递和存在协议 (XMPP)：即时消息传递和存�
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:58
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:369
-#, fuzzy
 msgid "`XEP-0084 <https://xmpp.org/extensions/xep-0084.html>`__"
 msgstr "`XEP-0084 <https://xmpp.org/extensions/xep-0084.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:58
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:369
-#, fuzzy
 msgid "User Avatar"
 msgstr "用户头像"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:60
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:419
-#, fuzzy
 msgid "`XEP-0153 <https://xmpp.org/extensions/xep-0153.html>`__"
 msgstr "`XEP-0153 <https://xmpp.org/extensions/xep-0153.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:60
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:419
-#, fuzzy
 msgid "vCard-Based Avatars"
 msgstr "基于 vCard 的头像"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:62
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:341
-#, fuzzy
 msgid "`XEP-0054 <https://xmpp.org/extensions/xep-0054.html>`__"
 msgstr "`XEP-0054 <https://xmpp.org/extensions/xep-0054.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:62
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:341
-#, fuzzy
 msgid "vcard-temp"
 msgstr "电子名片温度"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:64
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:515
-#, fuzzy
 msgid "`XEP-0280 <https://xmpp.org/extensions/xep-0280.html>`__"
 msgstr "`XEP-0280 <https://xmpp.org/extensions/xep-0280.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:64
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:515
-#, fuzzy
 msgid "Message Carbons"
 msgstr "消息碳"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:66
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:463
-#, fuzzy
 msgid "`XEP-0191 <https://xmpp.org/extensions/xep-0191.html>`__"
 msgstr "`XEP-0191 <https://xmpp.org/extensions/xep-0191.html>`__"
 
@@ -898,75 +838,63 @@ msgstr "阻断命令"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:68
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:331
-#, fuzzy
 msgid "`XEP-0045 <https://xmpp.org/extensions/xep-0045.html>`__"
 msgstr "`XEP-0045 <https://xmpp.org/extensions/xep-0045.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:68
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:331
-#, fuzzy
 msgid "Multi-User Chat"
 msgstr "多用户聊天"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:70
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:501
-#, fuzzy
 msgid "`XEP-0249 <https://xmpp.org/extensions/xep-0249.html>`__"
 msgstr "`XEP-0249 <https://xmpp.org/extensions/xep-0249.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:70
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:501
-#, fuzzy
 msgid "Direct MUC Invitations"
 msgstr "直接 MUC 邀请"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:72
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:335
-#, fuzzy
 msgid "`XEP-0048 <https://xmpp.org/extensions/xep-0048.html>`__"
 msgstr "`XEP-0048 <https://xmpp.org/extensions/xep-0048.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:72
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:335
-#, fuzzy
 msgid "Bookmarks"
 msgstr "书签"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:74
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:483
-#, fuzzy
 msgid "`XEP-0223 <https://xmpp.org/extensions/xep-0223.html>`__"
 msgstr "`XEP-0223 <https://xmpp.org/extensions/xep-0223.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:74
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:483
-#, fuzzy
 msgid "Persistent Storage of Private Data via PubSub"
 msgstr "通过 PubSub 持久存储私有数据"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:76
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:337
-#, fuzzy
 msgid "`XEP-0049 <https://xmpp.org/extensions/xep-0049.html>`__"
 msgstr "`XEP-0049 <https://xmpp.org/extensions/xep-0049.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:76
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:337
-#, fuzzy
 msgid "Private XML Storage"
 msgstr "私人XML 存储"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:78
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:93
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:465
-#, fuzzy
 msgid "`XEP-0198 <https://xmpp.org/extensions/xep-0198.html>`__"
 msgstr "`XEP-0198 <https://xmpp.org/extensions/xep-0198.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:78
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:93
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:465
-#, fuzzy
 msgid "Stream Management"
 msgstr "流管理"
 
@@ -978,29 +906,24 @@ msgstr "``Session Resumption`` 和``Stanza Acknowledgements``"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:80
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:523
-#, fuzzy
 msgid "`XEP-0313 <https://xmpp.org/extensions/xep-0313.html>`__"
 msgstr "`XEP-0313 <https://xmpp.org/extensions/xep-0313.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:80
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:523
-#, fuzzy
 msgid "Message Archive Management"
 msgstr "消息归档管理"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:84
-#, fuzzy
 msgid "Mobile Compliance Suite"
 msgstr "移动合规套件"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:86
-#, fuzzy
 msgid "Table 4.Web Compliance Suite"
 msgstr "Table 4.网络合规套件"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:95
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:535
-#, fuzzy
 msgid "`XEP-0352 <https://xmpp.org/extensions/xep-0352.html>`__"
 msgstr "`XEP-0352 <https://xmpp.org/extensions/xep-0352.html>`__"
 
@@ -1011,7 +934,6 @@ msgstr "客户端状态指示"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:97
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:537
-#, fuzzy
 msgid "`XEP-0357 <https://xmpp.org/extensions/xep-0357.html>`__"
 msgstr "`XEP-0357 <https://xmpp.org/extensions/xep-0357.html>`__"
 
@@ -1021,42 +943,35 @@ msgid "Push Notifications"
 msgstr "推送通知"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:101
-#, fuzzy
 msgid "Non-Compliance Suite Extensions"
 msgstr "不合规套件扩展"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:103
-#, fuzzy
 msgid "Table 5.Core Compliance Suite"
 msgstr "Table 5.核心合规套件"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:108
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:315
-#, fuzzy
 msgid "`XEP-0004 <https://xmpp.org/extensions/xep-0004.html>`__"
 msgstr "`XEP-0004 <https://xmpp.org/extensions/xep-0004.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:108
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:315
-#, fuzzy
 msgid "Data Forms"
 msgstr "数据表单"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:110
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:317
-#, fuzzy
 msgid "`XEP-0008 <https://xmpp.org/extensions/xep-0004.html>`__"
 msgstr "`XEP-0008 <https://xmpp.org/extensions/xep-0004.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:110
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:317
-#, fuzzy
 msgid "IQ-Based Avatars"
 msgstr "基于 IQ 的头像"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:112
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:319
-#, fuzzy
 msgid "`XEP-0012 <https://xmpp.org/extensions/xep-0012.html>`__"
 msgstr "`XEP-0012 <https://xmpp.org/extensions/xep-0012.html>`__"
 
@@ -1067,31 +982,26 @@ msgstr "最后的活动"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:114
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:321
-#, fuzzy
 msgid "`XEP-0013 <https://xmpp.org/extensions/xep-0013.html>`__"
 msgstr "`XEP-0013 <https://xmpp.org/extensions/xep-0013.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:114
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:321
-#, fuzzy
 msgid "Flexible Offline Message Retrieval"
 msgstr "灵活的离线消息检索"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:116
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:323
-#, fuzzy
 msgid "`XEP-0016 <https://xmpp.org/extensions/xep-0016.html>`__"
 msgstr "`XEP-0016 <https://xmpp.org/extensions/xep-0016.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:116
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:323
-#, fuzzy
 msgid "Privacy Lists"
 msgstr "隐私列表"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:118
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:325
-#, fuzzy
 msgid "`XEP-0020 <https://xmpp.org/extensions/xep-0020.html>`__"
 msgstr "`XEP-0020 <https://xmpp.org/extensions/xep-0020.html>`__"
 
@@ -1102,175 +1012,146 @@ msgstr "功能协商"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:120
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:327
-#, fuzzy
 msgid "`XEP-0022 <https://xmpp.org/extensions/xep-0022.html>`__"
 msgstr "`XEP-0022 <https://xmpp.org/extensions/xep-0022.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:120
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:327
-#, fuzzy
 msgid "Message Events"
 msgstr "消息事件"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:122
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:333
-#, fuzzy
 msgid "`XEP-0047 <https://xmpp.org/extensions/xep-0047.html>`__"
 msgstr "`XEP-0047 <https://xmpp.org/extensions/xep-0047.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:122
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:333
-#, fuzzy
 msgid "In-Band Bytestreams"
 msgstr "带内字节流"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:124
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:339
-#, fuzzy
 msgid "`XEP-0050 <https://xmpp.org/extensions/xep-0050.html>`__"
 msgstr "`XEP-0050 <https://xmpp.org/extensions/xep-0050.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:124
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:339
-#, fuzzy
 msgid "Ad-Hoc Commands"
 msgstr "临时命令"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:126
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:343
-#, fuzzy
 msgid "`XEP-0059 <https://xmpp.org/extensions/xep-0059.html>`__"
 msgstr "`XEP-0059 <https://xmpp.org/extensions/xep-0059.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:126
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:343
-#, fuzzy
 msgid "Result Set Management"
 msgstr "结果集管理"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:128
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:345
-#, fuzzy
 msgid "`XEP-0060 <https://xmpp.org/extensions/xep-0060.html>`__"
 msgstr "`XEP-0060 <https://xmpp.org/extensions/xep-0060.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:128
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:345
-#, fuzzy
 msgid "Publish-Subscribe"
 msgstr "发布-订阅"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:130
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:347
-#, fuzzy
 msgid "`XEP-0065 <https://xmpp.org/extensions/xep-0065.html>`__"
 msgstr "`XEP-0065 <https://xmpp.org/extensions/xep-0065.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:130
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:347
-#, fuzzy
 msgid "SOCKS5 Bytestreams"
 msgstr "SOCKS5 字节流"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:132
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:349
-#, fuzzy
 msgid "`XEP-0066 <https://xmpp.org/extensions/xep-0066.html>`__"
 msgstr "`XEP-0066 <https://xmpp.org/extensions/xep-0066.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:132
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:349
-#, fuzzy
 msgid "Out of Band Data"
 msgstr "带外数据"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:134
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:351
-#, fuzzy
 msgid "`XEP-0068 <https://xmpp.org/extensions/xep-0068.html>`__"
 msgstr "`XEP-0068 <https://xmpp.org/extensions/xep-0068.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:134
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:351
-#, fuzzy
 msgid "Field Standardization for Data Forms"
 msgstr "数据表单的字段标准化"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:136
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:353
-#, fuzzy
 msgid "`XEP-0071 <https://xmpp.org/extensions/xep-0071.html>`__"
 msgstr "`XEP-0071 <https://xmpp.org/extensions/xep-0071.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:136
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:353
-#, fuzzy
 msgid "XHTML-IM"
 msgstr "XHTML-IM"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:138
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:355
-#, fuzzy
 msgid "`XEP-0072 <https://xmpp.org/extensions/xep-0072.html>`__"
 msgstr "`XEP-0072 <https://xmpp.org/extensions/xep-0072.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:138
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:355
-#, fuzzy
 msgid "SOAP Over XMPP"
 msgstr "XMPP 上的 SOAP"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:140
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:357
-#, fuzzy
 msgid "`XEP-0077 <https://xmpp.org/extensions/xep-0077.html>`__"
 msgstr "`XEP-0077 <https://xmpp.org/extensions/xep-0077.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:140
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:357
-#, fuzzy
 msgid "In-Band Registration"
 msgstr "带内注册"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:142
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:359
-#, fuzzy
 msgid "`XEP-0078 <https://xmpp.org/extensions/xep-0078.html>`__"
 msgstr "`XEP-0078 <https://xmpp.org/extensions/xep-0078.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:142
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:359
-#, fuzzy
 msgid "Non-SASL Authentication"
 msgstr "非 SASL 身份验证"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:144
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:361
-#, fuzzy
 msgid "`XEP-0079 <https://xmpp.org/extensions/xep-0079.html>`__"
 msgstr "`XEP-0079 <https://xmpp.org/extensions/xep-0079.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:144
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:361
-#, fuzzy
 msgid "Advanced Message Processing"
 msgstr "高级消息处理"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:146
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:363
-#, fuzzy
 msgid "`XEP-0080 <https://xmpp.org/extensions/xep-0080.html>`__"
 msgstr "`XEP-0080 <https://xmpp.org/extensions/xep-0080.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:146
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:363
-#, fuzzy
 msgid "User Location"
 msgstr "用户位置"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:148
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:365
-#, fuzzy
 msgid "`XEP-0082 <https://xmpp.org/extensions/xep-0082.html>`__"
 msgstr "`XEP-0082 <https://xmpp.org/extensions/xep-0082.html>`__"
 
@@ -1281,31 +1162,26 @@ msgstr "XMPP 日期和时序"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:150
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:367
-#, fuzzy
 msgid "`XEP-0083 <https://xmpp.org/extensions/xep-0083.html>`__"
 msgstr "`XEP-0083 <https://xmpp.org/extensions/xep-0083.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:150
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:367
-#, fuzzy
 msgid "Nested Roster Groups"
 msgstr "嵌套名册组"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:152
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:371
-#, fuzzy
 msgid "`XEP-0085 <https://xmpp.org/extensions/xep-0085.html>`__"
 msgstr "`XEP-0085 <https://xmpp.org/extensions/xep-0085.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:152
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:371
-#, fuzzy
 msgid "Chat State Notifications"
 msgstr "聊天状态通知"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:154
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:373
-#, fuzzy
 msgid "`XEP-0086 <https://xmpp.org/extensions/xep-0086.html>`__"
 msgstr "`XEP-0086 <https://xmpp.org/extensions/xep-0086.html>`__"
 
@@ -1316,73 +1192,61 @@ msgstr "错误条件映射"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:156
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:375
-#, fuzzy
 msgid "`XEP-0091 <https://xmpp.org/extensions/xep-0091.html>`__"
 msgstr "`XEP-0091 <https://xmpp.org/extensions/xep-0091.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:156
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:375
-#, fuzzy
 msgid "Legacy Delayed Delivery"
 msgstr "旧版延迟交付"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:158
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:377
-#, fuzzy
 msgid "`XEP-0092 <https://xmpp.org/extensions/xep-0092.html>`__"
 msgstr "`XEP-0092 <https://xmpp.org/extensions/xep-0092.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:158
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:377
-#, fuzzy
 msgid "Software Version"
 msgstr "软件版本"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:160
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:379
-#, fuzzy
 msgid "`XEP-0096 <https://xmpp.org/extensions/xep-0096.html>`__"
 msgstr "`XEP-0096 <https://xmpp.org/extensions/xep-0096.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:160
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:379
-#, fuzzy
 msgid "File Transfer"
 msgstr "文件传输"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:162
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:381
-#, fuzzy
 msgid "`XEP-0100 <https://xmpp.org/extensions/xep-0100.html>`__"
 msgstr "`XEP-0100 <https://xmpp.org/extensions/xep-0100.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:162
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:381
-#, fuzzy
 msgid "Gateway Interaction"
 msgstr "网关交互"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:164
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:383
-#, fuzzy
 msgid "`XEP-0106 <https://xmpp.org/extensions/xep-0106.html>`__"
 msgstr "`XEP-0106 <https://xmpp.org/extensions/xep-0106.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:164
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:383
-#, fuzzy
 msgid "JID Escaping"
 msgstr "JID 逃逸"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:166
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:385
-#, fuzzy
 msgid "`XEP-0107 <https://xmpp.org/extensions/xep-0107.html>`__"
 msgstr "`XEP-0107 <https://xmpp.org/extensions/xep-0107.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:166
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:385
-#, fuzzy
 msgid "User Mood"
 msgstr "用户心情"
 
@@ -1397,121 +1261,101 @@ msgstr "通过``Personal Eventing Protocol (XEP-0163)``支持服务器"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:168
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:387
-#, fuzzy
 msgid "`XEP-0108 <https://xmpp.org/extensions/xep-0108.html>`__"
 msgstr "`XEP-0108 <https://xmpp.org/extensions/xep-0108.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:168
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:387
-#, fuzzy
 msgid "User Activity"
 msgstr "用户活动"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:170
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:393
-#, fuzzy
 msgid "`XEP-0118 <https://xmpp.org/extensions/xep-0118.html>`__"
 msgstr "`XEP-0118 <https://xmpp.org/extensions/xep-0118.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:170
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:393
-#, fuzzy
 msgid "User Tune"
 msgstr "用户调谐"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:172
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:399
-#, fuzzy
 msgid "`XEP-0127 <https://xmpp.org/extensions/xep-0127.html>`__"
 msgstr "`XEP-0127 <https://xmpp.org/extensions/xep-0127.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:172
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:399
-#, fuzzy
 msgid "Common Alerting Protocol (CAP) Over XMPP"
 msgstr "XMPP 上的通用警报协议 (CAP)"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:174
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:397
-#, fuzzy
 msgid "`XEP-0128 <https://xmpp.org/extensions/xep-0128.html>`__"
 msgstr "`XEP-0128 <https://xmpp.org/extensions/xep-0128.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:174
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:397
-#, fuzzy
 msgid "Service Discovery Extensions"
 msgstr "服务发现扩展"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:176
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:401
-#, fuzzy
 msgid "`XEP-0131 <https://xmpp.org/extensions/xep-0131.html>`__"
 msgstr "`XEP-0131 <https://xmpp.org/extensions/xep-0131.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:176
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:401
-#, fuzzy
 msgid "Stanza Headers and Internet Metadata (SHIM)"
 msgstr "节标题和 Internet 元数据 (SHIM)"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:178
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:403
-#, fuzzy
 msgid "`XEP-0133 <https://xmpp.org/extensions/xep-0133.html>`__"
 msgstr "`XEP-0133 <https://xmpp.org/extensions/xep-0133.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:178
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:403
-#, fuzzy
 msgid "Service Administration"
 msgstr "服务管理"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:180
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:405
-#, fuzzy
 msgid "`XEP-0136 <https://xmpp.org/extensions/xep-0136.html>`__"
 msgstr "`XEP-0136 <https://xmpp.org/extensions/xep-0136.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:180
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:405
-#, fuzzy
 msgid "Message Archiving"
 msgstr "消息归档"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:182
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:407
-#, fuzzy
 msgid "`XEP-0141 <https://xmpp.org/extensions/xep-0141.html>`__"
 msgstr "`XEP-0141 <https://xmpp.org/extensions/xep-0141.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:182
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:407
-#, fuzzy
 msgid "Data Forms Layout"
 msgstr "数据表单布局"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:12
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:184
-#, fuzzy
 msgid "✓ [#]_"
 msgstr "✓ [#]_"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:184
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:409
-#, fuzzy
 msgid "`XEP-0142 <https://xmpp.org/extensions/xep-0142.html>`__"
 msgstr "`XEP-0142 <https://xmpp.org/extensions/xep-0142.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:184
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:409
-#, fuzzy
 msgid "Workgroup Queues"
 msgstr "工作组队列"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:186
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:411
-#, fuzzy
 msgid "`XEP-0144 <https://xmpp.org/extensions/xep-0144.html>`__"
 msgstr "`XEP-0144 <https://xmpp.org/extensions/xep-0144.html>`__"
 
@@ -1522,157 +1366,131 @@ msgstr "名册项目交换"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:188
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:413
-#, fuzzy
 msgid "`XEP-0145 <https://xmpp.org/extensions/xep-0145.html>`__"
 msgstr "`XEP-0145 <https://xmpp.org/extensions/xep-0145.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:188
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:413
-#, fuzzy
 msgid "Annotations"
 msgstr "注释"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:190
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:415
-#, fuzzy
 msgid "`XEP-0146 <https://xmpp.org/extensions/xep-0146.html>`__"
 msgstr "`XEP-0146 <https://xmpp.org/extensions/xep-0146.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:190
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:415
-#, fuzzy
 msgid "Remote Controlling Clients"
 msgstr "远程控制客户端"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:192
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:417
-#, fuzzy
 msgid "`XEP-0152 <https://xmpp.org/extensions/xep-0152.html>`__"
 msgstr "`XEP-0152 <https://xmpp.org/extensions/xep-0152.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:192
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:417
-#, fuzzy
 msgid "Reachability Addresses"
 msgstr "可达地址"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:194
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:421
-#, fuzzy
 msgid "`XEP-0155 <https://xmpp.org/extensions/xep-0155.html>`__"
 msgstr "`XEP-0155 <https://xmpp.org/extensions/xep-0155.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:194
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:421
-#, fuzzy
 msgid "Stanza Session Negotiation"
 msgstr "节会话协商"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:196
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:423
-#, fuzzy
 msgid "`XEP-0156 <https://xmpp.org/extensions/xep-0156.html>`__"
 msgstr "`XEP-0156 <https://xmpp.org/extensions/xep-0156.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:196
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:423
-#, fuzzy
 msgid "Discovering Alternative XMPP Connection Methods"
 msgstr "发现可替代 的XMPP 连接方法"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:196
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:423
-#, fuzzy
 msgid "Uses DNS records, so will work with Tigase XMPP Server"
 msgstr "使用 DNS 记录，这样其可以与 Tigase XMPP 服务器一起使用"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:198
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:425
-#, fuzzy
 msgid "`XEP-0157 <https://xmpp.org/extensions/xep-0157.html>`__"
 msgstr "`XEP-0157 <https://xmpp.org/extensions/xep-0157.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:198
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:425
-#, fuzzy
 msgid "Contact Addresses for XMPP Services"
 msgstr "XMPP 服务的联系地址"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:200
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:427
-#, fuzzy
 msgid "`XEP-0160 <https://xmpp.org/extensions/xep-0160.html>`__"
 msgstr "`XEP-0160 <https://xmpp.org/extensions/xep-0160.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:200
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:427
-#, fuzzy
 msgid "Best Practices for Handling Offline Messages"
 msgstr "处理离线消息的最佳实践"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:202
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:431
-#, fuzzy
 msgid "`XEP-0166 <https://xmpp.org/extensions/xep-0166.html>`__"
 msgstr "`XEP-0166 <https://xmpp.org/extensions/xep-0166.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:202
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:431
-#, fuzzy
 msgid "Jingle"
 msgstr "Jingle"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:204
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:433
-#, fuzzy
 msgid "`XEP-0167 <https://xmpp.org/extensions/xep-0167.html>`__"
 msgstr "`XEP-0167 <https://xmpp.org/extensions/xep-0167.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:204
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:433
-#, fuzzy
 msgid "Jingle RTP Sessions"
 msgstr "Jingle RTP 会话"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:206
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:435
-#, fuzzy
 msgid "`XEP-0170 <https://xmpp.org/extensions/xep-0170.html>`__"
 msgstr "`XEP-0170 <https://xmpp.org/extensions/xep-0170.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:206
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:435
-#, fuzzy
 msgid "Recommended Order of Stream Feature Negotiation"
 msgstr "流特征协商的推荐顺序"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:208
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:437
-#, fuzzy
 msgid "`XEP-0171 <https://xmpp.org/extensions/xep-0171.html>`__"
 msgstr "`XEP-0171 <https://xmpp.org/extensions/xep-0171.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:208
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:437
-#, fuzzy
 msgid "Language Translation"
 msgstr "语言翻译"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:210
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:439
-#, fuzzy
 msgid "`XEP-0172 <https://xmpp.org/extensions/xep-0172.html>`__"
 msgstr "`XEP-0172 <https://xmpp.org/extensions/xep-0172.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:210
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:439
-#, fuzzy
 msgid "User Nickname"
 msgstr "用户昵称"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:212
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:441
-#, fuzzy
 msgid "`XEP-0174 <https://xmpp.org/extensions/xep-0174.html>`__"
 msgstr "`XEP-0174 <https://xmpp.org/extensions/xep-0174.html>`__"
 
@@ -1683,493 +1501,411 @@ msgstr "无服务器消息传递"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:214
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:443
-#, fuzzy
 msgid "`XEP-0175 <https://xmpp.org/extensions/xep-0175.html>`__"
 msgstr "`XEP-0175 <https://xmpp.org/extensions/xep-0175.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:214
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:443
-#, fuzzy
 msgid "Best Practices for Use of SASL ANONYMOUS"
 msgstr "使用 SASL ANONYMOUS 的最佳实践"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:216
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:445
-#, fuzzy
 msgid "`XEP-0176 <https://xmpp.org/extensions/xep-0176.html>`__"
 msgstr "`XEP-0176 <https://xmpp.org/extensions/xep-0176.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:216
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:445
-#, fuzzy
 msgid "Jingle ICE-UDP Transport Method"
 msgstr "Jingle ICE-UDP 传输方法"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:218
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:447
-#, fuzzy
 msgid "`XEP-0177 <https://xmpp.org/extensions/xep-0177.html>`__"
 msgstr "`XEP-0177 <https://xmpp.org/extensions/xep-0177.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:218
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:447
-#, fuzzy
 msgid "Jingle Raw UDP Transport Method"
 msgstr "Jingle 原始 UDP 传输方法"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:220
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:449
-#, fuzzy
 msgid "`XEP-0178 <https://xmpp.org/extensions/xep-0178.html>`__"
 msgstr "`XEP-0178 <https://xmpp.org/extensions/xep-0178.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:220
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:449
-#, fuzzy
 msgid "Best Practices for Use of SASL EXTERNAL with Certificates"
 msgstr "使用带有证书的 SASL EXTERNAL 的最佳实践"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:222
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:451
-#, fuzzy
 msgid "`XEP-0179 <https://xmpp.org/extensions/xep-0179.html>`__"
 msgstr "`XEP-0179 <https://xmpp.org/extensions/xep-0179.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:222
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:451
-#, fuzzy
 msgid "Jingle IAX Transport Method"
 msgstr "Jingle IAX传输方式"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:224
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:453
-#, fuzzy
 msgid "`XEP-0180 <https://xmpp.org/extensions/xep-0180.html>`__"
 msgstr "`XEP-0180 <https://xmpp.org/extensions/xep-0180.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:224
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:453
-#, fuzzy
 msgid "Jingle Video via RTP"
 msgstr "通过RTP的Jingle 视频"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:226
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:455
-#, fuzzy
 msgid "`XEP-0181 <https://xmpp.org/extensions/xep-0181.html>`__"
 msgstr "`XEP-0181 <https://xmpp.org/extensions/xep-0181.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:226
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:455
-#, fuzzy
 msgid "Jingle DTMF"
 msgstr "Jingle DTMF"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:228
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:457
-#, fuzzy
 msgid "`XEP-0184 <https://xmpp.org/extensions/xep-0184.html>`__"
 msgstr "`XEP-0184 <https://xmpp.org/extensions/xep-0184.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:228
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:457
-#, fuzzy
 msgid "Message Receipts"
 msgstr "消息回执"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:230
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:459
-#, fuzzy
 msgid "`XEP-0185 <https://xmpp.org/extensions/xep-0185.html>`__"
 msgstr "`XEP-0185 <https://xmpp.org/extensions/xep-0185.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:230
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:459
-#, fuzzy
 msgid "Dialback Key Generation and Validation"
 msgstr "回拨密钥生成和验证"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:232
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:461
-#, fuzzy
 msgid "`XEP-0190 <https://xmpp.org/extensions/xep-0190.html>`__"
 msgstr "`XEP-0190 <https://xmpp.org/extensions/xep-0190.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:232
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:461
-#, fuzzy
 msgid "Best Practice for Closing Idle Streams"
 msgstr "关闭空闲流的最佳实践"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:234
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:467
-#, fuzzy
 msgid "`XEP-0199 <https://xmpp.org/extensions/xep-0199.html>`__"
 msgstr "`XEP-0199 <https://xmpp.org/extensions/xep-0199.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:234
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:467
-#, fuzzy
 msgid "XMPP Ping"
 msgstr "XMPP Ping"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:236
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:469
-#, fuzzy
 msgid "`XEP-0201 <https://xmpp.org/extensions/xep-0201.html>`__"
 msgstr "`XEP-0201 <https://xmpp.org/extensions/xep-0201.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:236
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:469
-#, fuzzy
 msgid "Best Practices for Message Threads"
 msgstr "消息线程的最佳实践"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:238
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:471
-#, fuzzy
 msgid "`XEP-0202 <https://xmpp.org/extensions/xep-0202.html>`__"
 msgstr "`XEP-0202 <https://xmpp.org/extensions/xep-0202.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:238
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:471
-#, fuzzy
 msgid "Entity Time"
 msgstr "实体时间"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:240
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:473
-#, fuzzy
 msgid "`XEP-0203 <https://xmpp.org/extensions/xep-0203.html>`__"
 msgstr "`XEP-0203 <https://xmpp.org/extensions/xep-0203.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:240
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:473
-#, fuzzy
 msgid "Delayed Delivery"
 msgstr "延迟交付"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:242
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:475
-#, fuzzy
 msgid "`XEP-0205 <https://xmpp.org/extensions/xep-0205.html>`__"
 msgstr "`XEP-0205 <https://xmpp.org/extensions/xep-0205.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:242
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:475
-#, fuzzy
 msgid "Best Practices to Discourage Denial of Service Attacks"
 msgstr "阻止阻断服务攻击的最佳实践"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:244
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:479
-#, fuzzy
 msgid "`XEP-0209 <https://xmpp.org/extensions/xep-0209.html>`__"
 msgstr "`XEP-0209 <https://xmpp.org/extensions/xep-0209.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:244
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:479
-#, fuzzy
 msgid "Metacontacts"
 msgstr "元联系人"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:246
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:481
-#, fuzzy
 msgid "`XEP-0220 <https://xmpp.org/extensions/xep-0220.html>`__"
 msgstr "`XEP-0220 <https://xmpp.org/extensions/xep-0220.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:246
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:481
-#, fuzzy
 msgid "Server Dialback"
 msgstr "服务器回拨"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:248
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:485
-#, fuzzy
 msgid "`XEP-0224 <https://xmpp.org/extensions/xep-0224.html>`__"
 msgstr "`XEP-0224 <https://xmpp.org/extensions/xep-0224.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:248
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:485
-#, fuzzy
 msgid "Attention"
 msgstr "注意"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:250
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:487
-#, fuzzy
 msgid "`XEP-0225 <https://xmpp.org/extensions/xep-0225.html>`__"
 msgstr "`XEP-0225 <https://xmpp.org/extensions/xep-0225.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:250
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:487
-#, fuzzy
 msgid "Component Connections"
 msgstr "组件连接"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:252
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:489
-#, fuzzy
 msgid "`XEP-0226 <https://xmpp.org/extensions/xep-0226.html>`__"
 msgstr "`XEP-0226 <https://xmpp.org/extensions/xep-0226.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:252
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:489
-#, fuzzy
 msgid "Message Stanza Profiles"
 msgstr "消息节配置"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:254
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:491
-#, fuzzy
 msgid "`XEP-0231 <https://xmpp.org/extensions/xep-0231.html>`__"
 msgstr "`XEP-0231 <https://xmpp.org/extensions/xep-0231.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:254
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:491
-#, fuzzy
 msgid "Bits of Binary"
 msgstr "二进制位"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:256
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:493
-#, fuzzy
 msgid "`XEP-0234 <https://xmpp.org/extensions/xep-0234.html>`__"
 msgstr "`XEP-0234 <https://xmpp.org/extensions/xep-0234.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:256
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:493
-#, fuzzy
 msgid "Jingle File Transfer"
 msgstr "Jingle 文件传输"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:258
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:495
-#, fuzzy
 msgid "`XEP-0245 <https://xmpp.org/extensions/xep-0245.html>`__"
 msgstr "`XEP-0245 <https://xmpp.org/extensions/xep-0245.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:258
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:495
-#, fuzzy
 msgid "The /me Command"
 msgstr "/me 命令"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:260
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:497
-#, fuzzy
 msgid "`XEP-0246 <https://xmpp.org/extensions/xep-0246.html>`__"
 msgstr "`XEP-0246 <https://xmpp.org/extensions/xep-0246.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:260
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:497
-#, fuzzy
 msgid "End-to-End XML Streams"
 msgstr "端到端 XML 流"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:262
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:499
-#, fuzzy
 msgid "`XEP-0247 <https://xmpp.org/extensions/xep-0247.html>`__"
 msgstr "`XEP-0247 <https://xmpp.org/extensions/xep-0247.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:262
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:499
-#, fuzzy
 msgid "Jingle XML Streams"
 msgstr "Jingle XML 流"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:264
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:503
-#, fuzzy
 msgid "`XEP-0250 <https://xmpp.org/extensions/xep-0250.html>`__"
 msgstr "`XEP-0250 <https://xmpp.org/extensions/xep-0250.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:264
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:503
-#, fuzzy
 msgid "C2C Authentication Using TLS"
 msgstr "使用 TLS 的 C2C 身份验证"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:266
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:505
-#, fuzzy
 msgid "`XEP-0251 <https://xmpp.org/extensions/xep-0251.html>`__"
 msgstr "`XEP-0251 <https://xmpp.org/extensions/xep-0251.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:266
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:505
-#, fuzzy
 msgid "Jingle Session Transfer"
 msgstr "Jingle 会话转移"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:268
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:507
-#, fuzzy
 msgid "`XEP-0260 <https://xmpp.org/extensions/xep-0260.html>`__"
 msgstr "`XEP-0260 <https://xmpp.org/extensions/xep-0260.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:268
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:507
-#, fuzzy
 msgid "Jingle SOCKS5 Bytestreams Transport Method"
 msgstr "Jingle SOCKS5 字节流传输方法"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:270
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:509
-#, fuzzy
 msgid "`XEP-0261 <https://xmpp.org/extensions/xep-0261.html>`__"
 msgstr "`XEP-0261 <https://xmpp.org/extensions/xep-0261.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:270
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:509
-#, fuzzy
 msgid "Jingle In-Band Bytestreams Transport"
 msgstr "Jingle 带内字节流传输"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:272
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:511
-#, fuzzy
 msgid "`XEP-0262 <https://xmpp.org/extensions/xep-0262.html>`__"
 msgstr "`XEP-0262 <https://xmpp.org/extensions/xep-0262.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:272
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:511
-#, fuzzy
 msgid "Use of ZRTP in Jingle RTP Sessions"
 msgstr "在 Jingle RTP 会话中使用 ZRTP"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:274
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:513
-#, fuzzy
 msgid "`XEP-0277 <https://xmpp.org/extensions/xep-0277.html>`__"
 msgstr "`XEP-0277 <https://xmpp.org/extensions/xep-0277.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:274
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:513
-#, fuzzy
 msgid "Microblogging over XMPP"
 msgstr "XMPP 上的微博"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:276
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:517
-#, fuzzy
 msgid "`XEP-0292 <https://xmpp.org/extensions/xep-0292.html>`__"
 msgstr "`XEP-0292 <https://xmpp.org/extensions/xep-0292.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:276
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:517
-#, fuzzy
 msgid "vCard4 Over XMPP"
 msgstr "XMPP 上的 vCard4"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:278
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:519
-#, fuzzy
 msgid "`XEP-0301 <https://xmpp.org/extensions/xep-0301.html>`__"
 msgstr "`XEP-0301 <https://xmpp.org/extensions/xep-0301.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:278
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:519
-#, fuzzy
 msgid "In-Band Real Time Text"
 msgstr "带内实时文本"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:280
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:521
-#, fuzzy
 msgid "`XEP-0305 <https://xmpp.org/extensions/xep-0305.html>`__"
 msgstr "`XEP-0305 <https://xmpp.org/extensions/xep-0305.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:280
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:521
-#, fuzzy
 msgid "XMPP Quickstart"
 msgstr "XMPP 快速入门"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:282
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:525
-#, fuzzy
 msgid "`XEP-0323 <https://xmpp.org/extensions/xep-0323.html>`__"
 msgstr "`XEP-0323 <https://xmpp.org/extensions/xep-0323.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:282
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:525
-#, fuzzy
 msgid "Internet of Things - Sensor Data"
 msgstr "物联网 - 传感器数据"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:284
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:527
-#, fuzzy
 msgid "`XEP-0324 <https://xmpp.org/extensions/xep-0324.html>`__"
 msgstr "`XEP-0324 <https://xmpp.org/extensions/xep-0324.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:284
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:527
-#, fuzzy
 msgid "Internet of Things - Provisioning"
 msgstr "物联网 - 开通"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:286
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:529
-#, fuzzy
 msgid "`XEP-0325 <https://xmpp.org/extensions/xep-0325.html>`__"
 msgstr "`XEP-0325 <https://xmpp.org/extensions/xep-0325.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:286
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:529
-#, fuzzy
 msgid "Internet of Things - Control"
 msgstr "物联网 - 控制"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:288
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:531
-#, fuzzy
 msgid "`XEP-0326 <https://xmpp.org/extensions/xep-0326.html>`__"
 msgstr "`XEP-0326 <https://xmpp.org/extensions/xep-0326.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:288
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:531
-#, fuzzy
 msgid "Internet of Things - Concentrators"
 msgstr "物联网 - 集中器"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:290
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:533
-#, fuzzy
 msgid "`XEP-0333 <https://xmpp.org/extensions/xep-0333.html>`__"
 msgstr "`XEP-0333 <https://xmpp.org/extensions/xep-0333.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:290
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:533
-#, fuzzy
 msgid "Chat Markers"
 msgstr "聊天标记"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:292
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:539
-#, fuzzy
 msgid "`XEP-0363 <https://xmpp.org/extensions/xep-0363.html>`__"
 msgstr "`XEP-0363 <https://xmpp.org/extensions/xep-0363.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:292
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:539
-#, fuzzy
 msgid "HTTP File Upload"
 msgstr "HTTP 文件上传"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:294
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:543
-#, fuzzy
 msgid "`XEP-0387 <https://xmpp.org/extensions/xep-0387.html>`__"
 msgstr "`XEP-0387 <https://xmpp.org/extensions/xep-0387.html>`__"
 
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:294
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:543
-#, fuzzy
 msgid "XMPP Compliance Suites 2018"
 msgstr "XMPP 合规性套件 2018"
 
@@ -2179,7 +1915,6 @@ msgstr "支持的 RFC 和 XEP 的完整有序列表："
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:80
 #: ../../Tigase_Administration/XMPP_Server/Supported_Extension.inc:547
-#, fuzzy
 msgid "Requires commercial license"
 msgstr "要求商业许可证"
 
@@ -2188,17 +1923,14 @@ msgid "Tigase Custom Extensions"
 msgstr "Tigase 自定义扩展"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:5
-#, fuzzy
 msgid "General features"
 msgstr "综合特征"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:7
-#, fuzzy
 msgid "tabel 6.Monitoring"
 msgstr "tabel 6.监控"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:12
-#, fuzzy
 msgid "AuditLog"
 msgstr "审计日志"
 
@@ -2209,56 +1941,46 @@ msgid ""
 msgstr "能够记录系统中的重要事件（登录，消息交换，呼叫）"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:14
-#, fuzzy
 msgid "Anti Abuse"
 msgstr "反滥用"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:14
-#, fuzzy
 msgid "Fight stanza SPAM, DoS, brute-force attacks and other threats"
 msgstr "打击stanza SPAM、DoS、暴力攻击和其他威胁"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:16
-#, fuzzy
 msgid "Virtual domains"
 msgstr "虚拟域"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:16
-#, fuzzy
 msgid ""
 "Ability to create and manage multiple virtual domains from a single "
 "instance and restart-less management"
 msgstr "能够从单个实例创建和管理多个虚拟域并且无需重新启动管理"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:18
-#, fuzzy
 msgid "MUC subscribe for offline push"
 msgstr "MUC订阅离线推送"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:18
-#, fuzzy
 msgid ""
 "Option to register permanently to the room to receive push notifications "
 "about new messages."
 msgstr "可选择永久注册到房间以接收新消息的推送通知。"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:20
-#, fuzzy
 msgid "Scripting API"
 msgstr "脚本 API"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:20
-#, fuzzy
 msgid "Supports the Java Scripting API JSR-223"
 msgstr "支持 Java 脚本 API JSR-223"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:22
-#, fuzzy
 msgid "JMX monitoring"
 msgstr "JMX 监控"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:22
-#, fuzzy
 msgid ""
 "Advanced monitoring the server via JMX protocol with an API for "
 "connecting custom monitors and TCP/IP end-point for connecting general "
@@ -2267,7 +1989,6 @@ msgstr "通过 JMX 协议来连接自定义监视器的 API 和连接通用 JMX 
 "端点对服务器进行高级监控"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:24
-#, fuzzy
 msgid "HTTP monitoring"
 msgstr "HTTP 监控"
 
@@ -2308,7 +2029,6 @@ msgstr "Bosh 会话缓存 - 一种快速重新加载用户数据的功能 - 网�
 "客户端（例如在网页重新加载后）的名册，出现和消息历史记录"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:32
-#, fuzzy
 msgid "Clustering"
 msgstr "集群"
 
@@ -2320,17 +2040,14 @@ msgstr "对 HA 和 LB "
 "的完整集群支持，具有插入式集群策略，从而可完美优化集群到客户端系统"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:34
-#, fuzzy
 msgid "Advanced Clustering Strategy"
 msgstr "高级聚群策略"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:34
-#, fuzzy
 msgid "Dedicated, specialised clustering strategy for best possible performance"
 msgstr "专用和专门的集群策略以获得最佳性能"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:36
-#, fuzzy
 msgid "MUC Clustered"
 msgstr "MUC 集群"
 
@@ -2339,7 +2056,6 @@ msgid "Support for clustering group chatrooms with various, pluggable strategies
 msgstr "支持具有各种插入式策略的集群群组聊天室"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:38
-#, fuzzy
 msgid "PubSub Clustered"
 msgstr "PubSub 集群"
 
@@ -2348,7 +2064,6 @@ msgid "Support for clustering PubSub component with various, pluggable strategie
 msgstr "支持使用各种插入式策略对 PubSub 组件进行集群"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:40
-#, fuzzy
 msgid "Mobile optimisations"
 msgstr "移动优化"
 
@@ -2357,97 +2072,80 @@ msgid "Optimizations designed for Mobile Devices"
 msgstr "对移动设备的优化设计"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:42
-#, fuzzy
 msgid "OSGi"
 msgstr "OSGi"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:42
-#, fuzzy
 msgid ""
 "Support for running in OSGi environment, i.e. as embedded XMPP server in "
 "advanced application server"
 msgstr "支持在 OSGi 环境中运行，即作为高级应用服务器中的嵌入式 XMPP 服务器"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:44
-#, fuzzy
 msgid "Dynamic rosters"
 msgstr "动态名册"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:44
-#, fuzzy
 msgid ""
 "Ability to create users' rosters entries on the fly based on data "
 "retrieved from any sources"
 msgstr "能够根据从任何来源检索到的数据即时创建用户名册条目"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:46
-#, fuzzy
 msgid "Command line admin tools"
 msgstr "命令行管理工具"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:46
-#, fuzzy
 msgid "Commandline utility to manage server"
 msgstr "用于管理服务器的命令行工具"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:48
-#, fuzzy
 msgid "Unified Archive"
 msgstr "统一档案"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:48
-#, fuzzy
 msgid ""
 "An extension to XEP-0313 Message Archive Management, with greatly "
 "improved flexibility in terms of what can be archived."
 msgstr "XEP-0313 消息存档管理的扩展，在可以存档的内容方面极大提高了灵活性。"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:53
-#, fuzzy
 msgid "Repositories/Databases"
 msgstr "存储库/数据库"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:55
-#, fuzzy
 msgid "Table 7.Repositories/Databases"
 msgstr "Table 7.存储库/数据库"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:60
-#, fuzzy
 msgid "DB per domain"
 msgstr "每个域的数据库"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:60
-#, fuzzy
 msgid "Ability to have multiple databases for specific domains."
 msgstr "特定域可拥有多个数据库。"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:62
-#, fuzzy
 msgid "PostgreSQL"
 msgstr "PostgreSQL"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:62
-#, fuzzy
 msgid ""
 "Full support for PostgreSQL database with database schemas excluding "
 "dedicated DB schema for PubSub component"
 msgstr "完全支持除PubSub 组件的专用数据库模式之外的具有数据库模式的 PostgreSQL 数据库"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:64
-#, fuzzy
 msgid "MySQL"
 msgstr "MySQL"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:64
-#, fuzzy
 msgid ""
 "Full support for MySQL database with database schemas, dedicated DB "
 "schema for PubSub component"
 msgstr "完全支持带有数据库模式的 MySQL 数据库，PubSub 组件的专用数据库模式"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:66
-#, fuzzy
 msgid "SQL Server"
 msgstr "SQL 服务器"
 
@@ -2461,24 +2159,20 @@ msgstr ""
 "数据库，这些仅存在于Tigase 服务器版本 3.x 中"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:68
-#, fuzzy
 msgid "Derby DB"
 msgstr "Derby 数据库"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:68
-#, fuzzy
 msgid ""
 "Full support for built-in Derby database with database schemas excluding "
 "dedicated DB schema for PubSub component"
 msgstr "完全支持除PubSub 组件的专用数据库架构以外的具有数据库架构的内置 Derby 数据库"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:70
-#, fuzzy
 msgid "JDBC"
 msgstr "JDBC"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:70
-#, fuzzy
 msgid ""
 "Support for all JDBC enabled databases, although the database schemas are"
 " available for some databases"
@@ -2486,12 +2180,10 @@ msgstr "支持所有启用 JDBC 的数据库，尽管数据库模式只可用于
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:72
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:74
-#, fuzzy
 msgid "Drupal Auth"
 msgstr "Drupal 身份验证"
 
 #: ../../Tigase_Administration/XMPP_Server/Custom_Extensions.inc:72
-#, fuzzy
 msgid ""
 "Drupal authentication - the Tigase server can share user authentication "
 "database with Drupal CMS and authenticate users agains Drupal user "
