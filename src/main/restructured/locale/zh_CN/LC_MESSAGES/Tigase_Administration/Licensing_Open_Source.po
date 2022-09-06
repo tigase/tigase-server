@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-06-15 20:40+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/licensing_open_source/zh_Hans/>\n"
@@ -25,7 +25,6 @@ msgid "Licensing and Open Source"
 msgstr "许可和开源"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:4
-#, fuzzy
 msgid ""
 "As mentioned previously, Tigase is open source under AGPLv3. If you are "
 "not familiar with open source software, or the environment, here are some"
@@ -34,12 +33,10 @@ msgstr "如前所述，Tigase 在 AGPLv3 下是开源的。如果您不熟悉开
 "常见问题可能会提供一些答案。"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:6
-#, fuzzy
 msgid "**What does open source mean?**"
 msgstr "**开源是什么意思？**"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:7
-#, fuzzy
 msgid ""
 "This means that Tigase’s source code is available to the public to see "
 "how Tigase works. There are no 'black boxes' for packets where things "
@@ -57,12 +54,10 @@ msgstr ""
 "提交代码改进，补丁，增强或其他更改的社区成员。"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:9
-#, fuzzy
 msgid "**Does this mean that the binaries are open to malicious code?**"
 msgstr "**这是否意味着二进制文件对恶意代码开放？**"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:10
-#, fuzzy
 msgid ""
 "Although we accept patches from contributors, our repository does not "
 "accept them directly. Code may be submitted through our `tigase.tech "
@@ -75,12 +70,10 @@ msgstr ""
 "人员将在添加代码之前对其进行审核。所有这些在构建时都需经过功能和安全性测试。"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:12
-#, fuzzy
 msgid "**Does this mean it is less secure?**"
 msgstr "**这是否意味着它的安全性较低？**"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:13
-#, fuzzy
 msgid ""
 "Not at all. Although anybody can see the source code, and know how Tigase"
 " works; your installation, connections, and settings are uniquely yours. "
@@ -92,12 +85,10 @@ msgstr ""
 "使用最新的加密和安全连接协议定期测试和编写以尽可能保证安全。"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:15
-#, fuzzy
 msgid "**Is Tigase free?**"
 msgstr "** Tigase 是免费的吗？**"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:16
-#, fuzzy
 msgid ""
 "Tigase is free for download and use in it’s unmodified state. Our "
 "commercial grade products such as Advanced Clustering Strategy is "
@@ -107,14 +98,12 @@ msgstr ""
 "Clustering Strategy）可免费用于测试和开发。"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:18
-#, fuzzy
 msgid ""
 "**Does this mean I cannot use it in my product or commercial "
 "environment?**"
 msgstr "**这是否意味着我不能在我的产品或商业环境中使用它？**"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:19
-#, fuzzy
 msgid ""
 "Not necessarily, consult the Affero General Public License Agreement v3 "
 "to see if your use qualifies. Tigase is offered under commercial license "
@@ -124,12 +113,10 @@ msgstr ""
 "如果您的使用不在 AGPLv3 范围内，则将在商业许可下提供Tigase 。"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:21
-#, fuzzy
 msgid "**Are there options for closed code or extensions?**"
 msgstr "**是否有封闭代码或扩展的选项？**"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:22
-#, fuzzy
 msgid ""
 "Yes! Commercial licenses can be custom made for each client, and software"
 " written for your company may be made private or part of our open source "
@@ -138,7 +125,6 @@ msgstr "是的！商业许可证可以为每个客户定制，专为您的公司
 "有化或成为我们开源发行版的一部分。"
 
 #: ../../Tigase_Administration/Licensing_Open_Source.rst:24
-#, fuzzy
 msgid "**Can I contribute code?**"
 msgstr "**我可以贡献代码吗？**"
 
