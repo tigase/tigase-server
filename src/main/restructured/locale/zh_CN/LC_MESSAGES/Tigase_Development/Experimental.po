@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-27 22:18+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dg-experimental/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/dg-experimental/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Experimental.rst:2
@@ -32,17 +33,14 @@ msgid ""
 msgstr "该指南包含对服务器的非标准或实验性功能的描述。其中一些基于从未发布的扩展，其中一些只是测试实现以获取新想法或性能改进。"
 
 #: ../../Tigase_Development/Experimental.rst:6
-#, fuzzy
 msgid ":ref:`Dynamic Rosters<dynamicRosters>`"
 msgstr ":ref:`动态名册<dynamicRosters>`"
 
 #: ../../Tigase_Development/Experimental.rst:8
-#, fuzzy
 msgid ":ref:`Mobile Optimizations<mobileoptimizations>`"
 msgstr ":ref:`移动优化<mobileoptimizations>`"
 
 #: ../../Tigase_Development/Experimental.rst:10
-#, fuzzy
 msgid ":ref:`Bosh Session Cache<boshsessioncache>`"
 msgstr ":ref:`Bosh会话缓存<boshsessioncache>`"
 
@@ -201,14 +199,13 @@ msgid ""
 msgstr "DynamicRoster实现类应该在 **config.tdsl** 文件中配置："
 
 #: ../../Tigase_Development/Experimental.rst:145
-#, fuzzy
 msgid ""
 "If you want to pass configuration to your implementation simply use "
 "``@ConfigField`` annotation on your variable (see :ref:`Component "
 "implementation - Lesson 2 - Configuration<cil2>` for more details)."
 msgstr ""
-"如果您想将配置传递给您的实现，只需在变量上使用 ``@ConfigField`` 注释（有关详细信息，请参阅 :ref:`组件实现 - 第2课 -"
-" 配置<cil2>`）。"
+"如果您想将配置传递给您的实现，只需在变量上使用 ``@ConfigField`` "
+"注释（有关详细信息，请参阅 :ref:`组件实现 - 第2课 - 配置<cil2>`）。"
 
 #: ../../Tigase_Development/Experimental.rst:150
 msgid "Mobile Optimizations"
@@ -579,4 +576,3 @@ msgid ""
 "the client quickly retrieve information about the full JID for the "
 "established Bosh session."
 msgstr "**bosh-resource-bind** - 用户资源绑定也被缓存，以允许客户端快速检索有关已建立Bosh会话的完整JID的信息。"
-
