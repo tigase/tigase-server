@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-29 01:40-0700\n"
-"PO-Revision-Date: 2022-07-28 10:00+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
@@ -214,12 +214,10 @@ msgid "You will be greeted by the following \"About software\" page."
 msgstr "您将看到以下\"About software\"的页面。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:75
-#, fuzzy
 msgid "|web install 01|"
 msgstr "|web install 01|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:180
-#, fuzzy
 msgid "web install 01"
 msgstr "web install 01"
 
@@ -929,12 +927,10 @@ msgid "In Welcome window just press 'Next'.(pic.1)"
 msgstr "在欢迎窗口中，只需按'Next'。（图 1）"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:64
-#, fuzzy
 msgid "|sql1|"
 msgstr "|sql1|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:134
-#, fuzzy
 msgid "sql1"
 msgstr "sql1"
 
@@ -945,12 +941,10 @@ msgid ""
 msgstr "在下一个窗口中选择 'Detailed Configuration' 并点击 'Next' (pic. 2)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:68
-#, fuzzy
 msgid "|sql2|"
 msgstr "|sql2|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:135
-#, fuzzy
 msgid "sql2"
 msgstr "sql2"
 
@@ -961,12 +955,10 @@ msgid ""
 msgstr "在下一个屏幕上选择选项: 'Server Machine' 并点击 'Next' (pic. 3)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:72
-#, fuzzy
 msgid "|sql3|"
 msgstr "|sql3|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:136
-#, fuzzy
 msgid "sql3"
 msgstr "sql3"
 
@@ -977,12 +969,10 @@ msgid ""
 msgstr "在第四个窗口保留默认选项 'Multi-functional Database' 并点击 'Next' (pic. 4)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:76
-#, fuzzy
 msgid "|sql4|"
 msgstr "|sql4|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:137
-#, fuzzy
 msgid "sql4"
 msgstr "sql4"
 
@@ -991,12 +981,10 @@ msgid "On the step number five just press 'Next' using defaults. (pic. 5)"
 msgstr "在第五步上，只需使用默认值按 'Next' . (pic. 5)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:80
-#, fuzzy
 msgid "|sql5|"
 msgstr "|sql5|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:138
-#, fuzzy
 msgid "sql5"
 msgstr "sql5"
 
@@ -1008,12 +996,10 @@ msgstr "同样，在窗口 6 上选择默认值 - 'Decision Support (DSS)/OLAP' 
 "图 6）"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:84
-#, fuzzy
 msgid "|sql6|"
 msgstr "|sql6|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:139
-#, fuzzy
 msgid "sql6"
 msgstr "sql6"
 
@@ -1022,12 +1008,10 @@ msgid "Make sure you switch OFF the 'Strict mode' and and press 'Next' (pic. 7)"
 msgstr "确保关闭 'Strict mode' ，然后点击'Next'（图 7）"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:88
-#, fuzzy
 msgid "|sql7|"
 msgstr "|sql7|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:140
-#, fuzzy
 msgid "sql7"
 msgstr "sql7"
 
@@ -1040,12 +1024,10 @@ msgstr ""
 "'utf8', 然后点击 'Next' (pic.8)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:92
-#, fuzzy
 msgid "|sql8|"
 msgstr "|sql8|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:141
-#, fuzzy
 msgid "sql8"
 msgstr "sql8"
 
@@ -1057,12 +1039,10 @@ msgstr "在下一个窗口中选择 'Include Bin Directory in Windows PATH' 然�
 "(pic.9)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:96
-#, fuzzy
 msgid "|sql9|"
 msgstr "|sql9|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:142
-#, fuzzy
 msgid "sql9"
 msgstr "sql9"
 
@@ -1074,12 +1054,10 @@ msgstr "在此窗口中，只需输入数据库超级用户密码并确保记住
 "10)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:100
-#, fuzzy
 msgid "|sql10|"
 msgstr "|sql10|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:143
-#, fuzzy
 msgid "sql10"
 msgstr "sql10"
 
@@ -1090,12 +1068,10 @@ msgid ""
 msgstr "这是最后一个画面。点击 'Execute' 并保存配置参数 (pic. 11)。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:104
-#, fuzzy
 msgid "|sql11|"
 msgstr "|sql11|"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:144
-#, fuzzy
 msgid "sql11"
 msgstr "sql11"
 
@@ -1340,7 +1316,6 @@ msgid "Comment"
 msgstr "评论"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:74
-#, fuzzy
 msgid "``_xmpp-client._tcp.your-domain.tld``"
 msgstr "``_xmpp-client._tcp.your-domain.tld``"
 
@@ -1350,12 +1325,10 @@ msgstr "``_xmpp-client._tcp.your-domain.tld``"
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:80
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:82
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:84
-#, fuzzy
 msgid "SRV"
 msgstr "SRV"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:74
-#, fuzzy
 msgid "``10 0 5222 tigase.me.``"
 msgstr "``10 0 5222 tigase.me.``"
 
@@ -1364,22 +1337,18 @@ msgid "Basic XMPP"
 msgstr "基本 XMPP"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:76
-#, fuzzy
 msgid "``_xmpps-client._tcp.your-domain.tld``"
 msgstr "``_xmpps-client._tcp.your-domain.tld``"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:76
-#, fuzzy
 msgid "``10 0 5223 tigase.me.``"
 msgstr "``10 0 5223 tigase.me.``"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:76
-#, fuzzy
 msgid "DirectTLS"
 msgstr "DirectTLS"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:78
-#, fuzzy
 msgid "``_xmpp-server._tcp.your-domain.tld``"
 msgstr "``_xmpp-server._tcp.your-domain.tld``"
 
@@ -1387,7 +1356,6 @@ msgstr "``_xmpp-server._tcp.your-domain.tld``"
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:80
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:82
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:84
-#, fuzzy
 msgid "``10 0 5269 tigase.me.``"
 msgstr "``10 0 5269 tigase.me.``"
 
@@ -1396,7 +1364,6 @@ msgid "Federation / s2s connection"
 msgstr "联盟/s2s 连接"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:80
-#, fuzzy
 msgid "``_xmpp-server._tcp.muc.your-domain.tld``"
 msgstr "``_xmpp-server._tcp.muc.your-domain.tld``"
 
@@ -1405,7 +1372,6 @@ msgid "Federation / s2s connection (MUC)"
 msgstr "联盟/s2s 连接 (MUC)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:82
-#, fuzzy
 msgid "``_xmpp-server._tcp.mix.your-domain.tld``"
 msgstr "``_xmpp-server._tcp.mix.your-domain.tld``"
 
@@ -1414,7 +1380,6 @@ msgid "Federation / s2s connection (MIX)"
 msgstr "联盟/s2s 连接 (MIX)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:84
-#, fuzzy
 msgid "``_xmpp-server._tcp.pubsub.your-domain.tld``"
 msgstr "``_xmpp-server._tcp.pubsub.your-domain.tld``"
 
@@ -1614,12 +1579,10 @@ msgid "Types of Operating Systems"
 msgstr "操作系统的类型"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:13
-#, fuzzy
 msgid "Systemd"
 msgstr "Systemd"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:13
-#, fuzzy
 msgid "``tigase-server/scripts/systemd/*``"
 msgstr "``tigase-server/scripts/systemd/*``"
 
@@ -1629,28 +1592,23 @@ msgstr "基于Systemd的发行版"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:15
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:197
-#, fuzzy
 msgid "Debian"
 msgstr "Debian"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:15
-#, fuzzy
 msgid "``tigase-server/scripts/debian/tigase.init.d``"
 msgstr "``tigase-server/scripts/debian/tigase.init.d``"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:15
-#, fuzzy
 msgid "Knoppix, Ubuntu (before v15.04), Raspbian or Duvian"
 msgstr "Knoppix, Ubuntu (before v15.04), Raspbian or Duvian"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:17
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:90
-#, fuzzy
 msgid "Gentoo"
 msgstr "Gentoo"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:17
-#, fuzzy
 msgid "``tigase-server/scripts/gentoo/init.d/tigase``"
 msgstr "``tigase-server/scripts/gentoo/init.d/tigase``"
 
@@ -1660,12 +1618,10 @@ msgstr "CoreOS（v94.0.0 之前），Tin Hat Linux 或其他基于 \\*too 的系
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:19
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:110
-#, fuzzy
 msgid "Mandriva"
 msgstr "Mandriva"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:19
-#, fuzzy
 msgid "``tigase-server/scripts/mandriva/init.d/tigase``"
 msgstr "``tigase-server/scripts/mandriva/init.d/tigase``"
 
@@ -1675,12 +1631,10 @@ msgstr "Mandriva Linux 的特定 init.d 文件"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:21
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:138
-#, fuzzy
 msgid "Redhat"
 msgstr "Redhat"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:21
-#, fuzzy
 msgid "``tigase-server/scripts/redhat/init.d/tigase``"
 msgstr "``tigase-server/scripts/redhat/init.d/tigase``"
 
@@ -2037,12 +1991,10 @@ msgstr "Tigase 应该开始在后台运行。由于 Tigase "
 "现在已作为服务安装，因此可以使用任何服务命令对其进行控制，例如："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:284
-#, fuzzy
 msgid "``service tigase stop``"
 msgstr "``service tigase stop``"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:286
-#, fuzzy
 msgid "``service tigase restart``"
 msgstr "``service tigase restart``"
 
