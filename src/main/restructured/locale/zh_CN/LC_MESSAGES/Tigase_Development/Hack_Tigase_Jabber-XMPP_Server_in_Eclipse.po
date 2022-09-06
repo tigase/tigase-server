@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-20 21:29+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/dp-hack_tigase/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/dp-hack_tigase/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:2
@@ -45,14 +46,13 @@ msgstr ""
 "<http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html>`__。"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:11
-#, fuzzy
 msgid ""
 "You will also need the M2E plugin for Maven integration, however this can"
 " be done inside Eclipse now, so refer to the :ref:`Plugin "
 "Installation<m2EPlugin>` section for that."
 msgstr ""
-"您还需要用于 Maven 集成的 M2E 插件，但是现在可以在 Eclipse 中完成，因此请参阅 :ref:`插件安装<m2EPlugin>` "
-"部分。"
+"您还需要用于 Maven 集成的 M2E 插件，但是现在可以在 Eclipse 中完成，"
+"因此请参阅 :ref:`插件安装<m2EPlugin>` 部分。"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:14
 msgid "Installation"
@@ -73,7 +73,6 @@ msgid "Before we begin, we will need to clone the repository from git."
 msgstr "在开始之前，我们需要从 git 克隆存储库。"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:21
-#, fuzzy
 msgid "Linux"
 msgstr "Linux"
 
@@ -84,7 +83,6 @@ msgid ""
 msgstr "对于 linux 操作系统，导航到要将存储库克隆到的目录，然后在终端中键入以下内容。"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:30
-#, fuzzy
 msgid "Windows"
 msgstr "Windows"
 
@@ -101,12 +99,10 @@ msgstr ""
 "中选择"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:34
-#, fuzzy
 msgid "|win git1|"
 msgstr "|win git1|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:89
-#, fuzzy
 msgid "win git1"
 msgstr "win git1"
 
@@ -115,12 +111,10 @@ msgid "Click next, and now select clone URI"
 msgstr "单击下一步，现在选择克隆 URI"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:38
-#, fuzzy
 msgid "|win git2|"
 msgstr "|win git2|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:90
-#, fuzzy
 msgid "win git2"
 msgstr "win git2"
 
@@ -133,12 +127,10 @@ msgid "The rest of the fields will populate automatically"
 msgstr "其余字段将自动填充"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:48
-#, fuzzy
 msgid "|win git3|"
 msgstr "|win git3|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:91
-#, fuzzy
 msgid "win git3"
 msgstr "win git3"
 
@@ -150,12 +142,10 @@ msgid ""
 msgstr "选择master分支，以及您要编辑的任何分支。 **master分支应该是你唯一需要的，其余分支用于特定的代码更改**"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:52
-#, fuzzy
 msgid "|win git4|"
 msgstr "|win git4|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:92
-#, fuzzy
 msgid "win git4"
 msgstr "win git4"
 
@@ -167,12 +157,10 @@ msgid ""
 msgstr "现在选择要将存储库克隆到的目录。这是您稍后将在设置中使用的项目根目录。"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:56
-#, fuzzy
 msgid "|win git5|"
 msgstr "|win git5|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:93
-#, fuzzy
 msgid "win git5"
 msgstr "win git5"
 
@@ -199,12 +187,10 @@ msgid ""
 msgstr "打开主窗口并建立工作区（这是将存储大部分工作文件的地方）后，单击帮助，然后单击安装新软件...​"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:67
-#, fuzzy
 msgid "|Eclipse help|"
 msgstr "|Eclipse help|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:94
-#, fuzzy
 msgid "Eclipse help"
 msgstr "Eclipse help"
 
@@ -223,12 +209,10 @@ msgid ""
 msgstr "**注意：您可能希望单击添加...按钮并将上述位置添加为永久软件位置，以将该位置保留在内存中**"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:73
-#, fuzzy
 msgid "|Eclipse m2Einstall|"
 msgstr "|Eclipse m2Einstall|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:95
-#, fuzzy
 msgid "Eclipse m2Einstall"
 msgstr "Eclipse m2Einstall"
 
@@ -250,12 +234,10 @@ msgid ""
 msgstr "单击文件和导入...​ 以打开导入对话框窗口。选择 Maven，然后选择现有的 Maven 项目。"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:81
-#, fuzzy
 msgid "|Eclipse importMaven|"
 msgstr "|Eclipse importMaven|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:96
-#, fuzzy
 msgid "Eclipse importMaven"
 msgstr "Eclipse importMaven"
 
@@ -267,12 +249,10 @@ msgid ""
 msgstr "现在单击 Next 并将根目录指向克隆 git 存储库的位置，Eclipse 应该会自动看到 pom.xml 文件并显示在下一个窗口中。"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:85
-#, fuzzy
 msgid "|Eclipse importMaven2|"
 msgstr "|Eclipse importMaven2|"
 
 #: ../../Tigase_Development/Hack_Tigase_Jabber-XMPP_Server_in_Eclipse.rst:97
-#, fuzzy
 msgid "Eclipse importMaven2"
 msgstr "Eclipse importMaven2"
 
@@ -281,4 +261,3 @@ msgid ""
 "Once the import is finished, you are able to now begin working with "
 "Tigase’s code inside Eclipse! Happy coding!"
 msgstr "导入完成后，您现在可以开始在 Eclipse 中使用 Tigase 的代码了！快乐编码！"
-
