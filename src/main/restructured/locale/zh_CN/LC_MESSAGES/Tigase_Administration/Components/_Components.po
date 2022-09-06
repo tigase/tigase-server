@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-08-09 21:33+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/components/zh_Hans/>\n"
@@ -394,7 +394,6 @@ msgid ""
 msgstr "JMX 和 SNMP 都可提供安全保护来限制对监控数据的访问。两者的安全配置略有不同。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:62
-#, fuzzy
 msgid "JMX"
 msgstr "JMX"
 
@@ -433,7 +432,6 @@ msgid ""
 msgstr "使用上述文件，您可以控制谁以及如何访问 JMX 监控服务。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:82
-#, fuzzy
 msgid "SNMP"
 msgstr "SNMP"
 
@@ -462,7 +460,6 @@ msgstr ""
 "以用于服务器特定的统计信息。 MIB 包含通过 SNMP 公开的所有服务器统计信息的定义。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Setting_up.inc:103
-#, fuzzy
 msgid "HTTP"
 msgstr "HTTP"
 
@@ -514,12 +511,10 @@ msgstr ""
 "客户端。成功配置并连接到具有管理权限的帐户后，我们需要从应用程序菜单或特定帐户的上下文菜单访问 *Service Discovery*："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:18
-#, fuzzy
 msgid "|roster-discovery|"
 msgstr "|roster-discovery|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:74
-#, fuzzy
 msgid "roster-discovery"
 msgstr "roster-discovery"
 
@@ -530,12 +525,10 @@ msgid ""
 msgstr "在 *Service Discovery* 窗口中，我们需要找到 *Server Statistics* 组件："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:22
-#, fuzzy
 msgid "|discovery-stats|"
 msgstr "|discovery-stats|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:75
-#, fuzzy
 msgid "discovery-stats"
 msgstr "discovery-stats"
 
@@ -548,12 +541,10 @@ msgid ""
 msgstr "我们可以访问所有组件的统计信息，也可以在展开树后选择特定组件。要执行临时命令，只需双击将打开统计窗口的特定节点："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:26
-#, fuzzy
 msgid "|server-stats|"
 msgstr "|server-stats|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:76
-#, fuzzy
 msgid "server-stats"
 msgstr "server-stats"
 
@@ -579,7 +570,6 @@ msgstr ""
 "<#monitoring_activation>`__。之后我们可以使用一些工具来获取统计信息，例如："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:36
-#, fuzzy
 msgid "JConsole"
 msgstr "JConsole"
 
@@ -593,12 +583,10 @@ msgstr ""
 "IP，端口和凭据："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:40
-#, fuzzy
 msgid "|jconsole|"
 msgstr "|jconsole|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:77
-#, fuzzy
 msgid "jconsole"
 msgstr "jconsole"
 
@@ -613,17 +601,14 @@ msgstr ""
 "访问所有组件的统计信息或仅访问特定组件的统计信息，以及调整我们想要获取统计信息的级别："
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:44
-#, fuzzy
 msgid "|jconsole-1|"
 msgstr "|jconsole-1|"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:78
-#, fuzzy
 msgid "jconsole-1"
 msgstr "jconsole-1"
 
 #: ../../Tigase_Administration/Components/Monitoring/Retrieving_statistics.inc:48
-#, fuzzy
 msgid "StatsDumper.groovy"
 msgstr "StatsDumper.groovy"
 
@@ -854,7 +839,6 @@ msgid ""
 msgstr "**注意：仅当满足两个阈值（数量和百分比）时才会生成事件。**"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:98
-#, fuzzy
 msgid "``period`` - Period of running check in ms, Integer value."
 msgstr "``period`` - 运行检查的周期，整数值。"
 
@@ -888,7 +872,6 @@ msgstr ""
 "HTTP REST 发送 XMPP 节。 XMPP 节配置将覆盖 config.tdsl 中的配置，但它们只会持续到服务器重新启动。"
 
 #: ../../Tigase_Administration/Components/Monitoring/MonitorComponent.inc:109
-#, fuzzy
 msgid "config.tdsl"
 msgstr "config.tdsl"
 
@@ -1175,7 +1158,6 @@ msgid ""
 msgstr "可以启用和配置统计信息的自动存储。为此，您需要将以下任何统计记录器配置为 ``StatisticsCollector`` 组件子 bean："
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:9
-#, fuzzy
 msgid "``tigase.stats.CounterDataArchivizer``"
 msgstr "``tigase.stats.CounterDataArchivizer``"
 
@@ -1187,7 +1169,6 @@ msgid ""
 msgstr "每次执行都会将当前的基本服务器指标（CPU 使用率，内存使用率，用户连接数，正常运行时间）放入数据库（覆盖先前的条目）。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:12
-#, fuzzy
 msgid "``tigase.stats.CounterDataLogger``"
 msgstr "``tigase.stats.CounterDataLogger``"
 
@@ -1202,7 +1183,6 @@ msgstr ""
 "使用率，内存使用率，每个连接器的用户连接数，已处理的不同类型的数据包数，正常运行时间等）。"
 
 #: ../../Tigase_Administration/Components/Monitoring/Statistics_Logger_Config.inc:15
-#, fuzzy
 msgid "``tigase.stats.CounterDataFileLogger``"
 msgstr "``tigase.stats.CounterDataFileLogger``"
 
@@ -1358,14 +1338,14 @@ msgid ""
 msgstr "有一个配置属性允许您调整 s2s 连接的网络缓冲区，以降低内存使用量或增加 s2s 通信的数据吞吐量。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:55
-#, fuzzy
 msgid ""
 "More details about are available in the :ref:`net-buff-high-"
 "throughput<netBuffHighThroughput>` or :ref:`net-buff-"
 "Standard<netBuffStandard>` property descriptions."
 msgstr ""
-"有关更多详细信息，请参阅 :ref:`net-buff-high-throughput<netBuffHighThroughput>` 或 "
-":ref:`net-buff-Standard<netBuffStandard>` 属性描述。"
+"有关更多详细信息，请参阅 :ref:`net-buff-high-"
+"throughput<netBuffHighThroughput>` 或 :ref:`net-buff-"
+"Standard<netBuffStandard>` 属性描述。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:58
 msgid "Maximum Packet Waiting Time and Connection Inactivity Time"
@@ -1435,7 +1415,6 @@ msgid "The default selector picks connections randomly."
 msgstr "默认选择器随机选择连接。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:94
-#, fuzzy
 msgid "skip-tls-hostnames"
 msgstr "skip-tls-hostnames"
 
@@ -1459,7 +1438,6 @@ msgstr ""
 "vhost 上启用此功能，但必须在 s2s 组件下进行配置。"
 
 #: ../../Tigase_Administration/Components/Server_to_Server_Protocol.inc:105
-#, fuzzy
 msgid "ejabberd-bug-workaround"
 msgstr "ejabberd-bug-workaround"
 
@@ -1568,22 +1546,18 @@ msgid "Possible values are:"
 msgstr "可能的值为："
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:42
-#, fuzzy
 msgid "``tigase.server.xmppclient.SeeOtherHost``"
 msgstr "``tigase.server.xmppclient.SeeOtherHost``"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:44
-#, fuzzy
 msgid "``tigase.server.xmppclient.SeeOtherHostHashed``"
 msgstr "``tigase.server.xmppclient.SeeOtherHostHashed``"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:46
-#, fuzzy
 msgid "``tigase.server.xmppclient.SeeOtherHostDB``"
 msgstr "``tigase.server.xmppclient.SeeOtherHostDB``"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:48
-#, fuzzy
 msgid "``tigase.server.xmppclient.SeeOtherHostDualIP``"
 msgstr "``tigase.server.xmppclient.SeeOtherHostDualIP``"
 
@@ -1625,7 +1599,6 @@ msgid "By default redirection is currently enabled only in the ``OPEN`` phase."
 msgstr "默认情况下，重定向当前仅在 ``OPEN`` 阶段启用。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:74
-#, fuzzy
 msgid "SeeOtherHostDB"
 msgstr "SeeOtherHostDB"
 
@@ -1655,7 +1628,6 @@ msgid "``get-all-query-timeout`` - allows to set timeout for executed queries."
 msgstr "``get-all-query-timeout`` - 允许为执行的查询设置超时。"
 
 #: ../../Tigase_Administration/Components/Load_Balancing.inc:96
-#, fuzzy
 msgid "SeeOtherHostDualIP"
 msgstr "SeeOtherHostDualIP"
 
@@ -1820,24 +1792,22 @@ msgid ""
 msgstr "本指南中的页面详细描述了设置和管理外部组件的所有管理方面。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:12
-#, fuzzy
 msgid ":ref:`External Component Configuration<External-Component-Configuration>`"
 msgstr ":ref:`外部组件配置<External-Component-Configuration>`"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:14
-#, fuzzy
 msgid ":ref:`Tigase as an External Component<Tigase-as-an-External-Component>`"
 msgstr ":ref:`Tigase 作为外部组件<Tigase-as-an-External-Component>`"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Intro.inc:16
-#, fuzzy
 msgid ""
 ":ref:`Load Balancing External Components in Cluster Mode<Load-Balancing-"
 "External-Components-in-Cluster-Mode>`"
-msgstr ":ref:`集群模式下的外部组件负载均衡<Load-Balancing-External-Components-in-Cluster-Mode>`"
+msgstr ""
+":ref:`集群模式下的外部组件负载均衡<Load-Balancing-External-Components-in-"
+"Cluster-Mode>`"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:6
-#, fuzzy
 msgid ""
 "As for all Tigase components you can load and configure external "
 "components via the ``config.tdsl`` file described in details in the "
@@ -1845,8 +1815,9 @@ msgid ""
 "to enable the component and set the initial configuration to accept or "
 "initiate connections for an external component."
 msgstr ""
-"对于所有 Tigase 组件，您可以通过 :ref:`DSL 配置<dslConfig>` 部分中详细描述的 ``config.tdsl`` "
-"文件加载和配置外部组件。本文档描述了如何启用组件并设置初始配置以接受或启动外部组件的连接。"
+"对于所有 Tigase 组件，您可以通过 :ref:`DSL 配置<dslConfig>` 部分中详细描述的 "
+"``config.tdsl`` 文件加载和配置外部组件。本文档描述了如何启用组件并设置初始配"
+"置以接受或启动外部组件的连接。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:8
 msgid ""
@@ -1875,7 +1846,6 @@ msgid ""
 msgstr "虽然这会加载组件，但没有提供任何额外的配置，该组件实际上是无用的。有必要在运行时通过 ad-hoc 命令配置外部组件的虚拟主机域以使用该组件。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:18
-#, fuzzy
 msgid ""
 "You may additionally configure the :ref:`bind-ext-"
 "hostnames<bindExtHostnames>` property."
@@ -1898,12 +1868,10 @@ msgstr ""
 "hoc 能力的 XMPP 客户端的组件执行相应的 ad-hoc 命令 ，即 `Psi <http://psi-im.org>`__。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:22
-#, fuzzy
 msgid "|adminui ext add item button|"
 msgstr "|adminui ext add item button|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:58
-#, fuzzy
 msgid "adminui ext add item button"
 msgstr "adminui ext add item button"
 
@@ -1914,12 +1882,10 @@ msgid ""
 msgstr "您将看到一个表单，您应该填写该表单以配置外部组件连接详细信息："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:26
-#, fuzzy
 msgid "|adminui ext add item form|"
 msgstr "|adminui ext add item form|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Configuration.inc:59
-#, fuzzy
 msgid "adminui ext add item form"
 msgstr "adminui ext add item form"
 
@@ -2072,12 +2038,10 @@ msgstr ""
 "item``，这将显示以下表单以填写外部组件连接详细信息："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:26
-#, fuzzy
 msgid "|adminui extman add item form|"
 msgstr "|adminui extman add item form|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:285
-#, fuzzy
 msgid "adminui extman add item form"
 msgstr "adminui extman add item form"
 
@@ -2150,12 +2114,10 @@ msgid ""
 msgstr "**使用管理 UI 将外部组件连接设置添加到管理器 (ext-man)。**"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:74
-#, fuzzy
 msgid "|adminui extman add item form external muc|"
 msgstr "|adminui extman add item form external muc|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Tigase_as_External.inc:286
-#, fuzzy
 msgid "adminui extman add item form external muc"
 msgstr "adminui extman add item form external muc"
 
@@ -2407,12 +2369,10 @@ msgid "So here is a simple picture showing the use case."
 msgstr "所以这里有一张显示用例的简单图片。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:27
-#, fuzzy
 msgid "|ExternalCompClustering002|"
 msgstr "|ExternalCompClustering002|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:82
-#, fuzzy
 msgid "ExternalCompClustering002"
 msgstr "ExternalCompClustering002"
 
@@ -2440,12 +2400,10 @@ msgstr ""
 "Configuration<tigaseExternalComponent>` 部分描述的那样。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:35
-#, fuzzy
 msgid "|adminui ext add item form_1|"
 msgstr "|adminui ext add item form_1|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:83
-#, fuzzy
 msgid "adminui ext add item form_1"
 msgstr "adminui ext add item form_1"
 
@@ -2532,12 +2490,10 @@ msgstr ""
 "test.org,** **green.xmpp-test. org** 和 **blue.xmpp-test.org.**"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:56
-#, fuzzy
 msgid "|ExternalCompClustering003 0|"
 msgstr "|ExternalCompClustering003 0|"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:84
-#, fuzzy
 msgid "ExternalCompClustering003 0"
 msgstr "ExternalCompClustering003 0"
 
@@ -2558,7 +2514,6 @@ msgid ""
 msgstr "这可以通过在服务器配置文件中添加以下行来简单地完成："
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:66
-#, fuzzy
 msgid ""
 "After this is done we need to add a new external component connection "
 "settings using ``Add item`` position for ``ext`` component in "
@@ -2566,8 +2521,9 @@ msgid ""
 ":ref:`External Component Configuration<External-Component-Configuration>`"
 " section."
 msgstr ""
-"完成此操作后，我们需要在网页的 ``Configuration`` 部分中使用 ``Add item`` 位置为 ``ext`` "
-"组件添加新的外部组件连接设置，正如 :ref:`外部组件配置<tigaseExternalComponent>` 部分中所述。"
+"完成此操作后，我们需要在网页的 ``Configuration`` 部分中使用 ``Add item`` "
+"位置为 ``ext`` 组件添加新的外部组件连接设置，正如 :ref:`外部组件配置"
+"<External-Component-Configuration>` 部分中所述。"
 
 #: ../../Tigase_Administration/Components/External_Component_Configuration/Load_Balancing.inc:68
 msgid ""
@@ -2647,7 +2603,6 @@ msgid ""
 msgstr "连接容器包含与组件连接相关的所有配置。每个端口都可以单独配置。"
 
 #: ../../Tigase_Administration/Components/C2S.inc:36
-#, fuzzy
 msgid "new-connections-throttling"
 msgstr "new-connections-throttling"
 
