@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-07-19 21:20+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/dpguide_basicinformation/zh_Hans/>\n"
@@ -82,12 +82,10 @@ msgid "In a very broad view this can be depicted with a following graph:"
 msgstr "从一个非常广泛的角度来看，这可以用下图来描述："
 
 #: ../../Tigase_Development/Basic_Information.rst:17
-#, fuzzy
 msgid "|Tigase architecture|"
 msgstr "|Tigase architecture|"
 
 #: ../../Tigase_Development/Basic_Information.rst:90
-#, fuzzy
 msgid "Tigase architecture"
 msgstr "Tigase architecture"
 
