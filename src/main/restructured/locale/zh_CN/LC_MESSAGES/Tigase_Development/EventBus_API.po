@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-08-10 00:19+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/dg-eventbus_api/zh_Hans/>\n"
@@ -37,7 +37,6 @@ msgstr ""
 "server/snapshot/Administration_Guide/html/#eventBus>`__。"
 
 #: ../../Tigase_Development/EventBus_API.rst:8
-#, fuzzy
 msgid "EventBus API"
 msgstr "EventBus API"
 
