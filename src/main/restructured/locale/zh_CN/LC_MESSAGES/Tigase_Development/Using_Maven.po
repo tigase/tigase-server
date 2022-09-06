@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-07-26 21:31+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/dg-using_maven/zh_Hans/>\n"
@@ -106,12 +106,10 @@ msgstr "**重要提示：更改这些设置可能会破坏操作系统中的其�
 "什么，请勿遵循本指南！**"
 
 #: ../../Tigase_Development/Using_Maven.rst:25
-#, fuzzy
 msgid "|Env Panel|"
 msgstr "|Env Panel|"
 
 #: ../../Tigase_Development/Using_Maven.rst:71
-#, fuzzy
 msgid "Env Panel"
 msgstr "Env Panel"
 
@@ -131,12 +129,10 @@ msgid "Click on New…​"
 msgstr "点击新建…​"
 
 #: ../../Tigase_Development/Using_Maven.rst:31
-#, fuzzy
 msgid "|Env New|"
 msgstr "|Env New|"
 
 #: ../../Tigase_Development/Using_Maven.rst:72
-#, fuzzy
 msgid "Env New"
 msgstr "Env New"
 
@@ -252,7 +248,6 @@ msgid "Generating tar.gz, tar.bz2 File With Sources Only"
 msgstr "仅使用源生成tar.gz、tar.bz2文件"
 
 #: ../../Tigase_Development/Using_Maven.rst:100
-#, fuzzy
 msgid "``mvn -DdescriptorId=src assembly:assembly``"
 msgstr "``mvn -DdescriptorId=src assembly:assembly``"
 
