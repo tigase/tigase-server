@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-04 11:04-0700\n"
-"PO-Revision-Date: 2022-08-09 21:26+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/database_management/zh_Hans/>\n"
@@ -58,12 +58,10 @@ msgid "Additional Information"
 msgstr "补充信息"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:14
-#, fuzzy
 msgid "DerbyDB"
 msgstr "DerbyDB"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:14
-#, fuzzy
 msgid "10.12.1.1"
 msgstr "10.12.1.1"
 
@@ -72,17 +70,14 @@ msgid "Included with Tigase XMPP Server"
 msgstr "包含在 Tigase XMPP 服务器中"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
-#, fuzzy
 msgid "MySQL"
 msgstr "MySQL"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
-#, fuzzy
 msgid "5.7"
 msgstr "5.7"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
-#, fuzzy
 msgid "5.6.4"
 msgstr "5.6.4"
 
@@ -91,17 +86,14 @@ msgid "Required to properly support timestamp storage with millisecond precision
 msgstr "需要以毫秒精度来正确支持时间戳存储"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:18
-#, fuzzy
 msgid "SQLServer"
 msgstr "SQLServer"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:18
-#, fuzzy
 msgid "2014"
 msgstr "2014"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:18
-#, fuzzy
 msgid "2012"
 msgstr "2012"
 
@@ -110,17 +102,14 @@ msgid "2012 needed so we can count use fetch-offset pagination feature."
 msgstr "需要 2012 ，这样我们可以计算使用 fetch-offset 分页功能。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:20
-#, fuzzy
 msgid "PostgreSQL"
 msgstr "PostgreSQL"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:20
-#, fuzzy
 msgid "13.0"
 msgstr "13.0"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:20
-#, fuzzy
 msgid "9.4"
 msgstr "9.4"
 
@@ -131,32 +120,26 @@ msgid ""
 msgstr "新的 UA 架构至少需要 9.4；如果使用早于 13 的版本，则需要手动安装 ``uuid-ossp`` 扩展 (1)"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:22
-#, fuzzy
 msgid "MongoDB"
 msgstr "MongoDB"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:22
-#, fuzzy
 msgid "3.2"
 msgstr "3.2"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:22
-#, fuzzy
 msgid "3.0"
 msgstr "3.0"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:24
-#, fuzzy
 msgid "MariaDB"
 msgstr "MariaDB"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:24
-#, fuzzy
 msgid "?"
 msgstr "?"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:24
-#, fuzzy
 msgid "10.0.12"
 msgstr "10.0.12"
 
@@ -202,11 +185,11 @@ msgid "This one changes to 15 minutes."
 msgstr "这个更改为 15 分钟。"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:69
-#, fuzzy
 msgid ""
 "see :ref:`Period / Duration values<PeriodDurationvalues>` for format "
 "details"
-msgstr "有关格式详细信息，请参阅 :ref:`Period / Duration values<Period-Duration-values>`"
+msgstr "有关格式详细信息，请参阅 :ref:`Period / Duration "
+"values<PeriodDurationvalues>`"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:72
 msgid "Using modified database schema"
@@ -1038,13 +1021,12 @@ msgid ""
 msgstr "``-F``, ``--file=`` - 用逗号分隔的将要被处理的 SQL 文件列表。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:113
-#, fuzzy
 msgid ""
 "``-Q``, ``--query=`` - custom queries to be executed, see :ref:`Query "
 "function<queryschema>` for details."
 msgstr ""
-"``-Q``, ``--query=`` - 要执行的自定义查询，请参阅 :ref:`Query function<queryschema>` "
-"了解详细信息。"
+"``-Q``, ``--query=`` - 要执行的自定义查询，请参阅 :ref:`Query "
+"function<queryschema>` 了解详细信息。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:115
 msgid ""
@@ -1275,14 +1257,14 @@ msgid "Create the database space for the Tigase server:"
 msgstr "为 Tigase 服务器创建数据库空间："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:130
-#, fuzzy
 msgid ""
 "Add the ``tigase_user`` user and grant access to the tigasedb database. "
 "Depending on how you plan to connect to the database (locally or over the"
 " network) use one of following commands or all if you are not sure:"
 msgstr ""
-"添加 ``tigase_user`` 用户并授予它对 ``tigasedb`` "
-"数据库的访问权限。取决您计划如何连接到数据库（本地或通过网络），如果您不确定，请使用以下全部命令或命令之一："
+"添加 ``tigase_user`` 用户并授予它对 ``tigasedb`` 数据库的访问权限。取决您计划"
+"如何连接到数据库（本地或通过网络），如果您不确定，请使用以下全部命令或命令之"
+"一："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:132
 msgid "Selective access configuration"
@@ -1483,12 +1465,10 @@ msgid "You must use these sql files on order FIRST!"
 msgstr "您必须首先使用这些 sql 文件！"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:26
-#, fuzzy
 msgid "**Linux**"
 msgstr "**Linux**"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/Derby.inc:32
-#, fuzzy
 msgid "**Windows**"
 msgstr "**Windows**"
 
@@ -1948,14 +1928,13 @@ msgstr ""
 "文件中添加以下行来实现："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:96
-#, fuzzy
 msgid ""
 "If the PubSub components fails to detect and use a proper storage layer "
 "for MongoDB, you can force it to use one provided by Tigase by using the "
 "following line in the ``config.tdsl`` file:"
 msgstr ""
-"如果 MUC 组件无法为 MongoDB 检测和使用适当的存储层，您可以通过在 ``config.tdsl`` 文件中使用以下行来强制它使用 "
-"Tigase 提供的存储层："
+"如果 MUC 组件无法为 MongoDB 检测和使用适当的存储层，您可以通过在 ``config."
+"tdsl`` 文件中使用以下行来强制它使用 Tigase 提供的存储层："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:105
 msgid "Configuration for Message Archiving"
@@ -2012,7 +1991,6 @@ msgid "``tig_users`` collection contains the following fields:"
 msgstr "``tig_users`` 集合包含以下字段："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:136
-#, fuzzy
 msgid "Table 9. tig_users"
 msgstr "Table 9. tig_users"
 
@@ -2033,7 +2011,6 @@ msgstr "描述"
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:141
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:157
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:197
-#, fuzzy
 msgid "\\_id"
 msgstr "\\_id"
 
@@ -2043,7 +2020,6 @@ msgid "id of user which is SHA256 hash of users jid (raw byte array)."
 msgstr "用户 id 是用户 jid 的 SHA256 哈希（原始字节数组）。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:143
-#, fuzzy
 msgid "user_id"
 msgstr "user_id"
 
@@ -2072,7 +2048,6 @@ msgid "``tig_nodes`` collection contains the following fields"
 msgstr "``tig_nodes`` 集合包含以下字段"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:152
-#, fuzzy
 msgid "Table 10. tig_nodes"
 msgstr "Table 10. tig_nodes"
 
@@ -2082,7 +2057,6 @@ msgstr "由 MongoDB 自动生成的行的 id。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:159
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:199
-#, fuzzy
 msgid "uid"
 msgstr "uid"
 
@@ -2117,12 +2091,10 @@ msgid ""
 msgstr "Tigase XMPP 服务器还使用其他的集合来存储离线消息"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:170
-#, fuzzy
 msgid "Table 11. msg_history collection"
 msgstr "Table 11. msg_history collection"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:175
-#, fuzzy
 msgid "from"
 msgstr "from"
 
@@ -2131,7 +2103,6 @@ msgid "full user jid of message sender."
 msgstr "消息发送者的完整用户 jid。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:177
-#, fuzzy
 msgid "from_hash"
 msgstr "from_hash"
 
@@ -2140,7 +2111,6 @@ msgid "SHA256 hash of message sender jid as raw byte array."
 msgstr "消息发送者 jid 的 SHA256 哈希作为原始字节数组。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:179
-#, fuzzy
 msgid "to"
 msgstr "to"
 
@@ -2149,7 +2119,6 @@ msgid "full users jid of message recipient."
 msgstr "消息接收者的完整用户 jid。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:181
-#, fuzzy
 msgid "to_hash"
 msgstr "to_hash"
 
@@ -2158,7 +2127,6 @@ msgid "SHA256 hash of message recipient full jid as raw byte array."
 msgstr "消息接收者完整 jid 的 SHA256 哈希作为原始字节数组。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:183
-#, fuzzy
 msgid "ts"
 msgstr "ts"
 
@@ -2175,7 +2143,6 @@ msgid "serialized XML stanza containing message."
 msgstr "包含消息的序列化 XML 节。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:187
-#, fuzzy
 msgid "expire-at"
 msgstr "expire-at"
 
@@ -2326,7 +2293,6 @@ msgid ""
 msgstr "``MD5-USERNAME-PASSWORD`` 数据库存储来自连接用户名（localpart）和密码的 MD5 哈希码。"
 
 #: ../../Tigase_Administration/Database_Management/Hashed_User_Passwords_in_Database.inc:33
-#, fuzzy
 msgid "For example:"
 msgstr "例如："
 
@@ -2653,15 +2619,15 @@ msgid "Connecting the Tigase Server to MySQL Database"
 msgstr "将 Tigase 服务器连接到 MySQL 数据库"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:9
-#, fuzzy
 msgid ""
 "Please before continuing reading of this manual have a look at the "
 ":ref:`initial MySQL database setup<Prepare-the-MySQL-Database-for-the-"
 "Tigase-Server>`. It will help you with database preparation for "
 "connecting with Tigase server."
 msgstr ""
-"在继续阅读本手册之前，请先查看 :ref:`initial MySQL database "
-"setup<prepareMysql>`。它将帮助您准备用于连接 Tigase 服务器的数据库。"
+"在继续阅读本手册之前，请先查看 :ref:`初始 MySQL 数据库设置<Prepare-the-MySQL-"
+"Database-for-the-Tigase-Server>`。它将帮助您准备用于连接 Tigase "
+"服务器的数据库。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:11
 msgid "This guide describes MySQL database connection parameters."
@@ -3042,7 +3008,6 @@ msgid ""
 msgstr "此更改导致创建具有以下字段的新表 ``tig_user_credentials`` ："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:133
-#, fuzzy
 msgid "**uid**"
 msgstr "**uid**"
 
@@ -3289,7 +3254,6 @@ msgstr ""
 "服务器的性能。这是附加到先前架构的主键项的自动递增列。"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:230
-#, fuzzy
 msgid ""
 "**You MUST update your database to be compliant with the new schema. If "
 "you do not, Tigase will not function properly.**"
@@ -3469,17 +3433,14 @@ msgid ""
 msgstr "您可以使用 Tigase 中的实用程序从 Tigase 根目录使用以下命令更新架构："
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:307
-#, fuzzy
 msgid "Linux"
 msgstr "Linux"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:313
-#, fuzzy
 msgid "Windows:"
 msgstr "Windows:"
 
 #: ../../Tigase_Administration/Database_Management/Schema_Updates.inc:321
-#, fuzzy
 msgid ""
 "**Some variation may be necessary depending on how your java build uses**"
 " ``-cp`` **option**"
