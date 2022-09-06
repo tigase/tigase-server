@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-08-09 21:11+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/security/zh_Hans/>\n"
@@ -164,12 +164,10 @@ msgid ""
 msgstr "暴力防护由 VHost 配置。有以下配置参数列表："
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:12
-#, fuzzy
 msgid "``brute-force-lock-enabled``"
 msgstr "``brute-force-lock-enabled``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:12
-#, fuzzy
 msgid "``boolean``"
 msgstr "``boolean``"
 
@@ -178,7 +176,6 @@ msgid "Brute Force Prevention Enabled"
 msgstr "启用暴力预防"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:14
-#, fuzzy
 msgid "``brute-force-lock-after-fails``"
 msgstr "``brute-force-lock-after-fails``"
 
@@ -186,7 +183,6 @@ msgstr "``brute-force-lock-after-fails``"
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:16
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:18
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:20
-#, fuzzy
 msgid "``long``"
 msgstr "``long``"
 
@@ -195,7 +191,6 @@ msgid "Number of allowed invalid login"
 msgstr "允许的无效登录次数"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:16
-#, fuzzy
 msgid "``brute-force-period-time``"
 msgstr "``brute-force-period-time``"
 
@@ -204,7 +199,6 @@ msgid "Time [sec] in what failed login tries are counted"
 msgstr "计算失败登录尝试的时间 [秒]"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:18
-#, fuzzy
 msgid "``brute-force-disable-after-fails``"
 msgstr "``brute-force-disable-after-fails``"
 
@@ -213,7 +207,6 @@ msgid "Threshold beyond which account will be permanently disabled"
 msgstr "帐户将被永久禁用的阈值"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:20
-#, fuzzy
 msgid "``brute-force-lock-time``"
 msgstr "``brute-force-lock-time``"
 
@@ -222,12 +215,10 @@ msgid "Time [sec] of soft ban (first threshold)"
 msgstr "软禁令的时间[秒]（第一个阈值）"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:22
-#, fuzzy
 msgid "``brute-force-mode``"
 msgstr "``brute-force-mode``"
 
 #: ../../Tigase_Administration/Security/Brute-force_attack_prevention.inc:22
-#, fuzzy
 msgid "``string``"
 msgstr "``string``"
 
@@ -465,7 +456,6 @@ msgid ""
 msgstr "对于 Tigase 服务器以及许多其他服务器（Apache 2.x），顺序如下；您的域证书，您的私钥，颁发证书的机构，根证书。"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:118
-#, fuzzy
 msgid ""
 "**Tigase requires full certificate chain in PEM file (described above)! "
 "Different applications may require pem file with certificates and private"
@@ -473,8 +463,10 @@ msgid ""
 "other services like Web server or e-mail server. Currently, Tigase can "
 "automatically sort certificates in PEM file while loading it.**"
 msgstr ""
-"**Tigase 需要 PEM 文件中的完整证书链（如上所述）！不同的应用程序可能需要具有不同顺序的证书和私钥的 pem 文件。因此，Web "
-"服务器或电子邮件服务器等其他服务不一定会使用相同的文件。目前，Tigase 可以在加载 PEM 文件时自动对证书进行排序。**"
+"**Tigase 需要 PEM 文件中的完整证书链（如上所述）！"
+"不同的应用程序可能需要具有不同顺序的证书和私钥的 pem 文件。因此，Web "
+"服务器或电子邮件服务器等其他服务不一定会使用相同的文件。目前，Tigase "
+"可以在加载 PEM 文件时自动对证书进行排序。**"
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:123
 msgid "Installing/Loading Certificate To the Tigase Server"
@@ -529,7 +521,6 @@ msgstr ""
 "服务器识别，特别是如果它是来自新提供商的证书。以下是提供商的示例列表："
 
 #: ../../Tigase_Administration/Security/Server_Certificates.inc:136
-#, fuzzy
 msgid ""
 "LetsEncrypt - please see :ref:`Installing LetsEncrypt Certificates in "
 "Your Linux System<LetsEncryptCertificate>` for details"
@@ -1033,18 +1024,15 @@ msgid "The different ``cls`` or classes are:"
 msgstr "不同的 ``cls`` 或类是:"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:89
-#, fuzzy
 msgid "Drupal - ``tigase.db.jdbc.DrupalWPAuth``"
 msgstr "Drupal - ``tigase.db.jdbc.DrupalWPAuth``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:91
-#, fuzzy
 msgid ""
 "MySQL, Derby, PostgreSQL, MS SQL Server - "
 "``tigase.db.jdbc.JDBCRepository``"
 msgstr ""
-"MySQL, Derby, PostgreSQL, MS SQL Server - "
-"``tigase.db.jdbc.JDBCRepository``"
+"MySQL, Derby, PostgreSQL, MS SQL Server - ``tigase.db.jdbc.JDBCRepository``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:93
 msgid ""
@@ -1080,7 +1068,6 @@ msgstr ""
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:101
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:97
-#, fuzzy
 msgid "For example:"
 msgstr "例如："
 
@@ -1092,12 +1079,10 @@ msgid ""
 msgstr "如果您有兴趣通过编写自己的查询或存储过程来进一步自定义身份验证连接器，请查看以下指南："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:113
-#, fuzzy
 msgid ":ref:`Tigase Auth guide<tigaseAuthConnector>`"
 msgstr ":ref:`Tigase Auth guide<tigaseAuthConnector>`"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors.inc:115
-#, fuzzy
 msgid ":ref:`Tigase Custom Auth guide<custonAuthConnector>`"
 msgstr ":ref:`Tigase Custom Auth guide<custonAuthConnector>`"
 
@@ -1135,49 +1120,44 @@ msgstr ""
 " 请参阅 Tigase 存储库以获取模式定义文件（每个组件都有其专用的模式）。例如："
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:14
-#, fuzzy
 msgid ""
 "`tigase-server <https://github.com/tigase/tigase-"
 "server/tree/master/src/main/database>`__"
 msgstr ""
-"`tigase-server <https://github.com/tigase/tigase-"
-"server/tree/master/src/main/database>`__"
+"`tigase-server <https://github.com/tigase/tigase-server/tree/master/src/main/"
+"database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:16
-#, fuzzy
 msgid ""
 "`tigase-pubsub <https://github.com/tigase/tigase-"
 "pubsub/tree/master/src/main/database>`__"
 msgstr ""
-"`tigase-pubsub <https://github.com/tigase/tigase-"
-"pubsub/tree/master/src/main/database>`__"
+"`tigase-pubsub <https://github.com/tigase/tigase-pubsub/tree/master/src/main/"
+"database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:18
-#, fuzzy
 msgid ""
 "`tigase-muc <https://github.com/tigase/tigase-"
 "muc/tree/master/src/main/database>`__"
 msgstr ""
-"`tigase-muc <https://github.com/tigase/tigase-"
-"muc/tree/master/src/main/database>`__"
+"`tigase-muc <https://github.com/tigase/tigase-muc/tree/master/src/main/"
+"database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:20
-#, fuzzy
 msgid ""
 "`tigase-message-archiving <https://github.com/tigase/tigase-message-"
 "archiving/tree/master/src/main/database>`__"
 msgstr ""
-"`tigase-message-archiving <https://github.com/tigase/tigase-message-"
-"archiving/tree/master/src/main/database>`__"
+"`tigase-message-archiving <https://github.com/tigase/"
+"tigase-message-archiving/tree/master/src/main/database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:22
-#, fuzzy
 msgid ""
 "`tigase-socks5 <https://github.com/tigase/tigase-"
 "socks5/tree/master/src/main/database>`__"
 msgstr ""
-"`tigase-socks5 <https://github.com/tigase/tigase-"
-"socks5/tree/master/src/main/database>`__"
+"`tigase-socks5 <https://github.com/tigase/tigase-socks5/tree/master/src/main/"
+"database>`__"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Tigase_Auth_Connector.inc:24
 msgid "The absolute minimum of stored procedures you have to implement is:"
@@ -1425,7 +1405,6 @@ msgid "Example Query"
 msgstr "示例查询"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:176
-#, fuzzy
 msgid "``conn-valid-query``"
 msgstr "``conn-valid-query``"
 
@@ -1439,12 +1418,10 @@ msgid "Takes no arguments."
 msgstr "不接受任何参数。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:176
-#, fuzzy
 msgid "``select 1``"
 msgstr "``select 1``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:178
-#, fuzzy
 msgid "``init-db-query``"
 msgstr "``init-db-query``"
 
@@ -1453,12 +1430,10 @@ msgid "Database initialization query which is run after the server is started."
 msgstr "服务器启动后运行的数据库初始化查询。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:178
-#, fuzzy
 msgid "``update tig_users set online_status = 0``"
 msgstr "``update tig_users set online_status = 0``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:180
-#, fuzzy
 msgid "``add-user-query``"
 msgstr "``add-user-query``"
 
@@ -1472,12 +1447,10 @@ msgid "Takes 2 arguments: ``(user_id (JID), password)``"
 msgstr "接受 2 个参数： ``(user_id (JID), password)``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:180
-#, fuzzy
 msgid "``insert into tig_users (user_id, user_pw) values (?, ?)``"
 msgstr "``insert into tig_users (user_id, user_pw) values (?, ?)``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:182
-#, fuzzy
 msgid "``del-user-query``"
 msgstr "``del-user-query``"
 
@@ -1492,12 +1465,10 @@ msgid "Takes 1 argument: ``(user_id (JID))``"
 msgstr "接受 1 个参数： ``(user_id (JID))``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:182
-#, fuzzy
 msgid "``delete from tig_users where user_id = ?``"
 msgstr "``delete from tig_users where user_id = ?``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:184
-#, fuzzy
 msgid "``get-password-query``"
 msgstr "``get-password-query``"
 
@@ -1506,12 +1477,10 @@ msgid "Retrieves user password from the database for given user_id (JID)."
 msgstr "从数据库中找回给定 user_id (JID) 的用户密码。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:184
-#, fuzzy
 msgid "``select user_pw from tig_users where user_id = ?``"
 msgstr "``select user_pw from tig_users where user_id = ?``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:186
-#, fuzzy
 msgid "``update-password-query``"
 msgstr "``update-password-query``"
 
@@ -1524,12 +1493,10 @@ msgid "Takes 2 arguments: ``(password, user_id (JID))``"
 msgstr "接受 2 个参数： ``(password, user_id (JID))``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:186
-#, fuzzy
 msgid "``update tig_users set user_pw = ? where user_id = ?``"
 msgstr "``update tig_users set user_pw = ? where user_id = ?``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:188
-#, fuzzy
 msgid "``user-login-query``"
 msgstr "``user-login-query``"
 
@@ -1550,12 +1517,10 @@ msgstr ""
 "user_id 的结果集，如果登录不成功，则返回空结果集。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:188
-#, fuzzy
 msgid "``select user_id from tig_users where (user_id = ?) AND (user_pw = ?)``"
 msgstr "``select user_id from tig_users where (user_id = ?) AND (user_pw = ?)``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:190
-#, fuzzy
 msgid "``user-logout-query``"
 msgstr "``user-logout-query``"
 
@@ -1566,16 +1531,13 @@ msgid ""
 msgstr "当用户注销或断开连接时调用此查询。它可以在数据库中记录该事件。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:190
-#, fuzzy
 msgid ""
 "``update tig_users, set online_status = online_status - 1 where user_id ="
 " ?``"
 msgstr ""
-"``update tig_users, set online_status = online_status - 1 where user_id ="
-" ?``"
+"``update tig_users, set online_status = online_status - 1 where user_id = ?``"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:192
-#, fuzzy
 msgid "``non-sasl-mechs``"
 msgstr "``non-sasl-mechs``"
 
@@ -1590,7 +1552,6 @@ msgstr ""
 "password-query`` 激活且密码以纯文本格式存储在数据库中时起作用。"
 
 #: ../../Tigase_Administration/Security/Auth_Connectors/Custom_Auth_Connector.inc:194
-#, fuzzy
 msgid "``sasl-mechs``"
 msgstr "``sasl-mechs``"
 
@@ -1805,12 +1766,10 @@ msgid "PLAIN *(enabled)*"
 msgstr "PLAIN *(启用)*"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:8
-#, fuzzy
 msgid "ANONYMOUS"
 msgstr "ANONYMOUS"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:10
-#, fuzzy
 msgid "EXTERNAL"
 msgstr "EXTERNAL"
 
@@ -1823,7 +1782,6 @@ msgid "SCRAM-SHA-256 *(enabled)*"
 msgstr "SCRAM-SHA-256 *(启用)*"
 
 #: ../../Tigase_Administration/Security/SASL_Mechanisms.inc:16
-#, fuzzy
 msgid "SCRAM-SHA-512"
 msgstr "SCRAM-SHA-512"
 
@@ -2236,16 +2194,15 @@ msgstr ""
 "list”。用户存储库必须返回分号分隔的域列表：``domain1.com;domain2.com,domain3.org``"
 
 #: ../../Tigase_Administration/Security/Packet_Filtering.inc:110
-#, fuzzy
 msgid ""
 "The filtering is performed by the `tigase.xmpp.impl.DomainFilter "
 "<https://github.com/tigase/tigase-"
 "server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter.java>`__ "
 "plugin. Please refer to source code for more implementation details."
 msgstr ""
-"过滤由 `tigase.xmpp.impl.DomainFilter <https://github.com/tigase/tigase-"
-"server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter "
-"执行.java>`__ 插件实现。更多实现细节请参考源代码。"
+"过滤由 `tigase.xmpp.impl.DomainFilter <https://github.com/tigase/"
+"tigase-server/tree/master/src/main/java/tigase/xmpp/impl/DomainFilter 执行."
+"java>`__ 插件实现。更多实现细节请参考源代码。"
 
 #: ../../Tigase_Administration/Security/Access_Control_List.inc:2
 msgid "Access Control Lists in Tigase"
