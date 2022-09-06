@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-07-20 08:15+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/codestyleguide/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/codestyleguide/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:2
@@ -122,7 +123,6 @@ msgstr "所有不属于下列任何组的导入"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:57
 #: ../../Tigase_Development/CodeStyleGuide.rst:63
-#, fuzzy
 msgid "``blank line``"
 msgstr "``blank line``"
 
@@ -168,7 +168,6 @@ msgstr "``final``, ``static`` 字段按以下顺序："
 #: ../../Tigase_Development/CodeStyleGuide.rst:93
 #: ../../Tigase_Development/CodeStyleGuide.rst:105
 #: ../../Tigase_Development/CodeStyleGuide.rst:115
-#, fuzzy
 msgid "``public``"
 msgstr "``public``"
 
@@ -176,7 +175,6 @@ msgstr "``public``"
 #: ../../Tigase_Development/CodeStyleGuide.rst:95
 #: ../../Tigase_Development/CodeStyleGuide.rst:107
 #: ../../Tigase_Development/CodeStyleGuide.rst:117
-#, fuzzy
 msgid "``protected``"
 msgstr "``protected``"
 
@@ -184,7 +182,6 @@ msgstr "``protected``"
 #: ../../Tigase_Development/CodeStyleGuide.rst:97
 #: ../../Tigase_Development/CodeStyleGuide.rst:109
 #: ../../Tigase_Development/CodeStyleGuide.rst:119
-#, fuzzy
 msgid "``package-private``"
 msgstr "``package-private``"
 
@@ -192,12 +189,10 @@ msgstr "``package-private``"
 #: ../../Tigase_Development/CodeStyleGuide.rst:99
 #: ../../Tigase_Development/CodeStyleGuide.rst:111
 #: ../../Tigase_Development/CodeStyleGuide.rst:121
-#, fuzzy
 msgid "``private``"
 msgstr "``private``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:89
-#, fuzzy
 msgid "``public`` ``enum``"
 msgstr "``public`` ``enum``"
 
@@ -329,15 +324,15 @@ msgid "Column limit: 120"
 msgstr "列限制：120"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:174
-#, fuzzy
 msgid ""
 "Defined column limit is 120 characters and must be line-wrapped as "
 "described below Java code has a column limit of 100 characters. Except as"
 " noted below, any line that would exceed this limit must be line-wrapped,"
 " as explained in section :ref:`Line-wrapping<linewrapping>`."
 msgstr ""
-"定义的列限制为 120 个字符，并且必须按如下所述进行换行， Java 代码的列限制为 100 "
-"个字符。除下文所述外，任何超出此限制的行都必须换行，如 `Line-wrapping <#line-wrapping>`__ 部分所述。"
+"定义的列限制为 120 个字符，并且必须按如下所述进行换行， Java 代码的列限制为 "
+"100 个字符。除下文所述外，任何超出此限制的行都必须换行，如 :ref:`Line-"
+"wrapping<linewrapping>` 部分所述。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:179
 msgid "Line-wrapping"
@@ -630,7 +625,6 @@ msgid ""
 msgstr "不应忽略抓到的异常（如果这是必须的，则需要日志条目）。"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:308
-#, fuzzy
 msgid "Javadoc"
 msgstr "Javadoc"
 
@@ -655,17 +649,14 @@ msgid "empty tag should be included for following tags:"
 msgstr "以下标签应包含空标签："
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:320
-#, fuzzy
 msgid "``@params``"
 msgstr "``@params``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:322
-#, fuzzy
 msgid "``@return``"
 msgstr "``@return``"
 
 #: ../../Tigase_Development/CodeStyleGuide.rst:324
-#, fuzzy
 msgid "``@throws``"
 msgstr "``@throws``"
 
@@ -692,4 +683,3 @@ msgstr "对于像 ``getFoo`` 这样的 *简单和明显* 的方法是可选的�
 #: ../../Tigase_Development/CodeStyleGuide.rst:333
 msgid "in methods that overrides a supertype method."
 msgstr "在覆盖超类型方法的方法中。"
-
