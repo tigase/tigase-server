@@ -9,7 +9,7 @@ This document describes how virtual hosts work in Tigase server and how to get t
 
 The :ref:`'default-virtual-host'<virtHosts>` property allows to define name of the single vhost domain which will be considered a default vhost domain for this installation. It allows you just to configure the domain name. Any additional configuration needs to be configured using ad-hoc commands.
 
-Virtual hosts should be managed using ad-hoc commands or admin ui, visit :ref:`Add and Manage Domains<addManageDomain>` for description of vhosts management process or visit `Specification for ad-hoc Commands Used to Manage Virtual Domains<adhocCommands>` for more information about ad-hoc commands.
+Virtual hosts should be managed using ad-hoc commands or admin ui, visit :ref:`Add and Manage Domains<addManageDomain>` for description of vhosts management process or visit :ref:`Specification for ad-hoc Commands Used to Manage Virtual Domains<adhocCommands>` for more information about ad-hoc commands.
 
 If you have components that may not be able to handle multiple vhosts or cluster mode, we have developed a virtual component solution as well, details in the :ref:`Virtual Components for the Tigase Cluster<virtualComponents>` section.
 
