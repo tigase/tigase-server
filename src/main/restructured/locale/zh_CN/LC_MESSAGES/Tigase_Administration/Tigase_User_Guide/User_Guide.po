@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-27 12:30-0700\n"
-"PO-Revision-Date: 2022-06-13 22:23+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/user_guide/zh_Hans/>\n"
@@ -74,7 +74,6 @@ msgstr "XMPP 是一个开放的标准，这意味着每个人都可以知道它�
 "自己的软件连接到客户端和服务器端的网络。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Introduction.inc:17
-#, fuzzy
 msgid ""
 "The server side is actually the biggest difference and advantage. Many "
 "companies have offices in different locations, and such instant messaging"
@@ -145,7 +144,6 @@ msgid "Short instructions:"
 msgstr "简短说明："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/How_to_Use.inc:16
-#, fuzzy
 msgid ""
 "Usually you just need to enter the user name of the form: user@tigase.im."
 " Your XMPP client should take care of all other things as our service "
@@ -158,7 +156,6 @@ msgstr ""
 "服务器上没有帐户，只需勾选注册新帐户的选项即可。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/How_to_Use.inc:20
-#, fuzzy
 msgid "**Long Instructions:**"
 msgstr "**长指令说明:**"
 
@@ -184,7 +181,6 @@ msgstr ""
 "帐户，并且您仍然可以只使用一个程序同时连接所有这些帐户。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/How_to_Use.inc:26
-#, fuzzy
 msgid ""
 "The `full list of all known XMPP clients "
 "<https://xmpp.org/software/clients.html>`__ is very long. You can "
@@ -237,7 +233,6 @@ msgstr ""
 "Tigase.im 等免费服务和可以自己托管的服务器。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/How_to_Use.inc:34
-#, fuzzy
 msgid ""
 "tigase.im[Tigase.im] - web-based client allowing to easily chat with "
 "friends independently of platform."
@@ -264,7 +259,6 @@ msgstr ""
 "的客户端。非常人性化，适用于大多数 Linux 发行版，FreeBSD 和 MS Windows。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/How_to_Use.inc:40
-#, fuzzy
 msgid ""
 "`Pidgin <http://www.pidgin.im/>`__ (previously `Gaim "
 "<http://gaim.sourceforge.net/>`__) This is not just a Jabber client. This"
@@ -274,14 +268,14 @@ msgid ""
 "especially convenient if you have friends using other messaging networks."
 " Pidgin works on most Linux distributions, and on MS Windows."
 msgstr ""
-"`Pidgin <http://www.pidgin.im/>`__（以前的`Gaim <http://gaim.sourceforge.net/"
-">`__）这不仅仅是一个Jabber客户端。这种类型的应用程序被称为多通信器，因为除了 "
-"Jabber 之外，它还支持许多其他即时消息传递网络/协议，例如：AIM/ICQ、MSN、Yahoo"
-"、Gadu-Gadu、IRC 等等。因此，如果您有使用其他消息网络的朋友，就会特别方便。 "
-"Pidgin 适用于大多数 Linux 发行版和 MS Windows。"
+"`Pidgin <http://www.pidgin.im/>`__ （以前的 `Gaim <http://gaim.sourceforge."
+"net/>`__）这不仅仅是一个Jabber客户端。这种类型的应用程序被称为多通信器，"
+"因为除了 Jabber 之外，它还支持许多其他即时消息传递网络/协议，例如：AIM/"
+"ICQ、MSN、Yahoo、Gadu-Gadu、IRC "
+"等等。因此，如果您有使用其他消息网络的朋友，就会特别方便。 Pidgin "
+"适用于大多数 Linux 发行版和 MS Windows。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/How_to_Use.inc:42
-#, fuzzy
 msgid ""
 "`Kopete <http://kopete.kde.org/>`__ This is a `KDE "
 "<http://www.kde.org/>`__ component and although it only works on Linux "
@@ -293,7 +287,6 @@ msgstr ""
 "之外的最流行的即时通讯协议，比如：AIM、Gadu-Gadu、ICQ、IRC、MSN、Yahoo。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/How_to_Use.inc:44
-#, fuzzy
 msgid "Install the Jabber client of your choice and set up for a Tigase account:"
 msgstr "安装您选择的 Jabber 客户端并设置 Tigase 帐户："
 
@@ -302,27 +295,22 @@ msgid "Configuration instructions for Psi"
 msgstr "Psi 的配置说明"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:5
-#, fuzzy
 msgid "Psi - Initial configuration"
 msgstr "Psi - 初始配置"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:7
-#, fuzzy
 msgid "The first time you run Psi you see a screen like this:"
 msgstr "第一次运行 Psi 时，您会看到如下屏幕："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:9
-#, fuzzy
 msgid "|Psi First Run|"
 msgstr "|Psi First Run|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:109
-#, fuzzy
 msgid "Psi First Run"
 msgstr "Psi First Run"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:11
-#, fuzzy
 msgid ""
 "To connect to tigase.org server we need to configure the program. Below "
 "are step-by-step instructions for novice users on how to setup Psi."
@@ -330,7 +318,6 @@ msgstr "要连接到 tigase.org 服务器，我们需要配置程序。以下是
 "的分步说明。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:13
-#, fuzzy
 msgid ""
 "Psi can connect to many Jabber servers at the same time so we have to "
 "identify each connection somehow. The first thing to do is assign a name "
@@ -342,17 +329,14 @@ msgstr ""
 "服务器的连接时，我们将其命名为：**Tigase**。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:15
-#, fuzzy
 msgid "|Psi Add Account|"
 msgstr "|Psi Add Account|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:110
-#, fuzzy
 msgid "Psi Add Account"
 msgstr "Psi Add Account"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:17
-#, fuzzy
 msgid ""
 "**Note!** At the moment you can register an account through the Web site "
 "only. This is a single account for both services: The Drupal website and "
@@ -363,11 +347,11 @@ msgid ""
 msgstr ""
 "**注意！** 目前您只能通过网站注册帐户。这是拥有两个服务的一个帐户：Drupal "
 "网站和 tigase.org 域上的 Jabber/XMPP 服务。如果您想在 tigase.org "
-"服务器上拥有 Jabber 帐户，请转到注册页面，取消勾选“注册新帐户”，然后转到第 5 "
-"点。您可以参考使用指南的 2-4点 在任何其他 Jabber 服务器上注册 Jabber 帐户。"
+"服务器上拥有 Jabber 帐户，请转到注册页面，取消勾选 \"注册新帐户 \"，"
+"然后转到第 5 点。您可以参考使用指南的 2-4点 在任何其他 Jabber 服务器上注册 "
+"Jabber 帐户。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:19
-#, fuzzy
 msgid ""
 "When you press the Add button you will see next window where you can "
 "enter your Jabber account details:"
@@ -375,17 +359,14 @@ msgstr "当您按下添加按钮时，您将看到下一个窗口，您可以在
 "帐户详细信息："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:21
-#, fuzzy
 msgid "|Psi Empty Account|"
 msgstr "|Psi Empty Account|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:111
-#, fuzzy
 msgid "Psi Empty Account"
 msgstr "Psi Empty Account"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:23
-#, fuzzy
 msgid ""
 "Invent your user name for the account on Tigase server. Let’s assume your"
 " user name is: **frank**. Jabber ID’s however consist of 2 parts - your "
@@ -400,7 +381,6 @@ msgstr ""
 "org**。接下来输入您选择的密码，然后单击“注册”按钮。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:25
-#, fuzzy
 msgid "|Psi Register Account|"
 msgstr "|Psi Register Account|"
 
@@ -409,24 +389,20 @@ msgid "Psi Register Account"
 msgstr "Psi 注册帐户"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:27
-#, fuzzy
 msgid ""
 "On successful registration you will receive a confirmation message and "
 "you should see a window like this:"
 msgstr "注册成功后，您将收到一条确认消息，您应该会看到如下窗口："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:29
-#, fuzzy
 msgid "|Register Account Success|"
 msgstr "|Register Account Success|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:113
-#, fuzzy
 msgid "Register Account Success"
-msgstr "账号注册成功"
+msgstr "Register Account Success"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:31
-#, fuzzy
 msgid ""
 "It may happen that somebody earlier registered an account with the same "
 "name you’ve selected for yourself. If so, you will receive error message."
@@ -436,7 +412,6 @@ msgstr "有时候可能您为自己选择的用户名已经被其他人使用和
 "错误消息。此时您必须选择另一个用户名并再次注册。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:33
-#, fuzzy
 msgid ""
 "After clicking the **OK** button you will see a window with your "
 "connection and account setup. You can stick with default values for now."
@@ -444,44 +419,37 @@ msgstr "单击 **OK** 按钮后，您将看到一个包含有您的连接和帐�
 "用这些默认值。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:35
-#, fuzzy
 msgid "|PSI After Registration|"
 msgstr "|PSI After Registration|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:114
-#, fuzzy
 msgid "PSI After Registration"
 msgstr "PSI After Registration"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:37
-#, fuzzy
 msgid "Just click the **Save** button and this window closes."
 msgstr "只需单击 **Save** 按钮，此窗口就会关闭。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:39
-#, fuzzy
 msgid ""
 "Now you have your account configured and ready to use but you are still "
 "off-line. You can find out whether you are on-line or off-line by looking"
 " at the bottom of main Psi window. There you can see **Offline** text."
 msgstr ""
 "现在您已设置好帐户并可以使用，但此时您仍处于离线状态。您可以通过查看主 Psi "
-"窗口的底部来确定您是在线还是离线。在那里您可以看到 显示**Offline** 。"
+"窗口的底部来确定您是在线还是离线。在那里您可以看到 显示 **Offline** 。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:41
-#, fuzzy
 msgid ""
 "Click on this **Offline** text and you will see a list of possible "
 "options. Just select **Online**."
-msgstr "单击 **Offline** ，您将看到一系列可选择的列表选项。选择**Online**。"
+msgstr "单击 **Offline** ，您将看到一系列可选择的列表选项。选择 **Online**。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:43
-#, fuzzy
 msgid "|PSI Connected|"
 msgstr "|PSI Connected|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:115
-#, fuzzy
 msgid "PSI Connected"
 msgstr "PSI Connected"
 
@@ -490,7 +458,6 @@ msgid "Now you are connected!"
 msgstr "现在你已被连接！"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:47
-#, fuzzy
 msgid ""
 "Well, you are now connected but how to talk to other people? How to add "
 "friends to the contact list? You can send a message to your friends "
@@ -499,65 +466,54 @@ msgid ""
 "online and available for chatting and if you could start talking to your "
 "friend just by clicking on his name."
 msgstr ""
-"您现在已连接上，但如何与其他人交谈呢？如何将好友添加到联系人列表呢？您可以使"
-"用**Psi menu** 选择**New blank message** 立即向您的朋友发送消息。但是如果您可"
-"以看到哪些朋友在线并且可以聊天，并且您可以通过单击他的名字开始与之交谈，那么"
-"这样沟通会更方便。"
+"您现在已连接上，但如何与其他人交谈呢？如何将好友添加到联系人列表呢？"
+"您可以使用 **Psi menu** 选择 **New blank message** 立即向您的朋友发送消息。但"
+"是如果您可以看到哪些朋友在线并且可以聊天，并且您可以通过单击他的名字开始与之"
+"交谈，那么这样沟通会更方便。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:51
-#, fuzzy
 msgid "Short Instructions How to Add Your First Contact"
 msgstr "简短说明如何添加您的第一个联系人"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:53
-#, fuzzy
 msgid ""
 "Click on Psi menu - the button next to the **Online** text. You will see "
 "something like this:"
 msgstr "单击 Psi 菜单 - **Online** 文字旁边的按钮。你会看到如下界面："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:55
-#, fuzzy
 msgid "|PSI Menu|"
 msgstr "|PSI Menu|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:116
-#, fuzzy
 msgid "PSI Menu"
 msgstr "PSI Menu"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:57
-#, fuzzy
 msgid "From all menu options select the top one - Add a contact:"
 msgstr "从所有菜单选项中选择最上面的选项 - 添加联系人："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:59
-#, fuzzy
 msgid "|PSI Menu add Contact|"
 msgstr "|PSI Menu add Contact|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:117
-#, fuzzy
 msgid "PSI Menu add Contact"
 msgstr "PSI Menu add Contact"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:61
-#, fuzzy
 msgid "The next window will display where you can enter your contact details:"
 msgstr "下一个窗口将显示您可以在哪里输入您的联系方式："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:63
-#, fuzzy
 msgid "|PSI Add User Empty|"
 msgstr "|PSI Add User Empty|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:118
-#, fuzzy
 msgid "PSI Add User Empty"
 msgstr "PSI Add User Empty"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:65
-#, fuzzy
 msgid ""
 "You have to know the Jabber ID of the person you want to add to your "
 "contact list. Let’s assume, for example, you want to add Tigase server "
@@ -568,12 +524,10 @@ msgstr ""
 "Jabber ID 添加到您的联系人列表中。在输入这些详细信息后，窗口将如下所示："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:67
-#, fuzzy
 msgid "|PSI Add User Filled|"
 msgstr "|PSI Add User Filled|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:119
-#, fuzzy
 msgid "PSI Add User Filled"
 msgstr "PSI Add User Filled"
 
@@ -582,19 +536,16 @@ msgid "Click the **Add** button."
 msgstr "单击**Add**按钮。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:71
-#, fuzzy
 msgid ""
 "Now you will see a confirmation window that a new person has been added "
 "to your contact list:"
 msgstr "现在您将看到一个确认窗口表明您添加了一个新的联系人："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:73
-#, fuzzy
 msgid "|PSI Kobit Added|"
 msgstr "|PSI Kobit Added|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:120
-#, fuzzy
 msgid "PSI Kobit Added"
 msgstr "PSI Kobit Added"
 
@@ -625,12 +576,10 @@ msgid ""
 msgstr "一旦其他用户发回确认，您通常会收到 2 个系统事件："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:81
-#, fuzzy
 msgid "|PSI Kobit Auth Received|"
 msgstr "|PSI Kobit Auth Received|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:121
-#, fuzzy
 msgid "PSI Kobit Auth Received"
 msgstr "PSI Kobit Auth Received"
 
@@ -639,12 +588,10 @@ msgid "Click on the contact to see a window with these messages:"
 msgstr "单击联系人查看包含以下消息的窗口："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:85
-#, fuzzy
 msgid "|PSI Authorized Window|"
 msgstr "|PSI Authorized Window|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:122
-#, fuzzy
 msgid "PSI Authorized Window"
 msgstr "PSI Authorized Window"
 
@@ -653,12 +600,10 @@ msgid "One message just says you have been authorized by the other user:"
 msgstr "一条消息只是说您已被其他用户授权："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:89
-#, fuzzy
 msgid "|PSI Authorized Window 2|"
 msgstr "|PSI Authorized Window 2|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:123
-#, fuzzy
 msgid "PSI Authorized Window 2"
 msgstr "PSI Authorized Window 2"
 
@@ -675,12 +620,10 @@ msgstr "第二条消息更有趣。它包含您是否还授权其他用户看到
 "此请求，只需单击 **Add/Auth**。"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:95
-#, fuzzy
 msgid "|PSI Authorized Window 3|"
 msgstr "|PSI Authorized Window 3|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:124
-#, fuzzy
 msgid "PSI Authorized Window 3"
 msgstr "PSI Authorized Window 3"
 
@@ -689,12 +632,10 @@ msgid "Finally main Psi window with your new contact:"
 msgstr "最后这是您的新联系人的主 Psi 窗口："
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:99
-#, fuzzy
 msgid "|PSI Kobit Added Authorized|"
 msgstr "|PSI Kobit Added Authorized|"
 
 #: ../../Tigase_Administration/Tigase_User_Guide/Configuration_Instructions.inc:125
-#, fuzzy
 msgid "PSI Kobit Added Authorized"
 msgstr "PSI Kobit Added Authorized"
 
