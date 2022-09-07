@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-08-09 23:33+0000\n"
+"PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/using_tigasse/zh_Hans/>\n"
@@ -36,81 +36,68 @@ msgid ":ref:`Tigase Log Guide<Tigase-Log-Guide>`"
 msgstr ":ref:`Tigase 日志指南<Tigase-Log-Guide>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:8
-#, fuzzy
 msgid ":ref:`Debugging Tigase<Debuging-Tigase>`"
 msgstr ":ref:`调试Tigase<Debuging-Tigase>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:10
-#, fuzzy
 msgid ":ref:`Basic System Checks<Basic-System-Checks>`"
 msgstr ":ref:`基本系统检查<Basic-System-Checks>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:12
-#, fuzzy
 msgid ":ref:`Add and Manage Domains<addManageDomain>`"
 msgstr ":ref:`添加和管理域<addManageDomain>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:14
-#, fuzzy
 msgid ":ref:`Presence Forwarding<Presence-Forwarding>`"
 msgstr ":ref:`Presence转发<Presence-Forwarding>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:16
-#, fuzzy
 msgid ":ref:`Watchdog<Watchdog>`"
 msgstr ":ref:`监视器<Watchdog>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:18
-#, fuzzy
 msgid ""
 ":ref:`Runtime Environment Tip<Tigase-Tip-Checking-the-Runtime-"
 "Environment>`"
 msgstr ":ref:`运行环境提示<Tigase-Tip-Checking-the-Runtime-Environment>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:20
-#, fuzzy
 msgid ":ref:`Checking Cluster Connections<Checking-Cluster-Connections>`"
 msgstr ":ref:`检查集群连接<Checking-Cluster-Connections>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:22
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:10
-#, fuzzy
 msgid ""
 ":ref:`Best Practices for Connecting to Tigase XMPP server From Web "
 "Browser<Best-Practices-for-Connecting-to-Tigase-XMPP-server-From-Web-"
 "Browser>`"
 msgstr ""
-":ref:`从 Web 浏览器连接到 Tigase XMPP 服务器的最佳实践<Best-Practices-for-Connecting-to-"
-"Tigase-XMPP-server-From-Web-Browser>`"
+":ref:`从 Web 浏览器连接到 Tigase XMPP 服务器的最佳实践<Best-Practices-for-"
+"Connecting-to-Tigase-XMPP-server-From-Web-Browser>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:24
-#, fuzzy
 msgid ":ref:`Scripting Support in Tigase<Scripting-support-in-Tigase>`"
 msgstr ":ref:`Tigase 中的脚本支持<Scripting-support-in-Tigase>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:26
-#, fuzzy
 msgid ""
 ":ref:`Scripting Introduction - Hello World!<Scripting-Introduction - "
 "Hello-World!>`"
 msgstr ":ref:`脚本介绍- Hello World!<Scripting-Introduction - Hello-World!>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:28
-#, fuzzy
 msgid ""
 ":ref:`Tigase Scripting Version 4.4.x Update for Administrators<Tigase-"
 "Scripting-Version-4.4.x-Update-for-Administrators>`"
 msgstr ""
-":ref:`面向管理员的 Tigase 脚本版本 4.4.x 更新<Tigase-Scripting-Version-4.4.x-Update-"
-"for-Administrators>`"
+":ref:`面向管理员的 Tigase 脚本版本 4.4.x 更新<Tigase-Scripting-Version-4.4.x"
+"-Update-for-Administrators>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:30
-#, fuzzy
 msgid ":ref:`Tigase and Python Scripting<Tigase-and-Python>`"
 msgstr ":ref:`Tigase 和 Python 脚本<Tigase-and-Python>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Intro.inc:32
-#, fuzzy
 msgid ":ref:`Configuration Wizards<tigase3xconfiguration>`"
 msgstr ":ref:`配置向导<tigase3xconfiguration>`"
 
@@ -303,7 +290,6 @@ msgid "This example results in two settings:"
 msgstr "此示例产生两个设置："
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:150
-#, fuzzy
 msgid "``/message/received[urn:xmpp:receipts]``"
 msgstr "``/message/received[urn:xmpp:receipts]``"
 
@@ -314,7 +300,6 @@ msgid ""
 msgstr "结果存储带有 ``recieved`` 子元素和xlmns设置为 ``urn:xmpp:receipts`` 的消息"
 
 #: ../../Tigase_Administration/Using_Tigase/Offline_Messages.inc:153
-#, fuzzy
 msgid "``/message/store-offline``"
 msgstr "``/message/store-offline``"
 
@@ -482,7 +467,6 @@ msgstr ""
 "生成日志的位置，它们包含的内容，以及我们如何根据需要自定义它们。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:9
-#, fuzzy
 msgid "install.log"
 msgstr "install.log"
 
@@ -497,7 +481,6 @@ msgstr ""
 "服务器时生成的文件的基本列表。尽管您可能不需要使用它，但它可以提供一个方便的列表，以查看安装时是否有任何文件未写入您的硬盘驱动器。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:14
-#, fuzzy
 msgid "derby.log"
 msgstr "derby.log"
 
@@ -514,7 +497,6 @@ msgstr ""
 "行的非常小的文件。它在数据库启动时被覆盖。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:19
-#, fuzzy
 msgid "etc/config-dump.properties"
 msgstr "etc/config-dump.properties"
 
@@ -538,7 +520,6 @@ msgid "This file is re-written every time tigase starts."
 msgstr "每次启动 tigase 时都会重写此文件。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:32
-#, fuzzy
 msgid "logs/tigase.log.#"
 msgstr "logs/tigase.log.#"
 
@@ -625,7 +606,6 @@ msgid ""
 msgstr "*当服务器运行时，您可能会在目录中看到一个 tigase.log.0.lck 文件。这只是一个临时文件，一旦完全关闭 Tigase 就会被删除。*"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:68
-#, fuzzy
 msgid "logs/statistics.log.#"
 msgstr "logs/statistics.log.#"
 
@@ -640,7 +620,6 @@ msgstr ""
 "发送统计信息相关的任何信息。主要包括LicenceChecker 的输出。编号逻辑将与 ``tigase.log.#`` 文件相同。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:73
-#, fuzzy
 msgid "logs/tigase.pid"
 msgstr "logs/tigase.pid"
 
@@ -654,7 +633,6 @@ msgstr ""
 "Tigase 启动时被覆盖。"
 
 #: ../../Tigase_Administration/Using_Tigase/Log_Guide.inc:78
-#, fuzzy
 msgid "logs/tigase-console.log"
 msgstr "logs/tigase-console.log"
 
@@ -968,12 +946,10 @@ msgstr ""
 "``vhost-man`` 的 ``Add new item`` 位置）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:32
-#, fuzzy
 msgid "|adminui vhost add item button|"
 msgstr "|adminui vhost add item button|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:138
-#, fuzzy
 msgid "adminui vhost add item button"
 msgstr "adminui vhost add item button"
 
@@ -985,12 +961,10 @@ msgid ""
 msgstr "完成此操作后，您将看到一个需要填写的表格。此表格允许您传递 ``Domain name`` 以添加和其他选项（其中一些是高级选项）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:36
-#, fuzzy
 msgid "|adminui vhost add item form|"
 msgstr "|adminui vhost add item form|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:139
-#, fuzzy
 msgid "adminui vhost add item form"
 msgstr "adminui vhost add item form"
 
@@ -1025,12 +999,10 @@ msgstr ""
 "``Update item configuration`` 位置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:49
-#, fuzzy
 msgid "|adminui vhost update item button|"
 msgstr "|adminui vhost update item button|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:140
-#, fuzzy
 msgid "adminui vhost update item button"
 msgstr "adminui vhost update item button"
 
@@ -1042,12 +1014,10 @@ msgid ""
 msgstr "您将看到托管在此 Tigase XMPP 服务器安装上的域列表。从它们中，您应该选择要修改设置的那个。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:53
-#, fuzzy
 msgid "|adminui vhost update item domains list|"
 msgstr "|adminui vhost update item domains list|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:141
-#, fuzzy
 msgid "adminui vhost update item domains list"
 msgstr "adminui vhost update item domains list"
 
@@ -1059,12 +1029,10 @@ msgid ""
 msgstr "提交此选择后，您将看到与添加新域时使用的相同的表单。它提供了该域的配置选项和当前使用的值。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:57
-#, fuzzy
 msgid "|adminui vhost update item form|"
 msgstr "|adminui vhost update item form|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:142
-#, fuzzy
 msgid "adminui vhost update item form"
 msgstr "adminui vhost update item form"
 
@@ -1099,12 +1067,10 @@ msgstr ""
 "``vhost-man`` 的 ``Remove an item`` 位置。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:68
-#, fuzzy
 msgid "|adminui vhost remove item button|"
 msgstr "|adminui vhost remove item button|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:143
-#, fuzzy
 msgid "adminui vhost remove item button"
 msgstr "adminui vhost remove item button"
 
@@ -1116,12 +1082,10 @@ msgid ""
 msgstr "您将看到托管在此 Tigase XMPP 服务器安装上的域列表。从它们中，选择应该删除的那个。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:72
-#, fuzzy
 msgid "|adminui vhost remove item domains list|"
 msgstr "|adminui vhost remove item domains list|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:144
-#, fuzzy
 msgid "adminui vhost remove item domains list"
 msgstr "adminui vhost remove item domains list"
 
@@ -1203,12 +1167,10 @@ msgid ""
 msgstr "准备好后，右键单击 Psi 名册窗口中的帐户名称以显示上下文菜单。选择 **服务发现** 元素。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:96
-#, fuzzy
 msgid "|service disco menu|"
 msgstr "|service disco menu|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:145
-#, fuzzy
 msgid "service disco menu"
 msgstr "service disco menu"
 
@@ -1224,12 +1186,10 @@ msgstr ""
 "PubSub 组件。我们感兴趣的列表中的新内容是 2 个元素：**VHost Manager** 和 **Session Manager**。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:100
-#, fuzzy
 msgid "|service disco window vhost|"
 msgstr "|service disco window vhost|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:146
-#, fuzzy
 msgid "service disco window vhost"
 msgstr "service disco window vhost"
 
@@ -1265,12 +1225,10 @@ msgstr ""
 "**Update…​**。这些用于添加，删除和更新 VHost 信息。现在，只需选择第一个元素 **Add...​.**"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:108
-#, fuzzy
 msgid "|command menu add vhost|"
 msgstr "|command menu add vhost|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:147
-#, fuzzy
 msgid "command menu add vhost"
 msgstr "command menu add vhost"
 
@@ -1292,12 +1250,10 @@ msgstr ""
 "列表，供可以管理域内用户的人员使用。您无需将用户名添加到列表中，因为所有者始终可以管理域的用户。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:112
-#, fuzzy
 msgid "|add vhost window|"
 msgstr "|add vhost window|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:148
-#, fuzzy
 msgid "add vhost window"
 msgstr "add vhost window"
 
@@ -1330,12 +1286,10 @@ msgid ""
 msgstr "添加新用户进程非常相似，几乎与添加新域相同。但是这一次，我们必须在服务发现窗口中选择 **Session Manager**。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:121
-#, fuzzy
 msgid "|service disco window sm|"
 msgstr "|service disco window sm|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:149
-#, fuzzy
 msgid "service disco window sm"
 msgstr "service disco window sm"
 
@@ -1350,12 +1304,10 @@ msgstr ""
 "user**。我将在未来提供更多命令，我正在等待您的建议。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:125
-#, fuzzy
 msgid "|command menu add user|"
 msgstr "|command menu add user|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:150
-#, fuzzy
 msgid "command menu add user"
 msgstr "command menu add user"
 
@@ -1366,12 +1318,10 @@ msgid ""
 msgstr "如果您单击 **Execute**，则会显示左侧的窗口。相应地填写所有字段，然后按 **Finish**。"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:129
-#, fuzzy
 msgid "|add user window|"
 msgstr "|add user window|"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:151
-#, fuzzy
 msgid "add user window"
 msgstr "add user window"
 
@@ -1390,15 +1340,15 @@ msgid "SSL Certificate Management"
 msgstr "SSL 证书管理"
 
 #: ../../Tigase_Administration/Using_Tigase/Virtual_Domains.inc:136
-#, fuzzy
 msgid ""
 "SSL Certificate Management has been implemented, and certificates can be "
 "manipulated when in a .pem form. For more details, see :ref:`Creating and"
 " Loading the Server Certificate in pem Files<certspem>` section of "
 "documentation for more information."
 msgstr ""
-"SSL 证书管理已实施，并且可以在 .pem 格式中操作证书。有关更多详细信息，请参阅文档的 "
-":ref:`在pem文件中创建和加载服务器证书<certspem>` 部分以获取更多信息。"
+"SSL 证书管理已实施，并且可以在 .pem 格式中操作证书。有关更多详细信息，"
+"请参阅文档的 :ref:`在pem文件中创建和加载服务器证书<certspem>` "
+"部分以获取更多信息。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:4
 msgid "Presence Forwarding"
@@ -1449,12 +1399,10 @@ msgstr ""
 "将不会传递给机器人。"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:18
-#, fuzzy
 msgid "|vhost presence forward|"
 msgstr "|vhost presence forward|"
 
 #: ../../Tigase_Administration/Using_Tigase/Presence_Forwarding.inc:62
-#, fuzzy
 msgid "vhost presence forward"
 msgstr "vhost presence forward"
 
@@ -1794,9 +1742,8 @@ msgid ""
 msgstr "该部分包含一些简短的技巧和技巧，可帮助解决与服务器管理和维护相关的不同类型的问题。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:8
-#, fuzzy
 msgid ":ref:`Runtime Environment Tip<tigaseTip_RuntimeEnvironment>`"
-msgstr ":ref:`运行环境提示<Tigase-Tip-Checking-the-Runtime-Environment>`"
+msgstr ":ref:`运行环境提示<tigaseTip_RuntimeEnvironment>`"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:15
 msgid "Tigase Tip: Checking the Runtime Environment"
@@ -1864,7 +1811,6 @@ msgid ""
 msgstr "您将找到有关这些连接到 Tigase XMPP 服务器的方法的更多信息，其中包含一些有用的提示。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:69
-#, fuzzy
 msgid "BOSH"
 msgstr "BOSH"
 
@@ -1958,7 +1904,6 @@ msgstr ""
 "``example.com`` 作为它尝试连接的服务器的名称（``example.com`` 应该是 XMPP 流的 ``to`` 属性的值）。"
 
 #: ../../Tigase_Administration/Using_Tigase/Tips_and_Tricks.inc:95
-#, fuzzy
 msgid "WebSocket"
 msgstr "WebSocket"
 
@@ -2247,14 +2192,14 @@ msgstr ""
 " *etc/* 文件夹中并重新启动服务器，您的许可证现在已激活并安装在您的服务器上。"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:73
-#, fuzzy
 msgid ""
 "**If you are provided a manually produced license, you will need to place"
 " it in the same** ``etc/`` **directory with the name** "
 "``<component_name>.license`` (**e.g.:** ``etc/acs.license``)"
 msgstr ""
-"**如果您被提供手动生成的许可证，您需要将其放在同一个** ``etc/`` **目录中，命名为** "
-"``<component_name>.license`` (**例如**：``etc/acs.license``)"
+"**如果您被提供手动生成的许可证，您需要将其放在同一个** ``etc/`` "
+"**目录中，命名为** ``<component_name>.license`` (**例如**：``etc/acs."
+"license``)"
 
 #: ../../Tigase_Administration/Using_Tigase/Licensing.inc:76
 msgid "What happens if I do not use a license file or it is expired?"
@@ -2483,7 +2428,6 @@ msgid ""
 msgstr "您可以使用几个选项自定义集群服务器之间的流量。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:85
-#, fuzzy
 msgid "cm-ht-traffic-throttling"
 msgstr "cm-ht-traffic-throttling"
 
@@ -2540,7 +2484,6 @@ msgid ""
 msgstr "指定要采取的操作，可以是 **disc** 断开连接，或 **drop** 其将丢弃任何超过阈值的数据。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:107
-#, fuzzy
 msgid "cm-see-other-host"
 msgstr "cm-see-other-host"
 
@@ -2623,12 +2566,10 @@ msgid ""
 msgstr "有多种方法可以检查打开的连接，最简单的一种是使用命令行。（Tigase使用端口 *5277* 进行集群连接）"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:156
-#, fuzzy
 msgid "Linux"
 msgstr "Linux"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:162
-#, fuzzy
 msgid "Windows"
 msgstr "Windows"
 
@@ -2663,12 +2604,10 @@ msgstr ""
 "客户端。成功配置并连接到具有管理权限的帐户后，我们需要从应用程序菜单或特定帐户的上下文菜单访问 *Service Discovery*："
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:178
-#, fuzzy
 msgid "|roster-discovery|"
 msgstr "|roster-discovery|"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:184
-#, fuzzy
 msgid "roster-discovery"
 msgstr "roster-discovery"
 
@@ -2684,12 +2623,10 @@ msgstr ""
 "组件。展开组件的树节点后，所有集群节点的列表将显示当前状态（*已连接* 或 *已断开*）。节点列将包含集群节点的实际主机名："
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:182
-#, fuzzy
 msgid "|discovery-nodes|"
 msgstr "|discovery-nodes|"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:185
-#, fuzzy
 msgid "discovery-nodes"
 msgstr "discovery-nodes"
 
@@ -2910,12 +2847,10 @@ msgid ""
 msgstr "所有脚本内容通常基于Tigase服务器中的服务发现和临时命令。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:29
-#, fuzzy
 msgid "|service disco|"
 msgstr "|service disco|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:186
-#, fuzzy
 msgid "service disco"
 msgstr "service disco"
 
@@ -2951,12 +2886,10 @@ msgid ""
 msgstr "要添加新脚本，您只需执行 ``New command script``。在Psi中，这是通过双击服务发现列表中的元素来完成的。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:39
-#, fuzzy
 msgid "|hello1 new script|"
 msgstr "|hello1 new script|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:187
-#, fuzzy
 msgid "hello1 new script"
 msgstr "hello1 new script"
 
@@ -3017,12 +2950,10 @@ msgid ""
 msgstr "当您的脚本准备好并且所有字段都设置正确时，只需按\"**Finish**\"按钮，您应该会收到一条消息，确认脚本已成功加载。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:57
-#, fuzzy
 msgid "|loaded ok small|"
 msgstr "|loaded ok small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:188
-#, fuzzy
 msgid "loaded ok small"
 msgstr "loaded ok small"
 
@@ -3083,12 +3014,10 @@ msgid ""
 msgstr "成功加载脚本后，您将不得不重新加载/刷新服务发现窗口，该窗口现在应该在列表中再显示一个元素。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:89
-#, fuzzy
 msgid "|service disco with new hello|"
 msgstr "|service disco with new hello|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:189
-#, fuzzy
 msgid "service disco with new hello"
 msgstr "service disco with new hello"
 
@@ -3115,12 +3044,10 @@ msgid ""
 msgstr "结果，您应该会看到一个类似于下面显示我们消息的屏幕截图的简单窗口。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:97
-#, fuzzy
 msgid "|hello1 result small|"
 msgstr "|hello1 result small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:190
-#, fuzzy
 msgid "hello1 result small"
 msgstr "hello1 result small"
 
@@ -3144,12 +3071,10 @@ msgid ""
 msgstr "因此，在大多数情况下，管理员脚本必须显示一个带有输入字段的新窗口，要求用户提供更多数据。在本文档中，我们提供了非常简单的示例，这只是一个介绍，所以让我们在显示问候语之前询问管理员名称。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:106
-#, fuzzy
 msgid "|hello2 asking for name small|"
 msgstr "|hello2 asking for name small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:191
-#, fuzzy
 msgid "hello2 asking for name small"
 msgstr "hello2 asking for name small"
 
@@ -3170,12 +3095,10 @@ msgstr ""
 "输入字段中检索数据。如果提供了名称，则会显示问候语，否则脚本会询问用户名。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:135
-#, fuzzy
 msgid "|hello2 result small|"
 msgstr "|hello2 result small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:192
-#, fuzzy
 msgid "hello2 result small"
 msgstr "hello2 result small"
 
@@ -3238,12 +3161,10 @@ msgid ""
 msgstr "最后一个参数指定显示给用户的字段标签。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:153
-#, fuzzy
 msgid "|hello2 new script|"
 msgstr "|hello2 new script|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Introduction.inc:193
-#, fuzzy
 msgid "hello2 new script"
 msgstr "hello2 new script"
 
@@ -3395,12 +3316,10 @@ msgid ""
 msgstr "就像在Tigase中一样，您可以通过服务器上的XMPP服务发现访问所有功能。但是，一旦您连接到服务器，您就可以在那里看到一些变化。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:18
-#, fuzzy
 msgid "|new service disco admin|"
 msgstr "|new service disco admin|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:40
-#, fuzzy
 msgid "new service disco admin"
 msgstr "new service disco admin"
 
@@ -3439,12 +3358,10 @@ msgstr ""
 "environment\"执行。您当然可以添加新命令或删除现有命令，当然还可以执行列表中显示的任何命令。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:26
-#, fuzzy
 msgid "|new command list|"
 msgstr "|new command list|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:41
-#, fuzzy
 msgid "new command list"
 msgstr "new command list"
 
@@ -3456,12 +3373,10 @@ msgid ""
 msgstr "提醒一下，在窗口标题中您可以看到组件ID，您应该在运行任何命令之前检查它，以确保您不会意外破坏系统。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:30
-#, fuzzy
 msgid "|new add command|"
 msgstr "|new add command|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/v4.4.x_Update.inc:42
-#, fuzzy
 msgid "new add command"
 msgstr "new add command"
 
@@ -3556,12 +3471,10 @@ msgstr ""
 "中执行的语言，并且可以轻松地在主应用程序（Tigase服务器）和脚本之间交换数据。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:17
-#, fuzzy
 msgid "|lang list no python small|"
 msgstr "|lang list no python small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:69
-#, fuzzy
 msgid "lang list no python small"
 msgstr "lang list no python small"
 
@@ -3622,12 +3535,10 @@ msgstr ""
 "\"*Execute*\"。此时应该出现临时命令对话框窗口。其中一个字段是\"*Language*\"，其中包含可用脚本语言的下拉列表。如果\"*python*\"在列表中，则表示一切正常并且启用了对Python的支持。"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:27
-#, fuzzy
 msgid "|lang list with python small|"
 msgstr "|lang list with python small|"
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:70
-#, fuzzy
 msgid "lang list with python small"
 msgstr "lang list with python small"
 
@@ -3671,7 +3582,6 @@ msgid "The simplest possible Python script may look like this one:"
 msgstr "最简单的Python脚本可能如下所示："
 
 #: ../../Tigase_Administration/Using_Tigase/Scripting/Python.inc:42
-#, fuzzy
 msgid "``result = \"Hello world!\"``"
 msgstr "``result = \"Hello world!\"``"
 
