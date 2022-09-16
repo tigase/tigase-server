@@ -60,7 +60,7 @@ import java.util.stream.Collectors;
 
 import static tigase.net.IOService.CERT_CHECK_RESULT;
 
-class S2SConnManAbstractTest
+public class S2SConnManAbstractTest
 		extends SSLTestAbstract {
 
 	protected static Kernel kernel;
