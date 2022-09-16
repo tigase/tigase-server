@@ -202,11 +202,11 @@ public class JabberIqIq
 				results.offer(result);
 			}      // end of else
 		} catch (NotAuthorizedException e) {
-			log.warning("Received privacy request but user session is not authorized yet: " + packet.toString());
+			log.log(Level.FINE, "Received privacy request but user session is not authorized yet: " + packet.toString());
 			results.offer(
 					Authorization.NOT_AUTHORIZED.getResponseMessage(packet, "You must authorize session first.", true));
 		} catch (TigaseDBException e) {
-			log.warning("Database proble, please contact admin: " + e);
+			log.log(Level.WARNING, "Database proble, please contact admin: " + e);
 			results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet,
 																				 "Database access problem, please contact administrator.",
 																				 true));

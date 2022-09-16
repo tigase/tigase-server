@@ -2846,7 +2846,7 @@ public class SessionManager
 				XMPPResourceConnection connection;
 
 				while ((connection = staleConnections.poll()) != null) {
-					log.log(Level.WARNING, "Found stale XMPPResourceConnection: {0}, removing...", connection);
+					log.log(Level.FINE, "Found stale XMPPResourceConnection: {0}, removing...", connection);
 					session.removeResourceConnection(connection);
 				}
 
