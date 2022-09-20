@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-03 03:02-0700\n"
-"PO-Revision-Date: 2022-09-07 17:14+0000\n"
+"PO-Revision-Date: 2022-09-20 00:37+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/using_tigasse/zh_Hans/>\n"
@@ -2488,13 +2488,13 @@ msgid "cm-see-other-host"
 msgstr "cm-see-other-host"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:109
-#, fuzzy
 msgid ""
 "This allows the specific use of a load balancing mechanism by selecting "
 "``SeeOtherHostIfc`` implementation. For more details, see :ref:`Tigase "
 "Load Balancing<loadBalancing>` documentation."
 msgstr ""
-"这允许通过选择 ``SeeOtherHostIfc`` 实现来特定使用负载平衡机制。有关更多详细信息，请参阅 "
+"这允许通过选择 ``SeeOtherHostIfc`` "
+"实现来特定使用负载平衡机制。有关更多详细信息，请参阅 "
 ":ref:`Tigase负载平衡<loadBalancing>` 文档。"
 
 #: ../../Tigase_Administration/Using_Tigase/Clustering.inc:112
