@@ -17,6 +17,8 @@
  */
 package tigase.sys;
 
+import tigase.annotations.TigaseDeprecated;
+
 import javax.management.JMException;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
@@ -34,11 +36,18 @@ public class NativeMemoryTracking {
 
 	private static final Logger log = Logger.getLogger(NativeMemoryTracking.class.getName());
 	private static final Pattern subScopeHeaderPattern = Pattern.compile(
-			"^-\\s+([\\w\\s]+)\\(reserved=(\\d+)KB, committed=(\\d+)KB\\).*");
+			"^-\\s+([\\w\\s]+)\\(reserved=(\\d+)[GKM]B, committed=(\\d+)[GKM]B\\).*");
 	private static final Pattern mmapPattern = Pattern.compile(
-			"^\\s+\\(mmap: reserved=(\\d+)KB, committed=(\\d+)KB\\).*");
-	private static final Pattern mallocArenaPattern = Pattern.compile("^\\s*\\((malloc|arena)=(\\d+)KB.*\\).*");
+			"^\\s+\\(mmap: reserved=(\\d+)[GKM]B, committed=(\\d+)[GKM]B\\).*");
+	private static final Pattern mallocArenaPattern = Pattern.compile("^\\s*\\((malloc|arena)=(\\d+)[GKM]B.*\\).*");
+	private final SCALE scale;
 	private final Map<String, NMTScope> scopes;
+
+	enum SCALE {
+		KB,
+		MB,
+		GB
+	}
 
 	private static String executeMBeanCommand(String command, String... args) throws JMException {
 		return (String) ManagementFactory.getPlatformMBeanServer()
@@ -61,14 +70,18 @@ public class NativeMemoryTracking {
 	}
 
 	static Optional<NativeMemoryTracking> getNativeMemoryTracking() {
-		final Optional<String> nativeMemoryTrackingSummary = getNativeMemoryTrackingTextSummary();
-		return nativeMemoryTrackingSummary.flatMap(NativeMemoryTracking::parse);
+		return getNativeMemoryTracking(SCALE.MB);
 	}
 
-	private static Optional<String> getNativeMemoryTrackingTextSummary() {
+	static Optional<NativeMemoryTracking> getNativeMemoryTracking(SCALE scale) {
+		final Optional<String> nativeMemoryTrackingSummary = getNativeMemoryTrackingTextSummary(scale);
+		return nativeMemoryTrackingSummary.flatMap((String summary) -> parse(summary, scale));
+	}
+
+	private static Optional<String> getNativeMemoryTrackingTextSummary(SCALE scale) {
 		String result = null;
 		try {
-			result = executeMBeanCommand("vmNativeMemory", "summary");
+			result = executeMBeanCommand("vmNativeMemory", "summary", "scale=" + scale);
 		} catch (Exception e) {
 			log.log(Level.FINER, e, () -> "There was a problem obtaining NMT summary");
 		}
@@ -76,12 +89,18 @@ public class NativeMemoryTracking {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(NativeMemoryTracking.getNativeMemoryTracking());
+		System.out.println(NativeMemoryTracking.getNativeMemoryTracking(SCALE.MB));
 	}
 
 	static Optional<NativeMemoryTracking> parse(String summary) {
+		return parse(summary, SCALE.KB);
+	}
+
+	static Optional<NativeMemoryTracking> parse(String summary, SCALE scale) {
 		Map<String, NMTScope> scopes = getNMTScopesFrom(summary);
-		return scopes != null && !scopes.isEmpty() ? Optional.of(new NativeMemoryTracking(scopes)) : Optional.empty();
+		return scopes != null && !scopes.isEmpty()
+			   ? Optional.of(new NativeMemoryTracking(scopes, scale))
+			   : Optional.empty();
 	}
 
 	private static void processMallocAndArena(NMTScope.NMTScopeBuilder scopeBuilder, String subSummaryLine,
@@ -132,7 +151,7 @@ public class NativeMemoryTracking {
 	}
 
 	private static void processTotalScope(Map<String, NMTScope> scopes, String summaryLine) {
-		final Pattern compile = Pattern.compile("Total: reserved=(\\d+)KB, committed=(\\d+)KB");
+		final Pattern compile = Pattern.compile("Total: reserved=(\\d+)[GKM]B, committed=(\\d+)[GKM]B");
 		final Matcher matcher = compile.matcher(summaryLine);
 		if (matcher.matches()) {
 			final NMTScope total = new NMTScope("Total", Long.valueOf(matcher.group(1)),
@@ -151,12 +170,21 @@ public class NativeMemoryTracking {
 	}
 
 	public NativeMemoryTracking(Map<String, NMTScope> scopes) {
+		this(scopes, SCALE.MB);
+	}
+
+	public NativeMemoryTracking(Map<String, NMTScope> scopes, SCALE scale) {
 		Objects.nonNull(scopes);
 		this.scopes = scopes;
+		this.scale = scale;
 	}
 
 	public Map<String, NMTScope> getScopes() {
 		return Collections.unmodifiableMap(scopes);
+	}
+
+	public SCALE getScale() {
+		return scale;
 	}
 
 	@Override
@@ -167,7 +195,10 @@ public class NativeMemoryTracking {
 			sb.append(", total reserved: ")
 					.append(totalScope.getReserved())
 					.append(", total commited: ")
-					.append(totalScope.getCommitted());
+					.append(totalScope.getCommitted())
+					.append(", scale: ")
+					.append(scale)
+			;
 		}
 		return sb.toString();
 	}

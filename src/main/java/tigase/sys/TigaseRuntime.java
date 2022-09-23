@@ -17,6 +17,7 @@
  */
 package tigase.sys;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.XMPPServer;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.xmpp.jid.BareJID;
@@ -46,8 +47,14 @@ public abstract class TigaseRuntime {
 	private long prevCputime = 0;
 	private long prevUptime = 0;
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.3.0", removeIn = "9.0.0")
 	public static Optional<NativeMemoryTracking> getNativeMemoryTracking() {
-		return NativeMemoryTracking.getNativeMemoryTracking();
+		return NativeMemoryTracking.getNativeMemoryTracking(NativeMemoryTracking.SCALE.MB);
+	}
+
+	public static Optional<NativeMemoryTracking> getNativeMemoryTracking(NativeMemoryTracking.SCALE scale) {
+		return NativeMemoryTracking.getNativeMemoryTracking(scale);
 	}
 
 	public static TigaseRuntime getTigaseRuntime() {
@@ -56,6 +63,8 @@ public abstract class TigaseRuntime {
 
 	public static void main(String[] args) {
 		final TigaseRuntime tigaseRuntime = getTigaseRuntime();
+		System.out.println(tigaseRuntime);
+		System.out.println(getNativeMemoryTracking(NativeMemoryTracking.SCALE.MB));
 		tigaseRuntime.shutdownTigase(new String[]{"there", "was", "an", "error"});
 	}
 

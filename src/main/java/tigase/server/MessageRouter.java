@@ -470,7 +470,8 @@ public class MessageRouter
 				Packet res = Authorization.FEATURE_NOT_IMPLEMENTED.getResponseMessage(packet, null, true);
 				results.offer(res);
 			} catch (PacketInvalidTypeException e) {
-				log.log(Level.FINE, "Packet: {0} processing exception (I expect command (Iq) packet here): {1}", new Object[]{packet.toString(), e});
+				log.log(Level.FINE, "Packet: {0} processing exception (I expect command (Iq) packet here): {1}",
+						new Object[]{packet.toString(), e});
 			} catch (PacketInvalidAddressException e) {
 				log.log(Level.WARNING, "Packet processing exception (I expect command (Iq) packet here): ", e);
 			} catch (PacketErrorTypeException e) {
@@ -489,7 +490,8 @@ public class MessageRouter
 
 				// processPacket(res);
 			} catch (PacketInvalidTypeException e) {
-				log.log(Level.FINE, "Packet: {0} processing exception (not authorised): {1}", new Object[]{packet.toString(), e});
+				log.log(Level.FINE, "Packet: {0} processing exception (not authorised): {1}",
+						new Object[]{packet.toString(), e});
 			} catch (PacketInvalidAddressException e) {
 				log.log(Level.WARNING, "Packet processing exception (not authorised): ", e);
 			} catch (PacketErrorTypeException e) {
@@ -608,7 +610,7 @@ public class MessageRouter
 		list.add(getName(), "Max Heap mem", format.format(runtime.getHeapMemMax() / 1024), Level.INFO);
 		list.add(getName(), "Used Heap", format.format(runtime.getHeapMemUsed() / 1024), Level.INFO);
 		list.add(getName(), "Free Heap", format.format(
-				runtime.getHeapMemMax() == -1 ? -1.0 : (runtime.getHeapMemMax() - runtime.getHeapMemUsed()) / 1024),
+						 runtime.getHeapMemMax() == -1 ? -1.0 : (runtime.getHeapMemMax() - runtime.getHeapMemUsed()) / 1024),
 				 Level.FINE);
 		list.add(getName(), "Max NonHeap mem", format.format(runtime.getNonHeapMemMax() / 1024), Level.FINE);
 		list.add(getName(), "Used NonHeap", format.format(runtime.getNonHeapMemUsed() / 1024), Level.FINE);
@@ -674,15 +676,16 @@ public class MessageRouter
 				final TreeSet<NMTScope> scopes = new TreeSet<>(Comparator.comparing(NMTScope::getCommitted).reversed());
 				scopes.addAll(nmt.getScopes().values());
 				for (NMTScope scope : scopes) {
+					nmt.getScale();
 					final String keyPrefix = "JVM/NativeMemoryTracking/" + scope.getScopeType() + "/";
-					list.add(getName(), keyPrefix + "commited", scope.getCommitted(), Level.FINER);
-					list.add(getName(), keyPrefix + "reserved", scope.getReserved(), Level.FINER);
-					scope.getArena().ifPresent(val -> list.add(getName(), keyPrefix + "arena", val, Level.FINEST));
-					scope.getMalloc().ifPresent(val -> list.add(getName(), keyPrefix + "malloc", val, Level.FINEST));
-					scope.getMmapCommitted()
-							.ifPresent(val -> list.add(getName(), keyPrefix + "mmapCommitted", val, Level.FINEST));
-					scope.getMmapReserved()
-							.ifPresent(val -> list.add(getName(), keyPrefix + "mmapReserved", val, Level.FINEST));
+					list.add(getName(), keyPrefix + "commited [" + nmt.getScale() + "]", scope.getCommitted(), Level.FINE);
+					list.add(getName(), keyPrefix + "reserved [" + nmt.getScale() + "]", scope.getReserved(), Level.FINE);
+					scope.getArena().ifPresent(val -> list.add(getName(), keyPrefix + "arena [" + nmt.getScale() + "]", val, Level.FINER));
+					scope.getMalloc().ifPresent(val -> list.add(getName(), keyPrefix + "malloc [" + nmt.getScale() + "]", val, Level.FINER));
+//					scope.getMmapCommitted()
+//							.ifPresent(val -> list.add(getName(), keyPrefix + "mmapCommitted [" + nmt.getScale() + "]", val, Level.FINEST));
+//					scope.getMmapReserved()
+//							.ifPresent(val -> list.add(getName(), keyPrefix + "mmapReserved [" + nmt.getScale() + "]", val, Level.FINEST));
 				}
 			});
 		}
@@ -693,6 +696,14 @@ public class MessageRouter
 		components.put(getName(), this);
 		this.config = config;
 		addRegistrator(config);
+	}
+
+	public void setDetailedMemoryStatistics(boolean detailedMemoryStatistics) {
+		this.detailedMemoryStatistics = detailedMemoryStatistics;
+		if (detailedMemoryStatistics && TigaseRuntime.getNativeMemoryTracking().isEmpty()) {
+			log.log(Level.WARNING,
+					"Detailed memory statistics (NMT) enabled in config.tdsl but not enabled on JVM level - please enable in etc/tigase.conf!");
+		}
 	}
 
 	@Override

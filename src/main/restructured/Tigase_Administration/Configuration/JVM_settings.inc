@@ -57,6 +57,22 @@ In principle, in addition to HEAP’s maximum size defined by ``-Xmx`` you shoul
 
 If you are interested in detailed tracking of memory take a look at [Memory footprint of the JVM](\ https://spring.io/blog/2019/03/11/memory-footprint-of-the-jvm/), [Native Memory Tracking in JVM](\ https://www.baeldung.com/native-memory-tracking-in-jvm) or [Why does my Java process consume more memory than Xmx?](\ https://plumbr.io/blog/memory-leaks/why-does-my-java-process-consume-more-memory-than-xmx)
 
+To facilitate getting information about complete memory usage we include this information in Tigase statistics, but it requires explicitly enabling it:
+
+- uncomment ``JVM_MEMORY`` line in ``etc/tigase.conf``:
+
+ .. code:: bash
+
+    JVM_MEMORY=" -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+PrintNMTStatistics "
+
+- enable ``detailed-memory-statistics`` in ``message-router`` bean in ``etc/config.tdsl`` file:
+
+ .. code:: bash
+
+    'message-router' () {
+        'detailed-memory-statistics' = true
+    }
+
 
 GC settings
 ^^^^^^^^^^^^^^
