@@ -64,4 +64,15 @@ public class ExtendedQueryImpl
 			this.ids = Collections.emptyList();
 		}
 	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("ExtendedQueryImpl{");
+		sb.append("QueryImpl='").append(super.toString()).append('\'');
+		sb.append(", beforeId='").append(beforeId).append('\'');
+		sb.append(", afterId='").append(afterId).append('\'');
+		sb.append(", ids=").append(ids);
+		sb.append('}');
+		return sb.toString();
+	}
 }
