@@ -17,6 +17,7 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.component.exceptions.ComponentException;
 import tigase.db.NonAuthUserRepository;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
@@ -35,6 +36,7 @@ import tigase.xmpp.*;
 import tigase.xmpp.jid.JID;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -49,7 +51,7 @@ import java.util.stream.Collectors;
 @Bean(name = MessageCarbons.ID, parent = SessionManager.class, active = true)
 public class MessageCarbons
 		extends XMPPProcessor
-		implements XMPPProcessorIfc, XMPPPacketFilterIfc {
+		implements XMPPProcessorIfc, XMPPPacketFilterIfc, SaslAuth2.Inline {
 
 	public static final String XMLNS = "urn:xmpp:carbons:2";
 	protected static final String ID = "message-carbons";
@@ -133,6 +135,11 @@ public class MessageCarbons
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	@Override
+	public boolean canHandle(XMPPResourceConnection connection, Element el) {
+		return el.getName() == "enable" && el.getXMLNS() == XMLNS;
 	}
 
 	public String[] getMsgCarbonPaths() {
@@ -266,6 +273,28 @@ public class MessageCarbons
 				}
 			}
 		}
+	}
+
+	@Override
+	public CompletableFuture<Result> process(XMPPResourceConnection session, Element action) {
+		if (action.getName() == "enable" && action.getXMLNS() == XMLNS) {
+			try {
+				setEnabled(session, true);
+				return CompletableFuture.completedFuture(new Result(new Element("enabled", new String[]{"xmlns"}, new String[]{XMLNS}), true));
+			} catch (NotAuthorizedException ex) {
+				return CompletableFuture.failedFuture(ex);
+			}
+		} else {
+			return CompletableFuture.failedFuture(new ComponentException(Authorization.BAD_REQUEST, "Only 'enable' is supported"));
+		}
+	}
+	
+	@Override
+	public Element[] supStreamFeatures(Action action) {
+		return switch (action) {
+			case sasl2 -> new Element[0];
+			case bind2 -> DISCO_FEATURES;
+		};
 	}
 
 	protected Set<JID> prepareSkipForkingToList(Packet packet, XMPPResourceConnection session, Map<JID, Boolean> resources)

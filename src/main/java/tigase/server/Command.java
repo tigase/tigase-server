@@ -17,7 +17,6 @@
  */
 package tigase.server;
 
-import tigase.annotations.TigaseDeprecated;
 import tigase.xml.Element;
 import tigase.xml.XMLUtils;
 import tigase.xmpp.StanzaType;

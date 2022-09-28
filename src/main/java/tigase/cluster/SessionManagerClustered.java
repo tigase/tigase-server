@@ -534,13 +534,13 @@ public class SessionManagerClustered
 	}
 
 	@Override
-	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
+	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId, String sendReponse) {
 		try {
 			strategy.handleLocalUserChangedConnId(conn.getBareJID(), conn, oldConnId, newConnId);
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "This should not happen, check it out!, ", ex);
 		}
-		super.xmppStreamMoved(conn, oldConnId, newConnId);
+		super.xmppStreamMoved(conn, oldConnId, newConnId, sendReponse);
 	}
 
 	private void sendAdminNotification(String node, STATUS stat) {

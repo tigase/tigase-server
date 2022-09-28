@@ -18,6 +18,7 @@
 package tigase.server.xmppclient;
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.component.exceptions.ComponentException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -28,9 +29,7 @@ import tigase.stats.StatisticsList;
 import tigase.util.common.TimerTask;
 import tigase.util.dns.DNSResolverFactory;
 import tigase.xml.Element;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.StreamError;
-import tigase.xmpp.XMPPIOService;
+import tigase.xmpp.*;
 import tigase.xmpp.impl.MessageCarbons;
 import tigase.xmpp.jid.JID;
 
@@ -135,8 +134,40 @@ public class StreamManagementIOProcessor
 		// but in rare cases service can be null if connection was already closed..
 		if (service == null || service.getUserJid() == null)
 			return null;
+		if (isEnabled(service)) {
+			return null;
+		}
 
 		return FEATURES;
+	}
+	
+	private String enable(XMPPIOService service, boolean withResumption, Integer maxTimeout) {
+		OutQueue outQueue = newOutQueue();
+		outQueue.setAckRequestCount(ack_request_count);
+		service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, outQueue);
+		service.getSessionData().putIfAbsent(IN_COUNTER_KEY, newCounter());
+
+		String id = null;
+		int timeout = resumption_timeout;
+		if (resumption_timeout > 0 && withResumption) {
+			outQueue.setResumptionEnabled(true);
+			if (maxTimeout != null) {
+				timeout = Math.min(max_resumption_timeout, maxTimeout);
+			}
+			id = UUID.randomUUID().toString();
+			service.getSessionData().putIfAbsent(STREAM_ID_KEY, id);
+			service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, timeout);
+
+			services.put(id, service);
+		}
+
+		Packet cmd = StreamManagementCommand.ENABLED.create(service.getConnectionId(), service.getDataReceiver());
+		cmd.setPacketFrom(service.getConnectionId());
+		cmd.setPacketTo(service.getDataReceiver());
+		Command.addFieldValue(cmd, "resumption-id", id);
+		connectionManager.processOutPacket(cmd);
+
+		return id;
 	}
 
 	@Override
@@ -145,28 +176,12 @@ public class StreamManagementIOProcessor
 			if (packet.getXMLNS() != XMLNS) {
 				return false;
 			} else if (packet.getElemName() == ENABLE_NAME) {
-				OutQueue outQueue = newOutQueue();
-				outQueue.setAckRequestCount(ack_request_count);
-				service.getSessionData().putIfAbsent(OUT_COUNTER_KEY, outQueue);
-				service.getSessionData().putIfAbsent(IN_COUNTER_KEY, newCounter());
-
-				String id = null;
-				String location = null;
-				int timeout = resumption_timeout;
-
-				if (resumption_timeout > 0 && packet.getElement().getAttributeStaticStr(RESUME_ATTR) != null) {
-					outQueue.setResumptionEnabled(true);
-					String maxStr = packet.getElement().getAttributeStaticStr(MAX_ATTR);
-					if (maxStr != null) {
-						timeout = Math.min(max_resumption_timeout, Integer.parseInt(maxStr));
-					}
-					id = UUID.randomUUID().toString();
-					location = DNSResolverFactory.getInstance().getSecondaryHost();
-					service.getSessionData().putIfAbsent(STREAM_ID_KEY, id);
-					service.getSessionData().put(MAX_RESUMPTION_TIMEOUT_KEY, timeout);
-
-					services.put(id, service);
-				}
+				String maxStr = packet.getElement().getAttributeStaticStr(MAX_ATTR);
+				String id = enable(service, packet.getElement().getAttributeStaticStr(RESUME_ATTR) != null,
+								   maxStr != null ? Integer.parseInt(maxStr) : null);
+				String location = id != null ? DNSResolverFactory.getInstance().getSecondaryHost() : null;
+				Integer timeout = (Integer) service.getSessionData().get(MAX_RESUMPTION_TIMEOUT_KEY);
+				
 				try {
 					service.writeRawData("<" + ENABLED_NAME + " xmlns='" + XMLNS + "'" +
 												 (id != null ? " id='" + id + "' " + RESUME_ATTR + "='true' " +
@@ -255,6 +270,7 @@ public class StreamManagementIOProcessor
 			return false;
 		}
 
+		// stream resumption should queue only stanzas (iq, presence, message)
 		if (!isStanza(packet)) {
 			return false;
 		}
@@ -306,93 +322,149 @@ public class StreamManagementIOProcessor
 
 	@Override
 	public void processCommand(XMPPIOService service, Packet pc) {
-		String cmdId = Command.getFieldValue(pc, "cmd");
-		if ("stream-moved".equals(cmdId)) {
-			String newConn = Command.getFieldValue(pc, "new-conn-jid");
+		if (pc.getType() == StanzaType.error || pc.getType() == StanzaType.result) {
+			return;
+		}
+		StreamManagementCommand cmd = StreamManagementCommand.fromPacket(pc);
+		switch (cmd) {
+			case STREAM_MOVED:
+				String newConn = Command.getFieldValue(pc, "new-conn-jid");
 
-			String id = (String) service.getSessionData().get(STREAM_ID_KEY);
+				String id = (String) service.getSessionData().get(STREAM_ID_KEY);
 
-			JID newConnJid = JID.jidInstanceNS(newConn);
-			XMPPIOService newService = connectionManager.getXMPPIOService(newConnJid.getResource());
+				JID newConnJid = JID.jidInstanceNS(newConn);
+				XMPPIOService newService = connectionManager.getXMPPIOService(newConnJid.getResource());
 
-			// if connection was closed during resumption, then close
-			// old connection as it would not be able to resume
-			if (newService != null) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "stream for user {2} moved from {0} to {1}",
-							new Object[]{service.getConnectionId(), newService.getConnectionId(),
-										 newService.getUserJid()});
-				}
-				try {
-					newService.setUserJid(service.getUserJid());
-					Counter inCounter = (Counter) newService.getSessionData().get(IN_COUNTER_KEY);
-					newService.writeRawData(
-							"<" + RESUMED_NAME + " xmlns='" + XMLNS + "' " + PREVID_ATTR + "='" + id + "' " + H_ATTR +
-									"='" + inCounter.get() + "' />");
-
-					service.getSessionData().put("stream-closed", "stream-closed");
-					services.put(id, newService);
-
-					// resending packets thru new connection
-					OutQueue outQueue = (OutQueue) newService.getSessionData().get(OUT_COUNTER_KEY);
-					List<OutQueue.Entry> packetsToResend = new ArrayList<OutQueue.Entry>(outQueue.getQueue());
-					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "resuming stream with id = {1} resending unacked packets = {2} [{0}]",
-								new Object[]{service, id, outQueue.waitingForAck()});
+				// if connection was closed during resumption, then close
+				// old connection as it would not be able to resume
+				if (newService != null) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "stream for user {2} moved from {0} to {1}",
+								new Object[]{service.getConnectionId(), newService.getConnectionId(),
+											 newService.getUserJid()});
 					}
-					for (OutQueue.Entry entry : packetsToResend) {
-						Packet packetToResend = entry.getPacketWithStamp();
-						if (log.isLoggable(Level.FINEST)) {
-							log.log(Level.FINEST, "resuming stream with id = {1} resending unacked packet = {2} [{0}]",
-									new Object[]{service, id, packetToResend});
+					try {
+						newService.setUserJid(service.getUserJid());
+						if (!"false".equals(Command.getFieldValue(pc, "send-response"))) {
+							Counter inCounter = (Counter) newService.getSessionData().get(IN_COUNTER_KEY);
+							newService.writeRawData(
+									"<" + RESUMED_NAME + " xmlns='" + XMLNS + "' " + PREVID_ATTR + "='" + id + "' " + H_ATTR +
+											"='" + inCounter.get() + "' />");
 						}
-						newService.addPacketToSend(packetToResend);
-					}
 
-					// if there is any packet waiting we need to write them to socket
-					// and to do that we need to call processWaitingPackets();
-					if (!packetsToResend.isEmpty()) {
-						if (newService.writeInProgress.tryLock()) {
-							try {
-								newService.processWaitingPackets();
-								SocketThread.addSocketService(newService);
-							} catch (Exception e) {
-								log.log(Level.WARNING, newService + "Exception during writing packets: ", e);
+						service.getSessionData().put("stream-closed", "stream-closed");
+						services.put(id, newService);
+
+						// resending packets thru new connection
+						OutQueue outQueue = (OutQueue) newService.getSessionData().get(OUT_COUNTER_KEY);
+						List<OutQueue.Entry> packetsToResend = new ArrayList<OutQueue.Entry>(outQueue.getQueue());
+						if (log.isLoggable(Level.FINE)) {
+							log.log(Level.FINE, "resuming stream with id = {1} resending unacked packets = {2} [{0}]",
+									new Object[]{service, id, outQueue.waitingForAck()});
+						}
+						for (OutQueue.Entry entry : packetsToResend) {
+							Packet packetToResend = entry.getPacketWithStamp();
+							if (log.isLoggable(Level.FINEST)) {
+								log.log(Level.FINEST, "resuming stream with id = {1} resending unacked packet = {2} [{0}]",
+										new Object[]{service, id, packetToResend});
+							}
+							newService.addPacketToSend(packetToResend);
+						}
+
+						// if there is any packet waiting we need to write them to socket
+						// and to do that we need to call processWaitingPackets();
+						if (!packetsToResend.isEmpty()) {
+							if (newService.writeInProgress.tryLock()) {
 								try {
-									newService.stop();
-								} catch (Exception e1) {
-									log.log(Level.WARNING, newService + "Exception stopping XMPPIOService: ", e1);
-								}    // end of try-catch
-							} finally {
-								newService.writeInProgress.unlock();
+									newService.processWaitingPackets();
+									SocketThread.addSocketService(newService);
+								} catch (Exception e) {
+									log.log(Level.WARNING, newService + "Exception during writing packets: ", e);
+									try {
+										newService.stop();
+									} catch (Exception e1) {
+										log.log(Level.WARNING, newService + "Exception stopping XMPPIOService: ", e1);
+									}    // end of try-catch
+								} finally {
+									newService.writeInProgress.unlock();
+								}
 							}
 						}
+					} catch (IOException ex) {
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST,
+									"could not confirm session resumption for user = " + newService.getUserJid(), ex);
+						}
+
+						// remove new connection if resumption failed
+						services.remove(id, service);
+						services.remove(id, newService);
 					}
-				} catch (IOException ex) {
+				} else {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST,
-								"could not confirm session resumption for user = " + newService.getUserJid(), ex);
+								"no new service available for user {0} to resume from {1}," + " already closed?",
+								new Object[]{service.getUserJid(), service});
 					}
-
-					// remove new connection if resumption failed
-					services.remove(id, service);
-					services.remove(id, newService);
 				}
-			} else {
+
 				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST,
-							"no new service available for user {0} to resume from {1}," + " already closed?",
-							new Object[]{service.getUserJid(), service});
+					log.log(Level.FINEST, "closing old service {0} for user {1}",
+							new Object[]{service, service.getUserJid()});
+				}
+
+				// stopping old service
+				connectionManager.serviceStopped(service);
+				break;
+			case MOVE_STREAM: {
+				String resumptionId = Command.getFieldValue(pc, "resumption-id");
+				int h = Integer.parseInt(Command.getFieldValue(pc, "h"));
+				try {
+					String oldConnId = moveStream(service, resumptionId, h);
+
+					Packet response = pc.okResult(new Element(Command.COMMAND_EL, new String[]{"xmlns"}, new String[]{Command.XMLNS}), 0);
+					Counter inCounter = (Counter) service.getSessionData().get(IN_COUNTER_KEY);
+					Command.addFieldValue(response, "h", String.valueOf(inCounter.counter));
+					connectionManager.processOutPacket(response);
+
+					response = StreamManagementCommand.STREAM_MOVED.create(service.getConnectionId(), service.getDataReceiver());
+					response.setPacketFrom(service.getConnectionId());
+					response.setPacketTo(service.getDataReceiver());
+					Command.addFieldValue(response, "old-conn-jid", oldConnId);
+					Command.addFieldValue(response, "send-response", "false");
+					connectionManager.processOutPacket(response);
+
+				} catch (Exception ex) {
+					try {
+						connectionManager.processOutPacket(
+								Authorization.ITEM_NOT_FOUND.getResponseMessage(pc, ex.getMessage(), false));
+					} catch (PacketErrorTypeException e) {
+						// nothing to do..
+					}
 				}
 			}
+			break;
+			case ENABLE: {
+				String maxStr = Command.getFieldValue(pc, "max");
+				Integer max = maxStr != null ? Integer.parseInt(maxStr) : null;
+				boolean withResumption = Command.getCheckBoxFieldValue(pc, "resume");
+				String resumptionId = enable(service, withResumption, max);
 
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "closing old service {0} for user {1}",
-						new Object[]{service, service.getUserJid()});
+				Packet response = pc.okResult(new Element(Command.COMMAND_EL, new String[]{"xmlns"}, new String[]{Command.XMLNS}),0);
+				if (resumptionId != null) {
+					Command.addFieldValue(response, "id", resumptionId);
+
+					Command.addFieldValue(response, "location", DNSResolverFactory.getInstance().getSecondaryHost());
+					Integer timeout = (Integer) service.getSessionData().get(MAX_RESUMPTION_TIMEOUT_KEY);
+					if (timeout != null) {
+						Command.addFieldValue(response,"max", String.valueOf(timeout));
+					}
+				}
+				connectionManager.processOutPacket(response);
 			}
-
-			// stopping old service
-			connectionManager.serviceStopped(service);
+			break;
+			default:
+				break;
 		}
 	}
 
@@ -570,25 +642,23 @@ public class StreamManagementIOProcessor
 		};
 	}
 
-	/**
-	 * Method responsible for starting process of stream resumption
-	 */
-	private void resumeStream(XMPPIOService service, String id, int h) throws IOException {
+	public static class ResumptionException extends ComponentException {
+
+		public ResumptionException(Authorization errorCondition) {
+			super(errorCondition);
+		}
+	}
+
+	private String moveStream(XMPPIOService service, String id, int h) throws IOException, ResumptionException {
 		XMPPIOService oldService = services.get(id);
 		if (oldService == null || !isSameUser(oldService, service)) {
 			// should send failed!
-			service.writeRawData(
-					"<failed xmlns='" + XMLNS + "'>" + "<item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-							"</failed>");
-			return;
+			throw new ResumptionException(Authorization.ITEM_NOT_FOUND);
 		}
 
 		// if stream has resource binded then we should not resume
 		if (service.getUserJid() != null && JID.jidInstanceNS(service.getUserJid()).getResource() != null) {
-			service.writeRawData("<failed xmlns='" + XMLNS + "'>" +
-										 "<unexpected-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-										 "</failed>");
-			return;
+			throw new ResumptionException(Authorization.UNEXPECTED_REQUEST);
 		}
 
 		if (services.remove(id, oldService)) {
@@ -618,19 +688,29 @@ public class StreamManagementIOProcessor
 			service.getSessionData().put(IN_COUNTER_KEY, oldService.getSessionData().get(IN_COUNTER_KEY));
 			service.getSessionData().put(STREAM_ID_KEY, oldService.getSessionData().get(STREAM_ID_KEY));
 
+			return oldService.getConnectionId().toString();
+		} else {
+			throw new ResumptionException(Authorization.ITEM_NOT_FOUND);
+		}
+	}
+
+	/**
+	 * Method responsible for starting process of stream resumption
+	 */
+	private void resumeStream(XMPPIOService service, String id, int h) throws IOException {
+		try {
+			String oldConnId = moveStream(service, id,h);
 			// send notification to session manager about change of connection
 			// used for session
-			Packet cmd = Command.STREAM_MOVED.getPacket(service.getConnectionId(), service.getDataReceiver(),
-														StanzaType.set, "moved");
+			Packet cmd = StreamManagementCommand.STREAM_MOVED.create(service.getConnectionId(), service.getDataReceiver());
 			cmd.setPacketFrom(service.getConnectionId());
 			cmd.setPacketTo(service.getDataReceiver());
-			Command.addFieldValue(cmd, "old-conn-jid", oldService.getConnectionId().toString());
+			Command.addFieldValue(cmd, "old-conn-jid", oldConnId);
+			Command.addFieldValue(cmd, "send-response", "true");
 			connectionManager.processOutPacket(cmd);
-		} else {
-			// should send failed!
-			service.writeRawData(
-					"<failed xmlns='" + XMLNS + "'>" + "<item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
-							"</failed>");
+		} catch (ResumptionException ex) {
+			service.writeRawData("<failed xmlns='" + XMLNS + "'>" + "<" + ex.getName() + " xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+										 "</failed>");
 		}
 	}
 

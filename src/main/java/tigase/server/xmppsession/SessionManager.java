@@ -46,6 +46,7 @@ import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
 import tigase.server.*;
 import tigase.server.script.CommandIfc;
+import tigase.server.xmppclient.StreamManagementCommand;
 import tigase.stats.MaxDailyCounterQueue;
 import tigase.stats.StatisticsList;
 import tigase.sys.OnlineJidsReporter;
@@ -80,6 +81,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
+import static tigase.xmpp.impl.StreamManagementInline.SESSION_RESUMPTION_ID_KEY;
 
 /**
  * Class SessionManager
@@ -1678,46 +1680,81 @@ public class SessionManager
 				processing_result = true;
 				break;
 			case STREAM_MOVED:
-				if (connection != null && connection.isAuthorized()) {
-					String oldConnectionJidStr = Command.getFieldValue(pc, "old-conn-jid");
-					JID oldConnJid = JID.jidInstanceNS(oldConnectionJidStr);
+				if (pc.getType() == StanzaType.error || pc.getType() == StanzaType.result) {
 
-					try {
-
-						// get old session and replace it's connection id to redirect packets
-						// to new connection
-						XMPPResourceConnection oldConn = connectionsByFrom.remove(oldConnJid);
-
-						if (oldConn != null) {
-							oldConn.setConnectionId(connection.getConnectionId());
-							connectionsByFrom.remove(connection.getConnectionId());
-							connectionsByFrom.put(oldConn.getConnectionId(), oldConn);
-
-							// remove current connection from list of active connections as
-							// this connection will be used with other already authenticated connection
-							sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(connection);
-
-							xmppStreamMoved(oldConn, oldConnJid, oldConn.getConnectionId());
-						} else {
-							try {
-								addOutPacket(
-										Authorization.ITEM_NOT_FOUND.getResponseMessage(pc, "Previous session missing",
-																						false));
-							} catch (PacketErrorTypeException e) {
-								log.log(Level.FINEST, "could not send error, packet already of type error", e);
-							}
-						}
-					} catch (XMPPException ex) {
-						log.log(Level.SEVERE, "exception while replacing old connection id = " + oldConnJid +
-								" with new connection id = " + pc.getPacketFrom().toString(), ex);
-					}
 				} else {
-					try {
-						if (pc.getType() != StanzaType.error) {
-							addOutPacket(Authorization.NOT_AUTHORIZED.getResponseMessage(pc, "Not authorized", false));
-						}
-					} catch (PacketErrorTypeException e) {
-						log.log(Level.FINEST, "could not send not-authorized error, packet already of type error", e);
+					StreamManagementCommand cmd = StreamManagementCommand.fromPacket(pc);
+					switch (cmd) {
+						case ENABLED:
+							if (connection != null && connection.isAuthorized()) {
+								String resumptionId = Command.getFieldValue(pc, "resumption-id");
+								connection.putSessionData(SESSION_RESUMPTION_ID_KEY, resumptionId);
+							}
+							break;
+						case STREAM_MOVED:
+							if (connection != null && connection.isAuthorized()) {
+								String oldConnectionJidStr = Command.getFieldValue(pc, "old-conn-jid");
+								JID oldConnJid = JID.jidInstanceNS(oldConnectionJidStr);
+
+								try {
+
+									// get old session and replace it's connection id to redirect packets
+									// to new connection
+									XMPPResourceConnection oldConn = connectionsByFrom.remove(oldConnJid);
+
+									if (oldConn != null) {
+										// move resumption id from old to the new session
+										String resumptionId = (String) oldConn.getSessionData(SESSION_RESUMPTION_ID_KEY);
+										if (resumptionId != null) {
+											oldConn.removeSessionData(SESSION_RESUMPTION_ID_KEY);
+											connection.putSessionData(SESSION_RESUMPTION_ID_KEY, resumptionId);
+										}
+										// Move presence and priority from old session to the new one
+										//connection.setPresence(oldConn.getPresence());
+										connection.putSessionData(XMPPResourceConnection.PRESENCE_KEY, oldConn.getPresence());
+										connection.setPriority(oldConn.getPriority());
+
+
+										// remove current connection from list of active connections as
+										// this connection will be used with other already authenticated connection
+										sessionsByNodeId.get(oldConn.getBareJID()).removeResourceConnection(oldConn);
+										try {
+											// set resource, to add a new connection
+											connection.setResource(oldConn.getResource());
+										} catch (Throwable ex) {
+											log.log(Level.WARNING, "Could not set resource during resumption", ex);
+										}
+
+										xmppStreamMoved(connection, oldConnJid, oldConn.getConnectionId(), Command.getFieldValue(pc, "send-response"));
+									} else {
+										try {
+											addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(pc,
+																										 "Previous session missing",
+																										 false));
+										} catch (PacketErrorTypeException e) {
+											log.log(Level.FINEST, "could not send error, packet already of type error",
+													e);
+										}
+									}
+								} catch (XMPPException ex) {
+									log.log(Level.SEVERE, "exception while replacing old connection id = " + oldConnJid +
+											" with new connection id = " + pc.getPacketFrom().toString(), ex);
+								}
+							} else {
+								try {
+									if (pc.getType() != StanzaType.error) {
+										addOutPacket(
+												Authorization.NOT_AUTHORIZED.getResponseMessage(pc, "Not authorized",
+																								false));
+									}
+								} catch (PacketErrorTypeException e) {
+									log.log(Level.FINEST,
+											"could not send not-authorized error, packet already of type error", e);
+								}
+							}
+							break;
+						default:
+							break;
 					}
 				}
 				processing_result = true;
@@ -2157,11 +2194,12 @@ public class SessionManager
 		addTimerTask(nodeShutdownTask, event.getDelay() * SECOND, 1 * SECOND);
 	}
 
-	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId) {
-		Packet cmd = Command.STREAM_MOVED.getPacket(getComponentId(), oldConnId, StanzaType.set, "moved");
+	protected void xmppStreamMoved(XMPPResourceConnection conn, JID oldConnId, JID newConnId, String sendResponse) {
+		Packet cmd = StreamManagementCommand.STREAM_MOVED.create(getComponentId(), oldConnId);
 
 		Command.addFieldValue(cmd, "cmd", "stream-moved");
 		Command.addFieldValue(cmd, "new-conn-jid", newConnId.toString());
+		Command.addFieldValue(cmd, "send-response", sendResponse);
 		cmd.setPacketFrom(getComponentId());
 		cmd.setPacketTo(oldConnId);
 		addOutPacket(cmd);

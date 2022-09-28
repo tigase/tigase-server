@@ -49,7 +49,7 @@ public class SessionBind
 		implements XMPPProcessorIfc {
 
 	protected static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-session";
-	private static final String SESSION_KEY = "Session-Set";
+	public static final String SESSION_KEY = "Session-Set";
 	private static final Logger log = Logger.getLogger(SessionBind.class.getName());
 
 	@Override

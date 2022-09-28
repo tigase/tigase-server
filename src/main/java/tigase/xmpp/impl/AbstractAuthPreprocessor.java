@@ -49,6 +49,7 @@ public abstract class AbstractAuthPreprocessor
 			new ElementMatcher(new String[0], "urn:ietf:params:xml:ns:xmpp-tls", true),
 			new ElementMatcher(new String[0], "http://jabber.org/protocol/compress", true),
 			new ElementMatcher(new String[0], "urn:ietf:params:xml:ns:xmpp-sasl", true),
+			new ElementMatcher(new String[0], "urn:xmpp:sasl:2", true),
 			new ElementMatcher(Iq.IQ_QUERY_PATH, JabberIqRegister.ID, true),
 			new ElementMatcher(Iq.IQ_QUERY_PATH, JabberIqAuth.ID, true)
 	};

@@ -18,6 +18,7 @@
 package tigase.auth;
 
 import tigase.db.AuthRepository;
+import tigase.xml.Element;
 
 import javax.security.sasl.SaslException;
 
@@ -83,12 +84,20 @@ public class XmppSaslException
 
 		private final String elementName;
 
+		public static final String XMLNS = "urn:ietf:params:xml:ns:xmpp-sasl";
+
 		SaslError(String elementName) {
 			this.elementName = elementName;
 		}
 
 		public String getElementName() {
 			return elementName;
+		}
+
+		public Element getElement() {
+			Element error = new Element(getElementName());
+			error.setXMLNS(XMLNS);
+			return error;
 		}
 
 	}
