@@ -1725,7 +1725,7 @@ public class SessionManager
 											log.log(Level.WARNING, "Could not set resource during resumption", ex);
 										}
 
-										xmppStreamMoved(connection, oldConnJid, oldConn.getConnectionId(), Command.getFieldValue(pc, "send-response"));
+										xmppStreamMoved(connection, oldConnJid, connection.getConnectionId(), Command.getFieldValue(pc, "send-response"));
 									} else {
 										try {
 											addOutPacket(Authorization.ITEM_NOT_FOUND.getResponseMessage(pc,
