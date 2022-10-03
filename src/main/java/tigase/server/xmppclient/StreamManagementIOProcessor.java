@@ -240,6 +240,10 @@ public class StreamManagementIOProcessor
 			return true;
 		}
 
+		if (!isStanza(packet)) {
+			return false;
+		}
+
 		((Counter) service.getSessionData().get(IN_COUNTER_KEY)).inc();
 
 		return false;
@@ -248,6 +252,10 @@ public class StreamManagementIOProcessor
 	@Override
 	public boolean processOutgoing(XMPPIOService service, Packet packet) {
 		if (!isEnabled(service) || packet.getXMLNS() == XMLNS) {
+			return false;
+		}
+
+		if (!isStanza(packet)) {
 			return false;
 		}
 
@@ -553,6 +561,13 @@ public class StreamManagementIOProcessor
 
 	protected OutQueue newOutQueue() {
 		return new OutQueue();
+	}
+
+	protected boolean isStanza(Packet packet) {
+		return switch (packet.getElemName()) {
+			case Iq.ELEM_NAME, Message.ELEM_NAME, Presence.ELEM_NAME -> true;
+			default -> false;
+		};
 	}
 
 	/**
