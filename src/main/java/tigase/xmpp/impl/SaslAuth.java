@@ -291,6 +291,10 @@ public class SaslAuth
 			return null;
 		} else {
 			Collection<String> auth_mechs = saslProvider.filterMechanisms(Sasl.getSaslServerFactories(), session);
+			if (auth_mechs.isEmpty()) {
+				return null;
+			}
+
 			Element[] mechs = new Element[auth_mechs.size()];
 			int idx = 0;
 

@@ -121,6 +121,11 @@ public class StartTLS
 		// for non-existen stream, the second condition means that the TLS
 		// has not been yet completed for the user connection.
 		if ((session != null) && (session.getSessionData(ID) == null)) {
+			if (session.isEncrypted()) {
+				// connection is already SSL/TLS protected
+				return null;
+			}
+
 			VHostItem vhost = session.getDomain();
 
 			if ((vhost != null) && session.isTlsRequired()) {
@@ -150,7 +155,7 @@ public class StartTLS
 
 		// Check whether the TLS has been completed
 		// and the packet is allowed to be processed.
-		if ((vhost != null) && session.isTlsRequired() && (session.getSessionData(ID) == null) &&
+		if ((vhost != null) && (session.isTlsRequired() && !session.isEncrypted()) &&
 				!packet.isElement(EL_NAME, XMLNS)) {
 			stop = true;
 		}

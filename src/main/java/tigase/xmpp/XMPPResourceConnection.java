@@ -633,6 +633,10 @@ public class XMPPResourceConnection
 	}
 
 	public boolean isEncrypted() {
+		Boolean ssl = (Boolean) getSessionData("SSL");
+		if (ssl != null && ssl) {
+			return true;
+		}
 		String tls = (String) getSessionData("starttls");
 		return tls != null && "true".equals(tls);
 	}
@@ -640,9 +644,6 @@ public class XMPPResourceConnection
 	public boolean isTlsRequired() {
 		VHostItem vhost = getDomain();
 		try {
-			if (null != getSessionData("SSL") && (boolean) getSessionData("SSL")) {
-				return false;
-			}
 			if ("c2s".equals(getConnectionId().getLocalpart())) {
 				return vhost.isTlsRequired();
 			} else {

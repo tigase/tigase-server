@@ -421,6 +421,9 @@ public class JabberIqRegister
 			log.finest("VHostItem: " + session.getDomain());
 		}
 		if ((session != null) && session.getDomain().isRegisterEnabled()) {
+			if (session.isTlsRequired() && !session.isEncrypted()) {
+				return null;
+			}
 			return FEATURES;
 		} else {
 			return null;
