@@ -130,11 +130,10 @@ public class StreamManagementIOProcessor
 
 	@Override
 	public Element[] supStreamFeatures(XMPPIOService service) {
-		// user jid may not be set yet because is is set during resource binding
-		// while this feature should be advertised just after authentication of 
-		// connection
-		/*if (service.getUserJid() == null)
-			return null;*/
+		// user jid is set after authentication and then after resource bind,
+		// so it should be available after authentication
+		if (service.getUserJid() == null)
+			return null;
 
 		return FEATURES;
 	}

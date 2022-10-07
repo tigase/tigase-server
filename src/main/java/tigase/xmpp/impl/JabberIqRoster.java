@@ -368,7 +368,11 @@ public class JabberIqRoster
 
 	@Override
 	public Element[] supStreamFeatures(final XMPPResourceConnection session) {
-		return RosterAbstract.FEATURES;
+		if (session != null && session.isAuthorized()) {
+			return RosterAbstract.FEATURES;
+		} else {
+			return null;
+		}
 	}
 
 	/**
