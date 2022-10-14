@@ -132,7 +132,8 @@ public class StreamManagementIOProcessor
 	public Element[] supStreamFeatures(XMPPIOService service) {
 		// user jid is set after authentication and then after resource bind,
 		// so it should be available after authentication
-		if (service.getUserJid() == null)
+		// but in rare cases service can be null if connection was already closed..
+		if (service == null || service.getUserJid() == null)
 			return null;
 
 		return FEATURES;
