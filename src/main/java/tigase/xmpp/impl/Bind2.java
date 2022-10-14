@@ -99,7 +99,7 @@ public class Bind2 implements SaslAuth2.Inline {
 		String tag = parseTag(action);
 		if (tag != null) {
 			resourceBuilder.append(tag);
-			resourceBuilder.append("-");
+			resourceBuilder.append("/");
 		}
 
 		SaslAuth2.UserAgent userAgent = (SaslAuth2.UserAgent) session.getSessionData(SaslAuth2.USER_AGENT_KEY);
