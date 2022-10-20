@@ -19,7 +19,9 @@ package tigase.xmpp.impl;
 
 import tigase.auth.*;
 import tigase.auth.mechanisms.AbstractSasl;
+import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslANONYMOUS;
+import tigase.auth.mechanisms.SaslSCRAMPlus;
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -180,8 +182,16 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 				}
 			}
 
-			return new Element[]{new Element("authentication", children.toArray(Element[]::new), new String[]{"xmlns"},
-											 new String[]{XMLNS})};
+			if (session.isEncrypted() && session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null &&
+					SaslSCRAMPlus.containsScramPlus(auth_mechs)) {
+				Element bindings = AbstractSaslSCRAM.getSupportedChannelBindings(session);
+				return new Element[]{new Element("authentication", children.toArray(Element[]::new), new String[]{"xmlns"},
+												 new String[]{XMLNS}), bindings};
+			}
+			else {
+				return new Element[]{new Element("authentication", children.toArray(Element[]::new), new String[]{"xmlns"},
+												 new String[]{XMLNS})};
+			}
 		}
 	}
 

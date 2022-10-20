@@ -22,6 +22,8 @@ import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.callbacks.*;
 import tigase.util.Base64;
+import tigase.xml.Element;
+import tigase.xmpp.XMPPResourceConnection;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -99,6 +101,18 @@ public abstract class AbstractSaslSCRAM
 	private String sfmNonce;
 	private Step step = Step.clientFirstMessage;
 	private byte[] storedKey;
+
+	public static Element getSupportedChannelBindings(XMPPResourceConnection session) {
+		Element bindings = new Element("sasl-channel-binding");
+		bindings.setXMLNS("urn:xmpp:sasl-cb:0");
+		bindings.addChild(
+				new Element("channel-binding", new String[]{"type"}, new String[]{"tls-server-end-point"}));
+		if (session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null) {
+			bindings.addChild(
+					new Element("channel-binding", new String[]{"type"}, new String[]{"tls-unique"}));
+		}
+		return bindings;
+	}
 
 	public static byte[] hi(String algorithm, byte[] password, final byte[] salt, final int iterations)
 			throws InvalidKeyException, NoSuchAlgorithmException {

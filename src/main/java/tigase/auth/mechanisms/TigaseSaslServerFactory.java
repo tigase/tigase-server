@@ -65,10 +65,9 @@ public class TigaseSaslServerFactory
 
 	@Override
 	public String[] getMechanismNames(Map<String, ?> props) {
-		return new String[]{
-//				SaslSCRAMSha256Plus.NAME,
-//				SaslSCRAMPlus.NAME,
-SaslSCRAMSha512.NAME, SaslSCRAMSha256.NAME, SaslSCRAM.NAME, "PLAIN", "EXTERNAL", "ANONYMOUS",};
+		return new String[]{SaslSCRAMSha512Plus.NAME, SaslSCRAMSha256Plus.NAME, SaslSCRAMPlus.NAME,
+							SaslSCRAMSha512.NAME, SaslSCRAMSha256.NAME, SaslSCRAM.NAME, "PLAIN", "EXTERNAL",
+							"ANONYMOUS",};
 	}
 
 }

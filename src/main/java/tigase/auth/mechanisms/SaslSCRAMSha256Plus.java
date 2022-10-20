@@ -30,10 +30,8 @@ public class SaslSCRAMSha256Plus
 	protected final static String ALGO = "SHA-256";
 
 	public static boolean isAvailable(XMPPResourceConnection session) {
-		// Mechanism permanently disabled!
-		return false;
-//		return session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null
-//				|| session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null;
+		return session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null
+				|| session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null;
 	}
 
 	public SaslSCRAMSha256Plus(Map<? super String, ?> props, CallbackHandler callbackHandler) {

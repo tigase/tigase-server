@@ -48,6 +48,9 @@ public class DefaultMechanismSelector
 	@ConfigField(desc = "List of SASL mechanisms allowed with non-plain password stored in authentication repository", alias = "non-plain-password-allowed-mechanisms")
 	private HashSet<String> allowedMechanismsWithNonPlainPasswordInRepository = new HashSet<>();
 
+	@ConfigField(desc = "Disable SCRAM -PLUS mechanisms")
+	private boolean disableScramPlus = false;
+
 	@Inject
 	private AuthRepository authRepository;
 
@@ -103,7 +106,7 @@ public class DefaultMechanismSelector
 					return session.getDomain().isAnonymousEnabled();
 				default:
 					if (mechanismName.startsWith("SCRAM-") && mechanismName.endsWith("-PLUS") &&
-							!SaslSCRAMPlus.isAvailable(session)) {
+							((!SaslSCRAMPlus.isAvailable(session)) || disableScramPlus)) {
 						return false;
 					}
 

@@ -337,7 +337,7 @@ public class ClientConnectionManager
 
 	@Override
 	public void tlsHandshakeCompleted(XMPPIOService<Object> serv) {
-		sendTlsHandshakeCompletedToSessionManager(serv);
+		serv.getSessionData().put("SEND_TLS_COMPLETED", true);
 	}
 
 	@Override
@@ -466,6 +466,9 @@ public class ClientConnectionManager
 			Command.addFieldValue(streamOpen, "session-id", id);
 			Command.addFieldValue(streamOpen, "hostname", hostname);
 			Command.addFieldValue(streamOpen, "xml:lang", lang);
+			if (fromJID != null) {
+				Command.addFieldValue(streamOpen, "from", fromJID.toString());
+			}
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Sending a system command to SM: {0}", streamOpen);
 			}
@@ -475,8 +478,6 @@ public class ClientConnectionManager
 			addOutPacketWithTimeout(streamOpen, startedHandler, 45l, TimeUnit.SECONDS);
 
 			serviceConnected(serv);
-
-			sendTlsHandshakeCompletedToSessionManager(serv);
 			log.log(Level.FINER, "DONE 2");
 		} else {
 			if (log.isLoggable(Level.FINER)) {
@@ -984,6 +985,8 @@ public class ClientConnectionManager
 			return;
 		}
 
+		serv.getSessionData().remove("SEND_TLS_COMPLETED");
+
 		boolean send = false;
 
 		Packet command = Command.TLS_HANDSHAKE_COMPLETE.getPacket(serv.getConnectionId(), serv.getDataReceiver(),
@@ -1100,6 +1103,9 @@ public class ClientConnectionManager
 					}
 					serv.forceStop();
 					return;
+				}
+				if ((Boolean) serv.getSessionData().getOrDefault("SEND_TLS_COMPLETED", false)) {
+					ClientConnectionManager.this.sendTlsHandshakeCompletedToSessionManager(serv);
 				}
 				SocketType socket = (SocketType) serv.getSessionData().get("socket");
 				boolean ssl = socket.equals(SocketType.ssl);

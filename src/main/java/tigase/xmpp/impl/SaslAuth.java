@@ -20,7 +20,9 @@ package tigase.xmpp.impl;
 import tigase.auth.*;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.mechanisms.AbstractSasl;
+import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslANONYMOUS;
+import tigase.auth.mechanisms.SaslSCRAMPlus;
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -302,8 +304,15 @@ public class SaslAuth
 			for (String mech : auth_mechs) {
 				mechs[idx++] = new Element("mechanism", mech);
 			}
-
-			return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS})};
+			
+			if (session.isEncrypted() && session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null &&
+					SaslSCRAMPlus.containsScramPlus(auth_mechs)) {
+				Element bindings = AbstractSaslSCRAM.getSupportedChannelBindings(session);
+				return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS}), bindings};
+			}
+			else {
+				return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS})};
+			}
 		}
 	}
 

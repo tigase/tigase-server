@@ -37,7 +37,7 @@ import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -210,13 +210,16 @@ public class ScramCallbackHandler
 			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY));
 		} else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_server_end_point) {
 			try {
-				Certificate cert = (Certificate) session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY);
-				final String usealgo;
-				final String algo = cert.getPublicKey().getAlgorithm();
-				if (algo.equals("MD5") || algo.equals("SHA-1")) {
+				X509Certificate cert = (X509Certificate) session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY);
+				String usealgo;
+				final String algo =  cert.getSigAlgName();
+				int withIdx = algo.indexOf("with");
+				if (withIdx <= 0) {
+					throw new RuntimeException("Unable to parse SigAlgName: " + algo);
+				}
+				usealgo = algo.substring(0, withIdx);
+				if (usealgo.equalsIgnoreCase("MD5") || usealgo.equalsIgnoreCase("SHA1")) {
 					usealgo = "SHA-256";
-				} else {
-					usealgo = algo;
 				}
 				final MessageDigest md = MessageDigest.getInstance(usealgo);
 				final byte[] der = cert.getEncoded();

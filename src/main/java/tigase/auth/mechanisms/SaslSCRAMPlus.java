@@ -21,6 +21,7 @@ import tigase.xmpp.XMPPResourceConnection;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.SaslException;
+import java.util.Collection;
 import java.util.Map;
 
 public class SaslSCRAMPlus
@@ -29,11 +30,17 @@ public class SaslSCRAMPlus
 	public final static String NAME = "SCRAM-SHA-1-PLUS";
 	protected final static String ALGO = "SHA1";
 
-	public static boolean isAvailable(XMPPResourceConnection session) {
-		// Mechanism permanently disabled!
+	public static boolean containsScramPlus(Collection<String> mechanisms) {
+		for (String name : mechanisms) {
+			if (name.startsWith("SCRAM-") && name.endsWith("-PLUS"))
+				return true;
+		}
 		return false;
-//		return session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null
-//				|| session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null;
+	}
+
+	public static boolean isAvailable(XMPPResourceConnection session) {
+		return session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null
+				|| session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null;
 	}
 
 	public SaslSCRAMPlus(Map<? super String, ?> props, CallbackHandler callbackHandler) {
