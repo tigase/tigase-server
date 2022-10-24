@@ -1688,7 +1688,9 @@ public class SessionManager
 						case ENABLED:
 							if (connection != null && connection.isAuthorized()) {
 								String resumptionId = Command.getFieldValue(pc, "resumption-id");
-								connection.putSessionData(SESSION_RESUMPTION_ID_KEY, resumptionId);
+								if (resumptionId != null) {
+									connection.putSessionData(SESSION_RESUMPTION_ID_KEY, resumptionId);
+								}
 							}
 							break;
 						case STREAM_MOVED:
