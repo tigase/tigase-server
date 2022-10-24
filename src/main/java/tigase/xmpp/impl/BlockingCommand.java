@@ -250,6 +250,20 @@ public class BlockingCommand
 
 	private void sendUnblockPresences(XMPPResourceConnection session, JID jid, Queue<Packet> results)
 			throws NotAuthorizedException, TigaseDBException {
+		if (jid.getLocalpart() == null && jid.getResource() == null) {
+			JID[] buddies = roster_util.getBuddies(session);
+			if (buddies != null) {
+				for (JID buddy : buddies) {
+					if (!jid.getDomain().equals(buddy.getDomain())) {
+						continue;
+					}
+					if (buddy.getLocalpart() == null && buddy.getResource() == null) {
+						continue;
+					}
+					sendUnblockPresences(session, buddy, results);
+				}
+			}
+		}
 		SubscriptionType stype = roster_util.getBuddySubscription(session, jid);
 		if (stype == SubscriptionType.both || stype == SubscriptionType.from) {
 			PresenceAbstract.sendPresence(StanzaType.probe, JID.jidInstance(session.getBareJID()), jid, results, null);
@@ -269,6 +283,20 @@ public class BlockingCommand
 
 	private void sendBlockPresences(XMPPResourceConnection session, JID jid, Queue<Packet> results)
 			throws NotAuthorizedException, TigaseDBException {
+		if (jid.getLocalpart() == null && jid.getResource() == null) {
+			JID[] buddies = roster_util.getBuddies(session, EnumSet.of(SubscriptionType.both, SubscriptionType.to));
+			if (buddies != null) {
+				for (JID buddy : buddies) {
+					if (!jid.getDomain().equals(buddy.getDomain())) {
+						 continue;
+					}
+					if (buddy.getLocalpart() == null && buddy.getResource() == null) {
+						continue;
+					}
+					sendBlockPresences(session, buddy, results);
+				}
+			}
+		}
 		SubscriptionType stype = roster_util.getBuddySubscription(session, jid);
 		JID[] froms = session.getAllResourcesJIDs();
 		if (stype == SubscriptionType.both || stype == SubscriptionType.to) {

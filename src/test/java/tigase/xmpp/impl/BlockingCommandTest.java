@@ -26,21 +26,18 @@ import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.util.stringprep.TigaseStringprepException;
-import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
-import tigase.xml.SimpleParser;
-import tigase.xml.XMLUtils;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.util.ArrayDeque;
 import java.util.List;
-import java.util.Queue;
 
 import static org.junit.Assert.*;
 
@@ -251,6 +248,68 @@ public class BlockingCommandTest
 		blocked = getBlocked(sess);
 		assertTrue(blocked == null || blocked.isEmpty());
 	}
+
+	@Test
+	public void testBlockUnblockDomainWithPresence() throws Exception {
+		JID connJid = JID.jidInstanceNS("c2s@example.com/test-111");
+		JID userJid = JID.jidInstanceNS("user-1@example.com/res-1");
+		XMPPResourceConnection sess = getSession(connJid, userJid);
+
+		BareJID blockJid = BareJID.bareJIDInstanceNS( "block-1@example.com");
+		roster_util.addBuddy(sess, JID.jidInstance(blockJid), "Block-1", null, null, null);
+		roster_util.setBuddySubscription(sess, RosterAbstract.SubscriptionType.both, JID.jidInstance(blockJid));
+
+		checkPrivacyJidBlocked(sess, blockJid.getDomain(), false);
+		List<String> blocked = getBlocked(sess);
+		assertTrue(blocked == null || blocked.isEmpty());
+
+		block(sess, blockJid.getDomain());
+		assertEquals(3, results.size());
+		privacy.filter(null, sess, null, results);
+
+		assertEquals(3, results.size());
+		Packet result = results.poll();
+		assertNotNull(result);
+		assertEquals(tigase.server.Presence.ELEM_NAME, result.getElemName());
+		assertEquals(JID.jidInstanceNS(blockJid), result.getStanzaTo());
+		assertEquals(StanzaType.unavailable, result.getType());
+		result = results.poll();
+		assertNotNull(result);
+		assertEquals(Iq.ELEM_NAME, result.getElemName());
+		assertEquals(StanzaType.result, result.getType());
+		result = results.poll();
+		assertNotNull(result);
+		assertEquals(Iq.ELEM_NAME, result.getElemName());
+		assertEquals(StanzaType.set, result.getType());
+
+		checkPrivacyJidBlocked(sess, blockJid.getDomain(), true);
+		blocked = getBlocked(sess);
+		assertTrue(blocked.contains(blockJid.getDomain()));
+
+		unblock(sess, blockJid.getDomain());
+		assertEquals(3, results.size());
+		privacy.filter(null, sess, null, results);
+
+		assertEquals(3, results.size());
+		result = results.poll();
+		assertNotNull(result);
+		assertEquals(tigase.server.Presence.ELEM_NAME, result.getElemName());
+		assertEquals(JID.jidInstanceNS(blockJid), result.getStanzaTo());
+		assertEquals(StanzaType.probe, result.getType());
+		result = results.poll();
+		assertNotNull(result);
+		assertEquals(Iq.ELEM_NAME, result.getElemName());
+		assertEquals(StanzaType.result, result.getType());
+		result = results.poll();
+		assertNotNull(result);
+		assertEquals(Iq.ELEM_NAME, result.getElemName());
+		assertEquals(StanzaType.set, result.getType());
+
+		checkPrivacyJidBlocked(sess, blockJid.getDomain(), false);
+		blocked = getBlocked(sess);
+		assertTrue(blocked == null || blocked.isEmpty());
+	}
+
 
 	@Override
 	protected void registerBeans(Kernel kernel) {
