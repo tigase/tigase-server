@@ -82,7 +82,7 @@ public class XMPPIOService<RefObject>
 	/**
 	 * This variable keeps the time of last received XMPP packet, it is used to help detect dead connections.
 	 */
-	private long lastXmppPacketReceivedTime = 0;
+	private long lastXmppPacketReceivedTime = System.currentTimeMillis();
 	private long packetsReceived = 0;
 	private long packetsSent = 0;
 	/**
