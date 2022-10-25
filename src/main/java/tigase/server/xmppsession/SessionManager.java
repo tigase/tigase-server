@@ -1713,7 +1713,10 @@ public class SessionManager
 										}
 										// Move presence and priority from old session to the new one
 										//connection.setPresence(oldConn.getPresence());
-										connection.putSessionData(XMPPResourceConnection.PRESENCE_KEY, oldConn.getPresence());
+										Element oldPresent = oldConn.getPresence();
+										if (oldPresent != null) {
+											connection.putSessionData(XMPPResourceConnection.PRESENCE_KEY, oldPresent);
+										}
 										connection.setPriority(oldConn.getPriority());
 
 
