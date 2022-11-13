@@ -29,7 +29,7 @@ Server Components
 XMPP Clients
 ^^^^^^^^^^^^^^^^^
 
--  `SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client
+-  `SiskinIM and BeagleIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client
 
 -  `StorkIM <../../projects/tigase-stork/en/latest/>`__ android XMPP Client
 
