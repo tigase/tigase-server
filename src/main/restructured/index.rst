@@ -31,17 +31,27 @@ XMPP Clients
 
 -  `SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client
 
+-  `StorkIM <../../projects/tigase-stork/en/latest/>`__ android XMPP Client
 
 XMPP Libraries
 ^^^^^^^^^^^^^^^^^
 
--  `Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang XMPP Library
+-  `Martin <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang XMPP Library
 
 -  `Tigase Xmltools <../../projects/tigase-xmltools/en/latest/>`__ A library providing support for working with XML documents
 
 -  `Tigase Jaxmpp <../../projects/tigase-jaxmpp/en/latest/>`__ an extensible XMPP client library
 
 -  `Halcyon <../../projects/tigase-halcyon/en/latest/>`__ a multiplatform extensible XMPP client library
+
+
+Javadoc
+^^^^^^^^
+
+-  `Tigase Mangodb <../../projects/tigase-tigase-mangodb/en/latest/>`__ documentation in Java for tigase mangodb
+
+-  `Tigase Utils <../../projects/tigase-tigase-utils/en/latest/>`__ documentation in Java for tigase utils
+
 
 Legacy documentation website
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
