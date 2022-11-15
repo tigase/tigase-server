@@ -46,7 +46,7 @@ XMPP Libraries
 Javadoc
 ^^^^^^^^
 
--  `Tigase Mangodb <../../projects/tigase-tigase-mangodb/en/latest/>`__ Java documentation for tigase mangodb
+-  `Tigase Mongodb <../../projects/tigase-tigase-mongodb/en/latest/>`__ Java documentation for tigase mangodb
 
 -  `Tigase Utils <../../projects/tigase-tigase-utils/en/latest/>`__ Java documentation for tigase utils
 
