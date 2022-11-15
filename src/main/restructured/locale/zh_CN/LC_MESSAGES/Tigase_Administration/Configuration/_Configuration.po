@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-07 10:25-0700\n"
+"POT-Creation-Date: 2022-11-15 00:08-0800\n"
 "PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language: zh_CN\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
 "/tigase-xmpp-server/configuration/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.10.3\n"
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:2
 msgid "Configuration"
@@ -1136,11 +1136,28 @@ msgstr ""
 "jvm)或者[为什么我的Java进程消耗的内存比Xmx多？](\\ https://plumbr.io/blog/memory-leaks"
 "/why-does-my-java-process-consume-more-memory-than-xmx)"
 
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:60
+msgid ""
+"To facilitate getting information about complete memory usage we include "
+"this information in Tigase statistics, but it requires explicitly "
+"enabling it:"
+msgstr ""
+
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:62
+msgid "uncomment ``JVM_MEMORY`` line in ``etc/tigase.conf``:"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:68
+msgid ""
+"enable ``detailed-memory-statistics`` in ``message-router`` bean in "
+"``etc/config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:78
 msgid "GC settings"
 msgstr "GC 设置"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:64
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:80
 msgid ""
 "Let’s start with stating that there is no \"one to rule them all\" - each"
 " deployment and use-case is different, however we will try to give a "
@@ -1148,7 +1165,7 @@ msgid ""
 " GC itself."
 msgstr "让我们首先声明没有 \"一个人可以统治一切\" - 每个部署和用例都是不同的，但是我们将尝试给出一些指示和建议，并继续简要介绍 GC 本身。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:66
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:82
 msgid ""
 "XMPP is quite specific in terms of memory allocation - short-lived "
 "objects (various types of stanzas) usually exceed number of long-lived "
@@ -1160,21 +1177,21 @@ msgstr ""
 "XMPP 在内存分配方面非常具体 - 短期对象（各种类型的节）通常超过长期对象（用户连接和相关数据）的数量。这是关于 JVM HEAP "
 "的组织方式和垃圾收集器如何工作的重要信息。在最基本的层面上，堆被分成几个区域："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:69
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:85
 msgid "Generations"
 msgstr "代"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:71
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:87
 msgid "**Young Generation**, which is further divided in to:"
 msgstr "**年轻代**，其又分为："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:73
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:89
 msgid ""
 "**Eden** - the region when the objects are usually allocated when they "
 "are created;"
 msgstr "**Eden** - 创建对象时通常分配对象的区域；"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:75
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:91
 msgid ""
 "**Survivor Spaces** - (*to* and *from* - one of which is always empty) - "
 "responsible for storing all live object remaining after collecting "
@@ -1184,7 +1201,7 @@ msgstr ""
 "**幸存者区** - (*to* 和 *from* - 其中一个始终为空) - 负责存储收集 **年轻代** (过程重复多次，直到最终考虑对象 "
 "*足够老*)后剩余的所有存活对象 ;"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:77
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:93
 msgid ""
 "**Old Generation** - (*Tenured Space*) - responsible for live objects "
 "remaining after running GC on **Survivor Spaces** - those would be *long-"
@@ -1193,27 +1210,27 @@ msgstr ""
 "**老年代** - (*养老区*) - 负责在 **幸存者区** 上运行 GC 后剩余的活动对象 - 这些将是 *长期* "
 "对象（通常是用户连接和相关数据)；"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:80
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:96
 msgid "Minor, Major and Full GC - optimizing"
 msgstr "Minor，Major 和 Full GC - 优化"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:82
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:98
 msgid "General thinking suggests that:"
 msgstr "一般认为："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:84
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:100
 msgid "**Minor GC** cleans Young generation;"
 msgstr "**Minor GC** 清理年轻代；"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:86
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:102
 msgid "**Major GC** cleans Tenured space;"
 msgstr "**Major GC** 清理 Tenured 空间；"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:88
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:104
 msgid "**Full GC** cleans all heap."
 msgstr "**Full GC** 清理所有堆。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:90
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:106
 msgid ""
 "However, while we can certainly state that Minor GC cleans Young "
 "generation it’s a bit more difficult to differentiate Major and Full GC, "
@@ -1235,31 +1252,31 @@ msgstr ""
 "-Xloggc: logs/jvm.log -verbose:gc \"`` (或向 java "
 "命令行添加相同的属性)并随后分析结果应该会更有帮助。此外，使用示例 VisualVM（带有 VisualGC 插件）监控 GC 操作也将有所帮助。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:93
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:109
 msgid "Settings for XMPP"
 msgstr "XMPP 的设置"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:95
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:111
 msgid ""
 "Ideally we should limit both number of GC pauses as well as their "
 "duration. After running rather tests following conclusions were made:"
 msgstr "理想情况下，我们应该限制 GC 暂停的次数及其持续时间。经过非同寻常的测试，得出以下结论："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:97
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:113
 msgid ""
 "Garbage Collection is the faster the more dead objects occupies given "
 "space, therefore on high-traffic installation it’s better to have rather "
 "large YoungGen resulting in lower promotion of the objects to the OldGen;"
 msgstr "垃圾回收速度越快，死对象占用给定空间越多，因此在高流量安装中，最好使用较大的 YoungGen，从而降低对象向 OldGen 的提升;"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:99
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:115
 msgid ""
 "with JVM8 default sizing of Young / Old generation changed, even tho "
 "NewRatio is still defaulting to “2” - setting it explicitly to \"2\" "
 "brought back previous sizing;"
 msgstr "随着 JVM8 的年轻/老年代默认大小发生变化，即使 NewRatio 仍然默认为“2” - 将其显式设置为“2”会恢复以前的大小;"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:101
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:117
 msgid ""
 "Concurrent Mark and Sweep (CMS) enabled (applies to Tenured space only) "
 "with explicit configuration of NewRatio set to default value of 2 (i.e. "
@@ -1269,13 +1286,13 @@ msgstr ""
 "启用并发标记和扫描 (CMS)（仅适用于 Tenured 空间），通常将 NewRatio 的显式配置设置为默认值 2（即 "
 "``-XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:NewRatio=2``）表现最好;"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:103
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:119
 msgid ""
 "For small installations (few core CPU, less memory) with low traffic "
 "default Parallel collector may be a better solution;"
 msgstr "对于低流量的小型安装（核心 CPU 少，内存少）默认并行收集器可能是更好的解决方案;"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:105
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:121
 msgid ""
 "Using Heap size adjusted to the actual usage is better as the larger the "
 "heap the larger are spaces over which collection needs to be performed "
@@ -1285,13 +1302,13 @@ msgstr ""
 "使用根据实际使用情况调整的堆大小会更好，因为堆越大，需要执行收集的空间就越大，从而导致更长的暂停；如果堆很大，G1 "
 "收集器可能是避免更长暂停的更好解决方案;"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:107
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:123
 msgid ""
 "Considering all of the above using following options should be a good "
 "starting point toward further optimizing of Garbage Collection:"
 msgstr "考虑到上述所有因素，使用以下选项应该是进一步优化垃圾收集的良好起点："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:109
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:125
 msgid ""
 "``GC=\"-XX:+UseBiasedLocking -XX:+UseConcMarkSweepGC -XX:+UseParNewGC "
 "-XX:+CMSIncrementalMode -XX:-ReduceInitialCardMarks "
@@ -1303,17 +1320,17 @@ msgstr ""
 "-XX:CMSInitiatingOccupancyFraction=70 "
 "-XX:+UseCMSInitiatingOccupancyOnly\"``"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:112
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:128
 msgid "GC settings worth considering"
 msgstr "值得考虑的 GC 设置"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:114
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:130
 msgid ""
 "In addition to the general recommendation to use CMS collector, following"
 " options (or changes to the options) may be worth considering:"
 msgstr "除了使用 CMS 收集器的一般性建议外，以下选项(或对选项的更改)可能值得考虑："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:116
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:132
 msgid ""
 "``-XX:NewRatio=2`` - defines the ratio between the young and tenured "
 "generation is 1:2. In other words, the combined size of the eden and "
@@ -1326,7 +1343,7 @@ msgstr ""
 " NewSize 和 MaxNewSize 从下方和上方限制了年轻代的大小。将它们设置为相同的值会修复年轻代，就像将 -Xms 和 -Xmx "
 "设置为相同的值会修复总堆大小一样。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:118
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:134
 msgid ""
 "``-XX:CMSInitiatingOccupancyFraction=percent`` - sets the percentage of "
 "the old generation occupancy (0 to 100) at which to start a CMS "
@@ -1335,7 +1352,7 @@ msgstr ""
 "``-XX:CMSInitiatingOccupancyFraction=percent`` - 设置开始 CMS 收集周期的老年代占用率(0 到"
 " 100)。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:120
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:136
 msgid ""
 "``-XX:+UseCMSInitiatingOccupancyOnly`` - instructs the JVM not to base "
 "its decision when to start a CMS cycle on run time statistics but instead"
@@ -1344,7 +1361,7 @@ msgstr ""
 "``-XX:+UseCMSInitiatingOccupancyOnly`` - 指示 JVM 不要根据运行时统计信息，而是使用每个 CMS "
 "周期的 CMSInitiatingOccupancyFraction 的值来决定何时启动 CMS 周期。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:122
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:138
 msgid ""
 "``-XX:ParallelGCThreads=x`` - sets the number of threads used for "
 "parallel garbage collection in the young and old generations. The default"
@@ -1355,7 +1372,7 @@ msgstr ""
 "``-XX:ParallelGCThreads=x`` - 设置年轻代和老年代用于并行垃圾回收的线程数。默认值取决于 JVM 可用的 CPU "
 "数量。如果 Tigase JMV 是安装中唯一的运行，建议使用默认值。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:124
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:140
 msgid ""
 "``-XX:ConcGCThreads=x`` - sets the number of threads used for concurrent "
 "GC. The default value depends on the number of CPUs available to the JVM."
@@ -1365,7 +1382,7 @@ msgstr ""
 "``-XX:ConcGCThreads=x`` - 设置用于并发 GC 的线程数。默认值取决于 JVM 可用的 CPU 数量。如果 Tigase "
 "JMV 是安装中唯一的运行，建议使用默认值。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:126
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:142
 msgid ""
 "``-XX:+UseBiasedLocking`` and ``-XX:+DoEscapeAnalysis`` - designed to "
 "eliminate locking overhead, however their effect on performance is "
@@ -1376,13 +1393,13 @@ msgstr ""
 "``-XX:+UseBiasedLocking`` 和 ``-XX:+DoEscapeAnalysis`` - "
 "旨在消除锁定开销，但是它们对性能的影响是不可预测的，因此需要进行测试；减少锁定应该可提高并发性，并且在当前的多核硬件上，提高吞吐量。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:128
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:144
 msgid ""
 "``-XX:+OptimizeStringConcat`` - enables the optimization of String "
 "concatenation operations. This option is enabled by default."
 msgstr "``-XX:+OptimizeStringConcat`` - 启用字符串连接操作的优化。此选项默认被启用。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:130
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:146
 msgid ""
 "``-XX:+UseNUMA`` - enables performance optimization of an application on "
 "a machine with nonuniform memory architecture (NUMA - most modern "
@@ -1394,7 +1411,7 @@ msgstr ""
 "``-XX:+UseNUMA`` - 通过增加应用程序对低延迟内存的使用，在具有非统一内存架构（NUMA - 大多数现代计算机基于 NUMA "
 "架构）的机器上启用应用程序的性能优化。默认情况下，此选项处于禁用状态，并且不会对NUMA进行优化。该选项仅在使用并行垃圾收集器时可用（-XX:+UseParallelGC）。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:132
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:148
 msgid ""
 "``-XX:-UseCompressedOops`` — disables the use of compressed pointers. By "
 "default, this option is enabled, and compressed pointers are used when "
@@ -1407,15 +1424,15 @@ msgstr ""
 "时使用压缩指针。启用此选项后，对象引用将表示为 32 位偏移量而不是 64 位指针，这通常会在运行 Java 堆大小小于 32 GB "
 "的应用程序时提高性能。此选项仅适用于 64 位 JVM。"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:136
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:152
 msgid "What to use with Machine x, y, z?"
 msgstr "机器 x, y, z 使用什么？"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:139
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:155
 msgid "Server class machine (non-VM), > 16GB, >= 8 core CPU"
 msgstr "服务器类机器（非 VM) , > 16GB, >= 8 核 CPU"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:141
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:157
 msgid ""
 "For such setup enabling CMS garbage collector is recommended. Depending "
 "on the traffic usage and particular use-case adjusting NewRatio may be "
@@ -1425,17 +1442,17 @@ msgstr ""
 "对于此类设置，建议启用 CMS 垃圾收集器。根据流量使用情况和特定用例，可能需要调整 NewRatio。需要针对实际可用内存调整 Xms 和 "
 "Xms 大小（或者更好的是，针对实际流量！）。应使用以下内容："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:153
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:169
 msgid ""
 "For installation with lot of available memory and intention to utilize it"
 " all, using G1GC collector may be a better idea :"
 msgstr "对于有大量可用内存并打算利用这些内存的安装，使用 G1GC 收集器可能是一个更好的主意："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:167
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:183
 msgid "VM machine, 8GB of RAM, 4 core CPU equivalent"
 msgstr "VM 机器，8GB RAM，4 核 CPU 等效"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:169
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:185
 msgid ""
 "For such setup enabling CMS garbage collector is also recommended. "
 "Depending on the traffic usage and particular use-case adjusting NewRatio"
@@ -1446,11 +1463,11 @@ msgstr ""
 "对于此类设置，还建议启用 CMS 垃圾收集器。根据流量使用情况和特定用例，可能需要调整 NewRatio（并且必须配置 "
 "NewRatio！）。需要针对实际可用内存调整 Xms 和 Xms 大小（或者更好的是，针对实际流量！）。应使用以下内容："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:183
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:199
 msgid "VM machine with 4GB or less of RAM, and less than 4 core CPU equivalent"
 msgstr "具有 4GB 或更少 RAM 且少于 4 核 CPU 的 VM 机器"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:185
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:201
 msgid ""
 "Small installations with limited resources could operate better with "
 "default (for JVM versions up to 8, which is the most current at the "
@@ -1464,11 +1481,11 @@ msgstr ""
 "根据流量使用情况和特定用例，可能需要调整 NewRatio。建议针对实际可用内存调整 Xms 和 Xms "
 "大小（或者更好的是，针对实际流量！）。应该使用以下内容（即应该注释 ``GC`` 行以便使用默认值）："
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:199
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:215
 msgid "Additional resources"
 msgstr "其他资源"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:201
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:217
 msgid ""
 "`Sizing the Generations "
 "<https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/sizing.html>`__"
@@ -1476,7 +1493,7 @@ msgstr ""
 "`Generations的大小 "
 "<https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/sizing.html>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:203
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:219
 msgid ""
 "`About Java, parallel garbage collection and processor sets "
 "<http://www.c0t0d0s0.org/archives/6617-About-Java,-parallel-garbage-"
@@ -1485,17 +1502,17 @@ msgstr ""
 "`关于 Java, 并行垃圾收集和处理器集 <http://www.c0t0d0s0.org/archives/6617-About-Java"
 ",-parallel-garbage-collection-and-processor-sets.html>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:205
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:221
 msgid ""
 "`GC Threads <http://hiroshiyamauchi.blogspot.cl/2009/12/gc-"
 "threads.html>`__"
 msgstr "`GC 线程 <http://hiroshiyamauchi.blogspot.cl/2009/12/gc-threads.html>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:207
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:223
 msgid "`GCViewer readme <https://github.com/chewiebug/GCViewer#readme>`__"
 msgstr "`GCViewer 自述文件 <https://github.com/chewiebug/GCViewer#readme>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:209
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:225
 msgid ""
 "`Java HotSpot™ Virtual Machine Performance Enhancements "
 "<http://docs.oracle.com/javase/7/docs/technotes/guides/vm/performance-"
@@ -1505,17 +1522,17 @@ msgstr ""
 "<http://docs.oracle.com/javase/7/docs/technotes/guides/vm/performance-"
 "enhancements-7.html>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:211
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:227
 msgid ""
 "`Java Garbage Collection handbook <https://plumbr.eu/java-garbage-"
 "collection-handbook>`__"
 msgstr "`Java 垃圾收集手册 <https://plumbr.eu/java-garbage-collection-handbook>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:213
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:229
 msgid "Useful JVM Flags"
 msgstr "有用的 JVM 标志"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:215
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:231
 msgid ""
 "`Part 1 - JVM Types and Compiler Modes "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-1-jvm-"
@@ -1524,7 +1541,7 @@ msgstr ""
 "`第 1 部分 - JVM 类型和编译器模式 <https://blog.codecentric.de/en/2012/07/useful-"
 "jvm-flags-part-1-jvm-types-and-compiler-modes/>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:217
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:233
 msgid ""
 "`Part 2 - Flag Categories and JIT Compiler Diagnostics) "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-2-flag-"
@@ -1534,7 +1551,7 @@ msgstr ""
 "/useful-jvm-flags-part-2-flag-categories-and-jit-compiler-"
 "diagnostics/>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:219
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:235
 msgid ""
 "`Part 3 - Printing all XX Flags and their Values "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-3-printing-"
@@ -1543,7 +1560,7 @@ msgstr ""
 "`第 3 部分 - 打印所有 XX 标志及其值 <https://blog.codecentric.de/en/2012/07/useful-"
 "jvm-flags-part-3-printing-all-xx-flags-and-their-values/>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:221
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:237
 msgid ""
 "`Part 4 - Heap Tuning <https://blog.codecentric.de/en/2012/07/useful-jvm-"
 "flags-part-4-heap-tuning/>`__"
@@ -1551,7 +1568,7 @@ msgstr ""
 "`第 4 部分 - 堆调整 <https://blog.codecentric.de/en/2012/07/useful-jvm-flags-"
 "part-4-heap-tuning/>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:223
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:239
 msgid ""
 "`Part 5 - Young Generation Garbage Collection "
 "<https://blog.codecentric.de/en/2012/08/useful-jvm-flags-part-5-young-"
@@ -1560,7 +1577,7 @@ msgstr ""
 "`第 5 部分 - 年轻代垃圾回收 <https://blog.codecentric.de/en/2012/08/useful-jvm-"
 "flags-part-5-young-generation-garbage-collection/>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:225
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:241
 msgid ""
 "`Part 6 - Throughput Collector <https://blog.codecentric.de/en/2013/01"
 "/useful-jvm-flags-part-6-throughput-collector/>`__"
@@ -1568,7 +1585,7 @@ msgstr ""
 "`第 6 部分 - 吞吐量收集器 <https://blog.codecentric.de/en/2013/01/useful-jvm-"
 "flags-part-6-throughput-collector/>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:227
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:243
 msgid ""
 "`Part 7 - CMS Collector <https://blog.codecentric.de/en/2013/10/useful-"
 "jvm-flags-part-7-cms-collector/>`__"
@@ -1576,7 +1593,7 @@ msgstr ""
 "`第 7 部分 - CMS 收集器 <https://blog.codecentric.de/en/2013/10/useful-jvm-"
 "flags-part-7-cms-collector/>`__"
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:229
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:245
 msgid ""
 "`Part 8 - GC Logging <https://blog.codecentric.de/en/2014/01/useful-jvm-"
 "flags-part-8-gc-logging/>`__"

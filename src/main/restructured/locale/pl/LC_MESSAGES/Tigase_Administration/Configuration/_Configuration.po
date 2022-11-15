@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-07 10:25-0700\n"
+"POT-Creation-Date: 2022-11-15 00:08-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.10.3\n"
 
 #: ../../Tigase_Administration/Configuration/_Configuration.rst:2
 msgid "Configuration"
@@ -1019,11 +1019,28 @@ msgid ""
 "/memory-leaks/why-does-my-java-process-consume-more-memory-than-xmx)"
 msgstr ""
 
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:60
+msgid ""
+"To facilitate getting information about complete memory usage we include "
+"this information in Tigase statistics, but it requires explicitly "
+"enabling it:"
+msgstr ""
+
 #: ../../Tigase_Administration/Configuration/JVM_settings.inc:62
+msgid "uncomment ``JVM_MEMORY`` line in ``etc/tigase.conf``:"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:68
+msgid ""
+"enable ``detailed-memory-statistics`` in ``message-router`` bean in "
+"``etc/config.tdsl`` file:"
+msgstr ""
+
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:78
 msgid "GC settings"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:64
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:80
 msgid ""
 "Let’s start with stating that there is no \"one to rule them all\" - each"
 " deployment and use-case is different, however we will try to give a "
@@ -1031,7 +1048,7 @@ msgid ""
 " GC itself."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:66
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:82
 msgid ""
 "XMPP is quite specific in terms of memory allocation - short-lived "
 "objects (various types of stanzas) usually exceed number of long-lived "
@@ -1041,21 +1058,21 @@ msgid ""
 "couple of regions:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:69
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:85
 msgid "Generations"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:71
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:87
 msgid "**Young Generation**, which is further divided in to:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:73
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:89
 msgid ""
 "**Eden** - the region when the objects are usually allocated when they "
 "are created;"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:75
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:91
 msgid ""
 "**Survivor Spaces** - (*to* and *from* - one of which is always empty) - "
 "responsible for storing all live object remaining after collecting "
@@ -1063,34 +1080,34 @@ msgid ""
 " finally considered *old enough*);"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:77
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:93
 msgid ""
 "**Old Generation** - (*Tenured Space*) - responsible for live objects "
 "remaining after running GC on **Survivor Spaces** - those would be *long-"
 "lived* objects (usually user connections and associated data);"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:80
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:96
 msgid "Minor, Major and Full GC - optimizing"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:82
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:98
 msgid "General thinking suggests that:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:84
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:100
 msgid "**Minor GC** cleans Young generation;"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:86
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:102
 msgid "**Major GC** cleans Tenured space;"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:88
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:104
 msgid "**Full GC** cleans all heap."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:90
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:106
 msgid ""
 "However, while we can certainly state that Minor GC cleans Young "
 "generation it’s a bit more difficult to differentiate Major and Full GC, "
@@ -1106,31 +1123,31 @@ msgid ""
 "using for example VisualVM (with VisualGC plugin) will also be helpful."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:93
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:109
 msgid "Settings for XMPP"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:95
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:111
 msgid ""
 "Ideally we should limit both number of GC pauses as well as their "
 "duration. After running rather tests following conclusions were made:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:97
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:113
 msgid ""
 "Garbage Collection is the faster the more dead objects occupies given "
 "space, therefore on high-traffic installation it’s better to have rather "
 "large YoungGen resulting in lower promotion of the objects to the OldGen;"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:99
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:115
 msgid ""
 "with JVM8 default sizing of Young / Old generation changed, even tho "
 "NewRatio is still defaulting to “2” - setting it explicitly to \"2\" "
 "brought back previous sizing;"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:101
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:117
 msgid ""
 "Concurrent Mark and Sweep (CMS) enabled (applies to Tenured space only) "
 "with explicit configuration of NewRatio set to default value of 2 (i.e. "
@@ -1138,13 +1155,13 @@ msgid ""
 "behaves best;"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:103
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:119
 msgid ""
 "For small installations (few core CPU, less memory) with low traffic "
 "default Parallel collector may be a better solution;"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:105
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:121
 msgid ""
 "Using Heap size adjusted to the actual usage is better as the larger the "
 "heap the larger are spaces over which collection needs to be performed "
@@ -1152,13 +1169,13 @@ msgid ""
 "be better solution to avoid longer pauses;"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:107
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:123
 msgid ""
 "Considering all of the above using following options should be a good "
 "starting point toward further optimizing of Garbage Collection:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:109
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:125
 msgid ""
 "``GC=\"-XX:+UseBiasedLocking -XX:+UseConcMarkSweepGC -XX:+UseParNewGC "
 "-XX:+CMSIncrementalMode -XX:-ReduceInitialCardMarks "
@@ -1166,17 +1183,17 @@ msgid ""
 "-XX:+UseCMSInitiatingOccupancyOnly\"``"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:112
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:128
 msgid "GC settings worth considering"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:114
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:130
 msgid ""
 "In addition to the general recommendation to use CMS collector, following"
 " options (or changes to the options) may be worth considering:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:116
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:132
 msgid ""
 "``-XX:NewRatio=2`` - defines the ratio between the young and tenured "
 "generation is 1:2. In other words, the combined size of the eden and "
@@ -1186,21 +1203,21 @@ msgid ""
 "as setting -Xms and -Xmx to the same value fixes the total heap size."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:118
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:134
 msgid ""
 "``-XX:CMSInitiatingOccupancyFraction=percent`` - sets the percentage of "
 "the old generation occupancy (0 to 100) at which to start a CMS "
 "collection cycle."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:120
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:136
 msgid ""
 "``-XX:+UseCMSInitiatingOccupancyOnly`` - instructs the JVM not to base "
 "its decision when to start a CMS cycle on run time statistics but instead"
 " it uses the value of CMSInitiatingOccupancyFraction for every CMS cycle."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:122
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:138
 msgid ""
 "``-XX:ParallelGCThreads=x`` - sets the number of threads used for "
 "parallel garbage collection in the young and old generations. The default"
@@ -1209,7 +1226,7 @@ msgid ""
 "recommended."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:124
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:140
 msgid ""
 "``-XX:ConcGCThreads=x`` - sets the number of threads used for concurrent "
 "GC. The default value depends on the number of CPUs available to the JVM."
@@ -1217,7 +1234,7 @@ msgid ""
 "value is recommended."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:126
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:142
 msgid ""
 "``-XX:+UseBiasedLocking`` and ``-XX:+DoEscapeAnalysis`` - designed to "
 "eliminate locking overhead, however their effect on performance is "
@@ -1226,13 +1243,13 @@ msgid ""
 "throughput."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:128
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:144
 msgid ""
 "``-XX:+OptimizeStringConcat`` - enables the optimization of String "
 "concatenation operations. This option is enabled by default."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:130
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:146
 msgid ""
 "``-XX:+UseNUMA`` - enables performance optimization of an application on "
 "a machine with nonuniform memory architecture (NUMA - most modern "
@@ -1242,7 +1259,7 @@ msgid ""
 "parallel garbage collector is used (-XX:+UseParallelGC)."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:132
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:148
 msgid ""
 "``-XX:-UseCompressedOops`` — disables the use of compressed pointers. By "
 "default, this option is enabled, and compressed pointers are used when "
@@ -1252,15 +1269,15 @@ msgid ""
 "Java heap sizes less than 32 GB. This option works only for 64-bit JVMs."
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:136
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:152
 msgid "What to use with Machine x, y, z?"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:139
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:155
 msgid "Server class machine (non-VM), > 16GB, >= 8 core CPU"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:141
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:157
 msgid ""
 "For such setup enabling CMS garbage collector is recommended. Depending "
 "on the traffic usage and particular use-case adjusting NewRatio may be "
@@ -1268,17 +1285,17 @@ msgid ""
 " (or better yet, for the actual traffic!). Following should be used:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:153
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:169
 msgid ""
 "For installation with lot of available memory and intention to utilize it"
 " all, using G1GC collector may be a better idea :"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:167
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:183
 msgid "VM machine, 8GB of RAM, 4 core CPU equivalent"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:169
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:185
 msgid ""
 "For such setup enabling CMS garbage collector is also recommended. "
 "Depending on the traffic usage and particular use-case adjusting NewRatio"
@@ -1287,11 +1304,11 @@ msgid ""
 "actual traffic!). Following should be used:"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:183
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:199
 msgid "VM machine with 4GB or less of RAM, and less than 4 core CPU equivalent"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:185
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:201
 msgid ""
 "Small installations with limited resources could operate better with "
 "default (for JVM versions up to 8, which is the most current at the "
@@ -1302,97 +1319,97 @@ msgid ""
 "be commented so the defaults will be used):"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:199
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:215
 msgid "Additional resources"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:201
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:217
 msgid ""
 "`Sizing the Generations "
 "<https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/sizing.html>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:203
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:219
 msgid ""
 "`About Java, parallel garbage collection and processor sets "
 "<http://www.c0t0d0s0.org/archives/6617-About-Java,-parallel-garbage-"
 "collection-and-processor-sets.html>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:205
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:221
 msgid ""
 "`GC Threads <http://hiroshiyamauchi.blogspot.cl/2009/12/gc-"
 "threads.html>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:207
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:223
 msgid "`GCViewer readme <https://github.com/chewiebug/GCViewer#readme>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:209
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:225
 msgid ""
 "`Java HotSpot™ Virtual Machine Performance Enhancements "
 "<http://docs.oracle.com/javase/7/docs/technotes/guides/vm/performance-"
 "enhancements-7.html>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:211
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:227
 msgid ""
 "`Java Garbage Collection handbook <https://plumbr.eu/java-garbage-"
 "collection-handbook>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:213
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:229
 msgid "Useful JVM Flags"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:215
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:231
 msgid ""
 "`Part 1 - JVM Types and Compiler Modes "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-1-jvm-"
 "types-and-compiler-modes/>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:217
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:233
 msgid ""
 "`Part 2 - Flag Categories and JIT Compiler Diagnostics) "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-2-flag-"
 "categories-and-jit-compiler-diagnostics/>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:219
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:235
 msgid ""
 "`Part 3 - Printing all XX Flags and their Values "
 "<https://blog.codecentric.de/en/2012/07/useful-jvm-flags-part-3-printing-"
 "all-xx-flags-and-their-values/>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:221
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:237
 msgid ""
 "`Part 4 - Heap Tuning <https://blog.codecentric.de/en/2012/07/useful-jvm-"
 "flags-part-4-heap-tuning/>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:223
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:239
 msgid ""
 "`Part 5 - Young Generation Garbage Collection "
 "<https://blog.codecentric.de/en/2012/08/useful-jvm-flags-part-5-young-"
 "generation-garbage-collection/>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:225
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:241
 msgid ""
 "`Part 6 - Throughput Collector <https://blog.codecentric.de/en/2013/01"
 "/useful-jvm-flags-part-6-throughput-collector/>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:227
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:243
 msgid ""
 "`Part 7 - CMS Collector <https://blog.codecentric.de/en/2013/10/useful-"
 "jvm-flags-part-7-cms-collector/>`__"
 msgstr ""
 
-#: ../../Tigase_Administration/Configuration/JVM_settings.inc:229
+#: ../../Tigase_Administration/Configuration/JVM_settings.inc:245
 msgid ""
 "`Part 8 - GC Logging <https://blog.codecentric.de/en/2014/01/useful-jvm-"
 "flags-part-8-gc-logging/>`__"
