@@ -94,7 +94,7 @@ public class StartTLS
 				log.log(Level.FINEST, "Stream features received: {1} [{0}]", new Object[]{serv, p});
 			}
 
-			CID cid = (CID) serv.getSessionData().get("cid");
+			CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 			boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
 
 			if (p.isXMLNSStaticStr(FEATURES_STARTTLS_PATH, START_TLS_NS) && !skipTLS) {
@@ -113,7 +113,7 @@ public class StartTLS
 	@Override
 	public void streamFeatures(S2SIOService serv, List<Element> results) {
 		if (!serv.getSessionData().containsKey("TLS")) {
-			CID cid = (CID) serv.getSessionData().get("cid");
+			CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 			if (cid != null && !skipTLSForHost(cid.getRemoteHost()) && handler.isTlsRequired(cid.getLocalHost())) {
 				results.add(features_required);
 			} else {

@@ -134,7 +134,7 @@ public class Dialback
 
 	@Override
 	public boolean canHandle(Packet p, S2SIOService serv, Queue<Packet> results) {
-		CID cid = (CID) serv.getSessionData().get("cid");
+		CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 		boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
 
 		if (p.isElement(FEATURES_EL, FEATURES_NS) && p.getElement().getChildren() != null &&
@@ -249,7 +249,7 @@ public class Dialback
 				generateStreamError(false, "bad-request", serv);
 				return;
 			}
-			CID cid = (CID) serv.getSessionData().get("cid");
+			CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 			if (cid == null) {
 				// can't process such request
 				return;
@@ -278,7 +278,7 @@ public class Dialback
 		// Get the cid for which the connection has been created, the cid calculated
 		// from the packet may be different though if the remote server tries to
 		// multiplexing
-		CID cid_main = (CID) serv.getSessionData().get("cid");
+		CID cid_main = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 		CID cid_packet = new CID(p.getStanzaTo().getDomain(), p.getStanzaFrom().getDomain());
 
 		if (log.isLoggable(Level.FINEST)) {
@@ -296,7 +296,7 @@ public class Dialback
 			// This actually can only happen for 'accept' connection type
 			// what we did not get in stream open we can get from here
 			cid_main = cid_packet;
-			serv.getSessionData().put("cid", cid_main);
+			serv.getSessionData().put(S2SConnectionManager.CID_KEY, cid_main);
 
 			// For debuging purposes only....
 			serv.getSessionData().put("local-hostname", cid_main.getLocalHost());
@@ -324,7 +324,7 @@ public class Dialback
 		// Dummy dialback implementation for now....
 		if ((p.getElemName() == RESULT_EL_NAME) || (p.getElemName() == DB_RESULT_EL_NAME)) {
 			if (p.getType() == null) {
-				CID cid = (CID) serv.getSessionData().get("cid");
+				CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 				boolean skipTls = this.skipTLSForHost(cid.getRemoteHost());
 				if (!skipTls && !serv.getSessionData().containsKey("TLS") &&
 						handler.isTlsRequired(cid.getLocalHost())) {

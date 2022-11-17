@@ -56,6 +56,8 @@ public class S2SConnectionManager
 
 	public static final String CID_CONNECTIONS_BIND = "cidConnections";
 
+	public static final String CID_KEY = "cid";
+
 	public static final String CID_CONNECTIONS_TASKS_THREADS_KEY = "cid-connections-tasks-threads";
 
 	public static final String MAX_CONNECTION_INACTIVITY_TIME_PROP_KEY = "max-inactivity-time";
@@ -313,7 +315,7 @@ public class S2SConnectionManager
 
 	@Override
 	public void reconnectionFailed(Map<String, Object> port_props) {
-		CID cid = (CID) port_props.get("cid");
+		CID cid = (CID) port_props.get(CID_KEY);
 
 		if (cid == null) {
 			log.log(Level.WARNING, "Protocol error cid not set for outgoing connection: {0}", port_props);
@@ -396,7 +398,7 @@ public class S2SConnectionManager
 	@Override
 	public void serviceStarted(S2SIOService serv) {
 		super.serviceStarted(serv);
-		final CID cid = (CID)serv.getSessionData().get("cid");
+		final CID cid = (CID)serv.getSessionData().get(CID_KEY);
 		if (cid != null) {
 			serv.setUserJid(cid.toString());
 			serv.setConnectionId(JID.jidInstanceNS(cid.getLocalHost(), cid.getRemoteHost(), UUID.randomUUID().toString()));
@@ -480,6 +482,16 @@ public class S2SConnectionManager
 		}
 
 		return result;
+	}
+
+	@Override
+	public void validateCIDConnection(CID cid) throws NotLocalhostException, LocalhostException {
+		if (!isLocalDomainOrComponent(cid.getLocalHost())) {
+			throw new NotLocalhostException("This is not a valid localhost: " + cid.getLocalHost());
+		}
+		if (cid.getRemoteHost() != null && isLocalDomainOrComponent(cid.getRemoteHost())) {
+			throw new LocalhostException("This is not a valid remotehost: " + cid.getRemoteHost());
+		}
 	}
 
 	@Override

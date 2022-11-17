@@ -106,7 +106,7 @@ public class SaslExternal
 
 	@Override
 	public boolean canHandle(Packet p, S2SIOService serv, Queue<Packet> results) {
-		final CID cid = (CID) serv.getSessionData().get("cid");
+		final CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 		final boolean skipTLS = (cid != null) && skipTLSForHost(cid.getRemoteHost());
 
 		if (cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()))) {
@@ -229,7 +229,7 @@ public class SaslExternal
 	 */
 	private boolean canAddSaslToFeatures(S2SIOService serv) {
 		final ConcurrentMap<String, Object> sessionData = serv.getSessionData();
-		CID cid = (CID) sessionData.get("cid");
+		CID cid = (CID) sessionData.get(S2SConnectionManager.CID_KEY);
 		boolean skipDomain =
 				cid != null && (isSkippedDomain(cid.getLocalHost()) || isSkippedDomain(cid.getRemoteHost()));
 		CertCheckResult certCheckResult = (CertCheckResult) sessionData.get(S2SIOService.CERT_CHECK_RESULT);
@@ -251,7 +251,7 @@ public class SaslExternal
 
 	private void sendAuthRequest(S2SIOService serv, Queue<Packet> results) throws TigaseStringprepException {
 		String cdata = "=";
-		CID cid = (CID) serv.getSessionData().get("cid");
+		CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 		if (cid != null && legacyCompat) {
 			cdata = Base64.encode(cid.getLocalHost().getBytes(StandardCharsets.UTF_8));
 		}
@@ -265,7 +265,7 @@ public class SaslExternal
 
 	private void processSuccess(Packet p, S2SIOService serv, Queue<Packet> results)
 			throws TigaseStringprepException, LocalhostException, NotLocalhostException {
-		final CID cid = (CID) serv.getSessionData().get("cid");
+		final CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Sending new stream [{0}]", new Object[]{serv});
@@ -313,7 +313,7 @@ public class SaslExternal
 			return;
 		}
 
-		final CID cid = (CID) serv.getSessionData().get("cid");
+		final CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 		if (cid == null) {
 			// can't process such request
 			if (log.isLoggable(Level.FINE)) {

@@ -47,7 +47,7 @@ public class StreamOpen
 	public void serviceStarted(S2SIOService serv) {
 		switch (serv.connectionType()) {
 			case connect:
-				CID cid = (CID) serv.getSessionData().get("cid");
+				CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 
 				serv.getSessionData().put(S2SIOService.HOSTNAME_KEY, cid.getLocalHost());
 
@@ -84,7 +84,7 @@ public class StreamOpen
 
 	@Override
 	public void serviceStopped(S2SIOService serv) {
-		CID cid = (CID) serv.getSessionData().get("cid");
+		CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 
 		if (cid == null) {
 			if (serv.connectionType() == ConnectionType.connect) {
@@ -114,7 +114,7 @@ public class StreamOpen
 
 	@Override
 	public String streamOpened(S2SIOService serv, Map<String, String> attribs) {
-		CID cid = (CID) serv.getSessionData().get("cid");
+		CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 		String remote_hostname = attribs.get("from");
 		String local_hostname = attribs.get("to");
 		String version = attribs.get(VERSION_ATT_NAME);
@@ -128,11 +128,10 @@ public class StreamOpen
 			}
 		}
 
-		if (remote_hostname == null && (cid == null || cid.getRemoteHost() == null)) {
-			generateStreamError(false, "improper-addressing", serv);
-		}
 
 		try {
+			handler.validateCIDConnection(new CID(local_hostname, remote_hostname));
+
 			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 
 			switch (serv.connectionType()) {
@@ -196,7 +195,7 @@ public class StreamOpen
 									new Object[]{serv, cid, id});
 						}
 
-						serv.getSessionData().put("cid", cid);
+						serv.getSessionData().put(S2SConnectionManager.CID_KEY, cid);
 						serv.setConnectionId(JID.jidInstanceNS(cid.getLocalHost(), cid.getRemoteHost(), serv.getConnectionId().getResource()));
 						cid_conns.addIncoming(serv);
 					} else {

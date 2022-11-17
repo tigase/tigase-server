@@ -143,7 +143,7 @@ public class AuthenticatorSelectorManager
 	}
 
 	public void markConnectionAsFailed(String prefix, S2SIOService serv) {
-		CID cid = (CID) serv.getSessionData().get("cid");
+		CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 		log.log(Level.FINEST, () -> "Adding entry to stats, prefix: " + prefix + ", cid: " + cid);
 		failedAuthenticationDomains.computeIfAbsent(prefix + "/" + cid, s -> new AtomicInteger()).incrementAndGet();
 	}

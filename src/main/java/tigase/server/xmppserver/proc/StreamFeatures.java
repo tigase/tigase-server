@@ -142,7 +142,7 @@ public class StreamFeatures
 
 	private void stremNegotiationComplete(S2SIOService serv) {
 		if (!serv.isStreamNegotiationCompleted()) {
-			CID cid = (CID) serv.getSessionData().get("cid");
+			CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 			if (cid != null) {
 				CIDConnections cid_conns = null;
 				try {

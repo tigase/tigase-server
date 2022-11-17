@@ -109,7 +109,7 @@ public class CIDConnections {
 			serv.setS2SConnection(s2s_conn);
 		}
 
-		CID cid = (CID) serv.getSessionData().get("cid");
+		CID cid = (CID) serv.getSessionData().get(S2SConnectionManager.CID_KEY);
 		if (cid != null) {
 			// using additional mapping/masking of incoming connections to allow 
 			// usage of intermediate server also for incoming connections
@@ -551,7 +551,7 @@ public class CIDConnections {
 		port_props.put(PORT_TYPE_PROP_KEY, ConnectionType.connect);
 		port_props.put("srv-type", "_xmpp-server._tcp");
 		port_props.put(PORT_KEY, port);
-		port_props.put("cid", cid);
+		port_props.put(S2SConnectionManager.CID_KEY, cid);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "STARTING new connection: {0}, params: {1}", new Object[]{cid, port_props});
 		}

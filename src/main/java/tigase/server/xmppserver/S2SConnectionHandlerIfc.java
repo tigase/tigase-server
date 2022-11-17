@@ -49,6 +49,8 @@ public interface S2SConnectionHandlerIfc<IO extends XMPPIOService<?>> {
 
 	CIDConnections getCIDConnections(CID cid, boolean createNew) throws NotLocalhostException, LocalhostException;
 
+	void validateCIDConnection(CID cid) throws NotLocalhostException, LocalhostException;
+
 	CIDConnections.CIDConnectionsOpenerService getConnectionOpenerService();
 
 	BareJID getDefHostName();

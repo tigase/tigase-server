@@ -136,7 +136,7 @@ public class S2SIOService
 
 	@Override
 	public String toString() {
-		CID cid = (CID) getSessionData().get("cid");
+		CID cid = (CID) getSessionData().get(S2SConnectionManager.CID_KEY);
 
 		return "CID: " + cid + ", IN: " + authenticatedCIDsIN.size() + ", OUT: " + authenticatedCIDsOUT.size() +
 				", authenticated: " + isAuthenticated() + ", remote-session-id: " + getSessionId()
