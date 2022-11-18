@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-15 00:08-0800\n"
-"PO-Revision-Date: 2022-08-15 18:48+0000\n"
+"PO-Revision-Date: 2022-11-19 18:30+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/index/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/index/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.10.3\n"
 
 #: ../../index.rst:66
@@ -74,13 +75,12 @@ msgstr ""
 "XEP-0045 的实现：PubSub 协议"
 
 #: ../../index.rst:17
-#, fuzzy
 msgid ""
 "`Tigase Message Archiving <../../projects/tigase-tigase-message-"
 "archiving/en/latest/>`__ Implementation of XEP-0136: PMessage archiving"
 msgstr ""
-"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ "
-"XEP-0045 的实现：PubSub 协议"
+"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ XEP-0045 "
+"的实现：PubSub 协议"
 
 #: ../../index.rst:18
 msgid ""
@@ -244,4 +244,3 @@ msgstr ""
 #~ "`SiskinIM <../../projects/tigase-siskinim/en/latest/>`__"
 #~ " iOS XMPP Client"
 #~ msgstr ""
-
