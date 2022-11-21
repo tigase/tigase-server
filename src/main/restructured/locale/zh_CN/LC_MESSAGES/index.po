@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-15 00:08-0800\n"
-"PO-Revision-Date: 2022-11-19 18:30+0000\n"
+"PO-Revision-Date: 2022-11-21 17:37+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
 "Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
 "tigase-xmpp-server/index/zh_Hans/>\n"
@@ -88,51 +88,50 @@ msgid ""
 "archive/en/latest/>`__ The extended version of Tigase Message Archiving "
 "Component"
 msgstr ""
+"`Tigase Unified Archive <../../projects/projects/"
+"tigase-tigase-unified-archive/en/latest/>`__ Tigase 消息归档组件的扩展版本"
 
 #: ../../index.rst:19
-#, fuzzy
 msgid ""
 "`Tigase Socks5 <../../projects/tigase-socks5/en/latest/>`__ "
 "Implementation of XEP-0065 SOCKS5 Bytestreams"
 msgstr ""
-"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ "
-"XEP-0045 的实现：PubSub 协议"
+"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ XEP-0045 "
+"的实现：PubSub 协议"
 
 #: ../../index.rst:20
-#, fuzzy
 msgid ""
 "`Tigase Push <../../projects/tigase-tigase-push-2/en/latest/>`__ A "
 "gateway between Push Notification services and XMPP servers"
 msgstr ""
-"`Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift "
-"Lang XMPP 库"
+"`Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang "
+"XMPP 库"
 
 #: ../../index.rst:21
-#, fuzzy
 msgid ""
 "`Tigase ACS <../../projects/projects/tigase-tigase-acs-2/en/latest/>`__ "
 "General purpose, commercial clustering strategy"
-msgstr "`Tigase Spam <../../projects/tigase-tigase-spam/en/latest/>`__ 旨在打击垃圾邮件的项目"
+msgstr ""
+"`Tigase Spam <../../projects/tigase-tigase-spam/en/latest/>`__ "
+"旨在打击垃圾邮件的项目"
 
 #: ../../index.rst:22
-#, fuzzy
 msgid ""
 "`Tigase Auditlog <../../projects/projects/tigase-tigase-"
 "auditlog-2/en/latest/>`__ An implementation of Audit Log pattern "
 "functionality to log important events"
 msgstr ""
-"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ "
-"XEP-0045 的实现：PubSub 协议"
+"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ XEP-0045 "
+"的实现：PubSub 协议"
 
 #: ../../index.rst:23
-#, fuzzy
 msgid ""
 "`Tigase Workgroup Queues <../../projects/projects/tigase-tigase-"
 "workgroup-queues/en/latest/>`__ Implementation of XEP-0142: Workgroup "
 "Queues"
 msgstr ""
-"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ "
-"XEP-0045 的实现：PubSub 协议"
+"`Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ XEP-0045 "
+"的实现：PubSub 协议"
 
 #: ../../index.rst:24
 msgid ""
@@ -140,20 +139,20 @@ msgid ""
 "migrator/en/latest/>`__ Component allowing migration of different types "
 "of data from various XMPP servers"
 msgstr ""
+"`Tigase Databse Migrator <../../projects/tigase-database-migrator/en/latest/"
+">`__ 允许从各种 XMPP 服务器迁移不同类型数据的组件"
 
 #: ../../index.rst:28
 msgid "XMPP Clients"
 msgstr "XMPP 客户端"
 
 #: ../../index.rst:30
-#, fuzzy
 msgid ""
 "`SiskinIM and BeagleIM <../../projects/tigase-siskin-im/en/latest/>`__ "
 "iOS XMPP Client"
 msgstr "`SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP 客户端"
 
 #: ../../index.rst:32
-#, fuzzy
 msgid "`StorkIM <../../projects/tigase-stork/en/latest/>`__ android XMPP Client"
 msgstr "`SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP 客户端"
 
@@ -162,63 +161,68 @@ msgid "XMPP Libraries"
 msgstr "XMPP 库"
 
 #: ../../index.rst:37
-#, fuzzy
 msgid ""
 "`Martin <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang "
 "XMPP Library"
 msgstr ""
-"`Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift "
-"Lang XMPP 库"
+"`Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang "
+"XMPP 库"
 
 #: ../../index.rst:39
 msgid ""
 "`Halcyon <../../projects/tigase-halcyon/en/latest/>`__ a multiplatform, "
 "extensible XMPP client library"
 msgstr ""
+"`Halcyon <../../projects/tigase-halcyon/en/latest/>`__ 一个多平台、可扩展的 "
+"XMPP 客户端库"
 
 #: ../../index.rst:41
 msgid ""
 "`Tigase XML Tools <../../projects/tigase-xmltools/en/latest/>`__ A "
 "library providing support for working with XML documents"
 msgstr ""
+"`Tigase XML Tools <../../projects/tigase-xmltools/en/latest/>`__ 一个为处理 "
+"XML 文档提供支持的库"
 
 #: ../../index.rst:43
-#, fuzzy
 msgid ""
 "`Tigase JaXMPP <../../projects/tigase-jaxmpp/en/latest/>`__ an extensible"
 " XMPP client library"
 msgstr ""
-"`Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift "
-"Lang XMPP 库"
+"`Tigase Swift <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang "
+"XMPP 库"
 
 #: ../../index.rst:47
 msgid "Javadoc"
-msgstr ""
+msgstr "Javadoc"
 
 #: ../../index.rst:49
-#, fuzzy
 msgid ""
 "`Tigase Mongodb <../../projects/tigase-tigase-mongodb/en/latest/>`__ Java"
 " documentation for tigase mangodb"
-msgstr "`Tigase MUC <../../projects/tigase-tigase-muc/en/latest/>`__ 当前一代群聊协议"
+msgstr ""
+"`Tigase MUC <../../projects/tigase-tigase-muc/en/latest/>`__ tigase mangodb "
+"的 Java 文档"
 
 #: ../../index.rst:51
-#, fuzzy
 msgid ""
 "`Tigase Utils <../../projects/tigase-tigase-utils/en/latest/>`__ Java "
 "documentation for tigase utils"
-msgstr "`Tigase MIX <../../projects/tigase-tigase-mix/en/latest/>`__ 下一代群聊协议"
+msgstr ""
+"`Tigase MIX <../../projects/tigase-tigase-mix/en/latest/>`__ tigase "
+"实用程序的 Java 文档"
 
 #: ../../index.rst:54
 msgid "Miscellaneous"
-msgstr ""
+msgstr "杂项"
 
 #: ../../index.rst:56
-#, fuzzy
 msgid ""
 "`Tigase TTS NG <../../projects/tigase-tigase-tts-ng/en/latest/>`__ "
 "Project intended to run automated funtionality tests"
-msgstr "`Tigase Spam <../../projects/tigase-tigase-spam/en/latest/>`__ 旨在打击垃圾邮件的项目"
+msgstr ""
+"`Tigase TTS NG <../../projects/tigase-tigase-tts-ng/en/latest/>`__ "
+"旨在运行自动化功能测试的项目"
 
 #: ../../index.rst:58
 msgid ""
@@ -226,6 +230,8 @@ msgid ""
 " is working on with the goal to transition them to full, standard XMPP "
 "extensions."
 msgstr ""
+"`Tigase XEP <https://xeps.tigase.net/>`__ 我们 Tigase 正在开发的 XMPP 扩展，"
+"目标是将它们转换为完整的标准 XMPP 扩展。"
 
 #: ../../index.rst:62
 msgid "Legacy documentation website"
