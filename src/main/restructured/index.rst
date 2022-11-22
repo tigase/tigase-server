@@ -15,12 +15,12 @@ Server Components
 -  `Tigase HTTP API <../../projects/tigase-tigase-http-api/en/latest/>`__ Operate and manage Tigase via HTTP... and more!
 -  `Tigase PubSub <../../projects/tigase-tigase-pubsub/en/latest/>`__ Implementation of XEP-0045: PubSub protocol
 -  `Tigase Message Archiving <../../projects/tigase-tigase-message-archiving/en/latest/>`__ Implementation of XEP-0136: PMessage archiving
--  `Tigase Unified Archive <../../projects/projects/tigase-tigase-unified-archive/en/latest/>`__ The extended version of Tigase Message Archiving Component
+-  `Tigase Unified Archive <../../projects/tigase-tigase-unified-archive/en/latest/>`__ The extended version of Tigase Message Archiving Component
 -  `Tigase Socks5 <../../projects/tigase-socks5/en/latest/>`__ Implementation of XEP-0065 SOCKS5 Bytestreams
 -  `Tigase Push <../../projects/tigase-tigase-push-2/en/latest/>`__ A gateway between Push Notification services and XMPP servers
--  `Tigase ACS <../../projects/projects/tigase-tigase-acs-2/en/latest/>`__ General purpose, commercial clustering strategy 
--  `Tigase Auditlog <../../projects/projects/tigase-tigase-auditlog-2/en/latest/>`__ An implementation of Audit Log pattern functionality to log important events 
--  `Tigase Workgroup Queues <../../projects/projects/tigase-tigase-workgroup-queues/en/latest/>`__ Implementation of XEP-0142: Workgroup Queues
+-  `Tigase ACS <../../projects/tigase-tigase-acs-2/en/latest/>`__ General purpose, commercial clustering strategy 
+-  `Tigase Auditlog <../../projects/tigase-tigase-auditlog-2/en/latest/>`__ An implementation of Audit Log pattern functionality to log important events 
+-  `Tigase Workgroup Queues <../../projects/tigase-tigase-workgroup-queues/en/latest/>`__ Implementation of XEP-0142: Workgroup Queues
 -  `Tigase Databse Migrator <../../projects/tigase-database-migrator/en/latest/>`__ Component allowing migration of different types of data from various XMPP servers
 
 
