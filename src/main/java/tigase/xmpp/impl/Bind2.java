@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 import static tigase.xmpp.impl.SessionBind.SESSION_KEY;
 
-@Bean(name = Bind2.XMLNS, parent = SessionManager.class, active = true)
+@Bean(name = Bind2.XMLNS, parent = SessionManager.class, active = false)
 public class Bind2 implements SaslAuth2.Inline {
 
 	public static final String XMLNS = "urn:xmpp:bind:0";

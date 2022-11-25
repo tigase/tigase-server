@@ -47,7 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-@Bean(name = SaslAuth2.ID, parent = SessionManager.class, active = true)
+@Bean(name = SaslAuth2.ID, parent = SessionManager.class, active = false)
 public class SaslAuth2 extends AbstractAuthPreprocessor
 		implements XMPPProcessorIfc {
 
