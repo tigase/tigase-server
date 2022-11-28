@@ -1,7 +1,13 @@
 Tigase MIX Release Notes
 -------------------------
 
-Welcome to Tigase MIX 1.0.0! This is a feature release for with a number of fixes and updates.
+Tigase MIX 1.1.0 Release Notes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Added support for mam2#extended; #mam-73
+- Fixed issue with joining MIX channel using MUC; #mam-74
+- Fixed issue with rejecting incomplete data forms for channel configuration; #mix-31
+
 
 Tigase MIX 1.0.0 Release Notes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
