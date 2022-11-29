@@ -1,5 +1,0 @@
-= Repository
-
-include::authRepository.asciidoc[leveloffset=+1]
-
-include::dataSource.asciidoc[leveloffset=+1]

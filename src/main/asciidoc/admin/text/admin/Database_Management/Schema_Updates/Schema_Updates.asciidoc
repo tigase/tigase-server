@@ -1,8 +1,0 @@
-[[oldVerSchemas]]
-= Schema Updates
-:author: Daniel wisnewski
-:version: v1.0, October 2015
-
-This is a repository for Schema updates in case you have to upgrade from older installations.
-
-- xref:tigaseServer71[Tigase Server Schema v7.1 Updates] Applies to v7.1.0 and v8.0.0

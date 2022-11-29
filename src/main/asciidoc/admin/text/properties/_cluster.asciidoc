@@ -1,7 +1,0 @@
-= Cluster
-
-include::cl-comp.asciidoc[leveloffset=+1]
-
-include::cluster-mode.asciidoc[leveloffset=+1]
-
-include::cluster-nodes.asciidoc[leveloffset=+1]
