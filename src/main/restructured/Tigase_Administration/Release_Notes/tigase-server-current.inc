@@ -5,10 +5,10 @@ Major Changes
 ^^^^^^^^^^^^^
 
 * This version requires JDK17 to run
-* Added support for mam2#extended #mam-73
+* Added support for mam2#extended [#mam-73]
 * Rework certificate generation to utilise `keygen` tool instead of using `sun.*` API unavailable under JDK17
-* Added support for XEP-0440 SASL Channel Binding Type Capability and fixed and reenabled SCRAM-*-PLUS SASL mechanisms [#server-1335]
-* Added initial,preview support for SASL2 and Bind2 (disabled by default) [#server-1332] - to enable, activate beans `'urn:xmpp:bind:0'` and `'urn:xmpp:sasl:2'` in `'sess-man'`
+* Added support for XEP-0440 SASL Channel Binding Type Capability and fixed and reenabled `SCRAM-*-PLUS SASL` mechanisms [#server-1335]
+* Added initial,preview support for SASL2 and Bind2 (disabled by default) - to enable, activate beans `'urn:xmpp:bind:0'` and `'urn:xmpp:sasl:2'` in `'sess-man'` [#server-1332]
 
 
 All Minor Features & Behavior Changes
@@ -42,7 +42,7 @@ All Minor Features & Behavior Changes
 - Fixed advertisement stream features for unauthorized stream #server-1334
 - Fixed NPE during preparing stream features when connection is already closed #server-1334
 - Added initial support for SASL2 and Bind2 (preview feature, disabled by default) #server-1332
-- Added support for XEP-0440 SASL Channel Binding Type Capability and fixed and reenabled SCRAM-*-PLUS SASL mechanisms #server-1335
+- Added support for XEP-0440 SASL Channel Binding Type Capability and fixed and reenabled `SCRAM-*-PLUS SASL` mechanisms [#server-1335]
 - Fixed NPE during enabling of stream resumption #server-1332
 - Fixed sending block/unblock presences from blocking command for domain #server-1336
 - Better default for lastXmppPacketReceivedTime member to avoid WatchDog closing connection before lastXmppPacketReceivedTime is set; #server-1337
