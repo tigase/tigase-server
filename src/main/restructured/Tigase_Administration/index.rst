@@ -1,5 +1,5 @@
 =============================================
-Tigase Administration Guide
+Administration Guide
 =============================================
 
 .. toctree::

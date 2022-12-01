@@ -64,14 +64,14 @@ Legacy documentation website
 -  `Legacy documentation website <https://docs-legacy.tigase.net/>`__ Our legacy documentation website which contains documentation for older versions of componetns and applications
 
 .. toctree::
-   :caption: Tigase XMPP Server Distribution Administration Guide
+   :caption: Administration Guide
    :maxdepth: 3
 
    Tigase_Administration/index.rst
 
 
 .. toctree::
-   :caption: Tigase Development Guide
+   :caption: Development Guide
    :maxdepth: 3
 
    Tigase_Development/index.rst
