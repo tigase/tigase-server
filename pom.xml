@@ -4,7 +4,7 @@
     <parent>
         <groupId>tigase</groupId>
         <artifactId>tigase-projects-parent</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.0.5</version>
         <relativePath />
     </parent>
 
@@ -16,7 +16,7 @@
     </properties>
 
     <artifactId>tigase-mix</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>Tigase MIX</name>
@@ -35,7 +35,7 @@
         <connection>scm:git:${scm_repo_base}/tigase-mix.git</connection>
         <developerConnection>scm:git:${scm_repo_base}/tigase-mix.git</developerConnection>
         <url>https://projects.tigase.org/projects/tigase-mix/repository</url>
-        <tag>HEAD</tag>
+        <tag>tigase-mix-1.1.0</tag>
     </scm>
 
     <organization>
@@ -108,20 +108,20 @@
         <dependency>
             <groupId>tigase</groupId>
             <artifactId>tigase-server</artifactId>
-            <version>8.3.0-SNAPSHOT</version>
+            <version>8.3.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>tigase</groupId>
             <artifactId>tigase-server</artifactId>
-            <version>8.3.0-SNAPSHOT</version>
+            <version>8.3.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>tigase</groupId>
             <artifactId>tigase-pubsub</artifactId>
-            <version>5.1.0-SNAPSHOT</version>
+            <version>5.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
