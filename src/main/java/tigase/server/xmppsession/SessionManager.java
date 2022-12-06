@@ -442,6 +442,12 @@ public class SessionManager
 
 	@Override
 	public int hashCodeForPacket(Packet packet) {
+
+		if ((packet.getStanzaFrom() != null) && (packet.getStanzaFrom().getResource() != null)
+				&& !getComponentId().equals(packet.getStanzaFrom())) {
+			return packet.getStanzaFrom().hashCode();
+		}
+
 		// moved this check from AbstractMessageReceiver as it is related only to SM
 		// and in other components it causes issues as SM sending packet send packetFrom
 		// to SM address which in fact forced other components to process all packets
@@ -451,6 +457,11 @@ public class SessionManager
 			// This comes from connection manager so the best way is to get hashcode
 			// by the connectionId, which is in the getFrom()
 			return packet.getPacketFrom().hashCode();
+		}
+
+		if ((packet.getStanzaTo() != null) && (packet.getStanzaTo().getResource() != null)
+				&& !getComponentId().equals(packet.getStanzaTo())) {
+			return packet.getStanzaTo().hashCode();
 		}
 
 		return super.hashCodeForPacket(packet);
