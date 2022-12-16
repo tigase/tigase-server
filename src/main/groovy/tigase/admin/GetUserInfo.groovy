@@ -1,4 +1,4 @@
-/**
+/*
  * Tigase XMPP Server - The instant messaging server
  * Copyright (C) 2004 Tigase, Inc. (office@tigase.com)
  *
@@ -83,6 +83,7 @@ if (isAllowedForDomain.apply(bareJID.getDomain())) {
 
 	}
 	if (userRes.isEmpty()) {
+		rep
 		Command.addTextField(result, "Status", "Status: offline")
 	} else {
 		userRes.sort { it.res };
