@@ -269,7 +269,7 @@ public class BruteForceLockerBean
 
 	public boolean isEnabled(XMPPResourceConnection session) {
 		BruteForceLockerVHostExtension extension = session != null ? session.getDomain().getExtension(BruteForceLockerVHostExtension.class) : null;
-		return extension == null || extension.isEnabled();
+		return extension != null && extension.isEnabled();
 	}
 
 	@HandleEvent(filter = HandleEvent.Type.remote)
