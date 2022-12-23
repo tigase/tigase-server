@@ -130,7 +130,9 @@ public class StreamOpen
 
 
 		try {
-			handler.validateCIDConnection(new CID(local_hostname, remote_hostname));
+			if (serv.connectionType() == ConnectionType.accept) {
+				handler.validateCIDConnection(new CID(local_hostname, remote_hostname));
+			}
 
 			CIDConnections cid_conns = handler.getCIDConnections(cid, false);
 

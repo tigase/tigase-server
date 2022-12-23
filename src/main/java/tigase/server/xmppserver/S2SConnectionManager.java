@@ -486,8 +486,8 @@ public class S2SConnectionManager
 
 	@Override
 	public void validateCIDConnection(CID cid) throws NotLocalhostException, LocalhostException {
-		if (!isLocalDomainOrComponent(cid.getLocalHost())) {
-			throw new NotLocalhostException("This is not a valid localhost: " + cid.getLocalHost());
+		if (cid.getLocalHost() == null || !isLocalDomainOrComponent(cid.getLocalHost())) {
+			throw new NotLocalhostException("This is not a valid local domain: " + cid.getLocalHost());
 		}
 		if (cid.getRemoteHost() != null && isLocalDomainOrComponent(cid.getRemoteHost())) {
 			throw new LocalhostException("This is not a valid remotehost: " + cid.getRemoteHost());

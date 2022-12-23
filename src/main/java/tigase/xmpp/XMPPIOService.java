@@ -535,7 +535,7 @@ public class XMPPIOService<RefObject>
 
 					moveParsedPacketsToReceived(true);
 				} catch (Exception ex) {
-					log.log(Level.CONFIG,
+					log.log(Level.INFO,
 							"Incorrect XML data: " + new String(data) + ", stopping connection " + " [" + toString() +
 									"] exception: ", ex);
 					forceStop();

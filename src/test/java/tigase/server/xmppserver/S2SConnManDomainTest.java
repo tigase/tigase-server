@@ -52,6 +52,8 @@ public class S2SConnManDomainTest
 //		TestLogger.configureLogger(Logger.getLogger("tigase.server"), Level.FINEST);
 //		TestLogger.configureLogger(Logger.getLogger("tigase.cert"), Level.FINEST);
 //		TestLogger.configureLogger(Logger.getLogger("tigase.io"), Level.FINEST);
+//		TestLogger.configureLogger(Logger.getLogger("tigase.net"), Level.FINEST);
+//		TestLogger.configureLogger(Logger.getLogger("tigase.xmpp"), Level.FINEST);
 	}
 
 	@Test
@@ -76,6 +78,12 @@ public class S2SConnManDomainTest
 	public void testS2S_jabber_ru() {
 		setupCID("tigase.im", "jabber.ru");
 		testS2STigaseConnectionManager("tigase.im", null);
+	}
+
+	@Test
+	public void testS2S_jabbercity_ru() {
+		setupCID("sure.im", "jabbercity.ru");
+		testS2STigaseConnectionManager("sure.im", null);
 	}
 
 	@Test

@@ -308,7 +308,7 @@ public class S2SConnManAbstractTest
 
 		@Override
 		public boolean isLocalDomainOrComponent(String domain) {
-			return false;
+			return items.containsKey(domain);
 		}
 
 		@Override
