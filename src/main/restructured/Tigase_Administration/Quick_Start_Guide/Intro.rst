@@ -6,7 +6,7 @@ Minimum Requirements
 
 Before you begin installing Tigase server onto your system, please make sure the minimum requirements are met first:
 
--  **Java Development Kit (JDK) 11 (LTS)** - We recommend OpenJDK
+-  **Java Development Kit (JDK) 17 (LTS)** - We recommend OpenJDK
 
 -  **Administrator access** - We recommend that you install Tigase Server from a user login with administrator access.
 
