@@ -1489,8 +1489,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 											} else {
 												if (log.isLoggable(Level.WARNING)) {
 													log.log(Level.WARNING,
-															"Could not sent watchdog XMPP ping - missing to or from: {0}",
-															new Object[]{pingPacket});
+															"Could not sent watchdog XMPP ping - missing to or from: {0}, service: {1} ",
+															new Object[]{pingPacket, String.valueOf(service)});
 												}
 											}
 											break;
