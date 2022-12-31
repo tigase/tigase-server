@@ -83,7 +83,6 @@ if (isAllowedForDomain.apply(bareJID.getDomain())) {
 
 	}
 	if (userRes.isEmpty()) {
-		rep
 		Command.addTextField(result, "Status", "Status: offline")
 	} else {
 		userRes.sort { it.res };
