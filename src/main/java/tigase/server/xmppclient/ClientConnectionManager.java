@@ -112,17 +112,12 @@ public class ClientConnectionManager
 
 	@Override
 	public int hashCodeForPacket(Packet packet) {
-		if ((packet.getStanzaFrom() != null) && (packet.getStanzaFrom().getResource() != null)
-				&& !getComponentId().equals(packet.getStanzaFrom())) {
-			return packet.getStanzaFrom().hashCode();
-		}
-
 		if ((packet.getPacketFrom() != null) &&
 				getComponentId().getBareJID().equals(packet.getPacketFrom().getBareJID())) {
 			return packet.getPacketFrom().hashCode();
+		} else {
+			return packet.getTo().hashCode();
 		}
-
-		return packet.getTo().hashCode();
 	}
 
 	@Override

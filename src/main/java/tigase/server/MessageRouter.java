@@ -152,8 +152,9 @@ public class MessageRouter
 					mr.setParent(this);
 					mr.start();
 				}
-				addConnectionManager(comp);
-
+				if (comp instanceof ConnectionManager) {
+					connectionManagerNames.add(comp.getName());
+				}
 				if (comp instanceof ComponentRegistrator) {
 					addRegistrator((ComponentRegistrator) comp);
 				} else if (comp instanceof MessageReceiver) {
@@ -165,12 +166,6 @@ public class MessageRouter
 				// TODO - most likely this will no longer happen as configuration will not be done in this method
 				log.log(Level.WARNING, "component " + comp.getName() + " was not configured properly", ex);
 			}
-		}
-	}
-
-	protected void addConnectionManager(ServerComponent comp) {
-		if (comp instanceof ConnectionManager) {
-			connectionManagerNames.add(comp.getName());
 		}
 	}
 
@@ -223,15 +218,6 @@ public class MessageRouter
 	@Override
 	public int hashCodeForPacket(Packet packet) {
 
-		if ((packet.getStanzaFrom() != null) && (packet.getStanzaFrom().getResource() != null)
-				&& !getComponentId().equals(packet.getStanzaFrom())) {
-			return packet.getStanzaFrom().hashCode();
-		}
-
-		if ((packet.getStanzaTo() != null) && (packet.getStanzaTo().getResource() != null)
-				&& !getComponentId().equals(packet.getStanzaTo())) {
-			return packet.getStanzaTo().hashCode();
-		}
 		// This is actually quite tricky part. We want to both avoid
 		// packet reordering and also even packets distribution among
 		// different threads.
