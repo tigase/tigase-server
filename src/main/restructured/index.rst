@@ -29,6 +29,8 @@ XMPP Clients
 
 -  `SiskinIM and BeagleIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client
 
+-  `BeagleIM <../../projects/tigase-beagle-im/en/latest/>`__ macOS XMPP Client
+
 -  `StorkIM <../../projects/tigase-stork/en/latest/>`__ android XMPP Client
 
 XMPP Libraries
