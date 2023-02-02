@@ -767,10 +767,8 @@ public class JDBCRepository
 	@Override
 	public boolean userExists(BareJID user) {
 		try {
-			getUserUID(null, user, false);
-
-			return true;
-		} catch (Exception e) {
+			return getUserUID(null, user) > 0;
+		} catch (SQLException e) {
 			return false;
 		}
 	}

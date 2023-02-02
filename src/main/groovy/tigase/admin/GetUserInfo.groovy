@@ -26,6 +26,7 @@
 package tigase.admin
 
 import tigase.cluster.strategy.ClusteringStrategyIfc
+import tigase.db.UserRepository
 import tigase.server.Command
 import tigase.server.Packet
 import tigase.vhosts.VHostManagerIfc
@@ -42,6 +43,7 @@ def vhost_man = (VHostManagerIfc) vhostMan
 def admins = (Set) adminsSet
 def stanzaFromBare = p.getStanzaFrom().getBareJID()
 def isServiceAdmin = admins.contains(stanzaFromBare)
+def user_repo = (UserRepository) userRepository
 
 def userJid = Command.getFieldValue(packet, JID)
 
@@ -83,7 +85,12 @@ if (isAllowedForDomain.apply(bareJID.getDomain())) {
 
 	}
 	if (userRes.isEmpty()) {
-		Command.addTextField(result, "Status", "Status: offline")
+		if (user_repo.userExists(bareJID)) {
+			Command.addTextField(result, "Status", "Status: offline")
+		} else {
+			Command.addTextField(result, "Error", "User doesn't exists")
+			return result
+		}
 	} else {
 		userRes.sort { it.res };
 		Command.addTextField(result, "Status", "Status: " + (userRes.size() ? "online" : "offline"))
