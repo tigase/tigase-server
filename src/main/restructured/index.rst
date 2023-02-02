@@ -27,7 +27,7 @@ Server Components
 XMPP Clients
 ^^^^^^^^^^^^^^^^^
 
--  `SiskinIM and BeagleIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client
+-  `SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client
 
 -  `BeagleIM <../../projects/tigase-beagle-im/en/latest/>`__ macOS XMPP Client
 
