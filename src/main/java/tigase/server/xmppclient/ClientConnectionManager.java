@@ -341,6 +341,11 @@ public class ClientConnectionManager
 	}
 
 	@Override
+	protected boolean shouldRedeliverWaitingPackets(XMPPIOService<Object> service) {
+		return super.shouldRedeliverWaitingPackets(service) && service.getSessionData().containsKey("stream-closed");
+	}
+
+	@Override
 	public void xmppStreamClosed(XMPPIOService<Object> serv) {
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "Stream closed: {0}", serv.getConnectionId());
@@ -380,6 +385,7 @@ public class ClientConnectionManager
 																StanzaType.set, UUID.randomUUID().toString());
 					addOutPacket(command);
 				}
+				redeliverWaitingPackets(serv);
 			} else {
 				log.fine("Service stopped, before stream:stream received");
 			}

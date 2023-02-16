@@ -493,14 +493,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			if (result) {
 				--services_size;
 
-				Queue<Packet> undeliveredPackets = service.getWaitingPackets();
-				log.log(Level.FINEST, "[[{0}]] processing undelivered packets: {1}",
-						new Object[]{getName(), undeliveredPackets.size()});
-
-				Packet p = null;
-				while ((p = undeliveredPackets.poll()) != null) {
-					processUndeliveredPacket(p, null, null);
-				}
+				redeliverWaitingPackets(service);
 			} else if (log.isLoggable(Level.FINER)) {
 
 				// Is it at all possible to happen???
@@ -514,6 +507,25 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 		return false;
 
+	}
+
+	protected boolean shouldRedeliverWaitingPackets(IO service) {
+		return true;
+	}
+
+	protected void redeliverWaitingPackets(IO service) {
+		if (!shouldRedeliverWaitingPackets(service)){
+			return;
+		}
+		
+		Queue<Packet> undeliveredPackets = service.getWaitingPackets();
+		log.log(Level.FINEST, "[[{0}]] processing undelivered packets: {1}",
+				new Object[]{getName(), undeliveredPackets.size()});
+
+		Packet p = null;
+		while ((p = undeliveredPackets.poll()) != null) {
+			processUndeliveredPacket(p, null, null);
+		}
 	}
 
 	@Override
