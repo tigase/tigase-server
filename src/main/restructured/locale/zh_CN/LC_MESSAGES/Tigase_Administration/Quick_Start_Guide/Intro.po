@@ -5,20 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc\n"
+"Project-Id-Version:  TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-29 01:40-0700\n"
+"POT-Creation-Date: 2023-02-16 15:01-0800\n"
 "PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
-"tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
+"/tigase-xmpp-server/quick_start_guide/zh_Hans/>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.11.2\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.11.0\n"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:2
 msgid "Quick Start Guide"
@@ -35,15 +34,15 @@ msgid ""
 msgstr "在将 Tigase 服务器开始安装到你的系统之前，请确保首先满足系统最低要求："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:9
-msgid "**Java Development Kit (JDK) 11 (LTS)** - We recommend OpenJDK"
+#, fuzzy
+msgid "**Java Development Kit (JDK) 17 (LTS)** - We recommend OpenJDK"
 msgstr "**Java开发工具包（JDK)11(LTS)** - 我们推荐OpenJDK"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:11
 msgid ""
 "**Administrator access** - We recommend that you install Tigase Server "
 "from a user login with administrator access."
-msgstr "**管理员访问权限** - 我们建议您从有管理员访问权限的用户登录安装Tigase "
-"Server。"
+msgstr "**管理员访问权限** - 我们建议您从有管理员访问权限的用户登录安装Tigase Server。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:17
 msgid ""
@@ -70,10 +69,8 @@ msgid ""
 "looking for. If you don’t find a document for the topic you need please "
 "`let us know <http://www.tigase.net/contact>`__."
 msgstr ""
-"这是可帮您快速开始使用我们软件的一组文档。每个文档都提供了对单个主题的介绍，"
-"从而使您可以开始使用/开发或开始研究该主题。请查看下面的文档列表以找到您正在寻"
-"找的主题。如果您没有找到所需主题的文档，请 `让我们知道 <http://www.tigase.net/"
-"contact>`__。"
+"这是可帮您快速开始使用我们软件的一组文档。每个文档都提供了对单个主题的介绍，从而使您可以开始使用/开发或开始研究该主题。请查看下面的文档列表以找到您正在寻找的主题。如果您没有找到所需主题的文档，请"
+" `让我们知道 <http://www.tigase.net/contact>`__。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Intro.rst:28
 msgid ":ref:`Installation Using Web Installer<webinstall>`"
@@ -108,9 +105,9 @@ msgid ""
 "environment, please see the :ref:`Windows Installation<winWebInstall>` "
 "section."
 msgstr ""
-"当Tigase XMPP服务器启动时，它会查找默认配置文件: ``etc/config.tdsl``。如果此"
-"文件未被修改，您可以运行Web安装程序。这将引导您完成Tigase的配置。如果您在Wind"
-"ows环境中安装Tigase，请参阅 :ref:`Windows安装<winWebInstall>` 部分。"
+"当Tigase XMPP服务器启动时，它会查找默认配置文件: "
+"``etc/config.tdsl``。如果此文件未被修改，您可以运行Web安装程序。这将引导您完成Tigase的配置。如果您在Windows环境中安装Tigase，请参阅"
+" :ref:`Windows安装<winWebInstall>` 部分。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:10
 msgid "Download and Extract"
@@ -124,9 +121,9 @@ msgid ""
 "Once you have the distribution binary extract it and navigate to the "
 "directory:"
 msgstr ""
-"首先下载Tigase XMPP Server并解压。你可以下载 `官方二进制文件 <https://tigase."
-"net/downloads>`__，或者最新最好的 `试运行 <https://build.tigase.net/"
-"nightlies/dists/>`__。一旦获得分发二进制文件后，可将其解压缩并浏览此目录："
+"首先下载Tigase XMPP Server并解压。你可以下载 `官方二进制文件 "
+"<https://tigase.net/downloads>`__，或者最新最好的 `试运行 "
+"<https://build.tigase.net/nightlies/dists/>`__。一旦获得分发二进制文件后，可将其解压缩并浏览此目录："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:22
 msgid "Do not run as root user!"
@@ -155,8 +152,7 @@ msgstr "Tigase开始监听端口8080 - 你可以使用 ``lsof``命令检查它�
 msgid ""
 "You can also check console log under ``logs/tigase-console.log``, which "
 "should point you directly to the installer."
-msgstr "您还可以检查 ``logs/tigase-console.log`` "
-"下的控制台日志，它应该直接指向安装程序。"
+msgstr "您还可以检查 ``logs/tigase-console.log`` 下的控制台日志，它应该直接指向安装程序。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:53
 msgid "Connect to the Web Installer"
@@ -171,16 +167,14 @@ msgid ""
 "This setup page is restricted access, however for first setup there is a "
 "default account set to setup Tigase: Username: ``admin`` Password: "
 "``tigase``"
-msgstr "此设置页面是受限访问的，但是第一次设置的时候，有一个默认帐户来设置Tigase：用"
-"户名：``admin`` 密码：``tigase``"
+msgstr "此设置页面是受限访问的，但是第一次设置的时候，有一个默认帐户来设置Tigase：用户名：``admin`` 密码：``tigase``"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:59
 msgid ""
 "This combination will only be valid once as it will be removed from "
 "``config.tdsl`` file on completion of setup process. After this point the"
 " setup page will only be accessible using the following:"
-msgstr "上面的设置仅一次有效，因为在安装过程完成后它将被从config."
-"tdsl文件中删除。在此之后，只能使用以下方式访问设置页面："
+msgstr "上面的设置仅一次有效，因为在安装过程完成后它将被从config.tdsl文件中删除。在此之后，只能使用以下方式访问设置页面："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:61
 msgid ""
@@ -198,8 +192,7 @@ msgstr "手动把用户名和密码组合添加到 ``config.tdsl`` 文件中或�
 msgid ""
 "Point your browser to http://localhost:8080/setup/ unless you are working"
 " remotely. You can also use the domain name, or IP address."
-msgstr "除非您在远程工作，否则您的浏览器将指向http://localhost:8080/setup/"
-"。您也可以使用域名或IP地址。"
+msgstr "除非您在远程工作，否则您的浏览器将指向http://localhost:8080/setup/。您也可以使用域名或IP地址。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:67
 msgid "Enter the username and password above to gain access."
@@ -247,8 +240,7 @@ msgid ""
 "licensing. Please read though the agreement, and as a confirmation of "
 "agreement type in your name or company and click \"Next\" to go to the "
 "next page."
-msgstr "您将看到有关我们的商业产品和许可的一些信息。请仔细阅读协议，并用您的姓名或公"
-"司确认该协议，然后单击\"Next\"进入下一页。"
+msgstr "您将看到有关我们的商业产品和许可的一些信息。请仔细阅读协议，并用您的姓名或公司确认该协议，然后单击\"Next\"进入下一页。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:89
 msgid "**Basic Tigase server configuration**"
@@ -261,16 +253,13 @@ msgid ""
 "specify an administrator for the domain. Also, you will be selecting what"
 " type of database Tigase server will be using (configuration comes "
 "later)."
-msgstr ""
-"此页面将查看您的基本配置设置，其中包括服务器类型，您希望使用的域，并让您有机"
-"会为域指定管理员。此外，您将选择Tigase服务器使用的数据库类型(稍后进行配置)。"
+msgstr "此页面将查看您的基本配置设置，其中包括服务器类型，您希望使用的域，并让您有机会为域指定管理员。此外，您将选择Tigase服务器使用的数据库类型(稍后进行配置)。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:93
 msgid ""
 "If you do not specify an administrator and password, one is made for you,"
 " which will be admin@yourdomain and password is tigase."
-msgstr "如果您没有指定管理员和密码，则会为您自动设置一个:admin@yourdomain，其密码为ti"
-"gase。"
+msgstr "如果您没有指定管理员和密码，则会为您自动设置一个:admin@yourdomain，其密码为tigase。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:95
 msgid "**Connectivity**"
@@ -283,8 +272,7 @@ msgid ""
 "of them (desktop, mobile, http, websocket, federation, etc.). After "
 "making this decisions, click \"Next\"."
 msgstr ""
-"在此页面上，您将看到Tigase "
-"XMPP服务器所支持的可能连接选项列表以及启用/禁用每个选项的方法(桌面，移动， "
+"在此页面上，您将看到Tigase XMPP服务器所支持的可能连接选项列表以及启用/禁用每个选项的方法(桌面，移动， "
 "http，websocket，联合等)。勾选相应选项后，单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:99
@@ -296,8 +284,7 @@ msgid ""
 "Now you will be able to select which features of Tigase XMPP Server (such"
 " as MUC, PubSub, MIX, MAM, Push Notifications) should be enabled or "
 "disabled."
-msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能(例如MUC, PubSub, MIX, "
-"MAM,推送通知)应该被启用或被禁用。"
+msgstr "现在您将可以选择Tigase XMPP服务器的哪些相关功能(例如MUC, PubSub, MIX, MAM,推送通知)应该被启用或被禁用。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:103
 msgid "At this step will also be able to enable clustering on your installation"
@@ -316,8 +303,7 @@ msgid ""
 "This is where the database is configured. The type of database selected "
 "in step 3 will influence available options. **BE SURE TO SPECIFY DATABASE"
 " ROOT USER ACCOUNT AND PASSWORD**"
-msgstr "在这里可以配置数据库。步骤3中选择的数据库类型将影响可用的选项。**请务必指定数"
-"据库根用户帐号和密码**"
+msgstr "在这里可以配置数据库。步骤3中选择的数据库类型将影响可用的选项。**请务必指定数据库根用户帐号和密码**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:111
 msgid "**Database connectivity check**"
@@ -330,12 +316,7 @@ msgid ""
 "everything went well. If anything is presented in \"red\" or \"yellow\", "
 "please read description presented below this header to learn more about "
 "this issue. If setup is completed, click \"Next\"."
-msgstr ""
-"数据库设置后，您应该会看到一个包含已执行操作及其结果的页面。"
-"所有出现的项目都应该是\"绿色\"，这意味着一切顺利。如果任何内容显示为\"红色"
-"\"或\"黄色\""
-"，请阅读此标题下方的说明以了解有关此问题的更多信息。如果设置完成，"
-"请单击\"Next\"。"
+msgstr "数据库设置后，您应该会看到一个包含已执行操作及其结果的页面。所有出现的项目都应该是\"绿色\"，这意味着一切顺利。如果任何内容显示为\"红色\"或\"黄色\"，请阅读此标题下方的说明以了解有关此问题的更多信息。如果设置完成，请单击\"Next\"。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:115
 msgid "**Setup security**"
@@ -348,10 +329,7 @@ msgid ""
 "specific user in addition to admin accounts to re-access this setup "
 "process later. If left blank, only JIDs listed in admin will be allowed "
 "to access."
-msgstr ""
-"如上所述，设置访问页面将被admin/tigase用户锁定。此时你可以在设置页面添加除管"
-"理员帐户之外的特定用户，以便稍后重新访问此设置。如果留空，则仅允许admin中列出"
-"的JIDs访问。"
+msgstr "如上所述，设置访问页面将被admin/tigase用户锁定。此时你可以在设置页面添加除管理员帐户之外的特定用户，以便稍后重新访问此设置。如果留空，则仅允许admin中列出的JIDs访问。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:119
 msgid "**Saving configuration**"
@@ -362,16 +340,14 @@ msgid ""
 "The installation is almost complete and you will be presented with a page"
 " showing what the resulting configuration (stored in ``config.tdsl`` "
 "file) will look like."
-msgstr "此时安装几乎快要完成，您将看到一个页面显示生成的配置(存储在 ``config.tdsl`` "
-"文件中)将是什么样子。"
+msgstr "此时安装几乎快要完成，您将看到一个页面显示生成的配置(存储在 ``config.tdsl`` 文件中)将是什么样子。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:123
 msgid ""
 "If you have a custom setup, or would like to put your own settings in, "
 "you may copy and past the contents here to edit the current "
 "``config.tdsl`` file."
-msgstr "如果您是自定义设置，或者想自己进行设置，"
-"您可以复制并粘贴此处的内容以编辑当前的 ``config.tdsl`` 文件。"
+msgstr "如果您是自定义设置，或者想自己进行设置，您可以复制并粘贴此处的内容以编辑当前的 ``config.tdsl`` 文件。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:125
 msgid "Click \"Save\" to write the file to disk."
@@ -396,8 +372,7 @@ msgid ""
 "It is recommended at this point to stop the server manually and restart "
 "it using the proper script for your OS. From the Tigase base directory "
 "enter"
-msgstr "此时，建议手动停止服务器并使用适合您操作系统的脚本重新启动它。从Tigase基本目"
-"录输入如下命令"
+msgstr "此时，建议手动停止服务器并使用适合您操作系统的脚本重新启动它。从Tigase基本目录输入如下命令"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:145
 msgid ""
@@ -405,8 +380,8 @@ msgid ""
 "startup you should setup startup scripts as described in :ref:`Tigase "
 "Script Selection<tigaseScriptStart>`"
 msgstr ""
-"为了使Tigase XMPP服务器在系统启动时自动启动，您应该按照 "
-":ref:`Tigase脚本选择<tigaseScriptStart>` 中的说明设置启动脚本"
+"为了使Tigase XMPP服务器在系统启动时自动启动，您应该按照 :ref:`Tigase脚本选择<tigaseScriptStart>` "
+"中的说明设置启动脚本"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:147
 msgid ""
@@ -415,9 +390,8 @@ msgid ""
 " ``JAVA_OPTIONS`` -Xmx (max), and -Xms (initial). You will need to direct"
 " Tigase to read settings from this file on startup as follows."
 msgstr ""
-"为了进一步微调服务器 ，需要编辑 ``etc/tigase.conf``。同时确保 ``JAVA_HOME`` "
-"的路径是正确的 , 并在需要时使用 ``JAVA_OPTIONS`` -Xmx（最大）和 -Xms（初始）"
-"时以增加内存。您需要告诉Tigase启动时按照如下所示从该文件中读取设置。"
+"为了进一步微调服务器 ，需要编辑 ``etc/tigase.conf``。同时确保 ``JAVA_HOME`` 的路径是正确的 , 并在需要时使用"
+" ``JAVA_OPTIONS`` -Xmx（最大）和 -Xms（初始）时以增加内存。您需要告诉Tigase启动时按照如下所示从该文件中读取设置。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:149
 msgid ""
@@ -450,8 +424,7 @@ msgid ""
 "inside the ``win-stuff`` folder. This will move the necessary files to "
 "the correct folders before Tigase begins operation."
 msgstr ""
-"第一步是将分发存档完整地提取到想要的运行目录下。在那里，运行 ``win-stuff`` "
-"文件夹里的 ``Setup.bat`` "
+"第一步是将分发存档完整地提取到想要的运行目录下。在那里，运行 ``win-stuff`` 文件夹里的 ``Setup.bat`` "
 "文件。在Tigase开始操作之前以上操作会将需要的文件移动到正确的文件夹中。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:176
@@ -461,16 +434,14 @@ msgid ""
 "Tigase using the wrapper. You may also install Tigase and run it as a "
 "service."
 msgstr ""
-"从这里开始，您可以选择不同方法来运行Tigase； ``run.bat`` "
-"将使用java命令执行Tigase，或 ``tigase.bat`` "
+"从这里开始，您可以选择不同方法来运行Tigase； ``run.bat`` 将使用java命令执行Tigase，或 ``tigase.bat`` "
 "将使用包装器启动Tigase。您也可以安装Tigase并将其作为服务运行。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Installation_Using_Web_Installer.inc:178
 msgid ""
 "Once this setup is finished, web installer will continue the same from "
 ":ref:`here<connecttoWebInstall>`."
-msgstr "完成此设置后，Web安装程序将从 :ref:`这里<connecttoWebInstall>` "
-"继续执行相同的操作。"
+msgstr "完成此设置后，Web安装程序将从 :ref:`这里<connecttoWebInstall>` 继续执行相同的操作。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:4
 msgid "Manual Installation in Console Mode"
@@ -483,9 +454,8 @@ msgid ""
 "binary packages. Please pick up the latest version of the distribution "
 "archive in our `download section <https://tigase.net/downloads>`__."
 msgstr ""
-"我们首选的安装Tigase服务器的方法是使用 :ref:`Web安装程序<webinstall>` "
-"和其中一个二进制包附带的配置程序。请在我们的 `下载部分 <https://tigase.net/"
-"downloads>`__ 中获取最新版本的分发存档。"
+"我们首选的安装Tigase服务器的方法是使用 :ref:`Web安装程序<webinstall>` 和其中一个二进制包附带的配置程序。请在我们的 "
+"`下载部分 <https://tigase.net/downloads>`__ 中获取最新版本的分发存档。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:8
 msgid ""
@@ -495,18 +465,13 @@ msgid ""
 "of the next releases but for the time being you can use our binary "
 "packages to install the server manually. Please continue reading to learn"
 " how to install and setup the server in a few easy steps…​"
-msgstr ""
-"然而，在许多情况下，并不总是可以使用Web安装程序。在许多情况下，您只有ssh访问"
-"权限，甚至只有控制台模式下的直接访问权限。我们将在下一个版本中提供纯文本安装"
-"程序，但目前您可以使用我们的二进制包手动安装服务器。请继续阅读以了解如何通过"
-"几个简单的步骤安装和设置服务器……​"
+msgstr "然而，在许多情况下，并不总是可以使用Web安装程序。在许多情况下，您只有ssh访问权限，甚至只有控制台模式下的直接访问权限。我们将在下一个版本中提供纯文本安装程序，但目前您可以使用我们的二进制包手动安装服务器。请继续阅读以了解如何通过几个简单的步骤安装和设置服务器……​"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:10
 msgid ""
 "If you have an old version of the Tigase server running and working and "
 "you intend to upgrade it please always backup the old version first."
-msgstr "如果您有旧版本的Tigase服务器正在运行和工作，并且您打算升级它，请先备份旧版本"
-"。"
+msgstr "如果您有旧版本的Tigase服务器正在运行和工作，并且您打算升级它，请先备份旧版本。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:14
 msgid ""
@@ -529,11 +494,10 @@ msgid ""
 "(basic package) or ``dist-max`` (extended set of components) and archive "
 "type can be eitehr ``tar.gz`` or ``zip``."
 msgstr ""
-"看看我们的 `下载区 <https://tigase.net/"
-"downloads>`__。始终选择可用的最新版本的软件包。对于手动安装，可以使用 ``zip``"
-" 或 ``tar.gz`` 文件。选择文件名如下的文件之一： ``tigase-"
-"server-<version>-b<build>-<type>.<archive>``，其中 ``<version>`` 的形式为 ``"
-"major .minor.bugfix``, ``<type>`` 可以是 ``dist`` （基本包）或 ``dist-max`` "
+"看看我们的 `下载区 <https://tigase.net/downloads>`__。始终选择可用的最新版本的软件包。对于手动安装，可以使用 "
+"``zip`` 或 ``tar.gz`` 文件。选择文件名如下的文件之一： ``tigase-"
+"server-<version>-b<build>-<type>.<archive>``，其中 ``<version>`` 的形式为 "
+"``major .minor.bugfix``, ``<type>`` 可以是 ``dist`` （基本包）或 ``dist-max`` "
 "（扩展的组件集），归档类型可以是  ``tar.gz`` or ``zip``。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:24
@@ -557,8 +521,7 @@ msgid ""
 "Sometimes after unpacking package on unix system startup script doesn’t "
 "have execution permissions. To fix the problem you have to run following "
 "command:"
-msgstr "有时在 unix "
-"系统启动脚本上解包后没有执行权限。要解决此问题，您必须运行以下命令："
+msgstr "有时在 unix 系统启动脚本上解包后没有执行权限。要解决此问题，您必须运行以下命令："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:48
 msgid "Prepare Configuration"
@@ -582,8 +545,8 @@ msgid ""
 " and java settings for Tigase to run. For now, the only setting we need "
 "to set is the **JAVA_HOME** directory."
 msgstr ""
-"Tigase.conf 是一个文件，其中包含了普遍程序的运行参数，以及运行 Tigase 的 "
-"java 设置。目前，我们需要配置的唯一设置是 **JAVA_HOME** 目录。"
+"Tigase.conf 是一个文件，其中包含了普遍程序的运行参数，以及运行 Tigase 的 java 设置。目前，我们需要配置的唯一设置是 "
+"**JAVA_HOME** 目录。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:96
 msgid ""
@@ -601,9 +564,7 @@ msgid ""
 "parameters normally set by the configuration program. As this is a manual"
 " installation, you will have to edit this document yourself. It contains "
 "already a few lines:"
-msgstr ""
-"您还需要编辑``config.tdsl``文件。它包含通常由配置程序设置的初始参数。由于这是"
-"手动安装，您必须自己编辑此文档。它已经包含如下几行："
+msgstr "您还需要编辑``config.tdsl``文件。它包含通常由配置程序设置的初始参数。由于这是手动安装，您必须自己编辑此文档。它已经包含如下几行："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:115
 msgid "You will need to set a few things in order to get Tigase up and running."
@@ -617,9 +578,7 @@ msgstr "第 一 步：更改配置类型"
 msgid ""
 "Refer to `config-type <#configType>`__ property description for details, "
 "but for most operations, change ``setup`` to ``default``."
-msgstr ""
-"详情参考 `config-type <#configType>`__ "
-"属性说明，但对于大多数操作，将``setup``更改为``default``。"
+msgstr "详情参考 `config-type <#configType>`__ 属性说明，但对于大多数操作，将``setup``更改为``default``。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:125
 msgid "Step 2: Set virtual host"
@@ -629,8 +588,7 @@ msgstr "第二步：设置虚拟主机"
 msgid ""
 "Without a virtual host, your XMPP server has no domain with which to "
 "operate. To set a virtual host use the following configuration:"
-msgstr "如果没有虚拟主机，您的 XMPP "
-"服务器就没有可操作的域。要设置虚拟主机，请使用以下配置："
+msgstr "如果没有虚拟主机，您的 XMPP 服务器就没有可操作的域。要设置虚拟主机，请使用以下配置："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:133
 msgid ""
@@ -658,9 +616,8 @@ msgid ""
 " you have finished setting up your server. To add admins, use the "
 "following line in the ``config.tdsl`` file:"
 msgstr ""
-"至少需要一名管理员，并且一旦数据库设置完毕，默认密码将是 "
-"``tigase``。完成设置服务器后，请务必更改此设置。要添加管理员，请在 ``config."
-"tdsl`` 文件中使用以下行："
+"至少需要一名管理员，并且一旦数据库设置完毕，默认密码将是 ``tigase``。完成设置服务器后，请务必更改此设置。要添加管理员，请在 "
+"``config.tdsl`` 文件中使用以下行："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:151
 msgid "Step 4: Set databases"
@@ -674,10 +631,9 @@ msgid ""
 "slightly different configurations. If we are using derby, in a directory "
 "called ``tigasedb``, your configuration would look like this:"
 msgstr ""
-"您还需要配置与数据库的连接。首先，您必须决定要使用什么数据库：``Derby``，``My"
-"SQL``，``PostgreSQL``，``MSSQL`` 或 "
-"``MondoDB``。每个数据库的配置都会略有不同。如果我们使用 derby，在名为 "
-"``tigasedb`` 的目录中，您的配置将如下所示："
+"您还需要配置与数据库的连接。首先，您必须决定要使用什么数据库：``Derby``，``MySQL``，``PostgreSQL``，``MSSQL``"
+" 或 ``MondoDB``。每个数据库的配置都会略有不同。如果我们使用 derby，在名为 ``tigasedb`` "
+"的目录中，您的配置将如下所示："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:163
 msgid ""
@@ -702,8 +658,8 @@ msgid ""
 "``tigase.sh`` script that can be used. Setting up the database can now be"
 " done using a single command."
 msgstr ""
-"下一步是创建数据库。以前，我们有脚本来处理这个过程，但我们现在拥有函数的优势"
-"，其可以在 ``tigase.sh`` 脚本中使用。现在设置数据库可以使用单个命令来完成。"
+"下一步是创建数据库。以前，我们有脚本来处理这个过程，但我们现在拥有函数的优势，其可以在 ``tigase.sh`` "
+"脚本中使用。现在设置数据库可以使用单个命令来完成。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:177
 msgid ""
@@ -716,10 +672,9 @@ msgid ""
 "for more information."
 msgstr ""
 "此命令将使用 在 ``localhost`` 上托管的名为 ``tigasedb`` 的Derby "
-"数据库上安装tigase。编辑数据库的用户名和密码是 ``tigase_pass`` 和 "
-"``root``。请注意，``-J`` 显式添加管理员，强烈建议使用 ``-N`` "
-"传递密码。您可以根据需要自定义此命令，有关详细信息，请参阅文档的 :ref"
-":`install-schema<install-schema>` 部分。"
+"数据库上安装tigase。编辑数据库的用户名和密码是 ``tigase_pass`` 和 ``root``。请注意，``-J`` "
+"显式添加管理员，强烈建议使用 ``-N`` 传递密码。您可以根据需要自定义此命令，有关详细信息，请参阅文档的 :ref:`install-"
+"schema<install-schema>` 部分。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:179
 msgid "On a windows system, you need to call the program directly:"
@@ -736,8 +691,8 @@ msgid ""
 "settings may not be set using this configuration. Again, it is only an "
 "**EXAMPLE**."
 msgstr ""
-"最后注意，脚本会输出一个推荐的示例文件。您可以将其与您编写的配置文件结合使用"
-"，但某些设置可能无法使用此配置进行设置。再说一遍，它只是一个 **示例**。"
+"最后注意，脚本会输出一个推荐的示例文件。您可以将其与您编写的配置文件结合使用，但某些设置可能无法使用此配置进行设置。再说一遍，它只是一个 "
+"**示例**。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:285
 msgid ""
@@ -745,10 +700,7 @@ msgid ""
 "directory of Tigase server base directory. There, select the type of "
 "linux you have, debian, gentoo, mendriva or redhat. In the root server "
 "directory type the following command:"
-msgstr ""
-"您可以使用Tigase服务器基本目录的scripts子目录中的tigase文件来启动服务器。在那"
-"里，选择您拥有的linux类型，debian，gentoo，mendriva或redhat。在根服务器目录中"
-"键入以下命令："
+msgstr "您可以使用Tigase服务器基本目录的scripts子目录中的tigase文件来启动服务器。在那里，选择您拥有的linux类型，debian，gentoo，mendriva或redhat。在根服务器目录中键入以下命令："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:291
 msgid "Where {OS} is your \\*nix operating system."
@@ -767,8 +719,7 @@ msgid ""
 "The server is started already but how do you know if it is really working"
 " and there were no problems. Have a look in the ``logs/`` directory. "
 "There should be a few files in there:"
-msgstr "服务器已经启动，但是你怎么知道它是否真的在工作并且没有问题。查看 ``logs/`` "
-"目录。里面应该有以下几个文件："
+msgstr "服务器已经启动，但是你怎么知道它是否真的在工作并且没有问题。查看 ``logs/`` 目录。里面应该有以下几个文件："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:315
 msgid ""
@@ -778,10 +729,9 @@ msgid ""
 "there are any **WARNING** or **SEVERE** entries. If not everything should"
 " be fine."
 msgstr ""
-"前 2 个文件对我们来说是最有趣的：**tigase-console.log** 和 **tigase.log."
-"0**。第一个包含非常有限的信息，其中只有最重要的条目。"
-"查看内部并检查是否有任何 **WARNING** 或 **SEVERE** "
-"条目。如果不是一切都应该没问题。"
+"前 2 个文件对我们来说是最有趣的：**tigase-console.log** 和 "
+"**tigase.log.0**。第一个包含非常有限的信息，其中只有最重要的条目。查看内部并检查是否有任何 **WARNING** 或 "
+"**SEVERE** 条目。如果不是一切都应该没问题。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Manual_Installation_in_Console_Mode.inc:317
 msgid ""
@@ -799,23 +749,21 @@ msgid ""
 "servers, although some slight modifications may be necessary to get "
 "things ready to run."
 msgstr ""
-"尽管可能需要进行一些细微的修改才能让一切准备好运行，但是Tigase XMPP Server "
-"也可以在 Microsoft Windows 系统和服务器上运行。"
+"尽管可能需要进行一些细微的修改才能让一切准备好运行，但是Tigase XMPP Server 也可以在 Microsoft Windows "
+"系统和服务器上运行。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:8
 msgid ""
 "Although you may wish to use command line, take note that commands "
 "entered in shell may require quotations in some cases."
-msgstr "尽管您可能希望使用命令行，但请注意，在 shell "
-"中输入的命令在某些情况下可能需要引号。"
+msgstr "尽管您可能希望使用命令行，但请注意，在 shell 中输入的命令在某些情况下可能需要引号。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:10
 msgid ""
 "Make sure that you have Java JDK v8 installed on your system prior to "
 "installing Tigase. It will also help to fully setup whatever database "
 "software you will be using as well."
-msgstr "在安装 Tigase 之前，请确保您的系统上安装了 Java JDK "
-"v8。它还将有助于完全设置您将使用的任何数据库软件。"
+msgstr "在安装 Tigase 之前，请确保您的系统上安装了 Java JDK v8。它还将有助于完全设置您将使用的任何数据库软件。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:13
 msgid "Step 1: Initial Setup"
@@ -837,8 +785,7 @@ msgid ""
 "files to appropriate places on your computer. The bat file should look "
 "like the following:"
 msgstr ""
-"一旦完成，进入目录 ``win-stuff`` 并运行 setup.bat "
-"程序。该程序在运行时会将必要的文件提取到计算机上的适当位置。 bat "
+"一旦完成，进入目录 ``win-stuff`` 并运行 setup.bat 程序。该程序在运行时会将必要的文件提取到计算机上的适当位置。 bat "
 "文件应如下所示："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:30
@@ -880,17 +827,16 @@ msgid ""
 "starting, and pausing of Tigase XMPP Server and allowing for graceful "
 "shutdowns."
 msgstr ""
-"在 Windows 环境中操作 Tigase 最简洁的方法是通过运行 InstallTigaseService.bat "
-"程序安装 Tigase。这会将 Tigase 安装为系统服务，现在可以从 services.msc "
-"面板控制服务器。从而允许停止，启动和暂停 Tigase XMPP 服务器并允许正常关闭。"
+"在 Windows 环境中操作 Tigase 最简洁的方法是通过运行 InstallTigaseService.bat 程序安装 "
+"Tigase。这会将 Tigase 安装为系统服务，现在可以从 services.msc 面板控制服务器。从而允许停止，启动和暂停 Tigase "
+"XMPP 服务器并允许正常关闭。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:51
 msgid ""
 "For a basic installation, MySQL is recommended over Derby DB. For that "
 "purpose, we have included a basic installation guide for MySQL on Windows"
 " systems here:"
-msgstr "对于基本安装，建议使用 MySQL 而不是 Derby DB。为此，我们在此处包括了 Windows "
-"系统上 MySQL 的基本安装指南："
+msgstr "对于基本安装，建议使用 MySQL 而不是 Derby DB。为此，我们在此处包括了 Windows 系统上 MySQL 的基本安装指南："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:54
 msgid "MySQL Database Installation"
@@ -918,8 +864,7 @@ msgid ""
 " menu and run the MySQL Configuration Wizard. Follow the wizard and make "
 "sure to check settings against the screenshots in the guide below."
 msgstr ""
-"运行安装程序并遵循默认安装步骤。安装完成后，在 Windows 开始菜单中找到 MySQL "
-"元素并运行 MySQL "
+"运行安装程序并遵循默认安装步骤。安装完成后，在 Windows 开始菜单中找到 MySQL 元素并运行 MySQL "
 "配置向导。按照向导进行操作，并确保根据以下指南中的屏幕截图检查设置。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:62
@@ -992,8 +937,7 @@ msgstr "sql5"
 msgid ""
 "Again, on window 6 select the default - 'Decision Support (DSS)/OLAP' and"
 " press 'Next' (pic.6)"
-msgstr "同样，在窗口 6 上选择默认值 - 'Decision Support (DSS)/OLAP' 并点击 'Next'（"
-"图 6）"
+msgstr "同样，在窗口 6 上选择默认值 - 'Decision Support (DSS)/OLAP' 并点击 'Next'（图 6）"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:84
 msgid "|sql6|"
@@ -1020,8 +964,8 @@ msgid ""
 "On the character encoding page select: 'Manual Selected Default Character"
 " set/ Collation' and 'utf8', press 'Next' (pic.8)"
 msgstr ""
-"在字符编码页面上选择 'Manual Selected Default Character set/ Collation' 和 "
-"'utf8', 然后点击 'Next' (pic.8)"
+"在字符编码页面上选择 'Manual Selected Default Character set/ Collation' 和 'utf8', "
+"然后点击 'Next' (pic.8)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:92
 msgid "|sql8|"
@@ -1035,8 +979,7 @@ msgstr "sql8"
 msgid ""
 "On next window select 'Include Bin Directory in Windows PATH' and press "
 "'Next' (pic.9)"
-msgstr "在下一个窗口中选择 'Include Bin Directory in Windows PATH' 然后点击 'Next' "
-"(pic.9)"
+msgstr "在下一个窗口中选择 'Include Bin Directory in Windows PATH' 然后点击 'Next' (pic.9)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:96
 msgid "|sql9|"
@@ -1050,8 +993,7 @@ msgstr "sql9"
 msgid ""
 "On this window just enter the database super user password and make sure "
 "you remember it. When ready press 'Next' (pic. 10)"
-msgstr "在此窗口中，只需输入数据库超级用户密码并确保记住它。准备好后点击'Next' (pic. "
-"10)"
+msgstr "在此窗口中，只需输入数据库超级用户密码并确保记住它。准备好后点击'Next' (pic. 10)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:100
 msgid "|sql10|"
@@ -1081,15 +1023,14 @@ msgid ""
 "settings at any time by running: **START ⇒ Programs ⇒ MYSQL⇒ MYSQL serwer"
 " machine⇒ MySQL Server Instance Config Wizard**"
 msgstr ""
-"保存配置后，您可以通过运行重复所有的步骤并随时更改设置：**START ⇒ Programs ⇒ "
-"MYSQL⇒ MYSQL serwer machine⇒ MySQL Server Instance Config Wizard**"
+"保存配置后，您可以通过运行重复所有的步骤并随时更改设置：**START ⇒ Programs ⇒ MYSQL⇒ MYSQL serwer "
+"machine⇒ MySQL Server Instance Config Wizard**"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:108
 msgid ""
 "Now we have to setup Tigase database. From the Start menu run the MySQL "
 "console and enter all commands below finishing them with **<ENTER>**:"
-msgstr "现在我们必须设置 Tigase 数据库。从开始菜单运行 MySQL "
-"控制台并输入下面的所有命令，并用 **<ENTER>** 完成它们："
+msgstr "现在我们必须设置 Tigase 数据库。从开始菜单运行 MySQL 控制台并输入下面的所有命令，并用 **<ENTER>** 完成它们："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Windows_Installation.inc:110
 msgid "Create the database:"
@@ -1107,8 +1048,7 @@ msgstr "加载 Tigase 数据库架构："
 msgid ""
 "When the system is up and running you can connect with any XMPP client "
 "(Psi for example) to your server to see if it is working."
-msgstr "当系统启动并运行时，您可以将任何 XMPP 客户端（例如 "
-"Psi）连接到您的服务器，以查看它是否正常工作。"
+msgstr "当系统启动并运行时，您可以将任何 XMPP 客户端（例如 Psi）连接到您的服务器，以查看它是否正常工作。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:4
 msgid "Tigase Server Network Instructions"
@@ -1120,16 +1060,15 @@ msgid ""
 "want to use it. If you are just using for local communications on a "
 "network behind a router, you’re all set. Enjoy and use!"
 msgstr ""
-"一旦你已经在一台机器上安装了 Tigase XMPP 服务器，你j就会想要使用它。如果您只"
-"是在路由器后面的网络上用于本地交流，那么您已经准备就绪。享受和使用吧！"
+"一旦你已经在一台机器上安装了 Tigase XMPP "
+"服务器，你j就会想要使用它。如果您只是在路由器后面的网络上用于本地交流，那么您已经准备就绪。享受和使用吧！"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:8
 msgid ""
 "However, if you want to have people from other computers outside your "
 "network connect to your server, you’re going to have to go through a few "
 "more steps to show your server out to the public."
-msgstr "但是，如果您想让你的网络外其他计算机的人连接到您的服务器，您将不得不通过几个"
-"其他步骤将您的服务器向公众展示。"
+msgstr "但是，如果您想让你的网络外其他计算机的人连接到您的服务器，您将不得不通过几个其他步骤将您的服务器向公众展示。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:12
 msgid ""
@@ -1140,9 +1079,8 @@ msgid ""
 "Please consult your IT Security expert for securing your own "
 "installation."
 msgstr ""
-"本指南只是仅仅给出了如何把本地服务器开放给传入的通信的建议。每当您打开端口或"
-"采取其他安全措施时，您就有可能危及网络安全。这些只是建议，可能并不适用于所有"
-"安装。请咨询您的 IT 安全专家以保护您自己的安装。"
+"本指南只是仅仅给出了如何把本地服务器开放给传入的通信的建议。每当您打开端口或采取其他安全措施时，您就有可能危及网络安全。这些只是建议，可能并不适用于所有安装。请咨询您的"
+" IT 安全专家以保护您自己的安装。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:14
 msgid ""
@@ -1155,12 +1093,9 @@ msgid ""
 "adding these records. If you do not have a DNS setup pointing to your "
 "server, you may use a free dynamic name service such as dynu.com."
 msgstr ""
-"XMPP 是一种去中心化的通信方法，其依赖于适当的 DNS 记录以确定 XMPP "
-"服务器的设置位置和方式。操作 XMPP 服务器需要您正确设置 DNS 路由器，以便客户端"
-"不仅可以连接到您，而且如果您决定运行联合服务器并启用服务器到服务器的通信，您"
-"也需要这样做。如果您已经有一个 DNS 服务器，那么添加这些记录应该没什么问题。"
-"如果您没有指向您的服务器的 DNS 设置，您可以使用免费的动态名称服务，例如 dynu."
-"com。"
+"XMPP 是一种去中心化的通信方法，其依赖于适当的 DNS 记录以确定 XMPP 服务器的设置位置和方式。操作 XMPP 服务器需要您正确设置 "
+"DNS 路由器，以便客户端不仅可以连接到您，而且如果您决定运行联合服务器并启用服务器到服务器的通信，您也需要这样做。如果您已经有一个 DNS "
+"服务器，那么添加这些记录应该没什么问题。如果您没有指向您的服务器的 DNS 设置，您可以使用免费的动态名称服务，例如 dynu.com。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:17
 msgid "A Records"
@@ -1173,8 +1108,8 @@ msgid ""
 "benefits such serving as a backup in case the SRV record is not "
 "configured right."
 msgstr ""
-"您将无法使用 IP 地址或 CNAME 记录来设置 XMPP 服务器。虽然这不是必需的，但 "
-"是A 记录可以提供一些其他好处，例如在 SRV 记录配置不正确的情况下用作备份。"
+"您将无法使用 IP 地址或 CNAME 记录来设置 XMPP 服务器。虽然这不是必需的，但 是A 记录可以提供一些其他好处，例如在 SRV "
+"记录配置不正确的情况下用作备份。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:22
 msgid "SRV Records"
@@ -1189,10 +1124,9 @@ msgid ""
 "we will use tigase.org is our domain, and xmpp as the xmpp server "
 "subdomain."
 msgstr ""
-"您需要为客户端到服务器 (c2s) 通信设置 SRV 记录，如果您打算使用它，"
-"还需要为服务器到服务器 (s2s) 通信设置 SRV 记录。我们建议为每台服务器输入两条"
-"记录，因为某些资源或客户端会检查两条记录。对于这个例子，我们将用 tigase.org "
-"作为我们的域，而 xmpp 作为 xmpp 服务器子域。"
+"您需要为客户端到服务器 (c2s) 通信设置 SRV 记录，如果您打算使用它，还需要为服务器到服务器 (s2s) 通信设置 SRV "
+"记录。我们建议为每台服务器输入两条记录，因为某些资源或客户端会检查两条记录。对于这个例子，我们将用 tigase.org 作为我们的域，而 "
+"xmpp 作为 xmpp 服务器子域。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:26
 msgid "SRV records have the following form:"
@@ -1206,8 +1140,7 @@ msgstr "以下是关键点："
 msgid ""
 "``service``: is the symbolic name of the desired service, in this case it"
 " would be *xmpp-client* or *xmpp-server*."
-msgstr "``service``: 是所需服务的符号名称，在本例中为 *xmpp-client* 或 *xmpp-"
-"server*。"
+msgstr "``service``: 是所需服务的符号名称，在本例中为 *xmpp-client* 或 *xmpp-server*。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:36
 msgid ""
@@ -1236,8 +1169,7 @@ msgid ""
 "``priority``: the priority of the target host with lower numbers being "
 "higher priority. Since we are not setting up multiple SRV records, we can"
 " use *0*."
-msgstr "``priority``: 目标主机的优先级，数字越小优先级越高。由于我们并没有设置多个 "
-"SRV 记录，我们可以使用 *0*。"
+msgstr "``priority``: 目标主机的优先级，数字越小优先级越高。由于我们并没有设置多个 SRV 记录，我们可以使用 *0*。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:46
 msgid ""
@@ -1249,8 +1181,7 @@ msgstr "``weight``：具有相同优先级的记录的相对权重。我们可�
 msgid ""
 "``port``: the specific TCP or UDP port where the service can be found. In"
 " this case it will be *5222* or *5269*."
-msgstr "``port``: 可以找到服务的特定 TCP 或 UDP 端口。在这种情况下，它将是 *5222* 或 "
-"*5269*。"
+msgstr "``port``: 可以找到服务的特定 TCP 或 UDP 端口。在这种情况下，它将是 *5222* 或 *5269*。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:50
 msgid ""
@@ -1273,9 +1204,8 @@ msgid ""
 "all you need if you are using default ports. If you are using custom "
 "ports, you will need to have a new SRV record for each subdomain."
 msgstr ""
-"如果您正在运行多个要分离的虚拟主机或子域，则需要另一条记录。在这种情况下，如"
-"果您使用默认端口，您将只需要一条 A 记录。如果您使用自定义端口，"
-"则需要为每个子域创建一条新的 SRV 记录。"
+"如果您正在运行多个要分离的虚拟主机或子域，则需要另一条记录。在这种情况下，如果您使用默认端口，您将只需要一条 A "
+"记录。如果您使用自定义端口，则需要为每个子域创建一条新的 SRV 记录。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:65
 msgid "Hosting via Tigase.me"
@@ -1288,16 +1218,14 @@ msgid ""
 "proper DNS service record (SRV) configuration that point to the following"
 " DNS address: ``tigase.me``."
 msgstr ""
-"如果您不想自己进行所有托管，您仍然可以在自己的域中运行 XMPP 服务。"
-"现在唯一的条件是将正确的 DNS 服务记录 (SRV) 配置指向以下 DNS 地址：``tigase."
-"me``。"
+"如果您不想自己进行所有托管，您仍然可以在自己的域中运行 XMPP 服务。现在唯一的条件是将正确的 DNS 服务记录 (SRV) 配置指向以下 "
+"DNS 地址：``tigase.me``。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:69
 msgid ""
 "We highly encourage using SRV records. If you want to register: **your-"
 "domain.tld** on our XMPP service make sure that it resolves correctly:"
-msgstr "我们强烈鼓励使用 SRV 记录。如果您想在我们的 XMPP 服务上注册：**your-domain."
-"tld**，请确保它正确解析："
+msgstr "我们强烈鼓励使用 SRV 记录。如果您想在我们的 XMPP 服务上注册：**your-domain.tld**，请确保它正确解析："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:72
 msgid "Service"
@@ -1409,11 +1337,9 @@ msgid ""
 "available for your domain and you can specify maximum number of users for"
 " your domain."
 msgstr ""
-"有几种方法。我们建议您查看文档中的 `添加和管理域 <#addManageDomain>`__ 部分以"
-"了解设置。如果您不能或不想自己做，请按照指南中描述的方式向我们发送消息，"
-"或通过 XMPP 到 admin@tigase.im 或联系表格请求新域。用户注册可通过带内注册协议"
-"获得。您还可以指定是否允许匿名身份验证可用于您的域，并且可以指定域的最大用户"
-"数。"
+"有几种方法。我们建议您查看文档中的 `添加和管理域 <#addManageDomain>`__ "
+"部分以了解设置。如果您不能或不想自己做，请按照指南中描述的方式向我们发送消息，或通过 XMPP 到 admin@tigase.im "
+"或联系表格请求新域。用户注册可通过带内注册协议获得。您还可以指定是否允许匿名身份验证可用于您的域，并且可以指定域的最大用户数。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:107
 msgid "Providing certificate"
@@ -1429,9 +1355,9 @@ msgid ""
 "Certificates in Your Linux System<LetsEncryptCertificate>`"
 msgstr ""
 "还鼓励提供专用的 SSL 证书 - 有多种方法可以做到这一点，它们在 :ref:`向 Tigase "
-"服务器安装/加载证书<InstallingSSLCertificate>` 中进行了描述。"
-"您可能希望利用免费的 Let's Encrypt 证书并自动化整个上传和续订过程，如 :ref:`"
-"在 Linux 系统中安装 LetsEncrypt 证书<LetsEncryptCertificate>`"
+"服务器安装/加载证书<InstallingSSLCertificate>` 中进行了描述。您可能希望利用免费的 Let's Encrypt "
+"证书并自动化整个上传和续订过程，如 :ref:`在 Linux 系统中安装 LetsEncrypt "
+"证书<LetsEncryptCertificate>`"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:113
 msgid "Checking setup"
@@ -1445,10 +1371,8 @@ msgid ""
 "https://kingant.net/check_xmpp_dns/ and it will tell you if anything is "
 "missing."
 msgstr ""
-"如果您在单独的网络上使用带有 XMPP "
-"客户端的手机，您现在可以尝试登录以测试服务器。如果这不方便，"
-"您可以使用在线工具检查正确的 DNS 记录，例如 kingant 的：https://kingant.net/"
-"check_xmpp_dns/，它会告诉您是否缺少任何内容。"
+"如果您在单独的网络上使用带有 XMPP 客户端的手机，您现在可以尝试登录以测试服务器。如果这不方便，您可以使用在线工具检查正确的 DNS "
+"记录，例如 kingant 的：https://kingant.net/check_xmpp_dns/，它会告诉您是否缺少任何内容。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:119
 msgid "Ports description"
@@ -1460,8 +1384,8 @@ msgid ""
 "default XMPP communication happens on ports 5222/5269, to which point SRV"
 " records. Other ports used by the server are:"
 msgstr ""
-"一旦设置服务器，您可能需要打开至少两个端口。默认情况下，XMPP 通信发生在端口 "
-"5222/5269 上，SRV 记录到该端口。服务器使用的其他端口如下："
+"一旦设置服务器，您可能需要打开至少两个端口。默认情况下，XMPP 通信发生在端口 5222/5269 上，SRV "
+"记录到该端口。服务器使用的其他端口如下："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:124
 msgid "``3478`` - TURN or STUN, plain socket, TCP and UDP"
@@ -1519,16 +1443,14 @@ msgid ""
 "In case you are using ``iptables`` you can use following command to "
 "include those ports in your rules:"
 msgstr ""
-"如果由于任何原因您不能使用默认端口并且必须更改它们，则可以指向 SRV "
-"记录这些端口。请记住，您必须为防火墙中的传入连接打开这些端口。如果您使用 "
+"如果由于任何原因您不能使用默认端口并且必须更改它们，则可以指向 SRV 记录这些端口。请记住，您必须为防火墙中的传入连接打开这些端口。如果您使用 "
 "``iptables`` ，您可以使用以下命令将这些端口包含在您的规则中："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:159
 msgid ""
 "Both ports should be setup to use TCP only. If for any reason you want to"
 " make service available for different ports you can:"
-msgstr "两个端口都应设置为仅使用 "
-"TCP。如果出于任何原因您希望为不同的端口提供服务，您可以："
+msgstr "两个端口都应设置为仅使用 TCP。如果出于任何原因您希望为不同的端口提供服务，您可以："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Tigase_Server_Network_Instructions.inc:161
 msgid "change ports in Tigase configuration and update DNS SRV records;"
@@ -1544,10 +1466,9 @@ msgid ""
 "are making available Tigase SSL websocket port available under port "
 "``443``, which is usually opened in corporate firewalls):"
 msgstr ""
-"将这些端口转发到默认 Tigase 端口（如果您想在运行时使用低于 ``1024`` 的端口，"
-"这在 \\*nix 操作系统下特别有用，根据推荐，来自用户帐户的 Tigase 服务 — "
-"有一个限制并且用户帐户可以绑定到低于 ``1024`` 的端口），例如使用 ``iptables``"
-" 规则（在以下示例中，我们在端口 443 下提供可用的 Tigase SSL websocket "
+"将这些端口转发到默认 Tigase 端口（如果您想在运行时使用低于 ``1024`` 的端口，这在 \\*nix "
+"操作系统下特别有用，根据推荐，来自用户帐户的 Tigase 服务 — 有一个限制并且用户帐户可以绑定到低于 ``1024`` 的端口），例如使用 "
+"``iptables`` 规则（在以下示例中，我们在端口 443 下提供可用的 Tigase SSL websocket "
 "端口，该端口通常在公司防火墙中被打开):"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:4
@@ -1559,8 +1480,7 @@ msgid ""
 "As mentioned in each of the quick start sections, each distribution of "
 "Tigase XMPP server comes with a number of scripts that are customized for"
 " different versions of Linux."
-msgstr "正如每个快速入门部分所述，Tigase XMPP "
-"服务器的每个发行版都带有许多针对不同版本的 Linux 定制的脚本。"
+msgstr "正如每个快速入门部分所述，Tigase XMPP 服务器的每个发行版都带有许多针对不同版本的 Linux 定制的脚本。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:8
 msgid "init.d chart"
@@ -1643,8 +1563,8 @@ msgid ""
 "RedHat (before v7.0) and other RPM based linux derivatives like CentOS "
 "(before v.7.14), openSUSE (before v12.2)"
 msgstr ""
-"RedHat（v7.0 之前）和其他基于 RPM 的 Linux 衍生产品，如 CentOS（v.7.14 "
-"之前），openSUSE（v12.2 之前）"
+"RedHat（v7.0 之前）和其他基于 RPM 的 Linux 衍生产品，如 CentOS（v.7.14 之前），openSUSE（v12.2 "
+"之前）"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:28
 msgid ""
@@ -1655,10 +1575,9 @@ msgid ""
 "and will even allow for automatic restart of the Tigase XMPP Server in "
 "the case of JVM crash."
 msgstr ""
-"如果您的操作系统是基于 systemd 的 linux 发行版，我们建议使用 systemd "
-"服务脚本。可以像以前一样使用（在这种情况下是旧的) ``init.d`` 启动文件，"
-"但是使用 systemd 启动脚本可以更好地控制启动过程，"
-"甚至可以在JVM崩溃的情况下自动重启 Tigase XMPP 服务器。"
+"如果您的操作系统是基于 systemd 的 linux 发行版，我们建议使用 systemd 服务脚本。可以像以前一样使用（在这种情况下是旧的) "
+"``init.d`` 启动文件，但是使用 systemd 启动脚本可以更好地控制启动过程，甚至可以在JVM崩溃的情况下自动重启 Tigase "
+"XMPP 服务器。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:32
 msgid "Configuration: For Linux Distributions using systemd"
@@ -1669,8 +1588,8 @@ msgid ""
 "To set up Tigase XMPP Server as a system service it is required to copy "
 "``tigase-server.service`` file to ``/etc/systemd/system/`` directory"
 msgstr ""
-"要将 Tigase XMPP 服务器设置为系统服务，需要将 ``tigase-server.service`` "
-"文件复制到 ``/etc/systemd/system/`` 目录"
+"要将 Tigase XMPP 服务器设置为系统服务，需要将 ``tigase-server.service`` 文件复制到 "
+"``/etc/systemd/system/`` 目录"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:40
 msgid "This file contains following parameters which may need to be adjusted:"
@@ -1694,8 +1613,8 @@ msgid ""
 "``scripts/tigase.sh start etc/tigase.conf`` in the Tigase installation "
 "directory)*"
 msgstr ""
-"``ExecStart`` - 指定启动命令 (*默认：运行 Tigase 安装目录中的* ``scripts/"
-"tigase.sh start etc/tigase.conf``）"
+"``ExecStart`` - 指定启动命令 (*默认：运行 Tigase 安装目录中的* ``scripts/tigase.sh start "
+"etc/tigase.conf``）"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:48
 msgid ""
@@ -1703,16 +1622,14 @@ msgid ""
 "``scripts/tigase.sh stop etc/tigase.conf`` in the Tigase installation "
 "directory)*"
 msgstr ""
-"``ExecStop`` - 指定关闭命令 (*默认：在 Tigase 安装目录中运行* ``scripts/"
-"tigase.sh stop etc/tigase.conf``）"
+"``ExecStop`` - 指定关闭命令 (*默认：在 Tigase 安装目录中运行* ``scripts/tigase.sh stop "
+"etc/tigase.conf``）"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:50
 msgid ""
 "``PIDFile`` - Specifies location of the PID file *(default: "
 "``logs/tigase.pid`` file in the Tigase installation directory)*"
-msgstr ""
-"``PIDFile`` - 指定 PID 文件的位置 (*默认：Tigase 安装目录中的* ``logs/tigase."
-"pid`` *文件*)"
+msgstr "``PIDFile`` - 指定 PID 文件的位置 (*默认：Tigase 安装目录中的* ``logs/tigase.pid`` *文件*)"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:52
 msgid ""
@@ -1729,8 +1646,7 @@ msgid ""
 "If you are upgrading from the previous version of the Tigase XMPP Server "
 "which was not running as the systemd system service it is required to "
 "uninstall old service and remove old service files."
-msgstr "如果您从旧版本的 Tigase XMPP 服务器升级，它不是作为 systemd "
-"系统服务运行的，因此需要卸载旧服务并删除旧服务文件。"
+msgstr "如果您从旧版本的 Tigase XMPP 服务器升级，它不是作为 systemd 系统服务运行的，因此需要卸载旧服务并删除旧服务文件。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:72
 msgid "Configuration: For All Linux Distributions"
@@ -1741,8 +1657,7 @@ msgid ""
 "Once you’ve located the appropriate distribution scripts (please take a "
 "look at the table above), copy it to your system’s init.d folder (usually"
 " it’s ``/etc/init.d/``):"
-msgstr "一旦找到合适的分发脚本后（请查看上表），将其复制到系统的 init.d 文件夹（"
-"通常是 ``/etc/init.d/``）："
+msgstr "一旦找到合适的分发脚本后（请查看上表），将其复制到系统的 init.d 文件夹（通常是 ``/etc/init.d/``）："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:80
 msgid "You may also need to make it executable:"
@@ -1777,8 +1692,7 @@ msgstr "``TIGASE_USER`` - 指定哪些用户将运行程序。这应该是具有
 msgid ""
 "``TIGASE_CONF`` - The location of tigase.conf file, relative to the "
 "``TIGASE_HOME`` directory."
-msgstr "``TIGASE_CONF`` - tigase.conf 文件的位置，其是 ``TIGASE_HOME`` "
-"目录的相对位置。"
+msgstr "``TIGASE_CONF`` - tigase.conf 文件的位置，其是 ``TIGASE_HOME`` 目录的相对位置。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:112
 msgid "Mandriva has a single init.d file, however it should be configured:"
@@ -1796,8 +1710,7 @@ msgstr "``TIGASE_DIR`` - Tigase 服务器安装目录。"
 msgid ""
 "``tigase`` - The location of your tigase.sh script. This should not need "
 "adjusting if you maintain the default file structure."
-msgstr "``tigase`` - 你的 tigase.sh "
-"脚本的位置。如果您保持默认文件结构，则不需要调整。"
+msgstr "``tigase`` - 你的 tigase.sh 脚本的位置。如果您保持默认文件结构，则不需要调整。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:132
 msgid ""
@@ -1846,8 +1759,8 @@ msgid ""
 "need to adjust this if you set ``TIGASE_HOME`` properly, and maintain the"
 " default file structure."
 msgstr ""
-"``TIGASE_LIB`` - 您的 Tigase Jars 文件夹的位置，如果您正确设置 "
-"``TIGASE_HOME`` 并保持默认文件结构，则不需要调整它。"
+"``TIGASE_LIB`` - 您的 Tigase Jars 文件夹的位置，如果您正确设置 ``TIGASE_HOME`` "
+"并保持默认文件结构，则不需要调整它。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:174
 msgid ""
@@ -1859,9 +1772,7 @@ msgstr "``TIGASE_CONFIG`` - 你的 tigase.conf 文件相对于 ``TIGASE_HOME`` �
 msgid ""
 "``TIGASE_OPTIONS`` - Legacy options for Tigase, most are now handled in "
 "``config.tdsl`` or tigase.conf."
-msgstr ""
-"``TIGASE_OPTIONS`` - Tigase 的旧选项，现在大部分在 ``config.tdsl`` 或 "
-"tigase.conf 中处理。"
+msgstr "``TIGASE_OPTIONS`` - Tigase 的旧选项，现在大部分在 ``config.tdsl`` 或 tigase.conf 中处理。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:178
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:232
@@ -1874,8 +1785,7 @@ msgstr "``TIGASE_PARAMS`` - 启动 Tigase 时传递给命令行的参数。"
 msgid ""
 "``PIDFILE`` - Location of Tigase PID file if you wish to use custom "
 "directory. Default will be located in /logs or /var/temp directory."
-msgstr "``PIDFILE`` - 如果你想使用自定义目录，Tigase PID 文件的位置。默认将位于 /"
-"logs 或 /var/temp 目录中。"
+msgstr "``PIDFILE`` - 如果你想使用自定义目录，Tigase PID 文件的位置。默认将位于 /logs 或 /var/temp 目录中。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:182
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:236
@@ -1884,8 +1794,8 @@ msgid ""
 "you wish to use a custom directory. Default will be located in /logs "
 "directory, failing that /dev/null."
 msgstr ""
-"``TIGASE_CONSOLE_LOG`` - 如果你想使用自定义目录，Tigase "
-"服务器控制台日志文件的位置。如果 /dev/null 失败，其默认将位于 /logs 目录中。"
+"``TIGASE_CONSOLE_LOG`` - 如果你想使用自定义目录，Tigase 服务器控制台日志文件的位置。如果 /dev/null "
+"失败，其默认将位于 /logs 目录中。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:184
 msgid ""
@@ -1902,8 +1812,7 @@ msgid ""
 "As with other distributions you should copy init.d script to the correct "
 "location. Afterwards it should be edited and correct values for variables"
 " need to be set:"
-msgstr "与其他发行版一样，您应该将 init.d "
-"脚本复制到正确的位置。之后应该对其进行编辑并需要设置变量的正确值："
+msgstr "与其他发行版一样，您应该将 init.d 脚本复制到正确的位置。之后应该对其进行编辑并需要设置变量的正确值："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:228
 msgid ""
@@ -1918,9 +1827,9 @@ msgid ""
 " configuration will be found then it will translate to "
 "``TIGASE_OPTIONS=\" --property-file etc/config.tdsl \"``"
 msgstr ""
-"``TIGASE_OPTIONS`` - 传递给 Tigase 服务器的命令行参数（可能包括``init."
-"properies`` 的路径（如果找到正确的 ``tigase.conf`` 配置，那么它将转换为 "
-"``TIGASE_OPTIONS=\" --property-file etc/config.tdsl \"``"
+"``TIGASE_OPTIONS`` - 传递给 Tigase 服务器的命令行参数（可能包括``init.properies`` "
+"的路径（如果找到正确的 ``tigase.conf`` 配置，那么它将转换为 ``TIGASE_OPTIONS=\" --property-"
+"file etc/config.tdsl \"``"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:234
 msgid ""
@@ -1929,9 +1838,9 @@ msgid ""
 "under (in this case relative to tigase home directory)\\ "
 "``logs/tigase.pid``."
 msgstr ""
-"``PIDFILE`` - 如果你想使用自定义目录，Tigase PID 文件的位置。默认将位于 /var/"
-"run/tigase/tigase.pid 或在（在这种情况下相对于 tigase 主目录）\\ ``logs/"
-"tigase.pid`` 下面。"
+"``PIDFILE`` - 如果你想使用自定义目录，Tigase PID 文件的位置。默认将位于 "
+"/var/run/tigase/tigase.pid 或在（在这种情况下相对于 tigase 主目录）\\ ``logs/tigase.pid``"
+" 下面。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:238
 msgid ""
@@ -1949,8 +1858,7 @@ msgid ""
 "which is to ensure that the program will run even in the event of a power"
 " outage or accidental server restart, Tigase will always be up and "
 "running."
-msgstr "将 Tigase 作为服务运行有很多好处，其中之一是确保即使在断电或服务器意外重启的"
-"情况下程序也能运行，Tigase 将始终启动并运行。"
+msgstr "将 Tigase 作为服务运行有很多好处，其中之一是确保即使在断电或服务器意外重启的情况下程序也能运行，Tigase 将始终启动并运行。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:252
 msgid "For systemd-based linux distributions"
@@ -1987,8 +1895,7 @@ msgid ""
 "Tigase should begin running in the background. Since Tigase is now "
 "installed as a service, it can be controlled with any of the service "
 "commands, such as:"
-msgstr "Tigase 应该开始在后台运行。由于 Tigase "
-"现在已作为服务安装，因此可以使用任何服务命令对其进行控制，例如："
+msgstr "Tigase 应该开始在后台运行。由于 Tigase 现在已作为服务安装，因此可以使用任何服务命令对其进行控制，例如："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Script_Selection.inc:284
 msgid "``service tigase stop``"
@@ -2011,11 +1918,8 @@ msgid ""
 "and completing statistics. To trigger a shutdown of Tigase server, the "
 "following command can be used from the tigase directory:"
 msgstr ""
-"虽然 Tigase XMPP Server "
-"可以通过结束进程来终止，但建议最好使用它自己的关闭脚本。"
-"这不仅允许从系统中正确清除 "
-"Tigase，而且允许所有关闭功能运行，例如修改日志和完成统计。要触发 Tigase "
-"服务器的关闭，可以从 tigase 目录使用以下命令："
+"虽然 Tigase XMPP Server 可以通过结束进程来终止，但建议最好使用它自己的关闭脚本。这不仅允许从系统中正确清除 "
+"Tigase，而且允许所有关闭功能运行，例如修改日志和完成统计。要触发 Tigase 服务器的关闭，可以从 tigase 目录使用以下命令："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:10
 msgid ""
@@ -2066,8 +1970,8 @@ msgid ""
 "refer to the :ref:`Statistics Description<statsticsDescription>` portion "
 "of the documentation."
 msgstr ""
-"关闭后，服务器运行时的统计信息将附加到日志文件中。有关统计信息的描述及其含义"
-"，请参阅文档的 :ref:`Statistics Description<statsticsDescription>` 部分。"
+"关闭后，服务器运行时的统计信息将附加到日志文件中。有关统计信息的描述及其含义，请参阅文档的 :ref:`Statistics "
+"Description<statsticsDescription>` 部分。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:35
 msgid "Shutdown StackTrace Dump"
@@ -2080,16 +1984,15 @@ msgid ""
 "Stacktrace logs will follow the same log file numbering scheme described "
 "in :ref:`Log file description<Tigase-Log-Guide>`."
 msgstr ""
-"为了帮助故障排除，完整的堆栈跟踪将转储到位于$serverdir/logs/threads-dump."
-"log.# 的单独文件中。Stacktrace 日志将遵循 :ref:`Log file description<Tigase-"
-"Log-Guide>` 中描述的相同日志文件编号方案。"
+"为了帮助故障排除，完整的堆栈跟踪将转储到位于$serverdir/logs/threads-dump.log.# "
+"的单独文件中。Stacktrace 日志将遵循 :ref:`Log file description<Tigase-Log-Guide>` "
+"中描述的相同日志文件编号方案。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:39
 msgid ""
 "This feature is enabled by default, however you may disable this by "
 "adding the following to your ``config.tdsl`` file:"
-msgstr "默认情况下启用此功能，但是您可以通过将以下内容添加到您的 ``config.tdsl`` "
-"文件来禁用此功能："
+msgstr "默认情况下启用此功能，但是您可以通过将以下内容添加到您的 ``config.tdsl`` 文件来禁用此功能："
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:46
 msgid "Shutting Down Cluster Nodes"
@@ -2102,8 +2005,8 @@ msgid ""
 "*SeeOtherHost* strategy to direct traffic to other nodes and update the "
 "cluster map to gracefully shut down the single node"
 msgstr ""
-"从 v8.0.0 开始，您现在可以关闭单个集群节点而无需关闭整个服务器。此命令将使用 "
-"*SeeOtherHost* 策略将流量引导到其他节点并更新集群映射以顺利地关闭单个节点"
+"从 v8.0.0 开始，您现在可以关闭单个集群节点而无需关闭整个服务器。此命令将使用 *SeeOtherHost* "
+"策略将流量引导到其他节点并更新集群映射以顺利地关闭单个节点"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Shutting_Down.inc:50
 msgid ""
@@ -2111,180 +2014,102 @@ msgid ""
 "out the response forms. The command is available from message-router as "
 "http://jabber.org/protocol/admin#shutdown."
 msgstr ""
-"可以通过 Ad-hoc 命令关闭单个节点并填写响应表。该命令可从 http://jabber.org/"
-"protocol/admin#shutdown 的 message-router 获得。"
+"可以通过 Ad-hoc 命令关闭单个节点并填写响应表。该命令可从 "
+"http://jabber.org/protocol/admin#shutdown 的 message-router 获得。"
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:2
-msgid "Upgrading to v8.0.0 from v7.1.0"
-msgstr "从 v7.1.0 升级到 v8.0.0"
+msgid "Upgrading Tigase to newer version"
+msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:4
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:6
 msgid ""
-"There have been a number of changes to the user and auth databases since "
-"v7.1.0. As a result, if you are upgrading from older versions, you will "
-"need to follow this guide."
-msgstr "自 v7.1.0 以来，用户和身份验证数据库发生了许多更改。因此，如果您从旧版本升级"
-"，则需要遵循本指南。"
+"Depending of the deployment we recommend installing Tigase XMPP Server "
+"next to the existing one and following with replace of the service once "
+"the upgrade finishes correctly."
+msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:8
-msgid "We recommend installing Tigase XMPP Server 8.0.0 in a separate directory."
-msgstr "我们建议将 Tigase XMPP Server 8.0.0 安装在单独的目录中。"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:11
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:9
 msgid "Backup your data"
 msgstr "备份您的数据"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:13
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:11
 msgid ""
-"As with any migration it is highly recommended that you backup your "
-"repository before conducting any upgrade operations."
-msgstr "与任何迁移一样，强烈建议您在执行任何升级操作之前备份您的存储库。"
+"As with any migration it is **highly recommended** that you backup your "
+"repository before conducting any upgrade operations. It can be done via "
+"simple SQL dump od the database or more elaborate snapshot of the "
+"database offered by cloud providers."
+msgstr ""
 
 #: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:15
-msgid "For MySQL databases:"
-msgstr "对于 MySQL 数据库："
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:23
-msgid "Setup Tigase XMPP Server 8.0.0"
-msgstr "设置 Tigase XMPP 服务器 8.0.0"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:25
-msgid ""
-"After downloading Tigase XMPP Server 8.0.0 from our website, or using "
-"wget, extract the files to a separate directory."
-msgstr "从我们的网站下载 Tigase XMPP Server 8.0.0 或使用 wget "
-"后，将文件解压缩到单独的目录。"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:27
-msgid ""
-"Copy the ``tigase.conf`` and ``init.properties`` files from the old "
-"directory to v8.0.0 directory."
-msgstr "将 ``tigase.conf`` 和 ``init.properties`` 文件从旧目录复制到 v8.0.0 目录。"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:35
-msgid "Import the database."
-msgstr "导入数据库。"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:45
-msgid "Upgrade configuration file"
+#, fuzzy
+msgid "Configuration files to migrate"
 msgstr "升级配置文件"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:47
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:17
 msgid ""
-"Tigase XMPP Server has a utility that can be called using ``upgrade-"
-"config`` that will update your old ``init.properties`` file and create a "
-"new file using DSL."
+"During the upgrade the most important files to migrate to newer versions "
+"are:"
 msgstr ""
-"Tigase XMPP Server 有一个可以使用 ``upgrade-config`` 调用的实用程序，"
-"它将更新旧的 ``init.properties`` 文件并使用 DSL 创建一个新文件。"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:53
-msgid "When everything is ready it will printout following information"
-msgstr "一切准备就绪后，它将打印出以下信息"
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:19
+#, fuzzy
+msgid "`etc/tigase.conf`"
+msgstr "配置tigase.conf"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:64
-msgid "Connect new database"
-msgstr "连接新数据库"
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:20
+#, fuzzy
+msgid "`etc/config.tdsl`"
+msgstr "配置 config.tdsl"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:66
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:21
+msgid "`etc/jmx.access` and `etc/jmx.password`"
+msgstr ""
+
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:22
 msgid ""
-"Edit your new ``config.tdsl`` file to connect to the new database you "
-"created during the import step."
-msgstr "编辑新的 ``config.tdsl`` 文件以连接到您在导入步骤中创建的新数据库。"
+"`certs/*` (if configured to use local filesystem, though we recommend to "
+"use database for storing certificates)"
+msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:83
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:25
 msgid "Upgrade Database schema"
 msgstr "升级数据库架构"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:85
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:27
 msgid ""
 "Upgrading database schemas is now possible using the ``upgrade-schema`` "
 "option. Do this now."
 msgstr "现在可以使用 ``upgrade-schema`` 选项升级数据库模式。现在就这样做。"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:94
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:36
 msgid "Your database schema MUST be v8 or conversion will not occur properly!"
 msgstr "您的数据库架构必须是 v8，否则转换将无法正常进行！"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:96
-msgid "You will be asked the following prompts:"
-msgstr "您将被询问以下提示："
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:38
+msgid ""
+"You will be asked for rood credentials. Those can be provided as "
+"parameters to `/scripts/tigase.sh upgrade-schema` - please check "
+"`./scripts/tigase.sh upgrade-schema --help` for more details"
+msgstr ""
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:104
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:40
 msgid "Upon success, you should see the following:"
 msgstr "成功后，您应该看到以下内容："
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:125
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:61
 msgid "Start Tigase!"
 msgstr "开始 Tigase！"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:129
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:65
 msgid "Help?"
 msgstr "Help?"
 
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:131
+#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:67
 msgid ""
 "Both ``upgrade`` commands also have a build in help function, they can be"
 " called if needed from the command line. You can also run these commands "
 "for help."
-msgstr "两个 ``upgrade`` 命令也有内置帮助功能，如果需要，可以从命令行调用它们。您还可"
-"以运行这些命令来寻求帮助。"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:140
-msgid "Upgrade/Restore with a script [experimental!]"
-msgstr "使用脚本升级/恢复 [实验性！]"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:142
-msgid ""
-"To make upgrade process easier it’s possible to utilize `tigase-"
-"upgrade.sh <https://raw.githubusercontent.com/tigase/tigase-"
-"server/master/src/main/restructured/files/tigase-upgrade.sh>`__ \\*nix "
-"shell script. It permits upgrading to new version (supports downloading "
-"version from provided URL)."
-msgstr ""
-"为了使升级过程更容易，可以使用 `tigase-upgrade.sh <https://raw."
-"githubusercontent.com/tigase/tigase-server/master/src/main/restructured/"
-"files/tigase-upgrade.sh>`__ \\*nix shell 脚本。它允许升级到新版本（"
-"支持从提供的 URL 下载版本）。"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:144
-msgid "It’s usage is as follows:"
-msgstr "它的用法如下："
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:150
-msgid ""
-"Where: \\* ``{upgrade|rollback}`` - defines whether to perform upgrade or"
-" rollback to previous version \\* ``install_package`` - package to which "
-"perform upgrade (can be URL) in case of upgrade or backed-up installation"
-" (from which we want to restore) in case of rollback \\* "
-"``install_directory`` - destination directory (both in upgrade and "
-"rollback); can be symlink in which case it will be preserved with "
-"upgraded/restored path as target \\* ``[tar|dir]`` - (optional) type of "
-"backup (either simply copy directory or also archive it using ``tar`` "
-"command); by default ``dir`` is used."
-msgstr ""
-"其中： \\* ``{upgrade|rollback}`` - 定义是执行升级还是回滚到以前的版本 \\* "
-"``install_package`` - 在升级或备份的情况下执行升级的包（可以是 "
-"URL）在回滚的情况下安装（我们要从中恢复）\\ * ``install_directory``-目标目录"
-"（在升级和回滚中）；可以是符号链接，在这种情况下，它将使用升级/"
-"恢复的路径作为目标 \\* ``[tar|dir]`` - （可选）备份类型（"
-"简单地复制目录或使用 ``tar`` 命令将其存档）；默认情况下使用 ``dir``。"
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:152
-msgid ""
-"To upgrade installation to version ``tigase-server-8.0.0-SNAPSHOT-b5285"
-"-dist-max.tar.gz`` execute the script as follows:"
-msgstr ""
-"要将安装升级到版本 ``tigase-server-8.0.0-SNAPSHOT-b5285-dist-max.tar.gz`` "
-"，请执行以下脚本："
-
-#: ../../Tigase_Administration/Quick_Start_Guide/Upgrading_from_Older_versions.inc:158
-msgid ""
-"To rollback from ``tigase-server-8.0.0-SNAPSHOT-"
-"b5264_backup-18-11-05_1712`` backup execute script as follows:"
-msgstr ""
-"要从 ``tigase-server-8.0.0-SNAPSHOT-b5264_backup-18-11-05_1712`` "
-"备份回滚执行如下所示脚本："
+msgstr "两个 ``upgrade`` 命令也有内置帮助功能，如果需要，可以从命令行调用它们。您还可以运行这些命令来寻求帮助。"
 
 #~ msgid ""
 #~ "There are many other settings that "
@@ -2342,3 +2167,139 @@ msgstr ""
 #~ "version (supports downloading version from "
 #~ "provided URL)."
 #~ msgstr ""
+
+#~ msgid "Upgrading to v8.0.0 from v7.1.0"
+#~ msgstr "从 v7.1.0 升级到 v8.0.0"
+
+#~ msgid ""
+#~ "There have been a number of "
+#~ "changes to the user and auth "
+#~ "databases since v7.1.0. As a result, "
+#~ "if you are upgrading from older "
+#~ "versions, you will need to follow "
+#~ "this guide."
+#~ msgstr "自 v7.1.0 以来，用户和身份验证数据库发生了许多更改。因此，如果您从旧版本升级，则需要遵循本指南。"
+
+#~ msgid ""
+#~ "We recommend installing Tigase XMPP "
+#~ "Server 8.0.0 in a separate directory."
+#~ msgstr "我们建议将 Tigase XMPP Server 8.0.0 安装在单独的目录中。"
+
+#~ msgid ""
+#~ "As with any migration it is highly"
+#~ " recommended that you backup your "
+#~ "repository before conducting any upgrade "
+#~ "operations."
+#~ msgstr "与任何迁移一样，强烈建议您在执行任何升级操作之前备份您的存储库。"
+
+#~ msgid "For MySQL databases:"
+#~ msgstr "对于 MySQL 数据库："
+
+#~ msgid "Setup Tigase XMPP Server 8.0.0"
+#~ msgstr "设置 Tigase XMPP 服务器 8.0.0"
+
+#~ msgid ""
+#~ "After downloading Tigase XMPP Server "
+#~ "8.0.0 from our website, or using "
+#~ "wget, extract the files to a "
+#~ "separate directory."
+#~ msgstr "从我们的网站下载 Tigase XMPP Server 8.0.0 或使用 wget 后，将文件解压缩到单独的目录。"
+
+#~ msgid ""
+#~ "Copy the ``tigase.conf`` and "
+#~ "``init.properties`` files from the old "
+#~ "directory to v8.0.0 directory."
+#~ msgstr "将 ``tigase.conf`` 和 ``init.properties`` 文件从旧目录复制到 v8.0.0 目录。"
+
+#~ msgid "Import the database."
+#~ msgstr "导入数据库。"
+
+#~ msgid ""
+#~ "Tigase XMPP Server has a utility "
+#~ "that can be called using ``upgrade-"
+#~ "config`` that will update your old "
+#~ "``init.properties`` file and create a "
+#~ "new file using DSL."
+#~ msgstr ""
+#~ "Tigase XMPP Server 有一个可以使用 ``upgrade-"
+#~ "config`` 调用的实用程序，它将更新旧的 ``init.properties`` 文件并使用"
+#~ " DSL 创建一个新文件。"
+
+#~ msgid "When everything is ready it will printout following information"
+#~ msgstr "一切准备就绪后，它将打印出以下信息"
+
+#~ msgid "Connect new database"
+#~ msgstr "连接新数据库"
+
+#~ msgid ""
+#~ "Edit your new ``config.tdsl`` file to"
+#~ " connect to the new database you "
+#~ "created during the import step."
+#~ msgstr "编辑新的 ``config.tdsl`` 文件以连接到您在导入步骤中创建的新数据库。"
+
+#~ msgid "You will be asked the following prompts:"
+#~ msgstr "您将被询问以下提示："
+
+#~ msgid "Upgrade/Restore with a script [experimental!]"
+#~ msgstr "使用脚本升级/恢复 [实验性！]"
+
+#~ msgid ""
+#~ "To make upgrade process easier it’s "
+#~ "possible to utilize `tigase-upgrade.sh "
+#~ "<https://raw.githubusercontent.com/tigase/tigase-"
+#~ "server/master/src/main/restructured/files/tigase-upgrade.sh>`__"
+#~ " \\*nix shell script. It permits "
+#~ "upgrading to new version (supports "
+#~ "downloading version from provided URL)."
+#~ msgstr ""
+#~ "为了使升级过程更容易，可以使用 `tigase-upgrade.sh "
+#~ "<https://raw.githubusercontent.com/tigase/tigase-"
+#~ "server/master/src/main/restructured/files/tigase-upgrade.sh>`__"
+#~ " \\*nix shell 脚本。它允许升级到新版本（支持从提供的 URL "
+#~ "下载版本）。"
+
+#~ msgid "It’s usage is as follows:"
+#~ msgstr "它的用法如下："
+
+#~ msgid ""
+#~ "Where: \\* ``{upgrade|rollback}`` - defines"
+#~ " whether to perform upgrade or "
+#~ "rollback to previous version \\* "
+#~ "``install_package`` - package to which "
+#~ "perform upgrade (can be URL) in "
+#~ "case of upgrade or backed-up "
+#~ "installation (from which we want to "
+#~ "restore) in case of rollback \\* "
+#~ "``install_directory`` - destination directory "
+#~ "(both in upgrade and rollback); can "
+#~ "be symlink in which case it will"
+#~ " be preserved with upgraded/restored path"
+#~ " as target \\* ``[tar|dir]`` - "
+#~ "(optional) type of backup (either simply"
+#~ " copy directory or also archive it"
+#~ " using ``tar`` command); by default "
+#~ "``dir`` is used."
+#~ msgstr ""
+#~ "其中： \\* ``{upgrade|rollback}`` - "
+#~ "定义是执行升级还是回滚到以前的版本 \\* ``install_package`` - "
+#~ "在升级或备份的情况下执行升级的包（可以是 URL）在回滚的情况下安装（我们要从中恢复）\\ * "
+#~ "``install_directory``-目标目录（在升级和回滚中）；可以是符号链接，在这种情况下，它将使用升级/恢复的路径作为目标"
+#~ " \\* ``[tar|dir]`` - （可选）备份类型（简单地复制目录或使用 "
+#~ "``tar`` 命令将其存档）；默认情况下使用 ``dir``。"
+
+#~ msgid ""
+#~ "To upgrade installation to version "
+#~ "``tigase-server-8.0.0-SNAPSHOT-b5285-dist-max.tar.gz`` "
+#~ "execute the script as follows:"
+#~ msgstr ""
+#~ "要将安装升级到版本 ``tigase-server-8.0.0-SNAPSHOT-b5285-dist-"
+#~ "max.tar.gz`` ，请执行以下脚本："
+
+#~ msgid ""
+#~ "To rollback from ``tigase-server-8.0.0"
+#~ "-SNAPSHOT-b5264_backup-18-11-05_1712`` backup execute"
+#~ " script as follows:"
+#~ msgstr ""
+#~ "要从 ``tigase-server-8.0.0-SNAPSHOT-"
+#~ "b5264_backup-18-11-05_1712`` 备份回滚执行如下所示脚本："
+

@@ -5,20 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc\n"
+"Project-Id-Version:  TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-04 11:04-0700\n"
+"POT-Creation-Date: 2023-02-16 15:01-0800\n"
 "PO-Revision-Date: 2022-09-07 17:14+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
-"tigase-xmpp-server/database_management/zh_Hans/>\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
+"/tigase-xmpp-server/database_management/zh_Hans/>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.11.2\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.11.0\n"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:2
 msgid "Database Management"
@@ -76,10 +75,6 @@ msgstr "MySQL"
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
 msgid "5.7"
 msgstr "5.7"
-
-#: ../../Tigase_Administration/Database_Management/Management.rst:16
-msgid "5.6.4"
-msgstr "5.6.4"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:16
 msgid "Required to properly support timestamp storage with millisecond precision"
@@ -188,8 +183,7 @@ msgstr "这个更改为 15 分钟。"
 msgid ""
 "see :ref:`Period / Duration values<PeriodDurationvalues>` for format "
 "details"
-msgstr "有关格式详细信息，请参阅 :ref:`Period / Duration "
-"values<PeriodDurationvalues>`"
+msgstr "有关格式详细信息，请参阅 :ref:`Period / Duration values<PeriodDurationvalues>`"
 
 #: ../../Tigase_Administration/Database_Management/Management.rst:72
 msgid "Using modified database schema"
@@ -1025,8 +1019,8 @@ msgid ""
 "``-Q``, ``--query=`` - custom queries to be executed, see :ref:`Query "
 "function<queryschema>` for details."
 msgstr ""
-"``-Q``, ``--query=`` - 要执行的自定义查询，请参阅 :ref:`Query "
-"function<queryschema>` 了解详细信息。"
+"``-Q``, ``--query=`` - 要执行的自定义查询，请参阅 :ref:`Query function<queryschema>` "
+"了解详细信息。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/DbSchemaLoader.inc:115
 msgid ""
@@ -1262,9 +1256,8 @@ msgid ""
 "Depending on how you plan to connect to the database (locally or over the"
 " network) use one of following commands or all if you are not sure:"
 msgstr ""
-"添加 ``tigase_user`` 用户并授予它对 ``tigasedb`` 数据库的访问权限。取决您计划"
-"如何连接到数据库（本地或通过网络），如果您不确定，请使用以下全部命令或命令之"
-"一："
+"添加 ``tigase_user`` 用户并授予它对 ``tigasedb`` "
+"数据库的访问权限。取决您计划如何连接到数据库（本地或通过网络），如果您不确定，请使用以下全部命令或命令之一："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MySQL.inc:132
 msgid "Selective access configuration"
@@ -1691,9 +1684,8 @@ msgid ""
 " Microsoft itself. Previous jdbc url will fallback to the Microsoft "
 "driver automatically."
 msgstr ""
-"以前 Tigase XMPP 服务器附带 jTDS 开源驱动程序，但是从 8.3.0 开始，我们切换到 "
-"Microsoft 自己提供的 FOSS 驱动程序。以前的 jdbc url 将自动回退到 Microsoft "
-"驱动程序。"
+"以前 Tigase XMPP 服务器附带 jTDS 开源驱动程序，但是从 8.3.0 开始，我们切换到 Microsoft 自己提供的 FOSS "
+"驱动程序。以前的 jdbc url 将自动回退到 Microsoft 驱动程序。"
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MSSQL.inc:156
 msgid "Microsoft driver:"
@@ -1933,8 +1925,8 @@ msgid ""
 "for MongoDB, you can force it to use one provided by Tigase by using the "
 "following line in the ``config.tdsl`` file:"
 msgstr ""
-"如果 MUC 组件无法为 MongoDB 检测和使用适当的存储层，您可以通过在 ``config."
-"tdsl`` 文件中使用以下行来强制它使用 Tigase 提供的存储层："
+"如果 MUC 组件无法为 MongoDB 检测和使用适当的存储层，您可以通过在 ``config.tdsl`` 文件中使用以下行来强制它使用 "
+"Tigase 提供的存储层："
 
 #: ../../Tigase_Administration/Database_Management/Database_Preparation/MongoDB.inc:105
 msgid "Configuration for Message Archiving"
@@ -2625,9 +2617,8 @@ msgid ""
 "Tigase-Server>`. It will help you with database preparation for "
 "connecting with Tigase server."
 msgstr ""
-"在继续阅读本手册之前，请先查看 :ref:`初始 MySQL 数据库设置<Prepare-the-MySQL-"
-"Database-for-the-Tigase-Server>`。它将帮助您准备用于连接 Tigase "
-"服务器的数据库。"
+"在继续阅读本手册之前，请先查看 :ref:`初始 MySQL 数据库设置<Prepare-the-MySQL-Database-for-the-"
+"Tigase-Server>`。它将帮助您准备用于连接 Tigase 服务器的数据库。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:11
 msgid "This guide describes MySQL database connection parameters."
@@ -2714,8 +2705,8 @@ msgid ""
 "Server>`."
 msgstr ""
 "理论上，您可以将 Tigase 数据库模式加载到 Drupal 数据库，然后两个 ``db-uris`` "
-"将具有相同的数据库连接字符串。有关设置和连接 MySQL 数据库的更多详细信息，"
-"请参阅 :ref:`MySQL 指南<Prepare-the-MySQL-Database-for-the-Tigase-Server>`。"
+"将具有相同的数据库连接字符串。有关设置和连接 MySQL 数据库的更多详细信息，请参阅 :ref:`MySQL 指南<Prepare-the-"
+"MySQL-Database-for-the-Tigase-Server>`。"
 
 #: ../../Tigase_Administration/Database_Management/Existing_Databases.inc:91
 msgid "Now run the Tigase server."
@@ -3621,3 +3612,7 @@ msgstr "因此，您的最终命令应如下所示："
 
 #~ msgid "jDTS driver"
 #~ msgstr "jDTS 驱动"
+
+#~ msgid "5.6.4"
+#~ msgstr "5.6.4"
+

@@ -8,21 +8,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 00:08-0800\n"
+"POT-Creation-Date: 2023-02-16 15:01-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.11.0\n"
 
-#: ../../index.rst:66
-msgid "Tigase XMPP Server Distribution Administration Guide"
+#: ../../index.rst:68
+msgid "Administration Guide"
 msgstr ""
 
-#: ../../index.rst:73
-msgid "Tigase Development Guide"
+#: ../../index.rst:75
+msgid "Development Guide"
 msgstr ""
 
 #: ../../index.rst:4
@@ -75,7 +75,7 @@ msgstr ""
 
 #: ../../index.rst:18
 msgid ""
-"`Tigase Unified Archive <../../projects/projects/tigase-tigase-unified-"
+"`Tigase Unified Archive <../../projects/tigase-tigase-unified-"
 "archive/en/latest/>`__ The extended version of Tigase Message Archiving "
 "Component"
 msgstr ""
@@ -94,22 +94,21 @@ msgstr ""
 
 #: ../../index.rst:21
 msgid ""
-"`Tigase ACS <../../projects/projects/tigase-tigase-acs-2/en/latest/>`__ "
-"General purpose, commercial clustering strategy"
+"`Tigase ACS <../../projects/tigase-tigase-acs-2/en/latest/>`__ General "
+"purpose, commercial clustering strategy"
 msgstr ""
 
 #: ../../index.rst:22
 msgid ""
-"`Tigase Auditlog <../../projects/projects/tigase-tigase-"
-"auditlog-2/en/latest/>`__ An implementation of Audit Log pattern "
-"functionality to log important events"
+"`Tigase Auditlog <../../projects/tigase-tigase-auditlog-2/en/latest/>`__ "
+"An implementation of Audit Log pattern functionality to log important "
+"events"
 msgstr ""
 
 #: ../../index.rst:23
 msgid ""
-"`Tigase Workgroup Queues <../../projects/projects/tigase-tigase-"
-"workgroup-queues/en/latest/>`__ Implementation of XEP-0142: Workgroup "
-"Queues"
+"`Tigase Workgroup Queues <../../projects/tigase-tigase-workgroup-"
+"queues/en/latest/>`__ Implementation of XEP-0142: Workgroup Queues"
 msgstr ""
 
 #: ../../index.rst:24
@@ -124,81 +123,85 @@ msgid "XMPP Clients"
 msgstr ""
 
 #: ../../index.rst:30
-msgid ""
-"`SiskinIM and BeagleIM <../../projects/tigase-siskin-im/en/latest/>`__ "
-"iOS XMPP Client"
+msgid "`SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP Client"
 msgstr ""
 
 #: ../../index.rst:32
+msgid ""
+"`BeagleIM <../../projects/tigase-beagle-im/en/latest/>`__ macOS XMPP "
+"Client"
+msgstr ""
+
+#: ../../index.rst:34
 msgid "`StorkIM <../../projects/tigase-stork/en/latest/>`__ android XMPP Client"
 msgstr ""
 
-#: ../../index.rst:35
+#: ../../index.rst:37
 msgid "XMPP Libraries"
 msgstr ""
 
-#: ../../index.rst:37
+#: ../../index.rst:39
 msgid ""
 "`Martin <../../projects/tigase-tigase-swift/en/latest/>`__ Swift Lang "
 "XMPP Library"
 msgstr ""
 
-#: ../../index.rst:39
+#: ../../index.rst:41
 msgid ""
 "`Halcyon <../../projects/tigase-halcyon/en/latest/>`__ a multiplatform, "
 "extensible XMPP client library"
 msgstr ""
 
-#: ../../index.rst:41
+#: ../../index.rst:43
 msgid ""
 "`Tigase XML Tools <../../projects/tigase-xmltools/en/latest/>`__ A "
 "library providing support for working with XML documents"
 msgstr ""
 
-#: ../../index.rst:43
+#: ../../index.rst:45
 msgid ""
 "`Tigase JaXMPP <../../projects/tigase-jaxmpp/en/latest/>`__ an extensible"
 " XMPP client library"
 msgstr ""
 
-#: ../../index.rst:47
+#: ../../index.rst:49
 msgid "Javadoc"
 msgstr ""
 
-#: ../../index.rst:49
+#: ../../index.rst:51
 msgid ""
 "`Tigase Mongodb <../../projects/tigase-tigase-mongodb/en/latest/>`__ Java"
 " documentation for tigase mangodb"
 msgstr ""
 
-#: ../../index.rst:51
+#: ../../index.rst:53
 msgid ""
 "`Tigase Utils <../../projects/tigase-tigase-utils/en/latest/>`__ Java "
 "documentation for tigase utils"
 msgstr ""
 
-#: ../../index.rst:54
+#: ../../index.rst:56
 msgid "Miscellaneous"
 msgstr ""
 
-#: ../../index.rst:56
+#: ../../index.rst:58
 msgid ""
 "`Tigase TTS NG <../../projects/tigase-tigase-tts-ng/en/latest/>`__ "
 "Project intended to run automated funtionality tests"
 msgstr ""
 
-#: ../../index.rst:58
+#: ../../index.rst:60
 msgid ""
 "`Tigase XEPs <https://xeps.tigase.net/>`__ XMPP extensions that we Tigase"
 " is working on with the goal to transition them to full, standard XMPP "
 "extensions."
 msgstr ""
 
-#: ../../index.rst:62
+#: ../../index.rst:64
 msgid "Legacy documentation website"
 msgstr ""
 
-#: ../../index.rst:64
+#: ../../index.rst:66
 msgid ""
 "`Legacy documentation website <https://docs-legacy.tigase.net/>`__ Our "
 "legacy documentation website which contains documentation for older "
@@ -218,5 +221,42 @@ msgstr ""
 #~ msgid ""
 #~ "`Tigase Swift <../../projects/tigase-tigase-"
 #~ "swift/en/latest/>`__ Swift Lang XMPP Library"
+#~ msgstr ""
+
+#~ msgid "Tigase XMPP Server Distribution Administration Guide"
+#~ msgstr ""
+
+#~ msgid "Tigase Development Guide"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Tigase Unified Archive <../../projects/projects"
+#~ "/tigase-tigase-unified-archive/en/latest/>`__ The"
+#~ " extended version of Tigase Message "
+#~ "Archiving Component"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Tigase ACS <../../projects/projects/tigase-"
+#~ "tigase-acs-2/en/latest/>`__ General purpose, "
+#~ "commercial clustering strategy"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Tigase Auditlog <../../projects/projects/tigase-"
+#~ "tigase-auditlog-2/en/latest/>`__ An implementation "
+#~ "of Audit Log pattern functionality to"
+#~ " log important events"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`Tigase Workgroup Queues <../../projects/projects"
+#~ "/tigase-tigase-workgroup-queues/en/latest/>`__ "
+#~ "Implementation of XEP-0142: Workgroup Queues"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "`SiskinIM and BeagleIM <../../projects/tigase-"
+#~ "siskin-im/en/latest/>`__ iOS XMPP Client"
 #~ msgstr ""
 
