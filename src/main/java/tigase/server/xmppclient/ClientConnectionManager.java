@@ -848,6 +848,9 @@ public class ClientConnectionManager
 					} catch (Exception e) {
 					}
 					serv.stop();
+					for (XMPPIOProcessor processor : processors) {
+						processor.serviceStopped(serv, true);
+					}
 				} else {
 					if (log.isLoggable(Level.FINE)) {
 						log.log(Level.FINE,
