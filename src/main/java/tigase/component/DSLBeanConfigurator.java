@@ -244,7 +244,7 @@ public class DSLBeanConfigurator
 							String prop = (cf == null || cf.alias().isEmpty()) ? field.getName() : cf.alias();
 							Object value = configuredValue == null ? defaultValue : configuredValue;
 
-							if (cf.type() != null) {
+							if (cf.type() != null && value != null) {
 								if (cf.type().equals(ConfigFieldType.Password) ) {
 									value = "*".repeat((Objects.toString(value)).length());
 								} else if (cf.type().equals(ConfigFieldType.JdbcUrl)) {
