@@ -54,6 +54,8 @@ public class MonitorComponent
 	@Inject(nullAllowed = true)
 	private List<MonitorExtension> extensions = new ArrayList<>();
 
+	public MonitorComponent() {}
+
 	@Override
 	public String getDiscoCategory() {
 		return "component";
