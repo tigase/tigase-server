@@ -5,19 +5,18 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: TigaseDoc\n"
+"Project-Id-Version:  TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-16 15:01-0800\n"
+"POT-Creation-Date: 2023-02-22 15:39-0800\n"
 "PO-Revision-Date: 2023-02-17 02:08+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
-"tigase-xmpp-server/index/zh_Hans/>\n"
 "Language: zh_CN\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
+"/tigase-xmpp-server/index/zh_Hans/>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.11.0\n"
 
 #: ../../index.rst:68
@@ -88,8 +87,8 @@ msgid ""
 "archive/en/latest/>`__ The extended version of Tigase Message Archiving "
 "Component"
 msgstr ""
-"`Tigase Unified Archive <../../projects/tigase-tigase-unified-archive/en/"
-"latest/>`__ Tigase 消息归档组件的扩展版本"
+"`Tigase Unified Archive <../../projects/tigase-tigase-unified-"
+"archive/en/latest/>`__ Tigase 消息归档组件的扩展版本"
 
 #: ../../index.rst:19
 msgid ""
@@ -111,9 +110,7 @@ msgstr ""
 msgid ""
 "`Tigase ACS <../../projects/tigase-tigase-acs-2/en/latest/>`__ General "
 "purpose, commercial clustering strategy"
-msgstr ""
-"`Tigase ACS <../../projects/tigase-tigase-acs-2/en/latest/>`__ "
-"通用、商业集群策略"
+msgstr "`Tigase ACS <../../projects/tigase-tigase-acs-2/en/latest/>`__ 通用、商业集群策略"
 
 #: ../../index.rst:22
 msgid ""
@@ -129,8 +126,8 @@ msgid ""
 "`Tigase Workgroup Queues <../../projects/tigase-tigase-workgroup-"
 "queues/en/latest/>`__ Implementation of XEP-0142: Workgroup Queues"
 msgstr ""
-"`Tigase Workgroup Queues <../../projects/tigase-tigase-workgroup-queues/en/"
-"latest/>`__ XEP-0142 的实现：工作组队列"
+"`Tigase Workgroup Queues <../../projects/tigase-tigase-workgroup-"
+"queues/en/latest/>`__ XEP-0142 的实现：工作组队列"
 
 #: ../../index.rst:24
 msgid ""
@@ -140,6 +137,16 @@ msgid ""
 msgstr ""
 "`Tigase Databse Migrator <../../projects/tigase-database-"
 "migrator/en/latest/>`__ 组件允许从各种 XMPP 服务器迁移不同类型的数据"
+
+#: ../../index.rst:25
+#, fuzzy
+msgid ""
+"`Tigase Extras <../../projects/tigase-tigase-extras/en/latest/>`__ AWS "
+"provides you with support for additional features and integrations with "
+"Amazon AWS."
+msgstr ""
+"`Tigase XML Tools <../../projects/tigase-xmltools/en/latest/>`__ 一个为处理 "
+"XML 文档提供支持的库"
 
 #: ../../index.rst:28
 msgid "XMPP Clients"
@@ -153,8 +160,7 @@ msgstr "`SiskinIM <../../projects/tigase-siskin-im/en/latest/>`__ iOS XMPP 客�
 msgid ""
 "`BeagleIM <../../projects/tigase-beagle-im/en/latest/>`__ macOS XMPP "
 "Client"
-msgstr ""
-"`BeagleIM <../../projects/tigase-beagle-im/en/latest/>`__ macOS XMPP 客户端"
+msgstr "`BeagleIM <../../projects/tigase-beagle-im/en/latest/>`__ macOS XMPP 客户端"
 
 #: ../../index.rst:34
 msgid "`StorkIM <../../projects/tigase-stork/en/latest/>`__ android XMPP Client"
@@ -257,3 +263,4 @@ msgstr ""
 
 #~ msgid "Tigase XMPP Server Distribution Administration Guide"
 #~ msgstr "Tigase XMPP 服务器发行管理指南"
+
