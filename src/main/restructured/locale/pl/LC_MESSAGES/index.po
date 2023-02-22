@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TigaseDoc \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-16 15:01-0800\n"
+"POT-Creation-Date: 2023-02-22 15:39-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,6 +116,13 @@ msgid ""
 "`Tigase Databse Migrator <../../projects/tigase-database-"
 "migrator/en/latest/>`__ Component allowing migration of different types "
 "of data from various XMPP servers"
+msgstr ""
+
+#: ../../index.rst:25
+msgid ""
+"`Tigase Extras <../../projects/tigase-tigase-extras/en/latest/>`__ AWS "
+"provides you with support for additional features and integrations with "
+"Amazon AWS."
 msgstr ""
 
 #: ../../index.rst:28
