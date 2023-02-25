@@ -5,18 +5,19 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  TigaseDoc\n"
+"Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-22 15:39-0800\n"
-"PO-Revision-Date: 2023-02-17 02:08+0000\n"
+"PO-Revision-Date: 2023-02-25 01:30+0000\n"
 "Last-Translator: Qian Luo <qian.luo@tigase.net>\n"
+"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/index/zh_Hans/>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) <http://translate.tigase.net/projects"
-"/tigase-xmpp-server/index/zh_Hans/>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.11.2\n"
 "Generated-By: Babel 2.11.0\n"
 
 #: ../../index.rst:68
@@ -139,14 +140,13 @@ msgstr ""
 "migrator/en/latest/>`__ 组件允许从各种 XMPP 服务器迁移不同类型的数据"
 
 #: ../../index.rst:25
-#, fuzzy
 msgid ""
 "`Tigase Extras <../../projects/tigase-tigase-extras/en/latest/>`__ AWS "
 "provides you with support for additional features and integrations with "
 "Amazon AWS."
 msgstr ""
-"`Tigase XML Tools <../../projects/tigase-xmltools/en/latest/>`__ 一个为处理 "
-"XML 文档提供支持的库"
+"`Tigase Extras <../../projects/tigase-tigase-extras/en/latest/>`__ "
+"为您提供附加功能支持以及与 Amazon AWS 的集成。"
 
 #: ../../index.rst:28
 msgid "XMPP Clients"
@@ -263,4 +263,3 @@ msgstr ""
 
 #~ msgid "Tigase XMPP Server Distribution Administration Guide"
 #~ msgstr "Tigase XMPP 服务器发行管理指南"
-
