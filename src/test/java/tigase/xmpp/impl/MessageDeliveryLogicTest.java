@@ -21,8 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
-import tigase.server.xmppserver.S2SConnManAbstractTest;
-import tigase.server.xmppserver.S2SConnManTest;
+import tigase.vhosts.DummyVHostManager;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
@@ -52,8 +51,7 @@ public class MessageDeliveryLogicTest
 	public void setUp() throws Exception {
 		super.setUp();
 		messageDeliveryLogic = getInstance(MessageDeliveryLogic.class);
-		final S2SConnManAbstractTest.DummyVHostManager vHostManager = getInstance(
-				S2SConnManAbstractTest.DummyVHostManager.class);
+		var vHostManager = getInstance(DummyVHostManager.class);
 		vHostManager.addVhost(domain);
 	}
 

@@ -32,31 +32,24 @@ import tigase.kernel.core.Kernel;
 import tigase.server.ConnectionManager;
 import tigase.server.Iq;
 import tigase.server.Packet;
-import tigase.server.ServerComponent;
 import tigase.server.xmppserver.proc.AuthenticatorSelectorManager;
 import tigase.server.xmppserver.proc.Dialback;
 import tigase.server.xmppserver.proc.StartTLS;
 import tigase.util.dns.DNSEntry;
 import tigase.util.dns.DNSResolverFactory;
-import tigase.util.stringprep.TigaseStringprepException;
-import tigase.vhosts.VHostItem;
-import tigase.vhosts.VHostItemImpl;
+import tigase.vhosts.DummyVHostManager;
 import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
-import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static tigase.net.IOService.CERT_CHECK_RESULT;
 
@@ -95,7 +88,7 @@ public class S2SConnManAbstractTest
 		kernel.registerBean(DummyDialbackImpl.class).exportable().setActive(true).exec();
 		kernel.registerBean(AuthenticatorSelectorManager.class).exportable().setActive(true).exec();
 		kernel.registerBean("vHostManager")
-				.asClass(S2SConnManTest.DummyVHostManager.class)
+				.asClass(DummyVHostManager.class)
 				.exportable()
 				.setActive(true)
 				.exec();
@@ -132,7 +125,7 @@ public class S2SConnManAbstractTest
 
 	protected static void setupCID(String localHostname, String remoteHostname) {
 		cid = new CID(localHostname, remoteHostname);
-		final S2SConnManTest.DummyVHostManager instance = (S2SConnManTest.DummyVHostManager) kernel.getInstance(
+		final DummyVHostManager instance = (DummyVHostManager) kernel.getInstance(
 				VHostManagerIfc.class);
 		if (instance.getVHostItem(localHostname) == null) {
 			instance.addVhost(localHostname);
@@ -277,89 +270,6 @@ public class S2SConnManAbstractTest
 				serv.getSessionData().put("dialback", "completed");
 			}
 			return super.process(p, serv, results);
-		}
-	}
-
-	/**
-	 * Dummy {@code VHostManagerIfc} implementation, mostly to avoid exceptions in Dialback processor
-	 */
-	public static class DummyVHostManager
-			implements VHostManagerIfc {
-
-		Map<String, VHostItem> items = new ConcurrentHashMap<>();
-
-		public DummyVHostManager() {
-		}
-
-		public void addVhost(String vhost) {
-
-			try {
-				VHostItem item = new VHostItemImpl(vhost);
-				items.put(vhost, item);
-			} catch (TigaseStringprepException e) {
-				log.log(Level.WARNING, "Adding VHost failed", e);
-			}
-		}
-
-		@Override
-		public boolean isLocalDomain(String domain) {
-			return items.containsKey(domain);
-		}
-
-		@Override
-		public boolean isLocalDomainOrComponent(String domain) {
-			return items.containsKey(domain);
-		}
-
-		@Override
-		public boolean isAnonymousEnabled(String domain) {
-			return false;
-		}
-
-		@Override
-		public ServerComponent[] getComponentsForLocalDomain(String domain) {
-			return new ServerComponent[0];
-		}
-
-		@Override
-		public ServerComponent[] getComponentsForNonLocalDomain(String domain) {
-			return new ServerComponent[0];
-		}
-
-		@Override
-		public VHostItem getVHostItem(String domain) {
-			return items.get(domain);
-		}
-
-		@Override
-		public VHostItem getVHostItemDomainOrComponent(String domain) {
-			return items.get(domain);
-		}
-
-		@Override
-		public void addComponentDomain(String domain) {
-
-		}
-
-		@Override
-		public void removeComponentDomain(String domain) {
-
-		}
-
-		@Override
-		public BareJID getDefVHostItem() {
-			return items.values()
-					.stream()
-					.map(VHostItem::getVhost)
-					.map(JID::toString)
-					.map(BareJID::bareJIDInstanceNS)
-					.findFirst()
-					.orElse(BareJID.bareJIDInstanceNS("not@available"));
-		}
-
-		@Override
-		public List<JID> getAllVHosts() {
-			return items.values().stream().map(VHostItem::getVhost).collect(Collectors.toList());
 		}
 	}
 

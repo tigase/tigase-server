@@ -24,9 +24,9 @@ import tigase.kernel.AbstractKernelWithUserRepositoryTestCase;
 import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.PacketWriterWithTimeout;
-import tigase.server.xmppserver.S2SConnManTest;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.stringprep.TigaseStringprepException;
+import tigase.vhosts.DummyVHostManager;
 import tigase.vhosts.VHostItemImpl;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
@@ -63,7 +63,7 @@ public abstract class ProcessorTestCase extends AbstractKernelWithUserRepository
 	protected void registerBeans(Kernel kernel) {
 		super.registerBeans(kernel);
 		kernel.registerBean("vHostManager")
-				.asClass(S2SConnManTest.DummyVHostManager.class)
+				.asClass(DummyVHostManager.class)
 				.exportable()
 				.setActive(true)
 				.exec();
