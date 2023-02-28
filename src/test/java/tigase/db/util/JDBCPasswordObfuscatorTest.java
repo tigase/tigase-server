@@ -28,8 +28,6 @@ public class JDBCPasswordObfuscatorTest {
 		String password = "tigase_password";
 		final String input = "jdbc:mysql://localhost/tigasedb?user=tigasedb&password=" + password + "&useSSL=false";
 		final String obfuscated = JDBCPasswordObfuscator.obfuscatePassword(input);
-		System.out.println(input);
-		System.out.println(obfuscated);
 		Assert.assertEquals("jdbc:mysql://localhost/tigasedb?user=tigasedb&password=***************&useSSL=false", obfuscated);
 	}
 
@@ -38,8 +36,6 @@ public class JDBCPasswordObfuscatorTest {
 		String password = "tigase_password";
 		final String input = "jdbc:mysql://localhost/tigasedb?user=tigasedb&password=" + password;
 		final String obfuscated = JDBCPasswordObfuscator.obfuscatePassword(input);
-		System.out.println(input);
-		System.out.println(obfuscated);
 		Assert.assertEquals("jdbc:mysql://localhost/tigasedb?user=tigasedb&password=***************", obfuscated);
 	}
 

@@ -69,7 +69,7 @@ public class VHostJDBCRepositoryTest {
 		DNSResolverFactory.setDnsResolverClassName(PassThroughDNSResolver.class.getName());
 
 		log = TestLogger.getLogger(VHostJDBCRepositoryTest.class);
-		TestLogger.configureLogger(log, Level.ALL);
+		TestLogger.configureLogger(log, Level.OFF);
 
 		TestLogger.configureLogger(Logger.getLogger("tigase"), Level.OFF);
 

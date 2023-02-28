@@ -56,7 +56,6 @@ public class DSLBeanConfiguratorTest {
 		final StringWriter stringWriter = new StringWriter();
 
 		configurator.dumpConfiguration(stringWriter);
-		System.out.println(stringWriter);
 
 		Assert.assertTrue(stringWriter.toString().contains(plainFieldValue));
 		Assert.assertFalse(stringWriter.toString().contains(jdbcUrlPassword));
