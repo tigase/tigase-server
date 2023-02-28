@@ -25,6 +25,7 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.PacketDefaultHandler;
 import tigase.server.xmppsession.SessionManager;
+import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
@@ -51,6 +52,8 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 	private boolean silentlyIgnoreError = false;
 	@Inject(nullAllowed = true)
 	private SessionManager.MessageArchive messageArchive;
+	@Inject
+	private VHostManagerIfc vHostManager;
 
 	private PacketDefaultHandler packetDefaultHandler = new PacketDefaultHandler();
 
@@ -255,6 +258,36 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 			}
 		} catch (NotAuthorizedException ex) {
 			// should not happen, end even if it happend then we should return false
+		}
+		return false;
+	}
+
+	public boolean preProcessFilter(Packet packet, XMPPResourceConnection session) {
+		final StanzaType type = packet.getType();
+		// only handle messages within local domains; errors to external domains and components (i.e. mix, pubsub) will be delivered
+		if (type == StanzaType.error && vHostManager.isLocalDomain(packet.getStanzaTo().getDomain())) {
+			if (packet.getStanzaTo().getResource() == null) {
+				// 1) https://xmpp.org/rfcs/rfc6121.html#rules-localpart-barejid
+				//* 8.5.2.1.  Available or Connected Resources > 8.5.2.1.1.  Message
+				//> For a message stanza of type "error", the server MUST silently ignore the message.
+				//
+				//* 8.5.2.2.  No Available or Connected Resources > 8.5.2.2.1.  Message
+				//> For a message stanza of type "headline" or "error", the server MUST silently ignore the message.
+				//
+				return true;
+			} else {
+				//
+				//* 8.5.3.2.  No Resource Matches > 8.5.3.2.1.  Message
+				//> For a message stanza of type "error", the server MUST silently ignore the stanza.
+				if (session != null && session.getjid() != null && session.getjid().equals(packet.getStanzaTo())) {
+					// 2) https://xmpp.org/rfcs/rfc6121.html#rules-localpart-fulljid
+					//* 8.5.3.1.  Resource Matches
+					//> For a message stanza, the server MUST deliver the stanza to the resource.
+					return false;
+				} else {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
