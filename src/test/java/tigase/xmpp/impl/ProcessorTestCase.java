@@ -21,8 +21,10 @@ import org.junit.After;
 import org.junit.Before;
 import tigase.TestLogger;
 import tigase.kernel.AbstractKernelWithUserRepositoryTestCase;
+import tigase.kernel.core.Kernel;
 import tigase.server.Packet;
 import tigase.server.PacketWriterWithTimeout;
+import tigase.server.xmppserver.S2SConnManTest;
 import tigase.server.xmppsession.SessionManagerHandler;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.vhosts.VHostItemImpl;
@@ -55,6 +57,16 @@ public abstract class ProcessorTestCase extends AbstractKernelWithUserRepository
 	@Before
 	public void setSessionManager() throws Exception {
 		loginHandler = new SessionManagerHandlerImpl();
+	}
+
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean("vHostManager")
+				.asClass(S2SConnManTest.DummyVHostManager.class)
+				.exportable()
+				.setActive(true)
+				.exec();
 	}
 
 	@After

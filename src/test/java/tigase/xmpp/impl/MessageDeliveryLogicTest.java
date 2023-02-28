@@ -45,11 +45,6 @@ public class MessageDeliveryLogicTest
 	protected void registerBeans(Kernel kernel) {
 		super.registerBeans(kernel);
 		kernel.registerBean(MessageDeliveryLogic.class).exec();
-		kernel.registerBean("vHostManager")
-				.asClass(S2SConnManTest.DummyVHostManager.class)
-				.exportable()
-				.setActive(true)
-				.exec();
 	}
 
 	@Before
