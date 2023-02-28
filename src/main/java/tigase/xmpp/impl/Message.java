@@ -74,6 +74,9 @@ public class Message
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
 							  Queue<Packet> results, Map<String, Object> settings) {
 		boolean result = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings, messageDeliveryLogic);
+		if (messageDeliveryLogic.preProcessFilter(packet, session)) {
+			return true;
+		}
 		if (result) {
 			packet.processedBy(id());
 		}

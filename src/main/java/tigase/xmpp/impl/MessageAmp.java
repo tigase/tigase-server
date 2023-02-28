@@ -157,6 +157,9 @@ public class MessageAmp
 							  Queue<Packet> results, Map<String, Object> settings) {
 		boolean processed = C2SDeliveryErrorProcessor.preProcess(packet, session, repo, results, settings,
 																 messageProcessor);
+		if (messageProcessor.preProcessFilter(packet, session)) {
+			return true;
+		}
 		if (processed && packet.getPacketFrom() != null &&
 				packet.getPacketFrom().getLocalpart().equals(ampJID.getLocalpart())) {
 			processed = false;
