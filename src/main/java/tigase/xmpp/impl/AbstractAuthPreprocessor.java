@@ -17,11 +17,14 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.auth.BruteForceLockerBean;
 import tigase.db.NonAuthUserRepository;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.xmpp.*;
+import tigase.xmpp.jid.BareJID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +47,9 @@ public abstract class AbstractAuthPreprocessor
 
 	private static final String[] AUTH_ONLY_ELEMS = {"message", "presence"};
 
+	@Inject(nullAllowed = true)
+	protected BruteForceLockerBean bruteForceLocker;
+
 	@ConfigField(desc = "Matchers selecting allowed packets for unauthorized session", alias = "allow-unauthorized")
 	private ElementMatcher[] allowMatchers = new ElementMatcher[]{
 			new ElementMatcher(new String[0], "urn:ietf:params:xml:ns:xmpp-tls", true),
@@ -53,6 +59,14 @@ public abstract class AbstractAuthPreprocessor
 			new ElementMatcher(Iq.IQ_QUERY_PATH, JabberIqRegister.ID, true),
 			new ElementMatcher(Iq.IQ_QUERY_PATH, JabberIqAuth.ID, true)
 	};
+
+	protected boolean isBruteForceLockerEnabled(XMPPResourceConnection session) {
+		return bruteForceLocker != null && bruteForceLocker.isEnabled(session);
+	}
+
+	protected boolean isLoginAllowedByBruteForceLocker(XMPPResourceConnection session, String clientIp, BareJID jid) {
+		return isBruteForceLockerEnabled(session) && !bruteForceLocker.isLoginAllowed(session, clientIp, jid);
+	}
 
 	@Override
 	public boolean preProcess(Packet packet, XMPPResourceConnection session, NonAuthUserRepository repo,
@@ -147,6 +161,11 @@ public abstract class AbstractAuthPreprocessor
 			}
 		}
 		return false;
+	}
+
+	public void setBruteForceLocker(BruteForceLockerBean bruteForceLocker) {
+		log.log(Level.CONFIG, bruteForceLocker != null ? "BruteForceLocker enabled" : "BruteForceLocker disabled" );
+		this.bruteForceLocker = bruteForceLocker;
 	}
 
 }
