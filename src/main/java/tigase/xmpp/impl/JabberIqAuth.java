@@ -65,19 +65,12 @@ public class JabberIqAuth
 	private static final Element[] FEATURES = {
 			new Element("auth", new String[]{"xmlns"}, new String[]{"http://jabber.org/features/iq-auth"})};
 	private static final Element[] DISCO_FEATURES = {new Element("feature", new String[]{"var"}, new String[]{XMLNS})};
-	@Inject(nullAllowed = true)
-	private BruteForceLockerBean bruteForceLocker;
 	@Inject
 	private TigaseSaslProvider saslProvider;
 
 	@Override
 	public String id() {
 		return ID;
-	}
-
-	public void setBruteForceLocker(BruteForceLockerBean bruteForceLocker) {
-		log.log(Level.CONFIG, bruteForceLocker != null ? "BruteForceLocker enabled" : "BruteForceLocker disabled" );
-		this.bruteForceLocker = bruteForceLocker;
 	}
 
 	@Override
@@ -294,7 +287,7 @@ public class JabberIqAuth
 			try {
 				cbh.handle(new Callback[]{vpc});
 				if (vpc.isVerified()) {
-					if (bruteForceLocker != null && !bruteForceLocker.isLoginAllowed(session, clientIp, user_id)) {
+					if (isLoginAllowedByBruteForceLocker(session, clientIp, user_id)) {
 						bruteForceLocker.addInvalidLogin(session, clientIp, user_id);
 						return Authorization.NOT_AUTHORIZED;
 					}
@@ -309,7 +302,7 @@ public class JabberIqAuth
 				char[] p = pc.getPassword();
 
 				if ((p != null) && password.equals(new String(p))) {
-					if (bruteForceLocker != null && !bruteForceLocker.isLoginAllowed(session, clientIp, user_id)) {
+					if (isLoginAllowedByBruteForceLocker(session, clientIp, user_id)) {
 						bruteForceLocker.addInvalidLogin(session, clientIp, user_id);
 						return Authorization.NOT_AUTHORIZED;
 					}

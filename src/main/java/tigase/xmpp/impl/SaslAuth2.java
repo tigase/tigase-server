@@ -17,19 +17,17 @@
  */
 package tigase.xmpp.impl;
 
-import tigase.auth.*;
+import tigase.auth.BruteForceLockerBean;
+import tigase.auth.XmppSaslException;
 import tigase.auth.mechanisms.AbstractSasl;
 import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslANONYMOUS;
 import tigase.auth.mechanisms.SaslSCRAMPlus;
-import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
-import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.Packet;
-import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.Base64;
 import tigase.xml.Element;
@@ -42,20 +40,19 @@ import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+
+import static tigase.auth.XmppSaslException.*;
 
 @Bean(name = SaslAuth2.ID, parent = SessionManager.class, active = false)
-public class SaslAuth2 extends AbstractAuthPreprocessor
+public class SaslAuth2 extends SaslAuthAbstract
 		implements XMPPProcessorIfc {
 
 	public static final String ID = "urn:xmpp:sasl:2";
 	private static final Logger log = Logger.getLogger(SaslAuth2.class.getName());
 	private static final String XMLNS = "urn:xmpp:sasl:2";
 
-	protected final static String ALLOWED_SASL_MECHANISMS_KEY = "allowed-sasl-mechanisms";
 	protected final static String USER_AGENT_KEY = "user-agent-key";
 	protected final static String SASL_FEATURES_KEY = "sasl-features-key";
 
@@ -63,69 +60,18 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 	private static final String[][] ELEMENTS = {{"authenticate"}, {"response"}, {"challenge"}, {"failure"}, {"success"},
 												{"continue"}, {"next"}, {"data"}, {"upgrade"}, {"parameters"}, {"hash"},
 												{"abort"}};
-	private final static String SASL_SERVER_KEY = "SASL_SERVER_KEY";
 	private static final String[] XMLNSS = {XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS, XMLNS,
 											XMLNS};
-
-	public enum ElementType {
-		ABORT,
-		AUTHENTICATE,
-		CHALLENGE,
-		FAILURE,
-		RESPONSE,
-		SUCCESS,
-		CONTINUE,
-		NEXT,
-		DATA,
-		UPGRADE,
-		PARAMETERS,
-		HASH;
-
-		private static Map<String, ElementType> ALL_TYPES = Arrays.stream(ElementType.values())
-				.collect(Collectors.toMap(ElementType::getElementName, Function.identity()));
-
-		public static ElementType parse(String name) {
-			return ALL_TYPES.get(name);
-		}
-		private final String elementName;
-
-		ElementType() {
-			this.elementName = name().toLowerCase();
-		}
-
-		public String getElementName() {
-			return elementName;
-		}
-
-	}
-
-	@Inject(nullAllowed = true)
-	private BruteForceLockerBean bruteForceLocker;
-
-	@Inject
-	private TigaseSaslProvider saslProvider;
 
 	@Inject(nullAllowed = true)
 	private SessionManager sessionManager;
 
 	@Inject
 	private List<Inline> inlines;
-	
-	private final Map<String, Object> props = new HashMap<String, Object>();
-	
-	@Override
-	public int concurrentQueuesNo() {
-		return super.concurrentQueuesNo() * 4;
-	}
-	
+
 	@Override
 	public String id() {
 		return ID;
-	}
-
-	public void setBruteForceLocker(BruteForceLockerBean bruteForceLocker) {
-		log.log(Level.CONFIG, bruteForceLocker != null ? "BruteForceLocker enabled" : "BruteForceLocker disabled" );
-		this.bruteForceLocker = bruteForceLocker;
 	}
 
 	@Override
@@ -151,7 +97,7 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 		if (inlines == null) {
 			inlines = Collections.emptyList();
 		}
-		List<Inline> smInlines = inlines.stream().filter(it -> it instanceof StreamManagementInline).collect(Collectors.toList());
+		List<Inline> smInlines = inlines.stream().filter(it -> it instanceof StreamManagementInline).toList();
 		if (!smInlines.isEmpty()) {
 			inlines.removeAll(smInlines);
 			inlines.addAll(0, smInlines);
@@ -213,40 +159,14 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 			}
 			final String clientIp = BruteForceLockerBean.getClientIp(session);
 			if (session.isAuthorized()) {
-
-				// Multiple authentication attempts....
-				// Another authentication request on already authenticated
-				// connection
-				// This is not allowed and must be forbidden.
-				Packet res = createSaslErrorResponse(null, null, packet);
-
-				// Make sure it gets delivered before stream close
-				res.setPriority(Priority.SYSTEM);
-				results.offer(res);
-
-				// Optionally close the connection to make sure there is no
-				// confusion about the connection state.
-				results.offer(Command.CLOSE.getPacket(packet.getTo(), packet.getFrom(), StanzaType.set,
-													  session.nextStanzaId()));
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Discovered second authentication attempt: {0}, packet: {1}",
-							new Object[]{session.toString(), packet.toString()});
-				}
-				try {
-					session.logout();
-				} catch (NotAuthorizedException ex) {
-					log.log(Level.FINER, "Unsuccessful session logout: {0}", session.toString());
-				}
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Session after logout: {0}", session.toString());
-				}
+				processSessionAlreadyAuthorized(packet, session, results);
 				return;
 			} else {
 				try {
 					ElementType action = ElementType.parse(packet.getElemName());
 					if (action == null) {
-						throw new XmppSaslException(XmppSaslException.SaslError.malformed_request,
-													"Unrecognized element " + action.getElementName());
+						throw new XmppSaslException(SaslError.malformed_request,
+						                            "Unrecognized element " + action.getElementName());
 					}
 
 					SaslServer ss;
@@ -270,8 +190,8 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 
 							if ((mechanismName == null) || allowedMechanisms == null ||
 									!allowedMechanisms.contains(mechanismName)) {
-								throw new XmppSaslException(XmppSaslException.SaslError.invalid_mechanism,
-															"Mechanism '" + mechanismName + "' is not allowed");
+								throw new XmppSaslException(SaslError.invalid_mechanism,
+								                            "Mechanism '" + mechanismName + "' is not allowed");
 							}
 
 							CallbackHandler cbh = saslProvider.create(mechanismName, session, repo, settings);
@@ -279,8 +199,8 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 							ss = Sasl.createSaslServer(mechanismName, "xmpp", session.getDomain().getVhost().getDomain(),
 													   props, cbh);
 							if (ss == null) {
-								throw new XmppSaslException(XmppSaslException.SaslError.invalid_mechanism,
-															"Mechanism '" + mechanismName + "' is not allowed");
+								throw new XmppSaslException(SaslError.invalid_mechanism,
+								                            "Mechanism '" + mechanismName + "' is not allowed");
 							}
 							session.putSessionData(SASL_SERVER_KEY, ss);
 
@@ -302,7 +222,7 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 						case RESPONSE:
 							ss = (SaslServer) session.getSessionData(SASL_SERVER_KEY);
 							if (ss == null) {
-								throw new XmppSaslException(XmppSaslException.SaslError.malformed_request);
+								throw new XmppSaslException(SaslError.malformed_request);
 							}
 							String cdata = packet.getElement().getCData();
 							if (cdata != null && !cdata.equals("=")) {
@@ -310,8 +230,8 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 							}
 							break;
 						default:
-							throw new XmppSaslException(XmppSaslException.SaslError.malformed_request,
-														"Unrecognized element " + action.getElementName());
+							throw new XmppSaslException(SaslError.malformed_request,
+							                            "Unrecognized element " + action.getElementName());
 					}
 
 					byte[] challenge = ss.evaluateResponse(data);
@@ -332,8 +252,7 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 														  session.getDomain().getVhost().getDomain());
 						}
 
-						if (bruteForceLocker != null && bruteForceLocker.isEnabled(session) &&
-								!bruteForceLocker.isLoginAllowed(session, clientIp, jid)) {
+						if (isLoginAllowedByBruteForceLocker(session, clientIp, jid)) {
 							throw new BruteForceLockerBean.LoginLockedException();
 						}
 
@@ -356,67 +275,18 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 							session.getAuthRepository().loggedIn(jid);
 						}
 
-						Element success = new Element("success");
-						success.setXMLNS(XMLNS);
-						if (challengeData != null) {
-							success.addChild(new Element("additional-data", challengeData));
-						}
-
-						CompletableFuture<Inline.Result> result = CompletableFuture.completedFuture(new Inline.Result(null, true));
-
-						List<Element> children = (List<Element>) session.getSessionData(SASL_FEATURES_KEY);
-						if (children != null && !children.isEmpty()) {
-							for (Element child : children) {
-								for (Inline inline : inlines) {
-									if (inline.canHandle(session, child)) {
-										result = result.thenCompose(r -> {
-											if (r.element != null) {
-												success.addChild(r.element);
-											}
-											if (r.shouldContinue) {
-												return inline.process(session, child);
-											} else {
-												return CompletableFuture.completedFuture(new Inline.Result(null, false));
-											}
-										});
-									}
-								}
-							}
-						}
-						result.thenCompose(x -> {
-							if (x.element != null) {
-								success.addChild(x.element);
-							}
-							try {
-								success.addChild(new Element("authorization-identifier", session.getJID().toString()));
-								return CompletableFuture.completedFuture(packet.swapFromTo(success, null, null));
-							} catch (NotAuthorizedException ex) {
-								return CompletableFuture.failedFuture(ex);
-							}
-						}).thenAccept(resultPacket -> {
-							sessionManager.addOutPacket(resultPacket);
-							// we need to send new stream features, so lets request them from SM and send result directly to C2S
-							Packet getFeaturesCmd = Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(), StanzaType.get,
-																				  UUID.randomUUID().toString(), null);
-							getFeaturesCmd.setPacketFrom(packet.getPacketFrom());
-							getFeaturesCmd.setPacketTo(packet.getPacketTo());
-							sessionManager.addOutPacket(getFeaturesCmd);
-						}).exceptionally(ex -> {
-							sessionManager.addOutPacket(createSaslErrorResponse(
-									XmppSaslException.SaslError.not_authorized, ex.getMessage(), packet));
-							return (Void) null;
-						});
+						processSuccess(packet, session, challengeData, results);
 					} else if (!ss.isComplete()) {
 						results.offer(packet.swapFromTo(createReply(ElementType.CHALLENGE, challengeData), null, null));
 					} else {
-						throw new XmppSaslException(XmppSaslException.SaslError.malformed_request);
+						throw new XmppSaslException(SaslError.malformed_request);
 					}
 				} catch (BruteForceLockerBean.LoginLockedException e) {
 					onAuthFail(session);
 					if (log.isLoggable(Level.FINER)) {
 						log.log(Level.FINER, "Account locked by BruteForceLocker.");
 					}
-					results.offer(createSaslErrorResponse(XmppSaslException.SaslError.not_authorized, AbstractSasl.PASSWORD_NOT_VERIFIED_MSG, packet));
+					results.offer(createSaslErrorResponse(SaslError.not_authorized, AbstractSasl.PASSWORD_NOT_VERIFIED_MSG, packet));
 				} catch (XmppSaslException e) {
 					saveIntoBruteForceLocker(session, e);
 					onAuthFail(session);
@@ -430,101 +300,75 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 					if (log.isLoggable(Level.FINER)) {
 						log.log(Level.FINER, "SASL unsuccessful", e);
 					}
-					results.offer(createSaslErrorResponse(XmppSaslException.SaslError.not_authorized, null, packet));
+					results.offer(createSaslErrorResponse(SaslError.not_authorized, null, packet));
 				} catch (Exception e) {
 					onAuthFail(session);
 					if (log.isLoggable(Level.WARNING)) {
 						log.log(Level.WARNING, "Problem with SASL", e);
 					}
-					results.offer(createSaslErrorResponse(XmppSaslException.SaslError.temporary_auth_failure, null, packet));
+					results.offer(createSaslErrorResponse(SaslError.temporary_auth_failure, null, packet));
 				}
 			}
 		}
 	}
 
-	protected void onAuthFail(final XMPPResourceConnection session) {
-		session.removeSessionData(SASL_SERVER_KEY);
-	}
-
-	private Element createReply(final SaslAuth2.ElementType type, final String cdata) {
-		Element reply = new Element(type.getElementName());
-
-		reply.setXMLNS(XMLNS);
-		if (cdata != null) {
-			reply.setCData(cdata);
+	@Override
+	protected void processSuccess(Packet packet, XMPPResourceConnection session, String challengeData,
+	                              Queue<Packet> results) {
+		Element success = new Element("success");
+		success.setXMLNS(XMLNS);
+		if (challengeData != null) {
+			success.addChild(new Element("additional-data", challengeData));
 		}
 
-		return reply;
-	}
+		CompletableFuture<Inline.Result> result = CompletableFuture.completedFuture(new Inline.Result(null, true));
 
-	private void disableUser(final XMPPResourceConnection session, final BareJID userJID) {
-		try {
-			AuthRepository.AccountStatus status = session.getAuthRepository().getAccountStatus(userJID);
-			if (status == AuthRepository.AccountStatus.active) {
-				log.log(Level.CONFIG, "Disabling user " + userJID);
-				session.getAuthRepository().setAccountStatus(userJID, AuthRepository.AccountStatus.disabled);
+		List<Element> children = (List<Element>) session.getSessionData(SASL_FEATURES_KEY);
+		if (children != null && !children.isEmpty()) {
+			for (Element child : children) {
+				for (Inline inline : inlines) {
+					if (inline.canHandle(session, child)) {
+						result = result.thenCompose(r -> {
+							if (r.element != null) {
+								success.addChild(r.element);
+							}
+							if (r.shouldContinue) {
+								return inline.process(session, child);
+							} else {
+								return CompletableFuture.completedFuture(new Inline.Result(null, false));
+							}
+						});
+					}
+				}
 			}
-		} catch (TigaseDBException e) {
-			log.log(Level.WARNING, "Cannot check status or disable user!", e);
 		}
-	}
-
-	/**
-	 * Tries to extract BareJID of user who try to log in.
-	 */
-	private BareJID extractUserJid(final Exception e, XMPPResourceConnection session) {
-		BareJID jid = null;
-
-		if (e instanceof SaslInvalidLoginExcepion) {
-			String t = ((SaslInvalidLoginExcepion) e).getJid();
-			jid = t == null ? null : BareJID.bareJIDInstanceNS(t);
-		}
-
-		if (jid != null) {
-			jid = (BareJID) session.getSessionData(CallbackHandlerFactory.AUTH_JID);
-		}
-
-		return jid;
-	}
-
-	private void saveIntoBruteForceLocker(final XMPPResourceConnection session, final Exception e) {
-		try {
-			if (bruteForceLocker != null && bruteForceLocker.isEnabled(session)) {
-				final String clientIp = BruteForceLockerBean.getClientIp(session);
-				final BareJID userJid = extractUserJid(e, session);
-
-				if (clientIp == null && log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "There is no client IP. Cannot add entry to BruteForceLocker.");
-				}
-				if (userJid == null && log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "There is no user JID. Cannot add entry to BruteForceLocker.");
-				}
-
-				if (userJid != null && clientIp != null) {
-					bruteForceLocker.addInvalidLogin(session, clientIp, userJid);
-				}
-
-				if (bruteForceLocker.canUserBeDisabled(session, clientIp, userJid)) {
-					disableUser(session, userJid);
-				}
-
+		result.thenCompose(x -> {
+			if (x.element != null) {
+				success.addChild(x.element);
 			}
-		} catch (Throwable caught) {
-			log.log(Level.WARNING, "Cannot update BruteForceLocker", caught);
-		}
+			try {
+				success.addChild(new Element("authorization-identifier", session.getJID().toString()));
+				return CompletableFuture.completedFuture(packet.swapFromTo(success, null, null));
+			} catch (NotAuthorizedException ex) {
+				return CompletableFuture.failedFuture(ex);
+			}
+		}).thenAccept(resultPacket -> {
+			sessionManager.addOutPacket(resultPacket);
+			// we need to send new stream features, so lets request them from SM and send result directly to C2S
+			Packet getFeaturesCmd = Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(), StanzaType.get,
+			                                                      UUID.randomUUID().toString(), null);
+			getFeaturesCmd.setPacketFrom(packet.getPacketFrom());
+			getFeaturesCmd.setPacketTo(packet.getPacketTo());
+			sessionManager.addOutPacket(getFeaturesCmd);
+		}).exceptionally(ex -> {
+			sessionManager.addOutPacket(createSaslErrorResponse(
+					SaslError.not_authorized, ex.getMessage(), packet));
+			return (Void) null;
+		});
 	}
 
-	private Packet createSaslErrorResponse(XmppSaslException.SaslError error, String message, Packet packet) {
-		Element failure = new Element(ElementType.FAILURE.getElementName());
-		failure.setXMLNS(XMLNS);
-		failure.addChild((error == null ? XmppSaslException.SaslError.not_authorized : error).getElement());
-		if (message != null) {
-			failure.addChild(new Element("text", message, new String[]{"xml:lang"}, new String[]{"en"}));
-		}
-
-		Packet response = packet.swapFromTo(failure, null, null);
-		response.setPriority(Priority.SYSTEM);
-		return response;
+	protected String getXmlns() {
+		return XMLNS;
 	}
 
 	private UserAgent parseUserAgent(Packet packet) {
