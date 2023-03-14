@@ -96,12 +96,12 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 		public String getElementName() {
 			return elementName;
 		}
-		
+
 	}
 
-	@Inject
+	@Inject(nullAllowed = true)
 	private BruteForceLockerBean bruteForceLocker;
-	
+
 	@Inject
 	private TigaseSaslProvider saslProvider;
 
@@ -121,6 +121,11 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	public void setBruteForceLocker(BruteForceLockerBean bruteForceLocker) {
+		log.log(Level.CONFIG, bruteForceLocker != null ? "BruteForceLocker enabled" : "BruteForceLocker disabled" );
+		this.bruteForceLocker = bruteForceLocker;
 	}
 
 	@Override
@@ -308,7 +313,7 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 							throw new XmppSaslException(XmppSaslException.SaslError.malformed_request,
 														"Unrecognized element " + action.getElementName());
 					}
-					
+
 					byte[] challenge = ss.evaluateResponse(data);
 					String challengeData;
 
@@ -327,7 +332,7 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 														  session.getDomain().getVhost().getDomain());
 						}
 
-						if (bruteForceLocker.isEnabled(session) &&
+						if (bruteForceLocker != null && bruteForceLocker.isEnabled(session) &&
 								!bruteForceLocker.isLoginAllowed(session, clientIp, jid)) {
 							throw new BruteForceLockerBean.LoginLockedException();
 						}
@@ -356,7 +361,7 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 						if (challengeData != null) {
 							success.addChild(new Element("additional-data", challengeData));
 						}
-						
+
 						CompletableFuture<Inline.Result> result = CompletableFuture.completedFuture(new Inline.Result(null, true));
 
 						List<Element> children = (List<Element>) session.getSessionData(SASL_FEATURES_KEY);
@@ -484,7 +489,7 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 
 	private void saveIntoBruteForceLocker(final XMPPResourceConnection session, final Exception e) {
 		try {
-			if (bruteForceLocker.isEnabled(session)) {
+			if (bruteForceLocker != null && bruteForceLocker.isEnabled(session)) {
 				final String clientIp = BruteForceLockerBean.getClientIp(session);
 				final BareJID userJid = extractUserJid(e, session);
 
@@ -541,11 +546,11 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 			sasl2,
 			bind2
 		}
-		
+
 		boolean canHandle(XMPPResourceConnection connection, Element el);
 
 		Element[] supStreamFeatures(Inline.Action action);
-		
+
 		CompletableFuture<Result> process(XMPPResourceConnection session, Element action);
 
 		public static class Result {
@@ -557,7 +562,7 @@ public class SaslAuth2 extends AbstractAuthPreprocessor
 				this.shouldContinue = shouldContinue;
 			}
 		}
-		
+
 	}
 
 	public static class UserAgent {

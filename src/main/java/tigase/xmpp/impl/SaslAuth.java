@@ -80,7 +80,7 @@ public class SaslAuth
 	}
 
 	private final Map<String, Object> props = new HashMap<String, Object>();
-	@Inject
+	@Inject(nullAllowed = true)
 	private BruteForceLockerBean bruteForceLocker;
 	@Inject
 	private TigaseSaslProvider saslProvider;
@@ -93,6 +93,11 @@ public class SaslAuth
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	public void setBruteForceLocker(BruteForceLockerBean bruteForceLocker) {
+		log.log(Level.CONFIG, bruteForceLocker != null ? "BruteForceLocker enabled" : "BruteForceLocker disabled" );
+		this.bruteForceLocker = bruteForceLocker;
 	}
 
 	@Override
@@ -211,7 +216,7 @@ public class SaslAuth
 														  session.getDomain().getVhost().getDomain());
 						}
 
-						if (bruteForceLocker.isEnabled(session) &&
+						if (bruteForceLocker != null && bruteForceLocker.isEnabled(session) &&
 								!bruteForceLocker.isLoginAllowed(session, clientIp, jid)) {
 							throw new BruteForceLockerBean.LoginLockedException();
 						}
@@ -363,7 +368,7 @@ public class SaslAuth
 
 	private void saveIntoBruteForceLocker(final XMPPResourceConnection session, final Exception e) {
 		try {
-			if (bruteForceLocker.isEnabled(session)) {
+			if (bruteForceLocker != null && bruteForceLocker.isEnabled(session)) {
 				final String clientIp = BruteForceLockerBean.getClientIp(session);
 				final BareJID userJid = extractUserJid(e, session);
 
