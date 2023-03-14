@@ -56,3 +56,14 @@ Permanent ban
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 In modes ``Jid`` and ``IpJid``, when invalid login counter reach threshold ``brute-force-disable-after-fails``, account status will be set o ``disabled``. To enable it again you should use `Re-Enable User <https://xmpp.org/extensions/xep-0133.html#reenable-users>`__ Ad-hoc Command.
+
+Disabling Brute Force protection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to disable Brute-Force detection you should deactivate ``BruteForceLockerBean``:
+
+::
+
+   'sess-man' () {
+       'brute-force-locker' (active: false) {}
+   }
