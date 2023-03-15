@@ -40,8 +40,10 @@ import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static tigase.auth.XmppSaslException.*;
 
@@ -68,6 +70,37 @@ public class SaslAuth2 extends SaslAuthAbstract
 
 	@Inject
 	private List<Inline> inlines;
+
+	public enum ElementType {
+		ABORT,
+		AUTHENTICATE,
+		CHALLENGE,
+		FAILURE,
+		RESPONSE,
+		SUCCESS,
+		CONTINUE,
+		NEXT,
+		DATA,
+		UPGRADE,
+		PARAMETERS,
+		HASH;
+
+		private static final Map<String, ElementType> ALL_TYPES = Arrays.stream(ElementType.values())
+				.collect(Collectors.toMap(ElementType::getElementName, Function.identity()));
+		private final String elementName;
+
+		public static ElementType parse(String name) {
+			return ALL_TYPES.get(name);
+		}
+
+		ElementType() {
+			this.elementName = name().toLowerCase();
+		}
+
+		public String getElementName() {
+			return elementName;
+		}
+	}
 
 	@Override
 	public String id() {
@@ -431,6 +464,17 @@ public class SaslAuth2 extends SaslAuthAbstract
 		public String getDevice() {
 			return device;
 		}
+	}
+
+	protected Element createReply(final ElementType type, final String cdata) {
+		Element reply = new Element(type.getElementName());
+
+		reply.setXMLNS(getXmlns());
+		if (cdata != null) {
+			reply.setCData(cdata);
+		}
+
+		return reply;
 	}
 
 }

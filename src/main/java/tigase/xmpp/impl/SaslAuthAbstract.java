@@ -19,8 +19,6 @@
 package tigase.xmpp.impl;
 
 import tigase.auth.*;
-import tigase.db.AuthRepository;
-import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.Packet;
@@ -46,40 +44,11 @@ abstract public class SaslAuthAbstract
 		implements XMPPProcessorIfc {
 
 	protected final static String SASL_SERVER_KEY = "SASL_SERVER_KEY";
+	private static final String SASL_SUCCESS_ELEMENT_NAME = "success";
+	private static final String SASL_FAILURE_ELEMENT_NAME = "failure";
 	protected final static String ALLOWED_SASL_MECHANISMS_KEY = "allowed-sasl-mechanisms";
 
 	private static final Logger log = Logger.getLogger(SaslAuthAbstract.class.getName());
-
-	public enum ElementType {
-		ABORT,
-		AUTHENTICATE,
-		CHALLENGE,
-		FAILURE,
-		RESPONSE,
-		SUCCESS,
-		CONTINUE,
-		NEXT,
-		DATA,
-		UPGRADE,
-		PARAMETERS,
-		HASH;
-
-		private static final Map<String, ElementType> ALL_TYPES = Arrays.stream(ElementType.values())
-				.collect(Collectors.toMap(ElementType::getElementName, Function.identity()));
-		private final String elementName;
-
-		public static ElementType parse(String name) {
-			return ALL_TYPES.get(name);
-		}
-
-		ElementType() {
-			this.elementName = name().toLowerCase();
-		}
-
-		public String getElementName() {
-			return elementName;
-		}
-	}
 
 	protected final Map<String, Object> props = new HashMap<>();
 	@Inject
@@ -90,19 +59,8 @@ abstract public class SaslAuthAbstract
 		return super.concurrentQueuesNo() * 4;
 	}
 
-	protected Element createReply(final SaslAuth2.ElementType type, final String cdata) {
-		Element reply = new Element(type.getElementName());
-
-		reply.setXMLNS(getXmlns());
-		if (cdata != null) {
-			reply.setCData(cdata);
-		}
-
-		return reply;
-	}
-
 	protected Packet createSaslErrorResponse(XmppSaslException.SaslError error, String message, Packet packet) {
-		Element failure = new Element(ElementType.FAILURE.getElementName());
+		Element failure = new Element(SASL_FAILURE_ELEMENT_NAME);
 		failure.setXMLNS(getXmlns());
 		failure.addChild((error == null ? XmppSaslException.SaslError.not_authorized : error).getElement());
 		if (message != null) {
@@ -114,21 +72,10 @@ abstract public class SaslAuthAbstract
 		return response;
 	}
 
-	protected void disableUser(final XMPPResourceConnection session, final BareJID userJID) {
-		try {
-			AuthRepository.AccountStatus status = session.getAuthRepository().getAccountStatus(userJID);
-			if (status == AuthRepository.AccountStatus.active) {
-				log.log(Level.CONFIG, "Disabling user " + userJID);
-				session.getAuthRepository().setAccountStatus(userJID, AuthRepository.AccountStatus.disabled);
-			}
-		} catch (TigaseDBException e) {
-			log.log(Level.WARNING, "Cannot check status or disable user!", e);
-		}
-	}
-
 	/**
 	 * Tries to extract BareJID of user who try to log in.
 	 */
+	@Override
 	protected BareJID extractUserJid(final Exception e, XMPPResourceConnection session) {
 		BareJID jid = null;
 
@@ -138,7 +85,7 @@ abstract public class SaslAuthAbstract
 		}
 
 		if (jid != null) {
-			jid = (BareJID) session.getSessionData(CallbackHandlerFactory.AUTH_JID);
+			jid = super.extractUserJid(e, session);
 		}
 
 		return jid;
@@ -182,30 +129,4 @@ abstract public class SaslAuthAbstract
 	protected abstract void processSuccess(Packet packet, XMPPResourceConnection session, String challengeData,
 	                                       Queue<Packet> results);
 
-	protected void saveIntoBruteForceLocker(final XMPPResourceConnection session, final Exception e) {
-		try {
-			if (isBruteForceLockerEnabled(session)) {
-				final String clientIp = BruteForceLockerBean.getClientIp(session);
-				final BareJID userJid = extractUserJid(e, session);
-
-				if (clientIp == null && log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "There is no client IP. Cannot add entry to BruteForceLocker.");
-				}
-				if (userJid == null && log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "There is no user JID. Cannot add entry to BruteForceLocker.");
-				}
-
-				if (userJid != null && clientIp != null) {
-					bruteForceLocker.addInvalidLogin(session, clientIp, userJid);
-				}
-
-				if (bruteForceLocker.canUserBeDisabled(session, clientIp, userJid)) {
-					disableUser(session, userJid);
-				}
-
-			}
-		} catch (Throwable caught) {
-			log.log(Level.WARNING, "Cannot update BruteForceLocker", caught);
-		}
-	}
 }
