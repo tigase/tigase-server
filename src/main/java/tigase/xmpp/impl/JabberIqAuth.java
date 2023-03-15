@@ -288,7 +288,7 @@ public class JabberIqAuth
 				cbh.handle(new Callback[]{vpc});
 				if (vpc.isVerified()) {
 					if (isLoginAllowedByBruteForceLocker(session, clientIp, user_id)) {
-						bruteForceLocker.addInvalidLogin(session, clientIp, user_id);
+						addInvalidLogin(session, clientIp, user_id);
 						return Authorization.NOT_AUTHORIZED;
 					}
 					session.authorizeJID(user_id, false);
@@ -303,7 +303,7 @@ public class JabberIqAuth
 
 				if ((p != null) && password.equals(new String(p))) {
 					if (isLoginAllowedByBruteForceLocker(session, clientIp, user_id)) {
-						bruteForceLocker.addInvalidLogin(session, clientIp, user_id);
+						addInvalidLogin(session, clientIp, user_id);
 						return Authorization.NOT_AUTHORIZED;
 					}
 					session.authorizeJID(user_id, false);
@@ -311,8 +311,8 @@ public class JabberIqAuth
 				}
 			}
 
-			if (bruteForceLocker !=null) {
-				bruteForceLocker.addInvalidLogin(session, clientIp, user_id);
+			if (isBruteForceLockerEnabled(session)) {
+				addInvalidLogin(session, clientIp, user_id);
 			}
 
 			return Authorization.NOT_AUTHORIZED;

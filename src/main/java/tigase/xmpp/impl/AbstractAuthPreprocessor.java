@@ -18,7 +18,11 @@
 package tigase.xmpp.impl;
 
 import tigase.auth.BruteForceLockerBean;
+import tigase.auth.CallbackHandlerFactory;
+import tigase.auth.SaslInvalidLoginExcepion;
+import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
@@ -48,7 +52,7 @@ public abstract class AbstractAuthPreprocessor
 	private static final String[] AUTH_ONLY_ELEMS = {"message", "presence"};
 
 	@Inject(nullAllowed = true)
-	protected BruteForceLockerBean bruteForceLocker;
+	private BruteForceLockerBean bruteForceLocker;
 
 	@ConfigField(desc = "Matchers selecting allowed packets for unauthorized session", alias = "allow-unauthorized")
 	private ElementMatcher[] allowMatchers = new ElementMatcher[]{
@@ -62,6 +66,10 @@ public abstract class AbstractAuthPreprocessor
 
 	protected boolean isBruteForceLockerEnabled(XMPPResourceConnection session) {
 		return bruteForceLocker != null && bruteForceLocker.isEnabled(session);
+	}
+
+	public void addInvalidLogin(XMPPResourceConnection session, String ip, BareJID jid) {
+		bruteForceLocker.addInvalidLogin(session, ip, jid);
 	}
 
 	protected boolean isLoginAllowedByBruteForceLocker(XMPPResourceConnection session, String clientIp, BareJID jid) {
@@ -143,6 +151,33 @@ public abstract class AbstractAuthPreprocessor
 		return result;
 	}
 
+	protected void saveIntoBruteForceLocker(final XMPPResourceConnection session, final Exception e) {
+		try {
+			if (isBruteForceLockerEnabled(session)) {
+				final String clientIp = BruteForceLockerBean.getClientIp(session);
+				final BareJID userJid = extractUserJid(e, session);
+
+				if (clientIp == null && log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "There is no client IP. Cannot add entry to BruteForceLocker.");
+				}
+				if (userJid == null && log.isLoggable(Level.FINE)) {
+					log.log(Level.FINE, "There is no user JID. Cannot add entry to BruteForceLocker.");
+				}
+
+				if (userJid != null && clientIp != null) {
+					bruteForceLocker.addInvalidLogin(session, clientIp, userJid);
+				}
+
+				if (bruteForceLocker.canUserBeDisabled(session, clientIp, userJid)) {
+					disableUser(session, userJid);
+				}
+
+			}
+		} catch (Throwable caught) {
+			log.log(Level.WARNING, "Cannot update BruteForceLocker", caught);
+		}
+	}
+
 	public void setAllowMatchers(String[] matcherStrs) {
 		List<ElementMatcher> matchers = new ArrayList<>();
 		for (String matcherStr : matcherStrs) {
@@ -167,5 +202,22 @@ public abstract class AbstractAuthPreprocessor
 		log.log(Level.CONFIG, bruteForceLocker != null ? "BruteForceLocker enabled" : "BruteForceLocker disabled" );
 		this.bruteForceLocker = bruteForceLocker;
 	}
+
+	protected void disableUser(final XMPPResourceConnection session, final BareJID userJID) {
+		try {
+			AuthRepository.AccountStatus status = session.getAuthRepository().getAccountStatus(userJID);
+			if (status == AuthRepository.AccountStatus.active) {
+				log.log(Level.CONFIG, "Disabling user " + userJID);
+				session.getAuthRepository().setAccountStatus(userJID, AuthRepository.AccountStatus.disabled);
+			}
+		} catch (TigaseDBException e) {
+			log.log(Level.WARNING, "Cannot check status or disable user!", e);
+		}
+	}
+
+	protected BareJID extractUserJid(final Exception e, XMPPResourceConnection session) {
+		return (BareJID) session.getSessionData(CallbackHandlerFactory.AUTH_JID);
+	}
+
 
 }

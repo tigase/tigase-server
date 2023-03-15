@@ -38,11 +38,14 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslException;
 import javax.security.sasl.SaslServer;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Queue;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Describe class SaslAuth here.
@@ -67,6 +70,32 @@ public class SaslAuth
 	@Override
 	public String id() {
 		return ID;
+	}
+
+	public enum ElementType {
+		ABORT,
+		AUTH,
+		CHALLENGE,
+		FAILURE,
+		RESPONSE,
+		SUCCESS;
+
+		private static final Map<String, ElementType> ALL_TYPES = Arrays.stream(
+						ElementType.values())
+				.collect(Collectors.toMap(ElementType::getElementName, Function.identity()));
+		private final String elementName;
+
+		public static ElementType parse(String name) {
+			return ALL_TYPES.get(name);
+		}
+
+		ElementType() {
+			this.elementName = name().toLowerCase();
+		}
+
+		public String getElementName() {
+			return elementName;
+		}
 	}
 
 	@Override
@@ -270,5 +299,16 @@ public class SaslAuth
 	protected void processSuccess(Packet packet, XMPPResourceConnection session, String challengeData,
 	                              Queue<Packet> results) {
 		results.offer(packet.swapFromTo(createReply(ElementType.SUCCESS, challengeData), null, null));
+	}
+
+	protected Element createReply(final ElementType type, final String cdata) {
+		Element reply = new Element(type.getElementName());
+
+		reply.setXMLNS(getXmlns());
+		if (cdata != null) {
+			reply.setCData(cdata);
+		}
+
+		return reply;
 	}
 }
