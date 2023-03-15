@@ -166,7 +166,7 @@ public class SaslAuth2 extends SaslAuthAbstract
 					ElementType action = ElementType.parse(packet.getElemName());
 					if (action == null) {
 						throw new XmppSaslException(SaslError.malformed_request,
-						                            "Unrecognized element " + action.getElementName());
+						                            "Unrecognized element " + packet.getElemName());
 					}
 
 					SaslServer ss;
