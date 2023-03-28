@@ -40,7 +40,7 @@
 
     <artifactId>tigase-server</artifactId>
     <packaging>bundle</packaging>
-    <version>8.2.1</version>
+    <version>8.2.2-SNAPSHOT</version>
 
     <name>Tigase XMPP Server</name>
     <description>The instant messaging server</description>
