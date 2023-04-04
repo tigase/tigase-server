@@ -70,8 +70,7 @@ public class MessageDeliveryLogicTest
 	public void testProcessingErrorMessageBareJidOnline() throws Exception {
 		var destinationUserJid = BareJID.bareJIDInstance("user1", domain);
 		var fullDestinationJid = JID.jidInstance(destinationUserJid, "res1");
-		var session = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID()),
-		                         fullDestinationJid);
+		var session = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID()), fullDestinationJid);
 
 		var packetElelement = new Element("message", new String[]{"type", "from", "to"},
 		                                  new String[]{"error", "remote-user@test.com/res1",
@@ -85,8 +84,7 @@ public class MessageDeliveryLogicTest
 	public void testProcessingErrorMessageFullJidOnlineWithMatchingResource() throws Exception {
 		var destinationUserJid = BareJID.bareJIDInstance("user1", domain);
 		var fullDestinationJid = JID.jidInstance(destinationUserJid, "res1");
-		var session = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID()),
-		                         fullDestinationJid);
+		var session = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID()), fullDestinationJid);
 
 		var packetElelement = new Element("message", new String[]{"type", "from", "to"},
 		                                  new String[]{"error", "remote-user@test.com/res1",
@@ -101,8 +99,7 @@ public class MessageDeliveryLogicTest
 		var destinationUserJid = BareJID.bareJIDInstance("user1", domain);
 		var fullDestinationJidPacketTo = JID.jidInstance(destinationUserJid, "res1");
 		var fullDestinationJidSession = JID.jidInstance(destinationUserJid, "res2");
-		var session = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID()),
-		                         fullDestinationJidSession);
+		var session = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID()), fullDestinationJidSession);
 
 		var packetElelement = new Element("message", new String[]{"type", "from", "to"},
 		                                  new String[]{"error", "remote-user@test.com/res1",
