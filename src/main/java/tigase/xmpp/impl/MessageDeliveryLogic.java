@@ -263,9 +263,12 @@ public class MessageDeliveryLogic implements MessageDeliveryProviderIfc {
 	}
 
 	public boolean preProcessFilter(Packet packet, XMPPResourceConnection session) {
+		if (packet.getElemName() != Message.ELEM_NAME) {
+			return false;
+		}
 		final StanzaType type = packet.getType();
 		// only handle messages within local domains; errors to external domains and components (i.e. mix, pubsub) will be delivered
-		if (type == StanzaType.error && vHostManager.isLocalDomain(packet.getStanzaTo().getDomain())) {
+		if (type == StanzaType.error && packet.getStanzaTo() != null && vHostManager.isLocalDomain(packet.getStanzaTo().getDomain())) {
 			if (packet.getStanzaTo().getResource() == null) {
 				// 1) https://xmpp.org/rfcs/rfc6121.html#rules-localpart-barejid
 				//* 8.5.2.1.  Available or Connected Resources > 8.5.2.1.1.  Message

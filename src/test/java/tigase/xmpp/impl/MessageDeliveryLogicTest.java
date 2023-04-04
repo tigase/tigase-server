@@ -131,4 +131,45 @@ public class MessageDeliveryLogicTest
 		block = messageDeliveryLogic.preProcessFilter(packet, session);
 		assertFalse("Message error addressed to PubSub/MIX should be correctly forwarded to the component", block);
 	}
+
+	@Test
+	public void testProcessingFailureErrorMissingToMissingFrom() throws Exception {
+
+		//<failure xmlns="urn:ietf:params:xml:ns:xmpp-sasl" type="error">
+		//    <not-authorized xmlns="urn:ietf:params:xml:ns:xmpp-sasl"/>
+		//    <text xml:lang="en">Password not verified</text>
+		//    <error code="404" type="wait">
+		//        <recipient-unavailable xmlns="urn:ietf:params:xml:ns:xmpp-stanzas"/>
+		//    </error>
+		//</failure>
+
+		var destinationUserJid = BareJID.bareJIDInstance("user1", domain);
+		var fullDestinationJid = JID.jidInstance(destinationUserJid, "res1");
+		var session = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID()), fullDestinationJid);
+
+		var packetElelement = new Element("failure", new String[]{"type", "xmlns"},
+		                                  new String[]{"error", "urn:ietf:params:xml:ns:xmpp-sasl"});
+		packetElelement.addChild(new Element("not-authorized", new String[]{" xmlns"},
+		                                     new String[]{"urn:ietf:params:xml:ns:xmpp-sasl"}));
+		packetElelement.addChild(new Element("text", "Password not verified"));
+		var packet = Packet.packetInstance(packetElelement);
+		final boolean block = messageDeliveryLogic.preProcessFilter(packet, session);
+		assertFalse("Only Message packets should be processed", block);
+	}
+
+	@Test
+	public void testProcessingIqErrorMissingTo() throws Exception {
+
+		//<iq xmlns="jabber:client" from="user@sure.im/movimklqp20" type="error" id="id-1"/>
+
+		var destinationUserJid = BareJID.bareJIDInstance("user1", domain);
+		var fullDestinationJid = JID.jidInstance(destinationUserJid, "res1");
+		var session = getSession(JID.jidInstance("c2s@example.com/" + UUID.randomUUID()), fullDestinationJid);
+
+		var packetElelement = new Element("iq", new String[]{"type", "from"},
+		                                  new String[]{"error", "remote-user@test.com/res1"});
+		var packet = Packet.packetInstance(packetElelement);
+		final boolean block = messageDeliveryLogic.preProcessFilter(packet, session);
+		assertFalse("Only Message packets should be processed", block);
+	}
 }
