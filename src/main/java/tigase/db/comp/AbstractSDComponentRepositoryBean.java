@@ -162,8 +162,9 @@ public abstract class AbstractSDComponentRepositoryBean<Item extends RepositoryI
 		final StringBuilder sb = new StringBuilder("RepoItems");
 		if (!items.isEmpty()) {
 			sb.append(", size=").append(items.size());
-			sb.append(", items=").append(items.toString().substring(0, 1024));
-			if (items.toString().length() > 1024) {
+			var itemsString = items.toString();
+			sb.append(", items=").append(itemsString.substring(0, Math.min(itemsString.length(), 1024)));
+			if (itemsString.length() > 1024) {
 				sb.append("...");
 			}
 		}
