@@ -20,7 +20,6 @@ package tigase.vhosts;
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.comp.RepositoryItemAbstract;
 import tigase.server.Command;
-import tigase.server.DataForm;
 import tigase.server.Packet;
 import tigase.util.StringUtilities;
 import tigase.util.repository.DataTypes;
@@ -270,7 +269,7 @@ public class VHostItemImpl
 		} else {
 			String[] values = Stream.concat(Stream.of("DEFAULT"), Arrays.stream(DomainFilterPolicy.valuesStr()))
 					.toArray(String[]::new);
-			Command.addFieldValue(packet, DOMAIN_FILTER_POLICY_LABEL, domainFilter.toString(),
+			Command.addFieldValue(packet, DOMAIN_FILTER_POLICY_LABEL, domainFilter != null ? domainFilter.toString() : "",
 								  DOMAIN_FILTER_POLICY_LABEL, values, values);
 		}
 		Command.addFieldValue(packet, DOMAIN_FILTER_POLICY_DOMAINS_LABEL,
