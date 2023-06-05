@@ -61,7 +61,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T>
 	
 	@Test
 	public void testStorageOfOfflineMessage()
-			throws UserNotFoundException, NotAuthorizedException, TigaseStringprepException {
+			throws TigaseDBException, NotAuthorizedException, TigaseStringprepException {
 		List<Packet> messages = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			Packet message = Message.getMessage(sender, recipient, StanzaType.chat, generateRandomBody(), null, null,
@@ -131,7 +131,7 @@ public abstract class AbstractMsgRepositoryTest<DS extends DataSource, T>
 
 	@Test
 	public void testStorageOfOfflineMessageWithExpiration1()
-			throws UserNotFoundException, NotAuthorizedException, TigaseStringprepException {
+			throws TigaseDBException, NotAuthorizedException, TigaseStringprepException {
 		try {
 			Date expire = new Date(System.currentTimeMillis() - 60 * 1000);
 

@@ -175,6 +175,15 @@ public class OfflineMessages
 				if (log.isLoggable(Level.FINEST)) {
 					log.finest("UserNotFoundException at trying to save packet for off-line user." + packet);
 				}
+			} catch (TigaseDBException ex) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Could not save packet for offline user, returning error " + packet, ex);
+				}
+				try {
+					queue.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet, null, true));
+				} catch (PacketErrorTypeException e) {
+					log.finest("Could not sent error for unsaved packet for offline user " + packet);
+				}
 			} catch (NotAuthorizedException ex) {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "NotAuthorizedException when checking if message is to this " +
@@ -213,7 +222,7 @@ public class OfflineMessages
 								notifyOfflineMessagesRetrieved(conn, results);
 							}
 						}    // end of if (packets != null)
-					} catch (UserNotFoundException e) {
+					} catch (TigaseDBException e) {
 						log.log(Level.CONFIG, "Something wrong, DB problem, cannot load offline messages. " + e);
 					}      // end of try-catch
 				}
@@ -300,7 +309,7 @@ public class OfflineMessages
 	 */
 	public Queue<Packet> restorePacketForOffLineUser(XMPPResourceConnection conn,
 													 tigase.db.OfflineMsgRepositoryIfc repo)
-			throws UserNotFoundException, NotAuthorizedException {
+			throws UserNotFoundException, NotAuthorizedException, TigaseDBException {
 		Queue<Element> elems = repo.loadMessagesToJID(conn, true);
 
 		if (elems != null) {
@@ -347,7 +356,7 @@ public class OfflineMessages
 	 *
 	 */
 	public Authorization savePacketForOffLineUser(Packet packet, tigase.db.OfflineMsgRepositoryIfc repo,
-												  NonAuthUserRepository userRepo) throws UserNotFoundException {
+												  NonAuthUserRepository userRepo) throws UserNotFoundException, TigaseDBException {
 		StanzaType type = packet.getType();
 
 		// save only:

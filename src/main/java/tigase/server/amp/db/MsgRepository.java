@@ -384,7 +384,7 @@ public abstract class MsgRepository<T, S extends DataSource>
 
 		@Override
 		public Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete)
-				throws UserNotFoundException {
+				throws UserNotFoundException, TigaseDBException {
 			Queue<Element> result = null;
 			try {
 				MsgRepositoryIfc repo = getRepository(session.getBareJID().getDomain());
@@ -397,7 +397,7 @@ public abstract class MsgRepository<T, S extends DataSource>
 
 		@Override
 		public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo)
-				throws UserNotFoundException {
+				throws UserNotFoundException, TigaseDBException {
 			MsgRepositoryIfc repo = getRepository(to.getDomain());
 			boolean result = repo.storeMessage(from, to, expired, msg, userRepo);
 			if (result && expired != null) {
@@ -415,12 +415,12 @@ public abstract class MsgRepository<T, S extends DataSource>
 		}
 
 		@Override
-		public Map<Enum, Long> getMessagesCount(JID to) throws UserNotFoundException {
+		public Map<Enum, Long> getMessagesCount(JID to) throws UserNotFoundException, TigaseDBException {
 			return getRepository(to.getDomain()).getMessagesCount(to);
 		}
 
 		@Override
-		public List<Element> getMessagesList(JID to) throws UserNotFoundException {
+		public List<Element> getMessagesList(JID to) throws UserNotFoundException, TigaseDBException {
 			return getRepository(to.getDomain()).getMessagesList(to);
 		}
 
@@ -436,7 +436,7 @@ public abstract class MsgRepository<T, S extends DataSource>
 
 		@Override
 		public Queue<Element> loadMessagesToJID(List db_ids, XMPPResourceConnection session, boolean delete,
-												OfflineMessagesProcessor proc) throws UserNotFoundException {
+												OfflineMessagesProcessor proc) throws UserNotFoundException, TigaseDBException {
 			return getRepository(session.getDomainAsJID().getDomain()).loadMessagesToJID(db_ids, session, delete, proc);
 		}
 

@@ -19,6 +19,7 @@ package tigase.server.amp.action;
 
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepositoryImpl;
+import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Initializable;
@@ -30,6 +31,8 @@ import tigase.server.amp.AmpComponent;
 import tigase.server.amp.cond.ExpireAt;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
+import tigase.xmpp.PacketErrorTypeException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -116,6 +119,15 @@ public class Store
 				repo.storeMessage(packet.getStanzaFrom(), packet.getStanzaTo(), expired, elem, nonAuthUserRepo);
 			} catch (UserNotFoundException ex) {
 				log.log(Level.CONFIG, "User not found for offline message: " + packet);
+			} catch (TigaseDBException ex) {
+				if (log.isLoggable(Level.FINEST)) {
+					log.log(Level.FINEST, "Could not save packet for offline user " + packet, ex);
+				}
+				try {
+					resultsHandler.addOutPacket(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet, null, true));
+				} catch (PacketErrorTypeException e) {
+					log.finest("Could not sent error for unsaved packet for offline user " + packet);
+				}
 			}
 		}
 
