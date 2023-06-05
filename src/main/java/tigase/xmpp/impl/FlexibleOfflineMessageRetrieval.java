@@ -19,6 +19,7 @@ package tigase.xmpp.impl;
 
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -158,7 +159,7 @@ public class FlexibleOfflineMessageRetrieval
 					} else if (purge && !fetch) {
 						msg_repo.deleteMessagesToJID(null, session);
 					}
-				} catch (UserNotFoundException | NotAuthorizedException ex) {
+				} catch (TigaseDBException | NotAuthorizedException ex) {
 					log.log(Level.WARNING, "Problem retrieving messages from repository: ", ex);
 				}
 				results.offer(packet.okResult(query, 0));
@@ -213,6 +214,8 @@ public class FlexibleOfflineMessageRetrieval
 					}
 				} catch (UserNotFoundException | NotAuthorizedException ex) {
 					log.log(Level.WARNING, "Problem retrieving messages from repository: ", ex);
+				} catch (TigaseDBException ex) {
+					results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet, null, true));
 				}
 			}
 		}
@@ -220,7 +223,7 @@ public class FlexibleOfflineMessageRetrieval
 
 	public Queue<Packet> restorePacketForOffLineUser(List<String> db_ids, XMPPResourceConnection conn,
 													 MsgRepositoryIfc repo)
-			throws UserNotFoundException, NotAuthorizedException {
+			throws UserNotFoundException, NotAuthorizedException, TigaseDBException {
 		Queue<Element> elems = repo.loadMessagesToJID(db_ids, conn, false, offlineMessagesStamper);
 
 		if (elems != null) {
@@ -297,7 +300,7 @@ public class FlexibleOfflineMessageRetrieval
 
 		} catch (NotAuthorizedException ex) {
 			log.log(Level.WARNING, "Problem retrieving messages from repository: ", ex);
-		} catch (UserNotFoundException ex) {
+		} catch (TigaseDBException ex) {
 
 		}
 	}
@@ -309,7 +312,7 @@ public class FlexibleOfflineMessageRetrieval
 			if (null != messagesList && !messagesList.isEmpty()) {
 				query.addChildren(messagesList);
 			}
-		} catch (NotAuthorizedException | UserNotFoundException ex) {
+		} catch (NotAuthorizedException | TigaseDBException ex) {
 			log.log(Level.WARNING, "Problem retrieving messages from repository: ", ex);
 		}
 	}

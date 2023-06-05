@@ -19,6 +19,7 @@ package tigase.xmpp.impl;
 
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -137,6 +138,15 @@ public class MessageAmp
 					if (log.isLoggable(Level.FINEST)) {
 						log.finest("UserNotFoundException at trying to save packet for off-line user." + packet);
 					}
+				} catch (TigaseDBException ex) {
+					if (log.isLoggable(Level.FINEST)) {
+						log.log(Level.FINEST, "Could not save packet for offline user, returning error " + packet, ex);
+					}
+					try {
+						results.offer(Authorization.INTERNAL_SERVER_ERROR.getResponseMessage(packet, null, true));
+					} catch (PacketErrorTypeException e) {
+						log.finest("Could not sent error for unsaved packet for offline user " + packet);
+					}
 				} catch (NotAuthorizedException ex) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "NotAuthorizedException when checking if message is to this " +
@@ -238,7 +248,7 @@ public class MessageAmp
 								offlineProcessor.notifyOfflineMessagesRetrieved(session, results);
 							}
 						}    // end of if (packets != null)
-					} catch (UserNotFoundException e) {
+					} catch (TigaseDBException e) {
 						log.log(Level.CONFIG, "Something wrong, DB problem, cannot load offline messages. " + e);
 					}      // end of try-catch
 

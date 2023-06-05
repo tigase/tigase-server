@@ -62,7 +62,7 @@ public interface OfflineMsgRepositoryIfc
 	 * @return a {@link Queue} of {@link Element} objects representing stored payloads for the given user's {@link JID}
 	 *
 	 */
-	Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete) throws UserNotFoundException;
+	Queue<Element> loadMessagesToJID(XMPPResourceConnection session, boolean delete) throws UserNotFoundException, TigaseDBException;
 
 	/**
 	 * Saves the massage to the repository
@@ -78,5 +78,5 @@ public interface OfflineMsgRepositoryIfc
 	 *
 	 */
 	boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo)
-			throws UserNotFoundException;
+			throws UserNotFoundException, TigaseDBException;
 }

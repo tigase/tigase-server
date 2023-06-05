@@ -35,9 +35,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public interface MsgRepositoryIfc<T extends DataSource>
 		extends OfflineMsgRepositoryIfc, DataSourceAware<T> {
 
-	Map<Enum, Long> getMessagesCount(JID to) throws UserNotFoundException;
+	Map<Enum, Long> getMessagesCount(JID to) throws UserNotFoundException, TigaseDBException;
 
-	List<Element> getMessagesList(JID to) throws UserNotFoundException;
+	List<Element> getMessagesList(JID to) throws UserNotFoundException, TigaseDBException;
 
 	@TigaseDeprecated(since = "8.2.0", removeIn = "9.0.0")
 	@Deprecated
@@ -45,7 +45,7 @@ public interface MsgRepositoryIfc<T extends DataSource>
 
 	Queue<Element> loadMessagesToJID(List<String> db_ids, XMPPResourceConnection session,
 													 boolean delete, MsgRepository.OfflineMessagesProcessor proc)
-			throws UserNotFoundException;
+			throws UserNotFoundException, TigaseDBException;
 
 	int deleteMessagesToJID(List<String> db_ids, XMPPResourceConnection session)
 			throws UserNotFoundException;
