@@ -17,6 +17,7 @@
  */
 package tigase.auth.credentials.entries;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.auth.CredentialsDecoderBean;
 import tigase.auth.CredentialsEncoderBean;
 import tigase.auth.credentials.Credentials;
@@ -28,6 +29,8 @@ import java.security.MessageDigest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Deprecated
+@TigaseDeprecated(since = "8.4.0", removeIn = "9.0.0", note = "SCRAM should be used for maximum security; it's possible to migrate to SCRAM seamlessly")
 public class MD5PasswordCredentialsEntry
 		implements Credentials.Entry {
 
