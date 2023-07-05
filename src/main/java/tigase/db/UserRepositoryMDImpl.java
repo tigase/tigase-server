@@ -216,7 +216,7 @@ public abstract class UserRepositoryMDImpl
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
-			repo.getSubnodes(user);
+			return repo.getSubnodes(user);
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
