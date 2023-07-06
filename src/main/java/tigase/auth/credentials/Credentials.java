@@ -18,10 +18,9 @@
 package tigase.auth.credentials;
 
 import tigase.annotations.TigaseDeprecated;
-import tigase.db.AuthRepository;
 import tigase.xmpp.jid.BareJID;
 
-import static tigase.db.AuthRepository.*;
+import static tigase.db.AuthRepository.AccountStatus;
 
 /**
  * Interface implemented by classes handling user login credentials. In implementations of this interface multiple
@@ -42,7 +41,7 @@ public interface Credentials {
 	boolean canLogin();
 
 	/**
-	 * Find a credential for specified mechanism
+	 * Find a credential for specified encryption mechanism
 	 *
 	 * @return instance of an entry if available or null
 	 */
@@ -86,9 +85,9 @@ public interface Credentials {
 		Entry decode(BareJID user, String value);
 
 		/**
-		 * Name of mechanism for which decoder works
+		 * Name of the encryption mechanism for which decoder works
 		 *
-		 * @return name of mechanism for which decoder works
+		 * @return name of the encryption mechanism for which decoder works
 		 */
 		String getName();
 
@@ -111,9 +110,9 @@ public interface Credentials {
 		String encode(BareJID user, String password);
 
 		/**
-		 * Name of mechanism for which encoder works
+		 * Name of the encryption mechanism for which encoder works
 		 *
-		 * @return name of mechanism for which encoder works
+		 * @return name of the encryption mechanism for which encoder works
 		 */
 		String getName();
 
@@ -125,7 +124,11 @@ public interface Credentials {
 	interface Entry {
 
 		/**
-		 * Name of the mechanism for which it will work
+		 * Name of the encryption mechanism used to encode stored credentials.
+		 *
+		 * Note: Value returned by this method may be equal to SASL mechanism name used to encode this value,
+		 * but doesn't have to be only one of SASL mechanism name, ie. for passwords encoded for PLAIN mechanism
+		 * not stored in plain format in the repository.
 		 */
 		String getMechanism();
 
@@ -142,7 +145,11 @@ public interface Credentials {
 	interface RawEntry {
 
 		/**
-		 * Name of mechanism
+		 * Name of the encryption mechanism used to encode stored credentials.
+		 *
+		 * Note: Value returned by this method may be equal to SASL mechanism name used to encode this value,
+		 * but doesn't have to be only one of SASL mechanism name, ie. for passwords encoded for PLAIN mechanism
+		 * not stored in plain format in the repository.
 		 */
 		String getMechanism();
 
@@ -152,7 +159,8 @@ public interface Credentials {
 		String getValue();
 
 		/**
-		 * Check if mechanism name matches
+		 * Checks if the provided string matches the name of the encryption mechanism used to encode data for storage
+		 * in the repository.
 		 */
 		default boolean isForMechanism(String mechanism) {
 			return mechanism.equals(getMechanism());
