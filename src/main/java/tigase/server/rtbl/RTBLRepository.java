@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -51,7 +52,7 @@ public class RTBLRepository implements Initializable, UnregisterAware, Statistic
 	private EventBus eventBus;
 
 	@ConfigField(desc = "Reload interval")
-	private long reloadInterval = 10 * 60 * 1000;
+	private long reloadInterval = TimeUnit.MINUTES.toMillis(10);
 
 	private BareJID repoUser = BareJID.bareJIDInstanceNS("rtbl");
 
