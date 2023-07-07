@@ -557,8 +557,9 @@ public abstract class AbstractBeanConfigurator
 					}
 
 					if (clazz == null) {
-						log.log(Level.WARNING, "unknown class {0} for bean {1}, skipping registration of a bean",
-								new Object[]{cfg.getClazzName(), cfg.getBeanName()});
+						log.log(Level.WARNING, "unknown class {0} for bean {1} (from: {2}), skipping registration of a bean",
+								new Object[]{cfg.getClazzName(), cfg.getBeanName(),
+								             (beanConfig != null ? beanConfig.getBeanName() : "n/a")});
 						continue;
 					}
 				}
