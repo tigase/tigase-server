@@ -6,6 +6,7 @@ The articles here cover advanced security features built into to Tigase Server, 
 .. include:: XEP-0191_Blocking_Command.inc
 .. include:: Account_Registration_Limits.inc
 .. include:: Brute-force_attack_prevention.inc
+.. include:: RealTimeBlockList.inc
 .. include:: Server_Certificates.inc
 .. include:: Auth_Connectors.inc
 .. include:: SASL_Mechanisms.inc
