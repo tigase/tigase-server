@@ -1078,7 +1078,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						connectionManager.releaseListener(connectionOpenListener);
 						connectionOpenListener = null;
 					} catch (Throwable ex) {
-						ex.printStackTrace();
+						log.log(Level.WARNING, "Error while processing handshake", ex);
 						throw ex;
 					}
 				}

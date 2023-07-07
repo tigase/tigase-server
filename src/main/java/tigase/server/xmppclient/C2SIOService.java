@@ -181,7 +181,7 @@ public class C2SIOService<RefObject>
 			try {
 				((TLSIOIfc) getIO()).processHandshake(tlsData);
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				log.log(Level.WARNING, "Error while processing handshake", ex);
 			}
 			tlsData = null;
 		} else {
