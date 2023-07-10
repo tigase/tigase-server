@@ -29,6 +29,8 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static junit.framework.TestCase.*;
 
@@ -46,7 +48,7 @@ public class RTBLRepositoryTest extends AbstractKernelWithUserRepositoryTestCase
 
 	private String hash = "SHA-256";
 
-	private static final int limit = 10;
+	private static final int limit = 30;
 
 	@Test
 	public void test() throws TigaseDBException, NoSuchFieldException, IllegalAccessException, InterruptedException {
@@ -55,18 +57,14 @@ public class RTBLRepositoryTest extends AbstractKernelWithUserRepositoryTestCase
 		assertEquals(0, repository.getBlockLists().size());
 
 		repository.add(pubsubJid, node, hash);
-		int i = 0;
-		while (i < limit && repository.getBlockLists().size() != 1) {
-			Thread.sleep(100);
-		}
+
+		waitUntil(() -> repository.getBlockLists().size() != 2);
 		assertEquals(1, repository.getBlockLists().size());
 
 		BareJID user = BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(), "domain");
 		repository.update(pubsubJid, node, RTBLRepository.Action.add, Algorithms.sha256(user.toString()));
-		i = 0;
-		while (i < limit && !repository.isBlocked(user)) {
-			Thread.sleep(100);
-		}
+
+		waitUntil(() -> !repository.isBlocked(user));
 		assertTrue(repository.isBlocked(user));
 
 		Field f = RTBLRepository.class.getDeclaredField("cache");
@@ -87,22 +85,24 @@ public class RTBLRepositoryTest extends AbstractKernelWithUserRepositoryTestCase
 		BareJID user2 = BareJID.bareJIDInstanceNS(UUID.randomUUID().toString(), "domain");
 		rtbl = new RTBL(rtbl.getKey(), hash, Set.of(Algorithms.sha256(user.toString()), Algorithms.sha256(user2.toString())));
 		repository.update(rtbl);
-		i = 0;
-		while (i < limit && !repository.isBlocked(user)) {
-			Thread.sleep(100);
-		}
 
+		waitUntil(() -> !repository.isBlocked(user));
 		assertTrue(repository.isBlocked(user));
 		assertTrue(repository.isBlocked(user2));
 
 		rtbl = new RTBL(rtbl.getKey(), hash, Set.of(Algorithms.sha256(user2.toString())));
 		repository.update(rtbl);
-		i = 0;
-		while (i < limit && !repository.isBlocked(user2)) {
-			Thread.sleep(100);
-		}
 
+		waitUntil(() -> !repository.isBlocked(user2));
 		assertFalse(repository.isBlocked(user));
 		assertTrue(repository.isBlocked(user2));
+	}
+
+	private void waitUntil(Supplier<Boolean> function) throws InterruptedException {
+		int i = 0;
+		while (i < limit && function.get()) {
+			TimeUnit.MILLISECONDS.sleep(10);
+			i++;
+		}
 	}
 }
