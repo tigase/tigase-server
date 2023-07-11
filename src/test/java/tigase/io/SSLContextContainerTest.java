@@ -46,6 +46,20 @@ public class SSLContextContainerTest {
 	}
 
 	@Test
+	public void testFindMuc() {
+		final HashMap<String, String> domains = new HashMap<String, String>();
+		domains.put("*.tigase.org", "*.tigase.org");
+
+		assertEquals("*.tigase.org", SSLContextContainer.find(domains, "tigase.org"));
+		assertEquals("*.tigase.org", SSLContextContainer.find(domains, "muc.tigase.org"));
+
+		domains.put("tigase.org", "tigase.org");
+
+		assertEquals("tigase.org", SSLContextContainer.find(domains, "tigase.org"));
+		assertEquals("*.tigase.org", SSLContextContainer.find(domains, "muc.tigase.org"));
+	}
+
+	@Test
 	public void testRemoveMatched() {
 		final HashMap<String, String> contexts = new HashMap<String, String>();
 		contexts.put("one.com", "one.com");
@@ -65,6 +79,23 @@ public class SSLContextContainerTest {
 		assertFalse(contexts.containsKey("*.one.com"));
 		assertTrue(contexts.containsKey("a.two.com"));
 		assertTrue(contexts.containsKey("*.two.com"));
+	}
+
+	@Test
+	public void testRemoveMatchedMuc() {
+		final HashMap<String, String> contexts = new HashMap<String, String>();
+		contexts.put("one.com", "one.com");
+		contexts.put("muc.one.com", "muc.one.com");
+		contexts.put("*.one.com", "*.one.com");
+
+		final Set<String> domains = new HashSet<>(Arrays.asList("one.com", "*.one.com"));
+
+		SSLContextContainer.removeMatchedDomains(contexts, domains);
+
+		assertFalse(contexts.containsKey("one.com"));
+		assertFalse(contexts.containsKey("muc.one.com"));
+		assertFalse(contexts.containsKey("*.one.com"));
+		assertTrue(contexts.isEmpty());
 	}
 
 }
