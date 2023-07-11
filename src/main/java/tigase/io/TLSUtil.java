@@ -46,7 +46,7 @@ public abstract class TLSUtil {
 	private static SSLContextContainerIfc sslContextContainer = null;
 
 	public static void addCertificate(Map<String, String> params) throws CertificateParsingException {
-		sslContextContainer.addCertificates(params);
+		certificateContainer.addCertificates(params);
 	}
 
 	public static void configureSSLContext(Map<String, Object> params) {

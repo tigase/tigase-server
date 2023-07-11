@@ -137,7 +137,7 @@ public abstract class SSLContextContainerAbstract
 				return sslHolder;
 			}
 			if (log.isLoggable(Level.CONFIG)) {
-				log.log(Level.CONFIG, "Key manager for hostname: {0} doesn't exist, generating new one",
+				log.log(Level.CONFIG, "Key manager for hostname: {0} does not exist, generating new one",
 						new String[]{hostname});
 			}
 
