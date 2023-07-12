@@ -18,10 +18,7 @@
 
 package tigase.io.repo;
 
-import tigase.annotations.TigaseDeprecated;
 import tigase.db.TigaseDBException;
-import tigase.db.UserExistsException;
-import tigase.db.UserRepository;
 import tigase.db.comp.UserRepoRepository;
 import tigase.io.CertificateContainer;
 import tigase.kernel.beans.Bean;
@@ -63,11 +60,7 @@ public class CertificateRepository
 
 		// store only single item for performance
 		if (repo != null && isInitialized()) {
-			try {
-				repo.setData(getRepoUser(), getItemsListPKey(), item.getKey(), item.toElement().toString());
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "Error storing item in the repository", e);
-			}
+			storeSingleItem(item);
 		}
 	}
 
@@ -155,11 +148,7 @@ public class CertificateRepository
 	public void store() {
 		if (repo != null && isInitialized()) {
 			for (CertificateItem item : items.values()) {
-				try {
-					repo.setData(getRepoUser(), getItemsListPKey(), item.getKey(), item.toElement().toString());
-				} catch (Exception e) {
-					log.log(Level.SEVERE, "Error storing items list in the repository", e);
-				}
+				storeSingleItem(item);
 			}
 		}
 	}
@@ -179,6 +168,14 @@ public class CertificateRepository
 		} else {
 			log.log(Level.WARNING, "Parsing certificate from element failed: " + element);
 			return Optional.empty();
+		}
+	}
+
+	protected void storeSingleItem(CertificateItem item) {
+		try {
+			repo.setData(getRepoUser(), getItemsListPKey(), item.getKey(), item.toElement().toString());
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Error storing item in the repository", e);
 		}
 	}
 }

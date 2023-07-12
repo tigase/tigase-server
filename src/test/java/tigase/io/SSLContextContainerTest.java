@@ -19,12 +19,10 @@ package tigase.io;
 
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
+import static tigase.io.SSLContextContainerAbstract.getSpareDomainNamesToRemove;
 
 public class SSLContextContainerTest {
 
@@ -79,6 +77,152 @@ public class SSLContextContainerTest {
 		assertFalse(contexts.containsKey("*.one.com"));
 		assertTrue(contexts.containsKey("a.two.com"));
 		assertTrue(contexts.containsKey("*.two.com"));
+	}
+
+	@Test
+	public void testGetSpareDomainNamesToRemove() {
+
+		final Set<String> contexts = new TreeSet<>();
+		contexts.add("one.com");
+		contexts.add("push.one.com");
+		contexts.add("muc.one.com");
+		contexts.add("sub.push.one.com");
+		contexts.add("*.one.com");
+		contexts.add("two.com");
+		contexts.add("a.two.com");
+		contexts.add("*.two.com");
+		contexts.add("three.com");
+		contexts.add("*.three.com");
+		contexts.add("push.three.com");
+		contexts.add("muc.three.com");
+
+		final Set<String> domains = new HashSet<>(Arrays.asList("one.com", "*.one.com", "two.com"));
+
+		final Set<String> spareDomainNamesToRemove = getSpareDomainNamesToRemove(contexts, domains);
+
+		// basically only domains that match the wildcard but not the others - those will be overwritten directly by "put"
+		assertFalse(spareDomainNamesToRemove.contains("one.com"));
+		assertTrue(spareDomainNamesToRemove.contains("push.one.com"));
+		assertTrue(spareDomainNamesToRemove.contains("muc.one.com"));
+		assertFalse(spareDomainNamesToRemove.contains("sub.push.one.com"));
+		assertFalse(spareDomainNamesToRemove.contains("*.one.com"));
+		assertFalse(spareDomainNamesToRemove.contains("two.com"));
+		assertFalse(spareDomainNamesToRemove.contains("a.two.com"));
+		assertFalse(spareDomainNamesToRemove.contains("*.two.com"));
+		assertFalse(spareDomainNamesToRemove.contains("three.com"));
+		assertFalse(spareDomainNamesToRemove.contains("*.three.com"));
+		assertFalse(spareDomainNamesToRemove.contains("push.three.com"));
+		assertFalse(spareDomainNamesToRemove.contains("muc.three.com"));
+
+		spareDomainNamesToRemove.forEach(contexts::remove);
+
+		assertTrue(contexts.contains("one.com"));
+		assertFalse(contexts.contains("push.one.com"));
+		assertFalse(contexts.contains("muc.one.com"));
+		assertTrue(contexts.contains("sub.push.one.com"));
+		assertTrue(contexts.contains("*.one.com"));
+		assertTrue(contexts.contains("two.com"));
+		assertTrue(contexts.contains("a.two.com"));
+		assertTrue(contexts.contains("*.two.com"));
+		assertTrue(contexts.contains("three.com"));
+		assertTrue(contexts.contains("*.three.com"));
+		assertTrue(contexts.contains("push.three.com"));
+		assertTrue(contexts.contains("muc.three.com"));
+
+		contexts.addAll(domains);
+
+		assertTrue(contexts.contains("one.com"));
+		assertFalse(contexts.contains("push.one.com"));
+		assertFalse(contexts.contains("muc.one.com"));
+		assertTrue(contexts.contains("sub.push.one.com"));
+		assertTrue(contexts.contains("*.one.com"));
+		assertTrue(contexts.contains("two.com"));
+		assertTrue(contexts.contains("a.two.com"));
+		assertTrue(contexts.contains("*.two.com"));
+		assertTrue(contexts.contains("three.com"));
+		assertTrue(contexts.contains("*.three.com"));
+		assertTrue(contexts.contains("push.three.com"));
+		assertTrue(contexts.contains("muc.three.com"));
+	}
+
+	@Test
+	public void testGetSpareDomainNamesToRemoveSimple() {
+
+		final Set<String> contexts = new TreeSet<>();
+		contexts.add("one.com");
+		contexts.add("two.com");
+
+		final Set<String> domains = new HashSet<>(Arrays.asList("one.com", "*.one.com"));
+
+		final Set<String> spareDomainNamesToRemove = getSpareDomainNamesToRemove(contexts, domains);
+
+		// basically only domains that match the wildcard but not the others - those will be overwritten directly by "put"
+		assertTrue(spareDomainNamesToRemove.isEmpty());
+
+		spareDomainNamesToRemove.forEach(contexts::remove);
+
+		assertTrue(contexts.contains("one.com"));
+		assertFalse(contexts.contains("*.one.com"));
+		assertTrue(contexts.contains("two.com"));
+
+		contexts.addAll(domains);
+
+		assertTrue(contexts.contains("one.com"));
+		assertTrue(contexts.contains("*.one.com"));
+		assertTrue(contexts.contains("two.com"));
+	}
+
+	@Test
+	public void testGetSpareDomainNamesToRemoveAtlantiscity() {
+
+		final Set<String> contexts = new TreeSet<>();
+		contexts.add("atlantiscity");
+		contexts.add("firefly");
+
+		final Set<String> domains = new HashSet<>(Arrays.asList("atlantiscity", "*.atlantiscity"));
+
+		final Set<String> spareDomainNamesToRemove = getSpareDomainNamesToRemove(contexts, domains);
+
+		// basically only domains that match the wildcard but not the others - those will be overwritten directly by "put"
+		assertTrue(spareDomainNamesToRemove.isEmpty());
+
+		spareDomainNamesToRemove.forEach(contexts::remove);
+
+		assertTrue(contexts.contains("atlantiscity"));
+		assertFalse(contexts.contains("*.atlantiscity"));
+		assertTrue(contexts.contains("firefly"));
+
+		contexts.addAll(domains);
+
+		assertTrue(contexts.contains("atlantiscity"));
+		assertTrue(contexts.contains("*.atlantiscity"));
+		assertTrue(contexts.contains("firefly"));
+	}
+
+	@Test
+	public void testGetSpareDomainNamesToRemoveLongDomains() {
+
+		final Set<String> contexts = new TreeSet<>();
+		contexts.add("chat.example.com");
+		contexts.add("muc.chat.example.com");
+
+		final Set<String> domains = new HashSet<>(Arrays.asList("chat.example.com", "*.chat.example.com"));
+
+		final Set<String> spareDomainNamesToRemove = getSpareDomainNamesToRemove(contexts, domains);
+
+		// basically only domains that match the wildcard but not the others - those will be overwritten directly by "put"
+		assertEquals(1, spareDomainNamesToRemove.size());
+		assertTrue(spareDomainNamesToRemove.contains("muc.chat.example.com"));
+
+		spareDomainNamesToRemove.forEach(contexts::remove);
+
+		assertTrue(contexts.contains("chat.example.com"));
+		assertFalse(contexts.contains("*.chat.example.com"));
+
+		contexts.addAll(domains);
+
+		assertTrue(contexts.contains("chat.example.com"));
+		assertTrue(contexts.contains("*.chat.example.com"));
 	}
 
 	@Test

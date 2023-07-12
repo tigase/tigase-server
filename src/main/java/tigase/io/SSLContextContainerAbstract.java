@@ -89,6 +89,18 @@ public abstract class SSLContextContainerAbstract
 		});
 	}
 
+	static Set<String> getSpareDomainNamesToRemove(Set<String> collection, Set<String> domains) {
+		var wildcardDomainsWithoutAsterisk = domains.stream()
+				.filter(domain -> domain.startsWith("*."))
+				.map(domain -> domain.substring(2))
+				.collect(Collectors.toSet());
+		return collection.stream().filter(alias -> {
+			var isWildcard = alias.startsWith("*.");
+			var parentDomain = alias.indexOf(".") != -1 ? alias.substring(alias.indexOf(".") + 1) : null;
+			return !isWildcard && parentDomain != null && wildcardDomainsWithoutAsterisk.contains(parentDomain);
+		}).collect(Collectors.toSet());
+	}
+
 	public SSLContextContainerAbstract(CertificateContainerIfc certContainer) {
 		this.certificateContainer = certContainer;
 	}

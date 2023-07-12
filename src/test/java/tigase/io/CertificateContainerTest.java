@@ -21,6 +21,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import tigase.cert.CertificateEntry;
+import tigase.cert.CertificateGenerator;
+import tigase.cert.CertificateGeneratorFactory;
 import tigase.cert.CertificateUtil;
 import tigase.eventbus.EventBusFactory;
 import tigase.io.repo.CertificateItem;
@@ -30,43 +32,45 @@ import tigase.kernel.core.Kernel;
 
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
+import java.security.GeneralSecurityException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static tigase.cert.CertificateUtil.*;
+import static tigase.cert.CertificateUtil.createKeyPair;
+import static tigase.cert.CertificateUtil.exportToPemFormat;
 import static tigase.io.CertificateContainerIfc.CertificateEntity;
 
-public class CertificateContainerTest extends AbstractKernelWithUserRepositoryTestCase {
+public class CertificateContainerTest
+		extends AbstractKernelWithUserRepositoryTestCase {
 
 	private static final Logger LOGGER = Logger.getLogger(CertificateContainerTest.class.getName());
 	private final String domain = "example.com";
+	private final String mucDomain = "muc." + domain;
+	private final String wildcardDomain = "*." + domain;
+
 	private CertificateContainer certificateContainer;
 	private SSLContextContainer sslContextContainer;
 
 	@Test
-	public void testRegularDomain() throws Exception {
-		testDomain(domain, true);
+	public void testRegularDomainForExistingCertificate() throws Exception {
+		testDomain(domain, domain, true);
 	}
 
 	@Test
-	public void testWildcardDomain() throws Exception {
-		testDomain("push." + domain, true);
+	public void testSubdomainAgainstWildcardCertificate() throws Exception {
+		testDomain("push." + domain, wildcardDomain, true);
 	}
 
 	@Test
 	public void testUpperCaseDomain() throws Exception {
-		testDomain(domain.toUpperCase(), true);
+		testDomain(domain.toUpperCase(), domain, true);
 	}
 
 	@Test
-	public void testNonexistentDomain() throws Exception {
-		testDomain("xmpp.org", false);
+	public void testDomainForNonexistentCertificate() throws Exception {
+		testDomain("xmpp.org", "xmpp.org", false);
 	}
 
 	@Override
@@ -79,22 +83,39 @@ public class CertificateContainerTest extends AbstractKernelWithUserRepositoryTe
 	}
 
 	@Before
-	public void setup() throws CertificateException, NoSuchAlgorithmException, IOException, SignatureException,
-							   NoSuchProviderException, InvalidKeyException {
+	public void setup() throws GeneralSecurityException, IOException {
 		certificateContainer = getKernel().getInstance(CertificateContainer.class);
 		sslContextContainer = getKernel().getInstance(SSLContextContainer.class);
 
-		CertificateEntry selfSignedCertificate = createSelfSignedCertificate("test@mail.com", "*." + domain, "OU", "O",
-																			 "City", "State", "Country",
-																			 () -> createKeyPair(1024, "secret"));
-
-		var pemCertificate = exportToPemFormat(selfSignedCertificate);
-
-		var certificateEntity = new CertificateEntity(pemCertificate, domain, false, false);
-		certificateContainer.addCertificates(certificateEntity);
+		addCertificateForDomain(domain, true);
+		addCertificateForDomain("*." + domain, true);
 	}
 
-	private void testDomain(String hostname, boolean expectsExist) throws Exception {
+	/**
+	 * If wildcard certificate is added it should be used instead of explicit one...
+	 */
+	@Test
+	public void testAddingCertificate() throws GeneralSecurityException, IOException {
+
+		addCertificateForDomain(mucDomain, false);
+		addCertificateForDomain(wildcardDomain, true);
+
+		var domainEntry = certificateContainer.getCertificateEntry(domain);
+		Assert.assertNotNull(domainEntry);
+		Assert.assertEquals(CertificateUtil.getCertCName((X509Certificate) domainEntry.getCertificate().get()), domain);
+
+		var wildcardDomainEntry = certificateContainer.getCertificateEntry(wildcardDomain);
+		Assert.assertNotNull(wildcardDomainEntry);
+		Assert.assertEquals(CertificateUtil.getCertCName((X509Certificate) wildcardDomainEntry.getCertificate().get()),
+		                    wildcardDomain);
+
+		var mucDomainEntry = certificateContainer.getCertificateEntry(mucDomain);
+		Assert.assertNotNull(mucDomainEntry);
+		Assert.assertEquals(CertificateUtil.getCertCName((X509Certificate) mucDomainEntry.getCertificate().get()),
+		                    wildcardDomain);
+	}
+
+	private void testDomain(String hostname, String expectedDomain, boolean expectsExist) throws Exception {
 		CertificateEntry certificateEntry = certificateContainer.getCertificateEntry(hostname);
 
 		LOGGER.log(Level.INFO, "Certificate for hostname " + hostname + ": " +
@@ -111,17 +132,31 @@ public class CertificateContainerTest extends AbstractKernelWithUserRepositoryTe
 		Assert.assertNotNull(ssl.domainCertificate);
 		String cNname = CertificateUtil.getCertCName(ssl.domainCertificate);
 
-
-		// FIXME: rework this test to take into consideration auto-generation of the certificate…
 		if (expectsExist) {
 			Assert.assertEquals(certificateEntry.getCertChain()[0], ssl.domainCertificate);
-			Assert.assertTrue(cNname.contains(domain));
 		} else {
-			Assert.assertFalse(cNname.contains(domain));
+			CertificateEntry generatedEntry = certificateContainer.getCertificateEntry(hostname);
+			Assert.assertNotNull(generatedEntry);
 		}
+		Assert.assertEquals(expectedDomain, cNname);
 	}
 
-	public static class TestCertificateContainerWithoutStore extends CertificateContainer {
+	private void addCertificateForDomain(String domain, boolean includeWildcardSubdomain)
+			throws GeneralSecurityException, IOException {
+		final CertificateGenerator generator = CertificateGeneratorFactory.getGenerator();
+		CertificateEntry selfSignedCertificate = generator.generateSelfSignedCertificateEntry("test@mail.com", domain,
+		                                                                                      "OU", "O", "City",
+		                                                                                      "State", "Country",
+		                                                                                      createKeyPair(1024,
+		                                                                                                    "secret"),
+		                                                                                      includeWildcardSubdomain);
+		var pemCertificate = exportToPemFormat(selfSignedCertificate);
+		var certificateEntity = new CertificateEntity(pemCertificate, domain, false, false);
+		certificateContainer.addCertificates(certificateEntity);
+	}
+
+	public static class TestCertificateContainerWithoutStore
+			extends CertificateContainer {
 
 		public TestCertificateContainerWithoutStore() {
 
@@ -130,25 +165,21 @@ public class CertificateContainerTest extends AbstractKernelWithUserRepositoryTe
 		@Override
 		void storeCertificateToFile(CertificateEntry entry, String filename)
 				throws CertificateEncodingException, IOException {
-			throw new RuntimeException(new IOException("We tried storing certificate to file, even though we shouldn't"));
+			throw new RuntimeException(
+					new IOException("We tried storing certificate to file, even though we shouldn't"));
 		}
 	}
 
-	public static class TestCertificateRepositoryWithoutStore extends CertificateRepository {
+	public static class TestCertificateRepositoryWithoutStore
+			extends CertificateRepository {
 
 		public TestCertificateRepositoryWithoutStore() {
 		}
 
 		@Override
-		public void addItem(CertificateItem item) {
-			super.addItem(item);
-//			throw new RuntimeException(new IOException("We tried storing certificate to repository, even though we shouldn't"));
-		}
-
-		@Override
-		public void store() {
-			super.store();
-//			throw new RuntimeException(new IOException("We tried storing certificate to repository, even though we shouldn't"));
+		protected void storeSingleItem(CertificateItem item) {
+			LOGGER.log(Level.SEVERE, "Storing certificate to repository (we shouldn't?");
+			super.storeSingleItem(item);
 		}
 	}
 }

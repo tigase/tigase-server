@@ -370,23 +370,23 @@ public class CertificateContainer
 		cens.put(alias, entry);
 
 		if (!def_cert_alias.equals(alias)) {
-			// TODO: better handling of updating collections, ideally in single step
 			Optional<Certificate> certificate = entry.getCertificate();
 			if (certificate.isPresent()) {
 				Set<String> domains = getAllCNames(certificate.get());
+				domains.add(alias);
+				var spareDomainNamesToRemoveFromKmfs = SSLContextContainerAbstract.getSpareDomainNamesToRemove(kmfs.keySet(), domains);
+				var spareDomainNamesToRemoveFromCens = SSLContextContainerAbstract.getSpareDomainNamesToRemove(cens.keySet(), domains);
 				log.log(Level.FINEST,
-						"Certificate present with domains: {0}. Replacing in collections, kmfs domains: {1}, cens domains: {2}. Certificate: {3}",
-						new Object[]{domains, kmfs.keySet(), cens.keySet(), entry.toString(true)});
-				SSLContextContainerAbstract.removeMatchedDomains(kmfs, domains);
-				SSLContextContainerAbstract.removeMatchedDomains(cens, domains);
-				log.log(Level.FINEST,
-						"Certificate present with domains: {0}. Collections after domain removal, kmfs domains: {1}, cens domains: {2}",
-						new Object[]{domains, kmfs.keySet(), cens.keySet()});
+						"Certificate present with domains: {0}. Replacing in collections, kmfs domains: {1}, spare to remove: {2}; cens domains: {3}, spare to remove: {4}. Certificate: {5}",
+						new Object[]{domains, kmfs.keySet(), spareDomainNamesToRemoveFromKmfs, cens.keySet(), spareDomainNamesToRemoveFromCens, entry.toString(true)});
+
 				for (String domain : domains) {
 					kmf = getKeyManagerFactory(domain, privateKey, certChain);
 					kmfs.put(domain, kmf);
 					cens.put(domain, entry);
 				}
+				spareDomainNamesToRemoveFromKmfs.forEach(d -> kmfs.remove(d));
+				spareDomainNamesToRemoveFromCens.forEach(d -> cens.remove(d));
 			}
 		}
 
