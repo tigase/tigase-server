@@ -61,6 +61,7 @@ public class CertificateRepository
 		}
 		addItemNoStore(item);
 
+		// store only single item for performance
 		if (repo != null && isInitialized()) {
 			try {
 				repo.setData(getRepoUser(), getItemsListPKey(), item.getKey(), item.toElement().toString());

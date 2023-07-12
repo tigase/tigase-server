@@ -22,25 +22,32 @@ import org.junit.Before;
 import org.junit.Test;
 import tigase.cert.CertificateEntry;
 import tigase.cert.CertificateUtil;
+import tigase.eventbus.EventBusFactory;
+import tigase.io.repo.CertificateItem;
+import tigase.io.repo.CertificateRepository;
+import tigase.kernel.AbstractKernelWithUserRepositoryTestCase;
+import tigase.kernel.core.Kernel;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.cert.CertificateUtil.*;
-import static tigase.io.SSLContextContainerIfc.*;
+import static tigase.io.CertificateContainerIfc.CertificateEntity;
 
-public class CertificateContainerTest {
+public class CertificateContainerTest extends AbstractKernelWithUserRepositoryTestCase {
 
 	private static final Logger LOGGER = Logger.getLogger(CertificateContainerTest.class.getName());
 	private final String domain = "example.com";
 	private CertificateContainer certificateContainer;
+	private SSLContextContainer sslContextContainer;
 
 	@Test
 	public void testRegularDomain() throws Exception {
@@ -62,30 +69,29 @@ public class CertificateContainerTest {
 		testDomain("xmpp.org", false);
 	}
 
+	@Override
+	protected void registerBeans(Kernel kernel) {
+		super.registerBeans(kernel);
+		kernel.registerBean("eventBus").asInstance(EventBusFactory.getInstance()).exportable().exec();
+		kernel.registerBean(TestCertificateRepositoryWithoutStore.class).setActive(true).exportable().exec();
+		kernel.registerBean(TestCertificateContainerWithoutStore.class).exec();
+		kernel.registerBean(SSLContextContainer.class).exec();
+	}
+
 	@Before
 	public void setup() throws CertificateException, NoSuchAlgorithmException, IOException, SignatureException,
 							   NoSuchProviderException, InvalidKeyException {
-		certificateContainer = new CertificateContainer() {
+		certificateContainer = getKernel().getInstance(CertificateContainer.class);
+		sslContextContainer = getKernel().getInstance(SSLContextContainer.class);
 
-			@Override
-			KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
-					throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
-						   UnrecoverableKeyException {
-				return super.addCertificateEntry(entry, alias, false);
-			}
-		};
-
-		Map<String, String> params = new HashMap<>();
-		params.put(CERT_ALIAS_KEY, domain);
 		CertificateEntry selfSignedCertificate = createSelfSignedCertificate("test@mail.com", "*." + domain, "OU", "O",
 																			 "City", "State", "Country",
 																			 () -> createKeyPair(1024, "secret"));
 
-		final String pemCertificate = exportToPemFormat(selfSignedCertificate);
-		params.put(PEM_CERTIFICATE_KEY, pemCertificate);
-		params.put(CERT_SAVE_TO_DISK_KEY, "false");
+		var pemCertificate = exportToPemFormat(selfSignedCertificate);
 
-		certificateContainer.addCertificates(params);
+		var certificateEntity = new CertificateEntity(pemCertificate, domain, false, false);
+		certificateContainer.addCertificates(certificateEntity);
 	}
 
 	private void testDomain(String hostname, boolean expectsExist) throws Exception {
@@ -99,19 +105,50 @@ public class CertificateContainerTest {
 			Assert.assertNull(certificateEntry);
 		}
 
-		SSLContextContainer sslContextContainer = new SSLContextContainer(certificateContainer);
-		SSLContextContainerAbstract.SSLHolder ssl = sslContextContainer.createContextHolder("SSL", hostname, hostname,
-																							false, new TrustManager[0]);
+		var ssl = sslContextContainer.createContextHolder("SSL", hostname, hostname, false, new TrustManager[0]);
+
 		Assert.assertNotNull(ssl);
 		Assert.assertNotNull(ssl.domainCertificate);
-		final String CName = CertificateUtil.getCertCName(ssl.domainCertificate);
+		String cNname = CertificateUtil.getCertCName(ssl.domainCertificate);
+
+
+		// FIXME: rework this test to take into consideration auto-generation of the certificate…
 		if (expectsExist) {
 			Assert.assertEquals(certificateEntry.getCertChain()[0], ssl.domainCertificate);
-			Assert.assertTrue(CName.contains(domain));
+			Assert.assertTrue(cNname.contains(domain));
 		} else {
-
-			Assert.assertFalse(CName.contains(domain));
+			Assert.assertFalse(cNname.contains(domain));
 		}
 	}
 
+	public static class TestCertificateContainerWithoutStore extends CertificateContainer {
+
+		public TestCertificateContainerWithoutStore() {
+
+		}
+
+		@Override
+		void storeCertificateToFile(CertificateEntry entry, String filename)
+				throws CertificateEncodingException, IOException {
+			throw new RuntimeException(new IOException("We tried storing certificate to file, even though we shouldn't"));
+		}
+	}
+
+	public static class TestCertificateRepositoryWithoutStore extends CertificateRepository {
+
+		public TestCertificateRepositoryWithoutStore() {
+		}
+
+		@Override
+		public void addItem(CertificateItem item) {
+			super.addItem(item);
+//			throw new RuntimeException(new IOException("We tried storing certificate to repository, even though we shouldn't"));
+		}
+
+		@Override
+		public void store() {
+			super.store();
+//			throw new RuntimeException(new IOException("We tried storing certificate to repository, even though we shouldn't"));
+		}
+	}
 }

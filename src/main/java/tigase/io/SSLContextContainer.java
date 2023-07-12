@@ -427,6 +427,9 @@ public class SSLContextContainer
 		return mode;
 	}
 
+	/**
+	 * Method used to re-create self-signed certificate in case it's invalid (e.g. expired)
+	 */
 	private void invalidateContextHolder(SSLHolder holder, String alias) throws Exception {
 		sslContexts.remove(alias);
 		createCertificate(alias);

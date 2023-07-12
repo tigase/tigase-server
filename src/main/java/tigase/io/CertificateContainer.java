@@ -113,6 +113,8 @@ public class CertificateContainer
 	}
 
 	@Override
+//	@Deprecated
+//	@TigaseDeprecated(since = "8.4.0", removeIn = "9.0.0")
 	public void addCertificates(Map<String, String> params) throws CertificateParsingException {
 		String pemCert = params.get(PEM_CERTIFICATE_KEY);
 		String saveToDiskVal = params.get(CERT_SAVE_TO_DISK_KEY);
@@ -132,6 +134,14 @@ public class CertificateContainer
 			if (useAsDefault) {
 				addCertificate(def_cert_alias, pemCert, saveToDisk, true);
 			}
+		}
+	}
+
+	@Override
+	public void addCertificates(CertificateEntity certificateEntity) throws CertificateParsingException {
+		addCertificate(certificateEntity.alias(), certificateEntity.certificatePem(), certificateEntity.storePermanently(), true);
+		if (certificateEntity.useAsDefault()) {
+			addCertificate(certificateEntity.alias(), def_cert_alias, certificateEntity.storePermanently(), true);
 		}
 	}
 
@@ -157,6 +167,7 @@ public class CertificateContainer
 
 	@Override
 	public KeyManager[] getKeyManagers(String hostname) {
+		log.log(Level.FINEST, "Looking up domain: {0} in collection: {1}", new Object[] {hostname, kmfs.keySet()});
 		if (hostname == null && !sniDisable) {
 			return kms;
 		}
@@ -320,8 +331,12 @@ public class CertificateContainer
 		if (event.isLocal()) {
 			return;
 		}
-
-		addCertificate(event.getAlias(), event.getPemCertificate(), event.isSaveToDisk());
+		boolean saveToDisk = repository == null;
+		try {
+			addCertificate(event.getAlias(), event.getPemCertificate(), saveToDisk, false);
+		} catch (CertificateParsingException ex) {
+			log.log(Level.WARNING, "Failed to update certificate for " + event.getAlias(), ex);
+		}
 		if (repository != null) {
 			repository.reload();
 		}
@@ -341,7 +356,7 @@ public class CertificateContainer
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
 		log.log(Level.FINEST, "Adding certificate entry for alias: {0}. Saving to disk: {1}, entry: {2}",
-				new Object[]{alias, store, entry});
+				new Object[]{alias, store, entry != null ? entry.toString(true) : "null"});
 		PrivateKey privateKey = entry.getPrivateKey();
 		Certificate[] certChain = CertificateUtil.sort(entry.getCertChain());
 
@@ -355,12 +370,13 @@ public class CertificateContainer
 		cens.put(alias, entry);
 
 		if (!def_cert_alias.equals(alias)) {
+			// TODO: better handling of updating collections, ideally in single step
 			Optional<Certificate> certificate = entry.getCertificate();
 			if (certificate.isPresent()) {
 				Set<String> domains = getAllCNames(certificate.get());
 				log.log(Level.FINEST,
 						"Certificate present with domains: {0}. Replacing in collections, kmfs domains: {1}, cens domains: {2}. Certificate: {3}",
-						new Object[]{domains, kmfs.keySet(), cens.keySet(), certificate.get()});
+						new Object[]{domains, kmfs.keySet(), cens.keySet(), entry.toString(true)});
 				SSLContextContainerAbstract.removeMatchedDomains(kmfs, domains);
 				SSLContextContainerAbstract.removeMatchedDomains(cens, domains);
 				log.log(Level.FINEST,
@@ -480,7 +496,7 @@ public class CertificateContainer
 		return file;
 	}
 
-	private void storeCertificateToFile(CertificateEntry entry, String filename)
+	void storeCertificateToFile(CertificateEntry entry, String filename)
 			throws CertificateEncodingException, IOException {
 		final String path = new File(defaultCertDirectory, filename + ".pem").toString();
 		CertificateUtil.storeCertificate(path, entry);
@@ -498,27 +514,17 @@ public class CertificateContainer
 		return kmf;
 	}
 
-	private void addCertificate(String alias, String pemCertificate, boolean saveToDisk) {
-		try {
-			addCertificate(alias, pemCertificate, saveToDisk, false);
-		} catch (CertificateParsingException ex) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Failed to update certificate for " + alias, ex);
-			}
-			log.log(Level.WARNING, "Failed to update certificate for " + alias + ", " + ex);
-		}
-	}
-
 	private void addCertificate(String alias, String pemCert, boolean saveToDisk, boolean notifyCluster)
 			throws CertificateParsingException {
 		try {
 			log.log(Level.FINEST, "Adding new certificate with alias: {0}. Saving to disk: {1}, notify cluster: {2}",
 					new Object[]{alias, saveToDisk, notifyCluster});
-			CertificateEntry entry = CertificateUtil.parseCertificate(new CharArrayReader(pemCert.toCharArray()));
-
+			CertificateEntry entry = CertificateUtil.parseCertificate(new StringReader(pemCert));
 			addCertificateEntry(entry, alias, saveToDisk);
 			if (notifyCluster) {
-				eventBus.fire(new CertificateChange(alias, pemCert, saveToDisk));
+				// we notify whole cluster but the event should not propagate "Save to disk" state if we use repository
+				boolean eventSaveToDisk = repository == null;
+				eventBus.fire(new CertificateChange(alias, pemCert, eventSaveToDisk));
 			}
 			Optional<Certificate> certificate = entry.getCertificate();
 			Set<String> domains = certificate.map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());

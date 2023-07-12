@@ -133,13 +133,9 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 					def subjectAltName = CertificateUtil.getCertAltCName((X509Certificate) certEntry.getCertChain()[0])
 					if (hasPermissionToUpdate(item, isServiceAdmin, stanzaFromBare, log) &&
 							isCertificateValidForVhost(itemKey, certCName, subjectAltName, log)) {
-						def params = new HashMap()
-						params.put(SSLContextContainerIfc.PEM_CERTIFICATE_KEY, pemCert)
-						params.put(SSLContextContainerIfc.CERT_ALIAS_KEY, itemKey)
-						params.put(SSLContextContainerIfc.CERT_SAVE_TO_DISK_KEY, saveToDisk.toString())
-						params.put(SSLContextContainerIfc.DEFAULT_DOMAIN_CERT_KEY, useAsDefault.toString())
 						CertificateContainerIfc certContainer = kernel.getInstance(CertificateContainerIfc.class);
-						certContainer.addCertificates(params);
+						certContainer.addCertificates(new CertificateContainerIfc.CertificateEntity(pemCert, itemKey, saveToDisk, useAsDefault));
+
 						Command.addTextField(result, "Note",
 											 "SSL Certificate for domain: " + itemKey + " loaded successfully")
 					} else {

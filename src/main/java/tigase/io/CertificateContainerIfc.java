@@ -17,6 +17,7 @@
  */
 package tigase.io;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.cert.CertificateEntry;
 
 import javax.net.ssl.KeyManager;
@@ -26,6 +27,7 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Interface implemented by classes responsible for keeping SSL certificates in memory
@@ -47,7 +49,11 @@ public interface CertificateContainerIfc {
 	 * @param params a <code>Map</code> value with configuration parameters.
 	 *
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.4.0", removeIn = "9.0.0", note = "Method with tigase.io.CertificateContainerIfc.CertificateEntity should be used")
 	void addCertificates(Map<String, String> params) throws CertificateParsingException;
+
+	void addCertificates(CertificateEntity certificateEntity) throws CertificateParsingException;
 
 	/**
 	 * Method <code>createCertificate</code> allows to generate self-signed certificate for passed domain name.s
@@ -85,4 +91,19 @@ public interface CertificateContainerIfc {
 	 *
 	 */
 	void init(Map<String, Object> params);
+
+	record CertificateEntity(String certificatePem, String alias, boolean storePermanently, boolean useAsDefault) {
+
+		public CertificateEntity {
+			Objects.requireNonNull(certificatePem);
+			Objects.requireNonNull(alias);
+		}
+
+		CertificateEntity withAlias(String alias) {
+			return new CertificateEntity(certificatePem, alias, storePermanently, useAsDefault);
+		}
+		CertificateEntity withDefaultAlias() {
+			return new CertificateEntity(certificatePem, SSLContextContainerIfc.DEFAULT_DOMAIN_CERT_VAL, storePermanently, useAsDefault);
+		}
+	}
 }
