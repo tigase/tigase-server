@@ -23,6 +23,7 @@ import tigase.auth.SaslInvalidLoginExcepion;
 import tigase.db.AuthRepository;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
+import tigase.db.UserNotFoundException;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Iq;
@@ -210,6 +211,8 @@ public abstract class AbstractAuthPreprocessor
 				log.log(Level.CONFIG, "Disabling user " + userJID);
 				session.getAuthRepository().setAccountStatus(userJID, AuthRepository.AccountStatus.disabled);
 			}
+		} catch (UserNotFoundException e) {
+			log.log(Level.FINE, "Cannot check status or disable nonexistent user!", e);
 		} catch (TigaseDBException e) {
 			log.log(Level.WARNING, "Cannot check status or disable user!", e);
 		}
