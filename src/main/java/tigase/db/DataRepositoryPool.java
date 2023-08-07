@@ -322,4 +322,10 @@ public class DataRepositoryPool
 		void run(DataRepository dataRepository) throws SQLException;
 
 	}
+
+	@Override
+	public String toString() {
+		final String url = getResourceUri() != null ? JDBCPasswordObfuscator.obfuscatePassword(getResourceUri()) : "n/a";
+		return "DataRepositoryPool{" + "size=" + getPoolSize() + ", uri='" + url + '\'' + '}';
+	}
 }
