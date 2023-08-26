@@ -48,6 +48,7 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -156,9 +157,21 @@ public class S2SConnManAbstractTest
 									   Assert::assertTrue);
 	}
 
+	protected void testS2STigaseConnectionManager(String localDomain, String[] protocols, S2SConnectionHandlerImpl.IPFamily ipFamily) {
+		testS2STigaseConnectionManager(localDomain, protocols, ipFamily,
+									   certCheckResult -> Assert.assertEquals(CertCheckResult.trusted, certCheckResult),
+									   Assert::assertTrue);
+	}
+
 	protected void testS2STigaseConnectionManager(String localDomain, String[] protocols, Consumer<CertCheckResult> certificateCheckResult,
 												  Consumer<Boolean> authenticatedConsumer) {
+		testS2STigaseConnectionManager(localDomain, protocols, S2SConnectionHandlerImpl.IPFamily.ANY, certificateCheckResult, authenticatedConsumer);
+	}
+
+	protected void testS2STigaseConnectionManager(String localDomain, String[] protocols, S2SConnectionHandlerImpl.IPFamily ipFamily, Consumer<CertCheckResult> certificateCheckResult,
+												  Consumer<Boolean> authenticatedConsumer) {
 		try {
+			handler.setIpFamily(ipFamily);
 			final SSLContextContainer context = kernel.getInstance(SSLContextContainer.class);
 			setupSslContextContainer(context, localDomain, SSLContextContainer.HARDENED_MODE.secure, protocols, null);
 
@@ -280,6 +293,22 @@ public class S2SConnManAbstractTest
 			connectionDelay = 0;
 		}
 
+		public enum IPFamily {
+			ANY,
+			IPv6,
+			IPv4
+		}
+
+		private IPFamily ipFamily = IPFamily.ANY;
+
+		public IPFamily getIpFamily() {
+			return ipFamily;
+		}
+
+		public void setIpFamily(IPFamily ipFamily) {
+			this.ipFamily = ipFamily;
+		}
+
 		@Override
 		public HashSet<Integer> getDefPorts() {
 			return new HashSet<>();
@@ -381,18 +410,41 @@ public class S2SConnManAbstractTest
 				}
 				final String serverName = cid.getRemoteHost();
 				DNSEntry[] dns_entries = DNSResolverFactory.getInstance().getHostSRV_Entries(serverName);
-				if (dns_entries != null && dns_entries.length > 0) {
-					final DNSEntry dns_entry = dns_entries[0];
-					final String ip = dns_entry.getIp();
-					s2s_conn = new S2SConnection(handler, ip);
-					Map<String, Object> port_props = new TreeMap<>();
-					port_props.put(S2SIOService.CERT_REQUIRED_DOMAIN, serverName);
-					initNewConnection(ip, dns_entry.getPort(), s2s_conn, port_props);
-				}
+				var dns_entry = selectDnsEntry(dns_entries).orElseThrow(NoValidDnsEntry::new);
+				final String ip = dns_entry.getIp();
+				s2s_conn = new S2SConnection(handler, ip);
+				Map<String, Object> port_props = new TreeMap<>();
+				port_props.put(S2SIOService.CERT_REQUIRED_DOMAIN, serverName);
+				initNewConnection(ip, dns_entry.getPort(), s2s_conn, port_props);
+			} catch (NoValidDnsEntry ex) {
+				log.log(Level.FINE, "No valid DNS entries found: " + cid.getRemoteHost() + ", for: " + cid + ", ipFamily: " + handler.getIpFamily());
+				//Assert.fail("No valid DNS entries found: " + cid.getRemoteHost() + ", for: " + cid + ", ipFamily: " + handler.getIpFamily());
 			} catch (UnknownHostException ex) {
 				log.log(Level.FINE, "Remote host not found: " + cid.getRemoteHost() + ", for: " + cid, ex);
 				Assert.fail("Remote host not found: " + cid.getRemoteHost() + ", for: " + cid);
 			}
 		}
+
+		protected Optional<DNSEntry> selectDnsEntry(DNSEntry[] dns_entries) {
+			if (dns_entries == null) {
+				return Optional.empty();
+			}
+			Predicate<String> ipPredicate = switch (handler.getIpFamily()) {
+				case ANY -> ip -> true;
+				case IPv4 -> ip -> ip.contains(".");
+				case IPv6 -> ip -> !ip.contains(".");
+			};
+
+			return Arrays.stream(dns_entries).map(e -> {
+				var ips = Arrays.stream(e.getIps()).filter(ipPredicate).toArray(String[]::new);
+				if (ips.length == 0) {
+					return null;
+				} else {
+					return new DNSEntry(e.getHostname(), e.getDnsResultHost(), ips, e.getPort(), e.getTtl(), e.getPriority(), e.getWeight());
+				}
+			}).filter(Objects::nonNull).findFirst();
+		}
+
+		protected class NoValidDnsEntry extends Exception {}
 	}
 }

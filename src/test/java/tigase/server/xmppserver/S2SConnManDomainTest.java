@@ -243,4 +243,19 @@ public class S2SConnManDomainTest
 									   certCheckResult -> Assert.assertEquals(CertCheckResult.expired, certCheckResult),
 									   Assert::assertFalse);
 	}
+
+	@Test
+	@Ignore
+	public void testS2S_ipv6_only_badxmpp_eu() {
+		setupCID("tigase.im", "ipv6-only.badxmpp.eu");
+		testS2STigaseConnectionManager("tigase.im", null);
+		testS2STigaseConnectionManager("tigase.im", null, S2SConnectionHandlerImpl.IPFamily.IPv6);
+	}
+
+	@Test
+	@Ignore
+	public void testS2S_ipv6_conversations_im() {
+		setupCID("tigase.im", "conversations.im");
+		testS2STigaseConnectionManager("tigase.im", null, S2SConnectionHandlerImpl.IPFamily.IPv6);
+	}
 }
