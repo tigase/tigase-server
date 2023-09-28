@@ -22,9 +22,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PreparedStatementInvocationHandler
 		implements InvocationHandler {
+
+	private final static Logger log = Logger.getLogger(PreparedStatementInvocationHandler.class.getName());
 
 	private final PreparedStatement ps;
 
@@ -37,6 +42,10 @@ public class PreparedStatementInvocationHandler
 		try {
 			return method.invoke(ps, args);
 		} catch (Throwable ex) {
+			if (isReadOnlyException(ex)) {
+				log.log(Level.FINEST, "Database connection threw read-only exception, marking it as such co reinitialise it: " + ps.getConnection());
+				ps.getConnection().setReadOnly(true);
+			}
 			if (ex instanceof UndeclaredThrowableException) {
 				ex = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();
 			}
@@ -46,5 +55,24 @@ public class PreparedStatementInvocationHandler
 				throw ex;
 			}
 		}
+	}
+
+	private boolean isMySqlReadOnly(SQLException sqlex) {
+		return sqlex.getErrorCode() == 1290 && "HY000".equals(sqlex.getSQLState());
+	}
+
+	private boolean isPostgresReadOnly(SQLException sqlex) {
+		return sqlex.getErrorCode() == 0 && "25006".equals(sqlex.getSQLState());
+	}
+
+	private boolean isReadOnlyException(Throwable ex) {
+		if (ex instanceof InvocationTargetException) {
+			ex = ((InvocationTargetException) ex).getTargetException();
+		}
+		if (ex instanceof SQLException) {
+			SQLException sqlex = (SQLException) ex;
+			return (isMySqlReadOnly(sqlex) || isPostgresReadOnly(sqlex));
+		}
+		return false;
 	}
 }

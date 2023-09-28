@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,7 +67,7 @@ public class DataRepositoryImpl
 	private String check_table_query = OTHER_CHECK_TABLE_QUERY;
 	private Connection conn = null;
 	private PreparedStatement conn_valid_st = null;
-	private long connectionValidateInterval = 1000 * 60;
+	private long connectionValidateInterval = TimeUnit.SECONDS.toMillis(60);
 	private dbTypes database = null;
 	private String db_conn = null;
 	@ConfigField(desc = "Database connection timeout", alias = DB_CONN_TIMEOUT_PROP_KEY)
@@ -82,6 +83,12 @@ public class DataRepositoryImpl
 	private String table_schema = null;
 	@ConfigField(desc = "Use workaround for slow prepareStatement() in MySQL", alias = "useCallableMysqlWorkaround")
 	private boolean useCallableMysqlWorkaround = false;
+	@ConfigField(desc = "Use native JDBC driver connectivity check", alias = "use-native-driver-connectivity-check")
+	private boolean useNativeDriverConnectivityCheck = true;
+	@ConfigField(desc = "Check if database connection is read-only", alias = "test-if-connection-is-read-only")
+	private boolean testIfConnectionIsReadOnly = true;
+	@ConfigField(desc = "Query connection server and check if it is read-only", alias = "query-server-is-read-only-state")
+	private boolean queryServerIsReadOnlyState = false;
 
 	@Override
 	public boolean automaticSchemaManagement() {
@@ -442,28 +449,91 @@ public class DataRepositoryImpl
 	 * @throws SQLException if an error occurs on database query.
 	 */
 	private synchronized boolean checkConnection() throws SQLException {
-		ResultSet rs = null;
+		if (conn.isClosed()) {
+			log.log(Level.FINEST, "Connection is in closed, reinitialising connection: " + conn);
+			initRepo();
+			return false;
+		}
+		if (testIfConnectionIsReadOnly) {
+			if (checkConnectionIsReadOnly()) {
+				log.log(Level.INFO, "Connection is in read-only mode, reinitialising connection: " + conn);
+				initRepo();
+				return false;
+			}
+		}
 
-		try {
+		if (useNativeDriverConnectivityCheck) {
 			long tmp = System.currentTimeMillis();
 
-			// synchronized (conn_valid_st) {
 			if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
 				lastConnectionValidated = tmp;
-				rs = conn_valid_st.executeQuery();
-			} // end of if ()
-			// }
+				try {
+					if (!conn.isValid(db_conn_timeout)) {
+						initRepo();
+					}
+				} catch (Exception e) {
+					initRepo();
+				}
+			}
+		} else {
+			ResultSet rs = null;
 
-			if (((conn_valid_st == null) || conn_valid_st.isClosed()) && ((tmp - lastConnectionValidated) >= 1000)) {
+			try {
+				long tmp = System.currentTimeMillis();
+
+				// synchronized (conn_valid_st) {
+				if ((tmp - lastConnectionValidated) >= connectionValidateInterval) {
+					lastConnectionValidated = tmp;
+					rs = conn_valid_st.executeQuery();
+				} // end of if ()
+				// }
+
+				if (((conn_valid_st == null) || conn_valid_st.isClosed()) && ((tmp - lastConnectionValidated) >= 1000)) {
+					initRepo();
+				} // end of if ()
+			} catch (Exception e) {
 				initRepo();
-			} // end of if ()
-		} catch (Exception e) {
-			initRepo();
-		} finally {
-			release(null, rs);
-		} // end of try-catch
+			} finally {
+				release(null, rs);
+			} // end of try-catch
 
+		}
 		return true;
+	}
+
+	private boolean checkConnectionIsReadOnly() {
+		try {
+			synchronized (conn) {
+				if (queryServerIsReadOnlyState ? isConnectionServerReadOnly() : conn.isReadOnly()) {
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			// FOR some reason MySQL driver throws either NPE or ArrayIndexOutOfBoundsException here…
+			log.log(Level.FINEST, "Connection.isReadOnly threw exception: " + conn, e);
+		}
+		return false;
+	}
+
+	private boolean isConnectionServerReadOnly() {
+		try (Statement statement = conn.createStatement()) {
+			Optional<String> query = switch (database) {
+				// AWS RDS uses `innodb_read_only` variable on read-only replica
+				case mysql -> Optional.of("select @@innodb_read_only");
+				case postgresql -> Optional.of("SELECT pg_is_in_recovery();");
+				default -> Optional.empty();
+			};
+			if (query.isPresent()) {
+				try (ResultSet resultSet = statement.executeQuery(query.get())) {
+					if (resultSet.next() && !resultSet.getBoolean(1)) {
+						return true;
+
+					}
+				}
+			}
+		} catch (SQLException ignored) {
+		}
+		return false;
 	}
 
 	/**
