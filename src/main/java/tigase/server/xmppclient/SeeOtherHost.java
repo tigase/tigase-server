@@ -50,7 +50,7 @@ public class SeeOtherHost
 	public static final String REDIRECTION_ENABLED = "see-other-host-redirect-enabled";
 	private static final Logger log = Logger.getLogger(SeeOtherHost.class.getName());
 	@ConfigField(desc = "Default host to redirect to")
-	protected List<BareJID> defaultHost = null;
+	protected ArrayList<BareJID> defaultHost = null;
 	@Inject
 	protected EventBus eventBus;
 	@Inject
@@ -72,7 +72,7 @@ public class SeeOtherHost
 	public void initialize() {
 	}
 
-	public void setDefaultHost(List<BareJID> defaultHost) {
+	public void setDefaultHost(ArrayList<BareJID> defaultHost) {
 		if (defaultHost != null) {
 			Collections.sort(defaultHost);
 		}
