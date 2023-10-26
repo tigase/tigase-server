@@ -113,15 +113,14 @@ public class MIXProcessor
 
 				switch (actionEl.getName()) {
 					case "client-join":
-						Element joinEl = Optional.ofNullable(actionEl.getChildStaticStr("join", "urn:xmpp:mix:core:1")).orElseThrow(() -> new XMPPProcessorException(Authorization.BAD_REQUEST));
-						session.setData(ID, generateId(channel, id), session.getResource());
-						sendToChannel(session.getBareJID(), channel, id, joinEl, results::offer);
+						Element joinEl = Optional.ofNullable(actionEl.getChildStaticStr("join", "urn:xmpp:mix:core:1"))
+								.orElseThrow(() -> new XMPPProcessorException(Authorization.BAD_REQUEST));
+						sendToChannel(session.getBareJID(), session.getResource(), channel, id, joinEl, results::offer);
 						break;
 					case "client-leave":
 						Element leaveEl = Optional.ofNullable(actionEl.getChildStaticStr("leave", "urn:xmpp:mix:core:1"))
 								.orElseThrow(() -> new XMPPProcessorException(Authorization.BAD_REQUEST));
-						session.setData(ID, generateId(channel, id), session.getResource());
-						sendToChannel(session.getBareJID(), channel, id, leaveEl, results::offer);
+						sendToChannel(session.getBareJID(), session.getResource(), channel, id, leaveEl, results::offer);
 						break;
 					default:
 						throw new XMPPProcessorException(Authorization.BAD_REQUEST);
@@ -249,6 +248,12 @@ public class MIXProcessor
 		Packet response = Packet.packetInstance(iqEl, JID.jidInstance(userJID), JID.jidInstanceNS(userJID, resource));
 		response.setPacketTo(connectionJID);
 		writer.accept(response);
+	}
+
+	public void sendToChannel(BareJID userJid, String resource, BareJID channel, String requestStanzaId, Element joinEl, Consumer<Packet> writer)
+			throws XMPPProcessorException, TigaseDBException {
+		userRepository.setData(userJid, ID, generateId(channel, requestStanzaId), resource);
+		sendToChannel(userJid, channel, requestStanzaId, joinEl, writer);
 	}
 
 	protected String generateId(BareJID channel, String packetID) throws XMPPProcessorException {
