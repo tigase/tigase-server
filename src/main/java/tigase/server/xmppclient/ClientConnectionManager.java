@@ -497,6 +497,9 @@ public class ClientConnectionManager
 					final SocketType socket = (SocketType) serv.getSessionData().get("socket");
 					boolean ssl = socket.equals(SocketType.ssl);
 					((C2SIOService) serv).waitForResponse();
+					if ((Boolean) serv.getSessionData().getOrDefault("SEND_TLS_COMPLETED", false)) {
+						ClientConnectionManager.this.sendTlsHandshakeCompletedToSessionManager(serv);
+					}
 					addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv.getDataReceiver(), StanzaType.get, (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
 				});
 			} else {
@@ -506,6 +509,9 @@ public class ClientConnectionManager
 				boolean ssl = socket.equals(SocketType.ssl);
 				if (serv instanceof C2SIOService) {
 					((C2SIOService) serv).waitForResponse();
+				}
+				if ((Boolean) serv.getSessionData().getOrDefault("SEND_TLS_COMPLETED", false)) {
+					ClientConnectionManager.this.sendTlsHandshakeCompletedToSessionManager(serv);
 				}
 				addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv.getDataReceiver(), StanzaType.get,
 														   (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
