@@ -21,6 +21,7 @@ import tigase.io.TLSIOIfc;
 import tigase.net.IOService;
 import tigase.net.SocketThread;
 import tigase.server.Packet;
+import tigase.util.Algorithms;
 import tigase.xmpp.XMPPIOService;
 
 import java.io.IOException;
@@ -148,6 +149,10 @@ public class C2SIOService<RefObject>
 				case 0x01:
 					if (i >= 2 && (buffer.get(i-2) & 0x80) == 0x80) {
 						// found SSL 2.0 header!!
+						// check if length is less than or equal 16709
+						if (((((int) (buffer.get(i-2) & 0x7f)) << 8) | buffer.get(i-1)) > 16709) {
+	                        return false;
+						}
 						synchronized (this) {
 							extractTlsHandshakeData(buffer, i - 2);
 						}
@@ -181,7 +186,11 @@ public class C2SIOService<RefObject>
 			try {
 				((TLSIOIfc) getIO()).processHandshake(tlsData);
 			} catch (Exception ex) {
-				log.log(Level.WARNING, "Error while processing handshake", ex);
+				if (log.isLoggable(Level.WARNING)) {
+					byte[] data = Arrays.copyOf(tlsData, Math.min(tlsData.length, 10));
+					log.log(Level.WARNING,
+							"Error while processing handshake, SSL packet header " + Algorithms.bytesToHex(data) + "...", ex);
+				}
 			}
 			tlsData = null;
 		} else {
