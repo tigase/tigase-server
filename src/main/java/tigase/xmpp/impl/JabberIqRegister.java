@@ -398,7 +398,7 @@ public class JabberIqRegister
 		if (log.isLoggable(Level.FINEST) && (session != null)) {
 			log.finest("VHostItem: " + session.getDomain());
 		}
-		if ((session != null) && session.getDomain().isRegisterEnabled()) {
+		if ((session != null) && ((!session.isTlsRequired()) || session.isEncrypted()) && session.getDomain().isRegisterEnabled()) {
 			return DISCO_FEATURES;
 		} else {
 			return null;
@@ -691,7 +691,9 @@ public class JabberIqRegister
 
 	private void validatCapchaForm(XMPPResourceConnection session, Form form) throws XMPPProcessorException {
 		CaptchaItem captcha = (CaptchaItem) session.getSessionData("jabber:iq:register:captcha");
-
+		if (captcha == null) {
+			captcha = captchaProvider.getCaptchaByID(form.getAsString("captcha-id"));
+		}
 		if (captcha == null) {
 			log.finest("CAPTCHA is required");
 			throw new XMPPProcessorException(Authorization.BAD_REQUEST,
@@ -718,9 +720,12 @@ public class JabberIqRegister
 		query.addChild(new Element("instructions", (emailRequired ? INSTRUCTION_EMAIL_REQUIRED_DEF : INSTRUCTION_DEF)));
 		Form form = prepareGenericRegistrationForm();
 
-		CaptchaItem captcha = captchaProvider.generateCaptcha();
+		CaptchaItem captcha = captchaProvider.generateCaptcha(session);
 		session.putSessionData("jabber:iq:register:captcha", captcha);
-		Field field = Field.fieldTextSingle("captcha", "", captcha.getCaptchaRequest(session));
+		Field field = Field.fieldHidden("captcha-id", captcha.getID());
+		field.setRequired(true);
+		form.addField(field);
+		field = Field.fieldTextSingle("captcha", "", captcha.getCaptchaRequest(session));
 		field.setRequired(true);
 		form.addField(field);
 
