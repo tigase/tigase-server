@@ -131,7 +131,7 @@ public class XmppSaslException
 			case system:
 				return new XmppSaslException(SaslError.invalid_authzid);
 			case pending:
-				return new XmppSaslException(SaslError.temporary_auth_failure, "Your account hasn't been activated yet. Please cheek your email for activation link");
+				return new XmppSaslException(SaslError.account_disabled, "Your account hasn't been activated yet. Please cheek your email for activation link");
 			default:
 				return new XmppSaslException(SaslError.not_authorized);
 		}
