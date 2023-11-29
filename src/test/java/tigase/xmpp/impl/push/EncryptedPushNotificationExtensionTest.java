@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class EncryptedPushNotificationExtensionTest {
@@ -69,6 +70,14 @@ public class EncryptedPushNotificationExtensionTest {
 	@Test
 	public void testMessageBodyTruncation5() {
 		runCharTest(5, "\uFFFD", 2999);
+	}
+
+	@Test
+	public void testJsonEncoding() {
+		String body = "To be, \\ or \"not\" to \b\t\r be:\n that is / the question";
+		StringBuilder sb = new StringBuilder();
+		EncryptedPushNotificationExtension.valueToString(body, sb);
+		assertEquals("\"To be, \\\\ or \\\"not\\\" to \\b\\t\\r be:\\n that is \\/ the question\"", sb.toString());
 	}
 	
 	private void runCharTest(int tryNo, String ch, int maxSize) {

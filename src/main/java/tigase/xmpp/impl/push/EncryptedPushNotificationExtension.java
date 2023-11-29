@@ -27,7 +27,6 @@ import tigase.xmpp.StanzaType;
 import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
-import tigase.xmpp.jid.JID;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
@@ -46,8 +45,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Bean(name = "encrypted", parent = PushNotifications.class, active = true)
 public class EncryptedPushNotificationExtension implements PushNotificationsExtension {
@@ -149,7 +146,7 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 			}
 		}
 
-		String content = valueToString(payload);
+		//String content = valueToString(payload);
 
 		boolean isEncrypted = packet.getElemChild("encrypted", "eu.siacs.conversations.axolotl") != null ||
 				packet.getElemChild("encrypted", "urn:xmpp:omemo:1") != null;
@@ -159,9 +156,11 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 			int maxSize = (int) (((maxSizeBytes - 64) * 6) / 8);
 			body = trimBodyToSize(maxSize, body);
 			payload.put("message", body);
-			content = valueToString(payload);
 		}
 
+		StringBuilder sb = new StringBuilder();
+		valueToString(payload, sb);
+		String content = sb.toString();
 		try {
 			Key key = new SecretKeySpec(Base64.decode(keyStr), "AES");
 			byte[] iv = new byte[12];
@@ -192,24 +191,72 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 		CoderResult r = enc.encode(cb, bb, true);
 		return r.isOverflow() ? cb.flip().toString() : body;
 	}
-	
-	private static String valueToString(Object value) {
-		if (value instanceof Number) {
-			return value.toString();
-		} else if (value instanceof String | value instanceof BareJID | value instanceof JID) {
-			return escapeValue(value.toString());
+
+	protected static void valueToString(Object value, StringBuilder sb) {
+		if (value instanceof Integer) {
+			sb.append((int) value);
+		} else if (value instanceof Double) {
+			sb.append((double) value);
+		} else if (value instanceof String) {
+			escapeValue((String) value, sb);
 		} else if (value instanceof List) {
-			return "[" + ((List) value).stream().map(EncryptedPushNotificationExtension::valueToString).collect(Collectors.joining(",")) + "]";
+			sb.append("[");
+			boolean first = true;
+			for (Object item : (List<Object>) value) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(", ");
+				}
+				valueToString(item, sb);
+			}
+			sb.append("]");
 		} else if (value instanceof Map) {
-			return "{" + ((Stream<Map.Entry>) ((Map) value).entrySet().stream()).map(
-					(Map.Entry e) -> "\"" + e.getKey() + "\" : " + valueToString(e.getValue()))
-					.collect(Collectors.joining(",")) + "}";
+			sb.append("{");
+			boolean first = true;
+			for (Map.Entry e : ((Map<String,Object>) value).entrySet()) {
+				if (first) {
+					first = false;
+				} else {
+					sb.append(", ");
+				}
+				sb.append("\"").append(e.getKey()).append("\" : ");
+				valueToString(e.getValue(), sb);
+			}
+			sb.append("}");
 		} else {
-			return "null";
+			sb.append("null");
 		}
 	}
 
-	private static String escapeValue(String in) {
-		return "\"" + in.replace("\"", "\\\"") + "\"";
+	private static void escapeValue(String in, StringBuilder sb) {
+		sb.append('\"');
+		for (char c : in.toCharArray()) {
+			switch (c) {
+				case '\b':
+					sb.append("\\b");
+					break;
+				case '\f':
+					sb.append("\\f");
+					break;
+				case '\n':
+					sb.append("\\n");
+					break;
+				case '\r':
+					sb.append("\\r");
+					break;
+				case '\t':
+					sb.append("\\t");
+					break;
+				case '"':
+				case '\\':
+				case '/':
+					sb.append("\\");
+				default:
+					sb.append(c);
+					break;
+			}
+		}
+		sb.append('\"');
 	}
 }
