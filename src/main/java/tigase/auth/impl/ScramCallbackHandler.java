@@ -206,7 +206,9 @@ public class ScramCallbackHandler
 	}
 
 	private void handleChannelBindingCallback(ChannelBindingCallback callback) {
-		if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique) {
+		if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_exporter) {
+			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_EXPORTER_KEY));
+		}else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique) {
 			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY));
 		} else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_server_end_point) {
 			try {

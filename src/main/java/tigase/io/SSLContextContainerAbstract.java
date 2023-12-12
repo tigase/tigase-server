@@ -25,6 +25,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509KeyManager;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
@@ -40,6 +42,8 @@ import java.util.stream.Collectors;
  */
 public abstract class SSLContextContainerAbstract
 		implements SSLContextContainerIfc {
+
+
 
 	private static final Logger log = Logger.getLogger(SSLContextContainerAbstract.class.getCanonicalName());
 
@@ -124,6 +128,10 @@ public abstract class SSLContextContainerAbstract
 		return certificateContainer.createCertificate(alias);
 	}
 
+	protected SSLContext createSSLContext(String protocol) throws NoSuchAlgorithmException, NoSuchProviderException {
+		return SSLContext.getInstance(protocol);
+	}
+
 	/**
 	 * Common method used to create SSLContext instance based on provided parameters
 	 */
@@ -139,7 +147,7 @@ public abstract class SSLContextContainerAbstract
 			// if there is no KeyManagerFactory for domain then we can create
 			// new empty context as we have no certificate for this domain
 			if (clientMode) {
-				sslContext = SSLContext.getInstance(protocol);
+				sslContext = createSSLContext(protocol);
 				sslContext.init(null, tms, secureRandom);
 				final SSLHolder sslHolder = new SSLHolder(tms, sslContext, null);
 				if (log.isLoggable(Level.FINEST)) {
@@ -171,7 +179,7 @@ public abstract class SSLContextContainerAbstract
 			crt = chain == null || chain.length == 0 ? null : chain[0];
 		}
 
-		sslContext = SSLContext.getInstance(protocol);
+		sslContext = createSSLContext(protocol);
 		sslContext.init(kms, tms, secureRandom);
 
 		final SSLHolder sslHolder = new SSLHolder(tms, sslContext, crt);

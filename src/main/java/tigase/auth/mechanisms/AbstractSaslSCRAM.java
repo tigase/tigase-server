@@ -48,10 +48,10 @@ import java.util.regex.Pattern;
 public abstract class AbstractSaslSCRAM
 		extends AbstractSasl {
 
-	private static final Charset CHARSET = Charset.forName("UTF-8");
-
 	public static final String TLS_UNIQUE_ID_KEY = "TLS_UNIQUE_ID_KEY";
+	public static final String TLS_EXPORTER_KEY = "TLS_EXPORTER_KEY";
 	public static final String LOCAL_CERTIFICATE_KEY = "LOCAL_CERTIFICATE_KEY";
+	private static final Charset CHARSET = Charset.forName("UTF-8");
 	protected final static byte[] DEFAULT_CLIENT_KEY = "Client Key".getBytes(CHARSET);
 	protected final static byte[] DEFAULT_SERVER_KEY = "Server Key".getBytes(CHARSET);
 	private final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -78,7 +78,11 @@ public abstract class AbstractSaslSCRAM
 		/**
 		 * Client requires channel binding: <code>tls-server-end-point</code>.
 		 */
-		tls_server_end_point
+		tls_server_end_point,
+		/**
+		 * Client requires channel binding: <code>tls-exporter</code>.
+		 */
+		tls_exporter
 	}
 
 	private final String algorithm;
@@ -110,6 +114,10 @@ public abstract class AbstractSaslSCRAM
 		if (session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null) {
 			bindings.addChild(
 					new Element("channel-binding", new String[]{"type"}, new String[]{"tls-unique"}));
+		}
+		if (session.getSessionData(AbstractSaslSCRAM.TLS_EXPORTER_KEY) != null) {
+			bindings.addChild(
+					new Element("channel-binding", new String[]{"type"}, new String[]{"tls-exporter"}));
 		}
 		return bindings;
 	}
@@ -181,7 +189,8 @@ public abstract class AbstractSaslSCRAM
 			result.write(this.cfmGs2header.getBytes(CHARSET));
 
 			if (this.requestedBindType == BindType.tls_unique ||
-					this.requestedBindType == BindType.tls_server_end_point) {
+					this.requestedBindType == BindType.tls_server_end_point ||
+					this.requestedBindType == BindType.tls_exporter) {
 				result.write(bindingData);
 			}
 			return result.toByteArray();
@@ -203,6 +212,8 @@ public abstract class AbstractSaslSCRAM
 			return BindType.tls_unique;
 		} else if ("tls-server-end-point".equals(cfmCbname)) {
 			return BindType.tls_server_end_point;
+		} else if ("tls-exporter".equals(cfmCbname)) {
+			return BindType.tls_exporter;
 		} else {
 			throw new SaslException("Unsupported channel binding type");
 		}
@@ -385,6 +396,8 @@ public abstract class AbstractSaslSCRAM
 		if (requestedBindType == BindType.tls_server_end_point && bindingData == null) {
 			throw new RuntimeException("Binding data not found!");
 		} else if (requestedBindType == BindType.tls_unique && bindingData == null) {
+			throw new RuntimeException("Binding data not found!");
+		} else if (requestedBindType == BindType.tls_exporter && bindingData == null) {
 			throw new RuntimeException("Binding data not found!");
 		}
 	}

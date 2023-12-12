@@ -137,6 +137,7 @@ public abstract class IOService<RefObject>
 	private SSLContextContainerIfc sslContextContainer;
 	private boolean stopping = false;
 	private byte[] tlsUniqueId;
+	private byte[] tlsExporter;
 	private long[] wrData = new long[60];
 
 	private TrustManager[] x509TrustManagers;
@@ -320,6 +321,9 @@ public abstract class IOService<RefObject>
 
 		if (!wrapper.isClientMode()) {
 			this.tlsUniqueId = wrapper.getTlsUniqueBindingData();
+		}
+		if (!wrapper.isClientMode()) {
+			this.tlsExporter = wrapper.getTlsExporterBindingData();
 		}
 
 		// we want to have local SSL certificate validated all the time, ie. for outgoing S2S connection
@@ -519,6 +523,10 @@ public abstract class IOService<RefObject>
 
 	public byte[] getTlsUniqueId() {
 		return tlsUniqueId;
+	}
+
+	public byte[] getTlsExporter() {
+		return tlsExporter;
 	}
 
 	/**

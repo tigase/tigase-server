@@ -54,7 +54,7 @@ public class JcaTLSWrapper
 	// private String protocol = null;
 	private TLSEventHandler eventHandler = null;
 	private int netBuffSize = 0;
-	private SSLEngine tlsEngine = null;
+	protected SSLEngine tlsEngine = null;
 	private SSLEngineResult tlsEngineResult = null;
 	private InternalHandshakeStatus handshakeStatus = InternalHandshakeStatus.handshaking;
 
@@ -252,6 +252,12 @@ public class JcaTLSWrapper
 
 	@Override
 	public byte[] getTlsUniqueBindingData() {
+		// Because of Java API limitations it always returns null.
+		return null;
+	}
+
+	@Override
+	public byte[] getTlsExporterBindingData() {
 		// Because of Java API limitations it always returns null.
 		return null;
 	}

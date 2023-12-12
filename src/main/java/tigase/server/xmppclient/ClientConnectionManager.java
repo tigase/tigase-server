@@ -1026,6 +1026,12 @@ public class ClientConnectionManager
 			send = true;
 		}
 
+		if (serv.getTlsExporter() != null) {
+			String data = Base64.encode(serv.getTlsExporter());
+			Command.addFieldValue(command, "tls-exporter", data);
+			send = true;
+		}
+
 		if ((serv.getPeerCertificate() != null)) {
 			try {
 				String encodedPeerCertificate = Base64.encode(serv.getPeerCertificate().getEncoded());

@@ -44,6 +44,7 @@ public class SaslSCRAM
 				// throw new SaslException("Server supports PLUS. Please use 'p'");
 				break;
 			case tls_server_end_point:
+			case tls_exporter:
 			case tls_unique:
 				throw new SaslException("Invalid request for " + NAME);
 		}

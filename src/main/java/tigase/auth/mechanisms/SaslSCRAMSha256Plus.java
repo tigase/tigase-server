@@ -50,6 +50,7 @@ public class SaslSCRAMSha256Plus
 			case y:
 				throw new SaslException("Server supports PLUS. Please use 'p'");
 			case tls_server_end_point:
+			case tls_exporter:
 			case tls_unique:
 				break;
 		}

@@ -1637,6 +1637,15 @@ public class SessionManager
 									new Object[]{tlsUniqueId, connection});
 						}
 					}
+					String tlsExporter = Command.getFieldValue(pc, "tls-exporter");
+					if (tlsExporter != null) {
+						byte[] bytes = Base64.decode(tlsExporter);
+						connection.putSessionData(AbstractSaslSCRAM.TLS_EXPORTER_KEY, bytes);
+						if (log.isLoggable(Level.FINEST)) {
+							log.log(Level.FINEST, "tls-exporter {0} stored in session-data. connection: {1}",
+									new Object[]{tlsUniqueId, connection});
+						}
+					}
 					String encodedCertificate = Command.getFieldValue(pc, "peer-certificate");
 					if (encodedCertificate != null) {
 						try {

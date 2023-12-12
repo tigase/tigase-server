@@ -50,6 +50,8 @@ public interface TLSWrapper {
 
 	byte[] getTlsUniqueBindingData();
 
+	byte[] getTlsExporterBindingData();
+
 	boolean isClientMode();
 
 	boolean isNeedClientAuth();
