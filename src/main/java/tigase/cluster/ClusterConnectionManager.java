@@ -460,7 +460,13 @@ public class ClusterConnectionManager
 		// readd packet - this may be good as we would retry to send packet
 		// which delivery failed due to IO error
 		try {
-			addPacket(packet);
+			// We are only redeliverying <cluster/> or <route/> packets as others, if sent over cluster connection, would be wrapped in <route/>.
+			// If they are not wrapped, that means that those are handshake packets and should not be resent.
+			if (packet.getElemName() == ClusterElement.CLUSTER_EL_NAME || packet.getElemName() == "route") {
+				addPacket(packet);
+			} else {
+				log.log(Level.FINEST, () -> "skipping redelivery of packet " + packet);
+			}
 		} catch (NullPointerException ex) {
 			log.log(Level.WARNING, "could not redeliver cluster packet on broken cluster connection:", packet.toString());
 		}
