@@ -1,0 +1,17 @@
+version: 25
+imports:
+- projectPath: Templates
+  revision: 0.0.3
+jobs:
+- name: Maven CI
+  steps:
+  - !UseTemplateStep
+    name: maven build & deploy
+    templateName: Tigase Server - Maven build & deploy
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+  triggers:
+  - !BranchUpdateTrigger {}
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600
