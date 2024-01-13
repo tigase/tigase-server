@@ -700,7 +700,8 @@ public class JabberIqRegister
 											 "CAPTCHA is required. Please reload your registration form.");
 		}
 
-		String capResp = form.getAsString("captcha");
+		// using var='qa' instead of 'captcha' to comply with XEP-0158: CAPTCHA Forms, see https://xmpp.org/extensions/xep-0158.html#challenge-captcha
+		String capResp = form.getAsString("qa");
 
 		if (!captcha.isResponseValid(session, capResp)) {
 			captcha.incraseErrorCounter();
@@ -725,7 +726,8 @@ public class JabberIqRegister
 		Field field = Field.fieldHidden("captcha-id", captcha.getID());
 		field.setRequired(true);
 		form.addField(field);
-		field = Field.fieldTextSingle("captcha", "", captcha.getCaptchaRequest(session));
+		// using var='qa' instead of 'captcha' to comply with XEP-0158: CAPTCHA Forms, see https://xmpp.org/extensions/xep-0158.html#challenge-captcha
+		field = Field.fieldTextSingle("qa", "", captcha.getCaptchaRequest(session));
 		field.setRequired(true);
 		form.addField(field);
 
