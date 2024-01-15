@@ -68,6 +68,7 @@ public class SSLContextContainer
 	/* @formatter:off */
 	private static final String EPHEMERAL_DH_KEYSIZE_KEY = "jdk.tls.ephemeralDHKeySize";
 	private static final int EPHEMERAL_DH_KEYSIZE_VALUE = 4096;
+	private static final String REJECT_CLIENT_INITIATED_RENEGOTIATION_KEY = "jdk.tls.rejectClientInitiatedRenegotiation";
 	private static final String MAX_TLS_HANDSHAKE_MESSAGE_SIZE_KEY = "jdk.tls.maxHandshakeMessageSize";
 	private static final int MAX_TLS_HANDSHAKE_MESSAGE_SIZE_VALUE = (int)Math.pow(2, 16);
 	private static final String[] TLS_WORKAROUND_CIPHERS = new String[]{"SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA",
@@ -89,8 +90,9 @@ public class SSLContextContainer
 	/* @formatter:on */
 
 	private static final String[] HARDENED_SECURE_FORBIDDEN_CIPHERS = new String[]{"^.*(_(MD5|SHA1)$|RC4_.*$)",
-																				   "^(TLS_RSA_WITH_AES.*$)"};
-	private static final String[] HARDENED_STRICT_FORBIDDEN_CIPHERS = new String[]{"^.*_AES_128_.*$"};
+																				   "^(TLS_RSA_WITH_AES.*$)",
+																				   "^.*_CBC_.*$"};
+	private static final String[] HARDENED_STRICT_FORBIDDEN_CIPHERS = new String[]{"^.*_AES_128_.*$", "^.*_CBC_.*$"};
 
 	private static final String[] HARDENED_SECURE_FORBIDDEN_PROTOCOLS = new String[]{"SSL", "SSLv2", "SSLv3"};
 	private static final String[] HARDENED_STRICT_FORBIDDEN_PROTOCOLS = new String[]{"SSLv2Hello", "TLSv1", "TLSv1.1"};
@@ -122,9 +124,9 @@ public class SSLContextContainer
 	@Deprecated
 	@ConfigField(desc = "Disable TLS 1.3", alias = "tls-disable-tls13")
 	private boolean disableTLS13 = false;
-	@ConfigField(desc = "Enabled TLS/SSL ciphers", alias = "tls-disabled-ciphers")
+	@ConfigField(desc = "Disabled TLS/SSL ciphers", alias = "tls-disabled-ciphers")
 	private String[] disabledCiphers;
-	@ConfigField(desc = "Enabled TLS/SSL protocols", alias = "tls-disabled-protocols")
+	@ConfigField(desc = "Disabled TLS/SSL protocols", alias = "tls-disabled-protocols")
 	private String[] disabledProtocols;
 	@ConfigField(desc = "Enabled TLS/SSL ciphers", alias = "tls-enabled-ciphers")
 	@TigaseDeprecated(since = "8.1.0", removeIn = "9.0.0", note = "Control list of ciphers with `tls-disabled-ciphers`")
@@ -343,6 +345,7 @@ public class SSLContextContainer
 	public void initialize() {
 		System.setProperty(EPHEMERAL_DH_KEYSIZE_KEY, String.valueOf(ephemeralDHKeySize));
 		System.setProperty(MAX_TLS_HANDSHAKE_MESSAGE_SIZE_KEY, String.valueOf(maxHandshakeMessageSize));
+		System.setProperty(REJECT_CLIENT_INITIATED_RENEGOTIATION_KEY, String.valueOf(true));
 		try {
 			final SSLContext sslContext = SSLContext.getDefault();
 			SSLEngine tmpEngine = sslContext.createSSLEngine();
