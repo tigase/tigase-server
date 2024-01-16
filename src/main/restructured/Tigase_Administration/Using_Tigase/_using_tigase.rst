@@ -6,7 +6,8 @@
 .. include:: Basic_System_Checks.inc 
 .. include:: Virtual_Domains.inc 
 .. include:: Presence_Forwarding.inc 
-.. include:: Watchdog.inc 
+.. include:: Watchdog.inc
+.. include:: PubSub_Server_Information.inc
 .. include:: Tips_and_Tricks.inc 
 .. include:: Licensing.inc 
 .. include:: Clustering.inc 
