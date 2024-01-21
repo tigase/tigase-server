@@ -7,6 +7,10 @@ build:
   tools:
     python: "3.11"
 
+python:
+  install:
+    - requirements: src/main/restructured/requirements.txt
+
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
-  configuration: conf.py
+  configuration: src/main/restructured/conf.py
