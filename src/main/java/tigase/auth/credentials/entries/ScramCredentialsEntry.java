@@ -18,7 +18,7 @@
 package tigase.auth.credentials.entries;
 
 import tigase.auth.credentials.Credentials;
-import tigase.auth.mechanisms.AbstractSaslSCRAM;
+import tigase.auth.mechanisms.SCRAMHelper;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.util.Base64;
 import tigase.xmpp.jid.BareJID;
@@ -36,32 +36,41 @@ public class ScramCredentialsEntry
 	private static final Logger log = Logger.getLogger(ScramCredentialsEntry.class.getCanonicalName());
 
 	private final String algorithm;
-	private final int iterations = 4096;
+	private final int iterations;
 	private final byte[] salt;
-	private final byte[] saltedPassword;
+	private final byte[] serverKey;
+	private final byte[] storedKey;
 
 	public ScramCredentialsEntry(String algorithm, PlainCredentialsEntry entry)
 			throws NoSuchAlgorithmException, InvalidKeyException {
 		final SecureRandom random = new SecureRandom();
 		this.algorithm = algorithm;
+		this.iterations = 4096;
 		this.salt = new byte[10];
 		random.nextBytes(salt);
-		this.saltedPassword = AbstractSaslSCRAM.hi(algorithm, AbstractSaslSCRAM.normalize(entry.getPassword()), salt,
-												   iterations);
+
+		var authData = SCRAMHelper.encodePlainPassword(algorithm, salt, iterations, entry.getPassword());
+		this.storedKey = authData.storedKey();
+		this.serverKey = authData.serverKey();
 	}
 
-	public ScramCredentialsEntry(String algorithm, byte[] salt, int iterations, byte[] saltedPassword) {
+	public ScramCredentialsEntry(String algorithm, byte[] salt, int iterations, byte[] saltedPassword)
+			throws NoSuchAlgorithmException, InvalidKeyException {
 		this.algorithm = algorithm;
+		this.iterations = iterations;
 		this.salt = salt;
-		this.saltedPassword = saltedPassword;
+
+		var authData = SCRAMHelper.transcode(algorithm, saltedPassword);
+		this.storedKey = authData.storedKey();
+		this.serverKey = authData.serverKey();
 	}
 
-	public byte[] getSalt() {
-		return salt;
-	}
-
-	public byte[] getSaltedPassword() {
-		return saltedPassword;
+	public ScramCredentialsEntry(String algorithm, byte[] salt, int iterations, byte[] storedKey, byte[] serverKey) {
+		this.algorithm = algorithm;
+		this.iterations = iterations;
+		this.salt = salt;
+		this.storedKey = storedKey;
+		this.serverKey = serverKey;
 	}
 
 	public int getIterations() {
@@ -73,12 +82,24 @@ public class ScramCredentialsEntry
 		return "SCRAM-" + algorithm;
 	}
 
+	public byte[] getSalt() {
+		return salt;
+	}
+
+	public byte[] getServerKey() {
+		return serverKey;
+	}
+
+	public byte[] getStoredKey() {
+		return storedKey;
+	}
+
 	@Override
 	public boolean verifyPlainPassword(String password) {
 		try {
-			byte[] expSaltedPassword = AbstractSaslSCRAM.hi(algorithm, AbstractSaslSCRAM.normalize(password), salt,
-															iterations);
-			return Arrays.equals(this.saltedPassword, expSaltedPassword);
+			var expAuthData = SCRAMHelper.encodePlainPassword(algorithm, salt, iterations, password);
+			return Arrays.equals(this.serverKey, expAuthData.serverKey()) &&
+					Arrays.equals(this.storedKey, expAuthData.storedKey());
 		} catch (InvalidKeyException | NoSuchAlgorithmException ex) {
 			log.log(Level.FINE, "Password comparison failed", ex);
 		}
@@ -86,7 +107,7 @@ public class ScramCredentialsEntry
 	}
 
 	public static class Decoder
-			implements Credentials.Decoder {
+			implements Credentials.Decoder<ScramCredentialsEntry> {
 
 		@ConfigField(desc = "Hash algorithm")
 		private String algorithm;
@@ -102,14 +123,11 @@ public class ScramCredentialsEntry
 		}
 
 		@Override
-		public String getName() {
-			return name;
-		}
-
-		@Override
-		public Credentials.Entry decode(BareJID user, String value) {
+		public ScramCredentialsEntry decode(BareJID user, String value) {
 			byte[] salt = null;
 			byte[] saltedPassword = null;
+			byte[] storedKey = null;
+			byte[] serverKey = null;
 			int iterations = 0;
 
 			int pos = 0;
@@ -128,6 +146,12 @@ public class ScramCredentialsEntry
 					case 'p':
 						saltedPassword = Base64.decode(part);
 						break;
+					case 't':
+						storedKey = Base64.decode(part);
+						break;
+					case 'e':
+						serverKey = Base64.decode(part);
+						break;
 				}
 
 				if (x == -1) {
@@ -136,24 +160,41 @@ public class ScramCredentialsEntry
 					pos = x + 1;
 				}
 			}
-
-			return newInstance(salt, iterations, saltedPassword);
+			if ((storedKey == null || serverKey == null) && saltedPassword != null) {
+				return newInstance(salt, iterations, saltedPassword);
+			} else if (storedKey != null && serverKey != null) {
+				return newInstance(salt, iterations, storedKey, serverKey);
+			} else {
+				throw new RuntimeException("saltedPassword or storedKey&serverKey pair must be not null.");
+			}
 		}
 
-		protected Credentials.Entry newInstance(byte[] salt, int iterations, byte[] saltedPassword) {
-			return new ScramCredentialsEntry(algorithm, salt, iterations, saltedPassword);
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		protected ScramCredentialsEntry newInstance(byte[] salt, int iterations, byte[] saltedPassword) {
+			try {
+				return new ScramCredentialsEntry(algorithm, salt, iterations, saltedPassword);
+			} catch (NoSuchAlgorithmException | InvalidKeyException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		protected ScramCredentialsEntry newInstance(byte[] salt, int iterations, byte[] storedKey, byte[] serverKey) {
+			return new ScramCredentialsEntry(algorithm, salt, iterations, storedKey, serverKey);
 		}
 	}
 
 	public static class Encoder
-			implements Credentials.Encoder {
+			implements Credentials.Encoder<ScramCredentialsEntry> {
 
+		@ConfigField(desc = "Number of iterations")
+		private final int iterations = 4096;
 		private final SecureRandom random = new SecureRandom();
 		@ConfigField(desc = "Hash algorithm")
 		private String algorithm;
-
-		@ConfigField(desc = "Number of iterations")
-		private int iterations = 4096;
 		@ConfigField(desc = "Mechanism name")
 		private String name;
 
@@ -166,24 +207,33 @@ public class ScramCredentialsEntry
 		}
 
 		@Override
-		public String getName() {
-			return name;
+		public String encode(BareJID user, ScramCredentialsEntry entry) {
+			return "s=" + tigase.util.Base64.encode(entry.getSalt()) + ",i=" + entry.getIterations() + ",t=" +
+					tigase.util.Base64.encode(entry.getStoredKey()) + ",e=" +
+					tigase.util.Base64.encode(entry.getServerKey());
 		}
 
 		@Override
 		public String encode(BareJID user, String password) {
 			byte[] salt = new byte[10];
 			random.nextBytes(salt);
-			byte[] saltedPassword = new byte[0];
+			SCRAMHelper.AuthenticationData authData;
 			try {
-				saltedPassword = AbstractSaslSCRAM.hi(algorithm, AbstractSaslSCRAM.normalize(password), salt,
-													  iterations);
+				authData = SCRAMHelper.encodePlainPassword(algorithm, salt, iterations, password);
 			} catch (InvalidKeyException | NoSuchAlgorithmException e) {
 				throw new RuntimeException("Could not encode password", e);
 			}
 
-			return "s=" + tigase.util.Base64.encode(salt) + ",i=" + iterations + ",p=" +
-					tigase.util.Base64.encode(saltedPassword);
+//			return "s=" + tigase.util.Base64.encode(salt) + ",i=" + iterations + ",p=" +
+//					tigase.util.Base64.encode(saltedPassword);
+			return "s=" + tigase.util.Base64.encode(salt) + ",i=" + iterations + ",t=" +
+					tigase.util.Base64.encode(authData.storedKey()) + ",e=" +
+					tigase.util.Base64.encode(authData.serverKey());
+		}
+
+		@Override
+		public String getName() {
+			return name;
 		}
 	}
 

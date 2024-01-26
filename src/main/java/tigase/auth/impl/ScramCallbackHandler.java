@@ -51,15 +51,15 @@ public class ScramCallbackHandler
 		implements CallbackHandler, AuthRepositoryAware, SessionAware, DomainAware, MechanismNameAware {
 
 	private static final Logger log = Logger.getLogger(ScramCallbackHandler.class.getCanonicalName());
-	private boolean loggingInForbidden = false;
+	private String credentialId = null;
 	private ScramCredentialsEntry credentialsEntry;
 	private boolean credentialsFetched;
 	private String domain;
 	private BareJID jid = null;
+	private boolean loggingInForbidden = false;
 	private String mechanismName;
 	private AuthRepository repo;
 	private XMPPResourceConnection session;
-	private String credentialId = null;
 
 	public ScramCallbackHandler() {
 	}
@@ -75,11 +75,6 @@ public class ScramCallbackHandler
 	}
 
 	@Override
-	public void setMechanismName(String mechanismName) {
-		this.mechanismName = mechanismName;
-	}
-
-	@Override
 	public void setAuthRepository(AuthRepository repo) {
 		this.repo = repo;
 	}
@@ -87,6 +82,11 @@ public class ScramCallbackHandler
 	@Override
 	public void setDomain(String domain) {
 		this.domain = domain;
+	}
+
+	@Override
+	public void setMechanismName(String mechanismName) {
+		this.mechanismName = mechanismName;
 	}
 
 	@Override
@@ -126,8 +126,6 @@ public class ScramCallbackHandler
 			handleChannelBindingCallback((ChannelBindingCallback) callback);
 		} else if (callback instanceof PBKDIterationsCallback) {
 			handlePBKDIterationsCallback((PBKDIterationsCallback) callback);
-		} else if (callback instanceof SaltedPasswordCallback) {
-			handleSaltedPasswordCallbackCallback((SaltedPasswordCallback) callback);
 		} else if (callback instanceof NameCallback) {
 			handleNameCallback((NameCallback) callback);
 		} else if (callback instanceof AuthorizationIdCallback) {
@@ -177,68 +175,6 @@ public class ScramCallbackHandler
 		}
 	}
 
-	protected void handleSaltedPasswordCallbackCallback(SaltedPasswordCallback callback) throws SaslException {
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "PasswordCallback: {0}", jid);
-		}
-
-		fetchCredentials();
-		if (credentialsEntry != null) {
-			callback.setSaltedPassword(credentialsEntry.getSaltedPassword());
-		} else {
-			callback.setSaltedPassword(null);
-		}
-	}
-
-	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
-		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null &&
-				!callback.getAuthzId().equals(jid.toString())) {
-			try {
-				credentialId = jid.getLocalpart();
-				setJid(BareJID.bareJIDInstance(callback.getAuthzId()));
-			} catch (Exception ex) {
-				throw new RuntimeException(ex);
-			}
-		} else {
-			credentialId = DEFAULT_CREDENTIAL_ID;
-			callback.setAuthzId(jid.toString());
-		}
-	}
-
-	private void handleChannelBindingCallback(ChannelBindingCallback callback) {
-		if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_exporter) {
-			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_EXPORTER_KEY));
-		}else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique) {
-			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY));
-		} else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_server_end_point) {
-			try {
-				X509Certificate cert = (X509Certificate) session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY);
-				String usealgo;
-				final String algo =  cert.getSigAlgName();
-				int withIdx = algo.indexOf("with");
-				if (withIdx <= 0) {
-					throw new RuntimeException("Unable to parse SigAlgName: " + algo);
-				}
-				usealgo = algo.substring(0, withIdx);
-				if (usealgo.equalsIgnoreCase("MD5") || usealgo.equalsIgnoreCase("SHA1")) {
-					usealgo = "SHA-256";
-				}
-				final MessageDigest md = MessageDigest.getInstance(usealgo);
-				final byte[] der = cert.getEncoded();
-				md.update(der);
-				callback.setBindingData(md.digest());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "Channel binding {0}: {1} in session-id {2}",
-					new Object[]{callback.getRequestedBindType(),
-								 callback.getBindingData() == null ? "null" : Base64.encode(callback.getBindingData()),
-								 session});
-		}
-	}
-
 	private void fetchCredentials() throws SaslException {
 		if (credentialsFetched) {
 			return;
@@ -276,9 +212,69 @@ public class ScramCallbackHandler
 		} catch (SaslException e) {
 			throw e;
 		} catch (Exception ex) {
-			log.log(Level.FINE, "Could not retrieve credentials for user " + jid + " with credentialId " + credentialId, ex);
+			log.log(Level.FINE, "Could not retrieve credentials for user " + jid + " with credentialId " + credentialId,
+					ex);
 		}
 		credentialsFetched = true;
+	}
+
+	private void handleAuthorizationIdCallback(AuthorizationIdCallback callback) {
+		if (!AbstractSasl.isAuthzIDIgnored() && callback.getAuthzId() != null &&
+				!callback.getAuthzId().equals(jid.toString())) {
+			try {
+				credentialId = jid.getLocalpart();
+				setJid(BareJID.bareJIDInstance(callback.getAuthzId()));
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		} else {
+			credentialId = DEFAULT_CREDENTIAL_ID;
+			callback.setAuthzId(jid.toString());
+		}
+	}
+
+	private void handleChannelBindingCallback(ChannelBindingCallback callback) {
+		if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_exporter) {
+			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_EXPORTER_KEY));
+		} else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_unique) {
+			callback.setBindingData((byte[]) session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY));
+		} else if (callback.getRequestedBindType() == AbstractSaslSCRAM.BindType.tls_server_end_point) {
+			try {
+				X509Certificate cert = (X509Certificate) session.getSessionData(
+						AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY);
+				String usealgo;
+				final String algo = cert.getSigAlgName();
+				int withIdx = algo.indexOf("with");
+				if (withIdx <= 0) {
+					throw new RuntimeException("Unable to parse SigAlgName: " + algo);
+				}
+				usealgo = algo.substring(0, withIdx);
+				if (usealgo.equalsIgnoreCase("MD5") || usealgo.equalsIgnoreCase("SHA1")) {
+					usealgo = "SHA-256";
+				}
+				final MessageDigest md = MessageDigest.getInstance(usealgo);
+				final byte[] der = cert.getEncoded();
+				md.update(der);
+				callback.setBindingData(md.digest());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "Channel binding {0}: {1} in session-id {2}",
+					new Object[]{callback.getRequestedBindType(),
+								 callback.getBindingData() == null ? "null" : Base64.encode(callback.getBindingData()),
+								 session});
+		}
+	}
+
+	private void handleServerKeyCallback(ServerKeyCallback callback) {
+
+		// TODO
+	}
+
+	private void handleStoredKeyCallback(StoredKeyCallback callback) {
+		// TODO
 	}
 
 	private void setJid(BareJID jid) {

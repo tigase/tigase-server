@@ -19,7 +19,6 @@ package tigase.auth.credentials.entries;
 
 import tigase.auth.CredentialsDecoderBean;
 import tigase.auth.CredentialsEncoderBean;
-import tigase.auth.credentials.Credentials;
 import tigase.kernel.beans.Bean;
 
 import java.security.InvalidKeyException;
@@ -34,8 +33,13 @@ public class ScramSha1CredentialsEntry
 		super("SHA-1", entry);
 	}
 
-	public ScramSha1CredentialsEntry(byte[] salt, int iterations, byte[] saltedPassword) {
+	public ScramSha1CredentialsEntry(byte[] salt, int iterations, byte[] saltedPassword)
+			throws NoSuchAlgorithmException, InvalidKeyException {
 		super("SHA-1", salt, iterations, saltedPassword);
+	}
+
+	public ScramSha1CredentialsEntry(byte[] salt, int iterations, byte[] storedKey, byte[] serverKey) {
+		super("SHA-1", salt, iterations, storedKey, serverKey);
 	}
 
 	@Bean(name = "SCRAM-SHA-1", parent = CredentialsDecoderBean.class, active = true)
@@ -47,8 +51,17 @@ public class ScramSha1CredentialsEntry
 		}
 
 		@Override
-		protected Credentials.Entry newInstance(byte[] salt, int iterations, byte[] saltedPassword) {
-			return new ScramSha1CredentialsEntry(salt, iterations, saltedPassword);
+		protected ScramSha1CredentialsEntry newInstance(byte[] salt, int iterations, byte[] saltedPassword) {
+			try {
+				return new ScramSha1CredentialsEntry(salt, iterations, saltedPassword);
+			} catch (NoSuchAlgorithmException | InvalidKeyException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		protected ScramSha1CredentialsEntry newInstance(byte[] salt, int iterations, byte[] storedKey,
+														byte[] serverKey) {
+			return new ScramSha1CredentialsEntry(salt, iterations, storedKey, serverKey);
 		}
 	}
 

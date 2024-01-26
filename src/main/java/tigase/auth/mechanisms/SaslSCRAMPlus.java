@@ -32,23 +32,24 @@ public class SaslSCRAMPlus
 
 	public static boolean containsScramPlus(Collection<String> mechanisms) {
 		for (String name : mechanisms) {
-			if (name.startsWith("SCRAM-") && name.endsWith("-PLUS"))
+			if (name.startsWith("SCRAM-") && name.endsWith("-PLUS")) {
 				return true;
+			}
 		}
 		return false;
 	}
 
 	public static boolean isAvailable(XMPPResourceConnection session) {
-		return session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null
-				|| session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null;
+		return session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null ||
+				session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null;
 	}
 
 	public SaslSCRAMPlus(Map<? super String, ?> props, CallbackHandler callbackHandler) {
-		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler);
+		super(NAME, ALGO, props, callbackHandler);
 	}
 
 	SaslSCRAMPlus(Map<? super String, ?> props, CallbackHandler callbackHandler, String once) {
-		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler, once);
+		super(NAME, ALGO, props, callbackHandler, once);
 	}
 
 	@Override

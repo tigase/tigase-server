@@ -41,6 +41,11 @@ public interface Credentials {
 	boolean canLogin();
 
 	/**
+	 * @return account status of the account
+	 */
+	AccountStatus getAccountStatus();
+
+	/**
 	 * Find a credential for specified encryption mechanism
 	 *
 	 * @return instance of an entry if available or null
@@ -67,22 +72,17 @@ public interface Credentials {
 	boolean isAccountDisabled();
 
 	/**
-	 * @return account status of the account
-	 */
-	AccountStatus getAccountStatus();
-
-	/**
 	 * Interface implemented by credentials decoder converting from value stored in database to the form represented by
 	 * implementation of Entry interface.
 	 */
-	interface Decoder {
+	interface Decoder<E extends Entry> {
 
 		/**
 		 * Decode credentials stored in database to more suitable form.
 		 *
 		 * @return credentials stored in database in more suitable form
 		 */
-		Entry decode(BareJID user, String value);
+		E decode(BareJID user, String value);
 
 		/**
 		 * Name of the encryption mechanism for which decoder works
@@ -97,17 +97,27 @@ public interface Credentials {
 	 * Interface implemented by credentials encoder converting them from plaintext value to encoded form stored in the
 	 * database.
 	 */
-	interface Encoder {
+	interface Encoder<E extends Entry> {
 
 		/**
-		 * Encrypt plaintext password for user
+		 * Encodes entry to store in database.
 		 *
-		 * @param user for which encrypt
-		 * @param password to encode
+		 * @param user for which encode
+		 * @param password plaintext password to encode
 		 *
-		 * @return encrypted plaintext password for user
+		 * @return encoded authentication data.
 		 */
 		String encode(BareJID user, String password);
+
+		/**
+		 * Encodes entry to store in database.
+		 *
+		 * @param user for which encode
+		 * @param entry to encode
+		 *
+		 * @return encoded authentication data.
+		 */
+		String encode(BareJID user, E entry);
 
 		/**
 		 * Name of the encryption mechanism for which encoder works

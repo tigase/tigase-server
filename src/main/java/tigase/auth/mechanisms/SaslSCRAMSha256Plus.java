@@ -30,16 +30,16 @@ public class SaslSCRAMSha256Plus
 	protected final static String ALGO = "SHA-256";
 
 	public static boolean isAvailable(XMPPResourceConnection session) {
-		return session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null
-				|| session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null;
+		return session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null ||
+				session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null;
 	}
 
 	public SaslSCRAMSha256Plus(Map<? super String, ?> props, CallbackHandler callbackHandler) {
-		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler);
+		super(NAME, ALGO, props, callbackHandler);
 	}
 
 	SaslSCRAMSha256Plus(Map<? super String, ?> props, CallbackHandler callbackHandler, String once) {
-		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler, once);
+		super(NAME, ALGO, props, callbackHandler, once);
 	}
 
 	@Override

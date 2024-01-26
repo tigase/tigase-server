@@ -33,13 +33,13 @@ public class PlainCredentialsEntry
 		this.password = password;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
 	@Override
 	public String getMechanism() {
 		return "PLAIN";
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	@Override
@@ -49,37 +49,42 @@ public class PlainCredentialsEntry
 
 	@Bean(name = "PLAIN", parent = CredentialsDecoderBean.class, active = true)
 	public static class Decoder
-			implements Credentials.Decoder {
+			implements Credentials.Decoder<PlainCredentialsEntry> {
 
 		@ConfigField(desc = "Mechanism name")
 		private String name;
 
 		@Override
-		public String getName() {
-			return name;
+		public PlainCredentialsEntry decode(BareJID user, String value) {
+			return new PlainCredentialsEntry(value);
 		}
 
 		@Override
-		public Credentials.Entry decode(BareJID user, String value) {
-			return new PlainCredentialsEntry(value);
+		public String getName() {
+			return name;
 		}
 	}
 
 	@Bean(name = "PLAIN", parent = CredentialsEncoderBean.class, active = false)
 	public static class Encoder
-			implements Credentials.Encoder {
+			implements Credentials.Encoder<PlainCredentialsEntry> {
 
 		@ConfigField(desc = "Mechanism name")
 		private String name;
 
 		@Override
-		public String getName() {
-			return name;
+		public String encode(BareJID user, String password) {
+			return password;
 		}
 
 		@Override
-		public String encode(BareJID user, String password) {
-			return password;
+		public String encode(BareJID user, PlainCredentialsEntry entry) {
+			return entry.getPassword();
+		}
+
+		@Override
+		public String getName() {
+			return name;
 		}
 	}
 }

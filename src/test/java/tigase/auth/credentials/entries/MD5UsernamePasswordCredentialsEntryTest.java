@@ -20,9 +20,22 @@ package tigase.auth.credentials.entries;
 import org.junit.Test;
 import tigase.xmpp.jid.BareJID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class MD5UsernamePasswordCredentialsEntryTest {
+
+	@Test
+	public void testDecodingOfStoredValue() {
+		String testPassword = "some-password-do-protect";
+		BareJID user = BareJID.bareJIDInstanceNS("user@domain");
+
+		String encPassword = "3e470bf91e38446f3d58ce890b1a8b63";
+		MD5UsernamePasswordCredentialsEntry.Decoder decoder = new MD5UsernamePasswordCredentialsEntry.Decoder();
+		MD5UsernamePasswordCredentialsEntry entry = decoder.decode(user, encPassword);
+
+		assertTrue(entry.verifyPlainPassword(testPassword));
+	}
 
 	@Test
 	public void testEncodingAndDecoding() {
@@ -34,23 +47,10 @@ public class MD5UsernamePasswordCredentialsEntryTest {
 //		System.out.println(encPassword);
 
 		MD5UsernamePasswordCredentialsEntry.Decoder decoder = new MD5UsernamePasswordCredentialsEntry.Decoder();
-		MD5UsernamePasswordCredentialsEntry entry = (MD5UsernamePasswordCredentialsEntry) decoder.decode(user,
-																										 encPassword);
+		MD5UsernamePasswordCredentialsEntry entry = decoder.decode(user, encPassword);
 
 		assertTrue(entry.verifyPlainPassword(testPassword));
-	}
-
-	@Test
-	public void testDecodingOfStoredValue() {
-		String testPassword = "some-password-do-protect";
-		BareJID user = BareJID.bareJIDInstanceNS("user@domain");
-
-		String encPassword = "3e470bf91e38446f3d58ce890b1a8b63";
-		MD5UsernamePasswordCredentialsEntry.Decoder decoder = new MD5UsernamePasswordCredentialsEntry.Decoder();
-		MD5UsernamePasswordCredentialsEntry entry = (MD5UsernamePasswordCredentialsEntry) decoder.decode(user,
-																										 encPassword);
-
-		assertTrue(entry.verifyPlainPassword(testPassword));
+		assertEquals(encPassword, encoder.encode(user, entry));
 	}
 
 }

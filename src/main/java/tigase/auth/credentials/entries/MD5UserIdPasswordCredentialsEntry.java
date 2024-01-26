@@ -25,6 +25,7 @@ import tigase.kernel.beans.Bean;
 import tigase.util.Algorithms;
 import tigase.xmpp.jid.BareJID;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +52,8 @@ public class MD5UserIdPasswordCredentialsEntry
 	@Override
 	public boolean verifyPlainPassword(String plain) {
 		try {
-			byte[] hash = MessageDigest.getInstance("MD5").digest((user.toString() + plain).getBytes("UTF-8"));
+			byte[] hash = MessageDigest.getInstance("MD5")
+					.digest((user.toString() + plain).getBytes(StandardCharsets.UTF_8));
 			return passwordHash.equalsIgnoreCase(Algorithms.bytesToHex(hash));
 		} catch (Exception ex) {
 			log.log(Level.WARNING, "failed to verify password digest", ex);
@@ -61,36 +63,42 @@ public class MD5UserIdPasswordCredentialsEntry
 
 	@Bean(name = "MD5-USERID-PASSWORD", parent = CredentialsDecoderBean.class, active = false)
 	public static class Decoder
-			implements Credentials.Decoder {
+			implements Credentials.Decoder<MD5UserIdPasswordCredentialsEntry> {
+
+		@Override
+		public MD5UserIdPasswordCredentialsEntry decode(BareJID user, String value) {
+			return new MD5UserIdPasswordCredentialsEntry(user, value);
+		}
 
 		@Override
 		public String getName() {
 			return "MD5-USERID-PASSWORD";
-		}
-
-		@Override
-		public Credentials.Entry decode(BareJID user, String value) {
-			return new MD5UserIdPasswordCredentialsEntry(user, value);
 		}
 	}
 
 	@Bean(name = "MD5-USERID-PASSWORD", parent = CredentialsEncoderBean.class, active = false)
 	public static class Encoder
-			implements Credentials.Encoder {
+			implements Credentials.Encoder<MD5UserIdPasswordCredentialsEntry> {
 
 		@Override
-		public String getName() {
-			return "MD5-USERID-PASSWORD";
+		public String encode(BareJID user, MD5UserIdPasswordCredentialsEntry entry) {
+			return entry.passwordHash;
 		}
 
 		@Override
 		public String encode(BareJID user, String password) {
 			try {
-				byte[] hash = MessageDigest.getInstance("MD5").digest((user.toString() + password).getBytes("UTF-8"));
+				byte[] hash = MessageDigest.getInstance("MD5")
+						.digest((user.toString() + password).getBytes(StandardCharsets.UTF_8));
 				return Algorithms.bytesToHex(hash);
 			} catch (Exception ex) {
 				throw new RuntimeException("failed to generate password hash", ex);
 			}
+		}
+
+		@Override
+		public String getName() {
+			return "MD5-USERID-PASSWORD";
 		}
 	}
 }

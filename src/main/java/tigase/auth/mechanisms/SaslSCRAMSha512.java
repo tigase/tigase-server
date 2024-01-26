@@ -28,11 +28,11 @@ public class SaslSCRAMSha512
 	protected final static String ALGO = "SHA-512";
 
 	public SaslSCRAMSha512(Map<? super String, ?> props, CallbackHandler callbackHandler) {
-		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler);
+		super(NAME, ALGO, props, callbackHandler);
 	}
 
 	SaslSCRAMSha512(Map<? super String, ?> props, CallbackHandler callbackHandler, String once) {
-		super(NAME, ALGO, DEFAULT_CLIENT_KEY, DEFAULT_SERVER_KEY, props, callbackHandler, once);
+		super(NAME, ALGO, props, callbackHandler, once);
 	}
 
 	@Override

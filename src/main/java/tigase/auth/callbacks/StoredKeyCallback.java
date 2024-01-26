@@ -19,31 +19,29 @@ package tigase.auth.callbacks;
 
 import javax.security.auth.callback.Callback;
 
-public class SaltedPasswordCallback
+public class StoredKeyCallback
 		implements Callback, java.io.Serializable {
 
-	private static final long serialVersionUID = -4342673378785456908L;
+	private final String prompt;
 
-	private String prompt;
+	private byte[] storedKey;
 
-	private byte[] saltedPassword;
-
-	public SaltedPasswordCallback(String prompt) {
+	public StoredKeyCallback(String prompt) {
 		this.prompt = prompt;
 	}
 
 	/**
-	 * @return the salt
+	 * @return the StoredKey
 	 */
-	public byte[] getSaltedPassword() {
-		return saltedPassword;
+	public byte[] getStoredKey() {
+		return storedKey;
 	}
 
 	/**
-	 * @param salt the salt to set
+	 * @param storedKey the StoredKey to set
 	 */
-	public void setSaltedPassword(byte[] salt) {
-		this.saltedPassword = salt;
+	public void setStoredKey(byte[] storedKey) {
+		this.storedKey = storedKey;
 	}
 
 }

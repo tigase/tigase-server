@@ -20,9 +20,22 @@ package tigase.auth.credentials.entries;
 import org.junit.Test;
 import tigase.xmpp.jid.BareJID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class PlainCredentialsEntryTest {
+
+	@Test
+	public void testDecodingOfStoredValue() {
+		String testPassword = "some-password-do-protect";
+		BareJID user = BareJID.bareJIDInstanceNS("user@domain");
+
+		String encPassword = testPassword;
+		PlainCredentialsEntry.Decoder decoder = new PlainCredentialsEntry.Decoder();
+		PlainCredentialsEntry entry = decoder.decode(user, encPassword);
+
+		assertTrue(entry.verifyPlainPassword(testPassword));
+	}
 
 	@Test
 	public void testEncodingAndDecoding() {
@@ -33,21 +46,10 @@ public class PlainCredentialsEntryTest {
 		String encPassword = encoder.encode(user, testPassword);
 
 		PlainCredentialsEntry.Decoder decoder = new PlainCredentialsEntry.Decoder();
-		PlainCredentialsEntry entry = (PlainCredentialsEntry) decoder.decode(user, encPassword);
+		PlainCredentialsEntry entry = decoder.decode(user, encPassword);
 
 		assertTrue(entry.verifyPlainPassword(testPassword));
-	}
-
-	@Test
-	public void testDecodingOfStoredValue() {
-		String testPassword = "some-password-do-protect";
-		BareJID user = BareJID.bareJIDInstanceNS("user@domain");
-
-		String encPassword = testPassword;
-		PlainCredentialsEntry.Decoder decoder = new PlainCredentialsEntry.Decoder();
-		PlainCredentialsEntry entry = (PlainCredentialsEntry) decoder.decode(user, encPassword);
-
-		assertTrue(entry.verifyPlainPassword(testPassword));
+		assertEquals(encPassword, encoder.encode(user, entry));
 	}
 
 }

@@ -34,6 +34,7 @@ import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -51,16 +52,16 @@ public abstract class AbstractSaslSCRAM
 	public static final String TLS_UNIQUE_ID_KEY = "TLS_UNIQUE_ID_KEY";
 	public static final String TLS_EXPORTER_KEY = "TLS_EXPORTER_KEY";
 	public static final String LOCAL_CERTIFICATE_KEY = "LOCAL_CERTIFICATE_KEY";
-	private static final Charset CHARSET = Charset.forName("UTF-8");
-	protected final static byte[] DEFAULT_CLIENT_KEY = "Client Key".getBytes(CHARSET);
-	protected final static byte[] DEFAULT_SERVER_KEY = "Server Key".getBytes(CHARSET);
+	private static final Charset CHARSET = StandardCharsets.UTF_8;
+	final static byte[] DEFAULT_CLIENT_KEY = "Client Key".getBytes(CHARSET);
+	final static byte[] DEFAULT_SERVER_KEY = "Server Key".getBytes(CHARSET);
 	private final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	private final static Pattern CLIENT_FIRST_MESSAGE = Pattern.compile(
 			"^(?<gs2Header>(?:y|n|p=(?<cbName>[a-zA-z0-9.-]+))," +
-					"(?:a=(?<authzid>(?:[^,\\x00-\\x20\\x2C]|=2C|=3D)+))?,)(?<clientFirstBare>(?<mext>m=[^\\000=]+,)" +
-					"?n=(?<username>(?:[^,\\x00-\\x20\\x2C]|=2C|=3D)+),r=(?<nonce>[^,\\x00-\\x20\\x2C]+)(?:,.*)?)$");
+					"(?:a=(?<authzid>(?:[^,\\x00-\\x20]|=2C|=3D)+))?,)(?<clientFirstBare>(?<mext>m=[^\\000=]+,)" +
+					"?n=(?<username>(?:[^,\\x00-\\x20]|=2C|=3D)+),r=(?<nonce>[^,\\x00-\\x20]+)(?:,.*)?)$");
 	private final static Pattern CLIENT_LAST_MESSAGE = Pattern.compile("^(?<withoutProof>c=(?<cb>[a-zA-Z0-9/+=]+)," +
-																			   "(?:r=(?<nonce>[^,\\x00-\\x20\\x2C]+))(?:,.*)?),p=(?<proof>[a-zA-Z0-9/+=]+)$");
+																			   "r=(?<nonce>[^,\\x00-\\x20]+)(?:,.*)?),p=(?<proof>[a-zA-Z0-9/+=]+)$");
 
 	public enum BindType {
 		/**
@@ -86,21 +87,17 @@ public abstract class AbstractSaslSCRAM
 	}
 
 	private final String algorithm;
-	private final byte[] clientKeyData;
 	private final String hmacAlgorithm;
 	private final String mechanismName;
-	private final byte[] serverKeyData;
+	private final Random random = new SecureRandom();
 	private final String serverNonce;
 	private byte[] bindingData = null;
 	private String cfmAuthzid;
 	private String cfmBareMessage;
-	private String cfmCbname;
 	private String cfmGs2header;
 	private String cfmUsername;
-	private byte[] clientKey;
-	private Random random = new SecureRandom();
 	private BindType requestedBindType;
-	private byte[] saltedPassword;
+	private byte[] serverKey;
 	private String sfmMessage;
 	private String sfmNonce;
 	private Step step = Step.clientFirstMessage;
@@ -109,17 +106,19 @@ public abstract class AbstractSaslSCRAM
 	public static Element getSupportedChannelBindings(XMPPResourceConnection session) {
 		Element bindings = new Element("sasl-channel-binding");
 		bindings.setXMLNS("urn:xmpp:sasl-cb:0");
-		bindings.addChild(
-				new Element("channel-binding", new String[]{"type"}, new String[]{"tls-server-end-point"}));
+		bindings.addChild(new Element("channel-binding", new String[]{"type"}, new String[]{"tls-server-end-point"}));
 		if (session.getSessionData(AbstractSaslSCRAM.TLS_UNIQUE_ID_KEY) != null) {
-			bindings.addChild(
-					new Element("channel-binding", new String[]{"type"}, new String[]{"tls-unique"}));
+			bindings.addChild(new Element("channel-binding", new String[]{"type"}, new String[]{"tls-unique"}));
 		}
 		if (session.getSessionData(AbstractSaslSCRAM.TLS_EXPORTER_KEY) != null) {
-			bindings.addChild(
-					new Element("channel-binding", new String[]{"type"}, new String[]{"tls-exporter"}));
+			bindings.addChild(new Element("channel-binding", new String[]{"type"}, new String[]{"tls-exporter"}));
 		}
 		return bindings;
+	}
+
+	public static byte[] h(String algorithm, byte[] data) throws NoSuchAlgorithmException {
+		MessageDigest digest = MessageDigest.getInstance(algorithm);
+		return digest.digest(data);
 	}
 
 	public static byte[] hi(String algorithm, byte[] password, final byte[] salt, final int iterations)
@@ -156,30 +155,68 @@ public abstract class AbstractSaslSCRAM
 		return mac.doFinal(data);
 	}
 
+	public static byte[] hmac(final String algorithm, final byte[] key, byte[] data)
+			throws NoSuchAlgorithmException, InvalidKeyException {
+		final SecretKeySpec k = new SecretKeySpec(key, "Hmac" + algorithm);
+		return hmac(k, data);
+	}
+
 	public static byte[] normalize(String str) {
 		return str.getBytes(CHARSET);
 	}
 
-	protected AbstractSaslSCRAM(String mechanismName, String algorithm, byte[] clientKey, byte[] serverKey,
-								Map<? super String, ?> props, CallbackHandler callbackHandler) {
+	protected AbstractSaslSCRAM(String mechanismName, String algorithm, Map<? super String, ?> props,
+								CallbackHandler callbackHandler) {
 		super(props, callbackHandler);
 		this.mechanismName = mechanismName;
 		this.algorithm = algorithm;
 		this.hmacAlgorithm = "Hmac" + (algorithm.startsWith("SHA-") ? algorithm.replace("SHA-", "SHA") : algorithm);
-		this.clientKeyData = clientKey;
-		this.serverKeyData = serverKey;
 		serverNonce = randomString();
 	}
 
-	protected AbstractSaslSCRAM(String mechanismName, String algorithm, byte[] clientKey, byte[] serverKey,
-								Map<? super String, ?> props, CallbackHandler callbackHandler, String serverOnce) {
+	protected AbstractSaslSCRAM(String mechanismName, String algorithm, Map<? super String, ?> props,
+								CallbackHandler callbackHandler, String serverOnce) {
 		super(props, callbackHandler);
 		this.mechanismName = mechanismName;
 		this.algorithm = algorithm;
 		this.hmacAlgorithm = "Hmac" + (algorithm.startsWith("SHA-") ? algorithm.replace("SHA-", "SHA") : algorithm);
-		this.clientKeyData = clientKey;
-		this.serverKeyData = serverKey;
 		this.serverNonce = serverOnce;
+	}
+
+	@Override
+	public byte[] evaluateResponse(byte[] response) throws SaslException {
+		try {
+			return switch (step) {
+				case clientFirstMessage -> processClientFirstMessage(response);
+				case clientFinalMessage -> processClientLastMessage(response);
+				default -> throw new SaslException(getMechanismName() + ": Server at illegal state");
+			};
+		} catch (SaslException e) {
+			throw e;
+		} catch (Exception e) {
+			log.log(Level.FINEST, "Error evaluating response", e);
+			throw new SaslException("SASL Failed", e);
+		}
+	}
+
+	@Override
+	public String getAuthorizationID() {
+		return authorizedId;
+	}
+
+	@Override
+	public String getMechanismName() {
+		return mechanismName;
+	}
+
+	@Override
+	public byte[] unwrap(byte[] incoming, int offset, int len) {
+		return null;
+	}
+
+	@Override
+	public byte[] wrap(byte[] outgoing, int offset, int len) {
+		return null;
 	}
 
 	protected byte[] calculateC() {
@@ -201,53 +238,6 @@ public abstract class AbstractSaslSCRAM
 
 	protected abstract void checkRequestedBindType(BindType requestedBindType) throws SaslException;
 
-	private BindType createBindType(final String cfmGs2header, final String cfmCbname) throws SaslException {
-		final char t = cfmGs2header.charAt(0);
-
-		if ('n' == t) {
-			return BindType.n;
-		} else if ('y' == t) {
-			return BindType.y;
-		} else if ("tls-unique".equals(cfmCbname)) {
-			return BindType.tls_unique;
-		} else if ("tls-server-end-point".equals(cfmCbname)) {
-			return BindType.tls_server_end_point;
-		} else if ("tls-exporter".equals(cfmCbname)) {
-			return BindType.tls_exporter;
-		} else {
-			throw new SaslException("Unsupported channel binding type");
-		}
-	}
-
-	@Override
-	public byte[] evaluateResponse(byte[] response) throws SaslException {
-		try {
-			switch (step) {
-				case clientFirstMessage:
-					return processClientFirstMessage(response);
-				case clientFinalMessage:
-					return processClientLastMessage(response);
-				default:
-					throw new SaslException(getMechanismName() + ": Server at illegal state");
-			}
-		} catch (SaslException e) {
-			throw e;
-		} catch (Exception e) {
-			log.log(Level.FINEST, "Error evaluating response", e);
-			throw new SaslException("SASL Failed", e);
-		}
-	}
-
-	@Override
-	public String getAuthorizationID() {
-		return authorizedId;
-	}
-
-	@Override
-	public String getMechanismName() {
-		return mechanismName;
-	}
-
 	protected byte[] h(byte[] data) throws NoSuchAlgorithmException {
 		MessageDigest digest = MessageDigest.getInstance(algorithm);
 		return digest.digest(data);
@@ -257,19 +247,18 @@ public abstract class AbstractSaslSCRAM
 		return new SecretKeySpec(key, hmacAlgorithm);
 	}
 
-	protected byte[] processClientFirstMessage(byte[] data)
-			throws SaslException, InvalidKeyException, NoSuchAlgorithmException {
+	protected byte[] processClientFirstMessage(byte[] data) throws SaslException {
 		Matcher r = CLIENT_FIRST_MESSAGE.matcher(new String(data, CHARSET));
 		if (!r.matches()) {
 			throw new SaslException("Bad challenge syntax");
 		}
 
 		this.cfmGs2header = r.group("gs2Header");
-		this.cfmCbname = r.group("cbName");
-		this.requestedBindType = createBindType(this.cfmGs2header, this.cfmCbname);
+		String cfmCbname = r.group("cbName");
+		this.requestedBindType = createBindType(this.cfmGs2header, cfmCbname);
 		this.cfmAuthzid = r.group("authzid");
 		this.cfmBareMessage = r.group("clientFirstBare");
-		final String cfmMext = r.group("mext");
+//		final String cfmMext = r.group("mext");
 		this.cfmUsername = r.group("username");
 		final String cfmNonce = r.group("nonce");
 
@@ -280,20 +269,16 @@ public abstract class AbstractSaslSCRAM
 		final AuthorizationIdCallback ai = new AuthorizationIdCallback("Authorization identity", this.cfmAuthzid);
 		final PBKDIterationsCallback ic = new PBKDIterationsCallback("PBKD2 iterations");
 		final SaltCallback sc = new SaltCallback("Salt");
-		final SaltedPasswordCallback pc = new SaltedPasswordCallback("Salted password");
+		final ServerKeyCallback sec = new ServerKeyCallback("Server Key");
+		final StoredKeyCallback stc = new StoredKeyCallback("Stored Key");
 
-		handleCallbacks(nc, ai, ic, sc, pc, cc);
+		handleCallbacks(nc, ai, ic, sc, sec, stc, cc);
 
-		if (pc.getSaltedPassword() == null) {
-			throw new SaslException("Unknown user");
-		}
+		validateKeyPresence(sec.getServerKey(), "Server Key");
+		this.serverKey = sec.getServerKey();
 
-		if (pc.getSaltedPassword().length == 0) {
-			if (log.isLoggable(Level.WARNING)) {
-				log.log(Level.WARNING, "User {0} exists, but his password is empty.", cfmUsername);
-			}
-			throw new SaslException("Unknown user");
-		}
+		validateKeyPresence(stc.getStoredKey(), "Stored Key");
+		this.storedKey = stc.getStoredKey();
 
 		this.cfmAuthzid = ai.getAuthzId();
 		if (this.cfmAuthzid == null) {
@@ -305,16 +290,7 @@ public abstract class AbstractSaslSCRAM
 
 		this.sfmNonce = cfmNonce + serverNonce;
 
-		this.saltedPassword = pc.getSaltedPassword();
-		this.clientKey = hmac(key(saltedPassword), clientKeyData);
-		this.storedKey = h(clientKey);
-
-		final StringBuilder serverStringMessage = new StringBuilder();
-		serverStringMessage.append("r=").append(sfmNonce).append(",");
-		serverStringMessage.append("s=").append(Base64.encode(sc.getSalt())).append(",");
-		serverStringMessage.append("i=").append(ic.getInterations());
-
-		this.sfmMessage = serverStringMessage.toString();
+		this.sfmMessage = "r=" + sfmNonce + "," + "s=" + Base64.encode(sc.getSalt()) + "," + "i=" + ic.getInterations();
 		step = Step.clientFinalMessage;
 		return sfmMessage.getBytes(CHARSET);
 	}
@@ -348,32 +324,68 @@ public abstract class AbstractSaslSCRAM
 
 		final String authMessage = cfmBareMessage + "," + sfmMessage + "," + clmWithoutProof;
 		byte[] clientSignature = hmac(key(storedKey), authMessage.getBytes(CHARSET));
-		byte[] clientProof = xor(clientKey, clientSignature);
 
-		byte[] dcp = Base64.decode(clmProof);
-		boolean proofMatch = Arrays.equals(clientProof, dcp);
+		byte[] clientProof = Base64.decode(clmProof);
+		byte[] calculatedClientKey = xor(clientProof, clientSignature);
+		byte[] calculatedStoredKey = h(calculatedClientKey);
+		boolean proofMatch = Arrays.equals(calculatedStoredKey, storedKey);
 
-		if (proofMatch == false) {
+		if (!proofMatch) {
 			throw new SaslInvalidLoginExcepion(SaslError.not_authorized, cfmAuthzid, PASSWORD_NOT_VERIFIED_MSG);
 		}
 
 		final AuthorizeCallback ac = new AuthorizeCallback(cfmUsername, cfmAuthzid);
 		handleCallbacks(ac);
-		if (ac.isAuthorized() == true) {
+		if (ac.isAuthorized()) {
 			authorizedId = ac.getAuthorizedID();
 		} else {
 			throw new SaslInvalidLoginExcepion(SaslError.invalid_authzid, cfmAuthzid,
 											   "SCRAM: " + cfmAuthzid + " is not authorized to act as " + cfmAuthzid);
 		}
 
-		byte[] serverKey = hmac(key(saltedPassword), serverKeyData);
 		byte[] serverSignature = hmac(key(serverKey), authMessage.getBytes(CHARSET));
 
-		final StringBuilder serverStringMessage = new StringBuilder();
-		serverStringMessage.append("v=").append(Base64.encode(serverSignature));
+		String serverStringMessage = "v=" + Base64.encode(serverSignature);
 		step = Step.finished;
 		complete = true;
-		return serverStringMessage.toString().getBytes(CHARSET);
+		return serverStringMessage.getBytes(CHARSET);
+	}
+
+	protected void validateBindingsData(BindType requestedBindType, byte[] bindingData) {
+		if (requestedBindType == BindType.tls_server_end_point && bindingData == null) {
+			throw new RuntimeException("Binding data not found!");
+		} else if (requestedBindType == BindType.tls_unique && bindingData == null) {
+			throw new RuntimeException("Binding data not found!");
+		} else if (requestedBindType == BindType.tls_exporter && bindingData == null) {
+			throw new RuntimeException("Binding data not found!");
+		}
+	}
+
+	protected byte[] xor(final byte[] a, final byte[] b) {
+		final int l = a.length;
+		byte[] r = new byte[l];
+		for (int i = 0; i < l; i++) {
+			r[i] = (byte) (a[i] ^ b[i]);
+		}
+		return r;
+	}
+
+	private BindType createBindType(final String cfmGs2header, final String cfmCbname) throws SaslException {
+		final char t = cfmGs2header.charAt(0);
+
+		if ('n' == t) {
+			return BindType.n;
+		} else if ('y' == t) {
+			return BindType.y;
+		} else if ("tls-unique".equals(cfmCbname)) {
+			return BindType.tls_unique;
+		} else if ("tls-server-end-point".equals(cfmCbname)) {
+			return BindType.tls_server_end_point;
+		} else if ("tls-exporter".equals(cfmCbname)) {
+			return BindType.tls_exporter;
+		} else {
+			throw new SaslException("Unsupported channel binding type");
+		}
 	}
 
 	private String randomString() {
@@ -387,33 +399,18 @@ public abstract class AbstractSaslSCRAM
 		return new String(buffer);
 	}
 
-	@Override
-	public byte[] unwrap(byte[] incoming, int offset, int len) {
-		return null;
-	}
-
-	protected void validateBindingsData(BindType requestedBindType, byte[] bindingData) {
-		if (requestedBindType == BindType.tls_server_end_point && bindingData == null) {
-			throw new RuntimeException("Binding data not found!");
-		} else if (requestedBindType == BindType.tls_unique && bindingData == null) {
-			throw new RuntimeException("Binding data not found!");
-		} else if (requestedBindType == BindType.tls_exporter && bindingData == null) {
-			throw new RuntimeException("Binding data not found!");
+	private void validateKeyPresence(final byte[] key, final String keyName) throws SaslException {
+		if (key == null) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "There is no {1} of user {0}.", new Object[]{cfmUsername, keyName});
+			}
+			throw new SaslException("Unknown user");
+		} else if (key.length == 0) {
+			if (log.isLoggable(Level.WARNING)) {
+				log.log(Level.WARNING, "User {0} exists, but his {1} is empty.", new Object[]{cfmUsername, keyName});
+			}
+			throw new SaslException("Unknown user");
 		}
-	}
-
-	@Override
-	public byte[] wrap(byte[] outgoing, int offset, int len) {
-		return null;
-	}
-
-	protected byte[] xor(final byte[] a, final byte[] b) {
-		final int l = a.length;
-		byte[] r = new byte[l];
-		for (int i = 0; i < l; i++) {
-			r[i] = (byte) (a[i] ^ b[i]);
-		}
-		return r;
 	}
 
 	private enum Step {
