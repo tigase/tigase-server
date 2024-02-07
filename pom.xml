@@ -40,7 +40,7 @@
 
     <artifactId>tigase-server</artifactId>
     <packaging>bundle</packaging>
-    <version>8.3.1-SNAPSHOT</version>
+    <version>8.3.1</version>
 
     <name>Tigase XMPP Server</name>
     <description>The instant messaging server</description>
@@ -76,7 +76,7 @@
         <connection>scm:git:${scm_repo_base}/tigase-server.git</connection>
         <developerConnection>scm:git:${scm_repo_base}/tigase-server.git</developerConnection>
         <url>https://tigase.tech/projects/tigase-server/repository</url>
-        <tag>HEAD</tag>
+        <tag>tigase-server-8.3.1</tag>
     </scm>
 
     <profiles>
