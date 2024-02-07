@@ -76,8 +76,8 @@
         <connection>scm:git:${scm_repo_base}/tigase-server.git</connection>
         <developerConnection>scm:git:${scm_repo_base}/tigase-server.git</developerConnection>
         <url>https://tigase.tech/projects/tigase-server/repository</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <profiles>
         <profile>
