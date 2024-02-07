@@ -381,6 +381,22 @@ public class AuthRepositoryPool
 	}
 
 	@Override
+	public void updateCredential(BareJID user, String credentialId, String mechanism, String data)
+			throws TigaseDBException {
+		AuthRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				repo.updateCredential(user, credentialId, mechanism, data);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.warning("repo is NULL, pool empty? - " + repoPool.size());
+		}
+	}
+
+	@Override
 	public void updatePassword(BareJID user, String password) throws TigaseDBException {
 		AuthRepository repo = takeRepo();
 

@@ -35,7 +35,6 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -991,6 +990,23 @@ public class TigaseCustomAuth
 					updateCredential_stmt.addBatch();
 				}
 				updateCredential_stmt.executeBatch();
+			}
+		} catch (SQLException ex) {
+			throw new TigaseDBException("Problem accessing repository.", ex);
+		}
+	}
+
+	public void updateCredential(BareJID user, String credentialId, String mechanism, String data) throws TigaseDBException {
+		try {
+			PreparedStatement updateCredential_stmt = data_repo.getPreparedStatement(user,
+																					 updateaccountcredential_query);
+			synchronized (updateCredential_stmt) {
+				updateCredential_stmt.setString(1, user.toString());
+				updateCredential_stmt.setString(2, credentialId);
+				updateCredential_stmt.setString(3, mechanism);
+				updateCredential_stmt.setString(4, data);
+
+				updateCredential_stmt.execute();
 			}
 		} catch (SQLException ex) {
 			throw new TigaseDBException("Problem accessing repository.", ex);

@@ -206,11 +206,19 @@ public class ScramCredentialsEntry
 			this.algorithm = algorithm;
 		}
 
+		public static String encode(byte[] salt, int iterations, byte[] storedKey, byte[] serverKey) {
+			return "s=" + tigase.util.Base64.encode(salt) + ",i=" + iterations + ",t=" +
+					tigase.util.Base64.encode(storedKey) + ",e=" +
+					tigase.util.Base64.encode(serverKey);
+		}
+
+		public static String encode(ScramCredentialsEntry entry) {
+			return encode(entry.getSalt(), entry.getIterations(), entry.getStoredKey(), entry.getServerKey());
+		}
+
 		@Override
 		public String encode(BareJID user, ScramCredentialsEntry entry) {
-			return "s=" + tigase.util.Base64.encode(entry.getSalt()) + ",i=" + entry.getIterations() + ",t=" +
-					tigase.util.Base64.encode(entry.getStoredKey()) + ",e=" +
-					tigase.util.Base64.encode(entry.getServerKey());
+			return encode(entry);
 		}
 
 		@Override
@@ -224,11 +232,7 @@ public class ScramCredentialsEntry
 				throw new RuntimeException("Could not encode password", e);
 			}
 
-//			return "s=" + tigase.util.Base64.encode(salt) + ",i=" + iterations + ",p=" +
-//					tigase.util.Base64.encode(saltedPassword);
-			return "s=" + tigase.util.Base64.encode(salt) + ",i=" + iterations + ",t=" +
-					tigase.util.Base64.encode(authData.storedKey()) + ",e=" +
-					tigase.util.Base64.encode(authData.serverKey());
+			return encode(salt, iterations, authData.storedKey(), authData.serverKey());
 		}
 
 		@Override

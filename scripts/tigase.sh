@@ -107,6 +107,9 @@ fi
 [[ -z "${SCHEMA_MANAGER}" ]] && \
   SCHEMA_MANAGER="tigase.db.util.SchemaManager"
 
+[[ -z "${REPOSITORY_MANAGER}" ]] && \
+  REPOSITORY_MANAGER="tigase.db.util.importexport.RepositoryManager"
+
 [[ -z "${CONFIG_HOLDER}" ]] && \
   CONFIG_HOLDER="tigase.conf.ConfigHolder"
 
@@ -217,6 +220,11 @@ case "${1}" in
     fi
 
     sh -c "exec $TIGASE_CMD"
+    ;;
+
+  export-data|import-data)
+    TMP="${@:2}"
+    sh -c "${JAVA} ${JAVA_OPTIONS} -DscriptName='${0}' ${LOGBACK} -cp ${CLASSPATH} ${REPOSITORY_MANAGER} ${1} ${TIGASE_OPTIONS} ${TMP}"
     ;;
 
   upgrade-schema|install-schema|destroy-schema)

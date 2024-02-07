@@ -736,7 +736,7 @@ public class SchemaManager {
 		return info;
 	}
 
-	private static List<RepoInfo> getRepositories(Kernel kernel, List<BeanConfig> repoBeans, Map<String, Object> config) {
+	public static List<RepoInfo> getRepositories(Kernel kernel, List<BeanConfig> repoBeans, Map<String, Object> config) {
 		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
 		Map<String, DataSourceInfo> dataSources = getDataSources(config);
 		return dataSources.isEmpty()
@@ -921,7 +921,7 @@ public class SchemaManager {
 		throw new RuntimeException("Unknown repository!");
 	}
 
-	private static Kernel prepareKernel(Map<String, Object> config) {
+	public static Kernel prepareKernel(Map<String, Object> config) {
 		Kernel kernel = new Kernel("root");
 		try {
 			if (XMPPServer.isOSGi()) {
@@ -953,7 +953,7 @@ public class SchemaManager {
 		return kernel;
 	}
 
-	private static List<BeanConfig> getRepositoryBeans(Kernel kernel, List<Class<?>> repositoryClasses, Map<String, Object> config) {
+	public static List<BeanConfig> getRepositoryBeans(Kernel kernel, List<Class<?>> repositoryClasses, Map<String, Object> config) {
 		DSLBeanConfigurator configurator = kernel.getInstance(DSLBeanConfigurator.class);
 		configurator.registerBeans(null, null, config);
 
@@ -961,7 +961,7 @@ public class SchemaManager {
 		fixShutdownThreadIssue();
 		return repoBeans;
 	}
-
+	
 	private static void fixShutdownThreadIssue() {
 		MonitorRuntime.getMonitorRuntime();
 		try {
@@ -974,8 +974,8 @@ public class SchemaManager {
 		}
 	}
 
-	private static List<BeanConfig> crawlKernel(List<Class<?>> repositoryClasses, Kernel kernel,
-										 DSLBeanConfigurator configurator, Map<String, Object> config) {
+	public static List<BeanConfig> crawlKernel(List<Class<?>> repositoryClasses, Kernel kernel,
+											   DSLBeanConfigurator configurator, Map<String, Object> config) {
 		List<BeanConfig> results = new ArrayList<>();
 		kernel.getDependencyManager()
 				.getBeanConfigs()

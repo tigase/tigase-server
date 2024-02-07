@@ -46,24 +46,8 @@ public class MAMItemHandler
 	@Override
 	public void itemFound(Query query, MAMRepository.Item item) {
 		Element m = new Element("message");
-		Element result = new Element("result", new String[]{"xmlns", "id"},
-									 new String[]{query.getXMLNS(), item.getId()});
-		if (query.getId() != null) {
-			result.setAttribute("queryid", query.getId());
-		}
+		Element result = prepareResult(query, item);
 		m.addChild(result);
-		Element forwarded = new Element("forwarded", new String[]{"xmlns"}, new String[]{"urn:xmpp:forward:0"});
-		result.addChild(forwarded);
-
-		String timestampStr = TIMESTAMP_FORMATTER.formatWithMs(item.getTimestamp());
-
-		Element delay = new Element("delay", new String[]{"xmlns", "stamp"},
-									new String[]{"urn:xmpp:delay", timestampStr});
-		forwarded.addChild(delay);
-
-		if (item.getMessage() != null) {
-			forwarded.addChild(item.getMessage());
-		}
 
 		Message packet = new Message(m, query.getComponentJID(), query.getQuestionerJID());
 		packet.setXMLNS(Packet.CLIENT_XMLNS);
@@ -77,6 +61,27 @@ public class MAMItemHandler
 				() -> "Processing item: " + item + " from query: " + query + ", resulting packet: " + packet);
 
 		packetWriter.write(packet);
+	}
+
+	protected Element prepareResult(Query query, MAMRepository.Item item) {
+		Element result = new Element("result", new String[]{"xmlns", "id"},
+									 new String[]{query.getXMLNS(), item.getId()});
+		if (query.getId() != null) {
+			result.setAttribute("queryid", query.getId());
+		}
+		Element forwarded = new Element("forwarded", new String[]{"xmlns"}, new String[]{"urn:xmpp:forward:0"});
+		result.addChild(forwarded);
+
+		String timestampStr = TIMESTAMP_FORMATTER.formatWithMs(item.getTimestamp());
+
+		Element delay = new Element("delay", new String[]{"xmlns", "stamp"},
+									new String[]{"urn:xmpp:delay", timestampStr});
+		forwarded.addChild(delay);
+
+		if (item.getMessage() != null) {
+			forwarded.addChild(item.getMessage());
+		}
+		return result;
 	}
 
 }

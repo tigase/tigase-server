@@ -272,6 +272,10 @@ public interface AuthRepository
 		updatePassword(user, password);
 	}
 
+	default void updateCredential(BareJID user, String credentialId, String mechanism, String data) throws TigaseDBException {
+		throw new TigaseDBException("Feature not supported by AuthRepository implementation " + this.getClass().getSimpleName());
+	}
+
 	@Deprecated
 	@TigaseDeprecated(since = "8.0.0")
 	void updatePassword(BareJID user, String password) throws TigaseDBException;
