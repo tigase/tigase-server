@@ -155,8 +155,11 @@ public abstract class AbstractSaslSCRAM
 		return mac.doFinal(data);
 	}
 
-	public static byte[] hmac(final String algorithm, final byte[] key, byte[] data)
+	public static byte[] hmac(String algorithm, final byte[] key, byte[] data)
 			throws NoSuchAlgorithmException, InvalidKeyException {
+		if (algorithm.startsWith("SHA-")) {
+			algorithm = algorithm.replace("SHA-", "SHA");
+		}
 		final SecretKeySpec k = new SecretKeySpec(key, "Hmac" + algorithm);
 		return hmac(k, data);
 	}

@@ -132,6 +132,10 @@ public class ScramCallbackHandler
 			handleAuthorizationIdCallback((AuthorizationIdCallback) callback);
 		} else if (callback instanceof SaltCallback) {
 			handleSaltCallback((SaltCallback) callback);
+		} else if (callback instanceof ServerKeyCallback serverKeyCallback) {
+			handleServerKeyCallback(serverKeyCallback);
+		} else if (callback instanceof StoredKeyCallback storedKeyCallback) {
+			handleStoredKeyCallback(storedKeyCallback);
 		} else if (callback instanceof AuthorizeCallback) {
 			handleAuthorizeCallback((AuthorizeCallback) callback);
 		} else {
@@ -268,13 +272,30 @@ public class ScramCallbackHandler
 		}
 	}
 
-	private void handleServerKeyCallback(ServerKeyCallback callback) {
+	private void handleServerKeyCallback(ServerKeyCallback callback) throws SaslException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "ServerKeyCallback: {0}", jid);
+		}
 
-		// TODO
+		fetchCredentials();
+		if (credentialsEntry != null) {
+			callback.setServerKey(credentialsEntry.getServerKey());
+		} else {
+			callback.setServerKey(null);
+		}
 	}
 
-	private void handleStoredKeyCallback(StoredKeyCallback callback) {
-		// TODO
+	private void handleStoredKeyCallback(StoredKeyCallback callback) throws SaslException {
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "StoredKeyCallback: {0}", jid);
+		}
+
+		fetchCredentials();
+		if (credentialsEntry != null) {
+			callback.setStoredKey(credentialsEntry.getStoredKey());
+		} else {
+			callback.setStoredKey(null);
+		}
 	}
 
 	private void setJid(BareJID jid) {
