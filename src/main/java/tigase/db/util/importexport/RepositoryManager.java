@@ -21,6 +21,7 @@ import tigase.component.exceptions.RepositoryException;
 import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigReader;
 import tigase.db.UserRepository;
+import tigase.db.comp.ConfigRepository;
 import tigase.db.util.SchemaManager;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
@@ -34,6 +35,7 @@ import tigase.vhosts.VHostJDBCRepository;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -166,7 +168,7 @@ java.util.logging.ConsoleHandler.formatter = tigase.util.log.LogFormatter""";
 
 	private void initialize(CommandlineParameter fileParam, Properties properties)
 			throws ConfigReader.ConfigException, IOException, ClassNotFoundException, RepositoryException,
-				   InstantiationException, IllegalAccessException {
+				   InstantiationException, IllegalAccessException, NoSuchFieldException {
 		rootPath = Paths.get(properties.getProperty(fileParam.getFullName().get()));
 		ConfigHolder holder = new ConfigHolder();
 		holder.loadConfiguration(new String[] { ConfigHolder.TDSL_CONFIG_FILE_KEY,
@@ -193,6 +195,10 @@ java.util.logging.ConsoleHandler.formatter = tigase.util.log.LogFormatter""";
 		vhostRepository.setExtensionManager(new VHostItemExtensionManager());
 		vhostRepository.setVhostDefaultValues(new VHostItemDefaults());
 		vhostRepository.reload();
+		// mark vhostRepository as initialized to allow saving items (not enabled autoreload intentionally)
+		Field f = ConfigRepository.class.getDeclaredField("initialized");
+		f.setAccessible(true);
+		f.set(vhostRepository, true);
 		
 		for (RepositoryManagerExtension extension : extensions) {
 			extension.initialize(kernel, dataSourceHelper, repositoryHolder, rootPath);
