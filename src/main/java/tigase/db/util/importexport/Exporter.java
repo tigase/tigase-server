@@ -52,6 +52,9 @@ public class Exporter {
 
 	public static final CommandlineParameter EXPORT_MAM_SINCE = new CommandlineParameter.Builder(null, "export-mam-since").description("Export MAM archive since").type(
 			LocalDateTime.class).required(false).build();
+	public static final CommandlineParameter EXPORT_MAM_BATCH_SIZE = new CommandlineParameter.Builder(null,
+																									  "export-mam-batch-size").description(
+			"Export MAM archive batch size").type(Integer.class).defaultValue("50000").required(false).build();
 
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
 	private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -68,6 +71,10 @@ public class Exporter {
 				}
 			}
 		});
+	}
+
+	public static Integer getExportMAMBatchSize() {
+		return EXPORT_MAM_BATCH_SIZE.getValue().map(Integer::parseInt).orElse(50000);
 	}
 
 	private static LocalDateTime parseLocalDate(String str) throws Exception {
@@ -111,6 +118,7 @@ public class Exporter {
 		this.rootPath = rootPath;
 
 		getExportMAMSinceValue().ifPresent(date -> log.info("exporting MAM since: " + date));
+		log.info("exporting MAM in batch size of " + getExportMAMBatchSize() + " messages");
 	}
 
 	public void export(String fileName) throws Exception {

@@ -22,6 +22,7 @@ import tigase.server.Message;
 import tigase.xml.Element;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
+import tigase.xmpp.mam.ExtendedQuery;
 import tigase.xmpp.mam.MAMItemHandler;
 import tigase.xmpp.mam.MAMRepository;
 import tigase.xmpp.mam.Query;
@@ -29,12 +30,13 @@ import tigase.xmpp.mam.Query;
 import java.io.Writer;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MAMRepositoryManagerExtensionHelper {
-
+	
 	private static Logger log = Logger.getLogger(MAMRepositoryManagerExtensionHelper.class.getCanonicalName());
 
 	public static void exportDataFromRepository(MAMRepository mamRepository, BareJID repoJID, BareJID askingJID, Writer archiveWriter) throws Exception {
@@ -47,23 +49,52 @@ public class MAMRepositoryManagerExtensionHelper {
 		query.setQuestionerJID(JID.jidInstance(askingJID));
 		query.setXMLNS("urn:xmpp:mam:2");
 		Exporter.getExportMAMSinceValue().ifPresent(query::setStart);
-		query.getRsm().setMax(Integer.MAX_VALUE);
-		mamRepository.queryItems(query, new MAMItemHandler() {
-			@Override
-			public void itemFound(Query query, MAMRepository.Item item) {
-				Element result = this.prepareResult(query, item);
-				if (result != null) {
-					if (outputModifier != null) {
-						outputModifier.accept(item, result);
-					}
-					try {
-						archiveWriter.append(result.toString());
-					} catch (Throwable ex) {
-						log.log(Level.SEVERE, ex.getMessage(), ex);
+		query.getRsm().setMax(Exporter.getExportMAMBatchSize());
+
+		AtomicReference<MAMRepository.Item> lastItem = new AtomicReference<>();
+		int batchNo = 0;
+		Integer itemsToExport = null;
+		while (true) {
+			mamRepository.queryItems(query, new MAMItemHandler() {
+				@Override
+				public void itemFound(Query query, MAMRepository.Item item) {
+					lastItem.set(item);
+					Element result = this.prepareResult(query, item);
+					if (result != null) {
+						if (outputModifier != null) {
+							outputModifier.accept(item, result);
+						}
+						try {
+							archiveWriter.append(result.toString());
+						} catch (Throwable ex) {
+							log.log(Level.SEVERE, ex.getMessage(), ex);
+						}
 					}
 				}
+			});
+			if (lastItem.get() == null) {
+				break;
+			} else {
+				if (itemsToExport == null) {
+					itemsToExport = query.getRsm().getCount();
+				}
+				if (itemsToExport != null) {
+					++batchNo;
+					int completed = Math.min(batchNo * Exporter.getExportMAMBatchSize(), itemsToExport);
+					int percent = (completed * 100) / itemsToExport;
+					if (batchNo > 1 || percent < 100) {
+						log.info("exported MAM archive for " + repoJID + " batch no. " + batchNo + ", " + (percent) +
+										 "%...");
+					}
+				}
+				if (query instanceof ExtendedQuery extendedQuery) {
+					extendedQuery.setAfterId(lastItem.get().getId());
+				} else {
+					query.getRsm().setAfter(lastItem.get().getId());
+				}
+				lastItem.set(null);
 			}
-		});
+		}
 		archiveWriter.append("</archive>");
 	}
 
