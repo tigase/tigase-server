@@ -111,7 +111,7 @@ If you wish to downloand SNAPSHOT build of the development version of Tigase XMP
 
 # Installation and usage
 
-Documentation of the project is part of the Tigase XMPP Server distribution package. Quickstart guide is also available [here](https://docs.tigase.net/tigase-server/snapshot/Administration_Guide/html/#QuickStart).
+Documentation of the project is part of the Tigase XMPP Server distribution package. Quickstart guide is also available [here](https://docs.tigase.net/en/latest/Tigase_Administration/Quick_Start_Guide/Intro.html).
 
 # Compilation 
 
