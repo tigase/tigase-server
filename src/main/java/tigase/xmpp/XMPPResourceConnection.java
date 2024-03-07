@@ -517,7 +517,14 @@ public class XMPPResourceConnection
 		if (!isAuthorized()) {
 			throw new NotAuthorizedException(NOT_AUTHORIZED_MSG);
 		}    // end of if (username == null)
-		this.resource = argResource;
+
+		// argResource shouldn't be null, but let's check that just in case
+		if (argResource != null) {
+			// added escaping to make sure that resource (later used in XML element attribute) is properly escaped
+			this.resource = argResource.replace("'", "&apos;").replace("\"", "&quot;");
+		} else {
+			this.resource = argResource;
+		}
 
 		// This is really unlikely a parent session would be null here but it may
 		// happen when the user disconnects just after sending resource bind.
