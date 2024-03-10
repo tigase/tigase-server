@@ -188,7 +188,7 @@ public class C2SIOService<RefObject>
 			} catch (Exception ex) {
 				if (log.isLoggable(Level.WARNING)) {
 					byte[] data = Arrays.copyOf(tlsData, Math.min(tlsData.length, 10));
-					log.log(Level.WARNING,
+					log.log(Level.FINE,
 							"Error while processing handshake, SSL packet header " + Algorithms.bytesToHex(data) + "...", ex);
 				}
 			}
