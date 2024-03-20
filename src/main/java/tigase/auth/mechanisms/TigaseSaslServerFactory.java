@@ -58,6 +58,8 @@ public class TigaseSaslServerFactory
 				return new SaslANONYMOUS(props, callbackHandler);
 			case SaslEXTERNAL.NAME:
 				return new SaslEXTERNAL(props, callbackHandler);
+			case SaslXTOKEN.NAME:
+				return new SaslXTOKEN(props, callbackHandler);
 			default:
 				throw new SaslException("Mechanism not supported yet.");
 		}
@@ -67,7 +69,7 @@ public class TigaseSaslServerFactory
 	public String[] getMechanismNames(Map<String, ?> props) {
 		return new String[]{SaslSCRAMSha512Plus.NAME, SaslSCRAMSha256Plus.NAME, SaslSCRAMPlus.NAME,
 							SaslSCRAMSha512.NAME, SaslSCRAMSha256.NAME, SaslSCRAM.NAME, "PLAIN", "EXTERNAL",
-							"ANONYMOUS",};
+							"ANONYMOUS", SaslXTOKEN.NAME};
 	}
 
 }

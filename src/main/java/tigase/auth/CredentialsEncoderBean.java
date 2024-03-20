@@ -54,7 +54,10 @@ public class CredentialsEncoderBean
 	public List<String[]> encodeForAllMechanisms(BareJID user, String password) {
 		List<String[]> entries = new ArrayList<>();
 		for (Credentials.Encoder enc : encoders) {
-			entries.add(new String[]{enc.getName(), enc.encode(user, password)});
+			String secret = enc.encode(user, password);
+			if (secret != null) {
+				entries.add(new String[]{enc.getName(), secret});
+			}
 		}
 		return entries;
 	}

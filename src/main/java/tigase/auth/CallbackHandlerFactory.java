@@ -20,6 +20,7 @@ package tigase.auth;
 import tigase.auth.callbacks.CallbackHandlerFactoryIfc;
 import tigase.auth.impl.PlainCallbackHandler;
 import tigase.auth.impl.ScramCallbackHandler;
+import tigase.auth.impl.XTokenCallbackHandler;
 import tigase.auth.mechanisms.*;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
@@ -83,6 +84,8 @@ public class CallbackHandlerFactory
 			case SaslSCRAMSha512.NAME:
 			case SaslSCRAMSha512Plus.NAME:
 				return ScramCallbackHandler.class.getName();
+			case SaslXTOKEN.NAME:
+				return XTokenCallbackHandler.class.getName();
 			default:
 				return null;
 		}

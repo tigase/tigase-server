@@ -291,6 +291,19 @@ public abstract class AuthRepositoryMDImpl
 	}
 
 	@Override
+	public void updateCredential(BareJID user, String credentialId, String mechanism, String data)
+			throws TigaseDBException {
+		AuthRepository repo = getRepo(user.getDomain());
+
+		if (repo != null) {
+			repo.updateCredential(user, credentialId, mechanism, data);
+		} else {
+			log.log(Level.WARNING,
+					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
+		}
+	}
+
+	@Override
 	public void updatePassword(BareJID user, String password) throws TigaseDBException {
 		AuthRepository repo = getRepo(user.getDomain());
 

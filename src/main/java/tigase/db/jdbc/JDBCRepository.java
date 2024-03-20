@@ -760,6 +760,17 @@ public class JDBCRepository
 	}
 
 	@Override
+	public void updateCredential(BareJID user, String credentialId, String mechanism, String data)
+			throws TigaseDBException {
+		auth.updateCredential(user, credentialId, mechanism, data);
+	}
+
+	@Override
+	public void updateCredential(BareJID user, String credentialId, String password) throws TigaseDBException {
+		auth.updateCredential(user, credentialId, password);
+	}
+
+	@Override
 	public void updatePassword(BareJID user, final String password) throws TigaseDBException {
 		auth.updatePassword(user, password);
 	}
