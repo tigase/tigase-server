@@ -25,6 +25,7 @@ import tigase.TestLogger;
 import tigase.auth.callbacks.AuthorizationIdCallback;
 import tigase.auth.callbacks.ReplaceServerKeyCallback;
 import tigase.auth.callbacks.ServerKeyCallback;
+import tigase.util.Base64;
 import tigase.xmpp.jid.BareJID;
 
 import javax.crypto.Mac;
@@ -51,7 +52,9 @@ public class SaslXTOKENTest extends TestCase {
 	private byte[] newServerKey;
 	private final SecureRandom random = new SecureRandom();
 	private SaslXTOKEN sasl;
-	
+
+	private final boolean printTestVectors = false;
+
 	@Override
 	@Before
 	public void setUp() {
@@ -154,6 +157,7 @@ public class SaslXTOKENTest extends TestCase {
 			System.arraycopy(jid, 0, exp, 0, jid.length);
 			System.arraycopy(newServerKey, 0, exp, jid.length + 1, newServerKey.length);
 			Assert.assertArrayEquals(exp,finish);
+			print(jid, serverKey, response, finish, newServerKey);
 
 			serverKey = newServerKey;
 			newServerKey = null;
@@ -167,11 +171,30 @@ public class SaslXTOKENTest extends TestCase {
 			System.arraycopy(jid, 0, response,66 , jid.length);
 			finish = sasl.evaluateResponse(response);
 			Assert.assertArrayEquals(jid,finish);
+			print(jid, serverKey, response, finish, newServerKey);
 		} catch (SaslException e) {
 			// shouldn't be thrown
 			e.printStackTrace();
 			fail("Exception must not be thrown");
 		}
 		assertTrue(sasl.isComplete());
+	}
+
+	private void print(byte[] jid, byte[] serverKey, byte[] clientSaslRequest, byte[] serverSaslResponse, byte[] newServerKey) {
+		if (!printTestVectors) {
+			return;
+		}
+		System.out.println("Authentication" + (newServerKey == null ? "" : " with key replace"));
+		System.out.println("JID: " + new String(jid, StandardCharsets.UTF_8));
+		System.out.println("Server key: " + Base64.encode(serverKey));
+		byte[] data = new byte[serverKey.length + 1 + jid.length];
+		System.arraycopy(serverKey, 0, data, 0, serverKey.length);
+		System.arraycopy(jid, 0, data, serverKey.length + 1, jid.length);
+		System.out.println("QR code: " + Base64.encode(data));
+		System.out.println("SASL payload sent by client: " + Base64.encode(clientSaslRequest));
+		System.out.println("SASL payload sent by server: " + Base64.encode(serverSaslResponse));
+		if (newServerKey != null) {
+			System.out.println("Server key (new): " + Base64.encode(newServerKey));
+		}
 	}
 }
