@@ -78,12 +78,14 @@ public class EventBusSerializerTest {
 		Element ex = serializer.serialize(eo);
 
 		Assert.assertEquals(5, ex.getChildren().size());
-		Assert.assertEquals("a@b.c/d", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "jid"}));
-		Assert.assertNull(ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "transientField"}));
-		Assert.assertEquals("message", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "v1"}));
-		Assert.assertEquals("9898", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "v2"}));
-		Assert.assertEquals("v", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "elementField", "x"}));
-		Assert.assertNotEquals("ala,m,a,kota", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "strArrField"}));
+		Assert.assertEquals("event", ex.getName());
+		Assert.assertEquals("tigase.eventbus.impl.Event1", ex.getAttributeStaticStr("class"));
+		Assert.assertEquals("a@b.c/d", ex.getCData(new String[]{"event", "jid"}));
+		Assert.assertNull(ex.getCData(new String[]{"event", "transientField"}));
+		Assert.assertEquals("message", ex.getCData(new String[]{"event", "v1"}));
+		Assert.assertEquals("9898", ex.getCData(new String[]{"event", "v2"}));
+		Assert.assertEquals("v", ex.getCData(new String[]{"event", "elementField", "x"}));
+		Assert.assertNotEquals("ala,m,a,kota", ex.getCData(new String[]{"event", "strArrField"}));
 	}
 
 	@Test
