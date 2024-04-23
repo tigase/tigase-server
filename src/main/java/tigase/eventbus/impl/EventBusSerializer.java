@@ -33,11 +33,20 @@ public class EventBusSerializer
 		implements Serializer {
 
 	private static final Logger log = Logger.getLogger(EventBusSerializer.class.getName());
+	private static final String ELEM_NAME = "event";
+	private static final String CLASS_ATTR_NAME = "class";
 	private TypesConverter typesConverter = new DefaultTypesConverter();
 
 	public <T> T deserialize(final Element element) {
 		try {
-			final Class<?> cls = Class.forName(element.getName());
+			if (!ELEM_NAME.equals(element.getName())) {
+				return null;
+			}
+			String className = element.getAttributeStaticStr(CLASS_ATTR_NAME);
+			if (className == null) {
+				return null;
+			}
+			final Class<?> cls = Class.forName(className);
 			final Object result = cls.newInstance();
 
 			Field[] fields = BeanUtils.getAllFields(cls);
@@ -85,7 +94,8 @@ public class EventBusSerializer
 
 	public Element serialize(final Object object) {
 		final Class<?> cls = object.getClass();
-		Element e = new Element(cls.getName());
+		Element e = new Element(ELEM_NAME);
+		e.setAttribute(CLASS_ATTR_NAME, cls.getName());
 
 		Field[] fields = BeanUtils.getAllFields(cls);
 		for (final Field f : fields) {

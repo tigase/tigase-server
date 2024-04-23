@@ -19,11 +19,19 @@ package tigase.eventbus.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
+import tigase.auth.BruteForceLockerBean;
+import tigase.util.stringprep.TigaseStringprepException;
+import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
+import tigase.xml.SimpleParser;
+import tigase.xml.SingletonFactory;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.util.Arrays;
 import java.util.HashSet;
+
+import static org.junit.Assert.*;
 
 public class EventBusSerializerTest {
 
@@ -44,7 +52,7 @@ public class EventBusSerializerTest {
 
 		Event1 ed = serializer.deserialize(ex);
 
-		Assert.assertNotNull(ed);
+		assertNotNull(ed);
 		Assert.assertNotSame(eo, ed);
 		Assert.assertEquals(JID.jidInstanceNS("a@b.c/d"), ed.getJid());
 		Assert.assertNull(ed.getTransientField());
@@ -76,6 +84,46 @@ public class EventBusSerializerTest {
 		Assert.assertEquals("9898", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "v2"}));
 		Assert.assertEquals("v", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "elementField", "x"}));
 		Assert.assertNotEquals("ala,m,a,kota", ex.getCData(new String[]{"tigase.eventbus.impl.Event1", "strArrField"}));
+	}
+
+	@Test
+	public void testSerializeXmlValidity() throws TigaseStringprepException {
+		EventBusSerializer serializer = new EventBusSerializer();
+
+		BruteForceLockerBean.StatHolder statHolder = new BruteForceLockerBean.StatHolder();
+		statHolder.addIP("192.168.0.1");
+		statHolder.addIP("::1");
+		statHolder.addJID(BareJID.bareJIDInstance("test@zeus"));
+		BruteForceLockerBean.StatisticsEmitEvent eo = new BruteForceLockerBean.StatisticsEmitEvent("test", statHolder);
+		String xmlString = serializer.serialize(eo).toString();
+
+		SimpleParser parser = SingletonFactory.getParserInstance();
+		TestDomBuilderHandler domHandler = new TestDomBuilderHandler();
+		parser.parse(domHandler, xmlString.toCharArray(), 0, xmlString.length());
+		assertFalse(domHandler.isError());
+		
+		Element ex = domHandler.getParsedElements().poll();
+
+		BruteForceLockerBean.StatisticsEmitEvent eor = serializer.deserialize(ex);
+		assertNotNull(eor);
+
+		String xmlString2 = serializer.serialize(eor).toString();
+		assertEquals(xmlString, xmlString2);
+	}
+
+	private static class TestDomBuilderHandler extends DomBuilderHandler {
+
+		private boolean error = false;
+
+		@Override
+		public void error(String errorMessage) {
+			super.error(errorMessage);
+			this.error = true;
+		}
+
+		public boolean isError() {
+			return error;
+		}
 	}
 
 }
