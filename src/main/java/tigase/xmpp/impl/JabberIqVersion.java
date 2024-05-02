@@ -57,7 +57,6 @@ public class JabberIqVersion
 		SERVER_VERSION = new Element("query", new Element[]{
 				new Element("name", XMPPServer.NAME),
 				new Element("version", XMPPServer.getImplementationVersion()),
-				new Element("build", XMPPServer.getImplementationVersion()),
 				new Element("os", System.getProperty("os.name") + "-" +
 						System.getProperty("os.arch") + "-" +
 						System.getProperty("os.version") + ", " +
