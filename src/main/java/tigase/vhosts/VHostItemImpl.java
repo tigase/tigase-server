@@ -118,7 +118,7 @@ public class VHostItemImpl
 	protected static final String S2S_SECRET_PROP_DEF = null;
 	protected static final String S2S_SECRET_PROP_KEY = "s2s-secret";
 	protected static final String VHOST_ANONYMOUS_ENABLED_PROP_KEY = "vhost-anonymous-enabled";
-	protected static final Boolean VHOST_ANONYMOUS_ENABLED_PROP_DEF = Boolean.TRUE;
+	protected static final Boolean VHOST_ANONYMOUS_ENABLED_PROP_DEF = Boolean.FALSE;
 	protected static final String VHOST_MAX_USERS_PROP_KEY = "vhost-max-users";
 	protected static final Long VHOST_MAX_USERS_PROP_DEF = Long.valueOf(0l);
 	protected static final String VHOST_MESSAGE_FORWARD_PROP_DEF = null;
