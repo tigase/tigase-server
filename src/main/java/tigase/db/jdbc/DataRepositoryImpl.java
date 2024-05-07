@@ -531,7 +531,8 @@ public class DataRepositoryImpl
 					}
 				}
 			}
-		} catch (SQLException ignored) {
+		} catch (SQLException e) {
+			log.log(Level.FINEST, "Checking if database server is ReadOnly threw exception: " + conn, e);
 		}
 		return false;
 	}
