@@ -121,6 +121,11 @@ public class BeanConfigBuilder {
 	 * @return {@link BeanConfigBuilder}.
 	 */
 	public BeanConfigBuilder exportable() {
+		if (beanConfig == null) {
+			log.warning("Bean " + clazz +
+					            " cannot be configured as exportable, because Kernel cannot create configuration for this bean." +
+					            this);
+		}
 		beanConfig.setExportable(true);
 		return this;
 	}

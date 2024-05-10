@@ -1265,7 +1265,7 @@ public class DBSchemaLoader
 					// explicitly disable SSL to avoid a warning by the driver
 					db_uri.append("&useSSL=false");
 				}
-				if (!params.isUseLegacyDatetimeCode()) {
+				if (Boolean.TRUE.equals(params.isUseLegacyDatetimeCode())) {
 					db_uri.append("&useLegacyDatetimeCode=").append(params.isUseLegacyDatetimeCode());
 				}
 				if (params.getServerTimezone() != null) {
@@ -1419,7 +1419,7 @@ public class DBSchemaLoader
 		private String serverTimezone = null;
 		private Boolean useLegacyDatetimeCode = false;
 		private Boolean useSSL = null;
-		private boolean forceReloadSchema = false;
+		private Boolean forceReloadSchema = false;
 		private String schemaDirectory = "database/";
 		private Map<String,String> otherParameters = new HashMap<>();
 
@@ -1614,14 +1614,13 @@ public class DBSchemaLoader
 			dbHostname = getProperty(props, PARAMETERS_ENUM.DATABASE_HOSTNAME);
 			dbUser = getProperty(props, PARAMETERS_ENUM.TIGASE_USERNAME);
 			dbPass = getProperty(props, PARAMETERS_ENUM.TIGASE_PASSWORD);
-			useSSL = getProperty(props, PARAMETERS_ENUM.USE_SSL, Boolean::parseBoolean);
-			useLegacyDatetimeCode = getProperty(props, PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE,
-												tmp -> Boolean.parseBoolean(tmp));
+			useSSL = getProperty(props, PARAMETERS_ENUM.USE_SSL, Boolean::valueOf);
+			useLegacyDatetimeCode = getProperty(props, PARAMETERS_ENUM.USE_LEGACY_DATETIME_CODE, Boolean::valueOf);
 			serverTimezone = getProperty(props, PARAMETERS_ENUM.SERVER_TIMEZONE);
 
 			dbRootUser = getProperty(props, PARAMETERS_ENUM.ROOT_USERNAME);
 			dbRootPass = getProperty(props, PARAMETERS_ENUM.ROOT_PASSWORD);
-			dbRootAsk = getProperty(props, PARAMETERS_ENUM.ROOT_ASK, Boolean::parseBoolean);
+			dbRootAsk = getProperty(props, PARAMETERS_ENUM.ROOT_ASK, Boolean::valueOf);
 
 			file = getProperty(props, PARAMETERS_ENUM.FILE);
 			query = getProperty(props, PARAMETERS_ENUM.QUERY);

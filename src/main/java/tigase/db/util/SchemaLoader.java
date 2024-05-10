@@ -93,6 +93,19 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 		return supportedTypes;
 	}
 
+	public static Optional<TypeInfo> getSupportedTypeForName(String name) {
+		if (name == null) {
+			return getDefaultSupportedTypeForName();
+		}
+		return getAllSupportedTypesStream()
+				.filter(type -> type.getName().equals(name))
+				.findAny();
+	}
+
+	public static Optional<TypeInfo> getDefaultSupportedTypeForName() {
+		return getAllSupportedTypesStream().findFirst();
+	}
+
 	private static Stream<Class<?>> getSchemaLoaderClasses() {
 		return ClassUtilBean.getInstance()
 				.getAllClasses()
