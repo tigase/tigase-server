@@ -17,6 +17,7 @@
  */
 package tigase.stats;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.server.QueueType;
 import tigase.util.repository.DataTypes;
 
@@ -29,6 +30,8 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
+@Deprecated
+@TigaseDeprecated(since = "8.4.0", note = "Will be replaced by more efficient statistics storage")
 public class StatisticsList
 		implements Iterable<StatRecord> {
 

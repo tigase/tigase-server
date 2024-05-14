@@ -17,6 +17,8 @@
  */
 package tigase.stats;
 
+import tigase.annotations.TigaseDeprecated;
+
 import java.util.Collection;
 import java.util.logging.Level;
 
@@ -27,6 +29,8 @@ import java.util.logging.Level;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
+@Deprecated
+@TigaseDeprecated(since = "8.4.0", note = "Will be replaced by more efficient statistics storage")
 public class StatRecord<E extends Number> {
 
 	private Collection<E> collection = null;

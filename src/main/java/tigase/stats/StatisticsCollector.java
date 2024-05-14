@@ -17,6 +17,7 @@
  */
 package tigase.stats;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.conf.ConfiguratorAbstract;
 import tigase.disco.ServiceEntity;
 import tigase.disco.ServiceIdentity;
@@ -53,6 +54,8 @@ import java.util.logging.Logger;
 @Bean(name = "stats", parent = Kernel.class, active = true)
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode,
 			 ConfigTypeEnum.ComponentMode})
+@Deprecated
+@TigaseDeprecated(since = "8.4.0", note = "Will be replaced by more efficient statistics storage")
 public class StatisticsCollector
 		extends AbstractComponentRegistrator<StatisticsContainer>
 		implements ShutdownHook, RegistrarBean {
