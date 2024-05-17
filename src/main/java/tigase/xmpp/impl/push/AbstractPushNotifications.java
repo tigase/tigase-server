@@ -22,6 +22,7 @@ import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.server.*;
 import tigase.server.amp.db.MsgRepository;
+import tigase.util.datetime.TimestampHelper;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.DomBuilderHandler;
 import tigase.xml.Element;
@@ -36,6 +37,7 @@ import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -66,6 +68,8 @@ public class AbstractPushNotifications
 	protected boolean withSender = true;
 	@ConfigField(desc = "Max notification timeout", alias = "max-timeout")
 	protected Duration maxTimeout = Duration.ofMinutes(6);
+	@ConfigField(desc = "Device registration TTL")
+	private Duration deviceRegistrationTTL = null;
 
 	@Inject
 	private MsgRepositoryIfc msgRepository;
@@ -76,9 +80,20 @@ public class AbstractPushNotifications
 	@Inject(bean = "sess-man")
 	private PacketWriterWithTimeout writer;
 
+	@Inject(nullAllowed = true)
+	private PushPresence pushDevicesPresence;
+
 	@ConfigField(desc = "Notification to display for encrypted messages", alias = "encrypted-message-body")
 	private String encryptedMessageBody = "New secure message. Open to see the message.";
-	
+
+	public PushPresence getPushDevicesPresence() {
+		return pushDevicesPresence;
+	}
+
+	public void setPushDevicesPresence(PushPresence pushDevicesPresence) {
+		this.pushDevicesPresence = pushDevicesPresence;
+	}
+
 	protected boolean shouldDisablePush(Authorization error) {
 		if (error == null) {
 			return false;
@@ -126,10 +141,10 @@ public class AbstractPushNotifications
 				switch (actionEl.getName()) {
 					case "enable":
 						enableNotifications(session, jid, node, actionEl, actionEl.findChild(
-								element -> element.getXMLNS() == JABBER_X_DATA_XMLNS && element.getName() == "x"));
+								element -> element.getXMLNS() == JABBER_X_DATA_XMLNS && element.getName() == "x"), results::offer);
 						break;
 					case "disable":
-						disableNotifications(session, jid, node);
+						disableNotifications(session, session.getBareJID(), jid, node, results::offer);
 						break;
 					default:
 						results.offer(Authorization.BAD_REQUEST.getResponseMessage(packet, null, true));
@@ -159,8 +174,12 @@ public class AbstractPushNotifications
 					String userJid = affiliationEl.getAttributeStaticStr("jid");
 					if ("none".equals(affiliationEl.getAttributeStaticStr("affiliation"))) {
 						if (userJid != null) {
-							userRepository.removeData(BareJID.bareJIDInstanceNS(userJid), ID,
+							BareJID bareJid = BareJID.bareJIDInstanceNS(userJid);
+							userRepository.removeData(bareJid, ID,
 													  packet.getStanzaFrom().toString() + "/" + node);
+							if (getPushServices(bareJid).isEmpty() && pushDevicesPresence != null) {
+								pushDevicesPresence.pushAvailabilityChanged(bareJid, false, results);
+							}
 						}
 					}
 				}
@@ -169,47 +188,58 @@ public class AbstractPushNotifications
 	}
 
 	protected void enableNotifications(XMPPResourceConnection session, JID jid, String node, Element enableElem,
-									   Element optionsForm) throws NotAuthorizedException, TigaseDBException {
+									   Element optionsForm, Consumer<Packet> packetConsumer) throws NotAuthorizedException, TigaseDBException {
 		Element settings = createSettingsElement(jid, node, enableElem, optionsForm);
 
-		enableNotifications(session, jid, node, settings);
+		enableNotifications(session, jid, node, settings, packetConsumer);
 	}
 
+	private static final TimestampHelper timestampHelper = new TimestampHelper();
+
 	protected Element createSettingsElement(JID jid, String node, Element enableElem, Element optionsForm) {
-		Element settings = new Element("settings", new String[]{"jid", "node"},
-									   new String[]{jid.toString(), node.toString()});
+		Element settings = new Element("settings", new String[]{"jid", "node", "createdAt"},
+									   new String[]{jid.toString(), node.toString(), timestampHelper.format(new Date())});
 		if (optionsForm != null) {
 			settings.addChild(optionsForm);
 		}
 		return settings;
 	}
-
-	protected void enableNotifications(XMPPResourceConnection session, JID jid, String node, Element settings)
+	
+	protected void enableNotifications(XMPPResourceConnection session, JID jid, String node, Element settings, Consumer<Packet> packetConsumer)
 			throws NotAuthorizedException, TigaseDBException {
 		String key = jid.toString() + "/" + node;
-		session.setData(ID, key, settings.toString());
 		Map<String, Element> pushServices = getPushServices(session);
+		session.setData(ID, key, settings.toString());
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Enabled push notifications for JID: {0}, node: {1}, settings: {2}",
 					new Object[]{jid, node, settings.toString()});
 		}
 
+		boolean hadPushServices = !pushServices.isEmpty();
 		pushServices.put(key, settings);
+		if (!hadPushServices && pushDevicesPresence != null) {
+			pushDevicesPresence.pushAvailabilityChanged(session.getBareJID(), true, packetConsumer);
+		}
 	}
 
-	protected void disableNotifications(XMPPResourceConnection session, JID jid, String node)
+	protected void disableNotifications(XMPPResourceConnection session, BareJID userJid, JID jid, String node, Consumer<Packet> packetConsumer)
 			throws NotAuthorizedException, TigaseDBException {
-		Map<String, Element> pushServices = getPushServices(session);
+		Map<String, Element> pushServices = session != null ? getPushServices(session) : getPushServices(userJid);
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Disabled push notifications for JID: {0}, node: {1}, pushServices: {2}",
 					new Object[]{jid, node, pushServices});
 		}
 
 		if (pushServices != null) {
+			boolean hadPushServices = !pushServices.isEmpty();
 			if (node != null) {
 				String key = jid.toString() + "/" + node;
 				pushServices.remove(key);
-				session.removeData(ID, key);
+				if (session != null) {
+					session.removeData(ID, key);
+				} else {
+					userRepository.removeData(userJid, ID, key);
+				}
 			} else {
 				String prefix = jid.toString() + "/";
 				List<String> removed = new ArrayList<>();
@@ -221,8 +251,15 @@ public class AbstractPushNotifications
 					return false;
 				});
 				for (String key : removed) {
-					session.removeData(ID, key);
+					if (session != null) {
+						session.removeData(ID, key);
+					} else {
+						userRepository.removeData(userJid, ID, key);
+					}
 				}
+			}
+			if (hadPushServices && pushServices.isEmpty() && pushDevicesPresence != null) {
+				pushDevicesPresence.pushAvailabilityChanged(session != null ? session.getBareJID() : userJid, false, packetConsumer);
 			}
 		}
 	}
@@ -285,16 +322,26 @@ public class AbstractPushNotifications
 	}
 
 	protected void sendPushNotification(BareJID userJid, Collection<Element> pushServices,
-										XMPPResourceConnection session, Packet packet, Map<Enum, Long> notificationData) {
-		pushServices.forEach(settings -> {
+										XMPPResourceConnection session, Packet packet, Map<Enum, Long> notificationData, Consumer<Packet> packetConsumer) {
+		for (Element settings : pushServices) {
 			try {
 				if (packet != null && !isSendingNotificationAllowed(userJid, session, settings, packet)) {
 					return;
 				}
-				final Element notification = prepareNotificationPayload(settings, packet, notificationData.getOrDefault(
-						MsgRepository.MSG_TYPES.message, 0l));
 				JID pushService = JID.jidInstance(settings.getAttributeStaticStr("jid"));
 				String pushNode = settings.getAttributeStaticStr("node");
+				if (deviceRegistrationTTL != null) {
+					// check device registration TTL
+					Date createdAt = timestampHelper.parseTimestamp(settings.getAttributeStaticStr("createdAt"));
+					if (createdAt != null && Duration.between(createdAt.toInstant(), Instant.now()).compareTo(deviceRegistrationTTL) > 0) {
+						// registration is expired
+						log.log(Level.WARNING, "disabling push service " + pushService + "/" + pushNode + " for user " + userJid + ", expired due to TTL");
+						disableNotifications(session, userJid, pushService, pushNode, packetConsumer);
+						continue;
+					}
+				}
+				final Element notification = prepareNotificationPayload(settings, packet, notificationData.getOrDefault(
+						MsgRepository.MSG_TYPES.message, 0l));
 				Element publishOptionsForm = settings.findChild(
 						element -> element.getXMLNS() == JABBER_X_DATA_XMLNS && element.getName() == "x");
 
@@ -308,14 +355,14 @@ public class AbstractPushNotifications
 				log.log(Level.FINE, "Could not publish notification for " + userJid + " to " +
 						settings.getAttributeStaticStr("jid") + " at " + settings.getAttributeStaticStr("node"));
 			}
-		});
+		}
 	}
 
 	protected Map<String, Element> getPushServices(BareJID userJid) throws TigaseDBException {
 		return userRepository.getDataMap(userJid, ID, this::parseElement);
 	}
 
-	protected void sendPushNotification(XMPPResourceConnection session, Packet packet)
+	protected void sendPushNotification(XMPPResourceConnection session, Packet packet, Consumer<Packet> packetConsumer)
 			throws TigaseDBException {
 		final BareJID userJid = packet.getStanzaTo().getBareJID();
 		Map<String, Element> pushServices = (session != null && session.isAuthorized())
@@ -331,7 +378,7 @@ public class AbstractPushNotifications
 
 		Map<Enum, Long> typesCount = msgRepository.getMessagesCount(packet.getStanzaTo());
 
-		sendPushNotification(userJid, pushServices.values(), session, packet, typesCount);
+		sendPushNotification(userJid, pushServices.values(), session, packet, typesCount, packetConsumer);
 	}
 
 	protected boolean isSendingNotificationAllowed(BareJID userJid, XMPPResourceConnection session,

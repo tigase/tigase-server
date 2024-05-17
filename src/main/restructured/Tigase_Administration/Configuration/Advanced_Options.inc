@@ -202,6 +202,19 @@ If you wish Tigase XMPP Server to override forward body of the encrypted message
        }
    }
 
+Enabling TTL (time-to-live) for enabled push devices
+
+By default, each device enabled for push notifications is kept in the servers storage until it is not disabled (or disabled due to errors reported by push component. To make sure that older push devices that are no longer in use and do not return errors are removed from the list of push enabled devices, it is now possible to configure TTL for enabled push devices. After TTL, subsequent notification will remove devices that reached TTL. Value is in `Java Period format <https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-java.lang.CharSequence-:>`__
+
+Example of setting TTL to 2 days.
+
+.. code::
+
+   'sess-man' {
+       'urn:xmpp:push:0' () {
+           'deviceRegistrationTTL' = 'P2D'
+       }
+   }
 
 Enabling push notifications for messages received when all resources are AWAY/XA/DND
 
@@ -240,3 +253,27 @@ If later on, user decides to disable notification for account in away/xa/dnd sta
        </x>
      </enable>
    </iq>
+
+
+Push Devices - Presence
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tigase XMPP Server comes with support for non-standard feature that allows you to configure it to send presence for configured resource for each user account for which push devices are registered with push notifications enabled. This allows XMPP users see users of your XMPP server with push capable clients be visible as connected but ie. away.
+
+Enabling push devices presence
+
+.. code::
+
+   'sess-man' () {
+       'push-presence' () {
+       }
+   }
+
+ Configuring sent presence ``<show/>`` value (default is ``xa``) to ``away``.
+
+.. code::
+
+   'sess-man' () {
+       'push-presence' () {
+           presenceStatus = 'away'
+       }
+   }

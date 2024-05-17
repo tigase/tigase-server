@@ -433,6 +433,10 @@ public abstract class PresenceAbstract
 //		}
 //	}
 
+	protected boolean forceSendingProbe() {
+		return true;
+	}
+
 	/**
 	 * <code>sendPresenceBroadcast</code> method broadcasts given presence to all buddies from roster and to all users
 	 * to which direct presence was sent. Before sending presence method calls {@code  requiresPresenceSending()},
@@ -465,7 +469,7 @@ public abstract class PresenceAbstract
 		}
 		if (buddies != null) {
 			for (JID buddy : buddies) {
-				if (requiresPresenceSending(roster_util, buddy, session, true)) {
+				if (forceSendingProbe() || requiresPresenceSending(roster_util, buddy, session, true)) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, session.getBareJID() + " | Sending presence probe to: " + buddy);
 					}
@@ -494,7 +498,7 @@ public abstract class PresenceAbstract
 
 		if (buddies_to != null) {
 			for (JID buddy : buddies_to) {
-				if (requiresPresenceSending(roster_util, buddy, session, true)) {
+				if (forceSendingProbe() || requiresPresenceSending(roster_util, buddy, session, true)) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, session.getBareJID() + " | Sending probe to: " + buddy);
 					}

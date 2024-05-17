@@ -1150,7 +1150,7 @@ public class SessionManager
 	}
 
 	@SuppressWarnings("deprecation")
-	protected XMPPResourceConnection loginUserSession(JID conn_id, String domain, BareJID user_id, String resource,
+	public XMPPResourceConnection loginUserSession(JID conn_id, String domain, BareJID user_id, String resource,
 													  String xmpp_sessionId, boolean tmpSession) {
 		try {
 			XMPPResourceConnection conn = createUserSession(conn_id, domain);

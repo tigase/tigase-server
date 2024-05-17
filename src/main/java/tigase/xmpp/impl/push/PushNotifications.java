@@ -17,9 +17,15 @@
  */
 package tigase.xmpp.impl.push;
 
+import tigase.component.adhoc.AdHocCommand;
+import tigase.component.adhoc.AdHocCommandException;
+import tigase.component.adhoc.AdHocResponse;
+import tigase.component.adhoc.AdhHocRequest;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
+import tigase.form.Field;
+import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
@@ -29,6 +35,7 @@ import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.server.amp.db.MsgRepository;
 import tigase.server.xmppsession.SessionManager;
+import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.OfflineMessages;
@@ -120,7 +127,7 @@ public class PushNotifications
 		if (session == null || !session.isAuthorized() || !shouldSendNotification(packet, session.getBareJID(), session)) {
 			return;
 		}
-		sendPushNotification(session, packet);
+		sendPushNotification(session, packet, consumer);
 	}
 
 	@Override
@@ -135,7 +142,7 @@ public class PushNotifications
 		}
 
 		try {
-			sendPushNotification(session, packet);
+			sendPushNotification(session, packet, results::offer);
 		} catch (UserNotFoundException ex) {
 			log.log(Level.FINEST, "Could not send push notification for message " + packet, ex);
 		} catch (TigaseDBException ex) {
@@ -156,7 +163,7 @@ public class PushNotifications
 				return;
 			}
 
-			notifyOfflineMessagesRetrieved(userJid, pushServices.values());
+			notifyOfflineMessagesRetrieved(userJid, pushServices.values(), results::offer);
 		} catch (UserNotFoundException | NotAuthorizedException ex) {
 			log.log(Level.FINEST, "Could not send push notification about offline message retrieval by " + session, ex);
 		} catch (TigaseDBException ex) {
@@ -178,16 +185,20 @@ public class PushNotifications
 	@Override
 	protected Element createSettingsElement(JID jid, String node, Element enableElem, Element optionsForm) {
 		Element settingsEl = super.createSettingsElement(jid, node, enableElem, optionsForm);
+		String name = enableElem.getAttributeStaticStr("name");
+		if (name != null && !name.isBlank()) {
+			settingsEl.setAttribute("name", name);
+		}
 		for (PushNotificationsAware trigger : awares) {
 			trigger.processEnableElement(enableElem, settingsEl);
 		}
 		return settingsEl;
 	}
 
-	protected void notifyOfflineMessagesRetrieved(BareJID userJid, Collection<Element> pushServices) {
+	protected void notifyOfflineMessagesRetrieved(BareJID userJid, Collection<Element> pushServices, Consumer<Packet> packetConsumer) {
 		Map<Enum, Long> map = new HashMap<>();
 		map.put(MsgRepository.MSG_TYPES.message, 0l);
-		sendPushNotification(userJid, pushServices, null, null, map);
+		sendPushNotification(userJid, pushServices, null, null, map, packetConsumer);
 	}
 
 	@Override
@@ -231,6 +242,177 @@ public class PushNotifications
 		}
 
 		return false;
+	}
+
+	protected static abstract class AbstractAdhocCommand implements AdHocCommand {
+
+		private final String node;
+		private final String name;
+
+		@Inject
+		private SessionManager component;
+		@Inject
+		private AbstractPushNotifications pushNotifications;
+
+		protected AbstractAdhocCommand(String node, String name) {
+			this.node = node;
+			this.name = name;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public String getNode() {
+			return node;
+		}
+
+		@Override
+		public void execute(AdhHocRequest request, AdHocResponse response) throws AdHocCommandException {
+			try {
+				final Element data = request.getCommand().getChild("x", "jabber:x:data");
+
+				if (request.isAction("cancel")) {
+					response.cancelSession();
+				} else {
+					if (data == null) {
+						response.getElements().add(prepareForm(request, response).getElement());
+						response.startSession();
+					} else {
+						Form form = new Form(data);
+						if (form.isType("submit")) {
+							Form responseForm = submitForm(request, response, form);
+							if (responseForm != null) {
+								response.getElements().add(responseForm.getElement());
+							}
+						}
+					}
+				}
+			} catch (AdHocCommandException ex) {
+				throw ex;
+			} catch (Exception e) {
+				log.log(Level.FINE, "Exception during execution of adhoc command " + getNode(), e);
+				throw new AdHocCommandException(Authorization.INTERNAL_SERVER_ERROR, e.getMessage());
+			}
+		}
+
+		protected abstract Form prepareForm(AdhHocRequest request, AdHocResponse response) throws AdHocCommandException;
+		protected abstract Form submitForm(AdhHocRequest request, AdHocResponse response, Form form)
+				throws AdHocCommandException;
+
+		protected boolean isEmpty(String input) {
+			return input == null || input.isBlank();
+		}
+
+		protected String assertNotEmpty(String input, String message) throws AdHocCommandException {
+			if (isEmpty(input)) {
+				throw new AdHocCommandException(Authorization.BAD_REQUEST, message);
+			}
+			return input.trim();
+		}
+
+		@Override
+		public boolean isAllowedFor(JID jid) {
+			return component.isAdmin(jid);
+		}
+
+		public SessionManager getComponent() {
+			return component;
+		}
+
+		public AbstractPushNotifications getPushNotifications() {
+			return pushNotifications;
+		}
+	}
+
+	@Bean(name = "push-list-devices", parent = SessionManager.class, active = true)
+	public static class ListDevicesAdhocCommand extends AbstractAdhocCommand {
+
+		public ListDevicesAdhocCommand() {
+			super("push-list-devices", "List push devices");
+		}
+
+		@Override
+		protected Form prepareForm(AdhHocRequest request, AdHocResponse response) throws AdHocCommandException {
+			Form form = new Form("form", "Unregister device", "Fill out and submit this form to list enabled devices with push notifications");
+			form.addField(Field.fieldJidSingle("userJid", "", "Account JID"));
+			return form;
+		}
+
+		@Override
+		protected Form submitForm(AdhHocRequest request, AdHocResponse response, Form form)
+				throws AdHocCommandException {
+			Form result = new Form("result", "List of push devices", null);
+			try {
+				BareJID accountJid = BareJID.bareJIDInstance(
+						assertNotEmpty(form.getAsString("userJid"), "Account JID is required!"));
+				Map<String, Element> pushServices = getPushNotifications().getPushServices(accountJid);
+				String[] deviceIds = pushServices.keySet().stream().sorted().toArray(String[]::new);
+				result.addField(Field.fieldTextMulti("deviceIds", deviceIds, "List of devices"));
+				return result;
+			} catch (TigaseStringprepException|TigaseDBException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	@Bean(name = "push-unregister-device", parent = SessionManager.class, active = true)
+	public static class DisableDeviceAdHocCommand
+			extends AbstractAdhocCommand {
+
+
+		public DisableDeviceAdHocCommand() {
+			super("push-disable-device", "Disable push notifications");
+		}
+
+		protected Form prepareForm(AdhHocRequest request, AdHocResponse response) throws AdHocCommandException {
+			try {
+				return prepareForm(null);
+			} catch (TigaseDBException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+
+		protected Form submitForm(AdhHocRequest request, AdHocResponse response, Form form)
+				throws AdHocCommandException {
+			try {
+				BareJID accountJid = BareJID.bareJIDInstance(assertNotEmpty(form.getAsString("userJid"), "Account JID is required!"));
+				String key = form.getAsString("deviceId");
+				if (isEmpty(key)) {
+					return prepareForm(accountJid);
+				}
+				int idx = key.indexOf('/');
+				if (idx < 0) {
+					throw new RuntimeException("Invalid device ID: " + key);
+				}
+				JID jid = JID.jidInstance(key.substring(0, idx));
+				String node = key.substring(idx + 1);
+				getPushNotifications().disableNotifications(null, accountJid, jid, node, getComponent()::addOutPacket);
+				return null;
+			} catch (TigaseStringprepException|TigaseDBException|NotAuthorizedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		protected Form prepareForm(BareJID accountJid) throws TigaseDBException {
+			Form form = new Form("form", "Unregister device", "Fill out and submit this form to disable sending push notifications to selected device");
+			form.addField(Field.fieldJidSingle("userJid", accountJid == null ? "" : accountJid.toString(), "Account JID"));
+			if (accountJid != null) {
+				Map<String, Element> pushServices = getPushNotifications().getPushServices(accountJid);
+				List<Map.Entry<String,Element>> entries = pushServices.entrySet().stream().sorted(
+						Map.Entry.comparingByKey()).toList();
+				form.addField(Field.fieldListSingle("deviceId", "", "Device", entries.stream()
+						.map(Map.Entry::getValue)
+						.map(settings -> Optional.ofNullable(settings.getAttributeStaticStr("name"))
+								.orElseGet(() -> settings.getAttributeStaticStr("jid") + " / " +
+										settings.getAttributeStaticStr("node")))
+						.toArray(String[]::new), entries.stream().map(Map.Entry::getKey).toArray(String[]::new)));
+			}
+			return form;
+		}
+		
 	}
 
 }

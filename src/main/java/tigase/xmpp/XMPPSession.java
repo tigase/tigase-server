@@ -104,8 +104,10 @@ public class XMPPSession {
 						log.finest("Found old resource connection for: " + username + ", id: " + old_res);
 					}
 					try {
-						old_res.putSessionData(XMPPResourceConnection.ERROR_KEY, "conflict");
-						old_res.logout();
+						if (!"PUSH_OFFLINE_PRESENCE".equals(old_res.getSessionId())) {
+							old_res.putSessionData(XMPPResourceConnection.ERROR_KEY, "conflict");
+							old_res.logout();
+						}
 					} catch (NotAuthorizedException e) {
 						log.log(Level.CONFIG, "Exception during closing old connection, ignoring.", e);
 					}

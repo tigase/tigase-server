@@ -118,7 +118,7 @@ public class AwayPushNotificationsExtension implements PushNotificationsExtensio
 		}
 
 		try {
-			pushNotifications.notifyOfflineMessagesRetrieved(conn.getBareJID(), services);
+			pushNotifications.notifyOfflineMessagesRetrieved(conn.getBareJID(), services, packet -> {});
 		} catch (NotAuthorizedException ex) {
 			log.log(Level.FINEST, "Connection {0} not yet authorized, ignoring..", conn);
 		}

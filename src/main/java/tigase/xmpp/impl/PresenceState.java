@@ -32,12 +32,14 @@ import tigase.xmpp.*;
 import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.impl.annotation.Handles;
 import tigase.xmpp.impl.annotation.Id;
+import tigase.xmpp.impl.push.PushPresence;
 import tigase.xmpp.impl.roster.*;
 import tigase.xmpp.impl.roster.RosterAbstract.PresenceType;
 import tigase.xmpp.impl.roster.RosterAbstract.SubscriptionType;
 import tigase.xmpp.jid.JID;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,6 +94,19 @@ public class PresenceState
 	@ConfigField(desc = "Enable roster lazy loading", alias = ENABLE_ROSTER_LAZY_LOADING_KEY)
 	private boolean rosterLazyLoading = true;
 	private long usersStatusChanges = 0;
+	@Inject(nullAllowed = true)
+	private PushPresence pushDevicesPresence;
+
+	private void withPushDevicesPresence(Consumer<PushPresence> consumer) {
+		if (pushDevicesPresence != null) {
+			consumer.accept(pushDevicesPresence);
+		}
+	}
+
+	@Override
+	protected boolean forceSendingProbe() {
+		return pushDevicesPresence != null;
+	}
 
 	/**
 	 * Add JID to collection of JIDs to which direct presence was sent. To all these addresses unavailable presence must
@@ -338,14 +353,18 @@ public class PresenceState
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Session is null, ignoring packet: {0}", packet);
 			}
-
+			withPushDevicesPresence(
+					pushPresence -> pushPresence.processPresenceToOffline(packet.getStanzaTo(), packet.getStanzaFrom(),
+																		  packet.getType(), results::offer));
 			return;
 		}    // end of if (session == null)
 		if (!session.isAuthorized()) {
 			if (log.isLoggable(Level.FINE)) {
 				log.log(Level.FINE, "Session is not authorized, ignoring packet: {0}", packet);
 			}
-
+			withPushDevicesPresence(
+					pushPresence -> pushPresence.processPresenceToOffline(packet.getStanzaTo(), packet.getStanzaFrom(),
+																		  packet.getType(), results::offer));
 			return;
 		}
 
@@ -409,6 +428,9 @@ public class PresenceState
 
 						break;
 					case in_probe:
+						withPushDevicesPresence(pushPresence -> pushPresence.processPresenceProbe(packet.getStanzaTo(),
+																								  packet.getStanzaFrom(),
+																								  results::offer));
 						if (session.getPresence() == null) {
 
 							// If the user has not yet sent initial presence then ignore the
