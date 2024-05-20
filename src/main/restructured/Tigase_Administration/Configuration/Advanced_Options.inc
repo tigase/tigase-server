@@ -257,7 +257,7 @@ If later on, user decides to disable notification for account in away/xa/dnd sta
 
 Push Devices - Presence
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Tigase XMPP Server comes with support for non-standard feature that allows you to configure it to send presence for configured resource for each user account for which push devices are registered with push notifications enabled. This allows XMPP users see users of your XMPP server with push capable clients be visible as connected but ie. away.
+Tigase XMPP Server comes with support for non-standard feature that allows setting it to send presence for specific resource for each user account for which push notifications were enabled. This allows XMPP users see their contacts using push capable clients as connected but eg.: away (configurable).
 
 Enabling push devices presence
 
