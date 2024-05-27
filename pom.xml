@@ -73,11 +73,11 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:${scm_repo_base}/tigase-server.git</connection>
-        <developerConnection>scm:git:${scm_repo_base}/tigase-server.git</developerConnection>
-        <url>https://tigase.tech/projects/tigase-server/repository</url>
-      <tag>HEAD</tag>
-  </scm>
+        <connection>scm:git:${scm_repo_server_base}/server-core.git</connection>
+        <developerConnection>scm:git:${scm_repo_server_base}/server-core.git</developerConnection>
+        <url>${scm_repo_server_base}/server-core</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <profiles>
         <profile>
