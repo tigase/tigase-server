@@ -139,7 +139,7 @@ public class PushPresenceTest
 		updateRoster(userSession, JID.jidInstance(buddyJid), RosterAbstract.SubscriptionType.both);
 		updateRoster(buddySession, JID.jidInstance(userJid), RosterAbstract.SubscriptionType.both);
 
-		System.out.println("packet writer " + writer);
+//		System.out.println("packet writer " + writer);
 		assertEquals(1, writer.getQueue().size());
 		assertEquals(1, writer.getQueue().size());
 		assertPresenceAway(writer.getQueue().poll());
@@ -211,7 +211,7 @@ public class PushPresenceTest
 
 		assertTrue(pushPresence.isPushAvailable(userJid));
 		// add user roster subscription triggers sending presence
-		System.out.println("packet writer " + writer + " - in test");
+//		System.out.println("packet writer " + writer + " - in test");
 		assertEquals(1, writer.getQueue().size());
 		assertPresenceAway(writer.getQueue().poll());
 		assertEquals(0, writer.getQueue().size());
@@ -257,7 +257,7 @@ public class PushPresenceTest
 		kernel.registerBean("writer").asInstance(new TestPacketWriter()).exec();
 		kernel.registerBean(PushPresence.class).setActive(true).exec();
 		kernel.registerBean(PresenceState.class).setActive(true).exec();
-		System.out.println("registering local beans done.");
+//		System.out.println("registering local beans done.");
 	}
 
 	protected static class TestPacketWriter implements PacketWriter {
@@ -265,7 +265,7 @@ public class PushPresenceTest
 		private final ArrayDeque<Packet> queue = new ArrayDeque<>();
 
 		public TestPacketWriter() {
-			System.out.println("creating new instance " + this + "....");
+//			System.out.println("creating new instance " + this + "....");
 		}
 
 		@Override
