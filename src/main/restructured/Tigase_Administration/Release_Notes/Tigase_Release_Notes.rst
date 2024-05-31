@@ -1,4 +1,4 @@
-Tigase 8.3.0 Release Notes
+Tigase 8.4.0 Release Notes
 =============================================
 
 .. include:: tigase-server-current.inc
