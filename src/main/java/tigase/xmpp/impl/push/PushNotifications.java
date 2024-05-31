@@ -29,6 +29,7 @@ import tigase.form.Form;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.RegistrarBean;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.server.Iq;
 import tigase.server.Message;
@@ -77,6 +78,8 @@ public class PushNotifications
 	private ArrayList<PushNotificationsExtension> triggers = new ArrayList<>();
 	@Inject(nullAllowed = true)
 	private ArrayList<PushNotificationsFilter> filters = new ArrayList<>();
+	@ConfigField(desc = "Send offline messages retrieved notification", alias = "send-offline-messages-retrieved-notification")
+	private boolean sendOfflineMessagesRetrievedNotification = true;
 
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
@@ -196,6 +199,9 @@ public class PushNotifications
 	}
 
 	protected void notifyOfflineMessagesRetrieved(BareJID userJid, Collection<Element> pushServices, Consumer<Packet> packetConsumer) {
+		if (!sendOfflineMessagesRetrievedNotification) {
+			return;
+		}
 		Map<Enum, Long> map = new HashMap<>();
 		map.put(MsgRepository.MSG_TYPES.message, 0l);
 		sendPushNotification(userJid, pushServices, null, null, map, packetConsumer);
