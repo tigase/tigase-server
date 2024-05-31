@@ -177,6 +177,17 @@ You can disable this feature with following settings:
        'urn:xmpp:push:0' (active: false) {}
    }
 
+Disabling notifications after offline messages are retrieved
+
+You can disabled send push notification after offline messages are retrieved from the server by user's XMPP client:
+
+.. code::
+   'sess-man' {
+       'urn:xmpp:push:0' () {
+           'send-offline-messages-retrieved-notification' = false
+       }
+   }
+
 Removing body and sender from notifications
 
 If you wish Tigase XMPP Server not to forward body of the message or sender details in the push notification you can disable that with following settings:
