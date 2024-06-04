@@ -154,7 +154,10 @@ public class RosterFlat
 			if (subscription != null) {
 				relem.setSubscription(subscription);
 			}
-			relem.setMixParticipantId(mixParticipantId);
+			// set it only if not null to make sure that roster item name change will not remove MIX annotation
+			if (mixParticipantId != null) {
+				relem.setMixParticipantId(mixParticipantId);
+			}
 			if (addBuddy(relem, roster)) {
 				saveUserRoster(session);
 				// notify that roster element was changed!
