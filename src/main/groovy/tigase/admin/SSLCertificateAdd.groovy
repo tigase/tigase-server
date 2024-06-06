@@ -39,6 +39,7 @@ import tigase.server.Packet
 import tigase.vhosts.VHostItem
 import tigase.xmpp.jid.BareJID
 
+import java.security.cert.Certificate
 import java.security.cert.X509Certificate
 import java.util.function.Function
 import java.util.logging.Level
@@ -173,7 +174,7 @@ private static boolean hasPermissionToUpdate(VHostItem item, boolean isServiceAd
 private static boolean isCertificateValidForVhost(String itemKey, String certCName, List<String> subjectAltName,
 												  Logger log) {
 	def wildcardItemKey = "*." + itemKey
-	def result = certCName == itemKey || certCName == wildcardItemKey || subjectAltName.contains(itemKey) ||
+	def result = certCName == itemKey || certCName == wildcardItemKey || isWildcardMatch(certCName, itemKey) || subjectAltName.contains(itemKey) ||
 			subjectAltName.contains(wildcardItemKey)
 	if (log.isLoggable(Level.FINEST)) {
 		Logger.getLogger("tigase.admin").
@@ -181,6 +182,12 @@ private static boolean isCertificateValidForVhost(String itemKey, String certCNa
 					"isCertificateValidForVhost:: itemKey: ${itemKey}, wildcardItemKey: ${wildcardItemKey}, certCName: ${certCName}, subjectAltName: ${subjectAltName}, result: ${result}")
 	}
 	return result
+}
+
+private static isWildcardMatch(String certCName, String vhost) {
+	def unWildcardCName = certCName.startsWith("*.") ? certCName.substring(2) : certCName;
+	def parentDomain = vhost.indexOf(".") != -1 ? vhost.substring(vhost.indexOf(".") + 1) : vhost;
+	return unWildcardCName == parentDomain;
 }
 
 return process(kernel, log, repo, p, admins, (Function<String,Boolean>) isAllowedForDomain);
