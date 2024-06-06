@@ -131,6 +131,8 @@ Once your server is setup, you may need to open at least two ports. By default X
 
 -  ``5269`` - default s2s port, i.e.: federation support
 
+-  ``5270`` - default external-component connection port
+
 -  ``5277`` - inter-cluster communication
 
 -  ``5280`` - default BOSH connections
