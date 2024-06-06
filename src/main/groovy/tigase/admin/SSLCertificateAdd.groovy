@@ -129,8 +129,9 @@ Packet process(Kernel kernel, Logger log, ComponentRepository<VHostItem> repo, I
 										 "Missing private key or private key encoded in uknown format.")
 					Command.addTextField(result, "Note", "Private key cannot be encoded with a password.")
 				} else {
-					def certCName = CertificateUtil.getCertCName((X509Certificate) certEntry.getCertChain()[0])
-					def subjectAltName = CertificateUtil.getCertAltCName((X509Certificate) certEntry.getCertChain()[0])
+					def domainCertificate = (X509Certificate)CertificateUtil.sort(certEntry.getCertChain())[0]
+					def certCName = CertificateUtil.getCertCName(domainCertificate)
+					def subjectAltName = CertificateUtil.getCertAltCName(domainCertificate)
 					if (hasPermissionToUpdate(item, isServiceAdmin, stanzaFromBare, log) &&
 							isCertificateValidForVhost(itemKey, certCName, subjectAltName, log)) {
 						CertificateContainerIfc certContainer = kernel.getInstance(CertificateContainerIfc.class);
