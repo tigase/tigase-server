@@ -141,7 +141,8 @@ public class CertificateContainer
 	public void addCertificates(CertificateEntity certificateEntity) throws CertificateParsingException {
 		addCertificate(certificateEntity.alias(), certificateEntity.certificatePem(), certificateEntity.storePermanently(), true);
 		if (certificateEntity.useAsDefault()) {
-			addCertificate(certificateEntity.alias(), def_cert_alias, certificateEntity.storePermanently(), true);
+			addCertificate(def_cert_alias, certificateEntity.certificatePem(), certificateEntity.storePermanently(),
+			               true);
 		}
 	}
 
