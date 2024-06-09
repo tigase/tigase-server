@@ -21,10 +21,13 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import tigase.TestLogger;
 import tigase.auth.callbacks.AuthorizationIdCallback;
 import tigase.auth.callbacks.ReplaceServerKeyCallback;
 import tigase.auth.callbacks.ServerKeyCallback;
+import tigase.auth.callbacks.SharedSecretKeyCallback;
 import tigase.util.Base64;
 import tigase.xmpp.jid.BareJID;
 
@@ -41,10 +44,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+@RunWith(Parameterized.class)
 public class SaslXTOKENTest extends TestCase {
 
 	private static final Logger log = TestLogger.getLogger(SaslSCRAMTest.class);
@@ -52,8 +58,24 @@ public class SaslXTOKENTest extends TestCase {
 	private byte[] newServerKey;
 	private final SecureRandom random = new SecureRandom();
 	private SaslXTOKEN sasl;
+	private final byte[] sharedKey;
 
 	private final boolean printTestVectors = false;
+
+	public SaslXTOKENTest(byte[] sharedKey) {
+		this.sharedKey = sharedKey;
+	}
+
+	@Parameterized.Parameters
+	public static Collection<Object[]> data() {
+		byte[] sharedKey = new byte[32];
+		SecureRandom random = new SecureRandom();
+		random.nextBytes(sharedKey);
+		return Arrays.asList(new Object[][] {
+				{ null },
+				{ sharedKey }
+		});
+	}
 
 	@Override
 	@Before
@@ -89,6 +111,8 @@ public class SaslXTOKENTest extends TestCase {
 						}
 					} else if (callback instanceof ReplaceServerKeyCallback) {
 						((ReplaceServerKeyCallback) callback).setNewServerKey(newServerKey);
+					} else if (callback instanceof SharedSecretKeyCallback) {
+						((SharedSecretKeyCallback) callback).setSecret(sharedKey);
 					} else {
 						throw new UnsupportedCallbackException(callback);
 					}
@@ -117,7 +141,11 @@ public class SaslXTOKENTest extends TestCase {
 
 		Mac mac = Mac.getInstance("HmacSHA256");
 		mac.init(new SecretKeySpec(serverKey, "SHA-256"));
-		byte[] token = mac.doFinal(data);
+		mac.update(data);
+		if (sharedKey != null) {
+			mac.update(sharedKey);
+		}
+		byte[] token = mac.doFinal();
 		
 		try {
 			byte[] jid = "test@domain.com".getBytes(StandardCharsets.UTF_8);
@@ -144,7 +172,11 @@ public class SaslXTOKENTest extends TestCase {
 
 		Mac mac = Mac.getInstance("HmacSHA256");
 		mac.init(new SecretKeySpec(serverKey, "SHA-256"));
-		byte[] token = mac.doFinal(data);
+		mac.update(data);
+		if (sharedKey != null) {
+			mac.update(sharedKey);
+		}
+		byte[] token = mac.doFinal();
 
 		try {
 			byte[] jid = "test@domain.com".getBytes(StandardCharsets.UTF_8);
@@ -163,7 +195,11 @@ public class SaslXTOKENTest extends TestCase {
 			newServerKey = null;
 			mac = Mac.getInstance("HmacSHA256");
 			mac.init(new SecretKeySpec(serverKey, "SHA-256"));
-			token = mac.doFinal(data);
+			mac.update(data);
+			if (sharedKey != null) {
+				mac.update(sharedKey);
+			}
+			token = mac.doFinal();
 			
 			response = new byte[data.length + 1 + token.length + 1 + jid.length];
 			System.arraycopy(data, 0, response,0 , 32);

@@ -22,6 +22,7 @@ import tigase.auth.XmppSaslException;
 import tigase.auth.callbacks.AuthorizationIdCallback;
 import tigase.auth.callbacks.ReplaceServerKeyCallback;
 import tigase.auth.callbacks.ServerKeyCallback;
+import tigase.auth.callbacks.SharedSecretKeyCallback;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -79,7 +80,8 @@ public class SaslXTOKEN
 		final NameCallback nc = new NameCallback("Authentication identity", authcid);
 		final AuthorizationIdCallback ai = new AuthorizationIdCallback("Authorization identity", null);
 		final ServerKeyCallback vtc = new ServerKeyCallback(null);
-		handleCallbacks(nc, ai, vtc);
+		final SharedSecretKeyCallback sskc = new SharedSecretKeyCallback();
+		handleCallbacks(nc, ai, vtc, sskc);
 
 		if (vtc.getServerKey() == null) {
 			throw new SaslInvalidLoginExcepion(XmppSaslException.SaslError.not_authorized, nc.getName(), PASSWORD_NOT_VERIFIED_MSG);
@@ -89,7 +91,11 @@ public class SaslXTOKEN
 			SecretKeySpec secretKeySpec = new SecretKeySpec(vtc.getServerKey(), "SHA-256");
 			Mac mac = Mac.getInstance("HmacSHA256");
 			mac.init(secretKeySpec);
-			byte[] hmac = mac.doFinal(data);
+			mac.update(data);
+			if (sskc.getSecret() != null) {
+				mac.update(sskc.getSecret());
+			}
+			byte[] hmac = mac.doFinal();
 			boolean proofMatch = Arrays.equals(hmac, token);
 
 			if (!proofMatch) {

@@ -24,6 +24,7 @@ import tigase.auth.XmppSaslException;
 import tigase.auth.callbacks.AuthorizationIdCallback;
 import tigase.auth.callbacks.ReplaceServerKeyCallback;
 import tigase.auth.callbacks.ServerKeyCallback;
+import tigase.auth.callbacks.SharedSecretKeyCallback;
 import tigase.auth.credentials.Credentials;
 import tigase.auth.credentials.entries.XTokenCredentialsEntry;
 import tigase.auth.mechanisms.AbstractSasl;
@@ -43,6 +44,7 @@ import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.RealmCallback;
 import javax.security.sasl.SaslException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -124,12 +126,14 @@ public class XTokenCallbackHandler implements CallbackHandler, AuthRepositoryAwa
 			handleAuthorizeCallback((AuthorizeCallback) callback);
 		} else if (callback instanceof ReplaceServerKeyCallback) {
 			handleReplaceServerKeyCallback((ReplaceServerKeyCallback) callback);
+		} else if (callback instanceof SharedSecretKeyCallback) {
+			handleSharedSecretKeyCallback((SharedSecretKeyCallback) callback);
 		} else {
 			throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
 		}
 
 	}
-
+	
 	protected void handleNameCallback(NameCallback nc) throws IOException {
 		credentialId = DEFAULT_CREDENTIAL_ID;
 
@@ -203,6 +207,13 @@ public class XTokenCallbackHandler implements CallbackHandler, AuthRepositoryAwa
 			callback.setNewServerKey(data);
 		} catch (TigaseDBException e) {
 			throw new XmppSaslException(XmppSaslException.SaslError.temporary_auth_failure);
+		}
+	}
+
+	private void handleSharedSecretKeyCallback(SharedSecretKeyCallback sskc) {
+		String appKey = System.getProperty("app-key");
+		if (appKey != null) {
+			sskc.setSecret(appKey.getBytes(StandardCharsets.UTF_8));
 		}
 	}
 
