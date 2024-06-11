@@ -227,6 +227,20 @@ Example of setting TTL to 2 days.
        }
    }
 
+Enabling push notifications for account removal
+
+In some cases, you want your applications to be notified, if your XMPP account was removed from the sever (ie. due to account removal using another application). To receive this notification, you should enable this feature.
+
+Example of enabling notifications on account removal.
+
+.. code::
+
+   'sess-man' {
+       'urn:xmpp:push:0' () {
+           'send-account-removal-notification' = true
+       }
+   }
+
 Enabling push notifications for messages received when all resources are AWAY/XA/DND
 
 Push notifications may also be sent by Tigase XMPP Server when new message is received and all resources of recipient are in AWAY/XA/DND state. To enable this type of notifications you need to enable additional push delivery extension named ``away`` in default push processor:
