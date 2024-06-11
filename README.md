@@ -1,3 +1,5 @@
+> # NOTE: Tigase has new home at [tigase.dev](https://tigase.dev/) - please submit all issues/pull-requests there in the relevant sub-project!
+
 <p align="center">
   <a href="https://tigase.net/">
     <img
@@ -14,7 +16,6 @@
 
 <p align="center">
   <img alt="Tigase Tigase Logo" src="https://github.com/tigase/website-assets/blob/master/tigase/images/tigase-logo.png?raw=true" width="25"/>
-  <img src="https://tc.tigase.net/app/rest/builds/buildType:(id:TigaseServer_Build)/statusIcon" width="100"/>
   <a href='https://compliance.conversations.im/server/tigase.im'><img src='https://compliance.conversations.im/badge/tigase.im'></a> 
   <a href='https://xmpp.net/result.php?domain=tigase.im&amp;type=client'><img src='https://xmpp.net/badge.php?domain=tigase.im' alt='xmpp.net score' /></a>
   <img src='https://img.shields.io/github/downloads/tigase/tigase-server/total' alt='GitHub All Releases' />
