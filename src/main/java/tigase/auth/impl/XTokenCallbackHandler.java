@@ -211,7 +211,7 @@ public class XTokenCallbackHandler implements CallbackHandler, AuthRepositoryAwa
 	}
 
 	private void handleSharedSecretKeyCallback(SharedSecretKeyCallback sskc) {
-		String appKey = System.getProperty("app-key");
+		String appKey = System.getProperty("client-application-secret");
 		if (appKey != null) {
 			sskc.setSecret(appKey.getBytes(StandardCharsets.UTF_8));
 		}
