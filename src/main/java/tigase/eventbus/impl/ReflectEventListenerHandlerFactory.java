@@ -38,10 +38,14 @@ public class ReflectEventListenerHandlerFactory {
 		final String packageName = eventType.getPackage().getName();
 		final String eventName = eventType.getSimpleName();
 
+		if (annotation.sync() && annotation.filter() != HandleEvent.Type.local) {
+			throw new RegistrationException("Handler synchronous event listener may only listen local events!");
+		}
+
 		ReflectEventListenerHandler handler;
 		switch (method.getParameterCount()) {
 			case 1:
-				handler = new ReflectEventListenerHandler(annotation.filter(), packageName, eventName, consumer,
+				handler = new ReflectEventListenerHandler(annotation.filter(), annotation.sync(), packageName, eventName, consumer,
 														  method);
 				break;
 			case 2:
@@ -49,7 +53,7 @@ public class ReflectEventListenerHandlerFactory {
 				if (!sourPar.equals(Object.class)) {
 					throw new RegistrationException("Second parameter (event source) must be Object type.");
 				}
-				handler = new ReflectEventSourceListenerHandler(annotation.filter(), packageName, eventName, consumer,
+				handler = new ReflectEventSourceListenerHandler(annotation.filter(), annotation.sync(), packageName, eventName, consumer,
 																method);
 				break;
 			default:

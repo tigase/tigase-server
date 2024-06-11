@@ -21,7 +21,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import tigase.db.*;
+import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.impl.EventBusImplementation;
 import tigase.kernel.core.Kernel;
 import tigase.server.Message;
 import tigase.server.Packet;
@@ -44,6 +46,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -107,7 +110,7 @@ public class PushNotificationsTest
 
 		enable(session,null);
 	}
-
+	
 	protected void enable(XMPPResourceConnection session, Consumer<Element> consumer) throws Exception {
 		Element enableEl = new Element("enable", new String[]{"xmlns", "jid", "node"},
 									   new String[]{"urn:xmpp:push:0",
@@ -754,6 +757,74 @@ public class PushNotificationsTest
 		assertNotNull(data);
 		assertEquals(1, data.size());
 		assertNotNull(data.get(pushServiceJid.toString() + "/push-node"));
+	}
+
+	@Test
+	public void test_accountRemovalNotificationGeneration() throws Exception {
+		EventBus eventBus = new EventBusImplementation();
+		eventBus.registerAll(pushNotifications);
+		try {
+			getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+													  pushServiceJid + "/push-node",
+													  new Element("settings", new String[]{"jid", "node"},
+																  new String[]{pushServiceJid.toString(),
+																			   "push-node"}).toString());
+
+			eventBus.fire(new UserRepository.UserBeforeRemovedEvent(recipientJid.getBareJID()));
+			Queue<SessionManagerHandlerImpl.Item> items = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+			assertEquals(0, items.size());
+
+			Field f = PushNotifications.class.getDeclaredField("sendAccountRemovalNotification");
+			f.setAccessible(true);
+			f.set(pushNotifications, true);
+
+			eventBus.fire(new UserRepository.UserBeforeRemovedEvent(recipientJid.getBareJID()));
+			items = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+			assertEquals(1, items.size());
+			Packet packet = items.poll().getPacket();
+			assertTrue(packet.getElement().toString().contains("account-removed"));
+		} finally {
+			eventBus.unregisterAll(pushNotifications);
+		}
+	}
+	
+	@Test
+	public void test_accountRemovalNotificationGenerationEncrypted() throws Exception {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		settings.addChild(new Element("jingle", new String[] {"xmlns", "id"}, new String[] {"tigase:push:jingle:0", "test-1"}));
+		SecureRandom random = new SecureRandom();
+		byte[] key = new byte[128/8];
+		random.nextBytes(key);
+		settings.withElement("encrypt", "tigase:push:encrypt:0", el -> {
+			el.setCData(Base64.encode(key));
+			el.setAttribute("alg", "aes-128-gcm");
+		});
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+		
+		pushNotifications.onUserRemoved(new UserRepository.UserBeforeRemovedEvent(recipientJid.getBareJID()));
+		Queue<SessionManagerHandlerImpl.Item> items = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		assertEquals(0, items.size());
+
+		Field f = PushNotifications.class.getDeclaredField("sendAccountRemovalNotification");
+		f.setAccessible(true);
+		f.set(pushNotifications, true);
+
+		pushNotifications.onUserRemoved(new UserRepository.UserBeforeRemovedEvent(recipientJid.getBareJID()));
+		
+		Element notificationElem = items.poll().getPacket().getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		Element encrypted = notificationElem.getChild("encrypted", "tigase:push:encrypt:0");
+		byte[] enc = Base64.decode(encrypted.getCData());
+		byte[] iv = Base64.decode(encrypted.getAttributeStaticStr("iv"));
+
+		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+		cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, iv));
+		byte[] decoded = cipher.doFinal(enc);
+
+		assertTrue(new String(decoded, StandardCharsets.UTF_8).contains("account-removed"));
 	}
 
 	protected void registerLocalBeans(Kernel kernel) {

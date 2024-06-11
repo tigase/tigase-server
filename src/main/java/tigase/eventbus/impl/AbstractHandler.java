@@ -56,4 +56,8 @@ public abstract class AbstractHandler {
 
 	public abstract Type getRequiredEventType();
 
+	public boolean isSynchronous() {
+		return false;
+	}
+
 }

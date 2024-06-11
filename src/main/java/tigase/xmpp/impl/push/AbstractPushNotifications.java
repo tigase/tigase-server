@@ -279,7 +279,7 @@ public class AbstractPushNotifications
 		});
 	}
 
-	protected Element prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount) {
+	protected Element prepareNotificationPayload(Element pushServiceSettings, PushNotificationCause cause, Packet packet, long msgCount) {
 		Element notification = new Element("notification", new String[]{"xmlns"}, new String[]{XMLNS});
 
 		Element x = new Element("x", new String[]{"xmlns"}, new String[]{"jabber:x:data"});
@@ -317,12 +317,19 @@ public class AbstractPushNotifications
 					notification.addChild(groupchat);
 				}
 			}
+		} else {
+			if (cause == PushNotificationCause.ACCOUNT_REMOVED) {
+				Element eventEl = new Element("event");
+				eventEl.setXMLNS("http://tigase.org/protocol/account#event");
+				eventEl.setAttribute("name", "account-removed");
+				notification.addChild(eventEl);
+			}
 		}
 		return notification;
 	}
 
 	protected void sendPushNotification(BareJID userJid, Collection<Element> pushServices,
-										XMPPResourceConnection session, Packet packet, Map<Enum, Long> notificationData, Consumer<Packet> packetConsumer) {
+										XMPPResourceConnection session, PushNotificationCause cause, Packet packet, Map<Enum, Long> notificationData, Consumer<Packet> packetConsumer) {
 		for (Element settings : pushServices) {
 			try {
 				if (packet != null && !isSendingNotificationAllowed(userJid, session, settings, packet)) {
@@ -340,7 +347,7 @@ public class AbstractPushNotifications
 						continue;
 					}
 				}
-				final Element notification = prepareNotificationPayload(settings, packet, notificationData.getOrDefault(
+				final Element notification = prepareNotificationPayload(settings, cause, packet, notificationData.getOrDefault(
 						MsgRepository.MSG_TYPES.message, 0l));
 				Element publishOptionsForm = settings.findChild(
 						element -> element.getXMLNS() == JABBER_X_DATA_XMLNS && element.getName() == "x");
@@ -362,7 +369,7 @@ public class AbstractPushNotifications
 		return userRepository.getDataMap(userJid, ID, this::parseElement);
 	}
 
-	protected void sendPushNotification(XMPPResourceConnection session, Packet packet, Consumer<Packet> packetConsumer)
+	protected void sendPushNotification(XMPPResourceConnection session, PushNotificationCause cause, Packet packet, Consumer<Packet> packetConsumer)
 			throws TigaseDBException {
 		final BareJID userJid = packet.getStanzaTo().getBareJID();
 		Map<String, Element> pushServices = (session != null && session.isAuthorized())
@@ -378,7 +385,7 @@ public class AbstractPushNotifications
 
 		Map<Enum, Long> typesCount = msgRepository.getMessagesCount(packet.getStanzaTo());
 
-		sendPushNotification(userJid, pushServices.values(), session, packet, typesCount, packetConsumer);
+		sendPushNotification(userJid, pushServices.values(), session, cause, packet, typesCount, packetConsumer);
 	}
 
 	protected boolean isSendingNotificationAllowed(BareJID userJid, XMPPResourceConnection session,

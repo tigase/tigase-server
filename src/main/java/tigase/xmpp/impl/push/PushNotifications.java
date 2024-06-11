@@ -24,6 +24,8 @@ import tigase.component.adhoc.AdhHocRequest;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserNotFoundException;
+import tigase.db.UserRepository;
+import tigase.eventbus.HandleEvent;
 import tigase.form.Field;
 import tigase.form.Form;
 import tigase.kernel.beans.Bean;
@@ -80,6 +82,8 @@ public class PushNotifications
 	private ArrayList<PushNotificationsFilter> filters = new ArrayList<>();
 	@ConfigField(desc = "Send offline messages retrieved notification", alias = "send-offline-messages-retrieved-notification")
 	private boolean sendOfflineMessagesRetrievedNotification = true;
+	@ConfigField(desc = "Send account removal notification", alias = "send-account-removal-notification")
+	private boolean sendAccountRemovalNotification = false;
 
 	@Override
 	public Element[] supDiscoFeatures(XMPPResourceConnection session) {
@@ -130,7 +134,7 @@ public class PushNotifications
 		if (session == null || !session.isAuthorized() || !shouldSendNotification(packet, session.getBareJID(), session)) {
 			return;
 		}
-		sendPushNotification(session, packet, consumer);
+		sendPushNotification(session, PushNotificationCause.STANZA, packet, consumer);
 	}
 
 	@Override
@@ -145,7 +149,7 @@ public class PushNotifications
 		}
 
 		try {
-			sendPushNotification(session, packet, results::offer);
+			sendPushNotification(session, PushNotificationCause.MESSAGES_FETCHED, packet, results::offer);
 		} catch (UserNotFoundException ex) {
 			log.log(Level.FINEST, "Could not send push notification for message " + packet, ex);
 		} catch (TigaseDBException ex) {
@@ -184,6 +188,25 @@ public class PushNotifications
 	public void unregister(Kernel kernel) {
 
 	}
+
+	@HandleEvent(filter = HandleEvent.Type.local, sync = true)
+	public void onUserRemoved(UserRepository.UserBeforeRemovedEvent event) {
+		try {
+			if (!sendAccountRemovalNotification) {
+				return;
+			}
+			Map<String,Element> pushServices = getPushServices(event.getJid());
+			if (pushServices.isEmpty()) {
+				return;
+			}
+			
+			sendPushNotification(event.getJid(), pushServices.values(), null, PushNotificationCause.ACCOUNT_REMOVED,
+								 null, Map.of(), consumer -> {
+					});
+		} catch (Throwable ex) {
+			log.log(Level.WARNING, "Could not get push services for " + event.getJid(), ex);
+		}
+	}
 	
 	@Override
 	protected Element createSettingsElement(JID jid, String node, Element enableElem, Element optionsForm) {
@@ -204,14 +227,15 @@ public class PushNotifications
 		}
 		Map<Enum, Long> map = new HashMap<>();
 		map.put(MsgRepository.MSG_TYPES.message, 0l);
-		sendPushNotification(userJid, pushServices, null, null, map, packetConsumer);
+		sendPushNotification(userJid, pushServices, null, PushNotificationCause.MESSAGES_FETCHED, null, map,
+							 packetConsumer);
 	}
 
 	@Override
-	protected Element prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount) {
-		Element notification = super.prepareNotificationPayload(pushServiceSettings, packet, msgCount);
+	protected Element prepareNotificationPayload(Element pushServiceSettings, PushNotificationCause cause, Packet packet, long msgCount) {
+		Element notification = super.prepareNotificationPayload(pushServiceSettings, cause, packet, msgCount);
 		for (PushNotificationsExtension trigger : triggers) {
-			trigger.prepareNotificationPayload(pushServiceSettings, packet, msgCount, notification);
+			trigger.prepareNotificationPayload(pushServiceSettings, cause, packet, msgCount, notification);
 		}
 		return notification;
 	}

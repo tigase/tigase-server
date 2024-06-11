@@ -455,5 +455,21 @@ public interface UserRepository
 			this.jid = jid;
 		}
 
+		public BareJID getJid() {
+			return jid;
+		}
+	}
+
+	public static class UserBeforeRemovedEvent implements EventBusEvent {
+
+		public final BareJID jid;
+
+		public UserBeforeRemovedEvent(BareJID jid) {
+			this.jid = jid;
+		}
+
+		public BareJID getJid() {
+			return jid;
+		}
 	}
 }    // UserRepository

@@ -29,6 +29,11 @@ public class ReflectEventSourceListenerHandler
 		super(filter, packageName, eventName, consumerObject, handlerMethod);
 	}
 
+	public ReflectEventSourceListenerHandler(HandleEvent.Type filter, boolean synchronous, String packageName, String eventName,
+											 Object consumerObject, Method handlerMethod) {
+		super(filter, synchronous, packageName, eventName, consumerObject, handlerMethod);
+	}
+
 	@Override
 	public void dispatch(final Object event, final Object source, boolean remotelyGeneratedEvent) {
 		if (remotelyGeneratedEvent && filter == HandleEvent.Type.local ||

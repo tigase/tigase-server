@@ -323,6 +323,7 @@ public abstract class UserRepositoryMDImpl
 		UserRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
+			eventBus.fire(new UserRepository.UserBeforeRemovedEvent(user));
 			repo.removeUser(user);
 
 			eventBus.fire(new UserRemovedEvent(user));

@@ -50,7 +50,7 @@ public class PriorityExtension implements PushNotificationsExtension {
 	}
 
 	@Override
-	public void prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount,
+	public void prepareNotificationPayload(Element pushServiceSettings, PushNotificationCause cause, Packet packet, long msgCount,
 										   Element notification) {
 		boolean supportsPriority = Boolean.parseBoolean(pushServiceSettings.getAttributeStaticStr("priority"));
 		boolean hasBody = packet != null && packet.getElemChild("body") != null;

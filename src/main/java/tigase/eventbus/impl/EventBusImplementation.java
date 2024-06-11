@@ -323,7 +323,11 @@ public class EventBusImplementation
 				}
 			};
 
-			executor.execute(task);
+			if (listenerHandler.isSynchronous()) {
+				task.run();
+			} else {
+				executor.execute(task);
+			}
 		}
 	}
 

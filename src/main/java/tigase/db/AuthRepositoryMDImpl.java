@@ -245,6 +245,7 @@ public abstract class AuthRepositoryMDImpl
 		AuthRepository repo = getRepo(user.getDomain());
 
 		if (repo != null) {
+			eventBus.fire(new UserRepository.UserBeforeRemovedEvent(user));
 			repo.removeUser(user);
 
 			eventBus.fire(new UserRepository.UserRemovedEvent(user));

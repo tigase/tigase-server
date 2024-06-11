@@ -15,43 +15,10 @@
  * along with this program. Look for COPYING file in the top folder.
  * If not, see http://www.gnu.org/licenses/.
  */
-package tigase.eventbus;
+package tigase.xmpp.impl.push;
 
-import java.lang.annotation.*;
-
-/**
- * Annotation to mark method as event handler. <br>
- * <br>
- * Example:
- * <br>
- * <pre>
- * <code>
- * public class Consumer {
- * &#64;HandleEvent
- * public void onCatchSomeNiceEvent(Event01 event) {
- * }
- * &#64;HandleEvent
- * public void onCatchSomeNiceEvent(Event02 event) {
- * }
- * }
- * </code>
- * </pre>
- * <br>
- * Handler method must have only one argument with type equals to expected event.
- */
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-@Documented
-public @interface HandleEvent {
-
-	enum Type {
-		remote,
-		local,
-		all
-	}
-
-	Type filter() default Type.all;
-
-	boolean sync() default false;
+public enum PushNotificationCause {
+	STANZA,
+	MESSAGES_FETCHED,
+	ACCOUNT_REMOVED
 }

@@ -86,9 +86,9 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 	}
 
 	@Override
-	public void prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount, Element notification) {
+	public void prepareNotificationPayload(Element pushServiceSettings, PushNotificationCause cause, Packet packet, long msgCount, Element notification) {
 		Element encryptEl = pushServiceSettings.getChild("encrypt", XMLNS);
-		if (encryptEl == null || packet == null) {
+		if (encryptEl == null) {
 			return;
 		}
 		String alg = encryptEl.getAttributeStaticStr("alg");
@@ -105,59 +105,71 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 		if (!alg.equalsIgnoreCase("aes-128-gcm")) {
 			return;
 		}
+		
+		Element actionEl = null;
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("unread", msgCount);
+		if (packet != null) {
+			payload.put("sender", packet.getStanzaFrom().getBareJID());
+			
+			actionEl = packet.getElement().findChild(el -> el.getXMLNS() == "urn:xmpp:jingle-message:0");
+			if (packet.getElemName() == Message.ELEM_NAME) {
+				if (packet.getType() == StanzaType.groupchat) {
+					payload.put("type", "groupchat");
+					Element mix = packet.getElement().getChild("mix", "urn:xmpp:mix:core:1");
+					if (mix != null) {
+						Element nickEl = mix.getChild("nick");
+						if (nickEl != null) {
+							String nickname = nickEl.getCData();
+							if (nickname != null) {
+								payload.put("nickname", nickname);
+							}
+						}
+					} else {
+						String nickname = packet.getStanzaFrom().getResource();
+						if (nickname != null) {
+							payload.put("nickname", nickname);
+						}
+					}
+				} else if (actionEl != null) {
+					payload.put("type", "call");
+					payload.put("sender", packet.getStanzaFrom());
+					payload.put("sid", actionEl.getAttributeStaticStr("id"));
+					payload.put("media", actionEl.mapChildren(
+							el -> el.getName() == "description" && el.getXMLNS() == "urn:xmpp:jingle:apps:rtp:1",
+							el -> el.getAttributeStaticStr("media")));
+				} else {
+					payload.put("type", "chat");
+				}
+			}
+
+			boolean isEncrypted = packet.getElemChild("encrypted", "eu.siacs.conversations.axolotl") != null ||
+					packet.getElemChild("encrypted", "urn:xmpp:omemo:1") != null;
+			String body = isEncrypted ? encryptedMessageBody : packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH);
+			if (body != null) {
+				// body is encrypted and base64 encoded so we need to adjust the size and reduce it by 64 (header size)
+				int maxSize = (int) (((maxSizeBytes - 64) * 6) / 8);
+				body = trimBodyToSize(maxSize, body);
+				payload.put("message", body);
+			}
+		} else {
+			switch (cause) {
+				case ACCOUNT_REMOVED -> {
+					payload.put("type", "account-removed");
+				}
+				default -> {
+					return;
+				}
+			}
+		}
 
 		Element x = notification.getChild("x", "jabber:x:data");
 		if (x != null) {
 			notification.removeChild(x);
 		}
 
-		Map<String, Object> payload = new HashMap<>();
-		payload.put("unread", msgCount);
-		payload.put("sender", packet.getStanzaFrom().getBareJID());
-
-		Element actionEl = packet.getElement().findChild(el -> el.getXMLNS() == "urn:xmpp:jingle-message:0");
-		if (packet.getElemName() == Message.ELEM_NAME) {
-			if (packet.getType() == StanzaType.groupchat) {
-				payload.put("type", "groupchat");
-				Element mix = packet.getElement().getChild("mix", "urn:xmpp:mix:core:1");
-				if (mix != null) {
-					Element nickEl = mix.getChild("nick");
-					if (nickEl != null) {
-						String nickname = nickEl.getCData();
-						if (nickname != null) {
-							payload.put("nickname", nickname);
-						}
-					}
-				} else {
-					String nickname = packet.getStanzaFrom().getResource();
-					if (nickname != null) {
-						payload.put("nickname", nickname);
-					}
-				}
-			} else if (actionEl != null) {
-				payload.put("type", "call");
-				payload.put("sender", packet.getStanzaFrom());
-				payload.put("sid", actionEl.getAttributeStaticStr("id"));
-				payload.put("media", actionEl.mapChildren(
-						el -> el.getName() == "description" && el.getXMLNS() == "urn:xmpp:jingle:apps:rtp:1",
-						el -> el.getAttributeStaticStr("media")));
-			} else {
-				payload.put("type", "chat");
-			}
-		}
-
 		//String content = valueToString(payload);
-
-		boolean isEncrypted = packet.getElemChild("encrypted", "eu.siacs.conversations.axolotl") != null ||
-				packet.getElemChild("encrypted", "urn:xmpp:omemo:1") != null;
-		String body = isEncrypted ? encryptedMessageBody : packet.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH);
-		if (body != null) {
-			// body is encrypted and base64 encoded so we need to adjust the size and reduce it by 64 (header size)
-			int maxSize = (int) (((maxSizeBytes - 64) * 6) / 8);
-			body = trimBodyToSize(maxSize, body);
-			payload.put("message", body);
-		}
-
+		
 		StringBuilder sb = new StringBuilder();
 		valueToString(payload, sb);
 		String content = sb.toString();

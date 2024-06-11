@@ -24,9 +24,16 @@ import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 
 public interface PushNotificationsExtension extends PushNotificationsAware {
-	
+
 	boolean shouldSendNotification(Packet packet, BareJID userJid, XMPPResourceConnection session)
 			throws XMPPException;
+	
+	default void prepareNotificationPayload(Element pushServiceSettings, PushNotificationCause cause, Packet packet, long msgCount, Element notification) {
+		switch (cause) {
+			case ACCOUNT_REMOVED -> {}
+			default -> prepareNotificationPayload(pushServiceSettings, packet, msgCount, notification);
+		}
+	}
 	
 	default void prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount, Element notification) {}
 

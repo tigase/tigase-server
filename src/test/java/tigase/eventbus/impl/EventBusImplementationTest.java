@@ -29,7 +29,7 @@ import tigase.xml.Element;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 
 import static org.junit.Assert.*;
 
@@ -175,6 +175,37 @@ public class EventBusImplementationTest {
 		Assert.assertNull(resp[2]);
 		Assert.assertTrue(resp[3] instanceof Element);
 		Assert.assertTrue(resp[4] instanceof Element);
+	}
+
+	@Test
+	public void testFireSync() throws ExecutionException, InterruptedException {
+		long threadId = Thread.currentThread().getId();
+		eventBus.setExecutor(Executors.newWorkStealingPool());
+		CompletableFuture<Long> future = new CompletableFuture<>();
+		AbstractListenerHandler handler = new ObjectEventsListenerHandler(Event1.class.getPackage().getName(), Event1.class.getSimpleName(), e -> {
+			future.complete(Thread.currentThread().getId());
+		}) {
+			@Override
+			public boolean isSynchronous() {
+				return true;
+			}
+		};
+		eventBus.addHandler(handler);
+		eventBus.fire(new Event1());
+		assertEquals(threadId, (long) future.orTimeout(1, TimeUnit.SECONDS).get());
+	}
+
+	@Test
+	public void testFireAsync() throws ExecutionException, InterruptedException {
+		long threadId = Thread.currentThread().getId();
+		eventBus.setExecutor(Executors.newWorkStealingPool());
+		CompletableFuture<Long> future = new CompletableFuture<>();
+		AbstractListenerHandler handler = new ObjectEventsListenerHandler(Event1.class.getPackage().getName(), Event1.class.getSimpleName(), e -> {
+			future.complete(Thread.currentThread().getId());
+		});
+		eventBus.addHandler(handler);
+		eventBus.fire(new Event1());
+		assertNotEquals(threadId, (long) future.orTimeout(1, TimeUnit.SECONDS).get());
 	}
 
 	@Test

@@ -27,10 +27,17 @@ public class ReflectEventListenerHandler
 	protected final Object consumerObject;
 	protected final HandleEvent.Type filter;
 	protected final Method handlerMethod;
+	protected final boolean synchronous;
 
 	public ReflectEventListenerHandler(HandleEvent.Type filter, final String packageName, final String eventName,
 									   Object consumerObject, Method handlerMethod) {
+		this(filter, false, packageName, eventName, consumerObject, handlerMethod);
+	}
+
+	public ReflectEventListenerHandler(HandleEvent.Type filter, boolean synchronous, final String packageName, final String eventName,
+									   Object consumerObject, Method handlerMethod) {
 		super(packageName, eventName);
+		this.synchronous = synchronous;
 		this.filter = filter;
 		this.consumerObject = consumerObject;
 		this.handlerMethod = handlerMethod;
@@ -71,6 +78,11 @@ public class ReflectEventListenerHandler
 	@Override
 	public Type getRequiredEventType() {
 		return Type.object;
+	}
+
+	@Override
+	public boolean isSynchronous() {
+		return synchronous;
 	}
 
 	@Override
