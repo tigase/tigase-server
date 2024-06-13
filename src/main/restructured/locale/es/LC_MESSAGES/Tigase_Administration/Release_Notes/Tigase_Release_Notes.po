@@ -8,9 +8,10 @@ msgstr ""
 "Project-Id-Version: TigaseDoc\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-16 15:01-0800\n"
-"PO-Revision-Date: 2024-06-12 11:40+0000\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2024-06-13 07:13+0000\n"
+"Last-Translator: Wojciech Kapcia <wojtek@tigase.net>\n"
+"Language-Team: Spanish <http://translate.tigase.net/projects/"
+"tigase-xmpp-server/release_notes/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -21,11 +22,11 @@ msgstr ""
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_Release_Notes.rst:2
 msgid "Tigase 8.3.0 Release Notes"
-msgstr ""
+msgstr "Notas de la versión de Tigase 8.3.0"
 
 #: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:2
 msgid "Tigase XMPP Server 8.4.0 Change notes"
-msgstr ""
+msgstr "Tigase XMPP Server 8.4.0 Notas de cambio"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.0.0.inc:5
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.1.0.inc:5
@@ -33,13 +34,13 @@ msgstr ""
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.3.0.inc:5
 #: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:5
 msgid "Major Changes"
-msgstr ""
+msgstr "Cambios importantes"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.2.0.inc:16
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.3.0.inc:15
 #: ../../Tigase_Administration/Release_Notes/tigase-server-current.inc:11
 msgid "All Minor Features & Behavior Changes"
-msgstr ""
+msgstr "Todas las funciones y cambios de comportamiento menores"
 
 #: ../../Tigase_Administration/Release_Notes/Tigase_v8.3.0.inc:2
 msgid "Tigase XMPP Server 8.3.0 Change notes"
