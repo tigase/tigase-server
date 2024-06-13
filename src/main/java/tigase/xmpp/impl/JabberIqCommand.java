@@ -17,8 +17,10 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.component.modules.impl.AdHocCommandModule;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
+import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.Iq;
 import tigase.server.Packet;
@@ -52,6 +54,9 @@ public class JabberIqCommand
 
 	private PacketDefaultHandler defaultHandler = new PacketDefaultHandler();
 
+	@Inject(nullAllowed = true)
+	private AdHocCommandModule adHocCommandModule;
+
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
 		if (conn == null) {
@@ -72,6 +77,10 @@ public class JabberIqCommand
 			return;
 		}
 
+		if (session.isUserId(packet.getStanzaFrom().getBareJID()) && (packet.getStanzaTo() == null || (session.isUserId(packet.getStanzaTo().getBareJID())) && packet.getStanzaTo().getResource() == null)) {
+			adHocCommandModule.process(packet);
+			return;
+		}
 		defaultHandler.process(packet, session, repo, results);
 	}
 

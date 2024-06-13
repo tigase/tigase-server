@@ -17,6 +17,7 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.component.modules.impl.AdHocCommandModule;
 import tigase.db.NonAuthUserRepository;
 import tigase.disco.XMPPServiceCollector;
 import tigase.kernel.beans.Bean;
@@ -36,6 +37,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static tigase.component.modules.impl.DiscoveryModule.DISCO_ITEMS_XMLNS;
 
 /**
  * Implementation of JEP-030.
@@ -64,6 +67,8 @@ public class ServiceDiscovery
 	private SessionManager sessionManager;
 	@Inject
 	private VHostManagerIfc vhostManager;
+	@Inject
+	private AdHocCommandModule adHocCommandModule;
 	
 	@Override
 	public String id() {
@@ -75,6 +80,13 @@ public class ServiceDiscovery
 						Queue<Packet> results, Map<String, Object> settings) throws XMPPException {
 
 		JID to = packet.getStanzaTo();
+		if (to == null) {
+			if (session == null || !session.isAuthorized()) {
+				log.log(Level.FINEST, "got <iq/> packet with no ''from'' attribute = {0}", packet);
+				return;
+			}
+			to = JID.jidInstance(session.getBareJID());
+		}
 
 		if (to != null) {
 			JID from = packet.getStanzaFrom();
@@ -96,17 +108,26 @@ public class ServiceDiscovery
 						if (query != null && query.getAttributeStaticStr("node") == null) {
 							// custom handling..
 							Packet result = packet.copyElementOnly();
+							if (result.getStanzaTo() == null) {
+								result.initVars(from, to);
+							}
 							result.setPacketTo(serviceProvider.getServiceProviderComponentJid());
 							result.setPacketFrom(sessionManager.getComponentId());
 							results.offer(result);
 						} else {
 							// this packet is to local user (offline or not but to bare JID) - just forward to service provider component
+							Element itemsQuery = packet.getElement().findChild(el -> el.getName() == "query" && el.getXMLNS() == "http://jabber.org/protocol/disco#items");
+							if (itemsQuery != null && "http://jabber.org/protocol/commands".equals(itemsQuery.getAttributeStaticStr("node".intern()))) {
+								Element resultQuery = new Element("query", new String[]{Packet.XMLNS_ATT}, new String[]{DISCO_ITEMS_XMLNS});
+								adHocCommandModule.addCommandListItemsElements("http://jabber.org/protocol/commands", to, from, resultQuery::addChild);
+								Packet result = packet.okResult(resultQuery, 0);
+								results.offer(result);
+								return;
+							}
 							Packet result = packet.copyElementOnly();
 							if (packet.getStanzaTo() == null && session != null) {
-								// in case if packet is from local user without from/to
-								JID userJid = JID.jidInstance(session.getBareJID());
 								result.initVars(packet.getStanzaFrom() != null ? packet.getStanzaFrom() : session.getJID(),
-												userJid);
+												to);
 							}
 							if (packet.getStanzaFrom() == null) {
 								// at this point we should already have "from" attribute set

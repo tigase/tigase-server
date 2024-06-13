@@ -17,13 +17,14 @@
  */
 package tigase.component.adhoc;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.xmpp.jid.JID;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface AdHocCommand {
-
+	
 	void execute(final AdhHocRequest request, AdHocResponse response) throws AdHocCommandException;
 
 	default void execute(final AdhHocRequest request, AdHocResponse response, Runnable completionHandler, Consumer<AdHocCommandException> exceptionHandler) throws AdHocCommandException {
@@ -39,6 +40,15 @@ public interface AdHocCommand {
 		return Optional.empty();
 	}
 
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
+	@Deprecated
 	boolean isAllowedFor(JID jid);
 
+	default boolean isAllowedFor(JID from, JID to) {
+		return isAllowedFor(from);
+	}
+
+	default boolean isForSelf() {
+		return false;
+	}
 }

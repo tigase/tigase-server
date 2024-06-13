@@ -89,18 +89,27 @@ public class AdHocCommandModule
 		return result;
 	}
 
-	public void addCommandListItemsElements(String node, final JID stanzaTo, final JID stanzaFrom, Consumer<Element> collector) {
+	public void addCommandListItemsElements(String node, JID stanzaTo, final JID stanzaFrom, Consumer<Element> collector) {
+		if (stanzaTo == null) {
+			stanzaTo = stanzaFrom.copyWithoutResource();
+		}
+		boolean selfQuery = stanzaFrom.getBareJID().equals(stanzaTo.getBareJID()) && stanzaTo.getResource() == null;
 		for (AdHocCommand c : commandsManager.getAllCommands()) {
-			if (c.isAllowedFor(stanzaFrom)) {
+			if (c.isForSelf() != selfQuery) {
+				continue;
+			}
+			if (c.isAllowedFor(stanzaFrom, stanzaTo)) {
 				Element i = new Element("item", new String[]{"jid", "node", "name"},
 										new String[]{stanzaTo.toString(), c.getNode(), c.getName()});
 				c.getGroup().ifPresent(group -> i.setAttribute("group", group));
 				collector.accept(i);
 			}
 		}
-		List<Element> scripts = scriptProcessor.getScriptItems(node, stanzaTo, stanzaFrom);
-		if (scripts != null) {
-			scripts.forEach(collector);
+		if (!selfQuery) {
+			List<Element> scripts = scriptProcessor.getScriptItems(node, stanzaTo, stanzaFrom);
+			if (scripts != null) {
+				scripts.forEach(collector);
+			}
 		}
 	}
 
