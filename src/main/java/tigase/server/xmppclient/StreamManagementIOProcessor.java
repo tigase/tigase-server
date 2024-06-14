@@ -328,6 +328,10 @@ public class StreamManagementIOProcessor
 		StreamManagementCommand cmd = StreamManagementCommand.fromPacket(pc);
 		switch (cmd) {
 			case STREAM_MOVED:
+				if (service == null) {
+					// it looks like the sender of this packet already was disconnected, ignoring request
+					return;
+				}
 				String newConn = Command.getFieldValue(pc, "new-conn-jid");
 
 				String id = (String) service.getSessionData().get(STREAM_ID_KEY);
