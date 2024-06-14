@@ -17,6 +17,8 @@
  */
 package tigase.xmpp;
 
+import tigase.xml.Element;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,5 +77,24 @@ public enum StreamError {
 
 	public String getCondition() {
 		return condition;
+	}
+
+	public String prepareStreamError(String errorMessage) {
+		return "<stream:error>" + "<" + condition + " xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
+				(errorMessage != null
+				 ? "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>" + errorMessage + "</text>"
+				 : "") + "</stream:error>" + "</stream:stream>";
+	}
+
+	public Element prepareStreamErrorElement(String errorMessage) {
+		Element err_el = new Element(condition);
+		err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+		if (errorMessage != null) {
+			Element text_el = new Element("text");
+			text_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
+			text_el.setCData(errorMessage);
+			err_el.addChild(text_el);
+		}
+		return err_el;
 	}
 }

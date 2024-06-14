@@ -61,6 +61,8 @@ public class XMPPResourceConnection
 
 	public static final String ERROR_KEY = "error-key";
 
+	public static final String ERROR_ELEMENT_KEY = "error-element-key";
+
 	public static final String CONNECTION_CHECK_TIMESTAMP_KEY = "connection-check-timestamp";
 
 	/**

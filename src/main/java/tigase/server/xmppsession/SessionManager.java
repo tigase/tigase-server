@@ -374,6 +374,12 @@ public class SessionManager
 				err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
 				cmd.getElement().getChild("command").addChild(err_el);
 			}
+
+			var errorElement = (Element)conn.getSessionData(XMPPResourceConnection.ERROR_ELEMENT_KEY);
+			if (errorElement != null) {
+				cmd.getElement().getChild("command").addChild(errorElement);
+			}
+
 			fastAddOutPacket(cmd);
 		} catch (NoConnectionIdException ex) {
 			log.log(Level.WARNING, "Connection ID not set for session: {0}", conn);
@@ -411,6 +417,31 @@ public class SessionManager
 			}
 
 			checkSingleUserConnectionsLimit(conn);
+		}
+	}
+
+	@HandleEvent
+	public void handleDisconnectUser(DisconnectUserEBAction event) {
+		log.log(Level.FINEST, "Handling event to disconnect!: " + event);
+		logoutAllUserConnections(event.getUserJid(), event.getError(), event.getMessage());
+	}
+
+	private void logoutAllUserConnections(BareJID bareJID, StreamError error, String message) {
+		var errorElement = error != null ? error.prepareStreamErrorElement(message) : null;
+		final XMPPSession session = getSession(bareJID);
+		if (session != null) {
+			for (XMPPResourceConnection xmppResourceConnection : session.getActiveResources()) {
+				try {
+					log.log(Level.FINEST, "Logging out user session: " + xmppResourceConnection);
+					if (errorElement != null) {
+						xmppResourceConnection.putSessionData(XMPPResourceConnection.ERROR_ELEMENT_KEY, errorElement);
+					}
+					xmppResourceConnection.logout();
+				} catch (NotAuthorizedException e) {
+					throw new RuntimeException(e);
+				}
+				session.removeResourceConnection(xmppResourceConnection);
+			}
 		}
 	}
 
@@ -1063,7 +1094,7 @@ public class SessionManager
 									sb.append(", res=").append(res_con.getResource());
 								}
 								log.log(Level.FINER, "Number of connections is {0} for the user: {1}{2}",
-										new Object[]{sessionParent.getActiveResourcesSize(), userJid, sb.toString()});
+										new Object[]{sessionParent.getActiveResourcesSize(), userJid.getBareJID(), sb.toString()});
 							}
 
 							return;
