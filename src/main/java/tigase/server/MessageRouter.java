@@ -74,6 +74,9 @@ public class MessageRouter
 	// "http://jabber.org/protocol/disco#info";
 	// public static final String ITEMS_XMLNS =
 	// "http://jabber.org/protocol/disco#items";
+
+	// TODO: use default logger with TRACE level after switching to slf4j
+	private static final Logger debugLog = Logger.getLogger("tigase.debug.MessageRouter");
 	private static final Logger log = Logger.getLogger(MessageRouter.class.getName());
 
 	private static final String JVM_STATS_GC_STATISTICS = "JVM/GC-statistics";
@@ -881,8 +884,9 @@ public class MessageRouter
 		if (comp != null) {
 			return comp;
 		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "No componentID matches (fast lookup against exact address): " +
+		if (debugLog.isLoggable(Level.FINEST)) {
+			// TODO: use default logger with TRACE level after switching to slf4j
+			debugLog.log(Level.FINEST, "No componentID matches (fast lookup against exact address): " +
 					"{0}, for map: {1}; trying VHost lookup", new Object[]{jid, components_byId.keySet()});
 		}
 
@@ -899,8 +903,9 @@ public class MessageRouter
 				return comp;
 			}
 		}
-		if (log.isLoggable(Level.FINEST)) {
-			log.log(Level.FINEST, "No component name matches (VHost lookup against component name): " +
+		if (debugLog.isLoggable(Level.FINEST)) {
+			// TODO: use default logger with TRACE level after switching to slf4j
+			debugLog.log(Level.FINEST, "No component name matches (VHost lookup against component name): " +
 							"{0}, for map: {1}, for all VHosts: {2}; trying other forms of addressing",
 					new Object[]{jid, components.keySet(), vHostManager.getAllVHosts().size() > 20 ? "[hosts count: " +
 							vHostManager.getAllVHosts().size() + "]" : String.valueOf(vHostManager.getAllVHosts())});
@@ -918,8 +923,9 @@ public class MessageRouter
 
 			comp = components.get(cmpName);
 			if ((comp != null) && (isLocalDomain(basename) || basename.equals(getDefHostName().getDomain()))) {
-				if (log.isLoggable(Level.FINEST)) {
-					log.log(Level.FINEST, "Component matched: {0}, for comp: {1}, basename: {3}",
+				if (debugLog.isLoggable(Level.FINEST)) {
+					// TODO: use default logger with TRACE level after switching to slf4j
+					debugLog.log(Level.FINEST, "Component matched: {0}, for comp: {1}, basename: {3}",
 							new Object[]{jid, components.keySet(), comp, basename});
 				}
 				return comp;
