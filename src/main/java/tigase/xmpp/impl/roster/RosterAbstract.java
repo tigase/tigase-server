@@ -220,7 +220,7 @@ public abstract class RosterAbstract {
 						  SubscriptionType.none_pre_approved),
 		none_pending_out_pre_approved(SubscriptionType.none_pending_out_pre_approved, SubscriptionType.none_pending_out,
 									  SubscriptionType.from_pending_out, SubscriptionType.none_pending_out_pre_approved,
-									  SubscriptionType.none_pending_out_pre_approved,
+									  SubscriptionType.to_pre_approved,
 									  SubscriptionType.none_pre_approved,
 									  SubscriptionType.none_pending_out_pre_approved,
 									  SubscriptionType.none_pre_approved),
