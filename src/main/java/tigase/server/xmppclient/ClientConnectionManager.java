@@ -73,7 +73,7 @@ public class ClientConnectionManager
 	private static final String ROUTING_ENTRY_PROP_KEY = ".+";
 	private static final String ROUTING_MODE_PROP_KEY = "multi-mode";
 	private static final String ROUTINGS_PROP_KEY = "routings";
-	private static final long SOCKET_CLOSE_WAIT_PROP_DEF = 1;
+	private static final long SOCKET_CLOSE_WAIT_PROP_DEF = 5;
 	private static final String SOCKET_CLOSE_WAIT_PROP_KEY = "socket-close-wait";
 	private static final String TLS_WANT_CLIENT_AUTH_ENABLED_KEY = "tls-want-client-auth-enabled";
 	private static final String XMLNS = "jabber:client";

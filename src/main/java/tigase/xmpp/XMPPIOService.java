@@ -216,6 +216,8 @@ public class XMPPIOService<RefObject>
 
 	@Override
 	public void forceStop() {
+		log.finest(() -> "Stopping connection for user: " + authorisedUserJid);
+
 		boolean stop = false;
 
 		if (processors != null) {

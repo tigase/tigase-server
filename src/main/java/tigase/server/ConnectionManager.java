@@ -228,14 +228,10 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		boolean xmppLimitHit = false;
 
 		if (last_minute_packets_limit > 0) {
-			xmppLimitHit = (serv.getPacketsReceived(false) >= last_minute_packets_limit)
-//							|| (serv.getPacketsSent(false) >= last_minute_packets_limit)
-			;
+			xmppLimitHit = (serv.getPacketsReceived(false) >= last_minute_packets_limit);
 		}
 		if (!xmppLimitHit && (total_packets_limit > 0)) {
-			xmppLimitHit = (serv.getTotalPacketsReceived() >= total_packets_limit)
-//							|| (serv.getTotalPacketsSent() >= total_packets_limit)
-			;
+			xmppLimitHit = (serv.getTotalPacketsReceived() >= total_packets_limit);
 		}
 		if (xmppLimitHit) {
 			Level level = Level.FINER;
@@ -246,7 +242,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			switch (xmppLimitAction) {
 				case DROP_PACKETS:
 					if (log.isLoggable(level)) {
-						log.log(level, "[[{0}]] XMPP Limits exceeded on connection {1}" + " dropping pakcets: {2}",
+						log.log(level, "[[{0}]] XMPP Limits exceeded on connection {1}" + " dropping packets: {2}",
 								new Object[]{getName(), serv, serv.getReceivedPackets()});
 					}
 					while (serv.getReceivedPackets().poll() != null) {
@@ -261,6 +257,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 								"[[{0}]] XMPP Limits exceeded on connection {1}" + " stopping, packets dropped: {2}",
 								new Object[]{getName(), serv, serv.getReceivedPackets()});
 					}
+					xmppStreamError(serv, Collections.singletonList(StreamError.PolicyViolation.prepareStreamErrorElement("XMPP Limits exceeded on connection")));
 					serv.forceStop();
 
 					break;
@@ -290,6 +287,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 						new Object[]{getName(), bytesSent, bytesReceived, totalSent, totalReceived, serv,
 									 serv.getReceivedPackets()});
 			}
+			xmppStreamError(serv, Collections.singletonList(StreamError.PolicyViolation.prepareStreamErrorElement("XMPP Limits exceeded on connection")));
+
 			serv.forceStop();
 
 			return false;
