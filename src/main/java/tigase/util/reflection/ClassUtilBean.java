@@ -79,6 +79,9 @@ public class ClassUtilBean {
 			} else {
 				List<String> packages = skipPackages.stream().map(packageName -> packageName + ".").collect(Collectors.toList());
 				filter = className -> {
+					if (ClassUtil.filterIncorrectMultiVersionClasses(className)) {
+						return false;
+					}
 					for (String packageName : packages) {
 						if (className.startsWith(packageName)) {
 							return false;
