@@ -1,4 +1,4 @@
-version: 25
+version: 35
 imports:
 - projectPath: Templates
   revision: 0.0.4
@@ -11,10 +11,16 @@ jobs:
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   triggers:
   - !BranchUpdateTrigger {}
+  projectDependencies:
+  - projectPath: tigase/_server/tigase-utils
+    buildProvider: !LastFinishedBuild
+      jobName: Maven CI
+    artifacts: '**'
+  - projectPath: tigase/_server/tigase-xmltools
+    buildProvider: !LastFinishedBuild
+      jobName: Maven CI
+    artifacts: '**'
   retryCondition: never
   maxRetries: 3
   retryDelay: 30
-  caches:
-  - key: maven-cache
-    path: /root/.m2/repository
   timeout: 3600
