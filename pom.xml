@@ -452,7 +452,7 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.1.0</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
@@ -476,6 +476,7 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyshared</artifactId>
             <version>10.15.2.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
