@@ -176,7 +176,7 @@ In that directory, you will find four files:
 
 -  ``fullchain.pem`` - all certificates, including server certificate (aka leaf certificate or end-entity certificate). The server certificate is the first one in this file, followed by any intermediates.
 
-For Tigase XMPP Server, we are only concerned with ``privkey.pem`` and ``fullchain.pem`` (or ``chain.pem`` - please consider actual issuers and certification chain!).
+For Tigase XMPP Server, we are only concerned with ``privkey.pem`` and ``fullchain.pem`` (or ``chain.pem`` - please consider actual issuers and certification chain in this case!).
 
 At this point we will need to obtain the root and intermediate certificates, this can be done by downloading these certificates from the `LetsEncrypt Chain of Trust website <https://letsencrypt.org/certificates/>`__.
 
@@ -184,14 +184,11 @@ At this point we will need to obtain the root and intermediate certificates, thi
 
    Please pay utmost attention to the actual certificate issuers and make sure that the certification chain is maintained!
 
-On the time of the writing, LetsEncrypt was providing domain certificates issued by ``R3`` CertificateAuthorigy (CA). In order to provide complete chain to the root CA you should get Let’s Encrypt R3 (``RSA 2048, O = Let’s Encrypt, CN = R3``) certificate. Depending on desired certification chain you have two options: 1) (default and recommended) using own LetsEncrypt CA: a) ``R3`` certificate signed by ISRG Root X1: https://letsencrypt.org/certs/lets-encrypt-r3.pem b) ``ISRG Root X1`` root certificate: https://letsencrypt.org/certs/isrgrootx1.pem 2) (legacy, option more compatible with old systems): cross-signed certificate by IdenTrust: a) ``R3`` certificate cross-signed by IdenTrust: https://letsencrypt.org/certs/lets-encrypt-r3-cross-signed.pem b) ``TrustID X3 Root`` from IdenTrust: https://letsencrypt.org/certs/trustid-x3-root.pem.txt
-
-Considering first (recommended) option, you may obtain them using wget:
+On the time of the writing, LetsEncrypt root CA is ``ISRG Root X1``. In order to provide complete chain to the root CA ``ISRG Root X1`` root certificate: https://letsencrypt.org/certs/isrgrootx1.pem and combine it with private key and full certificate chain from certbot.
 
 .. code:: bash
 
    wget https://letsencrypt.org/certs/isrgrootx1.pem
-   wget https://letsencrypt.org/certs/lets-encrypt-r3.pem
 
 These are the root certificate, and the intermediate certificate signed by root certificate.
 
@@ -199,7 +196,7 @@ These are the root certificate, and the intermediate certificate signed by root 
 
    IdenTrust cross-signed certificate will not function properly in the future!
 
-Take the contents of your ``privkey.pem``, certificate, and combine them with the contents of ``isrgrootx1.pem`` and ``lets-encrypt-r3.pem`` into a single pem certificate.
+Take the contents of your ``privkey.pem``, certificate, and combine them with the contents of ``isrgrootx1.pem``  into a single pem certificate.
 
 Depending on your configuration you either need to name the file after your domain such as ``mydomain.com.pem`` and place it under ``certs/`` subdirectory of Tigase XMPP Server installation or update it using admin ad-hoc (see :ref:`Storing and managing certificates<certificateStorage>`)
 
@@ -207,12 +204,7 @@ If you moved all certs to a single directory, you may combine them using the fol
 
 .. code:: bash
 
-   cat ./cert.pem ./privkey.pem ./lets-encrypt-r3.pem ./isrgrootx1.pem > mydomain.com.pem
-
-
-.. Note::
-
-   If you are using ``isrgrootx1`` root make sure you use ``cert.pem`` file instead of ``fullchain.pem``, which uses different intermediate certificate ( `Let’s Encrypt Authority X3 (IdenTrust cross-signed) <https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt>`__ ) and you will have to use `DST Root CA X3 <https://letsencrypt.org/certs/trustid-x3-root.pem.txt>`__ certificate!
+   cat ./cert.pem ./privkey.pem ./isrgrootx1.pem > mydomain.com.pem
 
 Your certificate should look something like this:
 
@@ -278,7 +270,11 @@ For greater automation it’s possible to automate updating certificate obtained
 
 .. Note::
 
-   Please adjust account credentials used for deployment (``USER``, ``PASS``, ``DOMAIN``) as well as paths to Let’s Encrypt certificates (*ISRG Root X1* named ``isrgrootx1.pem`` and *Let’s Encrypt Authority X3* named ``letsencryptauthorityx3.pem``)
+   Please adjust account credentials used for deployment (``USER``, ``PASS``, ``DOMAIN``) as well as paths to Let’s Encrypt certificates (``LE_CERTS_PATH``, i.e. path pointing to the directory with ``isrgrootx1.pem`` file)
+
+.. Note::
+
+   It's recommended to create dedicated user responsible for updating the certificate configured as domain administrator  to limit the scope of the access the user has on the server.
 
 .. code:: bash
 
@@ -322,7 +318,7 @@ For greater automation it’s possible to automate updating certificate obtained
            fi
        fi
 
-       CERT=`cat "$RENEWED_LINEAGE/cert.pem" "$RENEWED_LINEAGE/privkey.pem" ${LE_CERTS_PATH}/isrgrootx1.pem ${LE_CERTS_PATH}/letsencryptauthorityx3.pem`
+       CERT=`cat "$RENEWED_LINEAGE/fullchain.pem" "$RENEWED_LINEAGE/privkey.pem" "${LE_CERTS_PATH}/isrgrootx1.pem"`
 
        REQUEST="
        <command>
