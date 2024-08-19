@@ -270,7 +270,7 @@ For greater automation it’s possible to automate updating certificate obtained
 
 .. Note::
 
-   Please adjust account credentials used for deployment (``USER``, ``PASS``, ``DOMAIN``) as well as paths to Let’s Encrypt certificates (``LE_CERTS_PATH``, i.e. path pointing to the directory with ``isrgrootx1.pem`` file)
+   Please adjust account credentials used for deployment (``USER`` (only localpart, not JID!), ``PASS``, ``DOMAIN``) as well as paths to Let’s Encrypt certificates (``LE_CERTS_PATH``, i.e. path pointing to the directory with ``isrgrootx1.pem`` file)
 
 .. Note::
 
@@ -289,6 +289,7 @@ For greater automation it’s possible to automate updating certificate obtained
    DOMAIN="my_domain.tld"
    HOST=${DOMAIN}
    #UPDATE_DOMAINS=(${DOMAIN})
+   PROTOCOL=https
    # PORT=":8080"
    # APIKEY="?api-key=mySecretKey"
    LE_CERTS_PATH="/path/to/letsencrypt/CA/certificates/"
@@ -343,7 +344,7 @@ For greater automation it’s possible to automate updating certificate obtained
          </fields>
        </command>"
 
-       response=`curl -s -L -H "Content-Type: text/xml" -X POST  http://${USER}%40${DOMAIN}:${PASS}@${HOST}${PORT}/rest/adhoc/vhost-man@${DOMAIN}${APIKEY} -d "${REQUEST}"`
+       response=`curl -s -L -H -u "${USER}%40${DOMAIN}":"${PASS}" "Content-Type: text/xml" -X POST  ${PROTOCOL}://${HOST}${PORT}/rest/adhoc/vhost-man@${DOMAIN}${APIKEY} -d "${REQUEST}"`
 
        if [[ ! ${response} = *"loaded successfully"* ]] ; then
            echo -e "Server returned error while updating   ${domain}   certificate:\n ${response}"
