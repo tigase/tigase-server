@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -107,6 +108,7 @@ public class StreamManagementIOProcessor
 	@ConfigField(desc = "Time since last ack received or ack request sent before which ack request should not be sent", alias = ACK_REQUEST_MIN_DELAY_KEY)
 	private long ack_request_min_delay = 200l;
 
+	static AtomicLong totalQueueSize = new AtomicLong();
 	/**
 	 * Method returns true if XMPPIOService has enabled SM.
 	 *
@@ -593,19 +595,7 @@ public class StreamManagementIOProcessor
 	public void getStatistics(StatisticsList list) {
 		if (list.checkLevel(Level.FINEST)) {
 			list.add(connectionManager.getName() + "/" + getId(), "Number of resume services", services.size(), Level.FINEST);
-
-//			final Comparator<XMPPIOService> serviceAckQueueSizeComparator = Comparator.comparingInt(
-//					(XMPPIOService service) -> ((OutQueue) service
-//							.getSessionData()
-//							.get(OUT_COUNTER_KEY)).waitingForAck());
-//
-//			final Optional<XMPPIOService> serviceWithBiggestQueue = services.values().stream().max(serviceAckQueueSizeComparator);
-//			if (serviceWithBiggestQueue.isPresent()) {
-//				int size = ((OutQueue)serviceWithBiggestQueue.get().getSessionData().get(OUT_COUNTER_KEY)).waitingForAck();
-//				Optional<JID> jid = serviceWithBiggestQueue.get().getAuthorisedUserJid();
-//				list.add(connectionManager.getName() + "/" + getId(), "Biggest queue", size + " for " + jid, Level.FINEST);
-//			}
-
+			list.add(connectionManager.getName() + "/" + getId(), "Total size of all queues", totalQueueSize.get(), Level.FINEST);
 		}
 	}
 
@@ -845,6 +835,7 @@ public class StreamManagementIOProcessor
 				}
 				packet.processedBy(XMLNS);
 				queue.offer(new Entry(packet));
+				totalQueueSize.incrementAndGet();
 				inc();
 				return true;
 			}
@@ -866,6 +857,7 @@ public class StreamManagementIOProcessor
 
 			while (count < queue.size()) {
 				queue.poll();
+				totalQueueSize.decrementAndGet();
 			}
 		}
 
