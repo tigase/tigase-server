@@ -7,10 +7,6 @@ assignees: ''
 
 ---
 
-**I have a problem with…**
-A clear and concise description of what the problem is.
+> # NOTE: Tigase has new home at [tigase.dev](https://tigase.dev/) - please submit all issues/pull-requests there in the relevant sub-project!
 
-**Details (please complete the following information):**
- - Tigase version: [e.g. 8.1.0]
- - JVM flavour and version [e.g. AdoptOpenJDK11]
- - Operating system/distribution/version [e.g. Linux Ubuntu 20.04]
+For main Tigase Server please submit it here: https://tigase.dev/tigase/_server/server-core/~issues/
