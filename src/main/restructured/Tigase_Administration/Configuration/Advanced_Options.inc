@@ -153,6 +153,8 @@ Abuse Contacts
 
 Tigase has support for `XEP-0128: Service Discovery Extensions <https://xmpp.org/extensions/xep-0128.html>`__ for providing additional information to the server and component discovery information. One of the important usages for this feature is `XEP-0157: Contact Addresses for XMPP Services <https://xmpp.org/extensions/xep-0157.html>`__ which describes usage of this feature for providing contact information to server administrators or abuse response team.
 
+All supported fields: ``abuse-addresses``, ``admin-addresses``, ``feedback-addresses``, ``sales-addresses``, ``security-addresses``, ``support-addresses``.
+
 To set abuse contact details you should set ``disco-extensions`` in property in ``etc/config.tdsl`` file with subproperty ``abuse-addresses`` set to your abuse address URI (for email you need to prefix it with ``mailto:`` and for XMPP address you need to prefix it with ``xmpp``):
 
 .. code::
@@ -160,9 +162,6 @@ To set abuse contact details you should set ``disco-extensions`` in property in 
    'disco-extensions' = {
        'abuse-addresses' = [ 'mailto:abuse@localhost', 'xmpp:abuse@localhost' ]
    }
-
-
-All supported fields: ``abuse-addresses``, ``admin-addresses``, ``feedback-addresses``, ``sales-addresses``, ``security-addresses``, ``support-addresses``;
 
 Push Notifications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
