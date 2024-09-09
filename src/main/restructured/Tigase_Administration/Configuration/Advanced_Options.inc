@@ -161,6 +161,9 @@ To set abuse contact details you should set ``disco-extensions`` in property in 
        'abuse-addresses' = [ 'mailto:abuse@localhost', 'xmpp:abuse@localhost' ]
    }
 
+
+All supported fields: ``abuse-addresses``, ``admin-addresses``, ``feedback-addresses``, ``sales-addresses``, ``security-addresses``, ``support-addresses``;
+
 Push Notifications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
