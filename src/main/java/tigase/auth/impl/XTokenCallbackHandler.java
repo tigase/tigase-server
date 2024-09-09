@@ -202,9 +202,11 @@ public class XTokenCallbackHandler implements CallbackHandler, AuthRepositoryAwa
 
 	private void handleReplaceServerKeyCallback(ReplaceServerKeyCallback callback) throws XmppSaslException {
 		try {
-			byte[] data = SaslXTOKEN.generateSecretKey();
-			repo.updateCredential(jid, credentialId, SaslXTOKEN.NAME, "t=" + Base64.encode(data) + ",o=" + false);
-			callback.setNewServerKey(data);
+			if (entry != null && entry.isOneTime()) {
+				byte[] data = SaslXTOKEN.generateSecretKey();
+				repo.updateCredential(jid, credentialId, SaslXTOKEN.NAME, "t=" + Base64.encode(data) + ",o=" + false);
+				callback.setNewServerKey(data);
+			}
 		} catch (TigaseDBException e) {
 			throw new XmppSaslException(XmppSaslException.SaslError.temporary_auth_failure);
 		}
