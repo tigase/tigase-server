@@ -54,7 +54,7 @@ public class SchemaVersionCheckerLogger {
 	}
 
 	@HandleEvent
-	public void printErrorMessage(StartupFinishedEvent event) {
+	public void printSnapshotInformation(StartupFinishedEvent event) {
 
 		// if not this node is being shutdown then do nothing
 		if (event.getNode() == null || !DNSResolverFactory.getInstance().getDefaultHost().equals(event.getNode())) {
