@@ -344,7 +344,7 @@ For greater automation it’s possible to automate updating certificate obtained
          </fields>
        </command>"
 
-       response=`curl -s -L -H -u "${USER}%40${DOMAIN}":"${PASS}" "Content-Type: text/xml" -X POST  ${PROTOCOL}://${HOST}${PORT}/rest/adhoc/vhost-man@${DOMAIN}${APIKEY} -d "${REQUEST}"`
+       response=`curl -s -L -H "Content-Type: text/xml" -X POST  ${PROTOCOL}://${USER}%40${DOMAIN}:${PASS}${HOST}${PORT}/rest/adhoc/vhost-man@${DOMAIN}${APIKEY} -d "${REQUEST}"`
 
        if [[ ! ${response} = *"loaded successfully"* ]] ; then
            echo -e "Server returned error while updating   ${domain}   certificate:\n ${response}"
