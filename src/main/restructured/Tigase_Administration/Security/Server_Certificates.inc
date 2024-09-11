@@ -338,7 +338,7 @@ For greater automation it’s possible to automate updating certificate obtained
              <value>${CERT_DOMAIN}</value>
            </item>
            <item>
-             <var>Save to disk</var>
+             <var>Save permanently (to disk or repository)</var>
              <value>true</value>
            </item>
          </fields>
