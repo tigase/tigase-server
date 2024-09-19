@@ -17,6 +17,7 @@
  */
 package tigase.io;
 
+import jdk.net.ExtendedSocketOptions;
 import tigase.net.ConnectionOpenListener;
 import tigase.net.IOUtil;
 import tigase.stats.StatisticsList;
@@ -70,6 +71,11 @@ public class SocketIO
 		channel.socket().setSoLinger(false, 0);
 		channel.socket().setReuseAddress(true);
 		channel.socket().setKeepAlive(true);
+
+		channel.socket().setOption(ExtendedSocketOptions.TCP_KEEPIDLE, 60);
+		channel.socket().setOption(ExtendedSocketOptions.TCP_KEEPCOUNT, 3);
+		channel.socket().setOption(ExtendedSocketOptions.TCP_KEEPINTERVAL, 60);
+
 		remoteAddress = channel.socket().getInetAddress().getHostAddress();
 		if (channel.socket().getTrafficClass() == ConnectionOpenListener.IPTOS_THROUGHPUT) {
 			dataToSend = new LinkedBlockingQueue<ByteBuffer>(100000);
