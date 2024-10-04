@@ -71,6 +71,7 @@ public class OfflineMessages
 	 */
 	public static final String[] MESSAGE_HEADER_PATH = {ELEM_NAME, "header"};
 	public static final String[] MESSAGE_HINTS_NO_STORE = {ELEM_NAME, "no-store"};
+	public static final String[] MESSAGE_HINTS_STORE = {ELEM_NAME, "store"};
 	public static final String MESSAGE_HINTS_XMLNS = "urn:xmpp:hints";
 	public static final String[] MESSAGE_RECEIVED_PATH = {ELEM_NAME, "received"};
 	public static final String MESSAGE_RECEIVED_XMLNS = "urn:xmpp:receipts";
@@ -485,6 +486,9 @@ public class OfflineMessages
 					// support for XEP-0334 Message Processing Hints					
 					if (pac.getAttributeStaticStr(MESSAGE_HINTS_NO_STORE, "xmlns") == MESSAGE_HINTS_XMLNS) {
 						return false;
+					}
+					if (pac.getAttributeStaticStr(MESSAGE_HINTS_STORE, "xmlns") == MESSAGE_HINTS_XMLNS) {
+						return true;
 					}
 					if (pac.getElemCDataStaticStr(tigase.server.Message.MESSAGE_BODY_PATH) != null) {
 						return true;

@@ -19,6 +19,7 @@ package tigase.xmpp.impl.push;
 
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Message;
 import tigase.server.Packet;
 import tigase.xml.Element;
@@ -34,6 +35,9 @@ public class JinglePushNotificationsExtension implements PushNotificationsExtens
 
 	@Inject
 	private EncryptedPushNotificationExtension encryptedPushNotificationExtension;
+
+	@ConfigField(desc = "Always enable", alias = "push-jingle-always-enabled")
+	private boolean alwaysEnabled = false;
 
 	@Override
 	public Element[] getDiscoFeatures() {
@@ -74,6 +78,11 @@ public class JinglePushNotificationsExtension implements PushNotificationsExtens
 		if (actionEl == null) {
 			return true;
 		}
+
+		if (alwaysEnabled) {
+			return true;
+		}
+		
 		Element jingle = pushServiceSettings.getChild("jingle", "tigase:push:jingle:0");
 		if (jingle == null) {
 			return false;
