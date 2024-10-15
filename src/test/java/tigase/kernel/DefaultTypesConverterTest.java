@@ -25,12 +25,13 @@ import tigase.xmpp.jid.JID;
 
 import java.io.File;
 import java.lang.reflect.ParameterizedType;
+import java.time.Duration;
 import java.util.*;
 import java.util.logging.Level;
 
 import static org.junit.Assert.*;
 
-public class TypesConverterTest {
+public class DefaultTypesConverterTest {
 
 	public enum XT {
 		a1,
@@ -43,6 +44,13 @@ public class TypesConverterTest {
 	private List<Integer> listIntField;
 	private ArrayList<Integer> arrayListIntField;
 	private Set<Integer> setIntField;
+
+	@Test
+	public void testDurationConvert() throws Exception {
+		TypesConverter converter = new DefaultTypesConverter();
+
+		Assert.assertEquals(Duration.ofDays(1), converter.convert("P1D", Duration.class));
+	}
 
 	@Test
 	public void testConvert() throws Exception {
