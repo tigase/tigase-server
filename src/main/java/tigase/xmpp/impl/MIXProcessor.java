@@ -18,8 +18,6 @@
 package tigase.xmpp.impl;
 
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
@@ -50,7 +48,6 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 import static tigase.xmpp.impl.MIXProcessor.ID;
-import static tigase.xmpp.impl.Message.XMLNS;
 
 @Id(ID)
 @Bean(name = ID, parent = SessionManager.class, active = true)
