@@ -21,6 +21,7 @@ import tigase.annotations.TigaseDeprecated;
 import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.StanzaType;
+import tigase.xmpp.impl.annotation.Handle;
 import tigase.xmpp.jid.JID;
 
 import java.util.LinkedHashSet;
@@ -877,6 +878,9 @@ public class Packet {
 	 * <code>false</code>
 	 */
 	public boolean isXMLNSStaticStr(String[] elementPath, String xmlns) {
+		if (Handle.ANY_XMLNS.equals(xmlns)) {
+			return true;
+		}
 		String this_xmlns = elem.getXMLNSStaticStr(elementPath);
 
 		return (this_xmlns == xmlns);

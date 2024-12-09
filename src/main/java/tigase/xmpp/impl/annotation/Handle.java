@@ -29,6 +29,8 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Handle {
 
+	String ANY_XMLNS = "*";
+
 	String[] path() default {};
 
 	String pathStr() default "";

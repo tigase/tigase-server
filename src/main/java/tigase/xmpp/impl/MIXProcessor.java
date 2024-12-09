@@ -17,6 +17,9 @@
  */
 package tigase.xmpp.impl;
 
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.db.UserRepository;
@@ -26,6 +29,7 @@ import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.PolicyViolationException;
 import tigase.server.xmppsession.SessionManager;
+import tigase.util.Algorithms;
 import tigase.util.Base64;
 import tigase.xml.Element;
 import tigase.xmpp.*;
@@ -46,6 +50,7 @@ import java.util.Queue;
 import java.util.function.Consumer;
 
 import static tigase.xmpp.impl.MIXProcessor.ID;
+import static tigase.xmpp.impl.Message.XMLNS;
 
 @Id(ID)
 @Bean(name = ID, parent = SessionManager.class, active = true)
@@ -53,7 +58,8 @@ import static tigase.xmpp.impl.MIXProcessor.ID;
 		@Handle(path = {Iq.ELEM_NAME, "client-join"}, xmlns = "urn:xmpp:mix:pam:2"),
 		@Handle(path = {Iq.ELEM_NAME, "client-leave"}, xmlns = "urn:xmpp:mix:pam:2"),
 		@Handle(path = {Iq.ELEM_NAME, "join"}, xmlns = "urn:xmpp:mix:core:1"),
-		@Handle(path = {Iq.ELEM_NAME, "leave"}, xmlns = "urn:xmpp:mix:core:1")
+		@Handle(path = {Iq.ELEM_NAME, "leave"}, xmlns = "urn:xmpp:mix:core:1"),
+		@Handle(path = {Message.ELEM_NAME, "event", "items", "retract"}, xmlns = Handle.ANY_XMLNS)
 })
 @DiscoFeatures({ ID })
 public class MIXProcessor
@@ -67,6 +73,7 @@ public class MIXProcessor
 	private static final RosterAbstract rosterUtil = RosterFactory.getRosterImplementation(true);
 
 	private static final EnumSet<StanzaType> RESPONSE_TYPES = EnumSet.of(StanzaType.result, StanzaType.error);
+	private static final String[] retractItemMessagePath = {Message.ELEM_NAME, "event", "items", "retract"};
 
 	@Override
 	public Authorization canHandle(Packet packet, XMPPResourceConnection conn) {
@@ -81,8 +88,12 @@ public class MIXProcessor
 				if (RESPONSE_TYPES.contains(packet.getType())) {
 					return packet.getStanzaTo() != null && packet.getStanzaTo().getResource() == null ? result : null;
 				} else {
-					// stanza is a request and for direct communication with MIX component so leave it..
-					return null;
+					if  (Message.ELEM_NAME.equals(packet.getElemName())) {
+						return packet.getElement().findChild(retractItemMessagePath) != null ? result : null;
+					} else {
+						// stanza is a request and for direct communication with MIX component so leave it..
+						return null;
+					}
 				}
 			}
 		}
@@ -193,6 +204,18 @@ public class MIXProcessor
 											   packet.getStanzaId(), actionElCopy, packet.getElement().findChild(el -> el.getName() == "error"), results::offer);
 								});
 					}
+				} else if (session != null && packet.getElemName() == Message.ELEM_NAME) {
+					BareJID userJID = packet.getStanzaTo().getBareJID();
+					JID channelJID = JID.jidInstance(channel);
+					var participantId = generateParticipantId(channelJID.getBareJID(), session.getBareJID());
+					var childStaticStr = packet.getElement().findChildStaticStr(retractItemMessagePath);
+					var retractedId = childStaticStr != null ? childStaticStr.getAttributeStaticStr("id") : null;
+					if (participantId != null && participantId.equals(retractedId)) {
+
+						results.addAll(
+							rosterUtil.removeJidFromRoster(userRepository, session == null ? null : session.getParentSession(),
+							                               userJID, channelJID));
+					}
 				} else {
 					throw new XMPPProcessorException(Authorization.BAD_REQUEST);
 				}
@@ -264,6 +287,21 @@ public class MIXProcessor
 			return Base64.encode(hash);
 		} catch (NoSuchAlgorithmException ex) {
 			throw new XMPPProcessorException(Authorization.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public static @Nullable String generateParticipantId(BareJID channelJID, BareJID participantRealJID) {
+		if (channelJID.getLocalpart() == null) {
+			throw new IllegalArgumentException("Channel JID `" + channelJID + "` must contain localpart!");
+		}
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA1");
+			md.update(channelJID.getDomain().getBytes(StandardCharsets.UTF_8));
+			md.update(participantRealJID.toString().getBytes(StandardCharsets.UTF_8));
+			md.update(channelJID.getLocalpart().getBytes(StandardCharsets.UTF_8));
+			return Algorithms.bytesToHex(md.digest());
+		} catch (NoSuchAlgorithmException e) {
+			return null;
 		}
 	}
 }
