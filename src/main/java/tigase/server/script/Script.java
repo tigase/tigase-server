@@ -79,7 +79,7 @@ public class Script
 			scriptEngine = scriptEngineManager.getEngineByExtension(ext);
 		}
 
-		if (!Packet.FULL_DEBUG && (scriptEngine instanceof Compilable)) {
+		if (scriptEngine instanceof Compilable) {
 			compiledScript = ((Compilable) scriptEngine).compile(script);
 		}
 
