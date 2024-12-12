@@ -81,6 +81,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.server.xmppsession.SessionManagerConfig.*;
+import static tigase.xmpp.StreamError.ResourceConstraint;
 import static tigase.xmpp.impl.StreamManagementInline.SESSION_RESUMPTION_ID_KEY;
 
 /**
@@ -451,16 +452,22 @@ public class SessionManager
 			if (session != null) {
 				int overlimit = session.getActiveResourcesSize() - getSingleUserConnectionsLimit();
 				if (overlimit > 0) {
-					session.getActiveResources().stream().sorted(Comparator.comparing(XMPPResourceConnection::getCreationTime)).limit(overlimit).forEach(connToStop -> {
-						connToStop.putSessionData(XMPPResourceConnection.ERROR_KEY, "resource-constraint");
-						try {
-							connToStop.logout();
-						} catch (NotAuthorizedException ex) {
-							// if it is not authorized, there is nothing we can do, but this should not happen
-							log.log(Level.CONFIG, "Exception during closing old connection, ignoring.", ex);
-						}
-						session.removeResourceConnection(connToStop);
-					});
+					session.getActiveResources()
+						.stream()
+						.sorted(Comparator.comparing(XMPPResourceConnection::getCreationTime))
+						.limit(overlimit)
+						.forEach(connToStop -> {
+							var errorElement = ResourceConstraint.prepareStreamErrorElement(
+								"Exceeded the limit of allowed connections");
+							connToStop.putSessionData(XMPPResourceConnection.ERROR_ELEMENT_KEY, errorElement);
+							try {
+								connToStop.logout();
+							} catch (NotAuthorizedException ex) {
+								// if it is not authorized, there is nothing we can do, but this should not happen
+								log.log(Level.CONFIG, "Exception during closing old connection, ignoring.", ex);
+							}
+							session.removeResourceConnection(connToStop);
+						});
 				}
 			}
 		}

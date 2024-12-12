@@ -57,6 +57,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static tigase.xmpp.StreamError.ResourceConstraint;
+
 /**
  * Class SessionManagerClusteredOld
  * <br>
@@ -195,10 +197,10 @@ public class SessionManagerClustered
 							try {
 								Packet cmd = Command.CLOSE.getPacket(getComponentId(), rec.getConnectionId(),
 																	 StanzaType.set, conn.nextStanzaId());
-								Element err_el = new Element("resource-constraint");
 
-								err_el.setXMLNS("urn:ietf:params:xml:ns:xmpp-streams");
-								cmd.getElement().getChild("command").addChild(err_el);
+								var errorElement = ResourceConstraint.prepareStreamErrorElement(
+									"Exceeded the limit of allowed connections");
+								cmd.getElement().getChild("command").addChild(errorElement);
 								fastAddOutPacket(cmd);
 							} catch (Exception ex) {
 
