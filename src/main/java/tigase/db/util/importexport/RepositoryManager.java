@@ -62,7 +62,7 @@ public class RepositoryManager {
 			.required(true)
 			.build();
 	private final CommandlineParameter IMPORT_FROM = new CommandlineParameter.Builder(null, "from").description(
-					"Path to omport data from")
+					"Path to import data from")
 			.required(true)
 			.build();
 	private final CommandlineParameter TDSL_CONFIG_FILE = new CommandlineParameter.Builder(null,
