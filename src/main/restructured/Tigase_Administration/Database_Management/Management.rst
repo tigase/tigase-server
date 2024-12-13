@@ -360,6 +360,6 @@ It will be stored and maintained in the file named ``<RDBMS_name>-common-schema-
 .. include:: Database_Preparation.inc
 .. include:: Hashed_User_Passwords_in_Database.inc
 .. include:: Multiple_Databases.inc
-.. include:: Importing_User_Data.inc
+.. include:: Importing_Exporting_User_Data.inc
 .. include:: Existing_Databases.inc
 .. include:: Schema_Updates.inc
