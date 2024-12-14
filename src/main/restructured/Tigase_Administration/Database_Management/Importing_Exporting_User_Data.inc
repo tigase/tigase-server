@@ -98,7 +98,7 @@ Now to import data to your repository you simply execute the command:
 
 That will import all data including data from MIX, MUC, and PubSub component as well as data specified in XEP-0227.
 
-*Note, if your data is located at a different place you will need to adjust ``--from`` parameter value.
+*Note, if your data is located at a different place you will need to adjust ``--from`` parameter value.*
 
 To list all of the options available for importing data (ie. allowing to import data from MIX, MUC, PubSub, or excluding MAM data), you should execute following command:
 
@@ -162,7 +162,7 @@ Now to export data from your repository you simply execute the command:
 
 That will export all data including data from MIX, MUC, and PubSub component as well as data specified in XEP-0227.
 
-*Note, you prefer exported data to be located in a different place you will need to adjust ``--to`` parameter value.
+*Note, you prefer exported data to be located in a different place you will need to adjust ``--to`` parameter value.*
 
 To list all of the options available for exporting data (ie. allowing to import data from MIX, MUC, PubSub, or excluding MAM data), you should execute following command:
 
