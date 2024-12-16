@@ -126,7 +126,7 @@ To list all of the options available for importing data (ie. allowing to import 
    		Path to Tigase XMPP Server config file (default: etc/config.tdsl)
 
    	--from=value,
-   		Path to omport data from
+   		Path to import data from
 
    	--debug,  (optional)
    		Enable verbose logging (default: false)
