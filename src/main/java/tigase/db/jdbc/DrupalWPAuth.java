@@ -17,6 +17,7 @@
  */
 package tigase.db.jdbc;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.Repository.Meta;
 import tigase.db.util.JDBCPasswordObfuscator;
@@ -46,6 +47,8 @@ import java.util.logging.Logger;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
 @Meta(supportedUris = {"jdbc:[^:]+:.*"})
+@Deprecated
+@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 public class DrupalWPAuth
 		implements AuthRepository, DataSourceAware<DataRepository> {
 
