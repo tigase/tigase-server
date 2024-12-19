@@ -14,7 +14,6 @@ To connect to tigase.org server we need to configure the program. Below are step
 
    |Psi Add Account|
 
-   **Note!** At the moment you can register an account through the Web site only. This is a single account for both services: The Drupal website and Jabber/XMPP service on the tigase.org domain. If you want to have a Jabber account on the tigase.org server go to the registration page, un-tick "Register new account", and go to the point no 5. You can use guide points 2-4 to register a Jabber account on any other Jabber server.
 
 2. When you press the Add button you will see next window where you can enter your Jabber account details:
 

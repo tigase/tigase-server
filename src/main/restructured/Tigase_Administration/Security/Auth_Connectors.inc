@@ -13,8 +13,6 @@ At the moment Tigase offers following authentication connectors:
 
 -  ``mysql``, ``pgsql``, ``derby`` - standard authentication connector used to load user login data from the main user database used by the Tigase server. In fact the same physical implementation is used for all JDBC databases.
 
--  ``drupal`` - is the authentication connector used to integrate the Tigase server with `Drupal CMS <http://drupal.org/>`__.
-
 -  ``tigase-custom`` - is the authentication connector which can be used with any database. Unlike the 'tigase-auth' connector it allows you to define SQL queries in the configuration file. The advantage of this implementation is that you don’t have to touch your database. You can use either simple plain SQL queries or stored procedures. The configuration is more difficult as you have to enter carefully all SQL queries in the config file and changing the query usually involves restarting the server. For more details about this implementation and all configuration parameters please refer to :ref:`Tigase Custom Auth documentation<custonAuthConnector>`.
 
 -  |ss| ``tigase-auth``\ |se|\  (**DEPRECATED**) - is the authentication connector which can be used with any database. It executes stored procedures to perform all actions. Therefore it is a very convenient way to integrate the server with an external database if you don’t want to expose the database structure. You just have to provide a set of stored procedures in the database. While implementing all stored procedures expected by the server might be a bit of work it allows you to hide the database structure and change the SP implementation at any time. You can add more actions on user login/logout without restarting or touching the server. And the configuration on the server side is very simple. For detailed description of this implementation please refer to :ref:`Tigase Auth documentation<tigaseAuthConnector>`.
@@ -35,21 +33,6 @@ As always the simplest way to configure the server is through the ``config.tdsl`
        }
    }
 
-For example if you store authentication data in a ``drupal`` database on ``localhost`` your settings would be:
-
-.. code::
-
-   dataSource {
-       'default-auth' () {
-           uri = 'jdbc:mysql://localhost/drupal?user=user&password=passwd'
-       }
-   }
-   authRepository {
-       default () {
-           'data-source' = 'default-auth'
-       }
-   }
-
 You have to use a class name if you want to attach your own authentication connector.
 
 Default is:
@@ -64,17 +47,7 @@ Default is:
 
 In the same exact way you can setup connector for any different database type.
 
-For example, drupal configuration is below
-
-.. code::
-
-   authRepository {
-       default {
-           cls = 'tigase.db.jdbc.DrupalWPAuth'
-       }
-   }
-
-Or tigase-custom authentication connector.
+For example, tigase-custom authentication connector.
 
 .. code::
 
@@ -85,8 +58,6 @@ Or tigase-custom authentication connector.
    }
 
 The different ``cls`` or classes are:
-
--  Drupal - ``tigase.db.jdbc.DrupalWPAuth``
 
 -  MySQL, Derby, PostgreSQL, MS SQL Server - ``tigase.db.jdbc.JDBCRepository``
 
@@ -116,7 +87,6 @@ If you are interested in even further customizing your authentication connector 
 
 .. include:: Auth_Connectors/Tigase_Auth_Connector.inc
 .. include:: Auth_Connectors/Custom_Auth_Connector.inc
-.. include:: Auth_Connectors/Drupal_Auth.inc
 .. include:: Auth_Connectors/LDAP_Auth.inc
 .. include:: Auth_Connectors/SASL_EXTERNAL.inc
 

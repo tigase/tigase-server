@@ -55,7 +55,7 @@ First, let’s define our default database for all VHosts
        }
    }
 
-Now, we have VHost: domain1.com User authentication data for this VHost is stored in Drupal database
+Now, we have VHost: domain1.com User authentication data for this VHost is stored in database
 
 .. code::
 

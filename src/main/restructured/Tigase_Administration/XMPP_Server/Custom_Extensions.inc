@@ -69,10 +69,6 @@ Repositories/Databases
    +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | ✓       | JDBC          | Support for all JDBC enabled databases, although the database schemas are available for some databases                                                                  |
    +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | ✓       | Drupal Auth   | Drupal authentication - the Tigase server can share user authentication database with Drupal CMS and authenticate users agains Drupal user database                     |
-   +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | ✓       | Drupal Auth   | Close integration with Drupal CMS, the Tigase can send notifications to subscribed users about new posts, comments and can also publish short news information via XMPP |
-   +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | ✓       | LDAP-Auth     | LDAP Authentication Connector Supported                                                                                                                                 |
    +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 

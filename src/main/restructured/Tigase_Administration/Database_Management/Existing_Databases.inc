@@ -36,69 +36,6 @@ Start the server using following command:
 
    ./scripts/tigase.sh start etc/tigase.conf
 
-Integrating Tigase Server with Drupal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-First of all, Tigase can authenticate users against a Drupal database which means you have the same user account for both Drupal website and the XMPP server. Moreover in such a configuration all account management is done via Drupal web interface like account creation, password change update user details and so on. Administrator can temporarily disable user account and this is followed by Tigase server too.
-
-Connecting to Drupal Database
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The best way to setup Tigase with Drupal database is via the ``config.tdsl`` file where you can put initial setting for Tigase configuration.
-
-If you look in ``etc/`` directory of your Tigase installation you should find a the file there.
-
-All you need to connect to Drupal database is set the following:
-
-.. code::
-
-   dataSource {
-       'default-auth' () {
-           uri = 'jdbc:mysql://localhost/drupal?user=drupalusr&password=drupalpass'
-       }
-   }
-   authRepository {
-       default () {
-           cls = 'tigase.db.jdbc.DrupalWPAuth'
-           'data-source' = 'default-auth'
-       }
-   }
-
-Typically, you will need to have drupal for authentication, and another for user repository. In this case, we will use SQL for user DB.
-
-.. code::
-
-   dataSource {
-       default () {
-           uri = 'jdbc:mysql://localhost/tigasedb?user=tigase_user&password=mypass'
-       }
-       'default-auth' () {
-           uri = 'jdbc:mysql://localhost/drupal?user=drupalusr&password=drupalpass'
-       }
-   }
-   userRepository {
-       default () {}
-   }
-   authRepository {
-       default () {
-           cls = 'tigase.db.jdbc.DrupalWPAuth'
-           'data-source' = 'default-auth'
-       }
-   }
-
-In theory you can load Tigase database schema to Drupal database and then both ``db-uris`` would have the same database connection string. More details about setting up and connecting to MySQL database can be found in the :ref:`MySQL guide<Prepare-the-MySQL-Database-for-the-Tigase-Server>`.
-
-Now run the Tigase server.
-
-.. code:: sh
-
-   ./scripts/tigase.sh start etc/tigase.conf
-
-Now you can register an account on your Drupal website and connect with an XMPP client using the account details.
-
-.. Note::
-
-   You have to enable plain password authentication in your XMPP client to connect to Tigase server with Drupal database.
 
 PostgreSQL Database Use
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
