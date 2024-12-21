@@ -80,6 +80,24 @@ This sets the default timeout to 90 seconds. You may, if you choose, specify a m
 
 Available since v7.1.0
 
+It is also possible to configure max queue size of unacknowledged packages, burst period, and burst period ratio limit. By default max queue size is set to ``2000``, burst period to ``30`` (seconds), and burst ratio to ``20``. That means that for we limit no. of unacked packages to ``2000``, but for a short period of time (``30`` seconds) we allow this queue to be ``20`` times larger, ie. to allow MAM packets burst during MAM sync to complete successfully without hitting queue size limit.
+
+.. code::
+
+   c2s {
+       'urn:xmpp:sm:3' {
+           'max-resumption-queue-size' = 2000
+           'max-resumption-queue-size-burst-period' = 30
+           'max-resumption-queue-size-burst-ratio' = 20
+       }
+   }
+
+.. Note::
+
+   If you wish to disable burst mechanism, please set burst ratio to ``0``.
+
+Available since v8.5.0
+
 Packet Redelivery
 ^^^^^^^^^^^^^^^^^^^^^
 

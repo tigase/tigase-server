@@ -28,6 +28,7 @@ import tigase.xml.Element;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -233,4 +234,62 @@ public class StreamManagementIOProcessorTest
 		Thread.sleep(21);
 		assertTrue("Request for ACK should be sent as over 20ms passed", processor.shouldRequestAck(null, outQueue));
 	}
+
+	@Test
+	public void testBurstLimitPeriodRatio() throws TigaseStringprepException {
+		OutQueue outQueue = new OutQueue();
+		Packet packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		boolean result = outQueue.append(packet, 1, 1, 1, 2);
+		assertTrue(result);
+		packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		result = outQueue.append(packet, 1, 1, 1, 2);
+		assertTrue(result);
+		packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		result = outQueue.append(packet, 1, 1, 1, 2);
+		assertFalse(result);
+	}
+
+	@Test
+	public void testBurstLimitPeriod_Disabled() throws TigaseStringprepException {
+		OutQueue outQueue = new OutQueue();
+		Packet packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		boolean result = outQueue.append(packet, 1, 1, 0, 1);
+		assertTrue(result);
+		packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		result = outQueue.append(packet, 1, 1, 0, 1);
+		assertFalse(result);
+	}
+
+	@Test
+	public void testBurstLimitPeriod_1second() throws TigaseStringprepException, InterruptedException {
+		AtomicLong time = new AtomicLong();
+		OutQueue outQueue = new OutQueue(time::get);
+		time.set(System.currentTimeMillis());
+		Packet packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		boolean result = outQueue.append(packet, 1, 1, 1, 1);
+		assertTrue(result);
+		time.set(time.longValue() + 1000);
+		packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		result = outQueue.append(packet, 1, 1, 1, 1);
+		assertFalse(result);
+	}
+
+	@Test
+	public void testBurstLimitPeriod_2seconds() throws TigaseStringprepException, InterruptedException {
+		AtomicLong time = new AtomicLong();
+		OutQueue outQueue = new OutQueue(time::get);
+		time.set(System.currentTimeMillis());
+		Packet packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		boolean result = outQueue.append(packet, 1, 1, 2, 2);
+		assertTrue(result);
+		time.set(time.longValue() + 1000);
+		packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		result = outQueue.append(packet, 1, 1, 2, 2);
+		assertTrue(result);
+		time.set(time.longValue() + 1000);
+		packet = Packet.packetInstance(new Element("message").withElement("body", null, UUID.randomUUID().toString()));
+		result = outQueue.append(packet, 1, 1, 2, 2);
+		assertFalse(result);
+	}
+
 }

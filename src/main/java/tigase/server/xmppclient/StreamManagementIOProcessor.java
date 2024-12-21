@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.*;
+import java.util.function.LongSupplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -105,6 +106,10 @@ public class StreamManagementIOProcessor
 	private int resumption_timeout = 60;
 	@ConfigField(desc = "Max allowed queue size of unacked packets", alias = "max-resumption-queue-size")
 	private int max_queue_size = 2000;
+	@ConfigField(desc = "Maximal burst period for queue size", alias = "max-resumption-queue-size-burst-period")
+	private int max_resumption_queue_burst_period = 60;
+	@ConfigField(desc = "Maximal burst queue size ratio", alias = "max-resumption-queue-size-burst-ratio")
+	private int max_resumption_queue_burst_ratio = 20;
 	@ConfigField(desc = "Time since last ack received or ack request sent before which ack request should not be sent", alias = ACK_REQUEST_MIN_DELAY_KEY)
 	private long ack_request_min_delay = 200l;
 
@@ -289,7 +294,8 @@ public class StreamManagementIOProcessor
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Queuing StreamManagement packet: {1}, queue size: {2} [{0}]", new Object[]{service, packet, outQueue.waitingForAck()});
 			}
-			if (!outQueue.append(packet, max_queue_size, max_resumption_timeout)) {
+			if (!outQueue.append(packet, max_queue_size, max_resumption_timeout, max_resumption_queue_burst_period,
+								 max_resumption_queue_burst_ratio)) {
 				// it is too long without confirmation or queue is too big, we need to cancel this connection.
 				try {
 					service.getSessionData().put(RESUMPTION_TIMEOUT_START_KEY, 0L);
@@ -790,6 +796,15 @@ public class StreamManagementIOProcessor
 		private long lastRequestSentAt = 0;
 		private int lastRequestSentFor = 0;
 		private int ackRequestCount = DEF_ACK_REQUEST_COUNT_VAL;
+		private final LongSupplier timestampSupplier;
+
+		public OutQueue() {
+			this(System::currentTimeMillis);
+		}
+
+		protected OutQueue(LongSupplier timestampSupplier) {
+			this.timestampSupplier = timestampSupplier;
+		}
 		
 		/**
 		 * Method determines if we should check packets for falling within timeout. Currently we only check
@@ -814,27 +829,46 @@ public class StreamManagementIOProcessor
 		public boolean append(Packet packet, int timeoutInSec) {
 			return append(packet, Integer.MAX_VALUE, timeoutInSec);
 		}
-		
+
 		/**
 		 * Append packet to waiting for ack queue
 		 *
 		 */
+		@Deprecated
+		@TigaseDeprecated(removeIn = "9.0.0", since = "8.2.0", note = "Use method with maxQueueSize")
 		public boolean append(Packet packet, int maxQueueSize, int timeoutInSec) {
+			return append(packet, maxQueueSize, timeoutInSec, 0, 1);
+		}
+
+		/**
+		 * Append packet to waiting for ack queue
+		 *
+		 */
+		public boolean append(Packet packet, int maxQueueSize, int timeoutInSec, int burstPeriodInSec, int burstRatio) {
 			if (!packet.wasProcessedBy(XMLNS)) {
 
+				long currentTimeMillis = timestampSupplier.getAsLong();
 				// check if queue size does not exceed limit
-				if (queue.size() > maxQueueSize) {
-					return false;
+				if (queue.size() >= maxQueueSize) {
+					Entry first = queue.peekFirst();
+					Long period = first != null ? currentTimeMillis - first.stamp : null;
+					// queue is exceeded, but we should allow burst, ie. during reconnection
+					if (log.isLoggable(Level.FINEST)) {
+						log.finest(() -> "Queue size exceeded maxQueueSize: " + maxQueueSize + ", current size: " + queue.size() + ", period: " + period + "ms" + ", burst period: " + burstPeriodInSec + ", burst ratio: " + burstRatio);
+					}
+					if (period == null || period > ((long) burstPeriodInSec * 1000) || queue.size() >= (maxQueueSize * burstRatio)) {
+						return false;
+					}
 				}
 
 				if (shouldCheckTimeout()) {
 					Entry first = queue.peekFirst();
-					if (first != null && (System.currentTimeMillis() - first.stamp > ((long)timeoutInSec * 1000))) {
+					if (first != null && (currentTimeMillis - first.stamp > ((long)timeoutInSec * 1000))) {
 						return false;
 					}
 				}
 				packet.processedBy(XMLNS);
-				queue.offer(new Entry(packet));
+				queue.offer(new Entry(packet, timestampSupplier));
 				totalQueueSize.incrementAndGet();
 				inc();
 				return true;
@@ -853,7 +887,7 @@ public class StreamManagementIOProcessor
 				count = (Integer.MAX_VALUE - value) + get() + 1;
 			}
 
-			lastConfirmationAt = System.currentTimeMillis();
+			lastConfirmationAt = timestampSupplier.getAsLong();
 
 			while (count < queue.size()) {
 				queue.poll();
@@ -865,7 +899,7 @@ public class StreamManagementIOProcessor
 		 * Method notifies class that request for ack is being sent
 		 */
 		public void sendingRequest() {
-			lastRequestSentAt = System.currentTimeMillis();
+			lastRequestSentAt = timestampSupplier.getAsLong();
 			lastRequestSentFor = get();
 		}
 
@@ -937,10 +971,15 @@ public class StreamManagementIOProcessor
 		public static class Entry {
 
 			private final Packet packet;
-			private final long stamp = System.currentTimeMillis();
+			private final long stamp;
 
 			public Entry(Packet packet) {
+				this(packet, System::currentTimeMillis);
+			}
+
+			protected Entry(Packet packet, LongSupplier stampSupplier) {
 				this.packet = packet;
+				this.stamp = stampSupplier.getAsLong();
 			}
 
 			public Packet getPacketWithStamp() {
