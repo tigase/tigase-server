@@ -28,6 +28,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Command;
 import tigase.server.Packet;
+import tigase.server.Priority;
 import tigase.server.xmppsession.SessionManager;
 import tigase.util.Base64;
 import tigase.xml.Element;
@@ -386,6 +387,7 @@ public class SaslAuth2 extends SaslAuthAbstract
 				return CompletableFuture.failedFuture(ex);
 			}
 		}).thenAccept(resultPacket -> {
+			resultPacket.setPriority(Priority.HIGH);
 			sessionManager.addOutPacket(resultPacket);
 			// we need to send new stream features, so lets request them from SM and send result directly to C2S
 			Packet getFeaturesCmd = Command.GETFEATURES.getPacket(packet.getFrom(), packet.getTo(), StanzaType.get,
