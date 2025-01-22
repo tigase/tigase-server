@@ -34,6 +34,7 @@ import tigase.util.Base64;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.jid.BareJID;
+import tigase.xmpp.jid.JID;
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.sasl.Sasl;
@@ -46,7 +47,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static tigase.auth.XmppSaslException.*;
+import static tigase.auth.XmppSaslException.SaslError;
 
 @Bean(name = SaslAuth2.ID, parent = SessionManager.class, active = false)
 public class SaslAuth2 extends SaslAuthAbstract
@@ -367,7 +368,7 @@ public class SaslAuth2 extends SaslAuthAbstract
 								success.addChild(r.element);
 							}
 							if (r.shouldContinue) {
-								return inline.process(session, child);
+								return inline.process(session, null, child);
 							} else {
 								return CompletableFuture.completedFuture(new Inline.Result(null, false));
 							}
@@ -396,6 +397,9 @@ public class SaslAuth2 extends SaslAuthAbstract
 			getFeaturesCmd.setPacketTo(packet.getPacketTo());
 			sessionManager.addOutPacket(getFeaturesCmd);
 		}).exceptionally(ex -> {
+			if (log.isLoggable(Level.WARNING)) {
+				log.log(Level.WARNING, "SASL2 inline processing failed with exception:", ex);
+			}
 			sessionManager.addOutPacket(createSaslErrorResponse(
 					SaslError.not_authorized, ex.getMessage(), packet));
 			return (Void) null;
@@ -430,7 +434,7 @@ public class SaslAuth2 extends SaslAuthAbstract
 
 		Element[] supStreamFeatures(Inline.Action action);
 
-		CompletableFuture<Result> process(XMPPResourceConnection session, Element action);
+		CompletableFuture<Result> process(XMPPResourceConnection session, JID boundJID, Element action);
 
 		public static class Result {
 			public final Element element;

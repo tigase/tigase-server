@@ -276,10 +276,10 @@ public class MessageCarbons
 	}
 
 	@Override
-	public CompletableFuture<Result> process(XMPPResourceConnection session, Element action) {
+	public CompletableFuture<Result> process(XMPPResourceConnection session, JID boundJID, Element action) {
 		if (action.getName() == "enable" && action.getXMLNS() == XMLNS) {
 			try {
-				setEnabled(session, true);
+				setEnabled(session, boundJID, true);
 				return CompletableFuture.completedFuture(new Result(new Element("enabled", new String[]{"xmlns"}, new String[]{XMLNS}), true));
 			} catch (NotAuthorizedException ex) {
 				return CompletableFuture.failedFuture(ex);
@@ -478,13 +478,17 @@ public class MessageCarbons
 	 * Add/Remove session JID to set of JIDs with enabled carbon copy protocol
 	 */
 	private void setEnabled(XMPPResourceConnection session, boolean value) throws NotAuthorizedException {
+		setEnabled(session, session.getJID(), value);
+	}
+
+	private void setEnabled(XMPPResourceConnection session, JID boundJID, boolean value) throws NotAuthorizedException {
 		session.putSessionData(ENABLED_KEY, value);
 
 		if (log.isLoggable(Level.FINER)) {
 			log.log(Level.FINER, "session = {0}" + " enabling " + XMLNS, session);
 		}
 
-		MessageCarbonsStateChangedEvent event = new MessageCarbonsStateChangedEvent(session.getJID(), session.getJID()
+		MessageCarbonsStateChangedEvent event = new MessageCarbonsStateChangedEvent(boundJID, session.getJID()
 				.copyWithoutResource(), session.getParentSession());
 		event.add(session.getJID(), value);
 		eventBus.fire(event);

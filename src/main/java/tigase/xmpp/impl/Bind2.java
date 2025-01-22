@@ -27,6 +27,7 @@ import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.NotAuthorizedException;
 import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.jid.JID;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -86,7 +87,7 @@ public class Bind2 implements SaslAuth2.Inline {
 		return new Element[]{bind};
 	}
 
-	public CompletableFuture<Result> process(XMPPResourceConnection session, Element action) {
+	public CompletableFuture<Result> process(XMPPResourceConnection session, JID _jid, Element action) {
 		if (session == null) {
 			return CompletableFuture.failedFuture(new ComponentException(Authorization.UNEXPECTED_REQUEST));
 		}    // end of if (session == null)
@@ -112,8 +113,42 @@ public class Bind2 implements SaslAuth2.Inline {
 				md.update(UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8));
 			}
 			resourceBuilder.append(Base64.encode(md.digest()), 0, 12);
+			JID boundJID = session.getJID().copyWithResource(resourceBuilder.toString());
+
+			Element response = new Element("bound");
+			response.setXMLNS(XMLNS);
+
+			CompletableFuture<SaslAuth2.Inline.Result> result = CompletableFuture.completedFuture(new SaslAuth2.Inline.Result(null, true));
+			List<Element> features = action.getChildren();
+			if (features != null) {
+				for (Element feature : features) {
+					for (SaslAuth2.Inline inline : inlines) {
+						if (inline.canHandle(session, feature)) {
+							result = result.thenCompose(r -> {
+								if (r.element != null) {
+									response.addChild(r.element);
+								}
+								if (r.shouldContinue) {
+									return inline.process(session, boundJID, feature);
+								} else {
+									return CompletableFuture.completedFuture(new SaslAuth2.Inline.Result(null, false));
+								}
+							});
+						}
+					}
+				}
+			}
+			
 			session.setResource(resourceBuilder.toString());
 			session.putSessionData(SESSION_KEY, "true");
+
+			return result.thenApply(r -> {
+				if (r.element != null) {
+					response.addChild(r.element);
+				}
+				return new Result(response, true);
+			});
+
 		} catch (NotAuthorizedException ex) {
 			return CompletableFuture.failedFuture(new ComponentException(Authorization.NOT_AUTHORIZED));
 		} catch (TigaseStringprepException ex) {
@@ -122,37 +157,6 @@ public class Bind2 implements SaslAuth2.Inline {
 		} catch (NoSuchAlgorithmException e) {
 			return CompletableFuture.failedFuture(new ComponentException(Authorization.INTERNAL_SERVER_ERROR));
 		}
-
-		Element response = new Element("bound");
-		response.setXMLNS(XMLNS);
-
-		CompletableFuture<SaslAuth2.Inline.Result> result = CompletableFuture.completedFuture(new SaslAuth2.Inline.Result(null, true));
-		List<Element> features = action.getChildren();
-		if (features != null) {
-			for (Element feature : features) {
-				for (SaslAuth2.Inline inline : inlines) {
-					if (inline.canHandle(session, feature)) {
-						result = result.thenCompose(r -> {
-							if (r.element != null) {
-								response.addChild(r.element);
-							}
-							if (r.shouldContinue) {
-								return inline.process(session, feature);
-							} else {
-								return CompletableFuture.completedFuture(new SaslAuth2.Inline.Result(null, false));
-							}
-						});
-					}
-				}
-			}
-		}
-
-		return result.thenApply(r -> {
-			if (r.element != null) {
-				response.addChild(r.element);
-			}
-			return new Result(response, true);
-		});
 	}
 
 	private String parseTag(Element action) {

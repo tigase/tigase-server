@@ -27,10 +27,8 @@ import tigase.server.xmppclient.StreamManagementCommand;
 import tigase.server.xmppclient.StreamManagementIOProcessor;
 import tigase.server.xmppsession.SessionManager;
 import tigase.xml.Element;
-import tigase.xmpp.Authorization;
-import tigase.xmpp.NoConnectionIdException;
-import tigase.xmpp.StanzaType;
-import tigase.xmpp.XMPPResourceConnection;
+import tigase.xmpp.*;
+import tigase.xmpp.jid.JID;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -63,7 +61,7 @@ public class StreamManagementInline
 		};
 	}
 
-	public CompletableFuture<Result> process(XMPPResourceConnection session, Element action) {
+	public CompletableFuture<Result> process(XMPPResourceConnection session, JID boundJID, Element action) {
 		return switch (action.getName()) {
 			case "resume" -> resumeSession(session, action);
 			case "enable" -> enable(session, action);
