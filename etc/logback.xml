@@ -58,10 +58,10 @@ logging () {
     </appender>
 
     <!-- Offers higher throughput but Method name won't be available in logs, enabled in appender-ref -->
-    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="FILE" />
-        <queueSize>1024</queueSize>
-    </appender>
+    <!--<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">-->
+    <!--    <appender-ref ref="FILE" />-->
+    <!--    <queueSize>1024</queueSize>-->
+    <!--</appender>-->
 
     <!-- possible levels (TRACE, DEBUG, INFO, WARN and ERROR) -->
     <!-- Mappings to JUL levels are described in http://www.slf4j.org/api/org/slf4j/bridge/SLF4JBridgeHandler.html  -->
