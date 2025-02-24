@@ -1013,6 +1013,8 @@ public class JDBCRepository
 				}    // end of if (isnext) else
 			} catch (SQLException ex) {
 				if (isExceptionKeyViolation(ex)) {
+					// remove entry from cache as if cache was enabled and we ended here it may have incorrect value
+					cache.remove(user_id.toString());
 					throw new UserExistsException(user_id, "User already exist in the database", ex);
 				} else {
 					throw ex;
