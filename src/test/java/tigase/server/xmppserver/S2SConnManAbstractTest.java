@@ -57,7 +57,7 @@ import static tigase.net.IOService.CERT_CHECK_RESULT;
 public class S2SConnManAbstractTest
 		extends SSLTestAbstract {
 
-	protected static Kernel kernel;
+	public static Kernel kernel;
 	private static CID cid;
 	private static S2SConnManTest.S2SConnectionHandlerImpl handler = null;
 
@@ -377,7 +377,7 @@ public class S2SConnManAbstractTest
 		}
 	}
 
-	private static class fastCIDConnections
+	public static class fastCIDConnections
 			extends CIDConnections {
 
 		private final CID cid;

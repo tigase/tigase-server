@@ -48,6 +48,9 @@ public class AuthenticatorSelectorManager
 
 	private Map<String, AtomicInteger> failedAuthenticationDomains = new ConcurrentHashMap<>();
 
+	@Inject
+	private KnownDomainsListProvider knownDomainsListProvider;
+
 	public AuthenticatorSelectorManager() {}
 
 	/**
@@ -100,6 +103,8 @@ public class AuthenticatorSelectorManager
 		log.log(Level.FINE, "Authenticating connection [{0}]", new Object[]{serv});
 		serv.getSessionData().remove(S2S_METHOD_USED);
 		cid_conns.connectionAuthenticated(serv, cidPacket);
+
+		knownDomainsListProvider.addRemoteDomain(cidPacket.getRemoteHost());
 	}
 
 	@Override
