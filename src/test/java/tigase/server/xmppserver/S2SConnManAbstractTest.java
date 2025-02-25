@@ -87,6 +87,7 @@ public class S2SConnManAbstractTest
 		kernel.registerBean(CertificateContainer.class).exportable().exec();
 		kernel.registerBean(StartTLS.class).exportable().exec();
 		kernel.registerBean(DummyDialbackImpl.class).exportable().setActive(true).exec();
+		kernel.registerBean(KnownDomainsListProvider.class).exportable().setActive(true).exec();
 		kernel.registerBean(AuthenticatorSelectorManager.class).exportable().setActive(true).exec();
 		kernel.registerBean("vHostManager")
 				.asClass(DummyVHostManager.class)

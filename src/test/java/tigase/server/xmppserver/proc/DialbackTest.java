@@ -304,6 +304,7 @@ public class DialbackTest
 		kernel.registerBean(ConnectionManager.PortsConfigBean.class).exec();
 		kernel.registerBean(CIDConnections.CIDConnectionsOpenerService.class).exportable().exec();
 		kernel.registerBean(S2SRandomSelector.class).exportable().exec();
+		kernel.registerBean(KnownDomainsListProvider.class).exportable().setActive(true).exec();
 		kernel.registerBean(AuthenticatorSelectorManager.class).exportable().exec();
 		kernel.registerBean(DialbackImpl.class).exportable().exec();
 		kernel.registerBean(CertificateContainer.class).exportable().exec();
