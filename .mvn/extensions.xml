@@ -31,6 +31,13 @@
         <groupId>com.soebes.maven.extensions</groupId>
         <artifactId>maven-buildtime-profiler</artifactId>
         <version>0.2.0</version>
-      </extension>
+    </extension>
+
+    <extension>
+        <!-- requires enabling during execution: `-Dprofile -DprofileFormat=JSON,HTML` -->
+        <groupId>fr.jcgay.maven</groupId>
+        <artifactId>maven-profiler</artifactId>
+        <version>3.2</version>
+    </extension>
 </extensions>
 
