@@ -465,7 +465,7 @@ public abstract class IOService<RefObject>
 	public String toString() {
 		// there is no need to include connectionId here as it's passed to socket in
 		// tigase.net.IOService.setConnectionId and included from there
-		return getClass().getSimpleName() + ", UniqueId: " + getUniqueId() + ", type: " + connectionType.toStringPretty() + ", " + socketIO;
+		return getClass().getSimpleName() + ", UniqueId: " + getUniqueId() + ", type: " + (connectionType != null ? connectionType.toStringPretty() : null) + ", " + socketIO;
 	}
 
 	public boolean waitingToRead() {
