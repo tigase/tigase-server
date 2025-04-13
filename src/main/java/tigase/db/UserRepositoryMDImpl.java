@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import org.jspecify.annotations.NonNull;
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.beans.MDPoolBeanWithStatistics;
 import tigase.db.beans.UserRepositoryMDPoolBean;
@@ -130,6 +131,25 @@ public abstract class UserRepositoryMDImpl
 		}
 
 		return null;
+	}
+
+	@Override
+	public Map<BareJID, String> getDataMap(@NonNull String key) throws UserNotFoundException, TigaseDBException {
+		try {
+			return repositoriesStream().sequential().flatMap(userRepository -> {
+				try {
+					return userRepository.getDataMap(key).entrySet().stream();
+				} catch (TigaseDBException e) {
+					throw new RuntimeException(e);
+				}
+			}).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		} catch (RuntimeException ex) {
+			Throwable cause = ex.getCause();
+			if (cause instanceof TigaseDBException) {
+				throw new TigaseDBException("Could not retrieve list of users", cause);
+			}
+			throw ex;
+		}
 	}
 
 	@Override

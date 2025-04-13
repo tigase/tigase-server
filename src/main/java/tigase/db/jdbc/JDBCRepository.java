@@ -17,6 +17,7 @@
  */
 package tigase.db.jdbc;
 
+import org.jspecify.annotations.NonNull;
 import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.util.JDBCPasswordObfuscator;
@@ -92,6 +93,10 @@ public class JDBCRepository
 			"select pval from " + DEF_PAIRS_TBL + " where (nid = ?) AND (pkey = ?)";
 	private static final String KEYS_DATA_FOR_NODE_QUERY =
 			"select pkey, pval from " + DEF_PAIRS_TBL + " where (nid = ?)";
+	private static final String USER_KEY_VALUE_MAP_QUERY =
+			"select " + DEF_USERS_TBL + ".user_id, " + DEF_PAIRS_TBL + ".pval from " + DEF_PAIRS_TBL +
+				" left join " + DEF_USERS_TBL + " on " + DEF_USERS_TBL + ".uid = " + DEF_PAIRS_TBL + ".uid" +
+				" where (pkey = ?)";
 
 	private static final String UPDATE_LAST_LOGIN_QUERY =
 			"update " + DEF_USERS_TBL + " set last_login=? where user_id=?";
@@ -182,6 +187,41 @@ public class JDBCRepository
 	@Override
 	public String getData(BareJID user_id, final String key) throws UserNotFoundException, TigaseDBException {
 		return getData(user_id, null, key, null);
+	}
+
+	@Override
+	public Map<BareJID, String> getDataMap(@NonNull String key) throws UserNotFoundException, TigaseDBException {
+		Objects.requireNonNull(key);
+
+		log.log(Level.FINEST, "Searching for key: {0}", key);
+		try {
+			ResultSet rs = null;
+
+			PreparedStatement user_key_value_map = data_repo.getPreparedStatement(null, USER_KEY_VALUE_MAP_QUERY);
+
+			synchronized (user_key_value_map) {
+				try {
+					Map<BareJID, String> results = new HashMap<>();
+
+					user_key_value_map.setString(1, key);
+					rs = user_key_value_map.executeQuery();
+					while (rs.next()) {
+						String user = rs.getString(1);
+						String value = rs.getString(2);
+						log.log(Level.FINEST, () -> "Found data: " + user + ": " + value);
+						if (user != null) {
+							results.put(BareJID.bareJIDInstanceNS(user), value);
+						}
+					}
+					return results;
+				} finally {
+					data_repo.release(null, rs);
+				}
+			}
+		} catch (SQLException e) {
+			throw new TigaseDBException("Error getting user mapped data for: " + key, e);
+		}
+
 	}
 
 	@Override
@@ -534,6 +574,7 @@ public class JDBCRepository
 			data_repo.initPreparedStatement(DATA_FOR_NODE_QUERY, DATA_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(KEYS_FOR_NODE_QUERY, KEYS_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(KEYS_DATA_FOR_NODE_QUERY, KEYS_DATA_FOR_NODE_QUERY);
+			data_repo.initPreparedStatement(USER_KEY_VALUE_MAP_QUERY, USER_KEY_VALUE_MAP_QUERY);
 			data_repo.initPreparedStatement(NODES_FOR_NODE_QUERY, NODES_FOR_NODE_QUERY);
 			data_repo.initPreparedStatement(INSERT_KEY_VAL_QUERY, INSERT_KEY_VAL_QUERY);
 			data_repo.initPreparedStatement(REMOVE_KEY_DATA_QUERY, REMOVE_KEY_DATA_QUERY);

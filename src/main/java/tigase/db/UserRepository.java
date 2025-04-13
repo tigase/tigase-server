@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import org.jspecify.annotations.NonNull;
 import tigase.annotations.TigaseDeprecated;
 import tigase.eventbus.EventBusEvent;
 import tigase.xmpp.jid.BareJID;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -152,6 +154,26 @@ public interface UserRepository
 			return data;
 		}
 		return Collections.emptyMap();
+	}
+
+	/**
+	 * @param key key for which return of map of users and values corresponding to the value
+	 *
+	 * @return a <code>Map</code> with user JID as key and value corresponding to the key passed as parameter
+	 *
+	 * @throws UserNotFoundException if user id hasn't been found in repository.
+	 * @throws TigaseDBException if database backend error occurs.
+	 */
+	default Map<BareJID, String> getDataMap(@NonNull String key) throws UserNotFoundException, TigaseDBException {
+		Objects.requireNonNull(key);
+		Map<BareJID, String> result = new HashMap<>();
+		for (BareJID user : getUsers()) {
+			var userDataForKey = getData(user, key);
+			if (userDataForKey != null) {
+				result.put(user, userDataForKey);
+			}
+		}
+		return result;
 	}
 
 	/**

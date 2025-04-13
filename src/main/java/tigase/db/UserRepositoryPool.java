@@ -17,6 +17,7 @@
  */
 package tigase.db;
 
+import org.jspecify.annotations.NonNull;
 import tigase.annotations.TigaseDeprecated;
 import tigase.util.cache.SimpleCache;
 import tigase.xmpp.jid.BareJID;
@@ -159,6 +160,22 @@ public class UserRepositoryPool
 		if (repo != null) {
 			try {
 				return repo.getDataMap(user, subnode);
+			} finally {
+				addRepo(repo);
+			}
+		} else {
+			log.log(Level.WARNING, "repo is NULL, pool empty? - {0}", repoPool.size());
+		}
+		return null;
+	}
+
+	@Override
+	public Map<BareJID, String> getDataMap(@NonNull String key) throws UserNotFoundException, TigaseDBException {
+		UserRepository repo = takeRepo();
+
+		if (repo != null) {
+			try {
+				return repo.getDataMap(key);
 			} finally {
 				addRepo(repo);
 			}
