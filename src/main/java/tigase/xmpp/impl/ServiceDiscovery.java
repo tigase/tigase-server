@@ -19,22 +19,26 @@ package tigase.xmpp.impl;
 
 import tigase.component.modules.impl.AdHocCommandModule;
 import tigase.db.NonAuthUserRepository;
+import tigase.db.TigaseDBException;
+import tigase.db.UserRepository;
+import tigase.db.services.AccountExpirationService;
 import tigase.disco.XMPPServiceCollector;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.server.Command;
+import tigase.server.DataForm;
 import tigase.server.Iq;
 import tigase.server.Packet;
 import tigase.server.xmppsession.SessionManager;
+import tigase.util.datetime.TimestampHelper;
 import tigase.vhosts.VHostManagerIfc;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.jid.JID;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,6 +63,7 @@ public class ServiceDiscovery
 	private static final Element[] DISCO_FEATURES = {
 			new Element("feature", new String[]{"var"}, new String[]{XMPPServiceCollector.INFO_XMLNS}),
 			new Element("feature", new String[]{"var"}, new String[]{XMPPServiceCollector.ITEMS_XMLNS})};
+	private static final TimestampHelper timestampHelper = new TimestampHelper();
 
 	@Inject(nullAllowed = true)
 	private AccountServiceProvider serviceProvider;
@@ -69,6 +74,8 @@ public class ServiceDiscovery
 	private VHostManagerIfc vhostManager;
 	@Inject
 	private AdHocCommandModule adHocCommandModule;
+	@Inject
+	private UserRepository userRepository;
 	
 	@Override
 	public String id() {
@@ -260,6 +267,22 @@ public class ServiceDiscovery
 					features.forEach(query::addChild);
 				}
 				sessionManager.getDiscoFeatures(result.getStanzaFrom()).forEach(query::addChild);
+				try {
+					Optional.ofNullable(userRepository.getData(result.getStanzaFrom().getBareJID(),
+															   AccountExpirationService.ACCOUNT_EXPIRATION_DATE))
+							.map(LocalDate::parse)
+							.ifPresent(expirationDate -> {
+								Element x = new DataForm.Builder(Command.DataType.result).withFields(builder -> {
+									builder.withField(DataForm.FieldType.Hidden, "FORM_TYPE", field -> {
+										field.setValue("tigase:disco:account:0");
+									})
+											.withField(DataForm.FieldType.TextSingle, "expiration-date", field -> field.setValue(expirationDate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+								}).build();
+								query.addChild(x);
+							});
+				} catch (TigaseDBException e) {
+					log.log(Level.SEVERE, "Failed to retrieve account " + result.getStanzaFrom() + " expiration date", e);
+				}
 			}
 		}
 	}
