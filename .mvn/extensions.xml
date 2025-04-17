@@ -30,7 +30,7 @@
     <extension>
         <groupId>com.soebes.maven.extensions</groupId>
         <artifactId>maven-buildtime-profiler</artifactId>
-        <version>0.2.0</version>
+        <version>0.5.0</version>
     </extension>
 
     <extension>
