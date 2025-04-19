@@ -17,6 +17,7 @@
  */
 package tigase.net;
 
+import org.jspecify.annotations.Nullable;
 import tigase.annotations.TigaseDeprecated;
 import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
@@ -108,6 +109,7 @@ public abstract class IOService<RefObject>
 	 * Intended for low-level logging to contain user connection ID to easier track particular user connection and troubleshoot issues.
 	 */
 	private JID connectionId = null;
+	@Nullable
 	private ConnectionType connectionType = null;
 	private JID dataReceiver = null;
 	private long empty_read_call_count = 0;
