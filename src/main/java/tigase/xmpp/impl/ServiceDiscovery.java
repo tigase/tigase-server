@@ -276,7 +276,7 @@ public class ServiceDiscovery
 									builder.withField(DataForm.FieldType.Hidden, "FORM_TYPE", field -> {
 										field.setValue("tigase:disco:account:0");
 									})
-											.withField(DataForm.FieldType.TextSingle, "expiration-date", field -> field.setValue(expirationDate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+											.withField(DataForm.FieldType.TextSingle, "expiration-date", field -> field.setValue(expirationDate.toString()));
 								}).build();
 								query.addChild(x);
 							});
