@@ -17,6 +17,7 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
 import tigase.kernel.beans.Bean;
@@ -40,6 +41,8 @@ import java.util.logging.Logger;
  * @version 5.0.0, 2010.03.01 at 03:12:30 GMT
  */
 @Bean(name = PepPlugin.ID, parent = SessionManager.class, active = false)
+@Deprecated
+@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0", note = "use full-featured PEP plugin from pubsub component: `tigase.pubsub.PepPlugin`")
 public class PepPlugin
 		extends XMPPProcessorAbstract {
 
