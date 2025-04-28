@@ -17,8 +17,11 @@ import tigase.xmpp.jid.BareJID;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -88,6 +91,31 @@ public class AccountExpirationService
 			}
 		}
 	}
+
+	public Long getUserExpirationDays(@NonNull BareJID userId) {
+		return getUserExpiration(userId).map(d -> LocalDate.now().until(d, ChronoUnit.DAYS)).orElse(0L);
+	}
+	/**
+	 * @param userId JID of the user for which remaining expiration time should
+	 *
+	 * @return expiration date if the expiration date is present
+	 *
+	 */
+	public Optional<LocalDate> getUserExpiration(@NonNull BareJID userId) {
+		Objects.requireNonNull(userId);
+		log.log(Level.FINE, "Getting user expiration for " + userId);
+
+		try {
+			var expirationDate = userRepository.getData(userId, ACCOUNT_EXPIRATION_DATE);
+			if (expirationDate != null) {
+				return Optional.of(LocalDate.parse(expirationDate));
+			}
+		} catch (TigaseDBException e) {
+			log.log(Level.WARNING, "Error obtaining user expiration date from repository", e);
+		}
+		return Optional.empty();
+	}
+
 
 	private class RemoveExpiredAccountsTask
 		implements Runnable {
