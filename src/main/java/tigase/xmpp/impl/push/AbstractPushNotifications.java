@@ -333,7 +333,7 @@ public class AbstractPushNotifications
 		for (Element settings : pushServices) {
 			try {
 				if (packet != null && !isSendingNotificationAllowed(userJid, session, settings, packet)) {
-					return;
+					continue;
 				}
 				JID pushService = JID.jidInstance(settings.getAttributeStaticStr("jid"));
 				String pushNode = settings.getAttributeStaticStr("node");

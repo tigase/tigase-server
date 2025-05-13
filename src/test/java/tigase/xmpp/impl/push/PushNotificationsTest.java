@@ -34,9 +34,11 @@ import tigase.util.stringprep.TigaseStringprepException;
 import tigase.xml.Element;
 import tigase.xmpp.*;
 import tigase.xmpp.impl.MessageDeliveryLogic;
+import tigase.xmpp.impl.OfflineMessages;
 import tigase.xmpp.impl.ProcessorTestCase;
 import tigase.xmpp.impl.roster.RosterAbstract;
 import tigase.xmpp.impl.roster.RosterFactory;
+import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
 import javax.crypto.BadPaddingException;
@@ -650,6 +652,99 @@ public class PushNotificationsTest
 		assertTrue(new String(decoded).contains("New secure message. Open to see the message."));
 	}
 
+
+	record GroupchatSettings(BareJID jid, Allow allow, String nick) {
+		enum Allow {
+			always,
+			mentioned,
+			never
+		}
+	}
+	record Settings(String pushNode, byte[] key, List<GroupchatSettings> groupchatSettings) {
+		public static Settings create(List<GroupchatSettings> groupchatSettings) {
+			SecureRandom random = new SecureRandom();
+			byte[] key = new byte[128/8];
+			random.nextBytes(key);
+			return new Settings("push-node-" + UUID.randomUUID(), key, groupchatSettings);
+		}
+	}
+
+	private void setSettingsWithMuc(Settings dto) throws TigaseDBException {
+		Element settings = new Element("settings", new String[]{"jid", "node", "priority"},
+									   new String[]{pushServiceJid.toString(), dto.pushNode(), "true"});
+
+		settings.withElement("encrypt", "tigase:push:encrypt:0", el -> {
+			el.setCData(Base64.encode(dto.key()));
+			el.setAttribute("max-size", "3072");
+			el.setAttribute("alg", "aes-128-gcm");
+		});
+		if (dto.groupchatSettings() != null) {
+			settings.withElement("groupchat", "tigase:push:filter:groupchat:0", el -> {
+				for (GroupchatSettings groupchat : dto.groupchatSettings()) {
+					el.withElement("room", roomEl -> {
+						roomEl.withAttribute("jid", groupchat.jid().toString())
+								.withAttribute("allow", groupchat.allow().name());
+						Optional.ofNullable(groupchat.nick()).ifPresent(nick -> el.withAttribute("nick", nick));
+					});
+				}
+			});
+		}
+		settings.withElement("jingle", el -> {
+			el.setXMLNS("tigase:push:jingle:0");
+		});
+		System.out.println("saving settings: " + settings.toString());
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/" + dto.pushNode(),
+												  settings.toString());
+	}
+
+	@Test
+	public void testEncryptedNotificationForGroupchatOMEMO() throws TigaseDBException, NoSuchPaddingException, NoSuchAlgorithmException,
+														   InvalidAlgorithmParameterException, InvalidKeyException,
+														   BadPaddingException, IllegalBlockSizeException {
+		List<Settings> allSettings = List.of(
+				Settings.create(List.of(new GroupchatSettings(senderJid.getBareJID(), GroupchatSettings.Allow.mentioned, "test-123"))),
+				Settings.create(List.of(new GroupchatSettings(senderJid.getBareJID(), GroupchatSettings.Allow.never, "test-123"))),
+				Settings.create(List.of()),
+				Settings.create(List.of(new GroupchatSettings(senderJid.getBareJID(), GroupchatSettings.Allow.always, null)))
+		);
+
+		for (Settings settings : allSettings) {
+			setSettingsWithMuc(settings);
+		}
+
+		String msgBody = "Message body " + UUID.randomUUID().toString();
+		Element msg = new Element("message", new Element[]{new Element("body", msgBody)}, new String[]{"xmlns", "type"},
+								  new String[]{"jabber:client", "groupchat"});
+		msg.addChild(new Element("encrypted", new String[]{"xmlns"}, new String[]{"eu.siacs.conversations.axolotl"}));
+		msg.addChild(new Element("store", new String[]{"xmlns"}, new String[]{"urn:xmpp:hints"}));
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid.copyWithoutResource());
+
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		OfflineMessages offlineMessages = getInstance(OfflineMessages.class);
+		offlineMessages.postProcess(packet, null, null, new ArrayDeque<>(), new HashMap<>());
+
+//		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+//
+//		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		Settings usedSettings = allSettings.get(3);
+		
+		assertEquals(1, results.size());
+
+		Element notificationElem = results.remove().packet.getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		System.out.println(notificationElem);
+		Element encrypted = notificationElem.getChild("encrypted", "tigase:push:encrypt:0");
+		byte[] enc = Base64.decode(encrypted.getCData());
+		byte[] iv = Base64.decode(encrypted.getAttributeStaticStr("iv"));
+
+		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+		cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(usedSettings.key(), "AES"), new GCMParameterSpec(128, iv));
+		byte[] decoded = cipher.doFinal(enc);
+
+		assertTrue(new String(decoded).contains("New secure message. Open to see the message."));
+	}
+	
 	@Test
 	public void testMessageRetrieved() throws TigaseDBException, NotAuthorizedException, TigaseStringprepException {
 		Element settings = new Element("settings", new String[]{"jid", "node"},
@@ -833,6 +928,7 @@ public class PushNotificationsTest
 		kernel.registerBean("sess-man").asInstance(this.getSessionManagerHandler()).setActive(true).exportable().exec();//.asClass(DummySessionManager.class).setActive(true).exportable().exec();
 		kernel.registerBean(MessageDeliveryLogic.class).setActive(true).exportable().exec();
 		kernel.registerBean("msgRepository").asClass(MsgRepositoryIfcImpl.class).exportable().exec();
+		kernel.registerBean(OfflineMessages.class).setActive(true).exec();
 		kernel.registerBean(PushNotifications.class).setActive(true).exec();
 	}
 
