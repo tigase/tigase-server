@@ -17,6 +17,8 @@
  */
 package tigase.server.xmppclient;
 
+import org.jspecify.annotations.Nullable;
+import tigase.annotations.TigaseDeprecated;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.HandleEvent;
 import tigase.eventbus.events.ShutdownEvent;
@@ -455,7 +457,7 @@ public class ClientConnectionManager
 			serv.getSessionData().put(IOService.HOSTNAME_KEY, hostname);
 			serv.setDataReceiver(JID.jidInstanceNS(routings.computeRouting(hostname)));
 
-			String streamOpenData = prepareStreamOpen(serv, id, hostname);
+			String streamOpenData = prepareStreamOpen(serv, id, hostname, from);
 
 			if (log.isLoggable(Level.FINER)) {
 				log.log(Level.FINER, "Writing raw data to the socket: {0}", streamOpenData);
@@ -493,7 +495,7 @@ public class ClientConnectionManager
 			if (serv instanceof C2SIOService && ((C2SIOService) serv).shouldQueueStreamOpened()) {
 				final String localId = id;
 				((C2SIOService) serv).queueTask(() -> {
-					writeRawData(serv, prepareStreamOpen(serv, localId, hostname));
+					writeRawData(serv, prepareStreamOpen(serv, localId, hostname, from));
 					final SocketType socket = (SocketType) serv.getSessionData().get("socket");
 					boolean ssl = socket.equals(SocketType.ssl);
 					((C2SIOService) serv).waitForResponse();
@@ -503,7 +505,7 @@ public class ClientConnectionManager
 					addOutPacket(Command.GETFEATURES.getPacket(serv.getConnectionId(), serv.getDataReceiver(), StanzaType.get, (ssl ? "ssl_" : "") + UUID.randomUUID().toString(), null));
 				});
 			} else {
-				writeRawData(serv, prepareStreamOpen(serv, id, hostname));
+				writeRawData(serv, prepareStreamOpen(serv, id, hostname, from));
 
 				final SocketType socket = (SocketType) serv.getSessionData().get("socket");
 				boolean ssl = socket.equals(SocketType.ssl);
@@ -940,9 +942,15 @@ public class ClientConnectionManager
 		return "</stream:stream>";
 	}
 
+	@TigaseDeprecated(note = "Use method with 'to' parameter (pass null if not known)", since = "8.5.0")
+	@Deprecated
 	protected String prepareStreamOpen(XMPPIOService<Object> serv, String id, String hostname) {
+		return prepareStreamOpen(serv, id, hostname, null);
+	}
+
+	protected String prepareStreamOpen(XMPPIOService<Object> serv, String id, String hostname, @Nullable String to) {
 		return "<?xml version='1.0'?><stream:stream" + " xmlns='" + XMLNS + "'" +
-				" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'" + " id='" + id + "'" +
+				" xmlns:stream='http://etherx.jabber.org/streams'" + " from='" + hostname + "'" + (to == null ? "" : (" to='" + to + "'")) + " id='" + id + "'" +
 				" version='1.0' xml:lang='en'>";
 	}
 

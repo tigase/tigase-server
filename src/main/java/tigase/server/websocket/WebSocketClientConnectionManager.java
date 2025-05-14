@@ -17,6 +17,7 @@
  */
 package tigase.server.websocket;
 
+import org.jspecify.annotations.Nullable;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.selector.ClusterModeRequired;
@@ -95,11 +96,11 @@ public class WebSocketClientConnectionManager
 	}
 
 	@Override
-	protected String prepareStreamOpen(XMPPIOService<Object> serv, String id, String hostname) {
+	protected String prepareStreamOpen(XMPPIOService<Object> serv, String id, String hostname, @Nullable String to) {
 		if (isPreRFC(serv)) {
-			return super.prepareStreamOpen(serv, id, hostname);
+			return super.prepareStreamOpen(serv, id, hostname, to);
 		}
-		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" + hostname + "'" + " id='" + id + "'" +
+		return "<open" + " xmlns='" + XMLNS_FRAMING + "'" + " from='" + hostname + "'" + (to == null ? "" : (" to='" + to + "'")) + " id='" + id + "'" +
 				" version='1.0' xml:lang='en' />";
 	}
 
