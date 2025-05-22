@@ -22,7 +22,8 @@ Server Components
 -  `Tigase Auditlog <../../projects/tigase-tigase-auditlog-2/en/latest/>`__ An implementation of Audit Log pattern functionality to log important events 
 -  `Tigase Workgroup Queues <../../projects/tigase-tigase-workgroup-queues/en/latest/>`__ Implementation of XEP-0142: Workgroup Queues
 -  `Tigase Databse Migrator <../../projects/tigase-database-migrator/en/latest/>`__ Component allowing migration of different types of data from various XMPP servers
--  `Tigase Extras <../../projects/tigase-tigase-extras/en/latest/>`__ AWS provides you with support for additional features and integrations with Amazon AWS.
+-  `Tigase Extras AWS <../../projects/tigase-tigase-extras/en/latest/>`__ provides you with support for additional features and integrations with Amazon AWS.
+-  `Tigase Extras LDAP Server <../../projects/tigase-tigase-extras-ldap/en/latest/>`__ provides you with basic LDAP server to allow for integration with software allowing for LDAP-based authentication.
 
 XMPP Clients
 ^^^^^^^^^^^^^^^^^
