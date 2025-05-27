@@ -20,11 +20,13 @@ package tigase.server.xmppserver;
 
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
 import tigase.vhosts.VHostManagerIfc;
 import tigase.xmpp.jid.JID;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Logger;
@@ -35,24 +37,36 @@ public class KnownDomainsListProvider {
 
 	private static final Logger log = Logger.getLogger(KnownDomainsListProvider.class.getCanonicalName());
 
+	@ConfigField(desc = "Static list of domains that are to be provided instead of dynamic ones")
+	private HashSet<String> staticDomainsSet = new HashSet<>();
+
+	@ConfigField(desc = "Use only static list of domains for both local and remote domains")
+	private boolean useOnlyStaticDomainsList = false;
+
 	@Inject
 	private VHostManagerIfc vHostManagerIfc;
 
 	protected Set<String> authenticatedRemoteDomains = new CopyOnWriteArraySet<>();
 
 
-	private static final String[] emptyArray = new String[0];
-
 	public void addRemoteDomain(String remoteHost) {
-		authenticatedRemoteDomains.add(remoteHost);
+		if (staticDomainsSet.isEmpty()) {
+			authenticatedRemoteDomains.add(remoteHost);
+		}
 	}
 
 
 	public Set<String> getAuthenticatedRemoteDomains() {
+		if (!staticDomainsSet.isEmpty()) {
+			return Collections.unmodifiableSet(staticDomainsSet);
+		}
 		return Collections.unmodifiableSet(authenticatedRemoteDomains);
 	}
 
 	public Set<String> getAllLocalDomains() {
+		if (useOnlyStaticDomainsList) {
+			return Collections.unmodifiableSet(staticDomainsSet);
+		}
 		return vHostManagerIfc.getAllVHosts().stream().map(JID::toString).collect(Collectors.toSet());
 	}
 
