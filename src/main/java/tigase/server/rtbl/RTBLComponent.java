@@ -64,6 +64,11 @@ public class RTBLComponent extends AbstractKernelBasedComponent {
 		eventBus.unregisterAll(this);
 	}
 
+	@Override
+	public boolean isSubdomain() {
+		return true;
+	}
+
 	@HandleEvent
 	public void serverInitialized(ClusterConnectionManager.ClusterInitializedEvent event) {
 		if (subscribeModule != null && fetchModule != null) {

@@ -24,7 +24,7 @@ Tigase XMPP Server supports (`XMPP real-time block <https://xmppbl.org/>`__) lis
 Configuration
 ^^^^^^^^^^^^^^^^^
 
-Real-time block lists are configured with ad-hoc commands on the `rtbl-component@example.com` XMPP component (`example.com` is the virtual host domain hosted on your installation of Tigase XMPP Server).
+Real-time block lists are configured with ad-hoc commands on the `rtbl-component.example.com` XMPP component (`example.com` is the virtual host domain hosted on your installation of Tigase XMPP Server).
 
 If multiple RTBL are configured, then if JID is blocked by any of the block lists, it will be blocked.
 

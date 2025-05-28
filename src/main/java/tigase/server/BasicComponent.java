@@ -17,6 +17,7 @@
  */
 package tigase.server;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.cluster.api.ClusterControllerIfc;
 import tigase.cluster.api.ClusteredComponentIfc;
 import tigase.conf.Configurable;
@@ -788,6 +789,8 @@ public class BasicComponent
 		return (vHostManager != null) ? vHostManager.isLocalDomainOrComponent(domain) : false;
 	}
 
+	@TigaseDeprecated(note = "This method will be removed. All components should use a subdomain addressing", removeIn = "9.0.0", since = "8.5.0")
+	@Deprecated
 	public boolean isSubdomain() {
 		return false;
 	}
