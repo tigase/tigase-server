@@ -353,7 +353,7 @@ public class CertificateContainer
 
 	}
 
-	KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
+	public KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
 		log.log(Level.FINEST, "Adding certificate entry for alias: {0}. Saving to disk: {1}, entry: {2}",

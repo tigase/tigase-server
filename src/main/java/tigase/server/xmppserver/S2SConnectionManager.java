@@ -17,6 +17,7 @@
  */
 package tigase.server.xmppserver;
 
+import tigase.cert.CertCheckResult;
 import tigase.cert.CertificateUtil;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
@@ -24,7 +25,10 @@ import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.beans.selector.ConfigType;
 import tigase.kernel.beans.selector.ConfigTypeEnum;
 import tigase.kernel.core.Kernel;
-import tigase.server.*;
+import tigase.net.ConnectionType;
+import tigase.server.ConnectionManager;
+import tigase.server.Packet;
+import tigase.server.Permissions;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.vhosts.VHostItem;
@@ -40,8 +44,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static tigase.server.xmppserver.proc.S2SAbstract.STREAM_FEATURES_EL;
 
 /**
  * Created: Jun 14, 2010 11:59:38 AM
@@ -126,6 +128,8 @@ public class S2SConnectionManager
 	 */
 	private long maxPacketWaitingTime = MAX_PACKET_WAITING_TIME_PROP_VAL;
 
+	@ConfigField(desc = "Accept self-signed certificates for outgoing S2S connections")
+	private boolean acceptSelfSignedSslCertificates = false;
 	@ConfigField(desc = "Whether s2s connection is required to be authenticated both ways before allowing transmission", alias = "one-way-authentication")
 	private boolean oneWayAuthentication = false;
 	/**
@@ -430,6 +434,12 @@ public class S2SConnectionManager
 
 	@Override
 	public void tlsHandshakeCompleted(S2SIOService serv) {
+		if ((!acceptSelfSignedSslCertificates) && serv.connectionType() == ConnectionType.connect) {
+			if (serv.getSessionData().get(S2SIOService.CERT_CHECK_RESULT) != CertCheckResult.trusted) {
+				serv.stop();
+				return;
+			}
+		}
 		for (S2SProcessor proc : processors) {
 			proc.serviceStarted(serv);
 		}
