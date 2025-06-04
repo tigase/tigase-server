@@ -44,8 +44,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Describe class VHostManager here.
@@ -58,7 +60,7 @@ import java.util.logging.Logger;
 @ConfigType({ConfigTypeEnum.DefaultMode, ConfigTypeEnum.SessionManagerMode, ConfigTypeEnum.ConnectionManagersMode, ConfigTypeEnum.ComponentMode})
 public class VHostManager
 		extends AbstractComponentRegistrator<VHostListener>
-		implements VHostManagerIfc, StatisticsContainer, RegistrarBean {
+		implements DefaultAwareVHostManagerIfc, StatisticsContainer, RegistrarBean {
 
 	private static final Logger log = Logger.getLogger(VHostManager.class.getName());
 
@@ -132,12 +134,17 @@ public class VHostManager
 
 	@Override
 	public List<JID> getAllVHosts() {
-		List<JID> list = new ArrayList<JID>();
+		return getAllVHosts(true);
+	}
+
+	public List<JID> getAllVHosts(boolean includeDefaultVhost) {
+		List<JID> list = new ArrayList<>();
 
 		try {
-			for (VHostItem item : repo.allItems()) {
-				list.add(item.getVhost());
-			}
+			return repo.allItems().stream()
+					.filter(vHostItem -> (includeDefaultVhost || !vHostItem.isDefault()))
+					.map(VHostItem::getVhost)
+					.collect(Collectors.toList());
 		} catch (TigaseDBException ex) {
 			Logger.getLogger(VHostManager.class.getName()).log(Level.SEVERE, null, ex);
 		}

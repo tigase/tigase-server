@@ -238,10 +238,6 @@ public class VHostItemImpl
 		setVHost(vhost);
 	}
 
-	protected boolean isDefault() {
-		return VHostItem.DEF_VHOST_KEY.equals(getKey());
-	}
-
 	protected void setExtensionManager(VHostItemExtensionManager extensionManager) {
 		this.extensionManager = extensionManager;
 	}

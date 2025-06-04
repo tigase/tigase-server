@@ -89,6 +89,10 @@ public interface VHostItem
 		return false;
 	}
 
+	default boolean isDefault() {
+		return VHostItem.DEF_VHOST_KEY.equals(getKey());
+	}
+
 	boolean isAnonymousEnabled();
 
 	@Deprecated

@@ -36,6 +36,7 @@ import tigase.server.xmppserver.S2SConnManTest;
 import tigase.server.xmppserver.S2SIOService;
 import tigase.server.xmppserver.S2SRandomSelector;
 import tigase.server.xmppserver.proc.AuthenticatorSelectorManager;
+import tigase.vhosts.DefaultAwareVHostManagerIfc;
 import tigase.vhosts.DummyVHostManager;
 import tigase.vhosts.VHostManagerIfc;
 
@@ -102,6 +103,7 @@ public class SuggestedDomainsListAdhocTest {
 
 		Assert.assertTrue(localDomains.contains("my-other-local-domain.org"));
 		Assert.assertTrue(localDomains.contains("my-local-domain.net"));
+		Assert.assertFalse(localDomains.contains("default"));
 	}
 
 	@Before
@@ -109,9 +111,11 @@ public class SuggestedDomainsListAdhocTest {
 		prepareKernel();
 
 		authenticatorSelectorManager = kernel.getInstance(AuthenticatorSelectorManager.class);
-		dummyVHostManager = (DummyVHostManager) kernel.getInstance(VHostManagerIfc.class);
+		dummyVHostManager = (DummyVHostManager) kernel.getInstance(DefaultAwareVHostManagerIfc.class);
 		handler = kernel.getInstance(S2SConnManTest.S2SConnectionHandlerImpl.class);
 		suggestedDomainsListAdhoc = kernel.getInstance(SuggestedDomainsListAdhoc.class);
+
+		dummyVHostManager.addVhost("default");
 
 		addCID("my-local-domain.net", "tigase.org");
 		addCID("my-local-domain.net", "tigase.net");

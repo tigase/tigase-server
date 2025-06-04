@@ -26,6 +26,7 @@ import tigase.xmpp.jid.JID;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  * Dummy {@code VHostManagerIfc} implementation
  */
 public class DummyVHostManager
-		implements VHostManagerIfc {
+		implements DefaultAwareVHostManagerIfc {
 
 	private final static Logger LOG = Logger.getLogger(DummyVHostManager.class.getName());
 	private final Map<String, VHostItem> items = new ConcurrentHashMap<>();
@@ -59,7 +60,15 @@ public class DummyVHostManager
 
 	@Override
 	public List<JID> getAllVHosts() {
-		return items.values().stream().map(VHostItem::getVhost).collect(Collectors.toList());
+		return getAllVHosts(true);
+	}
+
+	@Override
+	public List<JID> getAllVHosts(boolean includeDefaultVhost) {
+		return items.values().stream()
+				.filter(vHostItem -> (includeDefaultVhost || !vHostItem.isDefault()))
+				.map(VHostItem::getVhost)
+				.collect(Collectors.toList());
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.kernel.core.Kernel;
+import tigase.vhosts.DefaultAwareVHostManagerIfc;
 import tigase.vhosts.VHostManagerIfc;
 import tigase.xmpp.jid.JID;
 
@@ -44,7 +45,7 @@ public class KnownDomainsListProvider {
 	private boolean useOnlyStaticDomainsList = false;
 
 	@Inject
-	private VHostManagerIfc vHostManagerIfc;
+	private DefaultAwareVHostManagerIfc vHostManagerIfc;
 
 	protected Set<String> authenticatedRemoteDomains = new CopyOnWriteArraySet<>();
 
@@ -67,7 +68,7 @@ public class KnownDomainsListProvider {
 		if (useOnlyStaticDomainsList) {
 			return Collections.unmodifiableSet(staticDomainsSet);
 		}
-		return vHostManagerIfc.getAllVHosts().stream().map(JID::toString).collect(Collectors.toSet());
+		return vHostManagerIfc.getAllVHosts(false).stream().map(JID::toString).collect(Collectors.toSet());
 	}
 
 }
