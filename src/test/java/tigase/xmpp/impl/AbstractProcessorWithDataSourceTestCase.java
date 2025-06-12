@@ -80,7 +80,7 @@ public class AbstractProcessorWithDataSourceTestCase<DS extends DataSource> exte
 	}
 
 	protected static void loadSchema(String schemaId, String schemaVersion, Set<String> components) throws DBInitException {
-		SchemaLoader loader = SchemaLoader.newInstance("jdbc");
+		SchemaLoader loader = SchemaLoader.newInstanceForURI(uri);
 		SchemaLoader.Parameters params = loader.createParameters();
 		params.parseUri(uri);
 		params.setDbRootCredentials(null, null);
