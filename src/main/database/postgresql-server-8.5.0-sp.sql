@@ -16,10 +16,19 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-source database/mysql-server-8.5.0-schema.sql;
+-- QUERY START:
+do $$
+begin
+    if exists( select 1 from pg_proc where proname = lower('Tig_OfflineMessages_DeleteMessages')) then
+drop function Tig_OfflineMessages_DeleteMessages(varchar(2049));
+end if;
+end$$;
+-- QUERY END:
 
-source database/mysql-server-8.5.0-sp.sql;
-
--- LOAD FILE: database/mysql-server-8.5.0-schema.sql;
-
--- LOAD FILE: database/mysql-server-8.5.0-sp.sql;
+-- QUERY START:
+create or replace function Tig_OfflineMessages_DeleteMessages(_to varchar(2049)) returns void as $$
+begin
+    delete from tig_offline_messages where lower(receiver) = lower(_to)
+end;
+$$ LANGUAGE 'plpgsql';
+-- QUERY END:

@@ -261,10 +261,9 @@ public class JDBCMsgRepository
 				synchronized (delete_to_jid_st) {
 					try {
 						delete_to_jid_st.setString(1, to.toString());
-						rs = delete_to_jid_st.executeQuery();
-						if (rs.next()) {
-							affectedRows += rs.getInt(1);
-						}
+						delete_to_jid_st.executeUpdate();
+						// we return 1 if messages were removed, but we not check if any message was actually removed
+						affectedRows += 1;
 					} finally {
 						data_repo.release(null, rs);
 					}
@@ -351,7 +350,7 @@ public class JDBCMsgRepository
 
 					synchronized (delete_to_jid_st) {
 						delete_to_jid_st.setString(1, to.toString());
-						rs = delete_to_jid_st.executeQuery();
+						delete_to_jid_st.executeUpdate();
 					}
 				} finally {
 					data_repo.release(null, rs);

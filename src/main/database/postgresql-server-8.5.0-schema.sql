@@ -16,10 +16,11 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-source database/mysql-server-8.5.0-schema.sql;
-
-source database/mysql-server-8.5.0-sp.sql;
-
--- LOAD FILE: database/mysql-server-8.5.0-schema.sql;
-
--- LOAD FILE: database/mysql-server-8.5.0-sp.sql;
+-- QUERY START:
+do $$
+begin
+if exists (select 1 where (select to_regclass('public.tig_offline_messages_receiver_msg_type_index')) is null) then
+    create index tig_offline_messages_receiver_msg_type_index on tig_offline_messages (lower(receiver), msg_type);
+end if;
+end$$;
+-- QUERY END:

@@ -53,7 +53,7 @@ public class JDBCMsgRepositoryTest
 	
 	@BeforeClass
 	public static void loadSchema() throws DBInitException {
-		loadSchema(Schema.SERVER_SCHEMA_ID, "8.0.0", Collections.emptySet());
+		loadSchema(Schema.SERVER_SCHEMA_ID, "8.5.0", Collections.emptySet());
 	}
 
 	@Override

@@ -16,8 +16,6 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
--- QUERY START:
-if not exists (select 1 from sys.indexes where object_id = object_id('dbo.tig_offline_messages') and name = 'IX_tig_offline_messages_receiver_sha1_msg_type' )
-    create index IX_tig_offline_messages_receiver_sha1_msg_type on [dbo].[tig_offline_messages] (receiver_sha1, msg_type);
--- QUERY END:
-GO
+-- LOAD FILE: database/sqlserver-server-8.5.0-schema.sql
+
+-- LOAD FILE: database/sqlserver-server-8.5.0-sp.sql

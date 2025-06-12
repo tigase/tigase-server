@@ -16,10 +16,17 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-source database/mysql-server-8.5.0-schema.sql;
+-- QUERY START:
+drop procedure if exists Tig_OfflineMessages_DeleteMessages;
+-- QUERY END:
 
-source database/mysql-server-8.5.0-sp.sql;
+delimiter //
 
--- LOAD FILE: database/mysql-server-8.5.0-schema.sql;
+-- QUERY START:
+create procedure Tig_OfflineMessages_DeleteMessages(_to varchar(2049) charset utf8)
+begin
+delete from tig_offline_messages where receiver_sha1 = sha1(lower(_to));
+end //
+-- QUERY END:
 
--- LOAD FILE: database/mysql-server-8.5.0-sp.sql;
+delimiter ;

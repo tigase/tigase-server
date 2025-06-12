@@ -16,10 +16,20 @@
 -- If not, see http://www.gnu.org/licenses/.
 --
 
-source database/mysql-server-8.5.0-schema.sql;
+-- QUERY START:
+if exists (select 1 from sys.objects where type = 'P' and name = 'Tig_OfflineMessages_DeleteMessages')
+    drop procedure [dbo].[Tig_OfflineMessages_DeleteMessages];
+-- QUERY END:
+GO
 
-source database/mysql-server-8.5.0-sp.sql;
-
--- LOAD FILE: database/mysql-server-8.5.0-schema.sql;
-
--- LOAD FILE: database/mysql-server-8.5.0-sp.sql;
+-- QUERY START:
+create procedure  [dbo].[Tig_OfflineMessages_DeleteMessages]
+    @_to nvarchar(2049)
+as
+begin
+    set nocount on;
+    delete from tig_offline_messages where receiver_sha1 = HASHBYTES('SHA1', lower(@_to))
+    set nocount off;
+end
+-- QUERY END:
+GO
