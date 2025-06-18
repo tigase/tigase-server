@@ -24,7 +24,7 @@ This is very easy to do through the Tigase’s configuration file.
    }
    authRepository {
        default () {
-           cls = 'tigase.db.jdbc.TigaseCustomAuth'
+           'repo-class' = 'tigase.db.jdbc.TigaseCustomAuth'
            'data-source' = 'default-auth'
        }
    }
@@ -50,12 +50,12 @@ First, let’s define our default database for all VHosts
    }
    authRepository {
        default () {
-           cls = 'tigase.db.jdbc.TigaseCustomAuth'
+           'repo-class' = 'tigase.db.jdbc.TigaseCustomAuth'
            'data-source' = 'default-auth'
        }
    }
 
-Now, we have VHost: domain1.com User authentication data for this VHost is stored in database
+Now, we have VHost: `domain1.com`. User authentication data for this VHost is stored in `db7.tigase` database
 
 .. code::
 
@@ -66,12 +66,12 @@ Now, we have VHost: domain1.com User authentication data for this VHost is store
    }
    authRepository {
      domain1.com () {
-       cls = 'tigase/db/jdbc.TigaseCustomAuth'
+       'repo-class' = 'tigase/db/jdbc.TigaseCustomAuth'
        'data-source' = 'domain1.com-auth'
      }
    }
 
-All other user data is stored in Tigase’s standard database in MySQL
+All other user data is stored in Tigase’s standard database in `db4.tigase` MySQL database
 
 .. code::
 
@@ -84,14 +84,16 @@ All other user data is stored in Tigase’s standard database in MySQL
      domain1.com () {}
    }
 
-Next VHost: domain2.com User authentication is in LDAP server but all other user data is stored in Tigase’s standard database
+Next VHost: `domain2.com`
+
+User authentication is in **LDAP** server but all other user data is stored in Tigase’s standard database
 
 .. code::
 
    authRepository {
        domain2.com () {
-           cls = 'tigase.db.ldap.LdapAuthProvider'
-           uri = 'ldap://ldap.domain2.com:389'
+           'repo-class' = 'tigase.db.ldap.LdapAuthProvider'
+           'repo-uri' = 'ldap://ldap.domain2.com:389'
            'data-source' = 'default'
        }
    }
@@ -133,13 +135,15 @@ When combined, the DSL output should look like this:
    }
    authRepository {
        domain2.com () {
-           cls = 'tigase.db.ldap.LdapAuthProvider'
-           uri = 'ldap://ldap.domain2.com:389'
+           'repo-class' = 'tigase.db.ldap.LdapAuthProvider'
+           'repo-uri' = 'ldap://ldap.domain2.com:389'
            'user-dn-pattern' = 'cn=,ou=,dc=,dc='
        }
    }
 
-Next VHost: domain3.com Again user authentication is in LDAP server but pointing to a different LDAP server with different access credentials and parameters. User information is stored in a postgreSQL database.
+Next VHost: `domain3.com`
+
+Again user authentication is in **LDAP** server but pointing to a different LDAP server with different access credentials and parameters. User information is stored in a postgreSQL database.
 
 .. code::
 
@@ -153,13 +157,13 @@ Next VHost: domain3.com Again user authentication is in LDAP server but pointing
    }
    authRepository {
        domain3.com () {
-           cls = 'tigase.db.ldap.LdapAuthProvider'
-           uri = 'ldap://ldap.domain3.com:389'
+           'repo-class' = 'tigase.db.ldap.LdapAuthProvider'
+           'repo-uri' = 'ldap://ldap.domain3.com:389'
            'user-dn-pattern' = 'cn=,ou=,dc=,dc='
        }
    }
 
-For VHost: domain4.com all the data, both authentication and user XMPP data are stored on a separate MySQL server with custom stored procedures for both user login and user logout processing.
+For VHost: `domain4.`com all the data, both authentication and user XMPP data are stored on a separate MySQL server with custom stored procedures for both user login and user logout processing.
 
 .. code::
 
@@ -173,7 +177,7 @@ For VHost: domain4.com all the data, both authentication and user XMPP data are 
    }
    authRepository {
        domain4.com () {
-           cls = 'tigase.db.jdbc.TigaseCustomAuth'
+           'repo-class' = 'tigase.db.jdbc.TigaseCustomAuth'
            'user-login-query' = '{ call UserLogin(?, ?) }'
            'user-logout-query' = '{ call UserLogout(?) }'
            'sasl-mechs' = [ 'PLAIN', 'DIGEST-MD5' ]

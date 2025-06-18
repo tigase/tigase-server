@@ -633,7 +633,8 @@ public class DBSchemaLoader
 			setComponentVersion(schema.getId(), build.toString() );
 		}
 		if (Result.skipped.equals(result)) {
-			log.log(Level.INFO, "Required schema is already loaded in correct version");
+			log.log(Level.INFO, "Required schema: {0} is already loaded in correct version: {1}",
+					new String[] {schema.getId(), version});
 		}
 
 		// logic to check if the schema version was correctly loaded
