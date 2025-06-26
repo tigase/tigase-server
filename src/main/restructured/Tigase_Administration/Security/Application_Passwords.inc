@@ -18,7 +18,55 @@ During execution for a command you will be provided with a form to fill in with 
 
 -  Password (``password``) - a new password
 
+.. code::
+
+    <iq type='set' to='sess-man@example.com' id='sasl-app-add-1'>
+        <command xmlns='http://jabber.org/protocol/commands' node='auth-credentials-add' action='execute'/>
+    </iq>
+
+    <iq type='result' from='sess-man@example.com' id='sasl-app-add-1' to='user@example.com/resource-1'>
+        <command xmlns='http://jabber.org/protocol/commands' node='auth-credentials-add' session-id='uuid-xxxxxx' status='executing'>
+            <x xmlns='jabber:x:data' type='form'>
+                <title>Add user credentials"</title>
+                <field var='jid' label='The Jabber ID for the account' type='jid-single'/>
+                <field var='credentialId' label='Credential ID' type='jid-single'/>
+                <field var='password' label='Password' type='text-single'/>
+            </x>
+        </command>
+    </iq>
+
+
 After submitting this form a new credential will be added.
+
+.. code::
+
+    <iq type='set' to='sess-man@example.com' id='sasl-app-add-2'>
+        <command xmlns='http://jabber.org/protocol/commands' node='auth-credentials-add' action='execute'>
+            <x xmlns='jabber:x:data' type='submit'>
+                <title>Add user credentials"</title>
+                <field var='jid' label='The Jabber ID for the account' type='jid-single'>
+                    <value>user@example.com</value>
+                </field>
+                <field var='credentialId' label='Credential ID' type='jid-single'>
+                    <value>my-new-app-1</value>
+                </field>
+                <field var='password' label='Password' type='text-single'>
+                    <value>39jfnwu053743</value>
+                </field>
+            </x>
+        </command>
+    </iq>
+
+    <iq type='result' from='sess-man@example.com' id='sasl-app-add-2' to='user@example.com/resource-1'>
+        <command xmlns='http://jabber.org/protocol/commands' node='auth-credentials-add' session-id='uuid-xxxxxx' status='completed'>
+            <x xmlns='jabber:x:data' type='result'>
+                <field type='fixed'>
+                    <value>OK</value>
+                </field>
+            </x>
+        </command>
+    </iq>
+
 
 Login in with application password
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -33,6 +81,19 @@ To log in with new password the XMPP client can use any SASL mechanism but it ne
 
 With proper values, you application will be able to log in using application password.
 
+In case of SASL PLAIN which has the following format (spaces should be ommited and ``[]`` means it is optional):
+``[authzid] UTF8NUL authcid UTF8NUL passwd``
+not encoded payload would look like this:
+``user@example.com UTF8NUL my-new-app-1 UTF8NUL 39jfnwu053743``
+
+That after Base64 encoding would be presented as `dXNlckBleGFtcGxlLmNvbQBteS1uZXctYXBwLTEDOWpmbnd1MDUzNzQz` and this value can be used as a correct CData of `<auth/>` element:
+
+.. code::
+
+    <auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>dXNlckBleGFtcGxlLmNvbQBteS1uZXctYXBwLTEDOWpmbnd1MDUzNzQz</auth>
+
+
+
 Removing application password
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -44,4 +105,46 @@ During execution for a command you will be provided with a form to fill in with 
 
 -  Credential ID (``credentialId``) - username for the application password which you want to remove
 
+.. code:
+
+    <iq type='set' to='sess-man@example.com' id='sasl-app-delete-1'>
+        <command xmlns='http://jabber.org/protocol/commands' node='auth-credentials-delete' action='execute'/>
+    </iq>
+
+    <iq type='result' from='sess-man@example.com' id='sasl-app-delete-1' to='user@example.com/resource-1'>
+        <command xmlns='http://jabber.org/protocol/commands' node='auth-credentials-delete' session-id='uuid-xxxxxx' status='executing'>
+            <x xmlns='jabber:x:data' type='form'>
+                <title>Add user credentials"</title>
+                <field var='jid' label='The Jabber ID for the account' type='jid-single'/>
+                <field var='credentialId' label='Credential ID' type='jid-single'/>
+            </x>
+        </command>
+    </iq>
+
 After submitting this form a credential will be removed.
+
+.. code::
+
+    <iq type='set' to='sess-man@example.com' id='sasl-app-delete-2'>
+        <command xmlns='http://jabber.org/protocol/commands' node='auth-credentials-delete' action='execute'>
+            <x xmlns='jabber:x:data' type='submit'>
+                <title>Add user credentials"</title>
+                <field var='jid' label='The Jabber ID for the account' type='jid-single'>
+                    <value>user@example.com</value>
+                </field>
+                <field var='credentialId' label='Credential ID' type='jid-single'>
+                    <value>my-new-app-1</value>
+                </field>
+            </x>
+        </command>
+    </iq>
+
+    <iq type='result' from='sess-man@example.com' id='sasl-app-delete-2' to='user@example.com/resource-1'>
+        <command xmlns='http://jabber.org/protocol/commands' node='auth-credentials-delete' session-id='uuid-xxxxxx' status='completed'>
+            <x xmlns='jabber:x:data' type='result'>
+                <field type='fixed'>
+                    <value>OK</value>
+                </field>
+            </x>
+        </command>
+    </iq>
