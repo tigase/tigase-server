@@ -1,3 +1,5 @@
+.. _data-sources-and-repositories:
+
 Data Source and Repositories
 ================================
 
@@ -59,6 +61,8 @@ DataSourceAware
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Custom repositories should implement they own interface specifying its API. This interfaces should extend ``DataSourceAware`` interface which is base interface required to be implemented by custom repositories. ``DataSourceAware`` has a method ``setDataSource()`` which will be called with instance of data source to initialize instance of custom repository. Implementations should be annotated with ``@Repository.Meta`` implementation to make the automatically selected for proper type of ``DataSource`` implementation.
+
+See :ref:`using-data-repository` for more details.
 
 MDRepositoryBean
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

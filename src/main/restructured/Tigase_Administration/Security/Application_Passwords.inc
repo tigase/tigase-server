@@ -1,3 +1,6 @@
+
+.. _application-passwords-admin-guide:
+
 Application passwords
 -------------------------
 
