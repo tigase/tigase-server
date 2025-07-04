@@ -4,13 +4,13 @@ Custom ``AuthRepository`` implementation
 ``Credentials`` - solid base for authentication
 ------------------------------------------------
 
-Tigase supports having per-application passwords, allowing having distinct password for each application greatly improving security (see :ref:`application-passwords-admin-guide` for more details). To facilitate it uses ``Credentials``, specified by the namesake interface: ``tigase.auth.credentials.Credentials``, which implementations may store multiple credentials for single account (under ```credentialId``, ie. different credentials for different authentication mechanisms).
+Tigase supports having per-application passwords, allowing having distinct password for each application greatly improving security (see :ref:`application-passwords-admin-guide` for more details). To facilitate it uses ``Credentials``, specified by the namesake interface: ``tigase.auth.credentials.Credentials``, which implementations may store multiple credentials for single account (under ``credentialId``, ie. different credentials for different authentication mechanisms).
 
 It's specifies a couple of essential API methods:
-	* ``boolean canLogin();`` - Checks if account can perform logging-in
+	* ``boolean canLogin();`` - checks if account can perform logging-in
 	* ``AccountStatus getAccountStatus();`` - returns account status, i.e. if it's enabled or not
 	* ``Entry getEntryForMechanism(String mechanism);`` - find a credential for specified encryption mechanism
-    * ``Entry getFirst();`` - returns first available instance of credentials entry
+	* ``Entry getFirst();`` - returns first available instance of credentials entry
 	* ``BareJID getUser();`` - returns bare jid of an account
 	* ``boolean isAccountDisabled();`` - checks if account is disabled
 
@@ -28,7 +28,7 @@ Here's the basic snippet that will authenticate all authentication attempts if `
 
 .. Note::
 
-    Particular password retrieval method is out of scope of this document; ee :ref:`using-data-repository` to use Tigase API for accessing databases.
+    Particular password retrieval method is out of scope of this document; see :ref:`using-data-repository` and :ref:`accessing-other-repositories-with-data-repository` for more information on how to use Tigase API for accessing databases.
 
 .. code:: java
 

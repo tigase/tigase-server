@@ -12,6 +12,8 @@ Development Guide
    Server_Compilation
    Tigase_Kernel
    Data_Sources_And_Repositories
+   UsingDataRepository
+   CustomAuthRepository
    Component_Implementation
    Packet_Filtering_in_Component
    EventBus_API

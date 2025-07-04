@@ -1338,8 +1338,10 @@ To use **AuthRepository** or **UserRepository** you need only to declare fields 
    @Inject
    private UserRepository userRepository;
 
-Accessing other repositories
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _accessing-other-repositories-with-data-repository:
+
+Accessing other repositories with ``DataRepository``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In order to have more freedom while accessing repositories it’s possible to create and use custom repository implementation which implements **DataSourceAware** interface.
 
