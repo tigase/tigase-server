@@ -490,7 +490,7 @@ public class MessageCarbons
 
 		MessageCarbonsStateChangedEvent event = new MessageCarbonsStateChangedEvent(boundJID, session.getJID()
 				.copyWithoutResource(), session.getParentSession());
-		event.add(session.getJID(), value);
+		event.add(boundJID, value);
 		eventBus.fire(event);
 	}
 
