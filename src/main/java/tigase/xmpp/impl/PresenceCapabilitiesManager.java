@@ -104,7 +104,7 @@ public class PresenceCapabilitiesManager {
 
 	public static Element getCapsElement(String caps) {
 		return new Element("c", new String[]{"xmlns", "hash", "node", "ver"},
-						   new String[]{CAPS.XMLNS, HASH_ALGORITHM, CAPS_NODE, caps});
+						   new String[]{CAPS.XMLNS, HASH_ALGORITHM.toLowerCase(), CAPS_NODE, caps});
 	}
 
 	public static String[] getFeaturesFromDiscoInfo(Element discoInfo) {
