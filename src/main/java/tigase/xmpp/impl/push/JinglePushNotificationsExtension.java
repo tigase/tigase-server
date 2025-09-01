@@ -55,7 +55,7 @@ public class JinglePushNotificationsExtension implements PushNotificationsExtens
 	@Override
 	public void prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount,
 										   Element notification) {
-		if (packet.getElemName() != Message.ELEM_NAME) {
+		if (packet == null || packet.getElemName() != Message.ELEM_NAME) {
 			return;
 		}
 		Element actionEl = packet.getElement().findChild(el -> el.getXMLNS() == "urn:xmpp:jingle-message:0");
