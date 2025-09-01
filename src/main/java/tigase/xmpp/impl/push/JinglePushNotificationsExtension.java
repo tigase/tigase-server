@@ -53,6 +53,29 @@ public class JinglePushNotificationsExtension implements PushNotificationsExtens
 	}
 
 	@Override
+	public void prepareNotificationPayload(Element pushServiceSettings, Packet packet, long msgCount,
+										   Element notification) {
+		if (packet.getElemName() != Message.ELEM_NAME) {
+			return;
+		}
+		Element actionEl = packet.getElement().findChild(el -> el.getXMLNS() == "urn:xmpp:jingle-message:0");
+		if (actionEl == null) {
+			return;
+		}
+		String sid = actionEl.getAttributeStaticStr("sid");
+		if (sid == null) {
+			return;
+		}
+
+		notification.withElement("jingle", "tigase:push:jingle:0", jingle -> {
+			jingle.addAttribute("sid", sid);
+			actionEl.mapChildren(el -> el.getName() == "description" && el.getXMLNS() == "urn:xmpp:jingle:apps:rtp:1",
+								 el -> el.getAttributeStaticStr("media"))
+					.forEach(media -> jingle.withElement("media", null, media));
+		});
+	}
+
+	@Override
 	public boolean shouldSendNotification(Packet packet, BareJID userJid, XMPPResourceConnection session)
 			throws XMPPException {
 		if (packet.getElemName() != Message.ELEM_NAME) {
