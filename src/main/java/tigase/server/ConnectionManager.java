@@ -207,6 +207,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	@ConfigField(desc = "Service connection timeout", alias = "service-connected-timeout")
 	protected int serviceConnectedTimeout = 60;
+	@ConfigField(desc = "Whitelisted IPs allowed to connect", alias = "ip-whitelist")
+	private List<String> whitelistedIPs;
 
 	public ConnectionManager() {
 	}
@@ -510,6 +512,13 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 	protected boolean shouldRedeliverWaitingPackets(IO service) {
 		return true;
+	}
+
+	protected boolean isAddressWhitelisted(String address) {
+		if (whitelistedIPs == null) {
+			return true;
+		}
+		return whitelistedIPs.contains(address);
 	}
 
 	protected void redeliverWaitingPackets(IO service) {
@@ -1241,6 +1250,16 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Accept called for service: {0}, port_props: {1}", new Object[]{cid, port_props});
+			}
+
+			if (!isAddressWhitelisted(sc.socket().getInetAddress().getHostAddress())) {
+				log.log(Level.FINE, "Rejecting service: {0}, port_props: {1}, due to IP not being whitelisted: {2}", new Object[]{cid, port_props, sc.socket().getInetAddress().getHostAddress()});
+				try {
+					sc.close();
+				} catch (IOException e) {
+					log.log(Level.WARNING, "Problem stopping service: {0}, port_props: {1}", new Object[]{cid, port_props});
+				}
+				return;
 			}
 
 			IO serv = getXMPPIOServiceInstance();
