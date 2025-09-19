@@ -65,9 +65,11 @@ public abstract class PresenceAbstract
 	@ConfigField(desc = "Probe full JID", alias = PRESENCE_PROBE_FULL_JID_KEY)
 	protected static boolean probeFullJID = false;
 	@ConfigField(desc = "Skip offline", alias = SKIP_OFFLINE_PROP_KEY)
+	// Setting this option to true will cause issues with PEP support!
 	protected static boolean skipOffline = false;
 	@ConfigField(desc = "Skip offline sys", alias = SKIP_OFFLINE_SYS_PROP_KEY)
-	private static boolean skipOfflineSys = true;
+	// Setting this option to true will cause issues with PEP support!
+	private static boolean skipOfflineSys = false;
 
 	protected RosterAbstract roster_util = getRosterUtil();
 
