@@ -38,8 +38,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.*;
-import java.security.cert.Certificate;
 import java.security.cert.*;
+import java.security.cert.Certificate;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -89,20 +89,8 @@ public class CertificateContainer
 	private KeyStore trustKeyStore = null;
 	@ConfigField(desc = "Location of trusted certificates", alias = TRUSTED_CERTS_DIR_KEY)
 	private String[] trustedCertsDir = {TRUSTED_CERTS_DIR_VAL};
-
-	private static Set<String> getAllCNames(Certificate certificate) {
-		Set<String> altDomains = new TreeSet<>();
-		if (certificate instanceof X509Certificate) {
-			X509Certificate certX509 = (X509Certificate) certificate;
-			String certCName = CertificateUtil.getCertCName(certX509);
-			if (certCName != null) {
-				altDomains.add(certCName);
-			}
-			List<String> certAltCName = CertificateUtil.getCertAltCName(certX509);
-			altDomains.addAll(certAltCName);
-		}
-		return altDomains;
-	}
+	@ConfigField(desc = "Remove unused self-signed certificates", alias = "remove-self-signed-unused-certificates")
+	private boolean removeSelfSignedUnusedCerts = false;
 
 	public void setRepository(CertificateRepository repository) {
 		if (repository != null) {
@@ -353,65 +341,131 @@ public class CertificateContainer
 
 	}
 
+	private boolean shouldReplace(String alias, CertificateEntry update) {
+		CertificateEntry current = cens.get(alias);
+		if (current == null) {
+			return true;
+		}
+		// if current certificate is self-signed we override it (even with not valid)
+		if (current.isSelfSigned()) {
+			// if certificate is for "exact" domain, then it is more important that certificate for SAN
+			if (alias.equals(current.getDomain()) && update.isSelfSigned() && !alias.equals(update.getDomain())) {
+				// except current is not valid or is self-signed and update is not, then use a SAN
+				return !current.isValid();
+			}
+			return true;
+		}
+		// if new certificate if self-signed but previous wasn't - do not update!
+		if (update.isSelfSigned() && !current.isSelfSigned()) {
+			return false;
+		}
+		// both certificates are properly signed
+		// if certificate is for "exact" domain, then it is more important that certificate for SAN
+		if (alias.equals(current.getDomain()) && !alias.equals(update.getDomain())) {
+			// except current is not valid, then use a SAN
+			return !current.isValid();
+		}
+		return true;
+	}
+
 	public KeyManagerFactory addCertificateEntry(CertificateEntry entry, String alias, boolean store)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
 		log.log(Level.FINEST, "Adding certificate entry for alias: {0}. Saving to disk: {1}, entry: {2}",
 				new Object[]{alias, store, entry != null ? entry.toString(true) : "null"});
-		PrivateKey privateKey = entry.getPrivateKey();
-		Certificate[] certChain = CertificateUtil.sort(entry.getCertChain());
 
-		if (removeRootCACertificate) {
-			log.log(Level.FINEST, "Removing RootCA from certificate chain.");
-			certChain = CertificateUtil.removeRootCACertificate(certChain);
+		boolean wasUsed = false;
+
+		KeyManagerFactory rootKmf =  getKeyManagerFactory(alias, entry);
+		if (shouldReplace(alias, entry)) {
+			log.log(Level.FINEST, "Certificate present with domain {0}, updating kmfs cens", alias);
+			kmfs.put(alias, rootKmf);
+			CertificateEntry removed = cens.put(alias, entry);
+			removeSelfSignedWildcardIfMainWasRemoved(removed, entry);
+			wasUsed = true;
 		}
 
-		KeyManagerFactory kmf = getKeyManagerFactory(alias, privateKey, certChain);
-		kmfs.put(alias, kmf);
-		cens.put(alias, entry);
+		if (!def_cert_alias.equals(alias) && (wasUsed || !entry.isSelfSigned())) {
+			Set<String> domains = entry.getAllDomains();
+			domains.removeIf(domain -> !shouldReplace(domain, entry));
+			var spareDomainNamesToRemoveFromKmfs = SSLContextContainerAbstract.getSpareDomainNamesToRemove(kmfs.keySet(), domains).stream().filter(domain -> shouldReplace(domain, entry)).toList();
+			var spareDomainNamesToRemoveFromCens = SSLContextContainerAbstract.getSpareDomainNamesToRemove(cens.keySet(), domains).stream().filter(domain -> shouldReplace(domain, entry)).toList();
+			log.log(Level.FINEST,
+					"Certificate present with domains: {0}. Replacing in collections, kmfs domains: {1}, spare to remove: {2}; cens domains: {3}, spare to remove: {4}. Certificate: {5}",
+					new Object[]{domains, kmfs.keySet(), spareDomainNamesToRemoveFromKmfs, cens.keySet(), spareDomainNamesToRemoveFromCens, entry.toString(true)});
 
-		if (!def_cert_alias.equals(alias)) {
-			Optional<Certificate> certificate = entry.getCertificate();
-			if (certificate.isPresent()) {
-				Set<String> domains = getAllCNames(certificate.get());
-				domains.add(alias);
-				var spareDomainNamesToRemoveFromKmfs = SSLContextContainerAbstract.getSpareDomainNamesToRemove(kmfs.keySet(), domains);
-				var spareDomainNamesToRemoveFromCens = SSLContextContainerAbstract.getSpareDomainNamesToRemove(cens.keySet(), domains);
-				log.log(Level.FINEST,
-						"Certificate present with domains: {0}. Replacing in collections, kmfs domains: {1}, spare to remove: {2}; cens domains: {3}, spare to remove: {4}. Certificate: {5}",
-						new Object[]{domains, kmfs.keySet(), spareDomainNamesToRemoveFromKmfs, cens.keySet(), spareDomainNamesToRemoveFromCens, entry.toString(true)});
-
-				for (String domain : domains) {
-					kmf = getKeyManagerFactory(domain, privateKey, certChain);
-					kmfs.put(domain, kmf);
-					cens.put(domain, entry);
-				}
-				spareDomainNamesToRemoveFromKmfs.forEach(d -> kmfs.remove(d));
-				spareDomainNamesToRemoveFromCens.forEach(d -> cens.remove(d));
+			for (String domain : domains) {
+				KeyManagerFactory kmf = getKeyManagerFactory(domain, entry);
+				kmfs.put(domain, kmf);
+				CertificateEntry removed = cens.put(domain, entry);
+				removeSelfSignedWildcardIfMainWasRemoved(removed, entry);
+				wasUsed = true;
 			}
+			spareDomainNamesToRemoveFromKmfs.forEach(d -> kmfs.remove(d));
+			spareDomainNamesToRemoveFromCens.forEach(d -> {
+				var removed = cens.remove(d);
+				removeSelfSignedWildcardIfMainWasRemoved(removed, entry);
+			});
 		}
 
 		if (store) {
-			if (repository != null) {
-				final CertificateItem item = new CertificateItem(alias, entry);
-				log.log(Level.FINEST, "Storing to repository, certificate entry for alias: {0} with SerialNumber: {1}",
-						new Object[]{alias, item.getSerialNumber()});
-				repository.addItem(item);
+			if ((!wasUsed) && entry.isSelfSigned()) {
+				if (repository != null && removeSelfSignedUnusedCerts) {
+					log.log(Level.FINER, "Self-signed certificate entry for alias: {0} was not used, removing {0}");
+					repository.removeItem(alias);
+				} else {
+					log.log(Level.FINER, "Self-signed certificate entry for alias: {0} was not used", alias);
+				}
 			} else {
-				storeCertificateToFile(entry, alias);
+				if (repository != null) {
+					final CertificateItem item = new CertificateItem(alias, entry);
+					log.log(Level.FINEST,
+							"Storing to repository, certificate entry for alias: {0} with SerialNumber: {1}",
+							new Object[]{alias, item.getSerialNumber()});
+					repository.addItem(item);
+				} else {
+					storeCertificateToFile(entry, alias);
+				}
 			}
 		}
 
-		return kmf;
+		return rootKmf;
+	}
+
+	private void removeSelfSignedWildcardIfMainWasRemoved(CertificateEntry replaced, CertificateEntry updated) {
+		if (replaced == null || replaced == updated) {
+			return;
+		}
+		log.log(Level.FINEST, "replaced certificate for " + replaced.getDomain() + ", self-signed: " + replaced.isSelfSigned() + ", " + replaced + " with " + updated.getDomain() + ", self-signed: " + updated.isSelfSigned() + ", " + updated);
+		// if we remove self-signed cert for domain, remove it for wildcard as well (if the same is used)
+		if (replaced.isSelfSigned() && !replaced.getDomain().startsWith("*.")) {
+			log.log(Level.FINEST, "removing certificate for *." + replaced.getDomain() + ", self-signed: " + replaced.isSelfSigned());
+			if (cens.get("*." + replaced.getDomain()) == replaced) {
+				kmfs.remove("*." + replaced.getDomain());
+				cens.remove("*." + replaced.getDomain());
+				if (!cens.containsValue(replaced)) {
+					if (repository != null && removeSelfSignedUnusedCerts) {
+						log.log(Level.FINER, "Self-signed certificate entry for alias: {0} was not used, removing {0}", replaced.getDomain());
+						repository.removeItem(replaced.getDomain());
+					} else {
+						log.log(Level.FINER, "Self-signed certificate entry for alias: {0} was not used", replaced.getDomain());
+					}
+				}
+			}
+		}
 	}
 
 	private void loadCertificatesFromRepository() {
 		if (repository != null) {
+			List<CertificateItem> allSelfSignedItems = new ArrayList<>();
 			for (CertificateItem item : repository.allItems()) {
 				CertificateEntry certificate = item.getCertificateEntry();
 				String alias = item.getAlias();
 				try {
 					addCertificateEntry(certificate, alias, false);
+					if (certificate.isSelfSigned()) {
+						allSelfSignedItems.add(item);
+					}
 				} catch (Exception ex) {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Cannot load certficate from repository: " + item.getKey(), ex);
@@ -419,6 +473,24 @@ public class CertificateContainer
 					log.log(Level.WARNING, "Cannot load certficate from repository: " + item.getKey());
 				}
 			}
+			List<String> skipped = new ArrayList<>();
+			for (CertificateItem item : allSelfSignedItems) {
+				CertificateEntry certificate = item.getCertificateEntry();
+				String alias = item.getAlias();
+				if (!certificate.isSelfSigned()) {
+					continue;
+				}
+				if (cens.containsValue(certificate)) {
+					continue;
+				}
+				skipped.add(alias);
+				if (removeSelfSignedUnusedCerts) {
+					log.log(Level.FINER, "Self-signed certificate entry for alias: {0} was not used, removing {0}",
+							alias);
+					repository.removeItem(alias);
+				}
+			}
+			log.log(Level.FINER, "Loaded " + cens.size() + " certificate entries from repository for domains (main): " + cens.values().stream().map(CertificateEntry::getDomain).distinct().toList() + ", skipped self-signed: " + skipped);
 		}
 	}
 
@@ -454,9 +526,7 @@ public class CertificateContainer
 		try {
 			CertificateEntry certEntry = CertificateUtil.loadCertificate(file);
 			addCertificateEntry(certEntry, alias, false);
-			Set<String> domains = certEntry.getCertificate()
-					.map(CertificateContainer::getAllCNames)
-					.orElse(Collections.emptySet());
+			Set<String> domains = certEntry.getAllDomains();
 			log.log(Level.CONFIG, "Loaded server certificate for domain: {0} (altCNames: {1}) from file: {2}",
 					new Object[]{alias, String.join(", ", domains), file});
 			if (moveFileToBackup) {
@@ -503,6 +573,12 @@ public class CertificateContainer
 		CertificateUtil.storeCertificate(path, entry);
 	}
 
+	private KeyManagerFactory getKeyManagerFactory(String domain, CertificateEntry entry)
+			throws UnrecoverableKeyException, CertificateException, KeyStoreException, IOException,
+				   NoSuchAlgorithmException {
+		return getKeyManagerFactory(domain, entry.getPrivateKey(), entry.getCertChain(removeRootCACertificate));
+	}
+
 	private KeyManagerFactory getKeyManagerFactory(String domain, PrivateKey privateKey, Certificate[] certChain)
 			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
 				   UnrecoverableKeyException {
@@ -527,8 +603,7 @@ public class CertificateContainer
 				boolean eventSaveToDisk = repository == null;
 				eventBus.fire(new CertificateChange(alias, pemCert, eventSaveToDisk));
 			}
-			Optional<Certificate> certificate = entry.getCertificate();
-			Set<String> domains = certificate.map(CertificateContainer::getAllCNames).orElse(Collections.emptySet());
+			Set<String> domains = entry.getAllDomains();
 
 			eventBus.fire(new CertificateChanged(alias, domains));
 			log.log(Level.CONFIG,

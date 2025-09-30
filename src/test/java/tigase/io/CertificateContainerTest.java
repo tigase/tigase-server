@@ -32,9 +32,15 @@ import tigase.kernel.core.Kernel;
 
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
+import java.io.StringReader;
 import java.security.GeneralSecurityException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -111,8 +117,8 @@ public class CertificateContainerTest
 
 		var mucDomainEntry = certificateContainer.getCertificateEntry(mucDomain);
 		Assert.assertNotNull(mucDomainEntry);
-		Assert.assertEquals(CertificateUtil.getCertCName((X509Certificate) mucDomainEntry.getCertificate().get()),
-		                    wildcardDomain);
+		// we expect mucDomain as both certificates are valid, so specific is more important than wildcard
+		Assert.assertEquals(mucDomain, CertificateUtil.getCertCName((X509Certificate) mucDomainEntry.getCertificate().get()));
 	}
 
 	private void testDomain(String hostname, String expectedDomain, boolean expectsExist) throws Exception {
