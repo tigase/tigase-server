@@ -471,11 +471,16 @@
                 <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0433.html"/>
             </xmpp:SupportedXep>
         </implements>
+        <implements>
+            <xmpp:SupportedXep>
+                <xmpp:xep rdf:resource="https://xmpp.org/extensions/xep-0485.html"/>
+            </xmpp:SupportedXep>
+        </implements>
 
         <release>
             <Version>
-                <revision>8.2.0</revision>
-                <created>2022-03-01</created>
+                <revision>8.4.0</revision>
+                <created>2024-06-05</created>
             </Version>
         </release>
     </Project>
