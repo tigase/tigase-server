@@ -17,6 +17,7 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.auth.credentials.Credentials;
 import tigase.db.*;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusEvent;
@@ -152,6 +153,22 @@ public class JabberIqRegister
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
+	}
+
+	public boolean isEmailRequired() {
+		return emailRequired;
+	}
+
+	public void setEmailRequired(boolean emailRequired) {
+		this.emailRequired = emailRequired;
+	}
+
+	public boolean isCaptchaRequired() {
+		return captchaRequired;
+	}
+
+	public void setCaptchaRequired(boolean captchaRequired) {
+		this.captchaRequired = captchaRequired;
 	}
 
 	public long getRegistrationsPerSecond() {
@@ -436,39 +453,59 @@ public class JabberIqRegister
 
 		final BareJID jid = BareJID.bareJIDInstance(user_name, domain.getVhost().getDomain());
 
+		try {
+			createAccount(session.getAuthRepository(), jid, password, email, reg_params);
+			if (log.isLoggable(Level.FINEST)) {
+				log.log(Level.FINEST, "Registration data set for: {0}, pass: {1}, reg_params: {2}",
+						new Object[]{BareJID.toString(user_name, domain.getVhost().getDomain()), password, reg_params});
+			}
+		} catch (UserExistsException e) {
+			throw new XMPPProcessorException(Authorization.CONFLICT);
+		}
+	}
+
+	public void createAccount(AuthRepository authRepository, BareJID jid, String password, String email, Map<String, String> reg_params)
+			throws TigaseDBException, XMPPProcessorException {
+		if (reg_params != null) {
+			reg_params = Collections.emptyMap();
+			if ((email != null) && !email.isBlank()) {
+				reg_params = new LinkedHashMap<>();
+				reg_params.put("email", email.trim());
+			}
+		}
+		
 		if (validators != null) {
 			for (AccountValidator validator : validators) {
 				validator.checkRequiredParameters(jid, reg_params);
 			}
 		}
 
-		try {
-			session.getAuthRepository().addUser(jid, password);
+		authRepository.addUser(jid, password);
 
-			boolean confirmationRequired = false;
-			if (validators != null) {
-				for (AccountValidator validator : validators) {
-					confirmationRequired |= validator.sendAccountValidation(jid, reg_params);
-				}
-				if (confirmationRequired) {
-					session.getAuthRepository().setAccountStatus(jid, AuthRepository.AccountStatus.pending);
-				}
+		boolean confirmationRequired = false;
+		if (validators != null) {
+			for (AccountValidator validator : validators) {
+				confirmationRequired |= validator.sendAccountValidation(jid, reg_params);
 			}
-
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "User added: {0}, pass: {1}",
-						new Object[]{BareJID.toString(user_name, domain.getVhost().getDomain()), password});
+			if (confirmationRequired) {
+				authRepository.setAccountStatus(jid, AuthRepository.AccountStatus.pending);
 			}
-			++statsRegisteredUsers;
-			session.setRegistration(user_name, password, reg_params);
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST, "Registration data set for: {0}, pass: {1}, reg_params: {2}",
-						new Object[]{BareJID.toString(user_name, domain.getVhost().getDomain()), password, reg_params});
-			}
-			eventBus.fire(new UserRegisteredEvent(jid, email, confirmationRequired, reg_params));
-		} catch (UserExistsException e) {
-			throw new XMPPProcessorException(Authorization.CONFLICT);
 		}
+
+		if (log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "User added: {0}, pass: {1}",
+					new Object[]{jid, password});
+		}
+		++statsRegisteredUsers;
+		authRepository.updateCredential(jid,
+								  Credentials.DEFAULT_CREDENTIAL_ID, password);
+		if (reg_params != null) {
+			for (Map.Entry<String, String> entry : reg_params.entrySet()) {
+				userRepository.setData(jid,
+							 entry.getKey(), entry.getValue());
+			}
+		}
+		eventBus.fire(new UserRegisteredEvent(jid, email, confirmationRequired, reg_params));
 	}
 
 	protected void doGetRegistrationForm(Packet packet, Element request, XMPPResourceConnection session,

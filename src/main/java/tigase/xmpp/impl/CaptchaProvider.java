@@ -19,6 +19,7 @@ package tigase.xmpp.impl;
 
 import tigase.kernel.beans.Bean;
 import tigase.util.Base64;
+import tigase.vhosts.VHostItem;
 import tigase.xmpp.XMPPResourceConnection;
 
 import javax.crypto.Mac;
@@ -32,6 +33,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 
 @Bean(name = "CaptchaProvider", parent = JabberIqRegister.class, active = true)
 public class CaptchaProvider {
@@ -75,7 +77,7 @@ public class CaptchaProvider {
 
 	}
 
-	private class SimpleTextCaptcha
+	public static class SimpleTextCaptcha
 			implements CaptchaItem {
 
 		private static final Duration TIMEOUT = Duration.ofMinutes(5);
@@ -93,6 +95,10 @@ public class CaptchaProvider {
 
 		public static byte[] calculateHMac(byte[] data, String key) throws NoSuchAlgorithmException, InvalidKeyException {
 			SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+			return calculateHMac(data, secretKeySpec);
+		}
+
+		public static byte[] calculateHMac(byte[] data, SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
 			Mac mac = Mac.getInstance("HmacSHA256");
 			mac.init(secretKeySpec);
 			return mac.doFinal(data);
@@ -103,7 +109,18 @@ public class CaptchaProvider {
 					.orElse(connection.getDomainAsJID().toString());
 		}
 
+		public static String getSecret(VHostItem item, String domain) {
+			return Optional.ofNullable(item).map(VHostItem::getS2sSecret).orElse(domain);
+		}
+		
 		SimpleTextCaptcha(Random random, XMPPResourceConnection connection) {
+			this(random, () -> {
+				String secret = getSecret(connection);
+				return new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+			});
+		}
+
+		public SimpleTextCaptcha(Random random, Supplier<SecretKeySpec> secretSupplier) {
 			this.a = 1 + random.nextInt(31);
 			this.b = 1 + random.nextInt(31);
 			this.result = a + b;
@@ -113,13 +130,13 @@ public class CaptchaProvider {
 
 			try {
 				this.hmac = calculateHMac((getPrefix() + "." + result).getBytes(StandardCharsets.UTF_8),
-										  getSecret(connection));
+										  secretSupplier.get());
 			} catch (Throwable ex) {
 				throw new RuntimeException("Could not generate HMAC", ex);
 			}
 		}
 
-		SimpleTextCaptcha(String[] parts) {
+		public SimpleTextCaptcha(String[] parts) {
 			this.nonce = new byte[NONCE_LENGTH];
 			ByteBuffer tmp = ByteBuffer.wrap(Base64.decode(parts[1]));
 			tmp.get(nonce);
@@ -149,6 +166,10 @@ public class CaptchaProvider {
 			return "Solve: " + String.valueOf(a) + " + " + String.valueOf(b);
 		}
 
+		public String getCaptchaRequest() {
+			return "Solve: " + String.valueOf(a) + " + " + String.valueOf(b);
+		}
+
 		@Override
 		public int getErrorCounter() {
 			return errorCounter;
@@ -161,6 +182,13 @@ public class CaptchaProvider {
 
 		@Override
 		public boolean isResponseValid(XMPPResourceConnection session, String response) {
+			return isResponseValid(() -> {
+				String secret = getSecret(session);
+				return new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+			}, response);
+		}
+		
+		public boolean isResponseValid(Supplier<SecretKeySpec> secretKeySpecSupplier, String response) {
 			if (response == null) {
 				return false;
 			}
@@ -176,7 +204,7 @@ public class CaptchaProvider {
 				}
 				// then check if anyone tampered with token
 				byte[] calculated = calculateHMac((getPrefix() + "." + responseResult).getBytes(StandardCharsets.UTF_8),
-												  getSecret(session));
+												  secretKeySpecSupplier.get());
 				return Arrays.equals(hmac, calculated);
 			} catch (Throwable ex) {
 				return false;
