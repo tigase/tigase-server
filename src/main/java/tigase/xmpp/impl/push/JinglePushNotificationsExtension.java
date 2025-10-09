@@ -27,6 +27,8 @@ import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.Optional;
+
 @Bean(name = "jingle", parent = PushNotifications.class, active = true)
 public class JinglePushNotificationsExtension implements PushNotificationsExtension, PushNotificationsFilter, PushNotificationsAware {
 
@@ -62,16 +64,16 @@ public class JinglePushNotificationsExtension implements PushNotificationsExtens
 		if (actionEl == null) {
 			return;
 		}
-		String sid = actionEl.getAttributeStaticStr("sid");
-		if (sid == null) {
+		String id = actionEl.getAttributeStaticStr("id");
+		if (id == null) {
 			return;
 		}
 
 		notification.withElement("jingle", "tigase:push:jingle:0", jingle -> {
-			jingle.addAttribute("sid", sid);
-			actionEl.mapChildren(el -> el.getName() == "description" && el.getXMLNS() == "urn:xmpp:jingle:apps:rtp:1",
-								 el -> el.getAttributeStaticStr("media"))
-					.forEach(media -> jingle.withElement("media", null, media));
+			jingle.addAttribute("sid", id);
+			Optional.ofNullable(actionEl.mapChildren(el -> el.getName() == "description" && el.getXMLNS() == "urn:xmpp:jingle:apps:rtp:1",
+								 el -> el.getAttributeStaticStr("media")))
+					.ifPresent(mediaTypes -> mediaTypes.forEach(media -> jingle.withElement("media", null, media)));
 		});
 	}
 
