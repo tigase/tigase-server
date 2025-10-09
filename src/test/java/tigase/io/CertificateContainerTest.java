@@ -90,7 +90,7 @@ public class CertificateContainerTest
 		addCertificateForDomain(domain, true);
 		addCertificateForDomain("*." + domain, true);
 	}
-
+	
 	/**
 	 * If wildcard certificate is added it should be used instead of explicit one...
 	 */

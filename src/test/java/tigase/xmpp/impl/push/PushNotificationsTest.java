@@ -480,6 +480,63 @@ public class PushNotificationsTest
 	}
 
 	@Test
+	public void testJingleNotification() throws TigaseDBException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		settings.addChild(new Element("jingle", new String[] {"xmlns", "id"}, new String[] {"tigase:push:jingle:0", "test-1"}));
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		Element msg = new Element("message", new Element[]{new Element("propose", new String[] {"xmlns", "id"}, new String[] {"urn:xmpp:jingle-message:0", "test-1"})}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Element notificationElem = results.remove().packet.getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		Element jingleEl = notificationElem.getChild("jingle");
+		assertNotNull(jingleEl);
+		assertEquals("test-1", jingleEl.getAttributeStaticStr("sid"));
+	}
+
+	@Test
+	public void testMeetNotification() throws TigaseDBException {
+		Element settings = new Element("settings", new String[]{"jid", "node"},
+									   new String[]{pushServiceJid.toString(),
+													"push-node"});
+		settings.addChild(new Element("meet", new String[] {"xmlns", "id"}, new String[] {"tigase:push:meet:0", "test-1"}));
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+												  pushServiceJid + "/push-node",
+												  settings.toString());
+
+		String meetJid = JID.jidInstanceNS("test-meet-1", "meet." + senderJid.getDomain()).toString();
+		Element msg = new Element("message", new Element[]{new Element("propose", new String[] {"xmlns", "id", "jid"}, new String[] {"tigase:meet:0", "test-1", meetJid}).withElement("media", mediaEl -> mediaEl.addAttribute("type", "audio")).withElement("media", mediaEl -> mediaEl.addAttribute("type", "video"))}, new String[]{"xmlns"},
+								  new String[]{"jabber:client"});
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Element notificationElem = results.remove().packet.getElement().findChild(new String[] { "iq", "pubsub", "publish", "item", "notification"});
+		Element meetEl = notificationElem.getChild("meet");
+		assertNotNull(meetEl);
+		assertEquals("test-1", meetEl.getAttributeStaticStr("id"));
+		assertEquals(meetJid, meetEl.getAttributeStaticStr("jid"));
+		assertArrayEquals(new String[] { "audio", "video" }, meetEl.findChildren(el -> el.getName() == "media").stream().map(Element::getCData).sorted().toArray(String[]::new));
+	}
+
+	@Test
 	public void testEncryptedNotification() throws TigaseDBException, NoSuchPaddingException, NoSuchAlgorithmException,
 												   InvalidAlgorithmParameterException, InvalidKeyException,
 												   BadPaddingException, IllegalBlockSizeException {
