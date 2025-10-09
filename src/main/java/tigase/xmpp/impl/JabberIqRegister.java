@@ -466,7 +466,7 @@ public class JabberIqRegister
 
 	public void createAccount(AuthRepository authRepository, BareJID jid, String password, String email, Map<String, String> reg_params)
 			throws TigaseDBException, XMPPProcessorException {
-		if (reg_params != null) {
+		if (reg_params == null) {
 			reg_params = Collections.emptyMap();
 			if ((email != null) && !email.isBlank()) {
 				reg_params = new LinkedHashMap<>();
