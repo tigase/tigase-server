@@ -50,6 +50,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static tigase.cert.CertificateUtil.validateCertificate;
+import static tigase.server.ConnectionManager.PORT_PROXY_PROTOCOL_PROP_KEY;
 
 /**
  * <code>IOService</code> offers thread safe <code>call()</code> method execution, however you must be prepared that
@@ -168,6 +169,17 @@ public abstract class IOService<RefObject>
 				socketChannel.finishConnect();
 			}    // end of if (socketChannel.isConnecyionPending())
 			socketIO = new SocketIO(socketChannel);
+			if (connectionType == ConnectionType.accept && sessionData != null &&
+					(Boolean) sessionData.getOrDefault(PORT_PROXY_PROTOCOL_PROP_KEY, false)) {
+				socketIO = new ProxyIO(socketIO, (local, remote) -> {
+					if (local != null) {
+						local_address = local;
+					}
+					if (remote != null) {
+						remote_address = remote;
+					}
+				});
+			}
 		} catch (IOException e) {
 			String host = (String) sessionData.get("remote-hostname");
 

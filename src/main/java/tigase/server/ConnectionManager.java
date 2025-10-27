@@ -95,6 +95,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 	public static final boolean PORT_LISTENING_DELAY_DEF = false;
 	public static final String PORT_KEY = "port-no";
 	public static final String PORT_NEW_CONNECTIONS_THROTTLING_KEY = "new-connections-throttling";
+	public static final String PORT_PROXY_PROTOCOL_PROP_KEY = "proxy-protocol";
 	public static final String PORT_REMOTE_HOST_PROP_KEY = "remote-host";
 	public static final String PORT_REMOTE_HOST_PROP_VAL = "localhost";
 	public static final String PORT_SOCKET_PROP_KEY = "socket";
@@ -1055,6 +1056,8 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 		protected SocketType socket = SocketType.plain;
 		@ConfigField(desc = "Port type")
 		protected ConnectionType type = ConnectionType.accept;
+		@ConfigField(desc = "Enable Proxy protocol support")
+		protected boolean enableProxy = false;
 		@Inject
 		private ConnectionManager connectionManager;
 		private ConnectionOpenListener connectionOpenListener = null;
@@ -1149,6 +1152,7 @@ public abstract class ConnectionManager<IO extends XMPPIOService<?>>
 			props.put(PORT_REMOTE_HOST_PROP_KEY, PORT_REMOTE_HOST_PROP_VAL);
 			props.put(PORT_NEW_CONNECTIONS_THROTTLING_KEY, newConnectionsThrottling);
 //			props.put(TLS_REQUIRED_PROP_KEY, TLS_REQUIRED_PROP_VAL);
+			props.put(PORT_PROXY_PROTOCOL_PROP_KEY, enableProxy);
 			return props;
 		}
 	}
