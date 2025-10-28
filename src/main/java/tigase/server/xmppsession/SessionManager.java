@@ -357,6 +357,7 @@ public class SessionManager
 			log.log(Level.FINEST, "handleLogin called for: {0}, conn_id: {1}", new Object[]{userId, conn});
 		}
 		registerNewSession(userId, conn);
+		AuthenticationTimer.cancel(conn);
 	}
 
 	@Override
@@ -1133,6 +1134,8 @@ public class SessionManager
 						}
 					}    // end of else
 				}      // end of if (session.getActiveResourcesSize() == 0)
+			} else {
+				AuthenticationTimer.cancel(conn);
 			}
 		} catch (NotAuthorizedException e) {
 			log.log(Level.CONFIG, "Closed not authorized session: {0}", e);
@@ -2572,6 +2575,19 @@ public class SessionManager
 	private static class AuthenticationTimer
 			extends TimerTask {
 
+		public static final String AUTH_TIMER_KEY = "authTimerKey";
+
+		public static void cancel(XMPPResourceConnection session) {
+			if (session != null) {
+				AuthenticationTimer timer = (AuthenticationTimer) session.getSessionData(AUTH_TIMER_KEY);
+				if (timer != null) {
+					session.removeSessionData(AUTH_TIMER_KEY);
+					timer.cancel();
+					log.log(Level.FINEST, "Authentication timer, cancelled for connection: {0}", session);
+				}
+			}
+		}
+
 		private final SessionManager sm;
 		private JID connId = null;
 
@@ -2723,7 +2739,9 @@ public class SessionManager
 
 					return;
 				}
-				sm.addTimerTask(new AuthenticationTimer(sm, packet.getFrom()), sm.authTimeout, TimeUnit.SECONDS);
+				AuthenticationTimer authTimer = new AuthenticationTimer(sm, packet.getFrom());
+				conn.putSessionData(AuthenticationTimer.AUTH_TIMER_KEY, authTimer);
+				sm.addTimerTask(authTimer, sm.authTimeout, TimeUnit.SECONDS);
 			} else {
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Stream opened for existing session, authorized: {0}", conn.isAuthorized());
