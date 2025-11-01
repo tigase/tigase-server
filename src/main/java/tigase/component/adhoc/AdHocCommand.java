@@ -18,6 +18,7 @@
 package tigase.component.adhoc;
 
 import tigase.annotations.TigaseDeprecated;
+import tigase.server.CmdAcl;
 import tigase.xmpp.jid.JID;
 
 import java.util.Optional;
@@ -50,5 +51,9 @@ public interface AdHocCommand {
 
 	default boolean isForSelf() {
 		return false;
+	}
+
+	default CmdAcl getDefaultACL() {
+		return null;
 	}
 }

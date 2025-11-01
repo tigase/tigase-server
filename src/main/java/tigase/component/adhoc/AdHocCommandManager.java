@@ -24,6 +24,7 @@ import tigase.kernel.beans.Inject;
 import tigase.server.Packet;
 import tigase.util.cache.SimpleCacheSynchronized;
 import tigase.xml.Element;
+import tigase.xmpp.Authorization;
 import tigase.xmpp.PacketErrorTypeException;
 import tigase.xmpp.jid.JID;
 
@@ -84,7 +85,19 @@ public class AdHocCommandManager {
 
 		if (adHocCommand == null) {
 		} else {
-			process(packet, command, node, action, sessionId, adHocCommand, resultConsumer);
+			boolean selfQuery = senderJid.getBareJID().equals(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null;
+			if (selfQuery == adHocCommand.isForSelf() && adHocCommand.isAllowedFor(senderJid, packet.getStanzaTo())) {
+				process(packet, command, node, action, sessionId, adHocCommand, resultConsumer);
+			} else {
+				try {
+					Packet errorResponse = new ComponentException(Authorization.NOT_ALLOWED, "You are not allowed to execute this command!").makeElement(packet, true);
+					resultConsumer.accept(errorResponse);
+				} catch (PacketErrorTypeException e1) {
+					if (log.isLoggable(Level.WARNING)) {
+						log.log(Level.WARNING, "Problem during generate error response", e1);
+					}
+				}
+			}
 		}
 	}
 

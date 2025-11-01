@@ -564,7 +564,7 @@ public class BasicComponent
 	@Override
 	public Element getDiscoInfo(String node, JID jid, JID from) {
 		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
-			Element queryEl = serviceEntity.getDiscoInfo(node, isAdmin(from) || nonAdminCommands);
+			Element queryEl = serviceEntity.getDiscoInfo(node, isAdmin(from) || hasNonAdminCommands());
 			if (queryEl != null) {
 				Element form = getDiscoExtensionsForm(jid.getDomain());
 				if (form != null) {
@@ -575,6 +575,10 @@ public class BasicComponent
 		}
 
 		return null;
+	}
+
+	protected boolean hasNonAdminCommands() {
+		return nonAdminCommands;
 	}
 
 	private static final List<String> DISCO_EXTENSION_ADDRESSES = Arrays.asList("abuse-addresses", "admin-addresses", "feedback-addresses", "sales-addresses", "security-addresses", "support-addresses");
@@ -652,13 +656,13 @@ public class BasicComponent
 
 		if (getName().equals(jid.getLocalpart()) || jid.toString().startsWith(getName() + ".")) {
 			if (node != null) {
-				if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom || nonAdminCommands)) {
+				if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom || hasNonAdminCommands())) {
 					result = getScriptItems(node, jid, from);
 				} else {
-					result = serviceEntity.getDiscoItems(node, jid.toString(), (isAdminFrom || nonAdminCommands));
+					result = serviceEntity.getDiscoItems(node, jid.toString(), (isAdminFrom || hasNonAdminCommands()));
 				}
 			} else {
-				result = serviceEntity.getDiscoItems(null, jid.toString(), (isAdminFrom || nonAdminCommands));
+				result = serviceEntity.getDiscoItems(null, jid.toString(), (isAdminFrom || hasNonAdminCommands()));
 				if (result != null) {
 					for (Iterator<Element> it = result.iterator(); it.hasNext(); ) {
 						Element element = it.next();
@@ -687,12 +691,12 @@ public class BasicComponent
 
 				Element res = null;
 
-				if (!serviceEntity.isAdminOnly() || isAdmin(from) || nonAdminCommands) {
+				if (!serviceEntity.isAdminOnly() || isAdmin(from) || hasNonAdminCommands()) {
 					res = serviceEntity.getDiscoItem(null, isSubdomain()
 														   ? (getName() + "." + jid)
 														   : getName() + "@" + jid.toString());
 				}
-				result = serviceEntity.getDiscoItems(null, null, (isAdminFrom || nonAdminCommands));
+				result = serviceEntity.getDiscoItems(null, null, (isAdminFrom || hasNonAdminCommands()));
 				if (res != null) {
 					if (result != null) {
 						for (Iterator<Element> it = result.iterator(); it.hasNext(); ) {
@@ -749,7 +753,7 @@ public class BasicComponent
 		LinkedList<Element> result = null;
 		boolean isAdminFrom = isAdmin(from);
 
-		if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom || nonAdminCommands)) {
+		if (node.equals("http://jabber.org/protocol/commands") && (isAdminFrom || hasNonAdminCommands())) {
 			result = new LinkedList<Element>();
 			for (CommandIfc comm : scriptCommands.values()) {
 				if (!comm.isAdminOnly() || isAdminFrom) {
@@ -815,6 +819,10 @@ public class BasicComponent
 	@Override
 	@Deprecated
 	public void setProperties(Map<String, Object> props) throws ConfigurationException {
+	}
+
+	protected Map<String, CopyOnWriteArraySet<CmdAcl>>getCommandACL() {
+		return Map.copyOf(commandsACL);
 	}
 
 	public void setCommandsACL(ConcurrentHashMap<String, CopyOnWriteArraySet<CmdAcl>> commandsACL) {
@@ -941,7 +949,7 @@ public class BasicComponent
 	}
 
 	public Optional<Element> getServiceEntityCaps(JID fromJid) {
-		return getServiceEntity().getCaps(isAdmin(fromJid) || nonAdminCommands, fromJid.getDomain());
+		return getServiceEntity().getCaps(isAdmin(fromJid) || hasNonAdminCommands(), fromJid.getDomain());
 	}
 
 	protected ScriptEngineManager createScriptEngineManager() {
@@ -969,7 +977,7 @@ public class BasicComponent
 	}
 
 	protected boolean isNonAdminCommands() {
-		return nonAdminCommands;
+		return hasNonAdminCommands();
 	}
 
 	protected void reloadScripts() {

@@ -27,7 +27,7 @@ import tigase.db.AuthRepository;
 import tigase.db.TigaseDBException;
 import tigase.form.Form;
 import tigase.kernel.beans.Inject;
-import tigase.server.xmppsession.SessionManager;
+import tigase.server.CmdAcl;
 import tigase.xml.Element;
 import tigase.xmpp.Authorization;
 import tigase.xmpp.jid.BareJID;
@@ -82,6 +82,11 @@ public abstract class AbstractCredentialsCommand
 	@Override
 	public boolean isAllowedFor(JID jid) {
 		return scriptCommandProcessor.isAllowed(getNode(), jid);
+	}
+
+	@Override
+	public CmdAcl getDefaultACL() {
+		return new CmdAcl("LOCAL");
 	}
 
 	protected abstract void processForm(Form form, AdhHocRequest request, AdHocResponse response)

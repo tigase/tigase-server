@@ -22,6 +22,7 @@ import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslEXTERNAL;
 import tigase.component.ComponenScriptCommandProcessor;
 import tigase.component.PacketWriter;
+import tigase.component.adhoc.AdHocCommand;
 import tigase.component.adhoc.AdHocCommandManager;
 import tigase.component.exceptions.ComponentException;
 import tigase.component.modules.impl.AdHocCommandModule;
@@ -73,10 +74,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -866,6 +864,16 @@ public class SessionManager
 
 	@Override
 	public void initialize() {
+		ConcurrentHashMap<String, CopyOnWriteArraySet<CmdAcl>> commandACL = new ConcurrentHashMap<>(getCommandACL());
+		for (AdHocCommand command : adHocCommandModule.getCommandsManager().getAllCommands()) {
+			if (!commandACL.containsKey(command.getNode())) {
+				if (command.getDefaultACL() != null) {
+					commandACL.put(command.getNode(), new CopyOnWriteArraySet<>(Set.of(command.getDefaultACL())));
+				}
+			}
+		}
+		setCommandsACL(commandACL);
+
 		super.initialize();
 
 		smResourceConnection = new SMResourceConnection(null, user_repository, auth_repository, this);
