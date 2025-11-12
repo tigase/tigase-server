@@ -115,3 +115,20 @@ This property activates a workaround for a bug in EJabberd in it’s s2s impleme
    }
 
 This replaces the old ``--s2s-ejabberd-bug-workaround-active`` property.
+
+Available since v8.5.0
+
+PROXY protocol support
+^^^^^^^^^^^^^^^^^^^^^^^
+PROXY protocol support (v1 & v2) may be enabled in the similar way as for client to server connections, by setting ``enableProxy`` to ``true`` on selected port.
+
+.. code::
+   s2s {
+       5369 () {
+           enableProxy = true
+       }
+   }
+
+.. Warning::
+
+   Do not enable PROXY protocol support on ports that are open for anyone to connect. Only load balancers should be able to connect to those ports as Tigase XMPP Server will trust IP addresses provide using PROXY protocol.

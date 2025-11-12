@@ -110,3 +110,22 @@ Normally packets are handled by C2S and are typically processed in the first run
    }
 
 This setting prevents packet redelivery attempts from continuing into infinity (or when the host machine runs out of memory).
+
+PROXY protocol support
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Client to server connections usually are direct TCP connections. However, in some cases it is required to use load balancers to distribute traffic from the Internet facing servers to the XMPP server that may be running in the internal network. If in this process TCP connection is accepted and then a new connection is established from load balancer to the XMPP server, then XMPP server is not aware of the XMPP client real IP address. This missing information makes it difficult to protect the server from DDOS attacks or to limit registration from the same IP addresses.
+To overcome this issue, we've added PROXY protocol support (v1 & v2) that when enabled will allow load balancer to share client IP address (and some additional connection details) with Tigase XMPP Server.
+
+To enable PROXY protocol support by setting ``enableProxy`` to ``true`` on selected port.
+
+.. code::
+   c2s {
+       5322 () {
+           enableProxy = true
+       }
+   }
+
+.. Warning::
+
+   Do not enable PROXY protocol support on ports that are open for anyone to connect. Only load balancers should be able to connect to those ports as Tigase XMPP Server will trust IP addresses provide using PROXY protocol.
