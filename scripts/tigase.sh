@@ -58,6 +58,8 @@ if [ -z "${TIGASE_HOME}" ] ; then
 fi
 
 if [ -n "${OSGI}" ] && ${OSGI} ; then
+  echo "OSGi mode is no longer supported by Tigase XMPP Server."
+  exit 1
 	LIB_DIR=jars
 	JAR_FILE=${LIB_DIR}/org.apache.felix.main*.jar
 else
