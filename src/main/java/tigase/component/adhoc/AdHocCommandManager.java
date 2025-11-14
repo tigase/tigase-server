@@ -85,7 +85,7 @@ public class AdHocCommandManager {
 
 		if (adHocCommand == null) {
 		} else {
-			boolean selfQuery = senderJid.getBareJID().equals(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null;
+			boolean selfQuery = packet.getStanzaTo() == null || (senderJid.getBareJID().equals(packet.getStanzaTo().getBareJID()) && packet.getStanzaTo().getResource() == null);
 			if (selfQuery == adHocCommand.isForSelf() && adHocCommand.isAllowedFor(senderJid, packet.getStanzaTo())) {
 				process(packet, command, node, action, sessionId, adHocCommand, resultConsumer);
 			} else {
