@@ -24,6 +24,8 @@ import tigase.db.DataSource;
 import tigase.db.Schema;
 import tigase.db.jdbc.DataRepositoryImpl;
 import tigase.db.util.locker.ConnectionLock;
+import tigase.server.extdisco.ExtServiceDiscoItem;
+import tigase.server.extdisco.ExtServiceDiscoveryUserRepoRepository;
 import tigase.util.Version;
 import tigase.util.log.LogFormatter;
 import tigase.util.ui.console.CommandlineParameter;
@@ -510,6 +512,49 @@ public class DBSchemaLoader
 			Result result = addUsersToRepository(schemaInfo, dataSource, DataRepository.class, jids, pwd, log);
 			if (result == Result.ok) {
 				log.log(Level.INFO, "All users added");
+			}
+			return result;
+		} catch (RepositoryException e) {
+			log.log(Level.WARNING, "Error initializing DB" + e);
+			return Result.error;
+		}
+	}
+	
+	@Override
+	public Result addExternalServices(SchemaManager.SchemaInfo schemaInfo) {
+		// part 1, check db preconditions
+		if (!connection_ok) {
+			log.log(Level.WARNING, "Connection not validated");
+			return Result.error;
+		}
+		if (!db_ok) {
+			log.log(Level.WARNING, "Database not validated");
+			return Result.error;
+		}
+
+		if (!schema_ok) {
+			log.log(Level.WARNING, "Database schema is invalid");
+			return Result.error;
+		}
+
+		// part 2, acquire required fields and validate them
+		List<ExtServiceDiscoItem> services = params.getExternalServices();
+		if (services.size() < 1) {
+			log.log(Level.WARNING, "Error: No external services entered");
+			return Result.skipped;
+		}
+
+		String dbUri = getDBUri();
+		log.log(Level.INFO, "Adding External Service Discovery Items, URI: " + getDBUri(true));
+
+		try {
+			DataRepository dataSource = new DataRepositoryImpl();
+			dataSource.initialize(dbUri);
+
+			Result result = addComponentRepositoryItems(schemaInfo, dataSource, DataRepository.class, ExtServiceDiscoveryUserRepoRepository.class, log, services);
+
+			if (result == Result.ok) {
+				log.log(Level.INFO, "All External Service Discovery Items added");
 			}
 			return result;
 		} catch (RepositoryException e) {
@@ -1423,6 +1468,7 @@ public class DBSchemaLoader
 		private Boolean forceReloadSchema = false;
 		private String schemaDirectory = "database/";
 		private Map<String,String> otherParameters = new HashMap<>();
+		private List<ExtServiceDiscoItem> externalServices = new ArrayList<>();
 
 		private static String getProperty(Properties props, PARAMETERS_ENUM param) {
 			return props.getProperty(param.getName(), null); //param.getDefaultValue());
@@ -1522,6 +1568,16 @@ public class DBSchemaLoader
 
 		public String getServerTimezone() {
 			return serverTimezone;
+		}
+
+		@Override
+		public List<ExtServiceDiscoItem> getExternalServices() {
+			return externalServices;
+		}
+
+		@Override
+		public void setExternalServices(List<ExtServiceDiscoItem> externalServices) {
+			this.externalServices = externalServices;
 		}
 
 		public String getSchemaDirectory() {

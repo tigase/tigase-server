@@ -24,9 +24,14 @@ import tigase.conf.ConfigBuilder;
 import tigase.conf.ConfigHolder;
 import tigase.conf.ConfigWriter;
 import tigase.db.*;
+import tigase.db.comp.ComponentRepository;
+import tigase.db.comp.RepositoryItem;
+import tigase.db.comp.UserRepoRepository;
 import tigase.kernel.DefaultTypesConverter;
+import tigase.kernel.beans.Initializable;
 import tigase.kernel.core.Kernel;
 import tigase.osgi.util.ClassUtilBean;
+import tigase.server.extdisco.ExtServiceDiscoItem;
 import tigase.util.Version;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
@@ -245,6 +250,10 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 	 */
 	public abstract Result addXmppAdminAccount(SchemaManager.SchemaInfo schemaInfo);
 
+	public Result addExternalServices(SchemaManager.SchemaInfo schemaInfo) {
+		return Result.skipped;
+	}
+
 	/**
 	 * Methods attempt to write to database loaded schema version for particular component
 	 *
@@ -290,6 +299,56 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 				.findAny()
 				.map(addUsersToRepositoryFunction(jids, password, log))
 				.orElse(Result.error);
+	}
+
+	protected <X extends RepositoryItem, T extends DataSource, R extends ComponentRepository<X>> Result addComponentRepositoryItems(SchemaManager.SchemaInfo schemaInfo, T dataSource, Class<T> dataSourceClass, Class<R> componentRepositoryClass, Logger log, List<X> items) {
+		return withComponentRepository(schemaInfo, dataSource, dataSourceClass, componentRepositoryClass, log, repo -> {
+			try {
+				for (X item : items) {
+					repo.addItem(item);
+				}
+				return Result.ok;
+			} catch (TigaseDBException ex) {
+				log.log(Level.WARNING, "Error adding component items for repository", ex);
+				return Result.error;
+			}
+		});
+	}
+
+	protected <T extends DataSource> Result withUserRepository(SchemaManager.SchemaInfo schemaInfo, T dataSource, Class<T> dataSourceClass, Logger log, Function<UserRepository, Result> function) {
+		return getDataSourceAwareClassesForSchemaInfo(schemaInfo, dataSourceClass)
+				.filter(UserRepository.class::isAssignableFrom)
+				.map(this::instantiateClass)
+				.map(initializeDataSourceAwareFunction(dataSource, log))
+				.map(UserRepository.class::cast)
+				.filter(Objects::nonNull)
+				.findAny()
+				.map(function)
+				.orElse(Result.error);
+	}
+
+	protected <X extends RepositoryItem, T extends DataSource, R extends ComponentRepository<X>> Result withComponentRepository(SchemaManager.SchemaInfo schemaInfo, T dataSource, Class<T> dataSourceClass, Class<R> componentRepositoryClass, Logger log, Function<R, Result> function) {
+		if (UserRepoRepository.class.isAssignableFrom(componentRepositoryClass)) {
+			return withUserRepository(schemaInfo, dataSource, dataSourceClass, log, userRepository -> {
+			   try {
+				   R repo = componentRepositoryClass.getConstructor().newInstance();
+				   if (repo instanceof UserRepoRepository) {
+					   ((UserRepoRepository<?>) repo).setRepo(userRepository);
+				   }
+				   if (repo instanceof Initializable) {
+					   ((Initializable) repo).initialize();
+				   }
+				   repo.reload();
+				   return function.apply(repo);
+			   } catch (Throwable ex) {
+				   log.log(Level.WARNING, "Failure while trying to initialize " + componentRepositoryClass.getName(), ex);
+				   return Result.error;
+			   }
+			});
+		} else {
+			log.log(Level.WARNING, "Invalid component repository class " + componentRepositoryClass.getCanonicalName());
+			return Result.error;
+		}
 	}
 
 	protected <DS extends DataSource> Stream<Class<DataSourceAware<DS>>> getDataSourceAwareClassesForSchemaInfo(
@@ -417,6 +476,13 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 		default void setSchemaDirectory(String schemaDirectory) {
 
+		}
+
+		default List<ExtServiceDiscoItem> getExternalServices() {
+			return Collections.emptyList();
+		}
+
+		default void setExternalServices(List<ExtServiceDiscoItem> externalServices) {
 		}
 
 		Level getLogLevel();

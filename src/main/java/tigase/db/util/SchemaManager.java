@@ -38,6 +38,7 @@ import tigase.kernel.core.Kernel;
 import tigase.kernel.core.RegistrarKernel;
 import tigase.osgi.ModulesManagerImpl;
 import tigase.server.XMPPServer;
+import tigase.server.extdisco.ExtServiceDiscoItem;
 import tigase.server.monitor.MonitorRuntime;
 import tigase.sys.TigaseRuntime;
 import tigase.util.Version;
@@ -137,6 +138,7 @@ public class SchemaManager {
 	private Level logLevel = Level.CONFIG;
 	private boolean forceReloadSchema = false;
 	private RootCredentialsCache rootCredentialsCache = new RootCredentialsCache();
+	private List<ExtServiceDiscoItem> externalServices = new ArrayList<>();
 
 	private static Stream<String> getActiveNonCoreComponentNames() {
 		return SetupHelper.getAvailableComponents()
@@ -411,6 +413,10 @@ public class SchemaManager {
 		rootCredentialsCache.set(null, new RootCredentials(user, pass));
 	}
 
+	public void setExternalServices(List<ExtServiceDiscoItem> externalServices) {
+		this.externalServices = externalServices;
+	}
+
 	public static Map<DataSourceInfo, List<SchemaInfo>> getDefaultDataSourceAndSchemas(String dbUri) {
 		return getDefaultDataSourceAndSchemas(dbUri, getActiveNonCoreComponentNames().collect(Collectors.toSet()));
 	}
@@ -591,9 +597,13 @@ public class SchemaManager {
 			schemas.stream()
 					.filter(schema -> Schema.SERVER_SCHEMA_ID.equals(schema.getId()) || (Schema.SERVER_SCHEMA_ID + "-user").equals(schema.getId()))
 					.findAny()
-					.ifPresent(schemaInfo -> results.add(
-							new ResultEntry("Adding XMPP admin accounts", schemaLoader.addXmppAdminAccount(schemaInfo),
-											handler)));
+					.ifPresent(schemaInfo -> {
+						results.add(
+								new ResultEntry("Adding XMPP admin accounts", schemaLoader.addXmppAdminAccount(schemaInfo),
+												handler));
+						results.add(
+								new ResultEntry("Adding external service discovery items", schemaLoader.addExternalServices(schemaInfo), handler));
+					});
 
 			results.add(new ResultEntry("Post installation action", schemaLoader.postInstallation(), handler));
 			return results;
@@ -697,6 +707,7 @@ public class SchemaManager {
 		params.setLogLevel(logLevel);
 		params.setForceReloadSchema(forceReloadSchema);
 		params.setDbRootAsk(dbRootAsk);
+		params.setExternalServices(externalServices);
 		schemaLoader.init(params, Optional.ofNullable(rootCredentialsCache));
 
 		results.add(new ResultEntry("Checking connection to database", schemaLoader.validateDBConnection(), handler));

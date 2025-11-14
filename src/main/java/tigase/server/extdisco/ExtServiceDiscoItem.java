@@ -81,7 +81,7 @@ public class ExtServiceDiscoItem
 	}
 
 	@Override
-	protected void setKey(String key) {
+	public void setKey(String key) {
 		this.key = key;
 	}
 	
@@ -97,6 +97,18 @@ public class ExtServiceDiscoItem
 
 	public String getType() {
 		return type;
+	}
+
+	public void init(String key, String name, String host, int port, String type, String transport, boolean restricted, String username, String password) {
+		this.key = key;
+		this.name = name;
+		this.host = host;
+		this.port = port;
+		this.type = type;
+		this.transport = transport;
+		this.restricted = restricted;
+		this.username = username;
+		this.password = password;
 	}
 
 	@Override
