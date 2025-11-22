@@ -21,9 +21,7 @@ import tigase.auth.BruteForceLockerBean;
 import tigase.auth.XmppSaslException;
 import tigase.auth.XmppSaslException.SaslError;
 import tigase.auth.mechanisms.AbstractSasl;
-import tigase.auth.mechanisms.AbstractSaslSCRAM;
 import tigase.auth.mechanisms.SaslANONYMOUS;
-import tigase.auth.mechanisms.SaslSCRAMPlus;
 import tigase.db.NonAuthUserRepository;
 import tigase.kernel.beans.Bean;
 import tigase.server.Packet;
@@ -279,15 +277,8 @@ public class SaslAuth
 			for (String mech : auth_mechs) {
 				mechs[idx++] = new Element("mechanism", mech);
 			}
-			
-			if (session.isEncrypted() && session.getSessionData(AbstractSaslSCRAM.LOCAL_CERTIFICATE_KEY) != null &&
-					SaslSCRAMPlus.containsScramPlus(auth_mechs)) {
-				Element bindings = AbstractSaslSCRAM.getSupportedChannelBindings(session);
-				return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS}), bindings};
-			}
-			else {
-				return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS})};
-			}
+
+			return new Element[]{new Element("mechanisms", mechs, new String[]{"xmlns"}, new String[]{_XMLNS})};
 		}
 	}
 
