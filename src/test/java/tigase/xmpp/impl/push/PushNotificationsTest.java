@@ -489,8 +489,11 @@ public class PushNotificationsTest
 												  pushServiceJid + "/push-node",
 												  settings.toString());
 
-		Element msg = new Element("message", new Element[]{new Element("propose", new String[] {"xmlns", "id"}, new String[] {"urn:xmpp:jingle-message:0", "test-1"})}, new String[]{"xmlns"},
-								  new String[]{"jabber:client"});
+		Element msg = new Element("message", new Element[]{new Element("propose", new String[]{"xmlns", "id"},
+																	   new String[]{"urn:xmpp:jingle-message:0",
+																					"test-1"}).withElement(
+				"description", "urn:xmpp:jingle:apps:rtp:1", x -> x.setAttribute("media", "audio"))},
+								  new String[]{"xmlns"}, new String[]{"jabber:client"});
 		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
 
 		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
@@ -504,6 +507,7 @@ public class PushNotificationsTest
 		Element jingleEl = notificationElem.getChild("jingle");
 		assertNotNull(jingleEl);
 		assertEquals("test-1", jingleEl.getAttributeStaticStr("sid"));
+		assertEquals("audio", jingleEl.getChildren().getFirst().getCData());
 	}
 
 	@Test

@@ -27,6 +27,7 @@ import tigase.xmpp.XMPPException;
 import tigase.xmpp.XMPPResourceConnection;
 import tigase.xmpp.jid.BareJID;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Bean(name = "jingle", parent = PushNotifications.class, active = true)
@@ -70,8 +71,9 @@ public class JinglePushNotificationsExtension implements PushNotificationsExtens
 		}
 
 		notification.withElement("jingle", "tigase:push:jingle:0", jingle -> {
+			jingle.addAttribute("action", actionEl.getName());
 			jingle.addAttribute("sid", id);
-			Optional.ofNullable(actionEl.mapChildren(el -> el.getName() == "description" && el.getXMLNS() == "urn:xmpp:jingle:apps:rtp:1",
+			Optional.ofNullable(actionEl.mapChildren(el -> Objects.equals(el.getName(), "description") && Objects.equals(el.getXMLNS(), "urn:xmpp:jingle:apps:rtp:1"),
 								 el -> el.getAttributeStaticStr("media")))
 					.ifPresent(mediaTypes -> mediaTypes.forEach(media -> jingle.withElement("media", null, media)));
 		});
@@ -89,6 +91,7 @@ public class JinglePushNotificationsExtension implements PushNotificationsExtens
 		}
 		switch (actionEl.getName()) {
 			case "retract":
+				return false;
 			case "propose":
 				return packet.getStanzaFrom() != null && !packet.getStanzaFrom().getBareJID().equals(userJid);
 			default:
