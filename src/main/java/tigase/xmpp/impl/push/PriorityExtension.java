@@ -55,8 +55,9 @@ public class PriorityExtension implements PushNotificationsExtension {
 		boolean supportsPriority = Boolean.parseBoolean(pushServiceSettings.getAttributeStaticStr("priority"));
 		boolean hasBody = packet != null && packet.getElemChild("body") != null;
 		boolean hasJinglePropose = packet != null && packet.getElemChild("propose", "urn:xmpp:jingle-message:0") != null;
+		boolean hasMeetPropose = packet != null && packet.getElemChild("propose", "tigase:meet:0") != null;
 		if (supportsPriority) {
-			Element element = new Element("priority", (hasBody || hasJinglePropose) ? "high" : "low");
+			Element element = new Element("priority", (hasBody || hasJinglePropose || hasMeetPropose) ? "high" : "low");
 			element.setXMLNS(XMLNS);
 			notification.addChild(element);
 		}
