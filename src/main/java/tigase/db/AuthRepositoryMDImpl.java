@@ -234,6 +234,7 @@ public abstract class AuthRepositoryMDImpl
 
 		if (repo != null) {
 			repo.removeCredential(user, credentialId);
+			eventBus.fire(new AuthRepository.PasswordChangedEvent(user, credentialId, null));
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
@@ -285,6 +286,7 @@ public abstract class AuthRepositoryMDImpl
 
 		if (repo != null) {
 			repo.updateCredential(user, credentialId, password);
+			eventBus.fire(new AuthRepository.PasswordChangedEvent(user, credentialId, null));
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
@@ -298,6 +300,7 @@ public abstract class AuthRepositoryMDImpl
 
 		if (repo != null) {
 			repo.updateCredential(user, credentialId, mechanism, data);
+			eventBus.fire(new AuthRepository.PasswordChangedEvent(user, credentialId, mechanism));
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");

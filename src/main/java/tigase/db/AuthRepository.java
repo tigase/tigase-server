@@ -17,11 +17,14 @@
  */
 package tigase.db;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import tigase.annotations.TigaseDeprecated;
 import tigase.auth.CredentialsDecoderBean;
 import tigase.auth.CredentialsEncoderBean;
 import tigase.auth.credentials.Credentials;
 import tigase.auth.credentials.entries.PlainCredentialsEntry;
+import tigase.eventbus.EventBusEvent;
 import tigase.xmpp.jid.BareJID;
 
 import java.security.NoSuchAlgorithmException;
@@ -431,5 +434,33 @@ public interface AuthRepository
 		}
 	}
 
+	public static class PasswordChangedEvent implements EventBusEvent {
+
+		private final BareJID jid;
+		private final String credentialId;
+		private final String mechanism;
+
+		public PasswordChangedEvent(@NonNull BareJID jid, @NonNull String credentialId, @Nullable String mechanism) {
+			this.jid = jid;
+			this.credentialId = credentialId;
+			this.mechanism = mechanism;
+		}
+
+		public @NonNull BareJID getJid() {
+			return jid;
+		}
+
+		public @NonNull String getCredentialId() {
+			return credentialId;
+		}
+
+		/**
+		 * If mechanism is <code>null</code>, then credential for all mechanism was updated.
+		 * @return
+		 */
+		public @Nullable String getMechanism() {
+			return mechanism;
+		}
+	}
 }    // AuthRepository
 
