@@ -256,6 +256,12 @@ public class PushNotifications
 
 	// move to filter
 	protected boolean shouldSendNotification(Packet packet, BareJID userJid, XMPPResourceConnection session) {
+		// if packet was already stored in offline message repository, it shouldn't trigger notification
+		Element delay = packet.getElemChild("delay", "urn:xmpp:delay");
+		if (delay != null && Objects.equals(userJid.getDomain(), delay.getAttributeStaticStr("from"))) {
+			return false;
+		}
+
 		if (session == null && packet.getElemName() == Message.ELEM_NAME && packet.getElemChild("body") != null) {
 			return true;
 		}
