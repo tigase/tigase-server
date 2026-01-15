@@ -469,6 +469,19 @@ public interface UserRepository
 	 */
 	boolean userExists(BareJID user);
 
+	public static class UserAddedEvent implements EventBusEvent {
+		
+		private final BareJID jid;
+
+		public UserAddedEvent(BareJID jid) {
+			this.jid = jid;
+		}
+
+		public BareJID getJid() {
+			return jid;
+		}
+	}
+
 	public static class UserRemovedEvent implements EventBusEvent {
 
 		public final BareJID jid;

@@ -69,6 +69,7 @@ public abstract class UserRepositoryMDImpl
 
 		if (repo != null) {
 			repo.addUser(user);
+			eventBus.fire(new UserAddedEvent(user));
 		} else {
 			log.log(Level.WARNING,
 					"Couldn't obtain user repository for domain: " + user.getDomain() + ", not even default one!");
