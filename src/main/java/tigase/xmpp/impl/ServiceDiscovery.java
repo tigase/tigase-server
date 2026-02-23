@@ -25,6 +25,7 @@ import tigase.db.services.AccountExpirationService;
 import tigase.disco.XMPPServiceCollector;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
+import tigase.kernel.beans.config.ConfigField;
 import tigase.server.Command;
 import tigase.server.DataForm;
 import tigase.server.Iq;
@@ -37,7 +38,6 @@ import tigase.xmpp.*;
 import tigase.xmpp.jid.JID;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,7 +76,10 @@ public class ServiceDiscovery
 	private AdHocCommandModule adHocCommandModule;
 	@Inject
 	private UserRepository userRepository;
-	
+
+	@ConfigField(alias = "additional-account-details", desc = "Additional account details")
+	private Map<String, Map<String,String>> additionalAccountDetails = new HashMap<>();
+
 	@Override
 	public String id() {
 		return ID;
@@ -282,6 +285,21 @@ public class ServiceDiscovery
 							});
 				} catch (TigaseDBException e) {
 					log.log(Level.SEVERE, "Failed to retrieve account " + result.getStanzaFrom() + " expiration date", e);
+				}
+				if (additionalAccountDetails != null) {
+					for (var entry : additionalAccountDetails.entrySet()) {
+						if (entry.getValue() != null) {
+							Element x = new DataForm.Builder(Command.DataType.result).withFields(builder -> {
+								builder.withField(DataForm.FieldType.Hidden, "FORM_TYPE", field -> {
+											field.setValue(entry.getKey());
+										});
+								for (var fieldEntry : entry.getValue().entrySet()) {
+									builder.withField(DataForm.FieldType.TextSingle, fieldEntry.getKey(), field -> field.setValue(fieldEntry.getValue()));
+								}
+							}).build();
+							query.addChild(x);
+						}
+					}
 				}
 			}
 		}
