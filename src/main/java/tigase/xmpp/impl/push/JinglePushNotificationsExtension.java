@@ -76,6 +76,9 @@ public class JinglePushNotificationsExtension implements PushNotificationsExtens
 			Optional.ofNullable(actionEl.mapChildren(el -> Objects.equals(el.getName(), "description") && Objects.equals(el.getXMLNS(), "urn:xmpp:jingle:apps:rtp:1"),
 								 el -> el.getAttributeStaticStr("media")))
 					.ifPresent(mediaTypes -> mediaTypes.forEach(media -> jingle.withElement("media", null, media)));
+			Optional.ofNullable(actionEl.mapChildren(el -> Objects.equals(el.getName(), "feature"), Element::getXMLNS))
+					.ifPresent(features -> features.forEach(
+							feature -> jingle.withElement("feature", el -> el.setXMLNS(feature))));
 		});
 	}
 

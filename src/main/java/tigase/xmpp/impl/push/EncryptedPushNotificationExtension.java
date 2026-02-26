@@ -39,10 +39,7 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -138,6 +135,8 @@ public class EncryptedPushNotificationExtension implements PushNotificationsExte
 					payload.put("media", actionEl.mapChildren(
 							el -> el.getName() == "description" && el.getXMLNS() == "urn:xmpp:jingle:apps:rtp:1",
 							el -> el.getAttributeStaticStr("media")));
+					payload.put("features", actionEl.mapChildren(
+							el -> Objects.equals("feature", el.getName()), Element::getXMLNS));
 				} else {
 					payload.put("type", "chat");
 				}
