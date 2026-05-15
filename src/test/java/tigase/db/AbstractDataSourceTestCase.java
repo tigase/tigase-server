@@ -21,6 +21,7 @@ import org.junit.*;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.util.SchemaLoader;
 import tigase.db.util.SchemaManager;
 import tigase.kernel.AbstractKernelTestCase;
@@ -57,6 +58,8 @@ public class AbstractDataSourceTestCase<DS extends DataSource> extends AbstractK
 	private DS dataSource;
 
 	@AfterClass
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static void cleanDerby() {
 		if (uri.contains("jdbc:derby:")) {
 			File f = new File("derby_test");

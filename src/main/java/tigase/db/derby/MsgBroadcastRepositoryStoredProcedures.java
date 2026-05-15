@@ -17,6 +17,7 @@
  */
 package tigase.db.derby;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.util.Algorithms;
 
 import java.security.NoSuchAlgorithmException;
@@ -25,6 +26,8 @@ import java.sql.*;
 /**
  * Created by andrzej on 24.03.2017.
  */
+@Deprecated
+@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 public class MsgBroadcastRepositoryStoredProcedures {
 
 	public static void addMessage(String msgId, Timestamp expired, String msg) throws SQLException {

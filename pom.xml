@@ -259,12 +259,14 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.apache.felix</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>1.4.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
             <version>5.0.0</version>
@@ -284,30 +286,35 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <version>${groovyVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-json</artifactId>
             <version>${groovyVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-jsr223</artifactId>
             <version>${groovyVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-templates</artifactId>
             <version>${groovyVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-xml</artifactId>
             <version>${groovyVersion}</version>
@@ -321,6 +328,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
             <version>10.2.1.jre17</version>
@@ -333,12 +341,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>10.15.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- TODO: Deprecated! Remove in 9.0.0 -->
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyshared</artifactId>
             <version>10.15.2.0</version>

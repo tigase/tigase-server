@@ -58,6 +58,8 @@ public class JDBCRepository
 
 	public static final String DEF_USERS_TBL = "tig_users";
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String DERBY_GETSCHEMAVER_QUERY = "values TigGetDBProperty('schema-version')";
 
 	/**

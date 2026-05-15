@@ -17,6 +17,7 @@
  */
 package tigase.db.derby;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.util.Algorithms;
 
 import java.nio.charset.Charset;
@@ -28,6 +29,8 @@ import java.util.logging.Logger;
 /**
  * Created by andrzej on 22.03.2017.
  */
+@Deprecated
+@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 public class MsgRepositoryStoredProcedures {
 
 	private static final Logger log = Logger.getLogger(StoredProcedures.class.getName());

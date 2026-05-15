@@ -17,6 +17,7 @@
 # If not, see http://www.gnu.org/licenses/.
 #
 
+### DEPRECATED!
 
 [[ "$1" = "" ]] && \
   echo "Give me a path to the location where you want to have the database created" && \

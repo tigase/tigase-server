@@ -42,12 +42,16 @@ public interface DataRepository
 	 * Helper enumeration with types of supported databases.
 	 */
 	public static enum dbTypes {
+		@Deprecated
+		@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 		derby,
 		mysql,
 		postgresql,
 		@Deprecated
 		@TigaseDeprecated(since = "8.3.0", removeIn = "9.0.0")
 		jtds,
+		@Deprecated
+		@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 		sqlserver,
 		other
 	}

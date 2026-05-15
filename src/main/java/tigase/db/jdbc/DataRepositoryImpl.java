@@ -17,16 +17,25 @@
  */
 package tigase.db.jdbc;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.DBInitException;
 import tigase.db.DataRepository;
+import tigase.db.DatabaseDeprecatedInformer;
 import tigase.db.Repository;
 import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.db.util.RepositoryVersionAware;
+import tigase.eventbus.EventBus;
+import tigase.eventbus.EventBusFactory;
+import tigase.eventbus.HandleEvent;
+import tigase.eventbus.events.StartupFinishedEvent;
+import tigase.kernel.beans.Initializable;
+import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
 import tigase.stats.CounterValue;
 import tigase.stats.StatisticsList;
 import tigase.stats.StatisticsProviderIfc;
 import tigase.util.Version;
+import tigase.util.dns.DNSResolverFactory;
 import tigase.xmpp.jid.BareJID;
 
 import java.lang.reflect.Proxy;
@@ -34,6 +43,7 @@ import java.sql.*;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -48,12 +58,18 @@ import java.util.logging.Logger;
 public class DataRepositoryImpl
 		implements DataRepository, StatisticsProviderIfc, RepositoryVersionAware {
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String DERBY_CONNVALID_QUERY = "values 1";
 	public static final String JDBC_CONNVALID_QUERY = "select 1";
 	public static final String JDBC_SCHEMA_VERSION_QUERY = "{ call TigGetComponentVersion( ? ) }";
 	public static final String MYSQL_CHECK_TABLE_QUERY = "select * from information_schema.tables where table_name = ? and table_schema = ?";
 	public static final String PGSQL_CHECK_TABLE_QUERY = "select * from pg_tables where tablename = ? and schemaname = ?";
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String DERBY_CHECK_TABLE_QUERY = "select * from SYS.SYSTABLES where tablename = UPPER(?) and ? is not null";
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String SQLSERVER_CHECK_TABLE_QUERY = "SELECT * FROM INFORMATION_SCHEMA.TABLES where TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = ? and TABLE_SCHEMA = ?";
 	public static final String OTHER_CHECK_TABLE_QUERY = "";
 	public static final String SP_STARTS_WITH = "{ call";
@@ -74,6 +90,8 @@ public class DataRepositoryImpl
 	private int db_conn_timeout = DB_CONN_TIMEOUT;
 	private Map<String, DBQuery> db_queries = new ConcurrentSkipListMap<String, DBQuery>();
 	private Map<String, PreparedStatement> db_statements = new ConcurrentSkipListMap<String, PreparedStatement>();
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	private boolean derby_mode = false;
 	private long lastConnectionValidated = 0;
 	@ConfigField(desc = "Query timeout", alias = QUERY_TIMEOUT_PROP_KEY)
@@ -258,6 +276,13 @@ public class DataRepositoryImpl
 
 		if (database == null) {
 			throw new DBInitException("Database not supported");
+		}
+
+		switch (database) {
+			case derby, sqlserver, jtds -> {
+				DatabaseDeprecatedInformer.addDeprecatedDatabase(database.toString(), resource_uri);
+                log.severe(database + " database is DEPRECATED and will be removed in future versions");
+            }
 		}
 
 		switch (database) {

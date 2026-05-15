@@ -18,6 +18,8 @@
 
 package tigase.db.util.locker;
 
+import tigase.annotations.TigaseDeprecated;
+
 import java.sql.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -27,6 +29,8 @@ import java.util.logging.Level;
  * https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-releaseapplock-transact-sql
  * https://docs.microsoft.com/en-us/sql/connect/jdbc/using-a-stored-procedure-with-a-return-status
  */
+@Deprecated
+@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 class MssqlConnectionLock
 		extends ConnectionLock {
 

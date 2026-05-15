@@ -152,6 +152,8 @@ Step 4: Set databases
 
 You will also need to configure connection to the database. First you have to decide what database you want to use: ``Derby``, ``MySQL``, ``PostgreSQL``, ``MSSQL``, or ``MondoDB``. Each database will have slightly different configurations. If we are using derby, in a directory called ``tigasedb``, your configuration would look like this:
 
+**Description:** Derby, MSSQL and MongoDB are deprecated since 8.5.0. Will be removed in 9.0.0.
+
 .. code::
 
    dataSource () {

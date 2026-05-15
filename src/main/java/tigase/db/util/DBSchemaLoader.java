@@ -17,6 +17,7 @@
  */
 package tigase.db.util;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.component.exceptions.RepositoryException;
 import tigase.db.AuthRepository;
 import tigase.db.DataRepository;
@@ -135,10 +136,10 @@ public class DBSchemaLoader
 	}
 
 	private static final List<TypeInfo> suppertedTypes = Stream.of(
-			new TypeInfo(10, "derby", "Derby (built in database)", "org.apache.derby.jdbc.EmbeddedDriver"),
-			new TypeInfo(20, "mysql", "MySQL", "com.mysql.cj.jdbc.Driver"),
-			new TypeInfo(30, "postgresql", "PostgreSQL", "org.postgresql.Driver"),
-			new TypeInfo(40, "sqlserver", "SQLServer", "com.microsoft.sqlserver.jdbc.SQLServerDriver"))
+					new TypeInfo(10, "derby", "Derby (built in database)", "org.apache.derby.jdbc.EmbeddedDriver", " !!! DEPRECATED !!!"),
+					new TypeInfo(20, "mysql", "MySQL", "com.mysql.cj.jdbc.Driver"),
+					new TypeInfo(30, "postgresql", "PostgreSQL", "org.postgresql.Driver"),
+					new TypeInfo(40, "sqlserver", "SQLServer", "com.microsoft.sqlserver.jdbc.SQLServerDriver", " !!! DEPRECATED !!!"))
 			.collect(Collectors.toList());
 
 	public DBSchemaLoader() {
@@ -329,6 +330,8 @@ public class DBSchemaLoader
 		return shutdownDerby();
 	}
 
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public Result shutdownDerby() {
 		String db_conn = getDBUri(false, true);
 		if ("derby".equals(params.getDbType())) {

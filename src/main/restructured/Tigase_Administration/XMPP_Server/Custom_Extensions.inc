@@ -63,9 +63,9 @@ Repositories/Databases
    +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | ✓       | MySQL         | Full support for MySQL database with database schemas, dedicated DB schema for PubSub component                                                                         |
    +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | ✓       | SQL Server    | Full support for MS SQL Server database with database schemas excluding dedicated DB schema for PubSub component, only in Tigase server version 3.x                     |
+   | ✓       | SQL Server    | (DEPRECATED!) Full support for MS SQL Server database with database schemas excluding dedicated DB schema for PubSub component, only in Tigase server version 3.x                     |
    +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | ✓       | Derby DB      | Full support for built-in Derby database with database schemas excluding dedicated DB schema for PubSub component                                                       |
+   | ✓       | Derby DB      | (DEPRECATED!) Full support for built-in Derby database with database schemas excluding dedicated DB schema for PubSub component                                                       |
    +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | ✓       | JDBC          | Support for all JDBC enabled databases, although the database schemas are available for some databases                                                                  |
    +---------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------+

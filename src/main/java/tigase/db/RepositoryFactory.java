@@ -93,13 +93,22 @@ public abstract class RepositoryFactory {
 	public static final String DATA_REPO_POOL_SIZE_PROP_KEY = "data-repo-pool-size";
 	public static final int DATA_REPO_POOL_SIZE_PROP_VAL = Math.max(10, Runtime.getRuntime().availableProcessors() *
 			REPO_POOL_SIZE_FACTOR_PROP_VAL);
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String DERBY_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
 
 	// DataRepository properties
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String DERBY_REPO_URL_PROP_VAL = "jdbc:derby:tigase-derbydb;create=true";
 
 	// repositories classes and URLs
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String DRUPAL_REPO_URL_PROP_VAL = "jdbc:mysql://localhost/drupal?user=root&password=mypass";
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String DRUPALWP_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.DrupalWPAuth";
 	public static final String DUMMY_REPO_CLASS_PROP_VAL = "tigase.db.DummyRepository";
 	public static final String GEN_AUTH_DB = "--auth-db";
@@ -108,11 +117,21 @@ public abstract class RepositoryFactory {
 	public static final String GEN_USER_DB = "--" + GEN_USER_DB_PROP_KEY;
 	public static final String GEN_USER_DB_URI_PROP_KEY = "user-db-uri";
 	public static final String GEN_USER_DB_URI = "--" + GEN_USER_DB_URI_PROP_KEY;
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String LIBRESOURCE_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.LibreSourceAuth";
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String LIBRESOURCE_REPO_URL_PROP_VAL = "jdbc:postgresql://localhost/libresource?user=demo";
 	/** Default MS SQL Server JDBC class */
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String SQLSERVER_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
 	/** Default MS SQL Server JDBC connection string */
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 	public static final String SQLSERVER_REPO_URL_PROP_VAL = "jdbc:sqlserver://localhost:1433;databaseName=tigasedb;user=tigase;password=tigase;schema=dbo";
 	public static final String MYSQL_REPO_CLASS_PROP_VAL = "tigase.db.jdbc.JDBCRepository";
 	public static final String MYSQL_REPO_URL_PROP_VAL = "jdbc:mysql://localhost/tigase?user=root&password=mypass";
@@ -353,12 +372,6 @@ public abstract class RepositoryFactory {
 		}
 		if (repo_name.equals("tigase-auth")) {
 			result = TIGASE_AUTH_REPO_CLASS_PROP_VAL;
-		}
-		if (repo_name.equals("drupal") || repo_name.equals("wp")) {
-			result = DRUPALWP_REPO_CLASS_PROP_VAL;
-		}
-		if (repo_name.equals("libresource")) {
-			result = LIBRESOURCE_REPO_CLASS_PROP_VAL;
 		}
 		if (repo_name.equals("sqlserver")) {
 			result = SQLSERVER_REPO_CLASS_PROP_VAL;

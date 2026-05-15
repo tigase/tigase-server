@@ -32,6 +32,8 @@ import java.util.logging.Logger;
  * @author Artur Hefczyc
  * @version 5.1.0, 2010.09.11 at 02:08:58 BST
  */
+@Deprecated
+@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
 public class StoredProcedures {
 
 	private static final Logger log = Logger.getLogger(StoredProcedures.class.getName());

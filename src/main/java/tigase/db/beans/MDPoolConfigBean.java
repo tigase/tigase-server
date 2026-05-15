@@ -17,8 +17,10 @@
  */
 package tigase.db.beans;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.component.exceptions.RepositoryException;
 import tigase.db.DBInitException;
+import tigase.db.DatabaseDeprecatedInformer;
 import tigase.db.RepositoryFactory;
 import tigase.db.RepositoryPool;
 import tigase.db.util.DBInitForkJoinPoolCache;
@@ -69,6 +71,11 @@ public abstract class MDPoolConfigBean<A, B extends MDPoolConfigBean<A, B>>
 	@Inject(bean = "instance", nullAllowed = true)
 	private A repository;
 	private boolean skipInitializationErrors = false;
+
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0")
+	@Inject
+	private DatabaseDeprecatedInformer databaseDeprecatedInformer;
 
 	@Override
 	public void beanConfigurationChanged(Collection<String> changedFields) {

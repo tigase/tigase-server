@@ -1,5 +1,7 @@
 .. _Prepare-the-MS-SQL-Server-Database-for-the-Tigase-Server:
 
+**Description:** Deprecated since 8.5.0. Will be removed in 9.0.0.
+
 Prepare the MS SQL Server Database for the Tigase Server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

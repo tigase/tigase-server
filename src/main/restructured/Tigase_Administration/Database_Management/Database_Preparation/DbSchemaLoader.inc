@@ -5,6 +5,8 @@ Schema Utility
 
 With the release of v8.0.0 calling the Tigase dbSchemaLoader utility now can be done using tasks instead of calling the specific method. Support for Derby, MySQL, PostgreSQL, MSSQL, and MongoDB is available.
 
+**Description:** Derby, MSSQL and MongoDB are deprecated since 8.5.0. Will be removed in 9.0.0.
+
 In order to use this utility with any of the databases, you will need to first have the database environment up and running, and have established user credentials. You may use root or an account with administrator write privileges.
 
 Operation & Variables

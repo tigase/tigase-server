@@ -1,5 +1,7 @@
 .. _PreparingTigaseforMongoDB:
 
+**Description:** Deprecated since 8.5.0. Will be removed in 9.0.0.
+
 Preparing Tigase for MongoDB
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

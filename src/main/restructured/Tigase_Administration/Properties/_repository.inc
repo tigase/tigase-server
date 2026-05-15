@@ -123,6 +123,9 @@ Once your configuration is setup, you will see the uri of your user database her
 MSSQL
 ^^^^^^^^^
 
+**Description:** Deprecated since 8.5.0. Will be removed in 9.0.0.
+
+
 MSSql support works out of the box, however Tigase provides an open source driver for the database. We recommend using Microsoft’s own driver for better functionality.
 
 .. code::
@@ -137,6 +140,8 @@ Where the uri is divided as follows: jdbc:<driver>:sqlserver://<server address>;
 
 MongoDb
 ^^^^^^^^^
+
+**Description:** Deprecated since 8.5.0. Will be removed in 9.0.0.
 
 For using mongoDB as the repository, the setting will look slightly different:
 
