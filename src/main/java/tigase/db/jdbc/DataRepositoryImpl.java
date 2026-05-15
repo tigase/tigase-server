@@ -254,8 +254,6 @@ public class DataRepositoryImpl
 
 	@Override
 	public void initialize(String resource_uri) throws DBInitException {
-		String driverClass = null;
-
 		database = parseDatabaseType(resource_uri);
 
 		if (database == null) {
@@ -264,32 +262,21 @@ public class DataRepositoryImpl
 
 		switch (database) {
 			case postgresql:
-				driverClass = "org.postgresql.Driver";
 				check_table_query = PGSQL_CHECK_TABLE_QUERY;
 				break;
 			case mysql:
-				driverClass = "com.mysql.cj.jdbc.Driver";
 				check_table_query = MYSQL_CHECK_TABLE_QUERY;
 				break;
 			case derby:
-				driverClass = "org.apache.derby.jdbc.EmbeddedDriver";
 				check_table_query = DERBY_CHECK_TABLE_QUERY;
 				break;
 			case jtds:
 			case sqlserver:
-				driverClass = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 				check_table_query = SQLSERVER_CHECK_TABLE_QUERY;
 				break;
 			default:
-				driverClass = "net.sf.log4jdbc.sql.jdbcapi.DriverSpy";
 				check_table_query = OTHER_CHECK_TABLE_QUERY;
 				break;
-		}
-
-		try {
-			Class.forName(driverClass, true, this.getClass().getClassLoader());
-		} catch (ClassNotFoundException ex) {
-			Logger.getLogger(DataRepositoryImpl.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
 		db_conn = resource_uri;
@@ -309,8 +296,7 @@ public class DataRepositoryImpl
 					table_schema = slashes[slashes.length - 1].split("\\?")[0];
 					break;
 			}
-			log.log(Level.CONFIG, "Table schema found: {0}, database type: {1}, database driver: {2}",
-					new Object[]{table_schema, database.toString(), driverClass});
+			log.log(Level.CONFIG, "Table schema found: {0}, database type: {1}", new Object[]{table_schema, database.toString()});
 		}
 		try {
 			reconnectionCounter = new CounterValue("reconnections", Level.FINER);
