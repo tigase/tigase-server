@@ -879,7 +879,7 @@ public class Packet {
 	 */
 	public boolean isXMLNSStaticStr(String[] elementPath, String xmlns) {
 		if (Handle.ANY_XMLNS.equals(xmlns)) {
-			return true;
+			return elem.findChildStaticStr(elementPath) != null;
 		}
 		String this_xmlns = elem.getXMLNSStaticStr(elementPath);
 
