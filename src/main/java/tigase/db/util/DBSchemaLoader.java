@@ -135,12 +135,17 @@ public class DBSchemaLoader
 		SchemaLoader.main(args);
 	}
 
-	private static final List<TypeInfo> suppertedTypes = Stream.of(
-					new TypeInfo(10, "derby", "Derby (built in database)", "org.apache.derby.jdbc.EmbeddedDriver", " !!! DEPRECATED !!!"),
-					new TypeInfo(20, "mysql", "MySQL", "com.mysql.cj.jdbc.Driver"),
-					new TypeInfo(30, "postgresql", "PostgreSQL", "org.postgresql.Driver"),
-					new TypeInfo(40, "sqlserver", "SQLServer", "com.microsoft.sqlserver.jdbc.SQLServerDriver", " !!! DEPRECATED !!!"))
-			.collect(Collectors.toList());
+	private static final List<TypeInfo> suppertedTypes;
+
+	static {
+		final String deprecationWarning = "!!! DEPRECATED !!! Support for this database will be removed in next release. Use MySQL or PostgreSQL instead.";
+		suppertedTypes = Stream.of(
+						new TypeInfo(10, "postgresql", "PostgreSQL", "org.postgresql.Driver"),
+						new TypeInfo(20, "mysql", "MySQL", "com.mysql.cj.jdbc.Driver"),
+						new TypeInfo(30, "derby", "Derby (deprecated)", "org.apache.derby.jdbc.EmbeddedDriver", deprecationWarning),
+						new TypeInfo(40, "sqlserver", "SQLServer (deprecated)", "com.microsoft.sqlserver.jdbc.SQLServerDriver", deprecationWarning))
+				.collect(Collectors.toList());
+	}
 
 	public DBSchemaLoader() {
 

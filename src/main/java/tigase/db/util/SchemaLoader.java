@@ -94,7 +94,7 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 	public static List<TypeInfo> getAllSupportedTypes() {
 		final List<TypeInfo> supportedTypes = getAllSupportedTypesStream().collect(Collectors.toList());
-		log.log(Level.WARNING, "All supported types: " + supportedTypes);
+		log.log(Level.INFO, "All supported types: " + supportedTypes);
 		return supportedTypes;
 	}
 
@@ -559,7 +559,13 @@ public abstract class SchemaLoader<P extends SchemaLoader.Parameters> {
 
 		@Override
 		public String toString() {
-			return name + " (" + ordinal + ")";
+			final StringBuilder sb = new StringBuilder("TypeInfo{");
+			sb.append(getName());
+			sb.append(" (").append(getOrdinal()).append(')');
+			if (warning != null) {
+				sb.append(" [").append(getWarning()).append(']');
+			}
+			return sb.toString();
 		}
 	}
 }
