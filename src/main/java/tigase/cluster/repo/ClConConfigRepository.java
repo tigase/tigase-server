@@ -18,7 +18,6 @@
 package tigase.cluster.repo;
 
 import tigase.annotations.TigaseDeprecated;
-import tigase.cluster.ClusterConnectionManager;
 import tigase.db.DBInitException;
 import tigase.db.comp.ConfigRepository;
 import tigase.eventbus.EventBus;
@@ -52,7 +51,6 @@ public class ClConConfigRepository
 
 	@ConfigField(desc = "Automatically remove obsolote items", alias = "repo-auto-remove-obsolete-items")
 	protected boolean auto_remove_obsolete_items = true;
-	protected boolean firstLoadDone = false;
 	protected long lastReloadTime = 0;
 	protected long lastReloadTimeFactor = 10;
 	@Inject
@@ -111,27 +109,7 @@ public class ClConConfigRepository
 		super.reload();
 
 		String host = DNSResolverFactory.getInstance().getDefaultHost();
-
-		// we check if we already realoded repo from repository and have all items (own item will have
-		// correct update time), if so we set flag that first load was made and if there was only one item
-		// we send even that cluster was initiated
-		if (!firstLoadDone) {
-			if (log.isLoggable(Level.FINEST)) {
-				log.log(Level.FINEST,
-						"First Cluster repository reload done: {0}, items size: {1}, last updated own item: {2}",
-						new Object[]{firstLoadDone, items.size(), items.get(host).getLastUpdate()});
-			}
-
-			if (items.get(host) != null && items.get(host).getLastUpdate() > 0) {
-				firstLoadDone = true;
-
-				if (items.size() == 1) {
-					eventBus.fire(new ClusterConnectionManager.ClusterInitializedEvent());
-				}
-
-			}
-		}
-
+		
 		ClusterRepoItem item = getItem(host);
 		try {
 			item = (item != null) ? (ClusterRepoItem) (item.clone()) : null;
@@ -199,6 +177,7 @@ public class ClConConfigRepository
 	@Override
 	public void initialize() {
 		super.initialize();
+		reload();
 		TigaseRuntime.getTigaseRuntime().addShutdownHook(this);
 	}
 

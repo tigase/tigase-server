@@ -107,6 +107,10 @@ public class ClConSQLRepository
 			data_repo.initPreparedStatement(UPDATE_ITEM_QUERY, UPDATE_ITEM_QUERY);
 			data_repo.initPreparedStatement(DELETE_ITEM_QUERY, DELETE_ITEM_QUERY);
 			this.data_repo = data_repo;
+
+			if (isInitialized()) {
+				reload();
+			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, "Problem initializing database: ", e);
 		}
@@ -189,6 +193,12 @@ public class ClConSQLRepository
 
 	@Override
 	public void reload() {
+		if (data_repo == null) {
+			if (log.isLoggable(Level.FINEST)) {
+				log.finest("missing data repository, skipping reload...");
+			}
+			return;
+		}
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Reloading items");
 		}

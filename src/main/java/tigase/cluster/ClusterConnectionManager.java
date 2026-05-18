@@ -31,6 +31,7 @@ import tigase.db.comp.ComponentRepositoryDataSourceAware;
 import tigase.db.comp.RepositoryChangeListenerIfc;
 import tigase.eventbus.EventBus;
 import tigase.eventbus.EventBusEvent;
+import tigase.eventbus.events.StartupFinishedEvent;
 import tigase.kernel.beans.Bean;
 import tigase.kernel.beans.Inject;
 import tigase.kernel.beans.config.ConfigField;
@@ -127,7 +128,6 @@ public class ClusterConnectionManager
 
 	@Inject
 	private ClusterControllerIfc clusterController = null;
-	private tigase.eventbus.EventListener<ClusterInitializedEvent> clusterEventHandler = null;
 	@ConfigField(desc = "Compress stream", alias = COMPRESS_STREAM_PROP_KEY)
 	private boolean compress_stream = COMPRESS_STREAM_PROP_VAL;
 	@ConfigField(desc = "Connect to all nodes", alias = CONNECT_ALL_PROP_KEY)
@@ -302,6 +302,8 @@ public class ClusterConnectionManager
 
 			sendEvent(REPO_ITEM_UPDATE_TYPE.ADDED, repoItem);
 			// reconnectService(port_props, connectionDelay);
+
+			checkClusterConnectionsInitialized();
 		}
 	}
 
@@ -317,11 +319,14 @@ public class ClusterConnectionManager
 			}
 		}
 		sendEvent(REPO_ITEM_UPDATE_TYPE.REMOVED, item);
+
+		checkClusterConnectionsInitialized();
 	}
 
 	@Override
 	public void itemUpdated(ClusterRepoItem item) {
 		sendEvent(REPO_ITEM_UPDATE_TYPE.UPDATED, item);
+		checkClusterConnectionsInitialized();
 	}
 
 	@Override
@@ -733,26 +738,13 @@ public class ClusterConnectionManager
 	@Override
 	public void start() {
 		super.start();
-
-		if (clusterEventHandler == null) {
-			clusterEventHandler = (ClusterInitializedEvent event) -> {
-				if (log.isLoggable(Level.FINE)) {
-					log.log(Level.FINE, "Setting initialClusterConnectedDone to true (was: {0})",
-							initialClusterConnectedDone);
-				}
-				initialClusterConnectedDone = true;
-				eventBus.removeListener(clusterEventHandler);
-			};
-		}
-
-		eventBus.addListener(ClusterInitializedEvent.class, clusterEventHandler);
+		eventBus.addListener(StartupFinishedEvent.class, startupFinishedEventListener);
 	}
 
 	@Override
 	public void stop() {
 		super.stop();
-		eventBus.removeListener(clusterEventHandler);
-		clusterEventHandler = null;
+		eventBus.removeListener(startupFinishedEventListener);
 	}
 
 	boolean isInitialClusterConnectedDone() {
@@ -791,18 +783,39 @@ public class ClusterConnectionManager
 			}
 		}
 
+		checkClusterConnectionsInitialized();
+		
+		super.serviceConnected(serv);
+	}
+
+	private boolean serverStartupFinished = false;
+	private final tigase.eventbus.EventListener<StartupFinishedEvent> startupFinishedEventListener = event -> {
+		if (eventBus != null) {
+			eventBus.removeListener(ClusterConnectionManager.this.startupFinishedEventListener);
+		}
+		serverStartupFinished = true;
+		checkClusterConnectionsInitialized();
+	};
+
+	private void checkClusterConnectionsInitialized() {
+		if (initialClusterConnectedDone) {
+			return;
+		}
+		if (!serverStartupFinished) {
+			return;
+		}
 		try {
 			// initial cluster connection done
 			int connectedSize = getNodesConnected().size();
 			int repoSize = repo.allItems().size();
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST,
-						"All repo nodes connected! Connected: {0}, repo size: {1}, initialClusterConnectedDone: {2}",
-						new Object[]{connectedSize, repoSize, initialClusterConnectedDone});
+				        "All repo nodes connected! Connected: {0}, repo size: {1}, initialClusterConnectedDone: {2}",
+				        new Object[]{connectedSize, repoSize, initialClusterConnectedDone});
 			}
 
 			synchronized (this) {
-				if (!initialClusterConnectedDone && (repoSize <= 1 || repoSize > 1 && connectedSize >= repoSize - 1)) {
+				if (!initialClusterConnectedDone && (repoSize <= 1 || (repoSize > 1 && connectedSize >= repoSize - 1))) {
 					initialClusterConnectedDone = true;
 
 					eventBus.fire(new ClusterInitializedEvent());
@@ -811,9 +824,6 @@ public class ClusterConnectionManager
 		} catch (TigaseDBException e) {
 			log.log(Level.WARNING, "There was an error while reading size of cluster repository", e);
 		}
-
-
-		super.serviceConnected(serv);
 	}
 
 	@Override
