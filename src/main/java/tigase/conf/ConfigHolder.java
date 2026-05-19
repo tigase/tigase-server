@@ -43,10 +43,7 @@ import tigase.vhosts.VHostItemImpl;
 import tigase.xmpp.XMPPIOService;
 import tigase.xmpp.impl.roster.RosterFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -687,23 +684,19 @@ public class ConfigHolder {
 		loadFromDSLFiles();
 		if (upgradeDSL(props)) {
 			try {
-				Optional<Path> configFileOld = Optional.ofNullable(backupOldConfigFile(configFile));
-				saveToDSLFile(configFile.toFile());
-				log.log(Level.CONFIG, "Configuration file {0} was updated to match current format." +
-						configFileOld.map(path -> " Previous version of configuration file was saved as " + path)
-								.orElse(""), new Object[]{configFile});
-
-				if (!oldConfigHolder.getOutput().isPresent()) {
-					output = Optional.of(Stream.of(java.text.MessageFormat.format(
-							"Configuration file {0} was updated to match current format.", configFile),
-												   configFileOld.map(
-														   path -> "Previous version of configuration file was saved as " +
-																   path).orElse(""))
-												 .filter(line -> !line.isEmpty())
-												 .toArray(x -> new String[x]));
-				}
+				Path newConfigFile = configFile.resolveSibling(configFile.getFileName() + ".new");
+				saveToDSLFile(newConfigFile.toFile());
+//				Optional<Path> configFileOld = Optional.ofNullable(backupOldConfigFile(configFile));
+//				saveToDSLFile(configFile.toFile());
+				log.log(Level.CONFIG, "Updated configuration file {0} was created to match current format." +
+								" Previous version of configuration file was not modified at {1}",
+				        new Object[]{newConfigFile, configFile});
+				output = Optional.of(new String[]{java.text.MessageFormat.format(
+						"Updated configuration file {0} was created to match current format." +
+								" Previous version of configuration file was not modified at {1}",
+						new Object[]{newConfigFile, configFile})});
 			} catch (IOException ex) {
-				log.log(Level.SEVERE, "could not replace configuration file with file in DSL format", ex);
+				log.log(Level.SEVERE, "could not create new configuration file with file in DSL format", ex);
 				throw new RuntimeException(ex.getMessage(), ex);
 			}
 		}
@@ -726,7 +719,18 @@ public class ConfigHolder {
 	}
 
 	public void saveToDSLFile(File f) throws IOException {
-		new ConfigWriter().write(f, props);
+		String newContent = new ConfigWriter().writeToString(props);
+		if (f.exists()) {
+			try (FileReader reader = new FileReader(f)) {
+				String content = reader.readAllAsString();
+				if (Objects.equals(newContent, content)) {
+					return;
+				}
+			}
+		}
+		try (FileWriter fileWriter = new FileWriter(f, false)) {
+			fileWriter.write(newContent);
+		}
 	}
 
 	public Path getConfigFilePath() {

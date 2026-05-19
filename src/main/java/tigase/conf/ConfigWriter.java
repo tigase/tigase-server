@@ -21,10 +21,7 @@ import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.xmpp.jid.BareJID;
 import tigase.xmpp.jid.JID;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -115,6 +112,13 @@ public class ConfigWriter {
 
 	public void write(Writer writer, Map<String, Object> props) throws IOException {
 		writeMap(writer, props);
+	}
+
+	public String writeToString(Map<String, Object> props) throws IOException {
+		try (StringWriter writer = new StringWriter()) {
+			write(writer, props);
+			return writer.toString();
+		}
 	}
 
 	private void writeObject(Writer writer, Object obj) throws IOException {
