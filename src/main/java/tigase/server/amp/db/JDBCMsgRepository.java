@@ -371,7 +371,7 @@ public class JDBCMsgRepository
 
 	@Override
 	public boolean storeMessage(JID from, JID to, Date expired, Element msg, NonAuthUserRepository userRepo)
-			throws UserNotFoundException {
+			throws UserNotFoundException, TigaseDBException {
 		if (log.isLoggable(Level.FINEST)) {
 			log.log(Level.FINEST, "Storring expired: {0} message: {1}",
 					new Object[]{expired, Packet.elemToString(msg)});
@@ -435,6 +435,7 @@ public class JDBCMsgRepository
 			} else {
 				log.log(Level.WARNING, "Problem adding new entry to DB: ", e);
 			}
+			throw new TigaseDBException("Could not store message", e);
 		} finally {
 			lock.unlock();
 		}
