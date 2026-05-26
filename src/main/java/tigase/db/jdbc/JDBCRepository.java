@@ -1073,27 +1073,23 @@ public class JDBCRepository
 	}
 
 	private String buildNodeQuery(long uid, String node_path) {
-		String query = "select nid as nid1 from " + DEF_NODES_TBL + " where (uid = " + uid + ")" +
-				" AND (parent_nid is null)" + " AND (node = '" + DEF_ROOT_NODE + "')";
+		StringBuilder innerJoin = new StringBuilder();
+		int cnt = 1;
 
-		if (node_path == null) {
-			return query;
-		} else {
+		if (node_path != null) {
 			StringTokenizer strtok = new StringTokenizer(node_path, "/", false);
-			int cnt = 1;
-			String subquery = query;
-
 			while (strtok.hasMoreTokens()) {
 				String token = strtok.nextToken();
+				int next = cnt + 1;
+				innerJoin.append(" INNER JOIN ").append(DEF_NODES_TBL).append(" t").append(next)
+						.append(" ON t").append(next).append(".parent_nid = t").append(cnt).append(".nid")
+						.append(" AND t").append(next).append(".uid = ").append(uid)
+						.append(" AND t").append(next).append(".node = '").append(token).append("'");
+				cnt = next;
+			}
+		}
 
-				++cnt;
-				subquery = "select nid as nid" + cnt + ", node as node" + cnt + " from " + DEF_NODES_TBL + ", (" +
-						subquery + ") nodes" + (cnt - 1) + " where (parent_nid = nid" + (cnt - 1) + ")" +
-						" AND (node = '" + token + "')";
-			}    // end of while (strtok.hasMoreTokens())
-
-			return subquery;
-		}      // end of else
+		return "SELECT t" + cnt + ".nid FROM " + DEF_NODES_TBL + " t1" + innerJoin + " WHERE (t1.uid = " + uid + ") AND (t1.parent_nid IS NULL) AND (t1.node = '" + DEF_ROOT_NODE + "')";
 	}
 
 	private long createNodePath(DataRepository repo, BareJID user_id, String node_path)
