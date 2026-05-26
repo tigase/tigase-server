@@ -19,10 +19,7 @@ package tigase;
 
 import tigase.xml.Element;
 
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertTrue;
 
@@ -79,6 +76,9 @@ public class Assert {
 					.allMatch(expChild -> actual.findChild(actChild -> equals(expChild, actChild)) != null)) {
 				return false;
 			}
+		}
+		if (!Objects.equals(expected.getCData(), actual.getCData())) {
+			return false;
 		}
 		return true;
 	}

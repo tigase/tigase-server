@@ -258,7 +258,7 @@ public class PushNotificationsTest
 		Packet expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid,
 																			   "push-node",
 																			   PushNotificationHelper.createPlainNotification(
-																					   1, senderJid, msgBody));
+																					   1, senderJid, "New secure message. Open to see the message."));
 
 		assertElementEquals(expNotification.getElement(), results.poll().packet.getElement());
 
@@ -277,9 +277,48 @@ public class PushNotificationsTest
 		expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid, "push-node",
 																		PushNotificationHelper.createPlainNotification(2,
 																													   senderJid,
-																													   "New secure message. Open to see the message."));
+																													   msgBody));
 
 		assertElementEquals(expNotification.getElement(), results.poll().packet.getElement());
+	}
+
+	@Test
+	public void test_notificationGenerationForOMEMONoBody() throws Exception {
+		getInstance(UserRepository.class).setData(recipientJid.getBareJID(), "urn:xmpp:push:0",
+		                                          pushServiceJid + "/push-node",
+		                                          new Element("settings", new String[]{"jid", "node"},
+		                                                      new String[]{pushServiceJid.toString(),
+		                                                                   "push-node"}).toString());
+
+		Element msg = new Element("message", new String[]{"xmlns"},
+		                          new String[]{"jabber:client"});
+		msg.addChild(new Element("encrypted", new String[]{"xmlns"}, new String[]{"eu.siacs.conversations.axolotl"}));
+		Packet packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		Queue<SessionManagerHandlerImpl.Item> results = getInstance(SessionManagerHandlerImpl.class).getOutQueue();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(1, results.size());
+
+		Packet expNotification = PushNotificationHelper.createPushNotification(pushServiceJid, recipientJid,
+		                                                                       "push-node",
+		                                                                       PushNotificationHelper.createPlainNotification(
+																					   1, senderJid, "New secure message. Open to see the message."));
+
+		assertElementEquals(expNotification.getElement(), results.poll().packet.getElement());
+
+		msg = new Element("message", new String[]{"xmlns"},
+		                  new String[]{"jabber:client"});
+		packet = Packet.packetInstance(msg, senderJid, recipientJid);
+
+		msgRepository.storeMessage(senderJid, recipientJid, new Date(), packet.getElement(), null);
+
+		results.clear();
+		pushNotifications.notifyNewOfflineMessage(packet, null, new ArrayDeque<>(), new HashMap<>());
+
+		assertEquals(0, results.size());
 	}
 
 	@Test

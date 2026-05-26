@@ -262,8 +262,15 @@ public class PushNotifications
 			return false;
 		}
 
-		if (session == null && packet.getElemName() == Message.ELEM_NAME && packet.getElemChild("body") != null) {
-			return true;
+		if (session == null && packet.getElemName() == Message.ELEM_NAME) {
+			if (packet.getElemChild("body") != null) {
+				return true;
+			}
+			boolean isEncrypted = packet.getElemChild("encrypted", "eu.siacs.conversations.axolotl") != null ||
+					packet.getElemChild("encrypted", "urn:xmpp:omemo:1") != null;
+			if (isEncrypted) {
+				return true;
+			}
 		}
 
 		for (PushNotificationsExtension trigger : triggers) {

@@ -59,7 +59,7 @@ public class AbstractPushNotifications
 	public static final String ID = XMLNS;
 	private static final Logger log = Logger.getLogger(AbstractPushNotifications.class.getCanonicalName());
 	private static final String JABBER_X_DATA_XMLNS = "jabber:x:data";
-	private static final String SUMMARY_XMLNS = XMLNS + ":summary";
+	private static final String SUMMARY_XMLNS = "urn:xmpp:push:summary";
 	private static final SimpleParser parser = SingletonFactory.getParserInstance();
 
 	@ConfigField(desc = "Send notifications with body", alias = "with-body")
