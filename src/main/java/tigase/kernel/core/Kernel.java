@@ -17,20 +17,24 @@
  */
 package tigase.kernel.core;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.kernel.BeanUtils;
 import tigase.kernel.KernelException;
 import tigase.kernel.beans.*;
 import tigase.kernel.beans.config.AbstractBeanConfigurator;
 import tigase.kernel.beans.config.BeanConfigurator;
 import tigase.kernel.core.BeanConfig.State;
+import tigase.server.XMPPServer;
 import tigase.sys.TigaseRuntime;
 import tigase.util.ExceptionUtilities;
+import tigase.util.Version;
 import tigase.util.reflection.ReflectionHelper;
 
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1106,6 +1110,20 @@ public class Kernel {
 
 	private Object createNewInstance(BeanConfig beanConfig) {
 		try {
+			if (beanConfig.getClazz() != null) {
+				TigaseDeprecated deprecated = beanConfig.getClazz().getAnnotation(TigaseDeprecated.class);
+				if (deprecated != null) {
+					String removeIn = Optional.ofNullable(deprecated.removeIn()).filter(Predicate.not(String::isBlank)).or(() -> {
+						try {
+
+							return Optional.of(new Version.Builder(XMPPServer.getVersion().getMajor() + 1, 0, 0).build().toString());
+						} catch (IllegalArgumentException e) {
+							return Optional.empty();
+						}
+					}).orElse("UNKNOWN");
+					log.warning(() -> "Class " + beanConfig.getClazz().getCanonicalName() + " used by bean " + beanConfig.getBeanName() + " is deprecated and will be removed in version " + removeIn);
+				}
+			}
 			if (beanConfig.getFactory() != null) {
 				BeanFactory<?> factory = beanConfig.getKernel().getInstance(beanConfig.getFactory());
 				return factory.createInstance();
