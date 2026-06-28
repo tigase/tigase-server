@@ -23,12 +23,14 @@ import tigase.conf.ConfigReader;
 import tigase.db.UserRepository;
 import tigase.db.comp.ConfigRepository;
 import tigase.db.util.SchemaManager;
+import tigase.io.repo.CertificateRepository;
 import tigase.kernel.core.BeanConfig;
 import tigase.kernel.core.Kernel;
 import tigase.util.ClassUtil;
 import tigase.util.ui.console.CommandlineParameter;
 import tigase.util.ui.console.ParameterParser;
 import tigase.util.ui.console.Task;
+import tigase.vhosts.VHostComponentRepository;
 import tigase.vhosts.VHostItemDefaults;
 import tigase.vhosts.VHostItemExtensionManager;
 import tigase.vhosts.VHostJDBCRepository;
@@ -191,7 +193,13 @@ java.util.logging.ConsoleHandler.formatter = tigase.util.log.LogFormatter""";
 
 		vhostRepository = new VHostJDBCRepository();
 		vhostRepository.setRepo(repositoryHolder.getDefaultRepository(UserRepository.class));
-		vhostRepository.setMainVHostName((String) config.get("default-virtual-host"));
+		String defVirtualHost = switch (config.get("default-virtual-host")) {
+			case String s -> s;
+			case ConfigReader.Variable v -> v.calculateValue().toString();
+			case null -> throw new ConfigReader.ConfigException("Default virtual host required");
+			default -> throw new ConfigReader.ConfigException("Incorrect value for default virtual host");
+		};
+		vhostRepository.setMainVHostName(defVirtualHost);
 		vhostRepository.setExtensionManager(new VHostItemExtensionManager());
 		vhostRepository.setVhostDefaultValues(new VHostItemDefaults());
 		vhostRepository.reload();
@@ -199,6 +207,12 @@ java.util.logging.ConsoleHandler.formatter = tigase.util.log.LogFormatter""";
 		Field f = ConfigRepository.class.getDeclaredField("initialized");
 		f.setAccessible(true);
 		f.set(vhostRepository, true);
+
+		repositoryHolder.registerRepository(VHostComponentRepository.class, "default", vhostRepository);
+
+		CertificateRepository certRepo = new CertificateRepository();
+		certRepo.setRepo(repositoryHolder.getDefaultRepository(UserRepository.class));
+		repositoryHolder.registerRepository(CertificateRepository.class, "default", certRepo);
 		
 		for (RepositoryManagerExtension extension : extensions) {
 			extension.initialize(kernel, dataSourceHelper, repositoryHolder, rootPath);

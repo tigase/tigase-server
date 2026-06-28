@@ -137,6 +137,12 @@ To list all of the options available for importing data (ie. allowing to import 
    	--plain-credentials,  (optional)
    		Import PLAIN credentials (default: false)
 
+	--include-ssl-certs,  (optional)
+		Import SSL certificates (default: false)
+
+	--include-vhosts,  (optional)
+		Import virtual hosts settings (if any exist) (default: false)
+
    	--include-mix,  (optional)
    		Include MIX component data (default: false)
 

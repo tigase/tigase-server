@@ -33,14 +33,14 @@ public class RepositoryHolder {
 	}
 
 	private final DataSourceHelper dataSourceHelper;
-	private final List<SchemaManager.RepoInfo> allRepoInfos;
+	private final List<SchemaManager.RepoInfo> allDataSourceRepoInfos;
 	private final Map<RepoCacheKey, Object> repoCache = new ConcurrentHashMap<>();
 	private final Map<Class, Function> prepFuncs = new ConcurrentHashMap<>();
 
 	public RepositoryHolder(DataSourceHelper dataSourceHelper,
-							List<SchemaManager.RepoInfo> allRepoInfos) {
+							List<SchemaManager.RepoInfo> allDataSourceRepoInfos) {
 		this.dataSourceHelper = dataSourceHelper;
-		this.allRepoInfos = allRepoInfos;
+		this.allDataSourceRepoInfos = allDataSourceRepoInfos;
 	}
 
 	public <X> X getDefaultRepository(Class<X> ifc)
@@ -53,7 +53,7 @@ public class RepositoryHolder {
 		RepoCacheKey key = new RepoCacheKey(ifc, name);
 		X repo = (X) repoCache.get(key);
 		if (repo == null) {
-			List<SchemaManager.RepoInfo> matchingClasses = allRepoInfos.stream()
+			List<SchemaManager.RepoInfo> matchingClasses = allDataSourceRepoInfos.stream()
 					.filter(repoInfo -> ifc.isAssignableFrom(repoInfo.getImplementation()))
 					.toList();
 			SchemaManager.RepoInfo repoInfo = findRepoInfo(matchingClasses, name).or(
@@ -66,6 +66,11 @@ public class RepositoryHolder {
 
 	public <X> void registerPrepFn(Class<X> ifc, Function<X, X> func) {
 		prepFuncs.put(ifc, func);
+	}
+
+	public void registerRepository(Class repositoryClass, String name,
+	                               Object repository) {
+		repoCache.put(new RepoCacheKey(repositoryClass, name), repository);
 	}
 
 	protected <X> X prepareRepository(X repo)

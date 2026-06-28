@@ -29,6 +29,8 @@ public interface ImporterExtension {
 
 	boolean handleElement(Element element) throws Exception;
 
+	default void elementCData(String cdata) throws Exception {}
+
 	default boolean endElement(String name) throws Exception {
 		return false;
 	}

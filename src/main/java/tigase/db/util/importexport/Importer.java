@@ -162,6 +162,12 @@ public class Importer {
 	protected void elementCData(String cdata) {
 		if (!readElements.isEmpty()) {
 			readElements.peek().addCData(cdata);
+		} else if (activeExtension != null) {
+			try {
+				activeExtension.elementCData(cdata);
+			} catch (Throwable ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 	}
 
@@ -353,9 +359,10 @@ public class Importer {
 
 	public void process(BufferedReader reader) throws IOException {
 		ImportXMLHandler importXMLHandler = new ImportXMLHandler(this);
+		char[] buf = new char[16*1024];
 		while (reader.ready()) {
-			String data = reader.readLine();
-			parser.parse(importXMLHandler, data);
+			int read = reader.read(buf);
+			parser.parse(importXMLHandler, buf, 0, read);
 		}
 	}
 }
