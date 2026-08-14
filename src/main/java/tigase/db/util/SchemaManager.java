@@ -1139,6 +1139,10 @@ public class SchemaManager {
 			return implementation;
 		}
 
+		public String getBeanName() {
+			return beanConfig.getBeanName();
+		}
+
 		@Override
 		public String toString() {
 			return beanConfig.getBeanName() + "[dataSource=" + dataSource.getName() + ", class=" + implementation + "]";

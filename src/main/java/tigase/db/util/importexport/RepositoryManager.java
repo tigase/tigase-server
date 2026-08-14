@@ -183,10 +183,6 @@ java.util.logging.ConsoleHandler.formatter = tigase.util.log.LogFormatter""";
 
 		List<SchemaManager.RepoInfo> repositories = SchemaManager.getRepositories(kernel, repoBeans, config);
 
-		Map<String, SchemaManager.RepoInfo> userRepoMap = repositories.stream()
-				.filter(repoInfo -> UserRepository.class.isAssignableFrom(repoInfo.getImplementation()))
-				.collect(Collectors.toMap(repoInfo -> repoInfo.getDataSource().getName(), Function.identity()));
-
 		dataSourceHelper = new DataSourceHelper(
 				repositories.stream().map(SchemaManager.RepoInfo::getDataSource).distinct().toList());
 		repositoryHolder = new RepositoryHolder(dataSourceHelper, repositories);

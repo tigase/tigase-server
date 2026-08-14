@@ -25,8 +25,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 public class RepositoryHolder {
+
+	Logger log = Logger.getLogger(RepositoryHolder.class.getName());
 
 	private record RepoCacheKey(Class<?> ifc, String name) {
 
@@ -58,6 +61,9 @@ public class RepositoryHolder {
 					.toList();
 			SchemaManager.RepoInfo repoInfo = findRepoInfo(matchingClasses, name).or(
 					() -> findRepoInfo(matchingClasses, "default")).orElseThrow();
+
+			log.info("Using repository bean: " + repoInfo + " to import domain: " + name);
+
 			repo = prepareRepository((X) dataSourceHelper.createRepository(repoInfo));
 			repoCache.put(key, repo);
 		}
@@ -84,6 +90,9 @@ public class RepositoryHolder {
 	}
 
 	private Optional<SchemaManager.RepoInfo> findRepoInfo(List<SchemaManager.RepoInfo> repoInfos, String name) {
-		return repoInfos.stream().filter(repoInfo -> name.equals(repoInfo.getDataSource().getName())).findFirst();
+		return repoInfos.stream().filter(repoInfo -> {
+			log.info("Checking domain name " + name + " against repository (bean): " + repoInfo);
+            return name.equals(repoInfo.getBeanName());
+        }).findFirst();
 	}
 }
