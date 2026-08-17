@@ -208,6 +208,7 @@ java.util.logging.ConsoleHandler.formatter = tigase.util.log.LogFormatter""";
 
 		CertificateRepository certRepo = new CertificateRepository();
 		certRepo.setRepo(repositoryHolder.getDefaultRepository(UserRepository.class));
+		certRepo.initialize();
 		repositoryHolder.registerRepository(CertificateRepository.class, "default", certRepo);
 		
 		for (RepositoryManagerExtension extension : extensions) {

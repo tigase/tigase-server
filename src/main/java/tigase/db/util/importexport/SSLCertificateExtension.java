@@ -108,6 +108,7 @@ public class SSLCertificateExtension extends RepositoryManagerExtensionBase {
 					log.info(() -> "importing SSL certificate " + domain + " with alias " + item.getAlias() + "...");
 					log.finest(() -> "importing SSL certificate " + domain + " with alias " + item.getAlias() + " from " + certEl.toStringPretty());
 					item.initFromElement(certEl);
+					log.finest(() -> "'" + domain + "' imported SSL certificate, alias " + item.getAlias() + " element " + item.toElement());
 					certificateRepository.addItem(item);
 				} else {
 					log.info(() -> "skipping import of SSL certificate " + domain);
