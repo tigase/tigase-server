@@ -352,6 +352,7 @@ public class Importer {
 	}
 	
 	public void process(Path path) throws IOException {
+		log.info("Processing file: " + path);
 		try (BufferedReader reader = Files.newBufferedReader(path)) {
 			process(reader);
 		}

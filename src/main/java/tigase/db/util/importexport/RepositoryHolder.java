@@ -91,7 +91,7 @@ public class RepositoryHolder {
 
 	private Optional<SchemaManager.RepoInfo> findRepoInfo(List<SchemaManager.RepoInfo> repoInfos, String name) {
 		return repoInfos.stream().filter(repoInfo -> {
-			log.info("Checking domain name " + name + " against repository (bean): " + repoInfo);
+			log.fine("Checking domain name " + name + " against repository (bean): " + repoInfo);
             return name.equals(repoInfo.getBeanName());
         }).findFirst();
 	}
