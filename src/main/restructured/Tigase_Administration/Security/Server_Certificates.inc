@@ -362,6 +362,147 @@ For greater automation it’s possible to automate updating certificate obtained
 
 .. _certificateStorage:
 
+
+
+Caddy update hook and Tigase API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For greater automation it’s possible to automate updating certificate obtained with ``Caddy`` in Tigase XMPP Server. It requires using ``exec`` plugin. For convinience there is ready Docker image containing it: ``ghcr.io/tigase/caddy_xcaddy_route53_exec:latest``.
+
+Caddy configuration is really simple, just add even handler do you Caddyfile:
+
+.. code::
+
+    {
+        events {
+            on cert_obtained exec /bin/sh /usr/local/bin/cert-hook.sh {event.data.identifier} {event.data.certificate_path} {event.data.private_key_path}
+            on cert_renewed exec /bin/sh /usr/local/bin/cert-hook.sh {event.data.identifier} {event.data.certificate_path} {event.data.private_key_path}
+        }
+    }
+
+And you can configure it via environment variables:
+
+.. code::
+
+    - HOOK_USER_NAME=certbot_updater
+    - HOOK_USER_DOMAIN=myawesome.xmpp.com
+    - HOOK_PASS=certbot_updater
+    - HOOK_HOST=xmpp
+    - HOOK_PROTOCOL=http
+    - PORT=8080
+
+
+Which would translate to a request being made to ``http://certbot_updater%40tigase.org:<USER_PASS>@xmpp:8080/rest/adhoc/vhost-man@test.localhost`` (HOOK_USER_NAME is the localpart and HOOK_USER_DOMAIN is the domain of the user having rights to update the certificate, i.e.: ``HOOK_USER_NAME@HOOK_USER_DOMAIN``
+
+.. Note::
+
+   It's recommended to create dedicated user responsible for updating the certificate configured as domain administrator  to limit the scope of the access the user has on the server.
+
+.. code:: bash
+
+    #!/bin/sh
+
+    #set -x
+    set -e
+
+    ## Called by Caddy events.handlers.exec plugin (https://github.com/mholt/caddy-events-exec) with:
+    ##   $1 = domain (e.g. "example.com" or "*.example.com")
+    ##   $2 = certificate file path
+    ##   $3 = key file path
+    ##
+    ## Caddy cert storage layout:
+    ##   /data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/<domain>/
+    ##     <domain>.crt   — fullchain (leaf + intermediates, already combined)
+    ##     <domain>.key   — private key
+
+    DOMAIN_RAW="${1}"
+    CERT_PATH="${2}"
+    KEY_PATH="${3}"
+
+    ## Strip wildcard prefix for API calls (*.example.com → example.com)
+    case "$DOMAIN_RAW" in
+        \*\.*) CERT_DOMAIN="${DOMAIN_RAW#*.}" ;;
+        *)     CERT_DOMAIN="$DOMAIN_RAW" ;;
+    esac
+
+
+    ## Configuration — set via Docker environment variables
+    USER_NAME="${HOOK_USER_NAME:?HOOK_USER_NAME not set}"
+    USER_DOMAIN="${HOOK_USER_DOMAIN:?HOOK_USER_DOMAIN not set}"
+    USER_PASS="${HOOK_PASS:?HOOK_PASS not set}"
+    DOMAIN="${HOOK_DOMAIN:?HOOK_DOMAIN not set}"
+    HOST="${HOOK_HOST:-${DOMAIN}}"
+    PROTOCOL="${HOOK_PROTOCOL:-https}"
+    # PORT=":8080"
+    # APIKEY="?api-key=mySecretKey"
+
+    BASE_DIR="${CERT_BASE:-/data/caddy}"
+    CERT_FILE="${BASE_DIR}/${CERT_PATH}"
+    KEY_FILE="${BASE_DIR}/${KEY_PATH}"
+
+    if [ -f "$CERT_FILE" ]; then cert_exists="YES"; else cert_exists="NO"; fi
+    if [ -f "$KEY_FILE" ]; then key_exists="YES"; else key_exists="NO"; fi
+    echo "  PARAMETERS:   $*"
+    echo "  DOMAIN_RAW:   ${DOMAIN_RAW}"
+    echo "  CERT_DOMAIN:  ${CERT_DOMAIN}"
+    echo "  CERT_FILE:    ${CERT_FILE}"
+    echo "  KEY_FILE:     ${KEY_FILE}"
+    echo "  Endpoint:     ${PROTOCOL}://${USER_NAME}%40${USER_DOMAIN}:<USER_PASS>@${HOST}:${PORT}/rest/adhoc/vhost-man@${CERT_DOMAIN}${APIKEY}"
+    echo "  Cert exists:  ${cert_exists}"
+    echo "  Key exists:   ${key_exists}"
+
+
+    if [ ! -f "$CERT_FILE" ] || [ ! -f "$KEY_FILE" ]; then
+        echo "ERROR: cert or key not found in ${CERT_DIR}" >&2
+        exit 1
+    fi
+
+    CERT=$(cat "$CERT_FILE" "$KEY_FILE")
+
+    REQUEST="
+    <command>
+      <node>ssl-certificate-add</node>
+      <fields>
+        <item>
+          <var>Certificate in PEM format</var>
+          <value>${CERT}</value>
+        </item>
+        <item>
+          <var>command-marker</var>
+          <value>command-marker</value>
+        </item>
+        <item>
+          <var>VHost</var>
+          <value>${CERT_DOMAIN}</value>
+        </item>
+        <item>
+          <var>Save permanently (to disk or repository)</var>
+          <value>true</value>
+        </item>
+      </fields>
+    </command>"
+
+    echo "Pushing certificate for ${CERT_DOMAIN}..."
+
+    response=$(curl -s -L \
+        -H "Content-Type: text/xml" \
+        -X POST \
+        "${PROTOCOL}://${USER_NAME}%40${USER_DOMAIN}:${USER_PASS}@${HOST}:${PORT}/rest/adhoc/vhost-man@${CERT_DOMAIN}${APIKEY}" \
+        -d "${REQUEST}")
+
+    case "$response" in
+        *"loaded successfully"*)
+            echo "Successfully updated certificate for ${CERT_DOMAIN}"
+            ;;
+        *)
+            echo "ERROR updating ${CERT_DOMAIN}, response: ${response}" >&2
+            exit 1
+            ;;
+    esac
+
+    #set +x
+
+
 Storing and managing certificates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
