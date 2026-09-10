@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 
 import static tigase.auth.XmppSaslException.SaslError;
 
+/// XEP-0388: Extensible SASL Profile implementation
 @Bean(name = SaslAuth2.ID, parent = SessionManager.class, active = false)
 public class SaslAuth2 extends SaslAuthAbstract
 		implements XMPPProcessorIfc {
@@ -230,7 +231,9 @@ public class SaslAuth2 extends SaslAuthAbstract
 							session.putSessionData(SASL_SERVER_KEY, ss);
 
 							UserAgent userAgent = parseUserAgent(packet);
-							session.putSessionData(USER_AGENT_KEY, userAgent);
+							if (userAgent != null) {
+								session.putSessionData(USER_AGENT_KEY, userAgent);
+							}
 							List<Element> features = packet.getElement().findChildren(el -> el.getName() != "initial-response" && el.getName() != "user-agent");
 							if (features != null && !features.isEmpty()) {
 								session.putSessionData(SASL_FEATURES_KEY, features);
