@@ -83,6 +83,7 @@ public class DataRepositoryImpl
 	private String check_table_query = OTHER_CHECK_TABLE_QUERY;
 	private Connection conn = null;
 	private PreparedStatement conn_valid_st = null;
+	@ConfigField(desc = "How often connection validation should be performed", alias = "connection-validate-interval")
 	private long connectionValidateInterval = TimeUnit.SECONDS.toMillis(60);
 	private dbTypes database = null;
 	private String db_conn = null;
