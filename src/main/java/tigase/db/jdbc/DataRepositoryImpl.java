@@ -537,9 +537,8 @@ public class DataRepositoryImpl
 			};
 			if (query.isPresent()) {
 				try (ResultSet resultSet = statement.executeQuery(query.get())) {
-					if (resultSet.next() && !resultSet.getBoolean(1)) {
+					if (resultSet.next() && resultSet.getBoolean(1)) {
 						return true;
-
 					}
 				}
 			}
