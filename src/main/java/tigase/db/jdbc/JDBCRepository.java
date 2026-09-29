@@ -617,7 +617,7 @@ public class JDBCRepository
 			long nid = getNodeNID(null, user_id, subnode);
 
 			if (nid > 0) {
-				deleteSubnode(null, nid);
+				deleteSubnode(null, user_id, nid);
 				cache.remove(user_id + "/" + subnode);
 			}
 		} catch (SQLException e) {
@@ -682,7 +682,7 @@ public class JDBCRepository
 		synchronized (repo) {
 			try {
 				uid = getUserUID(repo, user_id, autoCreateUser);
-				nid = getNodeNID(repo, uid, subnode);
+				nid = getNodeNID(repo, user_id, uid, subnode);
 				if (log.isLoggable(Level.FINEST)) {
 					log.log(Level.FINEST, "Saving data setting data, user_id: {0}, subnode: {1}, key: {2}, " +
 							"uid: {3}, nid: {4}, value: {5}", new Object[]{user_id, subnode, key, uid, nid, value});
@@ -698,7 +698,7 @@ public class JDBCRepository
 						// time write data to the same location, like offline messages....
 						// Let's try to get the nid again.
 						// OK
-						nid = getNodeNID(repo, uid, subnode);
+						nid = getNodeNID(repo, user_id, uid, subnode);
 					}
 				}
 
@@ -836,7 +836,7 @@ public class JDBCRepository
 			uid = getUserUID(repo, user_id, autoCreateUser);
 
 			// OK
-			nid = getNodeNID(repo, uid, subnode);
+			nid = getNodeNID(repo, user_id, uid, subnode);
 			if (log.isLoggable(Level.FINEST)) {
 				log.log(Level.FINEST, "Saving data adding data list, user_id: {0}, subnode: {1}, key: {2}, " +
 								"uid: {3}, nid: {4}, list: {5}",
@@ -853,7 +853,7 @@ public class JDBCRepository
 					// time write data to the same location, like offline messages....
 					// Let's try to get the nid again.
 					// OK
-					nid = getNodeNID(repo, uid, subnode);
+					nid = getNodeNID(repo, user_id, uid, subnode);
 				}
 			}
 
@@ -915,14 +915,14 @@ public class JDBCRepository
 		}
 	}
 
-	private long addNode(DataRepository repo, long uid, long parent_nid, String node_name) throws SQLException {
+	private long addNode(DataRepository repo, BareJID user_id, long uid, long parent_nid, String node_name) throws SQLException {
 		ResultSet rs = null;
 		PreparedStatement node_add_sp = null;
 
 		if (repo == null) {
-			node_add_sp = data_repo.getPreparedStatement(null, ADD_NODE_QUERY);
+			node_add_sp = data_repo.getPreparedStatement(user_id, ADD_NODE_QUERY);
 		} else {
-			node_add_sp = repo.getPreparedStatement(null, ADD_NODE_QUERY);
+			node_add_sp = repo.getPreparedStatement(user_id, ADD_NODE_QUERY);
 		}
 		synchronized (node_add_sp) {
 			try {
@@ -1051,7 +1051,7 @@ public class JDBCRepository
 		long uid = getUserUID(repo, user_id, autoCreateUser);
 
 		// OK
-		long nid = getNodeNID(repo, uid, null);
+		long nid = getNodeNID(repo, user_id, uid, null);
 		StringTokenizer strtok = new StringTokenizer(node_path, "/", false);
 		StringBuilder built_path = new StringBuilder();
 
@@ -1061,30 +1061,30 @@ public class JDBCRepository
 			built_path.append("/").append(token);
 
 			// OK
-			long cur_nid = getNodeNID(repo, uid, built_path.toString());
+			long cur_nid = getNodeNID(repo, user_id, uid, built_path.toString());
 
 			if (cur_nid > 0) {
 				nid = cur_nid;
 			} else {
 
 				// OK
-				nid = addNode(repo, uid, nid, token);
+				nid = addNode(repo, user_id, uid, nid, token);
 			}    // end of if (cur_nid > 0) else
 		}      // end of while (strtok.hasMoreTokens())
 
 		return nid;
 	}
 
-	private void deleteSubnode(DataRepository repo, long nid) throws SQLException {
+	private void deleteSubnode(DataRepository repo, BareJID user_id, long nid) throws SQLException {
 		Statement stmt = null;
 		ResultSet rs = null;
 		String query = null;
 
 		try {
 			if (repo == null) {
-				stmt = data_repo.createStatement(null);
+				stmt = data_repo.createStatement(user_id);
 			} else {
-				stmt = repo.createStatement(null);
+				stmt = repo.createStatement(user_id);
 			}
 			query = "delete from " + DEF_PAIRS_TBL + " where nid = " + nid;
 			stmt.executeUpdate(query);
@@ -1095,7 +1095,7 @@ public class JDBCRepository
 		}
 	}
 
-	private long getNodeNID(DataRepository repo, long uid, String node_path)
+	private long getNodeNID(DataRepository repo, BareJID user_id, long uid, String node_path)
 			throws SQLException, UserNotFoundException {
 		String query = buildNodeQuery(uid, node_path);
 
@@ -1109,9 +1109,9 @@ public class JDBCRepository
 
 		try {
 			if (repo == null) {
-				stmt = data_repo.createStatement(null);
+				stmt = data_repo.createStatement(user_id);
 			} else {
-				stmt = repo.createStatement(null);
+				stmt = repo.createStatement(user_id);
 			}
 			rs = stmt.executeQuery(query);
 			if (rs.next()) {
@@ -1125,7 +1125,7 @@ public class JDBCRepository
 									 "root node now.");
 
 					// OK
-					nid = addNode(repo, uid, -1, "root");
+					nid = addNode(repo, user_id, uid, -1, "root");
 				} else {
 					if (log.isLoggable(Level.FINEST)) {
 						log.log(Level.FINEST, "Missing nid for node path: {0} and uid: {1}",
@@ -1154,7 +1154,7 @@ public class JDBCRepository
 		long uid = getUserUID(repo, user_id, autoCreateUser);
 
 		// OK
-		long result = getNodeNID(repo, uid, node_path);
+		long result = getNodeNID(repo, user_id, uid, node_path);
 
 		if (result > 0) {
 			cache.put(user_id + "/" + node_path, Long.valueOf(result));
