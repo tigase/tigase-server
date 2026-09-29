@@ -157,6 +157,9 @@ public class DataRepositoryPool
 
 	@Override
 	public Statement createStatement(BareJID user_id) throws SQLException {
+		if (user_id == null && log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "user_id is NULL when creating statement");
+		}
 		DataRepository repo = takeRepo(user_id);
 
 		if (repo != null) {
@@ -170,6 +173,10 @@ public class DataRepositoryPool
 
 	@Override
 	public PreparedStatement getPreparedStatement(BareJID user_id, String stIdKey) throws SQLException {
+		if (user_id == null && log.isLoggable(Level.FINEST)) {
+			log.log(Level.FINEST, "user_id is NULL for statement key: " + stIdKey);
+		}
+
 		DataRepository repo = takeRepo(user_id);
 
 		if (repo != null) {

@@ -483,7 +483,7 @@ public class JDBCMsgRepository
 	@Override
 	protected void deleteMessage(Long msg_id) {
 		try {
-			PreparedStatement delete_id_st = data_repo.getPreparedStatement(null, MSGS_DELETE_MESSAGE);
+			PreparedStatement delete_id_st = data_repo.getPreparedStatement(msg_id.hashCode(), MSGS_DELETE_MESSAGE);
 
 			synchronized (delete_id_st) {
 				delete_id_st.setLong(1, msg_id);
