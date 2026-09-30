@@ -17,6 +17,7 @@
  */
 package tigase.xmpp.impl;
 
+import tigase.annotations.TigaseDeprecated;
 import tigase.db.MsgRepositoryIfc;
 import tigase.db.NonAuthUserRepository;
 import tigase.db.TigaseDBException;
@@ -728,6 +729,8 @@ public class OfflineMessages
 	 * Implementation of {@code MsgRepositoryIfc} interface providing basic support for storing and loading of Elements
 	 * from repository.
 	 */
+	@Deprecated
+	@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0", note = "Use JDBCMsgRepository instead")
 	private class MsgRepositoryImpl
 			implements OfflineMsgRepositoryIfc {
 
