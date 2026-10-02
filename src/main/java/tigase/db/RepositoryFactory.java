@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
 @Deprecated
-@TigaseDeprecated(since = "8.0.0")
+@TigaseDeprecated(since = "8.0.0", removeIn = "9.0.0", note = "No longer used")
 public abstract class RepositoryFactory {
 
 	public static final String AUTH_DOMAIN_POOL_CLASS = "--auth-domain-repo-pool";

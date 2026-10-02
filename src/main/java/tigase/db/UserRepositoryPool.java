@@ -39,6 +39,8 @@ import java.util.logging.Logger;
  *
  * @author <a href="mailto:artur.hefczyc@tigase.org">Artur Hefczyc</a>
 */
+@Deprecated
+@TigaseDeprecated(since = "8.5.0", removeIn = "9.0.0", note = "No longer used")
 public class UserRepositoryPool
 		implements UserRepository, RepositoryPool<UserRepository> {
 
