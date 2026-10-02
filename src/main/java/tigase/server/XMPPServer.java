@@ -139,6 +139,10 @@ public final class XMPPServer {
 		return inOSGi;
 	}
 
+	public static boolean isClusterModeEnabled() {
+		return bootstrap != null && ServerBeanSelector.getClusterMode(bootstrap.getKernel());
+	}
+
 	public static void setOSGi(boolean val) {
 		inOSGi = val;
 	}
