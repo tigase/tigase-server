@@ -21,6 +21,8 @@ import tigase.annotations.TigaseDeprecated;
 import tigase.db.*;
 import tigase.db.util.JDBCPasswordObfuscator;
 import tigase.db.util.RepositoryVersionAware;
+import tigase.kernel.beans.config.ConfigField;
+import tigase.server.XMPPServer;
 import tigase.util.cache.SimpleCache;
 import tigase.xmpp.jid.BareJID;
 
@@ -99,7 +101,20 @@ public class JDBCRepository
 	// ~--- fields ---------------------------------------------------------------
 	private AuthRepository auth = null;
 	private boolean autoCreateUser = false;
-	// Cache moved to connection pool
+
+	@ConfigField(desc = "Cache enabled")
+	private boolean cacheEnabled = true;
+
+	@ConfigField(desc = "Cache size")
+	private int cacheSize = 10000;
+
+	@ConfigField(desc = "Cache time")
+	private int cacheTimeInSeconds = XMPPServer.isClusterModeEnabled() ? 5 : 60;
+
+	public void setCacheTimeInSeconds(int cacheTimeInSeconds) {
+		this.cacheTimeInSeconds = cacheTimeInSeconds;
+	}
+
 	private IRepoCache<String, Object> cache = null;
 	private DataRepository data_repo = null;
 	private String get_users_query = null;
@@ -512,11 +527,11 @@ public class JDBCRepository
 			if (connection_str.contains("autoCreateUser=true")) {
 				autoCreateUser = true;
 			}    // end of if (db_conn.contains())
-			if (connection_str.contains("cacheRepo=off")) {
-				log.fine("Disabling cache.");
+			if (connection_str.contains("cacheRepo=off") || !cacheEnabled) {
+				log.info("UserRepository cache is disabled");
 				cache = new RepoNoCache();
 			} else {
-				cache = new RepoCache(10000, 60 * 1000);
+				cache = new RepoCache(cacheSize, cacheTimeInSeconds * 1000L);
 			}
 			data_repo.initPreparedStatement(GET_USER_DB_UID_QUERY, GET_USER_DB_UID_QUERY);
 			data_repo.initPreparedStatement(GET_USERS_COUNT_QUERY, GET_USERS_COUNT_QUERY);

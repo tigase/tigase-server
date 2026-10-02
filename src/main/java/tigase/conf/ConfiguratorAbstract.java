@@ -182,8 +182,11 @@ public abstract class ConfiguratorAbstract
 				// In cluster mode we switch DB cache off as this does not play well.
 				if (CLUSTER_MODE.equals(entry.getKey())) {
 					if ("true".equalsIgnoreCase(entry.getValue().toString())) {
-						System.setProperty("tigase.cache", "false");
-						log.log(Level.WARNING, "Tigase cache turned off");
+//						System.setProperty("tigase.cache", "false");
+						log.log(Level.WARNING, "You are running in Clustered Mode. Previously Tigase cache was turned off automatically globally. " +
+								"Currently its configuration is more granular and cluster mode mostly decreases cache lifetime " +
+								"(for example from 60s to 5s for JDBCRepository). You can still completely disable the cache by setting `-Dtigase.cache=off` " +
+								"or via beans configuration. Please consult documentation for details");
 					}
 				}
 			}

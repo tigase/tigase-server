@@ -259,8 +259,11 @@ public class Bootstrap {
 			clusterMode = Boolean.parseBoolean((String) clusterMode);
 		}
 		if ((Boolean) clusterMode) {
-			System.setProperty("tigase.cache", "false");
-			log.log(Level.INFO, "Tigase cache turned off");
+//			System.setProperty("tigase.cache", "false");
+			log.log(Level.WARNING, "You are running in Clustered Mode. Previously Tigase cache was turned off automatically globally. " +
+					"Currently its configuration is more granular and cluster mode mostly decreases cache lifetime " +
+					"(for example from 60s to 5s for JDBCRepository). You can still completely disable the cache by setting `-Dtigase.cache=off` " +
+					"or via beans configuration. Please consult documentation for details");
 		}
 		config.getProperties().put("cluster-mode", clusterMode);
 
