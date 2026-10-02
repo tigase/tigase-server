@@ -190,6 +190,15 @@ public class LdapAuthProvider
 
 	private boolean doBindAuthentication(BareJID userId, final String password)
 			throws UserNotFoundException, TigaseDBException, AuthorizationException {
+
+		// Explicitly reject empty or null passwords to prevent LDAP unauthenticated bind bypass
+		if (password == null || password.trim().isEmpty()) {
+			if (log.isLoggable(Level.FINE)) {
+				log.log(Level.FINE, "Authentication failed: password cannot be null or empty for user " + userId);
+			}
+			return false;
+		}
+
 		try {
 			Hashtable<Object, Object> env = new Hashtable<Object, Object>();
 			env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
